@@ -1440,7 +1440,7 @@ module N
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
       invariant { pelts !rp = pelts r }
-      invariant { 0 <= !c <= 1 }
+      invariant { 0 <= !c <= 1 } (*TODO c=0*)
       variant { sz - !i }
       label StartLoop in
       value_concat r !i (!i + sz);
@@ -4525,7 +4525,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           assert { power radix sy
                    = power radix (sy - 2) * radix * radix };
           assert { xp0 + radix * xp1
-                   + power radix 2 * !x1 at StartLoop (* radix * radix *)
+                   + radix * radix * !x1 at StartLoop
                    - !ql * (dl + radix * dh)
                   = rl + radix * rh };
           begin ensures { value (xd at SubProd) sy

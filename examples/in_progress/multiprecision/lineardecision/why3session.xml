@@ -150,10 +150,10 @@
   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC sprod.2" expl="exceptional postcondition" proved="true">
-  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC sprod.3" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1132,7 +1132,7 @@
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC linear_decision.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC linear_decision.11" expl="precondition" proved="true">
@@ -1142,24 +1142,24 @@
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC linear_decision.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC linear_decision.14" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
   <goal name="VC linear_decision.15" expl="exceptional postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.16" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC linear_decision.17" expl="exceptional postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
+  <goal name="VC linear_decision.17" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
   <goal name="VC linear_decision.18" expl="exceptional postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.19" expl="assertion" proved="true">
@@ -1190,10 +1190,10 @@
   <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="VC linear_decision.28" expl="exceptional postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.29" expl="exceptional postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.30" expl="exceptional postcondition" proved="true">
@@ -1230,10 +1230,10 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.41" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC linear_decision.42" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.43" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -1316,19 +1316,19 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC linear_decision.68" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC linear_decision.69" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
+  <goal name="VC linear_decision.69" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
   <goal name="VC linear_decision.70" expl="exceptional postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC linear_decision.71" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC linear_decision.72" expl="exceptional postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -2832,7 +2832,24 @@
 <theory name="Test2" sum="a38588d68003a039cb5d43eb15d507d6">
  <goal name="g">
  <transf name="reflection_f" arg1="int_decision">
-  <goal name="g.0" expl="reification check">
+  <goal name="g.0" expl="reification check" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="g.1">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Fmla" proved="true" sum="8647779672ac66d512da2e0faec50ac9">
+ <goal name="VC f" expl="VC for f" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="TestFmla" sum="0859686c2acb7a6b6ce7336b34e3e29c">
+ <goal name="g">
+ <transf name="reflection_f" arg1="f">
+  <goal name="g.0" expl="reification check" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="g.1">
   </goal>

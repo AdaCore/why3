@@ -587,6 +587,7 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
 =
   let n = a.rows in
   let m = a.columns in
+  (* print n; print m; *)
   let rec find_nonz (i j:int)
     requires { 0 <= i <= n }
     requires { 0 <= j < m }
@@ -745,7 +746,6 @@ let rec predicate valid_ctx' (ctx:context')
 let rec simp (e:expr') : expr
   ensures { forall y z. interp result y z = interp' e y z }
   ensures { valid_expr' e -> valid_expr result }
-(*  raises  { NonLinear -> true }*)
   raises  { C.Unknown -> true }
   variant { e }
 =
@@ -766,21 +766,6 @@ let rec simp (e:expr') : expr
   | Coeff c -> Cst c
   | ProdL e c | ProdR c e ->
     mul_expr (simp e) (simp_c c)
- (* | Prod (Var n) (Coeff c) -> Term c n
-  | Prod (Coeff c) (Var n) -> Term c n
-  | Prod (Coeff c1) (Coeff c2) -> Cst (C.mul c1 c2)
-  | Prod e1 e2 ->
-    let e1 = simp e1 in
-    let e2 = simp e2 in
-    match e1, e2 with
-    | Cst c1, Cst c2 -> Cst (C.mul c1 c2)
-    | Cst c1, Term c2 v | Term c2 v, Cst c1
-      -> Term (C.mul c1 c2) v
-    | Cst c, Add e1 e2 | Add e1 e2, Cst c ->
-      Add (mul_expr e1 c) (mul_expr e2 c)
-    | _ -> raise NonLinear; absurd
-    end *)
-  (*w/o absurd : type mismatch between () and expr in clone export 200 lines down ? *)
   end
 
 let simp_eq (eq:equality') : equality
@@ -1496,10 +1481,7 @@ let mp_decision (l: context') (g: equality') : bool
   requires { valid_eq' g }
   ensures  { forall y z. result -> pos_ctx' l z -> pos_eq' g z
              -> interp_ctx' l g y z }
-  raises  { R.Absurd -> true }
-(*  raises  { R.NonLinear -> true } *)
-  raises  { Unknown -> true }
-  raises  { Q.Unknown -> true }
+  raises  { R.Absurd -> true | Unknown -> true | Q.Unknown -> true }
 =
   R.decision (m_ctx l) (m_eq g)
 
@@ -1544,5 +1526,50 @@ goal g: forall x y z: int.
   x + y = 0 ->
   y - z = 0 ->
   x = 0
+
+end
+
+module Fmla
+
+
+
+use import map.Map
+use import int.Int
+
+type value
+constant dummy : value
+predicate foo value
+function add value value : value
+
+type term = Val int | Add term term
+type fmla = Forall fmla | Foo term
+
+function interp_term (t:term) (b:int->value) : value =
+  match t with
+  | Val n -> b n
+  | Add t1 t2 -> add (interp_term t1 b) (interp_term t2 b)
+  end
+
+function interp_fmla (f:fmla) (l:int) (b:int->value) : bool =
+  match f with
+  | Foo t -> foo (interp_term t b)
+  | Forall f -> forall v. interp_fmla f (l-1) b[l <- v]
+  end
+
+function interp (f:fmla) (b: int -> value) : bool =
+  interp_fmla f (-1) b
+
+let f (f:fmla) : bool
+  ensures { result -> forall b. interp f b }
+= false
+end
+
+module TestFmla
+
+use import Fmla
+
+goal g:
+     forall a: value.
+     ((forall x. forall y. foo (add x (add (add a dummy) y))) = True)
 
 end

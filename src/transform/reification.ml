@@ -9,7 +9,9 @@ exception NoReification
 exception Exit of string
 
 let debug = false
-
+let do_trans = true
+(* automatically perform helpful transformations to prove side conditions, set to false for debugging *)
+              
 let print_id fmt id = Format.fprintf fmt "%s" id.id_string
 
 let expl_reification_check = Ident.create_label "expl:reification check"
@@ -24,6 +26,8 @@ type reify_env = { kn: known_map;
                    ty_to_map: vsymbol Mty.t;
                    env: Env.env;
                    task: Task.task;
+                   bound_vars: Svs.t; (* bound variables, do not map them in a var map*)
+                   bound_fr: int; (* separate, negative index for bound vars*)
                  }
 
 let init_renv kn crc lv env task =
@@ -37,6 +41,8 @@ let init_renv kn crc lv env task =
     ty_to_map = Mty.empty;
     env = env;
     task = task;
+    bound_vars = Svs.empty;
+    bound_fr = -1;
   }
 
 let rec reify_term renv t rt =
@@ -56,20 +62,54 @@ let rec reify_term renv t rt =
       | _ -> false in
     if debug then Format.printf "use_interp %a: %b@." Pretty.print_term t r;
     r in
+  let add_to_maps renv vyl =
+     let var_maps, ty_to_map =
+       List.fold_left
+         (fun (var_maps, ty_to_map) vy ->
+           if Mty.mem vy.vs_ty ty_to_map
+           then (Mvs.add vy vy.vs_ty var_maps, ty_to_map)
+           else (Mvs.add vy vy.vs_ty var_maps,
+                 Mty.add vy.vs_ty vy ty_to_map))
+         (renv.var_maps, renv.ty_to_map)
+         (List.map
+            (fun t -> match t.t_node with Tvar vy -> vy | _ -> assert false)
+            vyl)
+     in
+     { renv with var_maps = var_maps; ty_to_map = ty_to_map }
+  in
+  let open Theory in
+  let th_list = Env.read_theory renv.env ["list"] "List" in
+  let ty_list = ns_find_ts th_list.th_export ["list"] in
+  let compat_h t rt =
+    match t.t_node, rt.t_node with
+    | Tapp (ls1,_), Tapp(ls2, _) -> ls_equal ls1 ls2
+    | Tquant (Tforall, _), Tquant (Tforall, _)
+      | Tquant (Texists, _), Tquant (Texists, _)-> true
+    | _ -> false in
+  let is_eq_true t = match t.t_node with
+    | Tapp (eq, [_; tr])
+       when ls_equal eq ps_equ && t_equal tr t_bool_true -> true
+    | _ -> false in
+  let lhs_eq_true t = match t.t_node with
+    | Tapp (eq, [t; tr])
+         when ls_equal eq ps_equ && t_equal tr t_bool_true -> t
+    | _ -> assert false in
   let rec invert_nonvar_pat vl (renv:reify_env) (p,f) t =
     if debug
     then Format.printf
            "invert_nonvar_pat p %a f %a t %a@."
            Pretty.print_pat p Pretty.print_term f Pretty.print_term t;
+    if is_eq_true f && not (is_eq_true t)
+    then invert_nonvar_pat vl renv (p, lhs_eq_true f) t else
     match p.pat_node, f.t_node, t.t_node with
     | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_nl f t ->
        if debug then Format.printf "case equal@.";
        renv, t
-    | Papp (cs, pl), Tapp(ls1, _), Tapp(ls2, _)
-         when ls_equal ls1 ls2
+    | Papp (cs, pl), _,_
+         when compat_h f t
               && Svs.for_all (fun v -> t_v_occurs v f = 1) p.pat_vars
               && List.for_all is_pvar pl
-              (* could remove this with a bit more work in term reconstruction *)
+                              (* could remove this with a bit more work in term reconstruction *)
       ->
        if debug then Format.printf "case app@.";
        let rec rt_of_var svs f t v (renv, acc) =
@@ -90,6 +130,13 @@ let rec reify_term renv t rt =
                    else aux l1 l2
                 | _ -> assert false in
               aux la1 la2
+           | Tquant (Tforall, tq1), Tquant (Tforall, tq2)
+             | Tquant (Texists, tq1), Tquant (Texists, tq2) ->
+              let _, _, t1 = t_open_quant tq1 in
+              let vl, _, t2 = t_open_quant tq2 in
+              let bv = List.fold_left Svs.add_left renv.bound_vars vl in
+              let renv = { renv with bound_vars = bv } in
+              rt_of_var svs t1 t2 v (renv, acc)
            | _ -> raise NoReification
        in
        let rec check_nonvar f t =
@@ -137,6 +184,15 @@ let rec reify_term renv t rt =
                      renv, acc))
              (renv,None) la1 la2 in
          renv, Opt.get rt
+    | Pvar v, Tquant(Tforall, tq1), Tquant(Tforall, tq2)
+      | Pvar v, Tquant(Texists, tq1), Tquant(Texists, tq2)
+         when t_v_occurs v f = 1 ->
+       if debug then Format.printf "case quant_var@.";
+       let _,_,t1 = t_open_quant tq1 in
+       let vl,_,t2 = t_open_quant tq2 in
+       let bv = List.fold_left Svs.add_left renv.bound_vars vl in
+       let renv = { renv with bound_vars = bv } in
+       invert_nonvar_pat vl renv (p, t1) t2
     | Por (p1, p2), _, _ ->
        if debug then Format.printf "case or@.";
        begin try invert_pat vl renv (p1, f) t
@@ -207,11 +263,20 @@ let rec reify_term renv t rt =
        else
          begin
            if debug then Format.printf "%a is new@." Pretty.print_term t;
-           let fr = renv.fr in
-           let vy = Mty.find vy.vs_ty renv.ty_to_map in
-           let store = Mterm.add t (vy, fr) renv.store in
-           let renv = { renv with store = store; fr = fr + 1 } in
-           (renv, app_pat (t_nat_const fr))
+           let bound = match t.t_node with
+             | Tvar v -> Svs.mem v renv.bound_vars
+             | _ -> false in
+           let renv, i=
+             if bound
+             then let i = renv.bound_fr in
+                  { renv with bound_fr = i-1 }, i
+             else 
+               let vy = Mty.find vy.vs_ty renv.ty_to_map in
+               let fr = renv.fr in
+               let store = Mterm.add t (vy, fr) renv.store in
+               { renv with store = store; fr = fr + 1 }, fr in
+           let const = Number.(ConstInt (int_const_of_int i)) in
+           (renv, app_pat (t_const const Ty.ty_int))
          end
     | _ -> raise NoReification
   and invert_pat vl renv (p,f) t =
@@ -234,7 +299,7 @@ let rec reify_term renv t rt =
                                 Pretty.print_ty (Opt.get t.t_ty);
              raise NoReification
       end
-  and invert_interp renv ls (t:term) = (*la ?*)
+  and invert_interp renv ls (t:term) =
     let ld = try Opt.get (find_logic_definition renv.kn ls)
              with _ ->
                   if debug
@@ -265,6 +330,9 @@ let rec reify_term renv t rt =
             with NoReification ->
                  if debug then Format.printf "match failed@."; aux invert l in
        (try aux invert_nonvar_pat bl with NoReification -> aux invert_var_pat bl)
+    | Tapp (ls', _) ->
+       if debug then Format.printf "case app@.";
+       invert_interp renv ls' t
     | _ -> if debug then Format.printf "function body not handled@.";
            if debug then Format.printf "f: %a@." Pretty.print_term f;
            raise NoReification
@@ -282,10 +350,7 @@ let rec reify_term renv t rt =
   and invert_ctx_body renv ls vl f t l g =
     match f.t_node with
     | Tcase ({t_node = Tvar v}, [tbn; tbc] ) when vs_equal v (List.hd vl) ->
-       let open Theory in
-       let th_list = Env.read_theory renv.env ["list"] "List" in
        let ty_g = g.vs_ty in
-       let ty_list = ns_find_ts th_list.th_export ["list"] in
        let ty_list_g = ty_app ty_list [ty_g] in
        if (not (ty_equal ty_list_g l.vs_ty))
        then (if debug
@@ -348,21 +413,6 @@ let rec reify_term renv t rt =
     | _ -> if debug then Format.printf "not a match on list@.";
            raise NoReification
   in
-  let add_to_maps renv vyl =
-     let var_maps, ty_to_map =
-       List.fold_left
-         (fun (var_maps, ty_to_map) vy ->
-           if Mty.mem vy.vs_ty ty_to_map
-           then (Mvs.add vy vy.vs_ty var_maps, ty_to_map)
-           else (Mvs.add vy vy.vs_ty var_maps,
-                 Mty.add vy.vs_ty vy ty_to_map))
-         (renv.var_maps, renv.ty_to_map)
-         (List.map
-            (fun t -> match t.t_node with Tvar vy -> vy | _ -> assert false)
-            vyl)
-     in
-     { renv with var_maps = var_maps; ty_to_map = ty_to_map }
-  in
   if debug then Format.printf "reify_term t %a rt %a@."
                               Pretty.print_term t Pretty.print_term rt;
   if not (oty_equal t.t_ty rt.t_ty)
@@ -391,6 +441,7 @@ let rec reify_term renv t rt =
      reify_term (reify_term renv t1 rt1) t2 rt2
   | _, Tapp(eq,[{t_node=Tapp(interp, {t_node = Tvar l}::{t_node = Tvar g}::vyl)}; tr])
        when ls_equal eq ps_equ && t_equal tr t_bool_true
+            && ty_equal (ty_app ty_list [g.vs_ty]) l.vs_ty
             && List.mem l renv.lv
             && List.mem g renv.lv
             && List.for_all
@@ -402,6 +453,14 @@ let rec reify_term renv t rt =
      if debug then Format.printf "case context@.";
      let renv = add_to_maps renv vyl in
      invert_ctx_interp renv interp t l g
+  | Tbinop(Tiff,t,{t_node=Ttrue}), Tapp(eq,[{t_node=Tapp(interp, {t_node = Tvar f}::vyl)}; tr])
+       when ls_equal eq ps_equ && t_equal tr t_bool_true
+            && t.t_ty=None ->
+     if debug then Format.printf "case interp_fmla@.";
+     if debug then Format.printf "t %a rt %a@." Pretty.print_term t Pretty.print_term rt;
+     let renv = add_to_maps renv vyl in
+     let renv, rf = invert_interp renv interp t in
+     { renv with subst = Mvs.add f rf renv.subst }
   | _ -> if debug then Format.printf "no reify_term match@.";
          if debug then Format.printf "lv = [%a]@."
                                      (Pp.print_list Pp.space Pretty.print_vs)
@@ -493,29 +552,34 @@ let build_goals prev prs subst env lp g rt =
     with _ ->
          if debug then Format.printf "no cut found@.";
          let t = Trans.apply (Ind_itp.revert_tr_symbol [Tsprsymbol hr]) task_r in
-         let t = Trans.apply compute_in_goal t in
-         match t with
-         | [t] ->
-            let rewrite pr = Apply.rewrite None false pr None in
-            let lt, prs =
+         if do_trans
+         then
+           let t = Trans.apply compute_in_goal t in
+           match t with
+           | [t] ->
+              let rewrite pr = Apply.rewrite None false pr None in
+              let lt, prs =
+                List.fold_left
+                  (fun (acc, f) pr ->
+                    try (Lists.apply (Trans.apply (rewrite pr)) acc,f)
+                    with _ -> acc, pr::f)
+                  ([t],[]) prs in
+              (* for the prs that failed once, trying again seems to work ? *)
               List.fold_left
-                (fun (acc, f) pr ->
-                  try (Lists.apply (Trans.apply (rewrite pr)) acc,f)
-                  with _ -> acc, pr::f)
-                ([t],[]) prs in
-            (* for the prs that failed once, trying again seems to work ? *)
-            List.fold_left
-              (fun acc pr ->
-                try Lists.apply (Trans.apply (rewrite pr)) acc
-                with _ -> acc)
-              lt (List.rev prs)
-
-         | [] -> []
-         | _ -> assert false in
+                (fun acc pr ->
+                  try Lists.apply (Trans.apply (rewrite pr)) acc
+                  with _ -> acc)
+                lt (List.rev prs)
+                
+           | [] -> []
+           | _ -> assert false
+         else [t] in
   let lt = List.map (fun ng -> Task.add_decl prev
                        (create_prop_decl Pgoal (create_prsymbol (id_fresh "G")) ng))
                     inst_lp in
-  let lt = Lists.apply (Trans.apply compute_in_goal) lt in
+  let lt = if do_trans
+           then Lists.apply (Trans.apply compute_in_goal) lt
+           else lt in
   if debug then Format.printf "done@.";
   ltask_r@lt
 
