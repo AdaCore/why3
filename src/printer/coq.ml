@@ -604,12 +604,11 @@ let intros fmt fmla =
 let print_empty_proof fmt def =
   match def with
     | Some (_params,fmla) ->
+      fprintf fmt "Proof.@\n";
       if need_intros fmla then intros fmt fmla;
-      fprintf fmt "@\n@\n";
-      fprintf fmt "Qed.@\n"
+      fprintf fmt "@\n@\nQed.@\n"
     | None ->
-      fprintf fmt "@\n";
-      fprintf fmt "Defined.@\n"
+      fprintf fmt "Proof.@\n@\nDefined.@\n"
 
 let print_previous_proof def info fmt previous =
   match previous with
