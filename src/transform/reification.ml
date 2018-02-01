@@ -9,9 +9,7 @@ exception NoReification
 exception Exit of string
 
 let debug = false
-let do_trans = true
-(* automatically perform helpful transformations to prove side conditions, set to false for debugging *)
-              
+
 let print_id fmt id = Format.fprintf fmt "%s" id.id_string
 
 let expl_reification_check = Ident.create_label "expl:reification check"
@@ -270,7 +268,7 @@ let rec reify_term renv t rt =
              if bound
              then let i = renv.bound_fr in
                   { renv with bound_fr = i-1 }, i
-             else 
+             else
                let vy = Mty.find vy.vs_ty renv.ty_to_map in
                let fr = renv.fr in
                let store = Mterm.add t (vy, fr) renv.store in
@@ -387,7 +385,7 @@ let rec reify_term renv t rt =
           let rec add_to_ctx (renv, ctx) e =
             try
               match e.t_node with
-              | Tquant _ | Teps _ -> (renv, ctx)
+              | Teps _ -> (renv, ctx)
               | Tbinop (Tand,e1,e2) ->
                  add_to_ctx (add_to_ctx (renv, ctx) e1) e2
               | _ ->
@@ -520,7 +518,7 @@ let build_vars_map renv prev =
       renv.store (prev,prs) in
   subst, prev, prs
 
-let build_goals prev prs subst env lp g rt =
+let build_goals do_trans prev prs subst env lp g rt =
   if debug then Format.printf "building goals@.";
   let inst_rt = t_subst subst rt in
   if debug then Format.printf "reified goal instantiated@.";
@@ -570,7 +568,7 @@ let build_goals prev prs subst env lp g rt =
                   try Lists.apply (Trans.apply (rewrite pr)) acc
                   with _ -> acc)
                 lt (List.rev prs)
-                
+
            | [] -> []
            | _ -> assert false
          else [t] in
@@ -596,8 +594,8 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
-  let subst, prev, prs= build_vars_map renv prev in
-  build_goals prev prs subst env lp g rt)
+  let subst, prev, prs = build_vars_map renv prev in
+  build_goals true prev prs subst env lp g rt)
 
 open Mltree
 open Expr
@@ -1173,7 +1171,9 @@ let rec term_of_value = function
 
 (*exception FunctionNotFound*)
 
-let reflection_by_function s env = Trans.store (fun task ->
+exception ReductionFail of reify_env
+
+let reflection_by_function do_trans s env = Trans.store (fun task ->
   if debug then Format.printf "reflection_f start@.";
   let kn = task_known task in
   let nt = Args_wrapper.build_naming_tables task in
@@ -1254,17 +1254,29 @@ let reflection_by_function s env = Trans.store (fun task ->
                        cs = [];
                        } in
           if debug then Format.printf "eval_fun@.";
-          let res = term_of_value (eval_fun decl info) (*(try eval_fun decl info with Raised _ -> Vbool false)*) in
+          let res =
+            try term_of_value (eval_fun decl info)
+            with Raised (s1, s2) ->
+              Format.eprintf "Raised %s %s@." s1 s2;
+              raise (ReductionFail renv) (*(try eval_fun decl info with Raised _ -> Vbool false)*) in
           if debug then Format.printf "res %a@." Pretty.print_term res;
           let rinfo = {renv with subst = Mvs.add vres res renv.subst} in
           rinfo, lp, lv, rt
         with NoReification -> reify_post t
       end
   in
-  let rinfo, lp, _lv, rt = reify_post lpost in
-  let lp = (rs.rs_cty.cty_pre)@lp in
-  let subst, prev, prs = build_vars_map rinfo prev in
-  build_goals prev prs subst env lp g rt)
+  try
+    let rinfo, lp, _lv, rt = reify_post lpost in
+    let lp = (rs.rs_cty.cty_pre)@lp in
+    let subst, prev, prs = build_vars_map rinfo prev in
+    build_goals do_trans prev prs subst env lp g rt
+  with
+    ReductionFail renv ->
+    (* proof failed, show reification context for debugging *)
+    let _, prev, _ = build_vars_map renv prev in
+    let fg = create_prsymbol (id_fresh "Failure") in
+    let df = create_prop_decl Pgoal fg t_false in
+    [Task.add_decl prev df] )
 
 let () = wrap_and_register
            ~desc:"reflection_l <prop> attempts to prove the goal by reflection using the lemma prop"
@@ -1274,8 +1286,12 @@ let () = wrap_and_register
 let () = wrap_and_register
            ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the program function f"
            "reflection_f"
-           (Tstring Tenvtrans_l) reflection_by_function
+           (Tstring Tenvtrans_l) (reflection_by_function true)
 
+let () = wrap_and_register
+           ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the program function f, does not automatically perform transformations afterward. Use for debugging."
+           "reflection_f_nt"
+           (Tstring Tenvtrans_l) (reflection_by_function false)
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.."

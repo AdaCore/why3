@@ -1256,7 +1256,7 @@ let madd (a b:t)
                   = qinterp q1 *. p +. qinterp q2 *. p
                   = minterp a y +. minterp b y };
       (q,e1) end
-    else raise Unknown
+    else (print a; print b; raise Unknown)
   end
 
 let mmul (a b:t)
@@ -1486,6 +1486,7 @@ let mp_decision (l: context') (g: equality') : bool
   R.decision (m_ctx l) (m_eq g)
 
 end
+
 module TestMP
 
 use import LinearDecisionIntMP
@@ -1530,8 +1531,6 @@ goal g: forall x y z: int.
 end
 
 module Fmla
-
-
 
 use import map.Map
 use import int.Int
