@@ -821,7 +821,7 @@ let print_recursive_decl ~old info fmt dl =
   List.iter (print_equivalence_lemma ~old info fmt) dl_syn
 
 let print_ind info fmt (pr,f) =
-  fprintf fmt "@[<4>| %a : %a@]" print_pr pr (print_term info) f
+  fprintf fmt "@[<hv 4>| %a :@ @[%a@]@]" print_pr pr (print_term info) f
 
 let print_ind_decl info fmt ps bl =
   let _, _, all_ty_params = ls_ty_vars ps in
