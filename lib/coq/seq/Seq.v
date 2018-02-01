@@ -32,8 +32,7 @@ decide equality.
 Qed.
 
 (* Why3 goal *)
-Definition length : forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z.
-intros a a_WT.
+Definition length {a:Type} {a_WT:WhyType a} : (seq a) -> Z.
 exact (fix len l := match l with
   | nil => 0 | cons _ t => 1 + len t end)%Z.
 Defined.
@@ -41,9 +40,8 @@ Defined.
 Hint Unfold length.
 
 (* Why3 goal *)
-Lemma length_nonnegative :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:seq a), (0%Z <= (length s))%Z.
-intros a a_WT.
+Lemma length_nonnegative {a:Type} {a_WT:WhyType a} :
+  forall (s:seq a), (0%Z <= (length s))%Z.
 induction s.
 auto with *.
 unfold length. fold length. omega.

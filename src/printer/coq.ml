@@ -418,7 +418,7 @@ let read_until_or_eof re s i ch =
   | End_of_file -> ()
 
 let read_old_proof =
-  let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :(.]+\\)" in
+  let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :({.]+\\)" in
   let def_end = Str.regexp ".*[.]$" in
   let old_intros = Str.regexp "^ *([*] Why3 intros " in
   let old_end = Str.regexp ".*[*])" in
@@ -591,28 +591,20 @@ let rec do_intros n fmt fmla =
       List.iter forget_var vsl
     | _ -> ()
 
-let intros_params fmt params =
-  Stv.iter
-    (fun tv ->
-      let n = id_unique iprinter tv.tv_name in
-      fprintf fmt "@ %s %s_WT" n n)
-    params
-
-let need_intros params fmla =
-  not (Stv.is_empty params) ||
+let need_intros fmla =
   match fmla.t_node with
   | Tlet _
   | Tquant(Tforall,_)
   | Tbinop(Timplies, _, _) -> true
   | _ -> false
 
-let intros fmt params fmla =
-  fprintf fmt "@[intros%a%a.@]" intros_params params (do_intros 1) fmla
+let intros fmt fmla =
+  fprintf fmt "@[intros%a.@]" (do_intros 1) fmla
 
 let print_empty_proof fmt def =
   match def with
-    | Some (params,fmla) ->
-      if need_intros params fmla then intros fmt params fmla;
+    | Some (_params,fmla) ->
+      if need_intros fmla then intros fmt fmla;
       fprintf fmt "@\n@\n";
       fprintf fmt "Qed.@\n"
     | None ->
@@ -625,8 +617,8 @@ let print_previous_proof def info fmt previous =
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
     begin match def with
-    | Some (p, f) when not info.realization && need_intros p f ->
-        fprintf fmt "@[(* Why3 %a *)@]@\n" (fun fmt f -> intros fmt p f) f
+    | Some (_p, f) when not info.realization && need_intros f ->
+        fprintf fmt "@[(* Why3 %a *)@]@\n" (fun fmt f -> intros fmt f) f
     | _ -> ()
     end;
     fprintf fmt "%s" c
@@ -745,8 +737,9 @@ let print_param_decl ~prev info fmt ls =
         (print_term info) e;
       List.iter forget_var vl
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition %a :@ @[<hv>%a@[%a%a.@]@]@]@\n%a@\n"
-        print_ls ls (print_params info ~whytypes:true) all_ty_params
+      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition @[<h>%a%a@] :@ @[%a%a.@]@]@\n%a@\n"
+        print_ls ls
+        (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
         (print_arrow_list (print_op_type info)) ls.ls_args
         (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
@@ -776,11 +769,10 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
   let def_formula = ls_defn_axiom ld in
   fprintf fmt
-    "(* Why3 goal *)@\n@[<hv 2>Lemma %s :@ @[%a%a.@]@]@\n"
+    "(* Why3 goal *)@\n@[<hv 2>Lemma @[<h>%s%a@] :@ @[%a.@]@]@\n%a@\n"
     name
-    (print_params info ~whytypes:true) all_ty_params
-    (print_term info) def_formula;
-  fprintf fmt "%a@\n"
+    (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
+    (print_term info) def_formula
     (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
 
 let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
@@ -871,8 +863,9 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
         print_pr pr (print_params info ~whytypes:true) params
         (print_term info) f
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s %a :@ @[<hv>%a@[%a.@]@]@]@\n%a@\n"
-        stt print_pr pr (print_params info ~whytypes:true) params
+      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s @[<h>%a%a@] :@ @[%a.@]@]@\n%a@\n"
+        stt print_pr pr
+        (print_tv_binders info ~whytypes:true ~implicit:true) params
         (print_term info) f
         (print_previous_proof (Some (params,f)) info) prev
   else

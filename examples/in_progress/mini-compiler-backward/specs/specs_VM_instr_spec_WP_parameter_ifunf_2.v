@@ -536,7 +536,7 @@ Theorem WP_parameter_ifunf : forall {a:Type} {a_WT:WhyType a},
   c_glob, post2) mc mc') /\ ~ ((infix_at post2 mc') = true)) -> forall (x1:Z)
   (x2:(list Z)) (x3:(map id Z)) (x4:Z), (mc' = (VMC x1 x2 x3 x4)) ->
   (mc = mc'))).
-intros a a_WT pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5) x1 x2 x3
+intros pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5) x1 x2 x3
 x4 h6.
 remember post2 as post;unfold post2 in *;clear post2.
 inversion h4;subst. trivial.

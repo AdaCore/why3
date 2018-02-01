@@ -175,10 +175,10 @@ Theorem WP_parameter_enqueue : forall {a:Type} {a_WT:WhyType a},
   (rho5 = (rho1 + 1%Z)%Z) -> forall (rho6:(@list a a_WT)),
   (rho6 = (infix_plpl rho (Cons x (Nil :(@list a a_WT))))) ->
   (rho6 = (to_list (mk_array rho3 o) rho2 rho5))).
-(* Why3 intros a a_WT x rho rho1 rho2 rho3 rho4
+(* Why3 intros x rho rho1 rho2 rho3 rho4
         ((((h1,((h2,h3),h4)),h5),h6),h7) (h8,h9) o (h10,h11) rho5 h12 rho6
         h13. *)
-intros a a_WT x rho rho1 rho2 rho3 rho4 ((((h1,((h2,h3),h4)),h5),h6),h7)
+intros x rho rho1 rho2 rho3 rho4 ((((h1,((h2,h3),h4)),h5),h6),h7)
 (h8,h9) o (h10,h11) rho5 h12 rho6 h13.
 subst rho6.
 symmetry.

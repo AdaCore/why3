@@ -22,10 +22,10 @@ Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)) : Prop :=
   end.
 
 (* Why3 goal *)
-Lemma is_none_spec : forall {a:Type} {a_WT:WhyType a}, forall (o:(option a)),
-  (is_none o) <-> (o = Init.Datatypes.None).
+Lemma is_none_spec {a:Type} {a_WT:WhyType a} :
+  forall (o:(option a)), (is_none o) <-> (o = Init.Datatypes.None).
 Proof.
-intros a a_WT o.
+intros o.
 split.
 now destruct o.
 now intros ->.

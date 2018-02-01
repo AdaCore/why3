@@ -462,9 +462,9 @@ Theorem WP_parameter_infix_tl : forall {a:Type} {a_WT:WhyType a},
   | (VMC p2 s m _) => exists ms:machine_state, (transition c_glob (VMS p2 s
       m) ms)
   end)))))))).
-(* Why3 intros a a_WT s1 s11 s2 s21 (h1,h2) code2 x p mc p1 x1 y z h3 (h4,h5)
+(* Why3 intros s1 s11 s2 s21 (h1,h2) code2 x p mc p1 x1 y z h3 (h4,h5)
         c_glob post2 mc' mc'' h6 h7 h8 h9 h10 h11 post21 h12 h13. *)
-intros a a_WT s1 s11 s2 s21 (h1,h2) code2 x p mc p1 x1 y z h3 (h4,h5) c_glob
+intros s1 s11 s2 s21 (h1,h2) code2 x p mc p1 x1 y z h3 (h4,h5) c_glob
 post2 mc' mc'' h6 h7 h8 h9 h10 h11 post21 h12 h13.
 Require Import Why3.
 Ltac cvc := why3 "CVC4,1.4," timelimit 10.

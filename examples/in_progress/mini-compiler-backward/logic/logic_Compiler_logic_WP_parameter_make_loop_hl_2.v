@@ -541,9 +541,9 @@ Theorem WP_parameter_make_loop_hl : forall {a:Type} {a_WT:WhyType a},
   | (VMC p2 s m _) => exists ms:machine_state, (transition c_glob (VMS p2 s
       m) ms)
   end)))))))).
-(* Why3 intros a a_WT c c1 c2 inv p x y z h1 (h2,h3) post2 x1 c_glob p1 mc'
+(* Why3 intros c c1 c2 inv p x y z h1 (h2,h3) post2 x1 c_glob p1 mc'
         mc'' h4 h5 h6 (h7,(h8,h9)) mc h10 h11 h12 post21 h13 h14. *)
-intros a a_WT c c1 c2 inv p x y z h1 (h2,h3) post2 x1 c_glob p1 mc' mc'' h4
+intros c c1 c2 inv p x y z h1 (h2,h3) post2 x1 c_glob p1 mc' mc'' h4
 h5 h6 (h7,(h8,h9)) mc h10 h11 h12 post21 h13 h14.
 Require Import Why3.
 Ltac cvc := why3 "CVC4,1.4,".

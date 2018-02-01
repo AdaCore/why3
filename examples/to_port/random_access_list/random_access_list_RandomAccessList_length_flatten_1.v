@@ -42,7 +42,7 @@ Fixpoint flatten {a:Type} {a_WT:WhyType a} (l:(list (a*
 Theorem length_flatten : forall {a:Type} {a_WT:WhyType a},
   forall (l:(list (a* a)%type)),
   ((list.Length.length (flatten l)) = (2%Z * (list.Length.length l))%Z).
-intros a a_WT l.
+intros l.
 induction l.
 auto.
 simpl (flatten (a0::l)).
