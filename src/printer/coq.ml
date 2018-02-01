@@ -346,9 +346,6 @@ and print_tbranch info fmt br =
     (print_pat info) p (print_term info) t;
   Svs.iter forget_var p.pat_vars
 
-let print_expr info fmt =
-  TermTF.t_select (print_term info fmt) (print_term info fmt)
-
 (** Declarations *)
 
 let print_constr info ts fmt (cs,_) =
@@ -745,7 +742,7 @@ let print_param_decl ~prev info fmt ls =
         "(* Why3 comment *)@\n\
          (* %a is replaced with %a by the coq driver *)@\n@\n"
         print_ls ls
-        (print_expr info) e;
+        (print_term info) e;
       List.iter forget_var vl
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition %a :@ @[<hv>%a@[%a%a.@]@]@]@\n%a@\n"
@@ -771,7 +768,7 @@ let print_logic_decl info fmt (ls,ld) =
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_list_pre space (print_vsty info)) vl
     (print_ls_type info) ls.ls_value
-    (print_expr info) e;
+    (print_term info) e;
   List.iter forget_var vl;
   fprintf fmt "@\n"
 
@@ -782,7 +779,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
     "(* Why3 goal *)@\n@[<hv 2>Lemma %s :@ @[%a%a.@]@]@\n"
     name
     (print_params info ~whytypes:true) all_ty_params
-    (print_expr info) def_formula;
+    (print_term info) def_formula;
   fprintf fmt "%a@\n"
     (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
 
@@ -813,7 +810,7 @@ let print_recursive_decl info fmt (ls,ld) =
     (print_list_pre space (print_vsty info)) vl
     print_vs (List.nth vl i)
     (print_ls_type info) ls.ls_value
-    (print_expr info) e;
+    (print_term info) e;
   List.iter forget_var vl
 
 let print_recursive_decl ~old info fmt dl =
