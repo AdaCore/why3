@@ -202,7 +202,7 @@ let rec num_lines s acc tr =
       (color_of_status ~dark:true) (th_proved s th)
       name;
     if th_proved s th then
-      fprintf fmt "fully verified in %%.02f s"
+      fprintf fmt "fully verified" (*TODO in %%.02f s*)
     else fprintf fmt "not fully verified";
     fprintf fmt "</span></h2>@\n";
 
