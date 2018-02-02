@@ -755,7 +755,7 @@ let print_param_decl ~prev info fmt ls =
 let print_logic_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
   let vl,e = open_ls_defn ld in
-  fprintf fmt "(* Why3 assumption *)@\n@[<hv 2>Definition @[%a%a%a :@ %a@] :=@ @[%a.@]@]@\n"
+  fprintf fmt "(* Why3 assumption *)@\n@[<hv 2>@[<4>Definition %a%a%a :@ %a@] :=@ @[%a.@]@]@\n"
     print_ls ls
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_list_pre space (print_vsty info)) vl

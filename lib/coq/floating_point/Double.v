@@ -150,56 +150,58 @@ Qed.
 
 (* Why3 assumption *)
 Definition of_real_post (m:floating_point.Rounding.mode) (x:R)
-  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
-  x)) /\ (((exact res) = x) /\ ((model res) = x)).
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (round m x)) /\ (((exact res) = x) /\ ((model res) = x)).
 
 (* Why3 assumption *)
 Definition add_post (m:floating_point.Rounding.mode)
-  (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double)
-  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
-  ((value x) + (value y))%R)) /\
+    (x:floating_point.DoubleFormat.double)
+    (y:floating_point.DoubleFormat.double)
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (round m ((value x) + (value y))%R)) /\
   (((exact res) = ((exact x) + (exact y))%R) /\
-  ((model res) = ((model x) + (model y))%R)).
+   ((model res) = ((model x) + (model y))%R)).
 
 (* Why3 assumption *)
 Definition sub_post (m:floating_point.Rounding.mode)
-  (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double)
-  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
-  ((value x) - (value y))%R)) /\
+    (x:floating_point.DoubleFormat.double)
+    (y:floating_point.DoubleFormat.double)
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (round m ((value x) - (value y))%R)) /\
   (((exact res) = ((exact x) - (exact y))%R) /\
-  ((model res) = ((model x) - (model y))%R)).
+   ((model res) = ((model x) - (model y))%R)).
 
 (* Why3 assumption *)
 Definition mul_post (m:floating_point.Rounding.mode)
-  (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double)
-  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
-  ((value x) * (value y))%R)) /\
+    (x:floating_point.DoubleFormat.double)
+    (y:floating_point.DoubleFormat.double)
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (round m ((value x) * (value y))%R)) /\
   (((exact res) = ((exact x) * (exact y))%R) /\
-  ((model res) = ((model x) * (model y))%R)).
+   ((model res) = ((model x) * (model y))%R)).
 
 (* Why3 assumption *)
 Definition div_post (m:floating_point.Rounding.mode)
-  (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double)
-  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
-  ((value x) / (value y))%R)) /\
+    (x:floating_point.DoubleFormat.double)
+    (y:floating_point.DoubleFormat.double)
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (round m ((value x) / (value y))%R)) /\
   (((exact res) = ((exact x) / (exact y))%R) /\
-  ((model res) = ((model x) / (model y))%R)).
+   ((model res) = ((model x) / (model y))%R)).
 
 (* Why3 assumption *)
 Definition neg_post (x:floating_point.DoubleFormat.double)
-  (res:floating_point.DoubleFormat.double): Prop :=
-  ((value res) = (-(value x))%R) /\ (((exact res) = (-(exact x))%R) /\
-  ((model res) = (-(model x))%R)).
+    (res:floating_point.DoubleFormat.double) : Prop :=
+  ((value res) = (-(value x))%R) /\
+  (((exact res) = (-(exact x))%R) /\ ((model res) = (-(model x))%R)).
 
 (* Why3 assumption *)
 Definition lt (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double): Prop := ((value x) < (value y))%R.
+    (y:floating_point.DoubleFormat.double) : Prop :=
+  ((value x) < (value y))%R.
 
 (* Why3 assumption *)
 Definition gt (x:floating_point.DoubleFormat.double)
-  (y:floating_point.DoubleFormat.double): Prop := ((value y) < (value x))%R.
+    (y:floating_point.DoubleFormat.double) : Prop :=
+  ((value y) < (value x))%R.
 
