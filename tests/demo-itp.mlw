@@ -1,3 +1,8 @@
+module Naming
+  use import int.Int
+  constant x : int
+  goal G : forall x:int. x >= 0 -> x = 0
+end
 
 module ApplyRewrite
 
