@@ -10,10 +10,65 @@
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../demo-itp.mlw">
-<theory name="ApplyRewrite" proved="true" sum="06c28a672d2fbb0de6998078f2cfe895">
- <goal name="g" proved="true">
+<theory name="Naming" sum="887148d0be0266efa5001ad2fedbe72e">
+ <goal name="G">
+ </goal>
+</theory>
+<theory name="ApplyRewrite" sum="a5d903eba2570fb4645483c4ff500ebb">
+ <goal name="g1" proved="true">
  <transf name="apply" proved="true" arg1="H">
  </transf>
+ <transf name="rewrite" proved="true" arg1="H">
+  <goal name="g1.0" proved="true">
+  <transf name="compute_in_goal" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g3" proved="true">
+ <transf name="apply" proved="true" arg1="Ha">
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="compute_specified" >
+  <goal name="g2.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="A" sum="1abc5293356c4003ce35806f735459dc">
+ <goal name="g1" proved="true">
+ <transf name="apply" proved="true" arg1="H">
+ </transf>
+ </goal>
+ <goal name="g">
+ </goal>
+ <goal name="ga" proved="true">
+ <transf name="apply" proved="true" arg1="Ha">
+ </transf>
+ </goal>
+ <goal name="gb">
+ </goal>
+</theory>
+<theory name="Soundness" sum="aa1c41b51a76f536179c52b8dcf8a473">
+ <goal name="A" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="Fail">
+ <transf name="assert" arg1="(forall y:int, z:int. y = z -&gt; p (\ x:int. f0 x y z))">
+  <goal name="Fail.0" proved="true">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="Fail.1">
+  <transf name="compute_specified" >
+   <goal name="Fail.1.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Absurd" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="TestCEX" sum="55ceea8b24a88c1829a53af2c814f1a6">

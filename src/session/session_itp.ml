@@ -1090,6 +1090,8 @@ let load_theory session parent_name old_provers acc th =
     List.iter2
       (load_goal session old_provers (Theory mth))
       th.Xml.elements goals;
+    let proved = bool_attribute "proved" th false in
+    Hid.add session.th_state thname proved;
     mth::acc
   | s ->
     Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."

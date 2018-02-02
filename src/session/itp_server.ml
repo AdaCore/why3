@@ -881,12 +881,10 @@ end
 
   (* -- send the task -- *)
   let task_of_id d id do_intros show_full_context loc =
-    let task,tables =
-      if do_intros then get_task d.cont.controller_session id
-      else
-        let task = get_raw_task d.cont.controller_session id in
-        let tables = Args_wrapper.build_naming_tables task in
-        task,tables
+    let task,tables = get_task d.cont.controller_session id in
+    let task =
+      if do_intros then task else
+        get_raw_task d.cont.controller_session id
     in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
@@ -924,7 +922,7 @@ end
                Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
                  res.Call_provers.pr_model
              in
-             result ^ "\n\n" ^ ce_result
+             result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
          | None -> "Result of the prover not available.\n"
        in
        P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
