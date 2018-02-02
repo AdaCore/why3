@@ -1,10 +1,8 @@
-(*
+(** {1 The Scottish private club puzzle} *)
 
-The classical example of the Scottish private club puzzle
+(* The club follows six rules:
 
-The club follows six rules:
-
- - every non-scotti``sh members wear red socks
+ - every non-scottish members wear red socks
 
  - every member wears a kilt or doesn't wear socks
 
@@ -16,11 +14,11 @@ The club follows six rules:
 
  - every scottish member wears a kilt
 
-Problem: prove that there is nobody in this club !
+Problem: prove that there is nobody in this club!
 
 *)
 
-theory ScottishClubProblem "the Scottish private club puzzle"
+theory ScottishClubProblem
 
   predicate is_scottish
   predicate wears_red_socks

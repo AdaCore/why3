@@ -1,5 +1,5 @@
 
-(* Greatest common divisor, using the Euclidean algorithm *)
+(** Greatest common divisor, using the Euclidean algorithm *)
 
 module EuclideanAlgorithm
 
@@ -10,7 +10,7 @@ module EuclideanAlgorithm
     variant  { v }
     requires { u >= 0 /\ v >= 0 }
     ensures  { result = gcd u v }
-  = "vc:sp"
+  = [@vc:sp]
     if v = 0 then
       u
     else
@@ -27,7 +27,7 @@ module EuclideanAlgorithmIterative
   let euclid (u0 v0: int) : int
     requires { u0 >= 0 /\ v0 >= 0 }
     ensures  { result = gcd u0 v0 }
-  = "vc:sp"
+  = [@vc:sp]
     let u = ref u0 in
     let v = ref v0 in
     while !v <> 0 do
@@ -77,7 +77,7 @@ module BinaryGcd
     variant  { (v, u) with lex }
     requires { u >= 0 /\ v >= 0 }
     ensures  { result = gcd u v }
-  = "vc:sp"
+  = [@vc:sp]
     if v > u then binary_gcd v u else
     if v = 0 then u else
     if mod u 2 = 0 then
@@ -121,7 +121,7 @@ module EuclideanAlgorithm63
     variant  { to_int v }
     requires { u >= 0 /\ v >= 0 }
     ensures  { result = gcd u v }
-  = "vc:sp"
+  = [@vc:sp]
     if v = 0 then
       u
     else

@@ -198,7 +198,7 @@ module Append
     end
 
   lemma Append_assoc:
-    forall l1 "induction" l2 l3: list 'a.
+    forall l1 [@induction] l2 l3: list 'a.
     l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 
   lemma Append_l_nil:
@@ -208,12 +208,12 @@ module Append
   use import int.Int
 
   lemma Append_length:
-    forall l1 "induction" l2: list 'a. length (l1 ++ l2) = length l1 + length l2
+    forall l1 [@induction] l2: list 'a. length (l1 ++ l2) = length l1 + length l2
 
   use import Mem
 
   lemma mem_append:
-    forall x: 'a, l1 "induction" l2: list 'a.
+    forall x: 'a, l1 [@induction] l2: list 'a.
     mem x (l1 ++ l2) <-> mem x l1 \/ mem x l2
 
   lemma mem_decomp:
@@ -234,7 +234,7 @@ module NthLengthAppend
     i < length l1 -> nth i (l1 ++ l2) = nth i l1
 
   lemma nth_append_2:
-    forall l1 "induction" l2: list 'a, i: int.
+    forall l1 [@induction] l2: list 'a, i: int.
     length l1 <= i -> nth i (l1 ++ l2) = nth (i - length l1) l2
 
 end
@@ -295,20 +295,20 @@ module RevAppend
   use import Append
 
   lemma rev_append_append_l:
-    forall r "induction" s t: list 'a.
+    forall r [@induction] s t: list 'a.
       rev_append (r ++ s) t = rev_append s (rev_append r t)
 
   use import int.Int
   use import Length
 
   lemma rev_append_length:
-    forall s "induction" t: list 'a.
+    forall s [@induction] t: list 'a.
       length (rev_append s t) = length s + length t
 
   use import Reverse
 
   lemma rev_append_def:
-    forall r "induction" s: list 'a. rev_append r s = reverse r ++ s
+    forall r [@induction] s: list 'a. rev_append r s = reverse r ++ s
 
   lemma rev_append_append_r:
     forall r s t: list 'a.
@@ -358,7 +358,7 @@ module Sorted
   use import Append
 
   lemma sorted_append:
-    forall  l1 "induction" l2: list t.
+    forall  l1 [@induction] l2: list t.
     (sorted l1 /\ sorted l2 /\ (forall x y: t. mem x l1 -> mem y l2 -> le x y))
     <->
     sorted (l1 ++ l2)
@@ -395,12 +395,12 @@ module RevSorted
   use import RevAppend
 
   lemma rev_append_sorted_incr:
-    forall s "induction" t: list t.
+    forall s [@induction] t: list t.
       Incr.sorted (rev_append s t) <->
         Decr.sorted s /\ Incr.sorted t /\ compat s t
 
   lemma rev_append_sorted_decr:
-    forall s "induction" t: list t.
+    forall s [@induction] t: list t.
       Decr.sorted (rev_append s t) <->
         Incr.sorted s /\ Decr.sorted t /\ compat t s
 
@@ -430,7 +430,7 @@ module NumOcc
   use import Append
 
   lemma Append_Num_Occ :
-    forall x: 'a, l1 "induction" l2: list 'a.
+    forall x: 'a, l1 [@induction] l2: list 'a.
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
 
   use import Reverse
@@ -512,7 +512,7 @@ module Distinct
   use import Append
 
   lemma distinct_append:
-    forall l1 "induction" l2: list 'a.
+    forall l1 [@induction] l2: list 'a.
     distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
     distinct (l1 ++ l2)
 
@@ -593,7 +593,7 @@ module FoldLeft
   use import Append
 
   lemma fold_left_append:
-    forall l1"induction" l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
+    forall l1 [@induction] l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
     fold_left f acc (l1++l2) = fold_left f (fold_left f acc l1) l2
 
 end
@@ -611,7 +611,7 @@ module FoldRight
   use import Append
 
   lemma fold_right_append:
-    forall l1"induction" l2: list 'a, f: 'a -> 'b -> 'b, acc : 'b.
+    forall l1 [@induction] l2: list 'a, f: 'a -> 'b -> 'b, acc : 'b.
     fold_right f (l1++l2) acc = fold_right f l1 (fold_right f l2 acc)
 
 end

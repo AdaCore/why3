@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -20,9 +20,9 @@ Require int.Int.
 
 (* Why3 goal *)
 Lemma abs_def :
-forall (x:Z),
- ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x))
- /\ ((~ (0%Z <= x)%Z) -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
+  forall (x:Z),
+  ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x)) /\
+  (~ (0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
 intros x.
 split ; intros H.
 now apply Zabs_eq.
@@ -35,16 +35,15 @@ Qed.
 
 (* Why3 goal *)
 Lemma Abs_le :
-forall (x:Z) (y:Z),
- ((ZArith.BinInt.Z.abs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\ (x <= y)%Z).
+  forall (x:Z) (y:Z),
+  ((ZArith.BinInt.Z.abs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\ (x <= y)%Z).
 intros x y.
 zify.
 omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_pos :
-forall (x:Z), (0%Z <= (ZArith.BinInt.Z.abs x))%Z.
+Lemma Abs_pos : forall (x:Z), (0%Z <= (ZArith.BinInt.Z.abs x))%Z.
 exact Zabs_pos.
 Qed.
 

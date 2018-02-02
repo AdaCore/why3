@@ -256,7 +256,7 @@ module BoundedIntegers
     Sum.sum (fun i -> (a[i] : int)) lo hi
 
   let maximum_subarray (a: array int63) (ghost lo hi: ref int): int63
-    requires { "no overflow" forall l h. 0 <= l <= h <= length a ->
+    requires { [@no overflow] forall l h. 0 <= l <= h <= length a ->
                sum a l h <= max_int }
     ensures { 0 <= !lo <= !hi <= length a && result  = sum a !lo !hi }
     ensures { forall l h. 0 <= l <= h <= length a -> result >= sum a !lo !hi }

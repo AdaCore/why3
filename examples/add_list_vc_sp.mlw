@@ -32,7 +32,7 @@ use import SumList
 let rec sum (l: list or_integer_float) : (int, real) =
     variant { l }
     returns { si, sf -> si = add_int l /\ sf = add_real l }
-  "vc:sp"
+  [@vc:sp]
   match l with
   | Nil -> 0, 0.0
   | Cons h t ->
@@ -44,7 +44,7 @@ let rec sum (l: list or_integer_float) : (int, real) =
   end
 
 let main () =
-  "vc:sp"
+  [@vc:sp]
   let l =
     Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
       (Cons (Real 1.4) (Cons (Integer 9) Nil))))
@@ -63,7 +63,7 @@ use import ref.Ref
 
 let sum (l: list or_integer_float) : (int, real) =
     returns { si, sf -> si = add_int l /\ sf = add_real l }
-  "vc:sp"
+  [@vc:sp]
   let si = ref 0 in
   let sf = ref 0.0 in
   let ll = ref l in
@@ -83,7 +83,7 @@ let sum (l: list or_integer_float) : (int, real) =
 
 
 let main () =
-  "vc:sp"
+  [@vc:sp]
   let l =
     Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
       (Cons (Real 1.4) (Cons (Integer 9) Nil))))

@@ -99,7 +99,7 @@ Theorem VC_find : forall {a:Type} {a_WT:WhyType a}, forall (h:(t a))
   | (Init.Datatypes.Some v) => (list.Mem.mem (k, v) o1)
   end -> (result = ((view h) k))).
 Proof.
-intros a a_WT h h_view h_data h_size k (h1,(h2,h3)) o i (h4,h5) o1 result h6.
+intros h h_view h_data h_size k (h1,(h2,h3)) o i (h4,h5) o1 result h6.
 subst i.
 destruct result.
 symmetry.

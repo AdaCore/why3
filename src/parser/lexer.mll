@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -137,8 +137,10 @@ rule token = parse
     (digit+ as echar) space* "#"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
+  | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
+      { ATTRIBUTE lbl }
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | '_'

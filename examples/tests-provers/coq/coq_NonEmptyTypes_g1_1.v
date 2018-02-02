@@ -32,9 +32,7 @@ Axiom ax : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ((id x) = x).
 
 (* Why3 goal *)
 Theorem g1 : forall {a:Type} {a_WT:WhyType a}, exists x:a, ((id x) = x).
-(* Why3 intros a a_WT. *)
 Proof.
-intros a a_WT.
 exists why_inhabitant.
 apply ax.
 Qed.

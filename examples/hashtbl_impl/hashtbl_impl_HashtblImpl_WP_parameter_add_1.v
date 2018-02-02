@@ -123,10 +123,10 @@ Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   forall (rho6:(map.Map.map key (option a))), (rho6 = (map.Map.set rho2 k
   (Init.Datatypes.Some v))) -> forall (i1:Z), ((0%Z <= i1)%Z /\
   (i1 < rho)%Z) -> (good_hash (mk_array rho o) i1))).
-(* Why3 intros a a_WT h h1 h2 k v ((h1,(h2,h3)),h4) rho rho1
+(* Why3 intros h h1 h2 k v ((h1,(h2,h3)),h4) rho rho1
         ((h5,(h6,h7)),h8) rho2 rho3 rho4 (((h9,(h10,h11)),h12),(h13,h14)) i
         (h15,h16) (h17,h18) o (h19,h20) rho5 h21 rho6 h22 i1 (h23,h24). *)
-intros a a_WT rho rho1 rho2 k v ((h1,(h2,h3)),h4) rho3 rho4 ((h5,(h6,h7)),h8)
+intros rho rho1 rho2 k v ((h1,(h2,h3)),h4) rho3 rho4 ((h5,(h6,h7)),h8)
 rho5 rho6 rho7 (((h9,(h10,h11)),h12),(h13,h14)) i1 (h15,h16) (h17,h18) o
 (h19,h20) rho8 h21 rho9 h22 i (h23,h24).
 subst i1.

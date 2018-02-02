@@ -17,7 +17,7 @@ module BinarySearch
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
-  = "vc:sp"
+  = [@vc:sp]
     let l = ref 0 in
     let u = ref (length a - 1) in
     while !l <= !u do
@@ -56,7 +56,7 @@ module BinarySearchAnyMidPoint
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
-  = "vc:sp"
+  = [@vc:sp]
     let l = ref 0 in
     let u = ref (length a - 1) in
     while !l <= !u do
@@ -95,7 +95,7 @@ module BinarySearchInt32
     ensures  { 0 <= result < a.length /\ a[result] = v }
     raises   { Not_found ->
                  forall i:int. 0 <= i < a.length -> a[i] <> v }
-  = "vc:sp"
+  = [@vc:sp]
     let l = ref 0 in
     let u = ref (length a - 1) in
     while !l <= !u do
@@ -133,7 +133,7 @@ module BinarySearchBoolean
     ensures  { 0 <= result < a.length }
     ensures  { a[result] = 1 }
     ensures  { forall i. 0 <= i < result -> a[i] = 0 }
- = "vc:sp"
+  = [@vc:sp]
     let lo = ref 0 in
     let hi = ref (length a - 1) in
     while !lo < !hi do

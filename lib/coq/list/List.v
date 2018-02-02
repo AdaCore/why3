@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,17 +15,17 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)): Prop :=
+Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)) : Prop :=
   match l with
   | Init.Datatypes.nil => True
   | (Init.Datatypes.cons _ _) => False
   end.
 
 (* Why3 goal *)
-Lemma is_nil_spec : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  (is_nil l) <-> (l = Init.Datatypes.nil).
+Lemma is_nil_spec {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)), (is_nil l) <-> (l = Init.Datatypes.nil).
 Proof.
-intros a a_WT l.
+intros l.
 split.
 now destruct l.
 now intros ->.

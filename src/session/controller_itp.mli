@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -231,6 +231,7 @@ val prepare_edition :
     of node [id] with prover [pr], using the file name given. The
     editor is not launched. *)
 
+exception TransAlreadyExists of string * string
 
 val schedule_transformation :
   controller ->
@@ -270,6 +271,8 @@ val mark_as_obsolete:
   notification:notifier ->
   controller -> any option -> unit
 
+exception BadCopyPaste
+
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
     notification:notifier ->
@@ -299,12 +302,14 @@ val replay:
     valid_only:bool ->
     obsolete_only:bool ->
     ?use_steps:bool ->
+    ?filter:(proof_attempt_node -> bool) ->
     controller ->
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->
     notification:notifier ->
     final_callback:
-      ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
-            -> unit) -> any: Session_itp.any option ->
+      (bool ->
+       (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
+       -> unit) -> any: Session_itp.any option ->
     unit
 (** This function reruns all the proofs of the session under the given any (None
     means the whole session), and produces a report comparing the results with
@@ -316,13 +321,17 @@ val replay:
     The session state is changed, all changes are notified via the
     callback [notification]
 
-    When finished, call the callback [final_callback] with the report,
-a list of 4-uples [(goalID, prover, limits, report)]
+    When finished, call the callback [final_callback] with a boolean
+    telling if some prover was upgraded, and the report, a list of
+    4-uples [(goalID, prover, limits, report)]
 
-    When obsolete_only is set, only obsolete proofs are replayed (default)
+    When [obsolete_only] is set, only obsolete proofs are replayed (default)
 
-    When use_steps is set, replay use the recorded number of proof
+    When [use_steps] is set, replay use the recorded number of proof
     steps (not set by default)
+
+    When [filter] is set, only the proof attempts on which the filter
+    returns true are replayed
 
  *)
 

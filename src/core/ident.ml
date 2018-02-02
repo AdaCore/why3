@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -103,19 +103,20 @@ let get_model_trace_string ~labels =
 let is_name_label label =
   Strings.has_prefix "name:" label.lab_string
 
-let get_name_label ~labels = Slab.choose (Slab.filter is_name_label labels)
+let get_name_label ~labels =
+  try Some (Slab.choose (Slab.filter is_name_label labels))
+  with Not_found -> None
 
 let get_element_name ~labels =
-  let name_label = get_name_label ~labels in
-  let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
-  match splitted1 with
-  | ["name"; content] ->
-    begin
-      content
-    end;
-  | [_] -> ""
-  | _ -> assert false
-
+  match get_name_label ~labels with
+  | None -> None
+  | Some name_label ->
+    let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+    let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
+    match splitted1 with
+    | ["name"; content] when Str.string_match correct_word content 0 ->
+        Some content
+    | _ -> None
 
 (** Identifiers *)
 
@@ -189,8 +190,26 @@ type ident_printer = {
   blacklist : string list;
 }
 
+(* name is already sanitized *)
 let find_unique indices name =
-  let specname ind = name ^ string_of_int ind in
+  let specname ind =
+    let rec repeat n s =
+      if n <= 0 then s else repeat (n-1) (s ^ "^")
+    in
+    (* In the case, the symbol is infix/prefix *and* the name has not been
+       sanitized for provers (the space " " is still there), we don't want to
+       disambiguate with a number but with a symbol: "+" becomes "+." "+.." etc.
+       It allows to parse the ident again (for transformations).
+    *)
+    if Strings.has_prefix "infix " name ||
+       Strings.has_prefix "prefix " name then
+      (repeat ind name)
+    else
+      if ind < 0 then
+        name
+      else
+        name ^ string_of_int ind
+  in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in
@@ -237,17 +256,16 @@ let id_unique_label printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id
   with Not_found ->
-    let labels =  id.id_label in
-    if Slab.exists is_name_label labels then
-      let name = sanitizer (get_element_name ~labels) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
-    else
-      let name = sanitizer (printer.sanitizer id.id_string) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
+    let labels = id.id_label in
+    let name =
+      match (get_element_name ~labels) with
+      | Some x -> x
+      | None -> printer.sanitizer id.id_string
+    in
+    let name = sanitizer name in
+    let name = find_unique printer.indices name in
+    Hid.replace printer.values id name;
+    name
 
 let string_unique printer s = find_unique printer.indices s
 

@@ -2,7 +2,7 @@ module I19_simplint
 
   use import int.Int
 
-  axiom H "W:non_conservative_extension:N" : forall x y z. x < y -> y < z -> x < z
+  axiom H [@W:non_conservative_extension:N] : forall x y z. x < y -> y < z -> x < z
 
   goal g: 0 < 2
 

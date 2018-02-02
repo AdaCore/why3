@@ -155,7 +155,7 @@ module N
     ensures  {
       value_sub x n (m+1) =
         value_sub x n m + (Map.get x m) * power radix (m-n) }
-  = "vc:sp" if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
+  = [@vc:sp] if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
 
   let rec lemma value_sub_concat (x:map int limb) (n m l:int)
     requires { n <= m <= l}
@@ -2489,7 +2489,7 @@ module N
                            = radix - 1
                 so !qh * d + !r = u
                ) };
-      assert { !r = cr + d by "case_split" cr >= 0 \/ cr < 0 };
+      assert { !r = cr + d by [@case_split] cr >= 0 \/ cr < 0 };
       assert { 1 <= cq <= radix ->
                ( !qh * d + !r = u
                by cq * d + cr = u
@@ -2503,7 +2503,7 @@ module N
        assert { 1 <= cq < radix };
     end;
     assert { !qh * d + !r = ul + radix * uh
-            by "case_split" cq = radix \/ 1 <= cq < radix };
+            by [@case_split] cq = radix \/ 1 <= cq < radix };
     if Limb.(>=) !r d
     then begin
       assert { cr >= 0 };
@@ -2991,10 +2991,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                 let bbd = radix * radix - d in
                 bbd > 0 /\ bbd <= m /\ q0 * radix <= m
                 so (bbd * bbd <= bbd * m
-                    by "case_split"
+                    by [@case_split]
                     (bbd = m \/ (bbd < m so bbd * bbd < bbd * m)))
                 so (d*(radix * q0) <= d * m
-                    by "case_split"
+                    by [@case_split]
                     (radix * q0 = m \/ (radix * q0 < m so d > 0 so d * (radix * q0) < d * m)))
                 so if uh <= dh - 1
                 then
@@ -3004,7 +3004,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   k * uh <= k * dm
                   so (k * dm <= d * dm
                      by k <= d /\ 0 <= dm
-                     so "case_split" (k = d \/ dm = 0 \/
+                     so [@case_split] (k = d \/ dm = 0 \/
                                      (k < d /\ dm > 0 so k * dm < d * dm)))
                   so k * uh <= d * dm
                   so
@@ -3289,7 +3289,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   so !q1 * d + cr = u };
     assert { !q1 * d + !r0 + radix * !r1 = u };
     label PreRemAdjust in
-    if "ex:unlikely" (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
+    if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin
       let bl, b = sub_with_borrow !r0 dl zero in
       let bh, b'= sub_with_borrow !r1 dh b in
@@ -3655,7 +3655,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       ensures { dl + radix * dh
                   >= (pelts x)[(!xp).offset] + radix * !x1 }
     let ghost ox = pelts x in
-    begin "vc:sp"
+    begin [@vc:sp]
     if (not (Limb.(=) qh limb_zero))
     then begin
          assert { qh = 1 };
@@ -3860,7 +3860,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       xp.contents <- C.incr !xp minus_one;
       let xd = C.incr !xp mdn in
       let nx0 = C.get_ofs !xp one in
-      if "ex:unlikely" (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
+      if [@ex:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
       then begin
         ql := Limb.of_int Limb.max_uint64;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
@@ -4376,11 +4376,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   dl + radix * dh
                   >= (pelts x)[(!xp).offset + 1] + radix * !x1
                   so dh >= !x1
-                  so "case_split" dh <> !x1
+                  so [@case_split] dh <> !x1
                    \/ (dh = !x1
                       /\ dl <> (pelts x)[(!xp).offset + 1])
                   so
-                   "case_split" dh > !x1 \/
+                   [@case_split] dh > !x1 \/
                    (dh = !x1 /\ dl > (pelts x)[(!xp).offset + 1])
         };
         label SmallDiv in
@@ -4446,9 +4446,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    ) };
           value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
         end;
-        let cy1 = "vc:sp" if (Limb.(<) !x0 cy) then uone else limb_zero in
+        let cy1 = [@vc:sp] if (Limb.(<) !x0 cy) then uone else limb_zero in
         x0 := sub_mod !x0 cy;
-        let cy2 = "vc:sp" if (Limb.(<) !x1 cy1) then uone else limb_zero in
+        let cy2 = [@vc:sp] if (Limb.(<) !x1 cy1) then uone else limb_zero in
         x1 := sub_mod !x1 cy1;
         assert { 0 <= cy2 <= 1 };
         (* assert { cy2 = 1 -> rh = 0 }; (* and cy > rl *)*)
@@ -4668,7 +4668,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   }*)
            end;
         end;
-        if "ex:unlikely" (not (Limb.(=) cy2 limb_zero))
+        if [@ex:unlikely] (not (Limb.(=) cy2 limb_zero))
         then begin
           label Adjust in
           assert { cy2 = 1 };
@@ -5702,7 +5702,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     assert { value y 2 = dl + radix * dh };
     let i = ref (Int32.(-) sx two) in
     let dinv = reciprocal_word_3by2 dh dl in
-    ("vc:sp" if (Limb.(>=) !rh dh && ("vc:sp" Limb.(>) !rh dh || Limb.(>=) !rl dl))
+    ([@vc:sp] if (Limb.(>=) !rh dh && ([@vc:sp] Limb.(>) !rh dh || Limb.(>=) !rl dl))
     then
       label Adjust in
       begin
@@ -6200,7 +6200,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    let dh = (pelts y)[y.offset + sy - 1] in
                    value y sy >= dh * power radix (sy - 1)
                    so value nx (sx + adjust) = value nx sx = value x sx
-                   so "case_split"
+                   so [@case_split]
                       ((adjust = 1
                            so value x sx < power radix sx
                            so value y sy * power radix (sx - sy + adjust)
@@ -6368,7 +6368,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                        so (p * (ah + 1) * s
                            <= radix * s
                            by
-                           "case_split"
+                           [@case_split]
                            (p * (ah + 1) = radix
                            \/ (p * (ah + 1) < radix
                                so s > 0
@@ -6390,7 +6390,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    value ny sy >= p * dh * power radix (sy - 1)
                    so value nx (sx + adjust) = p * value x sx
                    so p > 0
-                   so "case_split"
+                   so [@case_split]
                       ((adjust = 1
                            so value x sx < power radix sx
                            so p * value x sx < p * power radix sx

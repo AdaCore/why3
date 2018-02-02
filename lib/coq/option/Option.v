@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,17 +15,17 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)): Prop :=
+Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)) : Prop :=
   match o with
   | Init.Datatypes.None => True
   | (Init.Datatypes.Some _) => False
   end.
 
 (* Why3 goal *)
-Lemma is_none_spec : forall {a:Type} {a_WT:WhyType a}, forall (o:(option a)),
-  (is_none o) <-> (o = Init.Datatypes.None).
+Lemma is_none_spec {a:Type} {a_WT:WhyType a} :
+  forall (o:(option a)), (is_none o) <-> (o = Init.Datatypes.None).
 Proof.
-intros a a_WT o.
+intros o.
 split.
 now destruct o.
 now intros ->.

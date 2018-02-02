@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,7 +17,12 @@ open Stdlib
 
 let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"
+
+(* NO! this will be executed at plugin load, thus
+disabling the warning for ALL WHY3 USERS even if they don't
+use the python front-end
 let () = Debug.set_flag Dterm.debug_ignore_unused_var
+*)
 
 let mk_id ~loc name =
   { id_str = name; id_lab = []; id_loc = loc }

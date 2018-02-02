@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -28,36 +28,36 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sqrt_positive :
-forall (x:R), (0%R <= x)%R -> (0%R <= (Reals.R_sqrt.sqrt x))%R.
+  forall (x:R), (0%R <= x)%R -> (0%R <= (Reals.R_sqrt.sqrt x))%R.
 intros x _.
 apply sqrt_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Sqrt_square :
-forall (x:R), (0%R <= x)%R -> ((Reals.RIneq.Rsqr (Reals.R_sqrt.sqrt x)) = x).
+  forall (x:R), (0%R <= x)%R ->
+  ((Reals.RIneq.Rsqr (Reals.R_sqrt.sqrt x)) = x).
 exact sqrt_sqrt.
 Qed.
 
 (* Why3 goal *)
 Lemma Square_sqrt :
-forall (x:R), (0%R <= x)%R -> ((Reals.R_sqrt.sqrt (x * x)%R) = x).
+  forall (x:R), (0%R <= x)%R -> ((Reals.R_sqrt.sqrt (x * x)%R) = x).
 exact sqrt_square.
 Qed.
 
 (* Why3 goal *)
 Lemma Sqrt_mul :
-forall (x:R) (y:R),
- ((0%R <= x)%R /\ (0%R <= y)%R) ->
- ((Reals.R_sqrt.sqrt (x * y)%R) = ((Reals.R_sqrt.sqrt x) * (Reals.R_sqrt.sqrt y))%R).
+  forall (x:R) (y:R), ((0%R <= x)%R /\ (0%R <= y)%R) ->
+  ((Reals.R_sqrt.sqrt (x * y)%R) =
+   ((Reals.R_sqrt.sqrt x) * (Reals.R_sqrt.sqrt y))%R).
 intros x y (hx & hy); now apply sqrt_mult.
 Qed.
 
 (* Why3 goal *)
 Lemma Sqrt_le :
-forall (x:R) (y:R),
- ((0%R <= x)%R /\ (x <= y)%R) ->
- ((Reals.R_sqrt.sqrt x) <= (Reals.R_sqrt.sqrt y))%R.
+  forall (x:R) (y:R), ((0%R <= x)%R /\ (x <= y)%R) ->
+  ((Reals.R_sqrt.sqrt x) <= (Reals.R_sqrt.sqrt y))%R.
 intros x y (h1 & h2); apply sqrt_le_1; auto.
 apply Rle_trans with x; auto.
 Qed.

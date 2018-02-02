@@ -31,7 +31,9 @@ module FibonacciLinear
 
 end
 
-module FibRecGhost "recursive version, using ghost code"
+(** {2 Recursive version, using ghost code} *)
+
+module FibRecGhost
 
   use import int.Fibonacci
   use import int.Int
@@ -57,7 +59,9 @@ module FibRecGhost "recursive version, using ghost code"
 
 end
 
-module FibRecNoGhost "recursive version, without ghost code"
+(** {2 Recursive version, without ghost code} *)
+
+module FibRecNoGhost
 
   use import int.Fibonacci
   use import int.Int
@@ -257,7 +261,9 @@ module Zeckendorf
 
 end
 
-theory Mat22 "2x2 integer matrices"
+(** {2 2x2 integer matrices} *)
+
+theory Mat22
 
   use import int.Int
 

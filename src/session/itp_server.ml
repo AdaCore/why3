@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -111,6 +111,9 @@ let print_pr s id fmt t =
 let print_pat s id fmt t =
   let module P = (val (p s id)) in P.print_pat fmt t
 
+let print_tdecl s id fmt t =
+  let module P = (val (p s id)) in P.print_tdecl fmt t
+
 (* Exception reporting *)
 
 (* TODO remove references to id.id_string in this function *)
@@ -219,6 +222,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
+      Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
+        (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
@@ -758,18 +765,19 @@ end
      having a given property (label_detection) in the session tree. To change
      the property, one need to call function register_label_detection. *)
   let focus_on_label node =
-    match !get_focused_label with
-    | Some label_detection ->
-        let d = get_server_data () in
-        let session = d.cont.Controller_itp.controller_session in
-        (match node with
-        | APn pr_node ->
-            let task = Session_itp.get_raw_task session pr_node in
-            let b = label_detection task in
-            if b then
-              add_focused_node node
-        | _ -> ())
-    | None -> ()
+    let d = get_server_data () in
+    let session = d.cont.Controller_itp.controller_session in
+    if not (Session_itp.is_detached session node) then
+      match !get_focused_label with
+      | Some label_detection ->
+          (match node with
+          | APn pr_node ->
+              let task = Session_itp.get_raw_task session pr_node in
+              let b = label_detection task in
+              if b then
+                add_focused_node node
+          | _ -> ())
+      | None -> ()
 
   (* Create a new node in the_tree, update the tables and send a
      notification about it *)
@@ -873,12 +881,10 @@ end
 
   (* -- send the task -- *)
   let task_of_id d id do_intros show_full_context loc =
-    let task,tables =
-      if do_intros then get_task d.cont.controller_session id
-      else
-        let task = get_raw_task d.cont.controller_session id in
-        let tables = Args_wrapper.build_naming_tables task in
-        task,tables
+    let task,tables = get_task d.cont.controller_session id in
+    let task =
+      if do_intros then task else
+        get_raw_task d.cont.controller_session id
     in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
@@ -903,7 +909,23 @@ end
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
+       let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
+       (* Display the result of the prover *)
+       let prover_ce =
+         match pa.proof_state with
+         | Some res ->
+             let result =
+               Pp.string_of Call_provers.print_prover_answer
+                 res.Call_provers.pr_answer
+             in
+             let ce_result =
+               Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                 res.Call_provers.pr_model
+             in
+             result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+         | None -> "Result of the prover not available.\n"
+       in
+       P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
     | AFile f ->
        P.notify (Task (nid, "File " ^ file_name f, []))
     | ATn tid ->
@@ -911,7 +933,8 @@ end
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
+       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
+                       String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 
@@ -1102,19 +1125,30 @@ end
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
 
-  let rec apply_transform nid t args =
+  let apply_transform node_id t args =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-      let callback = callback_update_tree_transform t args in
-      C.schedule_transformation d.cont id t args ~callback ~notification:(notify_change_proved d.cont)
-    | APa panid ->
-      let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
-      let parent = node_ID_from_pn parent_id in
-      apply_transform parent t args
-    | ATn _ | AFile _ | ATh _ ->
-      (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
-      ()
+
+    let rec apply_transform nid t args =
+      match nid with
+      | APn id ->
+        if Session_itp.check_if_already_exists d.cont.controller_session id t args then
+          P.notify (Message (Information "Transformation already applied"))
+        else
+          let callback = callback_update_tree_transform t args in
+          C.schedule_transformation d.cont id t args ~callback
+            ~notification:(notify_change_proved d.cont)
+      | APa panid ->
+        let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
+        apply_transform (APn parent_id) t args
+      | ATn tnid ->
+        let child_ids = get_sub_tasks d.cont.controller_session tnid in
+        List.iter (fun id -> apply_transform (APn id) t args) child_ids
+      | AFile _ | ATh _ ->
+        (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
+        ()
+    in
+    let nid = any_from_node_ID node_id in
+    apply_transform nid t args
 
   let removed x =
     let nid = node_ID_from_any x in
@@ -1225,7 +1259,7 @@ end
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
-    let final_callback lr =
+    let final_callback _ lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
     C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
@@ -1287,7 +1321,10 @@ end
      | Get_task(nid,_,_,_) ->
          Hint.mem model_any nid
      | Command_req (nid, _) ->
-         Hint.mem model_any nid
+         if not (Itp_communication.is_root nid) then
+           Hint.mem model_any nid
+         else
+           true
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1337,10 +1374,16 @@ end
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
         let to_any = any_from_node_ID to_id in
-        C.copy_paste ~notification:(notify_change_proved d.cont)
-          ~callback_pa:(callback_update_tree_proof d.cont)
-          ~callback_tr:(callback_update_tree_transform)
-          d.cont from_any to_any
+        begin
+          try
+            C.copy_paste
+              ~notification:(notify_change_proved d.cont)
+              ~callback_pa:(callback_update_tree_proof d.cont)
+              ~callback_tr:(callback_update_tree_transform)
+              d.cont from_any to_any
+          with C.BadCopyPaste ->
+               P.notify (Message (Error "invalid copy"))
+        end
     | Get_file_contents f          ->
         read_and_send f
     | Save_file_req (name, text)   ->
@@ -1393,7 +1436,11 @@ end
        end
     | Exit_req                -> exit 0
      )
-    with e when not (Debug.test_flag Debug.stack_trace)->
+    with
+    | C.TransAlreadyExists (name,args) ->
+        P.notify (Message (Error
+          (Pp.sprintf "Transformation %s with arg [%s] already exists" name args)))
+    | e when not (Debug.test_flag Debug.stack_trace)->
       P.notify (Message (Error (Pp.string_of
           (fun fmt (r,e) -> Format.fprintf fmt
              "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"

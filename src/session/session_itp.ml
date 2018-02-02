@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -325,6 +325,11 @@ let set_obsolete s paid b =
   let pa = get_proof_attempt_node s paid in
   pa.proof_obsolete <- b
 
+let check_if_already_exists s pid t args =
+    let sub_transfs = get_transformations s pid in
+    List.exists (fun tr_id ->
+      get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
+      not (is_detached s (ATn tr_id))) sub_transfs
 
 (* Iterations functions on the session tree *)
 
@@ -1085,6 +1090,8 @@ let load_theory session parent_name old_provers acc th =
     List.iter2
       (load_goal session old_provers (Theory mth))
       th.Xml.elements goals;
+    let proved = bool_attribute "proved" th false in
+    Hid.add session.th_state thname proved;
     mth::acc
   | s ->
     Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."

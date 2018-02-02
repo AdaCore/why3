@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1042,9 +1042,11 @@ let display_warnings () =
       print_message ~kind:1 ~notif_kind:"warning" "%s" msg
     end
 
+let print_message ~kind ~notif_kind fmt =
+  display_warnings (); print_message ~kind ~notif_kind fmt
 
-let () =
-  Warning.set_hook (fun ?loc s -> record_warning ?loc s; display_warnings ())
+
+
 
 (**** Monitor *****)
 
@@ -1420,10 +1422,10 @@ let interp_ide cmd =
       let s = List.fold_left (fun acc x -> (fst x) ^ ": " ^
                               (snd x) ^ "\n" ^ acc) "" ide_command_list in
       clear_command_entry ();
-      message_zone#buffer#set_text s
+      print_message ~kind:1 ~notif_kind:"Info" "%s" s
   | _ ->
       clear_command_entry ();
-      message_zone#buffer#set_text ("Error: " ^ cmd ^ "\nPlease report.")
+      print_message ~kind:1 ~notif_kind:"error" "Error: %s\nPlease report." cmd
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
@@ -1501,7 +1503,14 @@ let on_selected_row r =
        edited_view#source_buffer#set_text "(not yet available)";
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
-       counterexample_view#scroll_to_mark `INSERT
+       counterexample_view#scroll_to_mark `INSERT;
+       let detached = get_node_detached id in
+       if detached then
+         task_view#source_buffer#set_text ""
+       else
+         let b = gconfig.intro_premises in
+         let c = gconfig.show_full_context in
+         send_request (Get_task(id,b,c,true))
     | _ ->
        let b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
@@ -1554,36 +1563,6 @@ let (_ : GtkSignal.id) =
     | _ -> false
   in
   goals_view#event#connect#key_press ~callback
-
-(*************************************)
-(* Commands of the Experimental menu *)
-(*************************************)
-
-let exp_menu = factory#add_submenu "_Experimental"
-let exp_factory = new GMenu.factory exp_menu ~accel_group
-
-
-(* Current copied node *)
-let saved_copy = ref None
-
-let copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    saved_copy := Some n
-  | _ -> ()
-
-let paste () =
-  match get_selected_row_references () with
-  | [r] ->
-      let m = get_node_id r#iter in
-    (match !saved_copy with
-    | Some n -> send_request (Copy_paste (n, m))
-    | None -> ())
-  | _ -> ()
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
 
 (*********************************)
 (* add a new file in the project *)
@@ -2050,6 +2029,8 @@ let bisect_item =
   create_menu_item tools_factory "Bisect on external proof"
                    "Search for a maximal set of hypotheses to remove before calling a prover"
 
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
 let focus_item =
   create_menu_item tools_factory "Focus"
     "Focus on proof node"
@@ -2057,6 +2038,14 @@ let focus_item =
 let unfocus_item =
   create_menu_item tools_factory "Unfocus"
     "Unfocus"
+
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
+let copy_item = create_menu_item tools_factory "Copy" "Copy the current tree node"
+
+let paste_item = create_menu_item tools_factory "Paste"
+                                  "Paste the copied node below the current node"
+
 
 let () =
   let on_selected_rows ~multiple ~notif_kind ~action f () =
@@ -2103,6 +2092,36 @@ let () =
     ~callback:(fun () -> send_request Unfocus_req)
 
 
+(*************************************)
+(* Copy paste                        *)
+(*************************************)
+
+(* Current copied node *)
+let saved_copy = ref None
+
+let copy () =
+  match get_selected_row_references () with
+  | [r] -> let n = get_node_id r#iter in
+           saved_copy := Some n;
+           paste_item#misc#set_sensitive true
+  | _ ->
+     saved_copy := None;
+     paste_item#misc#set_sensitive false
+
+let paste () =
+  match get_selected_row_references () with
+  | [r] ->
+      let m = get_node_id r#iter in
+    (match !saved_copy with
+    | Some n -> send_request (Copy_paste (n, m))
+    | None -> ())
+  | _ -> ()
+
+let () =
+  paste_item#misc#set_sensitive false;
+  connect_menu_item copy_item ~callback:copy;
+  connect_menu_item paste_item ~callback:paste
+
 
 (* the command-line *)
 
@@ -2114,7 +2133,6 @@ let check_uninstalled_prover =
       Whyconf.Hprover.add uninstalled_prover_seen p ();
       uninstalled_prover_dialog gconfig p
     end
-
 
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
@@ -2321,5 +2339,5 @@ let () =
     (fun () -> List.iter treat_notification (get_notified ()); true);
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
-  message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
+  print_message ~kind:1 ~notif_kind:"Info" "Welcome to Why3 IDE\ntype 'help' for help\n";
   GMain.main ()

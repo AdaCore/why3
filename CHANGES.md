@@ -1,22 +1,25 @@
 :x: marks a potential source of incompatibility
 
+Version 0.88.3, January 11, 2018
+--------------------------------
+
 Provers
   * support for Alt-Ergo 2.0.0 (released Nov 14, 2017)
+  * support for Coq 8.7.1 (released Dec 16, 2017)
   * support for Z3 4.6.0 (released Dec 18, 2017)
 
 Standard library
-  * fix compatibility of theory int.Exponentiation with instances
-    where multiplication is not commutative.
-    fix corresponding realizations in Coq and Isabelle/HOL :x:
+  * fixed soundness of theory `int.Exponentiation` when multiplication is not
+    commutative :x:
 
-Bug fixes
-  * Fix issue #50:
-    share/Makefile.config is missing when enable_relocation=yes
+Miscellaneous
+  * fixed support for `--enable_relocation=yes` (issue #50)
+  * fixed support for Windows (issue #70)
 
 Version 0.88.2, December 7, 2017
 --------------------------------
 
-Bug fixes
+Miscellaneous
   * `why3 session html`: improved compliance of generated files
   * `why3 doc`: fixed missing anchors for operator definitions
   * improved build process when `coqtop.byte` is missing

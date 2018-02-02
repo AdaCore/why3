@@ -160,7 +160,7 @@ module Occ
 
   lemma occ_exchange :
     forall m: map int 'a, l u i j: int, x y z: 'a.
-    l <= i < u -> l <= j < u ->
+    l <= i < j < u ->
     occ z m[i <- x][j <- y] l u =
     occ z m[i <- y][j <- x] l u
 

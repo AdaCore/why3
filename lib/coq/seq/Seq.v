@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -32,8 +32,7 @@ decide equality.
 Qed.
 
 (* Why3 goal *)
-Definition length: forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z.
-intros a a_WT.
+Definition length {a:Type} {a_WT:WhyType a} : (seq a) -> Z.
 exact (fix len l := match l with
   | nil => 0 | cons _ t => 1 + len t end)%Z.
 Defined.
@@ -41,10 +40,8 @@ Defined.
 Hint Unfold length.
 
 (* Why3 goal *)
-Lemma length_nonnegative :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)), (0%Z <= (length s))%Z.
-intros a a_WT.
+Lemma length_nonnegative {a:Type} {a_WT:WhyType a} :
+  forall (s:seq a), (0%Z <= (length s))%Z.
 induction s.
 auto with *.
 unfold length. fold length. omega.
@@ -57,9 +54,8 @@ exact nil.
 Defined.
 
 (* Why3 goal *)
-Lemma empty_length :
-forall {a:Type} {a_WT:WhyType a},
-((length (empty : (seq a))) = 0%Z).
+Lemma empty_length : forall {a:Type} {a_WT:WhyType a}, ((length (empty : (seq
+  a))) = 0%Z).
 intros a a_WT.
 auto with *.
 Qed.
@@ -73,47 +69,39 @@ exact ((fix nth n l := match l with
 Defined.
 
 (* Why3 goal *)
-Definition set: forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z -> a ->
-  (seq a).
+Definition set: forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z -> a -> (seq
+  a).
 admit.
 Admitted.
 
 (* Why3 goal *)
-Lemma set_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (i:Z) (v:a),
- ((0%Z <= i)%Z /\ (i < (length s))%Z) -> ((length (set s i v)) = (length s)).
+Lemma set_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
+  (v:a), ((0%Z <= i)%Z /\ (i < (length s))%Z) -> ((length (set s i
+  v)) = (length s)).
 intros a a_WT s i v (h1,h2).
 admit.
 Admitted.
 
 (* Why3 goal *)
-Lemma set_def2 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (i:Z) (v:a),
- ((0%Z <= i)%Z /\ (i < (length s))%Z) -> ((get (set s i v) i) = v).
+Lemma set_def2 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
+  (v:a), ((0%Z <= i)%Z /\ (i < (length s))%Z) -> ((get (set s i v) i) = v).
 intros a a_WT s i v (h1,h2).
 admit.
 Admitted.
 
 (* Why3 goal *)
-Lemma set_def3 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (i:Z) (v:a),
- ((0%Z <= i)%Z /\ (i < (length s))%Z) ->
- forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < (length s))%Z) ->
-  ((~ (j = i)) -> ((get (set s i v) j) = (get s j))).
+Lemma set_def3 : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
+  (v:a), ((0%Z <= i)%Z /\ (i < (length s))%Z) -> forall (j:Z),
+  ((0%Z <= j)%Z /\ (j < (length s))%Z) -> ((~ (j = i)) -> ((get (set s i v)
+  j) = (get s j))).
 intros a a_WT s i v (h1,h2) j (h3,h4) h5.
 admit.
 Admitted.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(seq a))
-  (s2:(seq a)): Prop :=
-  ((length s1) = (length s2))
-  /\ forall (i:Z),
-      ((0%Z <= i)%Z /\ (i < (length s1))%Z) -> ((get s1 i) = (get s2 i)).
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(seq a)) (s2:(seq
+  a)): Prop := ((length s1) = (length s2)) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (length s1))%Z) -> ((get s1 i) = (get s2 i)).
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
@@ -125,9 +113,8 @@ unfold length. fold length. omega.
 Qed.
 
 (* Why3 goal *)
-Lemma extensionality :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(seq a)) (s2:(seq a)), (infix_eqeq s1 s2) -> (s1 = s2).
+Lemma extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(seq a))
+  (s2:(seq a)), (infix_eqeq s1 s2) -> (s1 = s2).
 intros a a_WT.
 induction s1.
 inversion 1.
@@ -170,20 +157,17 @@ exact (cons x l).
 Defined.
 
 (* Why3 goal *)
-Lemma cons_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (s:(seq a)), ((length (cons x s)) = (1%Z + (length s))%Z).
+Lemma cons_length : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(seq
+  a)), ((length (cons x s)) = (1%Z + (length s))%Z).
 intros a a_WT x s.
 unfold length, cons. fold length; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma cons_get :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (s:(seq a)) (i:Z),
- ((0%Z <= i)%Z /\ (i <= (length s))%Z) ->
- (((i = 0%Z) -> ((get (cons x s) i) = x))
-  /\ ((~ (i = 0%Z)) -> ((get (cons x s) i) = (get s (i - 1%Z)%Z)))).
+Lemma cons_get : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(seq a))
+  (i:Z), ((0%Z <= i)%Z /\ (i <= (length s))%Z) -> (((i = 0%Z) ->
+  ((get (cons x s) i) = x)) /\ ((~ (i = 0%Z)) -> ((get (cons x s) i) = (get s
+  (i - 1%Z)%Z)))).
 intros a (d,eq) x s i hi.
 split.
 intro; subst i; now auto.
@@ -221,9 +205,8 @@ rewrite IHs1; omega.
 Qed.
 
 (* Why3 goal *)
-Lemma snoc_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (x:a), ((length (snoc s x)) = (1%Z + (length s))%Z).
+Lemma snoc_length : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a))
+  (x:a), ((length (snoc s x)) = (1%Z + (length s))%Z).
 intros.
 unfold snoc.
 rewrite length_append.
@@ -231,12 +214,10 @@ simpl (length (x::nil)). omega.
 Qed.
 
 (* Why3 goal *)
-Lemma snoc_get :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (x:a) (i:Z),
- ((0%Z <= i)%Z /\ (i <= (length s))%Z) ->
- (((i < (length s))%Z -> ((get (snoc s x) i) = (get s i)))
-  /\ ((~ (i < (length s))%Z) -> ((get (snoc s x) i) = x))).
+Lemma snoc_get : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (x:a)
+  (i:Z), ((0%Z <= i)%Z /\ (i <= (length s))%Z) -> (((i < (length s))%Z ->
+  ((get (snoc s x) i) = (get s i))) /\ ((~ (i < (length s))%Z) ->
+  ((get (snoc s x) i) = x))).
 admit.
 (*
 intros a a_WT (l, d) x i (h1,h2).
@@ -263,9 +244,8 @@ rewrite (Zabs2Nat.id (Datatypes.length l)). omega.
 Admitted.
 
 (* Why3 goal *)
-Lemma snoc_last :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (x:a), ((get (snoc s x) (length s)) = x).
+Lemma snoc_last : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (x:a),
+  ((get (snoc s x) (length s)) = x).
 intros a a_WT s x.
 Admitted. (* TODO *)
 
@@ -276,43 +256,37 @@ Definition mixfix_lb_dtdt_rb: forall {a:Type} {a_WT:WhyType a}, (seq a) ->
 Admitted. (* TODO *)
 
 (* Why3 goal *)
-Lemma sub_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (i:Z) (j:Z),
- ((0%Z <= i)%Z /\ ((i <= j)%Z /\ (j <= (length s))%Z)) ->
- ((length (mixfix_lb_dtdt_rb s i j)) = (j - i)%Z).
+Lemma sub_length : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
+  (j:Z), ((0%Z <= i)%Z /\ ((i <= j)%Z /\ (j <= (length s))%Z)) ->
+  ((length (mixfix_lb_dtdt_rb s i j)) = (j - i)%Z).
 intros a a_WT s i j (h1,(h2,h3)).
 
 Admitted. (* TODO *)
 
 (* Why3 goal *)
-Lemma sub_get :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(seq a)) (i:Z) (j:Z),
- ((0%Z <= i)%Z /\ ((i <= j)%Z /\ (j <= (length s))%Z)) ->
- forall (k:Z),
-  ((0%Z <= k)%Z /\ (k < (j - i)%Z)%Z) ->
+Lemma sub_get : forall {a:Type} {a_WT:WhyType a}, forall (s:(seq a)) (i:Z)
+  (j:Z), ((0%Z <= i)%Z /\ ((i <= j)%Z /\ (j <= (length s))%Z)) ->
+  forall (k:Z), ((0%Z <= k)%Z /\ (k < (j - i)%Z)%Z) ->
   ((get (mixfix_lb_dtdt_rb s i j) k) = (get s (i + k)%Z)).
 intros a a_WT s i j (h1,(h2,h3)) k (h4,h5).
 
 Admitted. (* TODO *)
 
 (* Why3 assumption *)
-Definition mixfix_lb_dtdtrb {a:Type} {a_WT:WhyType a} (s:(seq a))
-  (i:Z): (seq a) := (mixfix_lb_dtdt_rb s i (length s)).
+Definition mixfix_lb_dtdtrb {a:Type} {a_WT:WhyType a} (s:(seq a)) (i:Z): (seq
+  a) := (mixfix_lb_dtdt_rb s i (length s)).
 
 (* Why3 goal *)
-Definition infix_plpl: forall {a:Type} {a_WT:WhyType a}, (seq a) ->
-  (seq a) -> (seq a).
+Definition infix_plpl: forall {a:Type} {a_WT:WhyType a}, (seq a) -> (seq
+  a) -> (seq a).
 intros a aWT s1 s2.
 exact (s1 ++ s2)%list.
 Defined.
 
 (* Why3 goal *)
-Lemma concat_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(seq a)) (s2:(seq a)),
- ((length (infix_plpl s1 s2)) = ((length s1) + (length s2))%Z).
+Lemma concat_length : forall {a:Type} {a_WT:WhyType a}, forall (s1:(seq a))
+  (s2:(seq a)), ((length (infix_plpl s1
+  s2)) = ((length s1) + (length s2))%Z).
 admit.
 (*
 intros a a_WT s1 s2.
@@ -323,21 +297,18 @@ rewrite Nat2Z.inj_add. auto.
 Admitted.
 
 (* Why3 goal *)
-Lemma concat_get1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(seq a)) (s2:(seq a)) (i:Z),
- ((0%Z <= i)%Z /\ (i < (length s1))%Z) ->
- ((get (infix_plpl s1 s2) i) = (get s1 i)).
+Lemma concat_get1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(seq a))
+  (s2:(seq a)) (i:Z), ((0%Z <= i)%Z /\ (i < (length s1))%Z) ->
+  ((get (infix_plpl s1 s2) i) = (get s1 i)).
 intros a a_WT s1 s2 i (h1,h2).
 
 Admitted. (* TODO *)
 
 (* Why3 goal *)
-Lemma concat_get2 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(seq a)) (s2:(seq a)) (i:Z),
- (((length s1) <= i)%Z /\ (i < ((length s1) + (length s2))%Z)%Z) ->
- ((get (infix_plpl s1 s2) i) = (get s2 (i - (length s1))%Z)).
+Lemma concat_get2 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(seq a))
+  (s2:(seq a)) (i:Z), (((length s1) <= i)%Z /\
+  (i < ((length s1) + (length s2))%Z)%Z) -> ((get (infix_plpl s1 s2)
+  i) = (get s2 (i - (length s1))%Z)).
 intros a a_WT s1 s2 i (h1,h2).
 
 Admitted. (* TODO *)
@@ -348,8 +319,8 @@ Fixpoint enum {a:Type} (f: Z -> a) (start: Z) (n: nat) : seq a :=
   | S p => (f start :: enum f (start+1)%Z p)%list end.
 
 (* Why3 goal *)
-Definition create: forall {a:Type} {a_WT:WhyType a}, Z -> (Z -> a) ->
-  (seq a).
+Definition create: forall {a:Type} {a_WT:WhyType a}, Z -> (Z -> a) -> (seq
+  a).
 intros a a_WT n f.
 exact (if Zlt_bool n 0 then nil else enum f 0%Z (Zabs_nat n)).
 Defined.
@@ -366,10 +337,8 @@ rewrite Nat2Z.inj_succ. auto with *.
 Qed.
 
 (* Why3 goal *)
-Lemma create_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (len:Z) (f:(Z -> a)),
- (0%Z <= len)%Z -> ((length (create len f)) = len).
+Lemma create_length : forall {a:Type} {a_WT:WhyType a}, forall (len:Z)
+  (f:(Z -> a)), (0%Z <= len)%Z -> ((length (create len f)) = len).
 intros a a_WT len f h1.
 unfold create.
 generalize (Z.ltb_lt len 0).
@@ -383,10 +352,9 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma create_get :
-forall {a:Type} {a_WT:WhyType a},
-forall (len:Z) (f:(Z -> a)) (i:Z),
- ((0%Z <= i)%Z /\ (i < len)%Z) -> ((get (create len f) i) = (f i)).
+Lemma create_get : forall {a:Type} {a_WT:WhyType a}, forall (len:Z) (f:(Z ->
+  a)) (i:Z), ((0%Z <= i)%Z /\ (i < len)%Z) -> ((get (create len f) i) = (f
+  i)).
 intros a a_WT len f i (h1,h2).
 
 Admitted. (* TODO *)

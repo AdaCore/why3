@@ -86,8 +86,8 @@ Theorem exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(array a)) (a2:(array a)) (i:Z) (j:Z) (l:Z) (u:Z), (exchange1 a1
   a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) ->
   ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l u))))).
-(* Why3 intros a a_WT a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7. *)
-intros a a_WT a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7.
+(* Why3 intros a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7. *)
+intros a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7.
 destruct h1 as (h11,h12).
 destruct h12 as (ha,(hb,(hc,(hd,he)))).
 red. repeat split.

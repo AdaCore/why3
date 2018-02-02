@@ -12,7 +12,7 @@ module GcdBezout
     requires { x >= 0 /\ y >= 0 }
     ensures  { result = gcd x y }
     ensures  { exists a b:int. a*x+b*y = result }
-  = "vc:sp"
+  = [@vc:sp]
     let x = ref x in let y = ref y in
     label Pre in
     let ghost a = ref 1 in let ghost b = ref 0 in

@@ -67,7 +67,7 @@ module BinomialHeap
     end
 
   lemma heaps_append:
-    forall h1 "induction" h2. heaps h1 -> heaps h2 -> heaps (h1 ++ h2)
+    forall h1 [@induction] h2. heaps h1 -> heaps h2 -> heaps (h1 ++ h2)
   lemma heaps_reverse:
     forall h. heaps h -> heaps (reverse h)
 
@@ -89,7 +89,7 @@ module BinomialHeap
     end
 
   lemma occ_append:
-    forall l1 "induction" l2 x. occ x (l1 ++ l2) = occ x l1 + occ x l2
+    forall l1 [@induction] l2 x. occ x (l1 ++ l2) = occ x l1 + occ x l2
 
   lemma occ_reverse:
     forall x l. occ x l = occ x (reverse l)

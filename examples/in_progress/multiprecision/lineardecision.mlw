@@ -368,7 +368,7 @@ let rec add_expr (e1 e2: expr) : expr
   = if C.eq C.czero c then Cst C.czero else Term c i in
   let rec add_atom (e a:expr) : (expr, bool)
     requires { atom a }
-    returns { r,b -> forall y z. interp r y z
+    returns { r,_ -> forall y z. interp r y z
                      = C.(+) (interp e y z) (interp a y z) }
     variant { e }
     raises  { C.Unknown -> true }
@@ -1133,7 +1133,7 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
   variant { e2, e1 }
 =
   let rec add_atom (e a:exp) (s:bool) : (exp, bool)
-    returns { r, b -> forall y.
+    returns { r, _ -> forall y.
               if s then interp_exp r y = interp_exp e y + interp_exp a y
                    else interp_exp r y = interp_exp e y - interp_exp a y }
     raises { Unknown -> true }

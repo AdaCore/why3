@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -96,11 +96,6 @@
     "type", TYPE;
   ]
 
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
   let comment_start_loc = ref Loc.dummy_position
 
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
@@ -126,7 +121,7 @@ let do_char = [' '-'!' '#'-'[' ']'-'~'] | '\\' ['\\' '"']
 
 rule token = parse
   | newline
-      { newline lexbuf; token lexbuf }
+      { new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | lword as id
@@ -222,7 +217,7 @@ and comment_block = parse
   | "*/"
       { () }
   | newline
-      { newline lexbuf; comment_block lexbuf }
+      { new_line lexbuf; comment_block lexbuf }
   | eof
       { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
   | _
@@ -230,7 +225,7 @@ and comment_block = parse
 
 and comment_line = parse
   | newline
-      { newline lexbuf; () }
+      { new_line lexbuf; () }
   | eof
       { () }
   | _

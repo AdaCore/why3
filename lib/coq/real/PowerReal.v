@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,16 +27,16 @@ Import Rpower.
 
 (* Why3 goal *)
 Lemma Pow_def :
-forall (x:R) (y:R),
- (0%R < x)%R ->
- ((Reals.Rpower.Rpower x y) = (Reals.Rtrigo_def.exp (y * (Reals.Rpower.ln x))%R)).
+  forall (x:R) (y:R), (0%R < x)%R ->
+  ((Reals.Rpower.Rpower x y) =
+   (Reals.Rtrigo_def.exp (y * (Reals.Rpower.ln x))%R)).
 Proof.
 easy.
 Qed.
 
 (* Why3 goal *)
 Lemma Pow_pos :
-forall (x:R) (y:R), (0%R < x)%R -> (0%R < (Reals.Rpower.Rpower x y))%R.
+  forall (x:R) (y:R), (0%R < x)%R -> (0%R < (Reals.Rpower.Rpower x y))%R.
 Proof.
 intros x y h1.
 apply Exp_prop.exp_pos.
@@ -44,9 +44,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_plus :
-forall (x:R) (y:R) (z:R),
- (0%R < z)%R ->
- ((Reals.Rpower.Rpower z (x + y)%R) = ((Reals.Rpower.Rpower z x) * (Reals.Rpower.Rpower z y))%R).
+  forall (x:R) (y:R) (z:R), (0%R < z)%R ->
+  ((Reals.Rpower.Rpower z (x + y)%R) =
+   ((Reals.Rpower.Rpower z x) * (Reals.Rpower.Rpower z y))%R).
 Proof.
 intros x y z h1.
 now apply Rpower_plus.
@@ -54,9 +54,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_mult :
-forall (x:R) (y:R) (z:R),
- (0%R < x)%R ->
- ((Reals.Rpower.Rpower (Reals.Rpower.Rpower x y) z) = (Reals.Rpower.Rpower x (y * z)%R)).
+  forall (x:R) (y:R) (z:R), (0%R < x)%R ->
+  ((Reals.Rpower.Rpower (Reals.Rpower.Rpower x y) z) =
+   (Reals.Rpower.Rpower x (y * z)%R)).
 Proof.
 intros x y z h1.
 now apply Rpower_mult.
@@ -64,7 +64,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_x_zero :
-forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 0%R) = 1%R).
+  forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 0%R) = 1%R).
 Proof.
 intros x h1.
 now apply Rpower_O.
@@ -72,15 +72,14 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_x_one :
-forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 1%R) = x).
+  forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 1%R) = x).
 Proof.
 intros x h1.
 now apply Rpower_1.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_one_y :
-forall (y:R), ((Reals.Rpower.Rpower 1%R y) = 1%R).
+Lemma Pow_one_y : forall (y:R), ((Reals.Rpower.Rpower 1%R y) = 1%R).
 Proof.
 intros y.
 unfold Rpower.
@@ -91,8 +90,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_x_two :
-forall (x:R),
- (0%R < x)%R -> ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
+  forall (x:R), (0%R < x)%R ->
+  ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
 Proof.
 intros x h1.
 rewrite (Rpower_pow 2) by easy.
@@ -102,8 +101,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_half :
-forall (x:R),
- (0%R < x)%R -> ((Reals.Rpower.Rpower x (05 / 10)%R) = (Reals.R_sqrt.sqrt x)).
+  forall (x:R), (0%R < x)%R ->
+  ((Reals.Rpower.Rpower x (05 / 10)%R) = (Reals.R_sqrt.sqrt x)).
 Proof.
 intros x h1.
 replace (5 / 10)%R with (/ 2)%R by field.

@@ -55,7 +55,7 @@ module PrimeNumbers
 
   (** Bertrand's postulate, admitted as an axiom
    (the label is there to suppress the warning issued by Why3) *)
-  axiom Bertrand_postulate "W:non_conservative_extension:N" :
+  axiom Bertrand_postulate [@W:non_conservative_extension:N] :
     forall p: int. prime p -> not (no_prime_in p (2*p))
 
   use import array.Array

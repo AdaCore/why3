@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -304,13 +304,15 @@ module Print = struct
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
         if is_optional ~labels:(pv_name pv).id_label then
-          fprintf fmt "?%s:%a" (pv_name pv).id_string
-            (print_expr ~paren:true info) expr
+          begin match expr.e_node with
+            | Eapp (rs, _)
+              when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
+            | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
+                     (print_expr ~paren:true info) expr end
         else if is_named ~labels:(pv_name pv).id_label then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
             (print_expr ~paren:true info) expr
-        else
-          fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        else fprintf fmt "%a" (print_expr ~paren:true info) expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
     | [], _ -> ()
@@ -562,9 +564,12 @@ module Print = struct
     | Some s ->
         fprintf fmt "@[<hov 4>| %a ->@ %a@]"
           (syntax_arguments s print_var) pvl (print_expr info ~paren:true) e
-    | None   ->
-        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) (xs.xs_name)
-          (print_list nothing print_var) pvl (print_expr info) e
+    | None when pvl = []->
+        fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_uident info)
+          (xs.xs_name) (print_expr info) e
+    | None ->
+        fprintf fmt "@[<hov 4>| %a (%a) ->@ %a@]" (print_uident info)
+          (xs.xs_name) (print_list comma print_var) pvl (print_expr info) e
 
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =

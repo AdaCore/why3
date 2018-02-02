@@ -50,7 +50,7 @@ module Refptr
   use import mach.int.Int32
   use import mach.c.C
 
-  type refp = { mutable pcontents "model_trace:" : ptr int }
+  type refp = { mutable pcontents [@model_trace:] : ptr int }
 
  (* function (!!) (x: refp) : ptr int
   = x.pcontents*)

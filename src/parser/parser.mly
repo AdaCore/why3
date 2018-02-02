@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -117,6 +117,7 @@
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Number.real_literal> REAL
 %token <string> STRING
+%token <string> ATTRIBUTE
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
 
@@ -1169,11 +1170,10 @@ lident_rich:
 lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
 | LEFTPAR_STAR_RIGHTPAR
-  { (* parentheses are removed from the location *)
-    let s = $startpos and e = $endpos in
-    let s = { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
-    let e = { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
-    mk_id (infix "*") s e }
+    { (* parentheses are removed from the location *)
+      let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
+      let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
+      mk_id (infix "*") s e }
 
 lident_op:
 | op_symbol               { infix $1 }
@@ -1256,7 +1256,7 @@ sident:
 labels(X): X label* { add_lab $1 $2 }
 
 label:
-| STRING    { Lstr (Ident.create_label $1) }
+| ATTRIBUTE { Lstr (Ident.create_label $1) }
 | POSITION  { Lpos $1 }
 
 (* Miscellaneous *)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,11 +23,6 @@
     | UnterminatedString -> fprintf fmt "unterminated string"
     | _ -> raise e)
 
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
   let string_start_loc = ref Loc.dummy_position
   let string_buf = Buffer.create 1024
 
@@ -40,7 +35,7 @@
 
 }
 
-let newline = '\n'
+let newline = '\r'* '\n'
 
 rule comment = parse
   | "(*)"
@@ -50,7 +45,7 @@ rule comment = parse
   | "(*"
       { comment lexbuf; comment lexbuf }
   | newline
-      { newline lexbuf; comment lexbuf }
+      { new_line lexbuf; comment lexbuf }
   | eof
       { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
   | _
@@ -61,15 +56,20 @@ and string = parse
       { let s = Buffer.contents string_buf in
         Buffer.clear string_buf;
         s }
+  | "\\" newline
+      { new_line lexbuf; string_skip_spaces lexbuf }
   | "\\" (_ as c)
-      { if c = '\n' then newline lexbuf;
-        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
-      { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
+      { new_line lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
       { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
+
+and string_skip_spaces = parse
+  | [' ' '\t']*
+      { string lexbuf }
 
 {
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)

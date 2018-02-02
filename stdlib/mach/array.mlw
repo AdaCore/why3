@@ -20,11 +20,11 @@ module Array32
   function ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
   val ([]) (a: array 'a) (i: int32) : 'a
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { result = a[i] }
 
   val ([]<-) (a: array 'a) (i: int32) (v: 'a) : unit writes {a}
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
@@ -46,7 +46,7 @@ module Array32
     a[i] <- v
 
   val make (n: int32) (v: 'a) : array 'a
-    requires { "expl:array creation size" n >= 0 }
+    requires { [@expl:array creation size] n >= 0 }
     ensures  { forall i:int. 0 <= i < n -> result[i] = v }
     ensures  { result.length = n }
 
@@ -120,11 +120,11 @@ module Array31
   function ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
   val ([]) (a: array 'a) (i: int31) : 'a
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { result = a[i] }
 
   val ([]<-) (a: array 'a) (i: int31) (v: 'a) : unit writes {a}
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
@@ -146,7 +146,7 @@ module Array31
     a[i] <- v
 
   val make (n: int31) (v: 'a) : array 'a
-    requires { "expl:array creation size" n >= 0 }
+    requires { [@expl:array creation size] n >= 0 }
     ensures  { forall i:int. 0 <= i < n -> result[i] = v }
     ensures  { result.length = n }
 
@@ -220,11 +220,11 @@ module Array63
   function ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
   val ([]) (a: array 'a) (i: int63) : 'a
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { result = a[i] }
 
   val ([]<-) (a: array 'a) (i: int63) (v: 'a) : unit writes {a}
-    requires { "expl:index in array bounds" 0 <= i < a.length }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
@@ -246,7 +246,7 @@ module Array63
     a[i] <- v
 
   val make (n: int63) (v: 'a) : array 'a
-    requires { "expl:array creation size" n >= 0 }
+    requires { [@expl:array creation size] n >= 0 }
     ensures  { forall i:int. 0 <= i < n -> result[i] = v }
     ensures  { result.length = n }
 

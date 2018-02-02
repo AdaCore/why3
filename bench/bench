@@ -74,7 +74,7 @@ drivers () {
 valid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
-	printf "  "$f"... "
+	printf "  $f... "
 	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
 	    echo "$pgm -P alt-ergo $f"
@@ -89,7 +89,7 @@ valid_goals () {
 invalid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
-	printf "  "$f"... "
+	printf "  $f... "
 	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
 	    echo "invalid test $f failed!"
 	    echo "$pgm -P alt-ergo $f"
@@ -101,9 +101,24 @@ invalid_goals () {
     done
 }
 
+replay () {
+    pgm="bin/why3replay$suffix"
+    for f in $1/*/; do
+        printf "  $f... "
+        if $pgm $f > /dev/null; then
+            echo "ok"
+        else
+            echo "replay test failed!"
+            echo $pgm $f
+            $pgm $f
+            exit 1
+        fi
+    done
+}
+
 execute () {
     pgm="bin/why3execute$suffix"
-    printf "$1 $2... "
+    printf "  $1 $2... "
     if $pgm $1 $2 > /dev/null; then
         echo "ok"
     else
@@ -119,7 +134,7 @@ extract_and_run () {
     shift
     prg=$1
     shift
-    printf "$dir... "
+    printf "  $dir... "
     rm -f $dir/$prg
     printf "clean... "
     if BENCH=yes make -C $dir clean > /dev/null; then
@@ -166,7 +181,7 @@ extract_and_run () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf '%s ' "$1"
+    printf '  %s ' "$1"
     if $pgm $1 > /dev/null; then
         echo "ok"
     else
@@ -190,12 +205,13 @@ goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
 bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
-bads examples/bad-bts
+goods bench/typing/x-bad --type-only
 echo ""
 
 echo "=== Checking good files ==="
 goods bench/typing/good
 goods bench/programs/good
+goods bench/ce
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -212,6 +228,10 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/in_progress
 goods examples/in_progress/multiprecision
+echo ""
+
+echo "=== Checking replay (no prover) ==="
+replay bench/replay
 echo ""
 
 echo "=== Checking valid goals ==="
@@ -272,3 +292,7 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+
+echo "=== Checking realizations ==="
+echo "temporarily disabled"
+#exec bench/check_realizations.sh
