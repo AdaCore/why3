@@ -9,12 +9,12 @@
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../mergesort_list.mlw" proved="true">
-<theory name="Elt" proved="true" sum="84518d7f52d72813b9844e109c663213">
+<theory name="Elt" proved="true">
  <goal name="Trans" proved="true">
  <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
 </theory>
-<theory name="Merge" proved="true" sum="b8457c60501e667bc61cff1127ba68a7">
+<theory name="Merge" proved="true">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
@@ -65,7 +65,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="EfficientMerge" proved="true" sum="2015c9d93a74dcfbc92a8186a00ba3b6">
+<theory name="EfficientMerge" proved="true">
  <goal name="sorted_reverse_cons" proved="true">
  <proof prover="0"><result status="valid" time="0.26"/></proof>
  <proof prover="2" timelimit="6"><result status="valid" time="0.34"/></proof>
@@ -167,7 +167,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Mergesort" proved="true" sum="b57fa9f67002f7bf754492a590423a63">
+<theory name="Mergesort" proved="true">
  <goal name="WP_parameter split" expl="VC for split" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter split.0" expl="postcondition" proved="true">
@@ -239,7 +239,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="OCamlMergesort" proved="true" sum="52907827e0ab5839283d9166cbf7695b">
+<theory name="OCamlMergesort" proved="true">
  <goal name="sorted_reverse_cons" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.24"/></proof>
  </goal>

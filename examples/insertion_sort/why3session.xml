@@ -7,7 +7,7 @@
 <prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../insertion_sort.mlw">
-<theory name="InsertionSort" sum="724d2240d6a13cb3ff990292cbc5a942">
+<theory name="InsertionSort">
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter insertion_sort.1" expl="postcondition">
@@ -106,7 +106,7 @@
  <proof prover="6"><result status="valid" time="0.02" steps="21"/></proof>
  </goal>
 </theory>
-<theory name="InsertionSortGen" sum="ee94e2d0ddb5218d6b702548731a5c8d">
+<theory name="InsertionSortGen">
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter insertion_sort.1" expl="postcondition">

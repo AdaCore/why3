@@ -5,11 +5,11 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../leftist_heap.mlw">
-<theory name="Heap" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Heap">
 </theory>
-<theory name="TreeRank" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="TreeRank">
 </theory>
-<theory name="Size" sum="b5e0f5470f352887c314f0be5c5ea10b">
+<theory name="Size">
  <goal name="size_nonneg" expl="">
  <transf name="induction_ty_lex">
   <goal name="size_nonneg.1" expl="">
@@ -25,7 +25,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Occ" sum="6b8b644b7c697391f57f242ca6a55b2e">
+<theory name="Occ">
  <goal name="occ_nonneg" expl="">
  <transf name="induction_ty_lex">
   <goal name="occ_nonneg.1" expl="">
@@ -34,7 +34,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LeftistHeap" sum="76d50279012015d034cc91e06aa9e650">
+<theory name="LeftistHeap">
  <goal name="le_root_trans" expl="">
  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
  </goal>

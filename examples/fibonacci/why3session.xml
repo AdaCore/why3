@@ -12,7 +12,7 @@
 <prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="11" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../fibonacci.mlw" proved="true">
-<theory name="FibonacciTest" proved="true" sum="4c479fa43892b7cb3c00591a914a8d47">
+<theory name="FibonacciTest" proved="true">
  <goal name="isfib_2_1" proved="true">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -27,12 +27,12 @@
  <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLinear" proved="true" sum="7ea87ff256cdd54a5c83a7ac463a5cd4">
+<theory name="FibonacciLinear" proved="true">
  <goal name="WP_parameter fib" expl="VC for fib" proved="true">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="FibRecGhost" proved="true" sum="71ea351c35255d96bce5e3807fb03ba1">
+<theory name="FibRecGhost" proved="true">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter fib_aux.0" expl="postcondition" proved="true">
@@ -101,7 +101,7 @@
  <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="FibRecNoGhost" proved="true" sum="56a07332219c7a5302acd0f607ec5928">
+<theory name="FibRecNoGhost" proved="true">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter fib_aux.0" expl="postcondition" proved="true">
@@ -151,12 +151,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SmallestFibAbove" proved="true" sum="4bb9fe06e1479bb7ba8cf980c53ef19b">
+<theory name="SmallestFibAbove" proved="true">
  <goal name="WP_parameter smallest_fib_above" expl="VC for smallest_fib_above" proved="true">
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Zeckendorf" proved="true" sum="54686c9dccf333a9c9a90c9aa260bb25">
+<theory name="Zeckendorf" proved="true">
  <goal name="WP_parameter fib_nonneg" expl="VC for fib_nonneg" proved="true">
  <proof prover="8" timelimit="6"><result status="valid" time="0.03" steps="12"/></proof>
  </goal>
@@ -431,7 +431,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Mat22" proved="true" sum="f9f8bb3f8c40424a9637b70539497d11">
+<theory name="Mat22" proved="true">
  <goal name="Monoid.Assoc" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
@@ -442,7 +442,7 @@
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLogarithmic" proved="true" sum="c7cd90450f6b422f8c71664520a13fef">
+<theory name="FibonacciLogarithmic" proved="true">
  <goal name="WP_parameter logfib" expl="VC for logfib" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter logfib.0" expl="postcondition" proved="true">

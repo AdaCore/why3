@@ -9,9 +9,9 @@
 <prover id="9" name="Z3" version="4.3.2" timelimit="25" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="0.99.1" timelimit="25" steplimit="0" memlimit="1000"/>
 <file name="../queens.mlw">
-<theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="S">
 </theory>
-<theory name="NQueensSetsTermination" sum="bea7d269b5a633c9493f4915f687a3ce">
+<theory name="NQueensSetsTermination">
  <goal name="WP_parameter t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t.1" expl="loop invariant init">
@@ -35,7 +35,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Solution" sum="38908f3094a225b166c79d4eb99410d9">
+<theory name="Solution">
  <goal name="partial_solution_eq_prefix" expl="">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -45,7 +45,7 @@
  <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="NQueensSets" sum="dc4b9660bbaab859f8c89662a481cbb9">
+<theory name="NQueensSets">
  <goal name="WP_parameter t3" expl="VC for t3">
  <transf name="split_goal_wp">
   <goal name="WP_parameter t3.1" expl="loop invariant init">

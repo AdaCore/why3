@@ -5,7 +5,7 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../unraveling_a_card_trick.mlw">
-<theory name="GilbreathCardTrickPure" sum="89a1923ea61027cfed5e32434adeacd0">
+<theory name="GilbreathCardTrickPure">
  <goal name="shuffle_nil_nil_nil" expl="">
  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
@@ -44,7 +44,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="GilbreathCardTrick" sum="86ea96b5a7a96a828c175adbdc6ee466">
+<theory name="GilbreathCardTrick">
  <goal name="WP_parameter shuffle" expl="VC for shuffle">
  <transf name="split_goal_wp">
   <goal name="WP_parameter shuffle.1" expl="loop invariant init">

@@ -12,7 +12,7 @@
 <prover id="7" name="Spass" version="3.7" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../koda_ruskey.mlw">
-<theory name="KodaRuskey_Spec" sum="8e518d6f01f787c2ba93abeff13d48b2">
+<theory name="KodaRuskey_Spec">
  <goal name="size_forest_nonneg">
  <transf name="induction_ty_lex">
   <goal name="size_forest_nonneg.1" expl="1.">
@@ -28,7 +28,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Lemmas" sum="69586628d3c613c629b078044197f281">
+<theory name="Lemmas">
  <goal name="mem_app">
  <transf name="induction_ty_lex">
   <goal name="mem_app.1" expl="1.">
@@ -581,7 +581,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="KodaRuskey" sum="36a4845e80d79eb1bc0cec1b749891e7">
+<theory name="KodaRuskey">
  <goal name="WP_parameter enum" expl="VC for enum">
  <transf name="split_goal_wp">
   <goal name="WP_parameter enum.1" expl="1. unreachable point">
@@ -968,7 +968,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="CountCorrect" sum="0c4c6552ada3f064968caffb47cd9277">
+<theory name="CountCorrect">
  <goal name="WP_parameter product" expl="VC for product">
  <proof prover="1" timelimit="31"><result status="valid" time="0.22" steps="321"/></proof>
  </goal>

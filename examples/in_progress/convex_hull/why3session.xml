@@ -6,7 +6,7 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="1" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.1" timelimit="3" steplimit="1" memlimit="1000"/>
 <file name="../convex_hull.mlw">
-<theory name="ConvexSet" sum="fb384dbf120937751abd91425c4060e7">
+<theory name="ConvexSet">
  <goal name="knuth1">
  <proof prover="0" obsolete="true"><result status="valid" time="0.10"/></proof>
  <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -35,9 +35,9 @@
  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Incremental" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Incremental" proved="true">
 </theory>
-<theory name="Jarvis" sum="e04314a9221ab5cdc0a0e5fe3328c0dd">
+<theory name="Jarvis">
  <goal name="WP_parameter lowest_pt" expl="VC for lowest_pt">
  <transf name="split_goal_wp" >
   <goal name="WP_parameter lowest_pt.0" expl="loop invariant init">
@@ -91,7 +91,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Graham" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Graham" proved="true">
 </theory>
 </file>
 </why3session>

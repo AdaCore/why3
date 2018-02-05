@@ -5,7 +5,7 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../order.mlw">
-<theory name="Ordered" sum="c4cd675c6d383cf9b5db02c4bda78691">
+<theory name="Ordered">
  <goal name="maximum_supremum">
  <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="22"/></proof>
  </goal>
@@ -13,7 +13,7 @@
  <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
 </theory>
-<theory name="LimUniq" sum="145bb52ee4a424df949cd6b90ea9915f">
+<theory name="LimUniq">
  <goal name="maximum_uniq">
  <transf name="split_goal_wp">
   <goal name="maximum_uniq.1" expl="1.">
@@ -47,11 +47,11 @@
  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
  </goal>
 </theory>
-<theory name="Chain" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Chain">
 </theory>
-<theory name="WfChain" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="WfChain">
 </theory>
-<theory name="WfChainProof" sum="76c1ff9b2be6dcaacb75e7b135c35314">
+<theory name="WfChainProof">
  <goal name="wf_chain_hence_acc_on">
  <transf name="split_goal_wp">
   <goal name="wf_chain_hence_acc_on.1" expl="1.">
@@ -146,9 +146,9 @@
  <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
  </goal>
 </theory>
-<theory name="SubChain" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubChain">
 </theory>
-<theory name="SubChainProof" sum="c57370796bba4f99edbd20bd549c07e9">
+<theory name="SubChainProof">
  <goal name="subchain_antisymetric">
  <proof prover="2"><result status="valid" time="0.03" steps="123"/></proof>
  </goal>
@@ -276,7 +276,7 @@
  <proof prover="2"><result status="valid" time="0.03" steps="39"/></proof>
  </goal>
 </theory>
-<theory name="Product" sum="a605e98e1feab6fd671571dae0625b67">
+<theory name="Product">
  <goal name="order_product">
  <transf name="split_goal_wp">
   <goal name="order_product.1" expl="1.">
@@ -472,7 +472,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="ProductChain" sum="77e62c0f32a88126e6186c89d6c363b8">
+<theory name="ProductChain">
  <goal name="prod_chain">
  <transf name="split_goal_wp">
   <goal name="prod_chain.1" expl="1.">

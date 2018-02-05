@@ -8,9 +8,9 @@
 <prover id="13" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="15" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../mergesort_array.mlw" proved="true">
-<theory name="Elt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Elt" proved="true">
 </theory>
-<theory name="Merge" proved="true" sum="926a420600859df1bf7956dacc4cace8">
+<theory name="Merge" proved="true">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
@@ -267,7 +267,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TopDownMergesort" proved="true" sum="e983d83a289b51846a0fd2cf8915d7cd">
+<theory name="TopDownMergesort" proved="true">
  <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter mergesort_rec.0" expl="check division by zero" proved="true">
@@ -321,7 +321,7 @@
  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
 </theory>
-<theory name="BottomUpMergesort" proved="true" sum="6210fbc75810fa2473d31a291282e174">
+<theory name="BottomUpMergesort" proved="true">
  <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter bottom_up_mergesort.0" expl="loop invariant init" proved="true">
@@ -477,7 +477,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NaturalMergesort" proved="true" sum="58d60bf468fdcac4a3d847e617bfc16b">
+<theory name="NaturalMergesort" proved="true">
  <goal name="WP_parameter find_run" expl="VC for find_run" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter find_run.0" expl="loop invariant init" proved="true">

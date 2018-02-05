@@ -8,13 +8,13 @@
 <prover id="5" name="CVC3" version="2.4.1" timelimit="60" steplimit="0" memlimit="4000"/>
 <prover id="9" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../bag.mlw">
-<theory name="Bag" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Bag">
 </theory>
-<theory name="BagSpec" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="BagSpec">
 </theory>
-<theory name="ResizableArraySpec" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ResizableArraySpec">
 </theory>
-<theory name="BagImpl" sum="04f2593d97604dbae67eb342f4687d32">
+<theory name="BagImpl">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
  <proof prover="5"><result status="valid" time="0.02"/></proof>
@@ -110,7 +110,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="54e66c5ddd34c1e0113aa1b612b77112">
+<theory name="Harness">
  <goal name="WP_parameter test1" expl="VC for test1">
  <transf name="split_goal_wp">
   <goal name="WP_parameter test1.1" expl="assertion">

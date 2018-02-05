@@ -6,12 +6,12 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../register_allocation.mlw" proved="true">
-<theory name="Spec" proved="true" sum="ed57b6f9e86f0710eacfd48450b013e8">
+<theory name="Spec" proved="true">
  <goal name="WP_parameter exec_append" expl="VC for exec_append" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
 </theory>
-<theory name="DWP" proved="true" sum="fc1833da5441b79ecb167fa853df7992">
+<theory name="DWP" proved="true">
  <goal name="WP_parameter prefix $" expl="VC for prefix $" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
@@ -67,7 +67,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InfinityOfRegisters" proved="true" sum="ff914be14b29765446ad4b3fe44441de">
+<theory name="InfinityOfRegisters" proved="true">
  <goal name="WP_parameter compile" expl="VC for compile" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter compile.0" expl="precondition" proved="true">
@@ -208,7 +208,7 @@
  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
 </theory>
-<theory name="FiniteNumberOfRegisters" proved="true" sum="7ae61f34fa4afb432b219155e88f1b3c">
+<theory name="FiniteNumberOfRegisters" proved="true">
  <goal name="WP_parameter compile" expl="VC for compile" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter compile.0" expl="precondition" proved="true">
@@ -420,7 +420,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="OptimalNumberOfRegisters" proved="true" sum="c75b6bf94760cf66fb6e527dfc2fea1b">
+<theory name="OptimalNumberOfRegisters" proved="true">
  <goal name="measure_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="measure_nonneg.0" proved="true">

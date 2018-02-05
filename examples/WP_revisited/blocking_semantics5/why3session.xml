@@ -10,7 +10,7 @@
 <prover id="11" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../blocking_semantics5.mlw">
-<theory name="Syntax" sum="f7cde33e5e26ee60d3da8eec7b217241">
+<theory name="Syntax">
  <goal name="mident_decide" expl="">
  <proof prover="9"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
@@ -21,7 +21,7 @@
  <proof prover="9"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="SemOp" sum="60fbf73e1f7166ff30a0a13e124972f7">
+<theory name="SemOp">
  <goal name="get_stack_eq" expl="">
  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
@@ -38,7 +38,7 @@
  <proof prover="1" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
 </theory>
-<theory name="TestSemantics" sum="86970d496f2db125feae52276a283ee6">
+<theory name="TestSemantics">
  <goal name="Test13" expl="">
  <proof prover="9"><result status="valid" time="0.02" steps="16"/></proof>
  <proof prover="10"><result status="valid" time="0.03"/></proof>
@@ -60,9 +60,9 @@
  <proof prover="1" timelimit="6" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="0.81"/></proof>
  </goal>
 </theory>
-<theory name="Typing" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Typing">
 </theory>
-<theory name="TypingAndSemantics" sum="a93f17496bf551e48a79468a47f1668b">
+<theory name="TypingAndSemantics">
  <goal name="type_inversion" expl="">
  <transf name="induction_ty_lex">
   <goal name="type_inversion.1" expl="">
@@ -100,7 +100,7 @@
  <proof prover="1" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="1.52"/></proof>
  </goal>
 </theory>
-<theory name="FreshVariables" sum="e8d942e6e9d0add73d0d37a3267da968">
+<theory name="FreshVariables">
  <goal name="Cons_append" expl="">
  <proof prover="9"><result status="valid" time="0.03" steps="13"/></proof>
  </goal>
@@ -337,7 +337,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HoareLogic" sum="23cedd132ddce3b408fd64127096ec7a">
+<theory name="HoareLogic">
  <goal name="many_steps_seq" expl="">
  <proof prover="1" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="0.92"/></proof>
  </goal>
@@ -367,7 +367,7 @@
  <proof prover="1" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="0.46"/></proof>
  </goal>
 </theory>
-<theory name="WP" sum="5cc3a5597ba7d5d9898b25547d8addba">
+<theory name="WP">
  <goal name="monotonicity" expl="">
  <transf name="induction_ty_lex">
   <goal name="monotonicity.1" expl="">

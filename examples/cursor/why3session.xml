@@ -9,9 +9,9 @@
 <prover id="4" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../cursor.mlw">
-<theory name="Cursor" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Cursor">
 </theory>
-<theory name="TestCursor" sum="60512a0fc8f579016d61effc080ae36d">
+<theory name="TestCursor">
  <goal name="WP_parameter sum" expl="VC for sum">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sum.1" expl="loop invariant init">
@@ -57,7 +57,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="IntListCursor" sum="022d7dd5e6c670e9ab95d106c825b2ae">
+<theory name="IntListCursor">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
@@ -68,7 +68,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="47"/></proof>
  </goal>
 </theory>
-<theory name="TestListCursor" sum="284fa06961ca3c80b33a5e04966a9809">
+<theory name="TestListCursor">
  <goal name="WP_parameter list_sum" expl="VC for list_sum">
  <transf name="split_goal_wp">
   <goal name="WP_parameter list_sum.1" expl="loop invariant init">
@@ -101,7 +101,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="IntArrayCursor" sum="c7de5695d3db6235c67dcc5995efad58">
+<theory name="IntArrayCursor">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="5"><result status="valid" time="0.05" steps="15"/></proof>
  </goal>
@@ -142,7 +142,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TestArrayCursor" sum="9fbc3aefd45621fa8d19dcbb1b1d1449">
+<theory name="TestArrayCursor">
  <goal name="WP_parameter array_sum_array_to_list" expl="VC for array_sum_array_to_list">
  <proof prover="1"><result status="valid" time="0.04" steps="46"/></proof>
  </goal>

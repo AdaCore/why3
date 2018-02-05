@@ -5,9 +5,9 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../skew_heaps.mlw">
-<theory name="Heap" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Heap">
 </theory>
-<theory name="SkewHeaps" sum="4a959887a6d15df9a257f7c0446ce9ab">
+<theory name="SkewHeaps">
  <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
  <transf name="split_goal_wp">
   <goal name="WP_parameter root_is_min.1" expl="unreachable point">
@@ -167,7 +167,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HeapSort" sum="798f7dc1eed380be71f1e870dfeab291">
+<theory name="HeapSort">
  <goal name="WP_parameter heapsort" expl="VC for heapsort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter heapsort.1" expl="postcondition">

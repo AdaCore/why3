@@ -9,14 +9,14 @@
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.3" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../ropes.mlw" proved="true">
-<theory name="String" proved="true" sum="b614f01a5139505ba656626641d10339">
+<theory name="String" proved="true">
  <goal name="app_assoc" proved="true">
  <proof prover="4"><result status="valid" time="0.03" steps="33"/></proof>
  </goal>
 </theory>
-<theory name="Sig" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Sig" proved="true">
 </theory>
-<theory name="Rope" proved="true" sum="2cc20fa7ef0a7340d8901bf26115941a">
+<theory name="Rope" proved="true">
  <goal name="rope_length_is_string_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="rope_length_is_string_length.0" proved="true">
@@ -175,7 +175,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Balance" proved="true" sum="6c9f71412562cc224d9480f9f09a0c2f">
+<theory name="Balance" proved="true">
  <goal name="WP_parameter string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter string_of_array_concat.0" expl="variant decrease" proved="true">

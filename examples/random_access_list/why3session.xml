@@ -8,7 +8,7 @@
 <prover id="6" name="CVC4" version="1.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="15" steplimit="0" memlimit="1000"/>
 <file name="../random_access_list.mlw">
-<theory name="RandomAccessList" sum="7f98bb8e8a2f098e83e86fe73d805585">
+<theory name="RandomAccessList">
  <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
  <transf name="split_goal_wp">
   <goal name="WP_parameter length_flatten.1" expl="variant decrease">
@@ -150,7 +150,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RAL" sum="0c55f3a0f6d810facaf57d93e535239f">
+<theory name="RAL">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
@@ -164,7 +164,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="RandomAccessListWithSeq" sum="0ede75e2c46a696a091f3ed1a27b6f5e">
+<theory name="RandomAccessListWithSeq">
  <goal name="WP_parameter size" expl="VC for size">
  <transf name="split_goal_wp">
   <goal name="WP_parameter size.1" expl="postcondition">

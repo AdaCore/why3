@@ -4,9 +4,9 @@
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../snapshotable_trees.mlw">
-<theory name="Tree" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Tree">
 </theory>
-<theory name="Enum" sum="45de2fc48f315537f2d1cee3a237ebf6">
+<theory name="Enum">
  <goal name="WP_parameter enum" expl="VC for enum">
  <transf name="split_goal_wp">
   <goal name="WP_parameter enum.1" expl="postcondition">
@@ -21,7 +21,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Iterator" sum="4a873877ca1dc0df83bf388f54870f1c">
+<theory name="Iterator">
  <goal name="WP_parameter create_iterator" expl="VC for create_iterator">
  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
@@ -32,7 +32,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
 </theory>
-<theory name="BSTree" sum="f93a29a8e0fed8459fc92010ba1bb20b">
+<theory name="BSTree">
  <goal name="WP_parameter bst_mem" expl="VC for bst_mem">
  <proof prover="1"><result status="valid" time="0.02" steps="123"/></proof>
  </goal>
@@ -40,7 +40,7 @@
  <proof prover="1"><result status="valid" time="0.08" steps="378"/></proof>
  </goal>
 </theory>
-<theory name="ITree" sum="371ef89b8328e6b1805f537498166bc0">
+<theory name="ITree">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
@@ -80,7 +80,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="Harness" sum="67dff5996f85b9ade2ebec156d0d9fd6">
+<theory name="Harness">
  <goal name="WP_parameter test" expl="VC for test">
  <transf name="split_goal_wp">
   <goal name="WP_parameter test.1" expl="assertion">

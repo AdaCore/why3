@@ -8,7 +8,7 @@
 <prover id="3" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../vm.mlw">
-<theory name="ReflTransClosure" sum="41f42e2f3926adcb698b8698151507f0">
+<theory name="ReflTransClosure">
  <goal name="transition_star_one">
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -23,7 +23,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Vm" sum="acfc57c1ffaddaef327e3669c590c3a0">
+<theory name="Vm">
  <goal name="codeseq_at_app_right">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -31,7 +31,7 @@
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
-<theory name="VMClock" sum="8e19e54308c1351d0cdf53199e5bc630">
+<theory name="VMClock">
  <goal name="transition_star_endpoints">
  <transf name="split_goal_wp">
   <goal name="transition_star_endpoints.1" expl="1.">
