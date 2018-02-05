@@ -34,9 +34,8 @@ module VonNeumann16
   function pow2 (n:t) : t = lsl_bv (1:t) n
   predicate is_pow2 (x:t) (n:t) = bw_and x (pred (pow2 n)) = (0:t)
 
-  lemma sqr_add: forall x y.
-    sqr (add x y) = add (sqr x) (add (sqr y) (mul (2:t) (mul x y)))
-
+  lemma sqr_add2: forall x y.
+    sqr (add x y) = add (sqr x) (mul y (add (mul (2:t) x) y))
 
   let isqrt16 (x:t) : t
     ensures { ule (sqr result) x }
@@ -65,6 +64,7 @@ module VonNeumann16
       invariant { ule !num x }
       (* (x - num) is the square of (res / 2^m) *)
       invariant { sub x !num = sqr !res_g }
+      invariant {ule (add !res_g (pow2 !m)) (0x100:t)}
       (* x < (res_g + 2^m)^2 *)
       invariant { ule x (pred (sqr (add !res_g (pow2 !m)))) }
 
@@ -82,7 +82,7 @@ module VonNeumann16
       assert { !res = mul !res_g (pow2 !m) };
       if uge !num b then
         begin
-        num := sub !num b; 
+        num := sub !num b;
         label L in
         res := bw_or !res !bits;
         assert { !res = add (!res at L) !bits };
@@ -109,9 +109,9 @@ module VonNeumann32
   function pred (x:t) : t = sub x (1:t)
   function pow2 (n:t) : t = lsl_bv (1:t) n
   predicate is_pow2 (x:t) (n:t) = bw_and x (pred (pow2 n)) = (0:t)
-    
-  lemma sqr_add: forall x y.
-    sqr (add x y) = add (sqr x) (add (sqr y) (mul (2:t) (mul x y)))
+
+  lemma sqr_add2: forall x y.
+    sqr (add x y) = add (sqr x) (mul y (add (mul (2:t) x) y))
 
   let isqrt32 (x:t) : t
     ensures { ule (sqr result) x }
@@ -140,6 +140,7 @@ module VonNeumann32
       invariant { ule !num x }
       (* (x - num) est le carré de (res / 2^m) *)
       invariant { sub x !num = sqr !res_g }
+      invariant {ule (add !res_g (pow2 !m)) (0x1_0000:t)}
       (* x < (res_g + 2^m)^2 *)
       invariant { ule x (pred (sqr (add !res_g (pow2 !m)))) }
 
@@ -184,15 +185,8 @@ module VonNeumann64
   function pow2 (n:t) : t = lsl_bv (1:t) n
   predicate is_pow2 (x:t) (n:t) = bw_and x (pred (pow2 n)) = (0:t)
 
-
-  lemma sqr_add: forall x y.
-    sqr (add x y) = add (sqr x) (add (sqr y) (mul (2:t) (mul x y)))
-
   lemma sqr_add2: forall x y.
     sqr (add x y) = add (sqr x) (mul y (add (mul (2:t) x) y))
-    (*
-          pragma Assert ((X + Y) * (X + Y) = X * X + Y * (2 * X + Y));*)
-
 
   let isqrt64 (x:t) : t
     ensures { ule (sqr result) x }
@@ -207,11 +201,11 @@ module VonNeumann64
       variant { t'int !bits }
       (* 0 <= m <= 32 *)
       invariant { ule !m (32:t) }
-      (* bits_g = 2^{m-1} ou 0 si m=0 *)
+      (* bits_g = 2^{m-1} or 0 if m=0 *)
       invariant { !bits_g = if !m=(0:t) then (0:t) else pow2 (pred !m) }
       (* bits = bits_g^2 *)
       invariant { !bits = sqr !bits_g }
-      (* res_g multiple de 2^m *)
+      (* res_g multiple of 2^m *)
       invariant { is_pow2 !res_g !m }
       (* res_g smaller than 2^32 *)
       invariant { ult !res_g (0x1_0000_0000:t) }
@@ -219,10 +213,9 @@ module VonNeumann64
       invariant { !res = mul !res_g (pow2 !m) }
       (* num <= x *)
       invariant { ule !num x }
-      (* (x - num) est le carré de (res / 2^m) *)
+      (* (x - num) is the square of (res / 2^m) *)
       invariant { sub x !num = sqr !res_g }
       invariant {ule (add !res_g (pow2 !m)) (0x1_0000_0000:t)}
-
       (* x < (res_g + 2^m)^2 *)
       invariant { ule x (pred (sqr (add !res_g (pow2 !m)))) }
 
