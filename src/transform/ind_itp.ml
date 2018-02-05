@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -173,7 +173,7 @@ let revert_tr_symbol symbol_list =
     | [] -> (pr_acc, ls_acc)
     | Tsprsymbol pr :: tl -> convert_list (pr :: pr_acc) ls_acc tl
     | Tslsymbol ls :: tl -> convert_list pr_acc (ls :: ls_acc) tl
-    | Tstysymbol _ :: tl ->
+    | Tstysymbol _ :: _tl ->
         raise (Arg_trans "Tysymbol should not appear here. Please report")
   in
   let (prlist, lslist) = convert_list [] [] symbol_list in

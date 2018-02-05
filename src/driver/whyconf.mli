@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -74,6 +74,8 @@ val libobjdir: main -> string
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
+val set_loadpath : main -> string list -> main
+val default_loadpath : string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int

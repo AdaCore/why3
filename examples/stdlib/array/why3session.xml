@@ -3,12 +3,12 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="2250"/>
-<prover id="1" name="Coq" version="8.6.1" timelimit="2" steplimit="0" memlimit="0"/>
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="2250"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2250"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2250"/>
 <prover id="5" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="2250"/>
-<file name="../../../modules/array.mlw">
+<prover id="6" name="Coq" version="8.7.1" timelimit="2" steplimit="0" memlimit="0"/>
+<file name="../../../modules/array.mlw" proved="true">
 <theory name="Array" proved="true" sum="a4386c74c7fc0ab46ab3dd9d9d5cae40">
  <goal name="WP_parameter defensive_get" expl="VC for defensive_get" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
@@ -34,12 +34,12 @@
 </theory>
 <theory name="ArrayExchange" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ArrayPermut" sum="4df642c6a5d352ea5ec0e76c805c8f49">
- <goal name="exchange_permut_sub">
- <proof prover="1" timelimit="4" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.53"/></proof>
+<theory name="ArrayPermut" proved="true" sum="4df642c6a5d352ea5ec0e76c805c8f49">
+ <goal name="exchange_permut_sub" proved="true">
+ <proof prover="6" timelimit="4" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.53"/></proof>
  </goal>
  <goal name="permut_sub_weakening" proved="true">
- <proof prover="1" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.50"/></proof>
+ <proof prover="6" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.50"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -62,7 +62,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
-<theory name="ToSeq" proved="true" sum="16189e2571a1238f4124921c02a79c14">
+<theory name="ToSeq" proved="true" sum="094a325952a512c87b367dbc9505daa4">
  <goal name="WP_parameter to_seq_length" expl="VC for to_seq_length" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter to_seq_length.0" expl="variant decrease" proved="true">

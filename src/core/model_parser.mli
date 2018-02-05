@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -148,6 +148,16 @@ val print_model :
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
 *)
+
+val print_model_human :
+  ?me_name_trans:(model_element_name -> string) ->
+  Format.formatter ->
+  model ->
+  unit
+(** Same as print_model but is intended to be human readable.
+
+*)
+
 
 val model_to_string :
   ?me_name_trans:(model_element_name -> string) ->

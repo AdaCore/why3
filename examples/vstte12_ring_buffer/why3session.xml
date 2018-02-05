@@ -4,12 +4,12 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.6.1" timelimit="20" steplimit="0" memlimit="4000"/>
 <prover id="3" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.7.1" timelimit="20" steplimit="0" memlimit="4000"/>
 <file name="../vstte12_ring_buffer.mlw" proved="true">
-<theory name="RingBuffer" proved="true" sum="586116bfb760bb694b8273e1f1a8b69a">
+<theory name="RingBuffer" proved="true" sum="26430d7276801894a93171f8cee6215b">
  <goal name="WP_parameter create" expl="VC for create" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
@@ -70,7 +70,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter head.1" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="1000" edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v"><result status="valid" time="0.62"/></proof>
+  <proof prover="6" timelimit="5" memlimit="1000" edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v"><result status="valid" time="0.62"/></proof>
   </goal>
  </transf>
  </goal>
@@ -175,7 +175,7 @@
    <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter pop.7.1" expl="VC for pop" proved="true">
-   <proof prover="2" edited="vstte12_ring_buffer_RingBuffer_WP_parameter_pop_2.v"><result status="valid" time="0.52"/></proof>
+   <proof prover="6" edited="vstte12_ring_buffer_RingBuffer_WP_parameter_pop_2.v"><result status="valid" time="0.72"/></proof>
    </goal>
    <goal name="WP_parameter pop.7.2" expl="VC for pop" proved="true">
    <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="24"/></proof>
@@ -185,7 +185,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" proved="true" sum="0986f03b15c7d8b65b82ce334aa1cb5f">
+<theory name="Harness" proved="true" sum="e3241b00117c592bb16e9a8f2c8a2ec7">
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter harness.0" expl="precondition" proved="true">
@@ -349,7 +349,7 @@
  <proof prover="0" timelimit="6" memlimit="1000"><result status="valid" time="0.03" steps="62"/></proof>
  </goal>
 </theory>
-<theory name="HarnessSeq" proved="true" sum="66b07b87bcf1d9de376f650d1afe65d2">
+<theory name="HarnessSeq" proved="true" sum="32d72051ef9a3c8c44c07eb7037eaa7d">
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>

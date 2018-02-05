@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -428,11 +428,13 @@ let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
   ~desc:"Suppress@ warnings@ on@ unused@ variables"
 
 let check_used_var t vs =
-  if not (Debug.test_flag debug_ignore_unused_var) then
-  let s = vs.vs_name.id_string in
-  if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
-(*   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s *)
-    ()
+  if Debug.test_noflag debug_ignore_unused_var then
+    begin
+      let s = vs.vs_name.id_string in
+      if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
+(*        Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s*)
+        ()
+    end
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)

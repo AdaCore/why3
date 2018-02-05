@@ -4,10 +4,10 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../compiler.mlw" proved="true">
 <theory name="Compile_aexpr" proved="true" sum="407d77668df70f8af94774aee7f39cf3">
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr" proved="true">
@@ -1005,7 +1005,7 @@
   <proof prover="0"><result status="valid" time="0.12" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter compile_com.46" expl="precondition" proved="true">
-  <proof prover="2" edited="compiler_Compile_com_WP_parameter_compile_com_1.v"><result status="valid" time="2.27"/></proof>
+  <proof prover="6" edited="compiler_Compile_com_WP_parameter_compile_com_1.v"><result status="valid" time="1.69"/></proof>
   </goal>
   <goal name="WP_parameter compile_com.47" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.14" steps="40"/></proof>

@@ -1,9 +1,99 @@
+module Naming
+  use import int.Int
+  constant x : int
+  goal G : forall x:int. x >= 0 -> x = 0
+end
 
+module ApplyRewrite
+
+  use import int.Int
+
+  function f int int : int
+
+  use HighOrd
+
+  axiom H: forall x. (\z: int. x + z) =  f x
+
+  goal g1: (\toto. 42 + toto) = f 42
+  
+  axiom Ha: forall x. (\z: int. x + z) 2 = 2
+  
+  goal g3: (\toto. 42 + toto) 2 = 2 
+    
+  goal g2: (\y. y + y) = f 24
+end
+
+module A
+  
+  use import int.Int
+  use HighOrd
+
+  function f int: int
+
+  axiom H: forall y. exists x. f x = x + y
+  
+  goal g1: exists x. f x = x + 42
+  
+  goal g: (\y. f y) 0 = 3
+
+  constant b: bool
+
+  axiom Ha: forall y. if b = true then let x = 3 in f x = x + y else false
+  
+  goal ga: if b = true then let z = 3 in f z = z + 42 else false
+
+  goal gb: if b  = true then let z = 453 in f z = z + 42 else false
+
+end
+
+module Soundness
+  use import int.Int
+  use HighOrd
+  function f0 (x y z:int) : int = x * y + z
+  predicate p (f:int -> int) =
+    f (-1) = 0 && forall n:int. f n = f 0 + (f 1 - f 0) * n
+  lemma A : forall y z:int. p (\x. f0 x y z) <-> y = z
+  meta rewrite prop A
+  lemma Fail : 0 = 0 /\ p (\x. f0 x x x)
+  lemma Absurd : false
+end
+
+module TestCEX
+
+  use import int.Int
+  
+  goal g: forall x "model". x=0
+  
+end
+
+module TestCopyPaste
+
+ use import int.Int
+
+ goal g1: 1=2 /\ 3=4
+
+ goal g2: 5=6 /\ 7=8 /\ 9=10
+
+end
 
 module M
   use import int.Int
 
   function (++) (x:int) (y:int) : int  = x * y
+
+end
+
+module TestWarnings
+
+  use import int.Int
+
+  function f (x y : int) :int = x
+
+  axiom a : forall x:int. x*x >= 0
+
+  goal g1: forall z:int. 42 > 0
+
+  goal g2: let z=1 in 42 > 0
 
 end
 
@@ -52,11 +142,11 @@ end
 module TestInduction
 
   use import int.Int
-  
+
   predicate p int
-  
+
   goal g : forall n. p n
-  
+
 end
 
 module TestInfixSymbols
@@ -92,9 +182,9 @@ module TestRewritePoly
   use import int.Int
   use import list.List
   use import list.Append
-  
+
   goal g : (Cons 1 Nil) ++ ((Cons 2 Nil) ++ Nil) = Cons 1 (Cons 2 Nil)
-  
+
 end
 
 

@@ -3,15 +3,15 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../maximum_subarray.mlw" proved="true">
 <theory name="Spec" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Algo1" proved="true" sum="a89d18ca40dcc22fa9868a59c354857f">
+<theory name="Algo1" proved="true" sum="a81e0a8022fa5f4d1f1f107f8cedc54a">
  <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter maximum_subarray.0" expl="postcondition" proved="true">
@@ -162,7 +162,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Algo2" proved="true" sum="0b49164cba75630b08a8bc1e7da63fdb">
+<theory name="Algo2" proved="true" sum="a7e2211418f00a111bd43b8aa5d27c39">
  <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter maximum_subarray.0" expl="postcondition" proved="true">
@@ -240,7 +240,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Algo3" proved="true" sum="4454f683cfdd6f475d2948e91cb5b69d">
+<theory name="Algo3" proved="true" sum="0f330de659703291ef1cd8786666a8e8">
  <goal name="WP_parameter maximum_subarray_rec" expl="VC for maximum_subarray_rec" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter maximum_subarray_rec.0" expl="postcondition" proved="true">
@@ -476,7 +476,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter maximum_subarray_rec.76" expl="loop invariant preservation" proved="true">
-  <proof prover="1" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_1.v"><result status="valid" time="0.48"/></proof>
+  <proof prover="6" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_1.v"><result status="valid" time="0.48"/></proof>
   </goal>
   <goal name="WP_parameter maximum_subarray_rec.77" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
@@ -485,7 +485,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter maximum_subarray_rec.79" expl="loop invariant preservation" proved="true">
-  <proof prover="1" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_3.v"><result status="valid" time="0.46"/></proof>
+  <proof prover="6" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_3.v"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="WP_parameter maximum_subarray_rec.80" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
@@ -548,7 +548,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Algo4" proved="true" sum="034b628d7824d5af3d43df821ebda33e">
+<theory name="Algo4" proved="true" sum="355a377a2fc13afbe47e9470e692961b">
  <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter maximum_subarray.0" expl="postcondition" proved="true">
@@ -648,7 +648,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Algo5" proved="true" sum="168ca956ed7ab79235ebc43d52e0f472">
+<theory name="Algo5" proved="true" sum="afe0499b30cc61a8fedc416adfa99157">
  <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter maximum_subarray.0" expl="postcondition" proved="true">

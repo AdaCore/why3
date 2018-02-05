@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -195,23 +195,6 @@ let env, gconfig = try
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(* Initialization of config, provers, task_driver and controller in the server *)
-let () =
-  let dir =
-    try
-      Server_utils.get_session_dir ~allow_mkdir:true files
-    with Invalid_argument s ->
-      Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
-  in
-  Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files
-
-let () =
-  Debug.dprintf debug "Init the GTK interface...@?";
-  ignore (GtkMain.Main.init ());
-  Debug.dprintf debug " done.@.";
-  Gconfig.init ()
 
 
 (********************************)
@@ -377,6 +360,30 @@ let update_label_saved (label: GMisc.label) =
 (* Graphical elements *)
 (**********************)
 
+let initialization_complete = ref false
+let warnings = Queue.create ()
+
+let record_warning ?loc msg =
+  Format.eprintf "%awarning: %s@."
+    (Pp.print_option Loc.report_position) loc msg;
+  Queue.push (loc,msg) warnings
+
+let () =
+  Warning.set_hook record_warning;
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:true files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage spec usage_str
+  in
+  Server.init_server gconfig.config env dir;
+  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  send_request Get_global_infos;
+  Debug.dprintf debug "Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  Debug.dprintf debug " done.@.";
+  Gconfig.init ()
 
 let main_window : GWindow.window =
   let w = GWindow.window
@@ -393,7 +400,8 @@ let main_window : GWindow.window =
       (fun {Gtk.width=w;Gtk.height=h} ->
        gconfig.window_height <- h;
        gconfig.window_width <- w)
-  in w
+  in
+  w
 
 (* the main window contains a vertical box, containing:
    1. the menu [menubar]
@@ -475,13 +483,6 @@ let provers_factory =
 (****************************)
 (* actions of the interface *)
 (****************************)
-
-
-
-
-
-
-
 
 
 (***********************************)
@@ -1003,11 +1004,48 @@ let print_message ~kind ~notif_kind fmt =
               add_to_log notif_kind s;
               if kind>0 then
                 begin
-                  message_zone#buffer#set_text s;
+                  message_zone#buffer#insert (s ^ "\n");
                   messages_notebook#goto_page error_page
                 end)
     str_formatter
     fmt
+
+let display_warnings () =
+  if Queue.is_empty warnings then () else
+    begin
+      let nwarn = ref 0 in
+      begin try
+      Queue.iter
+        (fun (loc,msg) ->
+         if !nwarn = 4 then
+           begin
+             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+             raise Exit
+           end
+         else
+           begin
+             incr nwarn;
+             match loc with
+             | None ->
+                Format.fprintf Format.str_formatter "%s@\n@\n" msg
+             | Some l ->
+                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
+                               Loc.gen_report_position l msg
+           end) warnings;
+        with Exit -> ();
+      end;
+      Queue.clear warnings;
+      let msg =
+        Format.flush_str_formatter ()
+      in
+      print_message ~kind:1 ~notif_kind:"warning" "%s" msg
+    end
+
+let print_message ~kind ~notif_kind fmt =
+  display_warnings (); print_message ~kind ~notif_kind fmt
+
+
 
 
 (**** Monitor *****)
@@ -1217,9 +1255,9 @@ let collapse_proven_goals () =
 let () =
   let i = view_factory#add_item
             "Collapse proven goals"
-            ~key: GdkKeysyms._C
             ~callback:(fun () -> collapse_proven_goals ())
   in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
   i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
 
   let i = view_factory#add_item
@@ -1326,9 +1364,9 @@ let () =
 
   let i = view_factory#add_item
             "Expand all below node "
-            ~key:GdkKeysyms._E
             ~callback:(fun () -> expand_row ~all:true)
   in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E;
   i#misc#set_tooltip_markup "Expand all nodes of the tree view";
 
   let i = view_factory#add_item
@@ -1391,10 +1429,10 @@ let interp_ide cmd =
       let s = List.fold_left (fun acc x -> (fst x) ^ ": " ^
                               (snd x) ^ "\n" ^ acc) "" ide_command_list in
       clear_command_entry ();
-      message_zone#buffer#set_text s
+      print_message ~kind:1 ~notif_kind:"Info" "%s" s
   | _ ->
       clear_command_entry ();
-      message_zone#buffer#set_text ("Error: " ^ cmd ^ "\nPlease report.")
+      print_message ~kind:1 ~notif_kind:"error" "Error: %s\nPlease report." cmd
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
@@ -1472,7 +1510,14 @@ let on_selected_row r =
        edited_view#source_buffer#set_text "(not yet available)";
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
-       counterexample_view#scroll_to_mark `INSERT
+       counterexample_view#scroll_to_mark `INSERT;
+       let detached = get_node_detached id in
+       if detached then
+         task_view#source_buffer#set_text ""
+       else
+         let b = gconfig.intro_premises in
+         let c = gconfig.show_full_context in
+         send_request (Get_task(id,b,c,true))
     | _ ->
        let b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
@@ -1526,36 +1571,6 @@ let (_ : GtkSignal.id) =
   in
   goals_view#event#connect#key_press ~callback
 
-(*************************************)
-(* Commands of the Experimental menu *)
-(*************************************)
-
-let exp_menu = factory#add_submenu "_Experimental"
-let exp_factory = new GMenu.factory exp_menu ~accel_group
-
-
-(* Current copied node *)
-let saved_copy = ref None
-
-let copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    saved_copy := Some n
-  | _ -> ()
-
-let paste () =
-  match get_selected_row_references () with
-  | [r] ->
-      let m = get_node_id r#iter in
-    (match !saved_copy with
-    | Some n -> send_request (Copy_paste (n, m))
-    | None -> ())
-  | _ -> ()
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
-
 (*********************************)
 (* add a new file in the project *)
 (*********************************)
@@ -1598,8 +1613,6 @@ let (_ : GtkSignal.id) =
 (* Notification Handling *)
 (*************************)
 
-let initialization_complete = ref false
-
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
@@ -1632,11 +1645,7 @@ let treat_message_notification msg = match msg with
      print_message ~kind:1 ~notif_kind:"Query_info" "%s" s
   | Query_Error (_id, s) ->
      print_message ~kind:1 ~notif_kind:"Query_error" "%s" s
-  | Help s ->
-     print_message ~kind:1 ~notif_kind:"Help" "%s" s
   | Information s ->
-     if not !initialization_complete then main_window#show ();
-     initialization_complete := true;
      print_message ~kind:1 ~notif_kind:"Information" "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
@@ -1644,7 +1653,6 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         if not !initialization_complete then main_window#show ();
          (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
          color_loc ~color:Goal_color rel_loc;
@@ -2028,6 +2036,8 @@ let bisect_item =
   create_menu_item tools_factory "Bisect on external proof"
                    "Search for a maximal set of hypotheses to remove before calling a prover"
 
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
 let focus_item =
   create_menu_item tools_factory "Focus"
     "Focus on proof node"
@@ -2035,6 +2045,14 @@ let focus_item =
 let unfocus_item =
   create_menu_item tools_factory "Unfocus"
     "Unfocus"
+
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
+let copy_item = create_menu_item tools_factory "Copy" "Copy the current tree node"
+
+let paste_item = create_menu_item tools_factory "Paste"
+                                  "Paste the copied node below the current node"
+
 
 let () =
   let on_selected_rows ~multiple ~notif_kind ~action f () =
@@ -2081,6 +2099,36 @@ let () =
     ~callback:(fun () -> send_request Unfocus_req)
 
 
+(*************************************)
+(* Copy paste                        *)
+(*************************************)
+
+(* Current copied node *)
+let saved_copy = ref None
+
+let copy () =
+  match get_selected_row_references () with
+  | [r] -> let n = get_node_id r#iter in
+           saved_copy := Some n;
+           paste_item#misc#set_sensitive true
+  | _ ->
+     saved_copy := None;
+     paste_item#misc#set_sensitive false
+
+let paste () =
+  match get_selected_row_references () with
+  | [r] ->
+      let m = get_node_id r#iter in
+    (match !saved_copy with
+    | Some n -> send_request (Copy_paste (n, m))
+    | None -> ())
+  | _ -> ()
+
+let () =
+  paste_item#misc#set_sensitive false;
+  connect_menu_item copy_item ~callback:copy;
+  connect_menu_item paste_item ~callback:paste
+
 
 (* the command-line *)
 
@@ -2092,7 +2140,6 @@ let check_uninstalled_prover =
       Whyconf.Hprover.add uninstalled_prover_seen p ();
       uninstalled_prover_dialog gconfig p
     end
-
 
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
@@ -2212,7 +2259,9 @@ let treat_notification n =
      Hint.remove node_id_proved id;
      Hint.remove node_id_pa id
   | Initialized g_info            ->
-     (* TODO: treat other *)
+     initialization_complete := true;
+     main_window#show ();
+     display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
@@ -2297,5 +2346,5 @@ let () =
     (fun () -> List.iter treat_notification (get_notified ()); true);
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
-  message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
+  print_message ~kind:1 ~notif_kind:"Info" "Welcome to Why3 IDE\ntype 'help' for help\n";
   GMain.main ()

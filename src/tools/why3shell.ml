@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -112,11 +112,13 @@ let treat_message_notification fmt msg = match msg with
   | Query_Info (_id, s)                            -> fprintf fmt "%s@." s
   | Query_Error (_id, s)                           -> fprintf fmt "%s@." s
   | File_Saved s                                   -> fprintf fmt "%s@." s
+(*
   | Help s                                         -> fprintf fmt "%s@. Additionally for shell:\n\
 goto n -> focuse on n\n\
 ng -> next node\n\
 g -> print the current task\n\
 p -> print the session@." s
+ *)
   | Information s          -> fprintf fmt "%s@." s
   | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
   | Parse_Or_Type_Error (_, _, s)  -> fprintf fmt "%s@." s

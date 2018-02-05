@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -109,8 +109,6 @@ let add_file f = Queue.push f files
 let config, _, env =
   Whyconf.Args.initialize option_list add_file usage_msg
 
-let found_upgraded_prover = ref false
-
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
 let () =
@@ -193,7 +191,7 @@ let same_result r1 r2 =
 
 let add_to_check_no_smoke some_merge_miss found_obs cont =
   let session = cont.Controller_itp.controller_session in
-  let final_callback report =
+  let final_callback found_upgraded_prover report =
     Debug.dprintf debug "@.";
     let files,n,m =
       Stdlib.Hstr.fold (file_statistics session)
@@ -216,10 +214,10 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
       begin
         printf "(replay OK%s%s)@."
           (if found_obs then ", obsolete session" else "")
-          (if !found_upgraded_prover then ", upgraded prover" else "");
+          (if found_upgraded_prover then ", upgraded prover" else "");
         if true (* !opt_stats *) && n<m then print_statistics session files;
         Debug.dprintf debug "Everything replayed OK.@.";
-        if !opt_force || found_obs || !found_upgraded_prover then save ();
+        if !opt_force || found_obs || found_upgraded_prover then save ();
         exit 0
       end
     else
@@ -247,19 +245,16 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   C.register_observer update_monitor;
   if !opt_provers = [] then
     let () =
-      C.replay ~valid_only:false ~obsolete_only:false ~use_steps:!opt_use_steps
+      C.replay ~valid_only:false ~obsolete_only:!opt_obsolete_only ~use_steps:!opt_use_steps
                ~callback ~notification ~final_callback cont ~any:None
     in ()
   else
-    failwith "option -P not yet supported"
-(*
     let filter a =
       List.exists
-        (fun p -> Whyconf.filter_prover p a.Session.proof_prover)
+        (fun p -> Whyconf.filter_prover p a.Session_itp.prover)
         !opt_provers in
-    M.check_all ~release:true ~use_steps:!opt_use_steps
-      ~filter ~callback env_session sched
- *)
+    C.replay ~valid_only:false ~obsolete_only:!opt_obsolete_only ~use_steps:!opt_use_steps
+             ~filter ~callback ~notification ~final_callback cont ~any:None
 
 (*
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,8 +11,10 @@
 
 open Term
 open Decl
+open Theory
 
 exception Arg_trans of string
+exception Arg_trans_decl of (string * tdecl list)
 exception Arg_trans_term of (string * term * term)
 exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
@@ -156,3 +158,28 @@ let sort =
 (* Add a label to a goal (useful to add an expl for example) *)
 let add_goal_label_trans label =
   Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_label_add label g)])
+
+
+(****************************)
+(* Substitution of terms    *)
+(****************************)
+
+type term_subst = term Mterm.t
+
+(* Same as replace but for a list of terms at once. Here, a silent
+   assumption is made that any term tried to be replaced is actually a
+   constant.
+*)
+let replace_subst (subst: term_subst) t =
+  (* TODO improve efficiency of this ? *)
+  Mterm.fold (fun t_from t_to acc ->
+    t_replace_nt_nl t_from t_to acc) subst t
+
+let replace_decl (subst: term_subst) (d: decl) =
+  decl_map (replace_subst subst) d
+
+let replace_tdecl (subst: term_subst) (td: tdecl) =
+  match td.td_node with
+  | Decl d ->
+      create_decl (replace_decl subst d)
+  | _ -> td

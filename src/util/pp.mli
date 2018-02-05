@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -43,6 +43,8 @@ val print_pair_delim :
   (Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
+(** [print_pair_delim left_delim middle_delim right_delim] *)
+
 val print_pair :
   (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit

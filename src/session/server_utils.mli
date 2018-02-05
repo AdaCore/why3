@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -46,7 +46,7 @@ type query =
 (* The first argument is not used: these functions are supposed to be given to a
    Qtask. *)
 val print_id: 'a -> Trans.naming_table -> string list -> string
-val search_id: 'a -> Trans.naming_table -> string list -> string
+val search_id: search_both:bool -> 'a -> Trans.naming_table -> string list -> string
 
 val list_strategies : Controller_itp.controller -> (string * string) list
 val list_provers: Controller_itp.controller -> _ -> string

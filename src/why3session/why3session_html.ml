@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -202,7 +202,7 @@ let rec num_lines s acc tr =
       (color_of_status ~dark:true) (th_proved s th)
       name;
     if th_proved s th then
-      fprintf fmt "fully verified in %%.02f s"
+      fprintf fmt "fully verified" (*TODO in %%.02f s*)
     else fprintf fmt "not fully verified";
     fprintf fmt "</span></h2>@\n";
 

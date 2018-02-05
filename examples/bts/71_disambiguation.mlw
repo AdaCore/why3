@@ -1,0 +1,41 @@
+module M
+
+use import int.Int
+
+function (+) (x: int) (y : int) : int = x * y
+
+goal g: 2 + 3 = Int.(+) 3 3
+
+end
+
+module M1
+
+use import real.RealInfix
+use import int.Int
+
+constant x: int = 0 + 0
+(* constant y: real = 0.0 + 0.0     typing error*)
+
+goal g: True
+
+end
+
+module M2
+
+use import real.RealInfix
+
+(* constant y: real = 0.0 + 0.0     typing error*)
+
+goal g: True
+
+end
+
+module M3
+
+use import real.RealInfix
+
+(*constant x: int = 0 + 0          'unbound symbol infix +' *)
+
+goal g: True
+
+end

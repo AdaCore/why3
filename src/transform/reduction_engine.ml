@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -249,13 +249,13 @@ type engine =
     model([t],[]) = t
 
     model(t1::..::tn::t,f::s) = model(f(t1,..,tn)::t,s)
-      where f as arity n
+      where f is of arity n
 
   A given term can be "exploded" into a configuration by reversing the
   rules above
 
   During reduction, the terms in the first stack are kept in normal
-  form. The normalization process can be defined as the repeated
+  form (value). The normalization process can be defined as the repeated
   application of the following rules.
 
   ([t],[]) --> t  // t is in normal form
@@ -291,25 +291,52 @@ type config = {
 }
 
 
+(* This global variable is used to approximate a count of the elementary
+   simplifications that are done during normalization. This is used for
+   transformation step. *)
+let rec_step_limit = ref 0
+
 exception NoMatch of (term * term) option
 exception NoMatchpat of (pattern * pattern) option
 
-type matched = P of pattern | T of term
-
-let rec open_branches acc_p acc_t tbl1 =
-  match tbl1 with
-  | hd :: tl ->
-    let (p, t) = t_open_branch hd in
-    open_branches (P p :: acc_p) (T t :: acc_t) tl
-  | [] -> (acc_p, acc_t)
-
+let rec pattern_renaming (bound_vars, mt) p1 p2 =
+  match p1.pat_node, p2.pat_node with
+  | Pwild, Pwild ->
+      (bound_vars, mt)
+  | Pvar v1, Pvar v2 ->
+      begin
+        try
+          let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+          let bound_vars = Mvs.add v2 v1 bound_vars in
+          (bound_vars, mt)
+        with
+        | Ty.TypeMismatch _ ->
+          raise (NoMatchpat (Some (p1, p2)))
+      end
+  | Papp (ls1, tl1), Papp (ls2, tl2) when ls_equal ls1 ls2 ->
+      List.fold_left2 pattern_renaming (bound_vars, mt) tl1 tl2
+  | Por (p1a, p1b), Por (p2a, p2b) ->
+      let (bound_vars, mt) =
+        pattern_renaming (bound_vars, mt) p1a p2a in
+      pattern_renaming (bound_vars, mt) p1b p2b
+  | Pas (p1, v1), Pas (p2, v2) ->
+      begin
+        try
+          let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+          let bound_vars = Mvs.add v2 v1 bound_vars in
+          pattern_renaming (bound_vars, mt) p1 p2
+        with
+        | Ty.TypeMismatch _ ->
+          raise (NoMatchpat (Some (p1, p2)))
+      end
+  | _ -> raise (NoMatchpat (Some (p1, p2)))
 
 let first_order_matching (vars : Svs.t) (largs : term list)
     (args : term list) : Ty.ty Ty.Mtv.t * substitution =
-  let rec loop ((mt,mv) as sigma) largs args =
+  let rec loop bound_vars ((mt,mv) as sigma) largs args =
     match largs,args with
       | [],[] -> sigma
-      | T t1::r1, T t2::r2 ->
+      | t1::r1, t2::r2 ->
         begin
 (*
           Format.eprintf "matching terms %a and %a...@."
@@ -320,30 +347,26 @@ let first_order_matching (vars : Svs.t) (largs : term list)
               begin
                 try let t = Mvs.find vs mv in
                     if t_equal t t2 then
-                      loop sigma r1 r2
+                      loop bound_vars sigma r1 r2
                     else
                       raise (NoMatch (Some (t1, t2)))
                 with Not_found ->
                   try
                     let ts = Ty.ty_match mt vs.vs_ty (t_type t2) in
-                    loop (ts,Mvs.add vs t2 mv) r1 r2
+                    let fv2 = t_vars t2 in
+                    if Mvs.is_empty (Mvs.set_inter bound_vars fv2) then
+                      loop bound_vars (ts,Mvs.add vs t2 mv) r1 r2
+                    else
+                      raise (NoMatch (Some (t1, t2)))
                   with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1, t2)))
               end
-            | Tvar vs when Mvs.mem vs mv ->
-                begin
-                  let t = Mvs.find vs mv in
-                  if t_equal t t2 then
-                    loop sigma r1 r2
-                  else
-                    raise (NoMatch (Some (t1, t2)))
-                end
             | Tapp(ls1,args1) ->
               begin
                 match t2.t_node with
                   | Tapp(ls2,args2) when ls_equal ls1 ls2 ->
-                    let mt, mv = loop sigma
-                        (List.rev_append (List.map (fun x -> T x) args1) r1)
-                        (List.rev_append (List.map (fun x -> T x) args2) r2) in
+                    let mt, mv = loop bound_vars sigma
+                        (List.rev_append args1 r1)
+                        (List.rev_append args2 r2) in
                     begin
                       try Ty.oty_match mt t1.t_ty t2.t_ty, mv
                       with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1, t2)))
@@ -356,138 +379,103 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                 | Tquant (q2, bv2) when q1 = q2 ->
                   let (vl1, _tl1, term1) = t_open_quant bv1 in
                   let (vl2, _tl2, term2) = t_open_quant bv2 in
-                  let (mt, mv) =
-                    List.fold_left2 (fun (mt, mv) e1 e2 ->
+                  let (bound_vars, term1, mt) =
+                    try List.fold_left2 (fun (bound_vars, term1, mt) e1 e2 ->
                       let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
-                      (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2 in
-                  loop (mt, mv) (T term1 :: r1) (T term2 :: r2)
+                      let bound_vars = Mvs.add e2 e1 bound_vars in
+                      (bound_vars,term1, mt)) (bound_vars,term1, mt) vl1 vl2
+                    with Invalid_argument _ | Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2)))
+                  in
+                  loop bound_vars (mt, mv) (term1 :: r1) (term2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tbinop (b1, t1_l, t1_r) ->
               begin
                 match t2.t_node with
                 | Tbinop (b2, t2_l, t2_r) when b1 = b2 ->
-                  loop (mt, mv) (T t1_l :: T t1_r :: r1) (T t2_l :: T t2_r :: r2)
+                  loop bound_vars (mt, mv) (t1_l :: t1_r :: r1) (t2_l :: t2_r :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tif (t11, t12, t13) ->
               begin
                 match t2.t_node with
                 | Tif (t21, t22, t23) ->
-                  loop (mt, mv) (T t11 :: T t12 :: T t13 :: r1)
-                      (T t21 :: T t22 :: T t23 :: r2)
+                  loop bound_vars (mt, mv) (t11 :: t12 :: t13 :: r1)
+                      (t21 :: t22 :: t23 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
-            | Tlet (t1, tb1) ->
+            | Tlet (td1, tb1) ->
               begin
                 match t2.t_node with
-                | Tlet (t2, tb2) ->
+                | Tlet (td2, tb2) ->
                   let (v1, tl1) = t_open_bound tb1 in
                   let (v2, tl2) = t_open_bound tb2 in
-                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
-                  let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (T t1 :: T tl1 :: r1) (T t2 :: T tl2 :: r2)
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
+                  let bound_vars = Mvs.add v2 v1 bound_vars in
+                  loop bound_vars (mt, mv) (td1 :: tl1 :: r1) (td2 :: tl2 :: r2)
                 | _ ->
                   raise (NoMatch (Some (t1, t2)))
               end
-            (* We assume that patterns are well-formed (ie already typed)
-               and that it is not possible to have an occurence of a pattern
-               introduced variable into a branch that does not depend on this
-               pattern *)
-            | Tcase (t1, tbl1) ->
+            | Tcase (ts1, tbl1) ->
               begin
                 match t2.t_node with
-                | Tcase (t2, tbl2) ->
-                  let list_p1, list_t1 = open_branches [] [] tbl1 in
-                  let list_p2, list_t2 = open_branches [] [] tbl2 in
-                  loop sigma (T t1 :: list_p1 @ list_t1 @ r1)
-                    (T t2 :: list_p2 @ list_t2 @ r2)
+                | Tcase (ts2, tbl2) ->
+                    begin try
+                      let (bound_vars, mt, l1, l2) =
+                        List.fold_left2 (fun (bound_vars, mt, l1, l2) tb1 tb2 ->
+                          let (p1, tb1) = t_open_branch tb1 in
+                          let (p2, tb2) = t_open_branch tb2 in
+                          let bound_vars, mt = pattern_renaming (bound_vars, mt) p1 p2 in
+                          (bound_vars,mt, tb1 :: l1, tb2 :: l2)
+                        ) (bound_vars,mt, ts1 :: r1, ts2 :: r2) tbl1 tbl2 in
+                      loop bound_vars (mt,mv) l1 l2
+                    with Invalid_argument _ ->
+                      raise (NoMatch (Some (t1, t2)))
+                    end
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Teps tb1 ->
               begin
                 match t2.t_node with
                 | Teps tb2 ->
-                  let (v1, t1) = t_open_bound tb1 in
-                  let (v2, t2) = t_open_bound tb2 in
-                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
-                  let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (T t1 :: r1) (T t2 :: r2)
+                  let (v1, td1) = t_open_bound tb1 in
+                  let (v2, td2) = t_open_bound tb2 in
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
+                  let bound_vars = Mvs.add v2 v1 bound_vars in
+                  loop bound_vars (mt, mv) (td1 :: r1) (td2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
+
             | Tnot t1 ->
               begin
                 match t2.t_node with
                 | Tnot t2 ->
-                  loop sigma (T t1 :: r1) (T t2 :: r2)
+                  loop bound_vars sigma (t1 :: r1) (t2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
+            | Tvar v1 ->
+                begin match t2.t_node with
+                | Tvar v2 ->
+                    begin try
+                      if vs_equal v1 (Mvs.find v2 bound_vars) then
+                        loop bound_vars sigma r1 r2
+                      else
+                        raise (NoMatch (Some (t1, t2)))
+                    with
+                      Not_found -> assert false
+                    end
+                | _ -> raise (NoMatch (Some (t1, t2)))
+                end
             | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
-                loop sigma r1 r2
-            | Tvar _ | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2)))
-        end
-
-      | P p1 :: r1, P p2 :: r2 ->
-        begin
-          match p1.pat_node with
-          | Pwild ->
-            begin
-              match p2.pat_node with
-              | Pwild -> loop sigma r1 r2
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
-          | Pvar v1 when Mvs.mem v1 mv ->
-            begin
-              match p2.pat_node with
-              | Pvar v2 ->
-                if t_equal (t_var v2) (Mvs.find v1 mv) then
-                  loop (mt,mv) r1 r2
-                else
-                  raise (NoMatch (Some (t_var v1, t_var v2)))
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
-          | Pvar v1 ->
-            begin
-              match p2.pat_node with
-              | Pvar v2 ->
-                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
-                  let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) r1 r2
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
-          | Papp (ls1, pl1) ->
-            begin
-              match p2.pat_node with
-              | Papp (ls2, pl2) ->
-                if ls_equal ls1 ls2 then
-                  loop (mt, mv) ((List.map (fun x -> P x) pl1) @ r1)
-                    ((List.map (fun x -> P x) pl2) @ r2)
-                else
-                  raise (NoMatchpat (Some (p1, p2)))
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
-          | Por (p11, p12) ->
-            begin
-              match p2.pat_node with
-              | Por (p21, p22) ->
-                loop (mt, mv) (P p11 :: P p12 :: r1) (P p21 :: P p22 :: r2)
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
-          | Pas (p1, v1) ->
-            begin
-              match p2.pat_node with
-              | Pas (p2, v2) ->
-                let mt= Ty.ty_match mt v1.vs_ty v2.vs_ty in
-                let mv = Mvs.add v1 (t_var v2) mv in
-                loop (mt, mv) (P p1 :: r1) (P p2 :: r2)
-              | _ -> raise (NoMatchpat (Some (p1, p2)))
-            end
+                loop bound_vars sigma r1 r2
+            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2)))
         end
       | _ -> raise (NoMatch None)
   in
-  loop (Ty.Mtv.empty, Mvs.empty)
-    (List.map (fun x -> T x) largs)
-    (List.map (fun x -> T x) args)
+  loop Mvs.empty (Ty.Mtv.empty, Mvs.empty) largs args
 
 exception Irreducible
 
@@ -547,9 +535,11 @@ let rec reduce engine c =
     begin
       match v with
       | Term { t_node = Ttrue } ->
+        incr(rec_step_limit);
         { value_stack = st ;
           cont_stack = (Keval(t2,sigma),t_label_copy orig t2)  :: rem }
       | Term { t_node = Tfalse } ->
+        incr(rec_step_limit);
         { value_stack = st ;
           cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
       | Term t1 -> begin
@@ -557,6 +547,7 @@ let rec reduce engine c =
           | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
             when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
               ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
+            incr(rec_step_limit);
             { value_stack = Term (t_label_copy orig b0) :: st;
               cont_stack = rem }
           | _ ->
@@ -571,6 +562,7 @@ let rec reduce engine c =
     end
   | [], (Klet _, _) :: _ -> assert false
   | t1 :: st, (Klet(v,t2,sigma), orig) :: rem ->
+    incr(rec_step_limit);
     let t1 = term_of_value t1 in
     { value_stack = st;
       cont_stack =
@@ -583,12 +575,14 @@ let rec reduce engine c =
   | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _),
     (Kbinop _, _) :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, (Kbinop op, orig) :: rem ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig (t_binary_simp op t2 t1)) :: st;
       cont_stack = rem;
     }
   | [], (Knot,_) :: _ -> assert false
   | Int _ :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
@@ -640,6 +634,7 @@ and reduce_match st u ~orig tbl sigma cont =
           mv'';
         Format.eprintf "@]@.";
 *)
+        incr(rec_step_limit);
         { value_stack = st;
           cont_stack = (Keval(t,mv''), t_label_copy orig t) :: cont;
         }
@@ -664,6 +659,7 @@ and reduce_eval st t ~orig sigma rem =
     begin
       try
         let t = Mvs.find v sigma in
+        incr(rec_step_limit);
         { value_stack = Term (t_label_copy orig t) :: st ;
           cont_stack = rem;
         }
@@ -882,6 +878,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
             Format.eprintf "@.";
 *)
             let mv,rhs = t_subst_types mt mv rhs in
+            incr(rec_step_limit);
             { value_stack = rem_st;
               cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
@@ -957,6 +954,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
+      incr(rec_step_limit);
       { value_stack = Term (t_label_copy orig b) :: st;
         cont_stack = cont;
       }
@@ -965,6 +963,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
         try
           let n' = big_int_of_const c in
           let b = to_bool (BigInt.eq n n') in
+          incr(rec_step_limit);
           { value_stack = Term (t_label_copy orig b) :: st;
             cont_stack = cont;
           }
@@ -981,6 +980,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
 
 and reduce_term_equ ~orig st t1 t2 cont =
   if t_equal t1 t2 then
+    let () = incr(rec_step_limit) in
     { value_stack = Term (t_label_copy orig t_true) :: st;
       cont_stack = cont;
     }
@@ -994,6 +994,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
           BigInt.eq (Number.compute_int_constant i1)
                     (Number.compute_int_constant i2)
         in
+        incr(rec_step_limit);
         { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }
@@ -1016,6 +1017,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
       let sigma,t =
         aux Mvs.empty t_true ls1.ls_args tl1 tl2
       in
+      let () = incr(rec_step_limit) in
       { value_stack = st;
         cont_stack = (Keval(t,sigma),orig) :: cont;
       }
@@ -1026,6 +1028,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
     when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
          ls_equal ls2 fs_bool_false ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig b) :: st;
       cont_stack = cont }
   | _ -> raise Undetermined
@@ -1072,7 +1075,8 @@ let rec reconstruct c =
 
 (** iterated reductions *)
 
-let normalize ~limit engine t0 =
+let normalize ?step_limit ~limit engine t0 =
+  rec_step_limit := 0;
   let rec many_steps c n =
     match c.value_stack, c.cont_stack with
     | [Term t], [] -> t
@@ -1084,20 +1088,24 @@ let normalize ~limit engine t0 =
             Pretty.print_term t0 limit;
           reconstruct c
         end
-      else
-        let c = reduce engine c in
-        many_steps c (n+1)
+      else begin
+        match step_limit with
+        | None ->
+            let c = reduce engine c in
+            many_steps c (n+1)
+        | Some step_limit ->
+            if !rec_step_limit >= step_limit then
+              reconstruct c
+            else
+              let c = reduce engine c in
+              many_steps c (n+1)
+      end
   in
   let c = { value_stack = [];
             cont_stack = [Keval(t0,Mvs.empty),t0] ;
           }
   in
   many_steps c 0
-
-
-
-
-
 
 (* the rewrite engine *)
 
@@ -1130,7 +1138,9 @@ let extract_rule _km t =
 *)
 
   let check_vars acc t1 t2 =
-    (* check that quantified variables all appear in the lefthand side *)
+    (* check that quantified variables all appear in the lefthand side
+       (quantified variables not appearing could be removed and those appearing
+       on right hand side cannot be guessed during rewriting). *)
     let vars_lhs = t_vars t1 in
     if Svs.exists (fun vs -> not (Mvs.mem vs vars_lhs)) acc
     then raise (NotARewriteRule "lhs should contain all variables");
@@ -1141,7 +1151,6 @@ let extract_rule _km t =
     then raise (NotARewriteRule "lhs should contain all type variables")
 
   in
-
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -225,6 +225,8 @@ let loadpath m =
 *)
     Strings.split ':' d
   with Not_found -> m.loadpath
+
+let set_loadpath m l = { m with loadpath = l}
 
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
@@ -941,7 +943,12 @@ let absolute_driver_file main s =
 
 let load_driver main env file extras =
   let file = absolute_driver_file main file in
-  Driver.load_driver_absolute env file extras
+  try
+    Driver.load_driver_absolute env file extras
+  with e ->
+    eprintf "Fatal error while loading driver file '%s': %a@."
+            file Exn_printer.exn_printer e;
+    exit 1
 
 
 let unknown_to_known_provers provers pu =

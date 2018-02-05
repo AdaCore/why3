@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1004,8 +1004,8 @@ lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
 | LEFTPAR_STAR_RIGHTPAR
     { (* parentheses are removed from the location *)
-      let s = let s = $startpos in { s with pos_cnum = s.pos_cnum + 1 } in
-      let e = let e = $endpos   in { e with pos_cnum = e.pos_cnum - 1 } in
+      let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
+      let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
       mk_id (infix "*") s e }
 
 lident_op:

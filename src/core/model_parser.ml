@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -168,6 +168,49 @@ let print_model_value_sanit fmt v =
 
 let print_model_value = print_model_value_sanit
 
+
+(******************************************)
+(* Print values for humans                *)
+(******************************************)
+let print_float_human fmt f =
+  match f with
+  | Plus_infinity ->
+      fprintf fmt "+∞"
+  | Minus_infinity ->
+      fprintf fmt "-∞"
+  | Plus_zero ->
+      fprintf fmt "+0"
+  | Minus_zero ->
+      fprintf fmt "-0"
+  | Not_a_number ->
+      fprintf fmt "NaN"
+  | Float_value (b, eb, sb) ->
+      fprintf fmt "float(%s,%s,%s)" b eb sb
+
+let rec print_array_human fmt (arr: model_array) =
+  fprintf fmt "(";
+  List.iter (fun e ->
+    fprintf fmt "%s => %a," e.arr_index_key print_model_value_human e.arr_index_value)
+    arr.arr_indices;
+  fprintf fmt "others => %a)" print_model_value_human arr.arr_others
+
+(* TODO there should be no record printed that way currently in Why3 *)
+and print_record_human fmt r =
+  fprintf fmt "Record(";
+  List.iter (fun x -> fprintf fmt "%a" print_model_value_human x) r.fields;
+  fprintf fmt ")"
+
+and print_model_value_human fmt (v: model_value) =
+  match v with
+  | Integer s -> fprintf fmt "%s" s
+  | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
+  | Float f -> print_float_human fmt f
+  | Boolean b -> fprintf fmt "%b"  b
+  | Array arr -> print_array_human fmt arr
+  | Record r -> print_record_human fmt r
+  | Bitvector s -> fprintf fmt "%s" s
+  | Unparsed s -> fprintf fmt "%s" s
+
 (*
 ***************************************************************
 **  Model elements
@@ -265,7 +308,7 @@ type raw_model_parser =  string -> model_element list
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element me_name_trans fmt m_element =
+let print_model_element print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
@@ -274,10 +317,10 @@ let print_model_element me_name_trans fmt m_element =
     fprintf fmt  "%s = %a"
       me_name print_model_value m_element.me_value
 
-let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
+let print_model_elements ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element print_model_value me_name_trans) fmt m_elements
 
-let print_model_file fmt me_name_trans filename model_file =
+let print_model_file ~print_model_value fmt me_name_trans filename model_file =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -285,7 +328,7 @@ let print_model_file fmt me_name_trans filename model_file =
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements me_name_trans fmt m_elements)
+      print_model_elements print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -297,13 +340,24 @@ let why_name_trans me_name =
 
 let print_model
     ?(me_name_trans = why_name_trans)
+    ~print_model_value
     fmt
     model =
   (* Simple and easy way to print file sorted alphabetically
    FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
    *)
   let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file fmt me_name_trans k e) l
+  List.iter (fun (k, e) -> print_model_file ~print_model_value fmt me_name_trans k e) l
+
+let print_model_human
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+
+
+let print_model ?(me_name_trans = why_name_trans)
+    fmt
+    model = print_model ~me_name_trans ~print_model_value fmt model
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
@@ -335,7 +389,7 @@ let print_model_vc_term
       let (filename, line_number, _, _) = Loc.get pos in
       let model_file = get_model_file model.model_files filename in
       let model_elements = get_elements model_file line_number in
-      print_model_elements ~sep me_name_trans fmt model_elements
+      print_model_elements ~sep print_model_value me_name_trans fmt model_elements
 
 let model_vc_term_to_string
     ?(me_name_trans = why_name_trans)
@@ -360,7 +414,7 @@ let interleave_line
     line =
   try
     let model_elements = IntMap.find line_number model_file in
-    print_model_elements me_name_trans str_formatter model_elements ~sep:"; ";
+    print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
       (get_padding line) ^
 	start_comment ^

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -325,6 +325,11 @@ let set_obsolete s paid b =
   let pa = get_proof_attempt_node s paid in
   pa.proof_obsolete <- b
 
+let check_if_already_exists s pid t args =
+    let sub_transfs = get_transformations s pid in
+    List.exists (fun tr_id ->
+      get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
+      not (is_detached s (ATn tr_id))) sub_transfs
 
 (* Iterations functions on the session tree *)
 
@@ -534,7 +539,7 @@ let empty_session ?from dir =
 
 exception AlreadyExist
 
-let add_proof_attempt session prover limit state obsolete edit parentID =
+let add_proof_attempt session prover limit state ~obsolete edit parentID =
   let pn = get_proofNode session parentID in
   try
     let _ = Hprover.find pn.proofn_attempts prover in
@@ -564,7 +569,7 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->
-    add_proof_attempt s pr limit None false file id
+    add_proof_attempt s pr limit None ~obsolete:false file id
 
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
@@ -1034,7 +1039,7 @@ and load_proof_or_transf session old_provers pid a =
                         Call_provers.limit_mem   = memlimit;
                         Call_provers.limit_steps = steplimit; }
           in
-          ignore(add_proof_attempt session p limit (Some res) obsolete edit pid)
+          ignore(add_proof_attempt session p limit (Some res) ~obsolete edit pid)
         with Failure _ | Not_found ->
           Warning.emit "[Error] prover id not listed in header '%s'@." prover;
           raise (LoadError (a,"prover not listing in header"))
@@ -1085,6 +1090,8 @@ let load_theory session parent_name old_provers acc th =
     List.iter2
       (load_goal session old_provers (Theory mth))
       th.Xml.elements goals;
+    let proved = bool_attribute "proved" th false in
+    Hid.add session.th_state thname proved;
     mth::acc
   | s ->
     Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."
@@ -1317,7 +1324,7 @@ let found_detached = ref false
 let save_detached_proof s parent old_pa_n =
   let old_pa = old_pa_n in
   ignore (add_proof_attempt s old_pa.prover old_pa.limit
-                            old_pa.proof_state true old_pa.proof_script
+                            old_pa.proof_state ~obsolete:false old_pa.proof_script
                             parent)
 
 let rec save_detached_goal old_s s parent detached_goal_id id =
@@ -1368,7 +1375,7 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let obsolete = goal_obsolete || old_pa.proof_obsolete in
   found_obsolete := obsolete || !found_obsolete;
   ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
-    old_pa.proof_state obsolete old_pa.proof_script
+    old_pa.proof_state ~obsolete old_pa.proof_script
     new_goal)
 
 exception NoProgress

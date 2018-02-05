@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -352,6 +352,19 @@ if test "$enable_emacs_compilation" = yes ; then
       enable_emacs_compilation=no
       AC_MSG_WARN([Cannot find emacs, compilation of why3.elc disabled.])
    fi
+fi
+
+# checking for Num
+if test "$USEOCAMLFIND" = yes; then
+   NUMINCLUDE=$(ocamlfind query num)
+fi
+if test -n "$NUMINCLUDE"; then
+   echo "ocamlfind found num in $NUMINCLUDE"
+else
+   AC_CHECK_FILE($OCAMLLIB/nums.cma,,found_num=no)
+      if test "$found_num" = no; then
+         AC_MSG_ERROR([Library Num not found.])
+      fi
 fi
 
 # checking for Zarith

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -213,7 +213,6 @@ let induction_l label induct kn t =
   let (ctx, (ls, argl, cl), goal) = locate kn label t in
   let fold vsi p t = if p then vsi else t_freevars vsi t in
   let vsi = List.fold_left2 fold Mvs.empty (parameters ls cl) argl in
-  (*let vsi = t_vars (t_app_infer ls argl) in*)
   let cindep, cdep = partition ctx vsi in
   let goal = zip cdep goal in
   List.map (fun (_,c) ->

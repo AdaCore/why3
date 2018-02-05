@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -573,7 +573,6 @@ let interpNotif (n: notification) =
         PE.error_print_msg
           (Format.asprintf "Query error on selected node: \"%s\"" s)
       | Query_Info (_nid, s) -> PE.error_print_msg s
-      | Help s -> PE.error_print_msg s
       | Information s -> PE.error_print_msg s
       | Error s ->
           PE.error_print_msg
