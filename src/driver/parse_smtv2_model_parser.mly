@@ -33,6 +33,7 @@
 %token TRUE FALSE
 %token LET
 %token AND LE GE NOT
+%token DIV
 %token <Smt2_model_defs.float_type> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
@@ -92,6 +93,7 @@ smt_term:
 | name      { Smt2_model_defs.Variable $1  }
 | integer   { Smt2_model_defs.Integer $1   }
 | decimal   { Smt2_model_defs.Decimal $1   }
+| fraction  { Smt2_model_defs.Fraction $1  }
 | array     { Smt2_model_defs.Array $1     }
 | bitvector { Smt2_model_defs.Bitvector $1 }
 | boolean   { Smt2_model_defs.Boolean $1   }
@@ -205,6 +207,10 @@ decimal:
 | DEC_STR { $1 }
 | LPAREN ps MINUS_DEC_STR ps RPAREN
     { $3 }
+
+fraction:
+| LPAREN ps DIV ps integer ps integer ps RPAREN
+    { ($5, $7) }
 
 (* Example:
    (_ bv2048 16) *)

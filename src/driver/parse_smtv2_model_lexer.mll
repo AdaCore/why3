@@ -42,6 +42,7 @@ rule token = parse
   | ";;" { read_string (Buffer.create 17) lexbuf }
   | '=' { EQUAL }
   | '_' { UNDERSCORE }
+  | '/' { DIV }
   | "as-array" { AS_ARRAY }
   | "ite" { ITE }
   | "define-fun" { DEFINE_FUN }
