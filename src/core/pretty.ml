@@ -241,7 +241,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
+     begin
+       match t.t_ty with
+       | Some {ty_node = Tyapp (ts,[])}
+            when ts_equal ts ts_int || ts_equal ts ts_real ->
+          Number.print_constant fmt c
+       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+                            print_ty ty
+       | None -> assert false
+     end
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
