@@ -6,7 +6,7 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../tree_height.mlw" expanded="true">
+<file name="../tree_height.mlw">
 <theory name="HeightCPS" sum="a34aeeee318a5e96505ae98568726dd4">
  <goal name="height_cps_correct" expl="">
  <transf name="induction_ty_lex">
@@ -19,7 +19,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
 </theory>
-<theory name="Iteration" sum="8507e6acf1f665b240237e90daf4a059" expanded="true">
+<theory name="Iteration" sum="8507e6acf1f665b240237e90daf4a059">
  <goal name="sizek_nonneg" expl="">
  <transf name="induction_ty_lex">
   <goal name="sizek_nonneg.1" expl="">
@@ -33,8 +33,8 @@
  <goal name="sizew_nonneg" expl="">
  <proof prover="3"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="WP_parameter height1" expl="VC for height1" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter height1" expl="VC for height1">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter height1.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -68,7 +68,7 @@
   <goal name="WP_parameter height1.11" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter height1.12" expl="loop variant decrease" expanded="true">
+  <goal name="WP_parameter height1.12" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter height1.13" expl="loop invariant preservation">

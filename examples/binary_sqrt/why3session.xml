@@ -7,10 +7,10 @@
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../binary_sqrt.mlw" expanded="true">
-<theory name="BinarySqrt" sum="9ce354fc5ea5258e85043aee351a1947" expanded="true">
- <goal name="WP_parameter sqrt" expl="VC for sqrt" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<file name="../binary_sqrt.mlw">
+<theory name="BinarySqrt" sum="9ce354fc5ea5258e85043aee351a1947">
+ <goal name="WP_parameter sqrt" expl="VC for sqrt">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter sqrt.1" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -55,8 +55,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter sqrt_main" expl="VC for sqrt_main" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter sqrt_main" expl="VC for sqrt_main">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter sqrt_main.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>

@@ -11,7 +11,7 @@
 <prover id="6" name="Alt-Ergo" version="1.00.prv" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Spass" version="3.7" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Coq" version="8.4pl6" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../koda_ruskey.mlw" expanded="true">
+<file name="../koda_ruskey.mlw">
 <theory name="KodaRuskey_Spec" sum="8e518d6f01f787c2ba93abeff13d48b2">
  <goal name="size_forest_nonneg">
  <transf name="induction_ty_lex">
@@ -968,7 +968,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="CountCorrect" sum="0c4c6552ada3f064968caffb47cd9277" expanded="true">
+<theory name="CountCorrect" sum="0c4c6552ada3f064968caffb47cd9277">
  <goal name="WP_parameter product" expl="VC for product">
  <proof prover="1" timelimit="31"><result status="valid" time="0.22" steps="321"/></proof>
  </goal>
@@ -1098,8 +1098,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter solution_white_or_black" expl="VC for solution_white_or_black" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter solution_white_or_black" expl="VC for solution_white_or_black">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter solution_white_or_black.1" expl="1. postcondition">
   <transf name="inline_all">
    <goal name="WP_parameter solution_white_or_black.1.1" expl="1. postcondition">
@@ -1122,8 +1122,8 @@
  <goal name="solution_E">
  <proof prover="4"><result status="valid" time="0.03" steps="18"/></proof>
  </goal>
- <goal name="WP_parameter enum" expl="VC for enum" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter enum" expl="VC for enum">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter enum.1" expl="1. postcondition">
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -1164,8 +1164,8 @@
   <goal name="WP_parameter enum.12" expl="12. precondition">
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter enum.13" expl="13. assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter enum.13" expl="13. assertion">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter enum.13.1" expl="1. assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
@@ -1177,7 +1177,7 @@
    <proof prover="4"><result status="valid" time="6.72" steps="537"/></proof>
    <proof prover="5" obsolete="true"><result status="timeout" time="5.97"/></proof>
    </goal>
-   <goal name="WP_parameter enum.13.4" expl="4. VC for enum" expanded="true">
+   <goal name="WP_parameter enum.13.4" expl="4. VC for enum">
    <proof prover="0" timelimit="6"><result status="timeout" time="5.96"/></proof>
    <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
    <proof prover="3"><result status="timeout" time="5.96"/></proof>
@@ -1189,22 +1189,22 @@
   <goal name="WP_parameter enum.14" expl="14. postcondition">
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter enum.15" expl="15. postcondition" expanded="true">
+  <goal name="WP_parameter enum.15" expl="15. postcondition">
   <proof prover="0" timelimit="6" obsolete="true"><result status="timeout" time="6.92"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
   <proof prover="3" obsolete="true"><result status="timeout" time="5.93"/></proof>
   <proof prover="4" obsolete="true"><result status="timeout" time="5.99"/></proof>
   <proof prover="5" obsolete="true"><result status="timeout" time="5.98"/></proof>
   <proof prover="7" obsolete="true"><result status="timeout" time="6.39"/></proof>
-  <transf name="introduce_premises" expanded="true">
-   <goal name="WP_parameter enum.15.1" expl="1. postcondition" expanded="true">
-   <transf name="inline_goal" expanded="true">
-    <goal name="WP_parameter enum.15.1.1" expl="1. postcondition" expanded="true">
-    <transf name="split_goal_wp" expanded="true">
+  <transf name="introduce_premises">
+   <goal name="WP_parameter enum.15.1" expl="1. postcondition">
+   <transf name="inline_goal">
+    <goal name="WP_parameter enum.15.1.1" expl="1. postcondition">
+    <transf name="split_goal_wp">
      <goal name="WP_parameter enum.15.1.1.1" expl="1. VC for enum">
      <proof prover="1"><result status="valid" time="0.65" steps="496"/></proof>
      </goal>
-     <goal name="WP_parameter enum.15.1.1.2" expl="2. VC for enum" expanded="true">
+     <goal name="WP_parameter enum.15.1.1.2" expl="2. VC for enum">
      <proof prover="0" timelimit="6" obsolete="true"><result status="timeout" time="5.98"/></proof>
      <proof prover="1" obsolete="true"><result status="timeout" time="5.85"/></proof>
      <proof prover="3" obsolete="true"><result status="timeout" time="5.91"/></proof>
@@ -1217,7 +1217,7 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter enum.16" expl="16. postcondition" expanded="true">
+  <goal name="WP_parameter enum.16" expl="16. postcondition">
   <proof prover="0" timelimit="6" obsolete="true"><result status="timeout" time="6.01"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
   <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>

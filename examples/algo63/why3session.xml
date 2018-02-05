@@ -2,138 +2,136 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Spass" version="3.7" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../algo63.mlw" expanded="true">
-<theory name="Algo63" sum="c6dc6dde1a05c3cb0616dc083c49432a" expanded="true">
- <goal name="WP_parameter exchange" expl="VC for exchange">
+<file name="../algo63.mlw" proved="true">
+<theory name="Algo63" proved="true" sum="24fc90fcff68609a56b7e8b043f981e2">
+ <goal name="WP_parameter exchange" expl="VC for exchange" proved="true">
  <proof prover="4"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
- <goal name="WP_parameter partition_" expl="VC for partition_">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter partition_.1" expl="index in array bounds">
+ <goal name="WP_parameter partition_" expl="VC for partition_" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter partition_.0" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.2" expl="loop invariant init">
+  <goal name="WP_parameter partition_.1" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.3" expl="loop invariant init">
+  <goal name="WP_parameter partition_.2" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.4" expl="index in array bounds">
+  <goal name="WP_parameter partition_.3" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.5" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.4" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.6" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.5" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.7" expl="loop variant decrease">
+  <goal name="WP_parameter partition_.6" expl="loop variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.8" expl="loop invariant init">
+  <goal name="WP_parameter partition_.7" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.9" expl="loop invariant init">
+  <goal name="WP_parameter partition_.8" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.10" expl="index in array bounds">
+  <goal name="WP_parameter partition_.9" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.11" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.10" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.12" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.11" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.13" expl="loop variant decrease">
+  <goal name="WP_parameter partition_.12" expl="loop variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.14" expl="precondition">
+  <goal name="WP_parameter partition_.13" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.15" expl="variant decrease">
+  <goal name="WP_parameter partition_.14" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="87"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.16" expl="precondition">
+  <goal name="WP_parameter partition_.15" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.17" expl="precondition">
+  <goal name="WP_parameter partition_.16" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="124"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.18" expl="precondition">
+  <goal name="WP_parameter partition_.17" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.28" steps="193"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.19" expl="precondition">
+  <goal name="WP_parameter partition_.18" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.21" steps="157"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.20" expl="precondition">
+  <goal name="WP_parameter partition_.19" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="126"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.21" expl="postcondition">
+  <goal name="WP_parameter partition_.20" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.22" expl="postcondition">
+  <goal name="WP_parameter partition_.21" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.23" expl="postcondition">
+  <goal name="WP_parameter partition_.22" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.24" expl="postcondition">
+  <goal name="WP_parameter partition_.23" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.25" expl="postcondition">
+  <goal name="WP_parameter partition_.24" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.26" expl="postcondition">
+  <goal name="WP_parameter partition_.25" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="63"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.27" expl="postcondition">
+  <goal name="WP_parameter partition_.26" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="63"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.28" expl="postcondition">
+  <goal name="WP_parameter partition_.27" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.29" expl="postcondition">
+  <goal name="WP_parameter partition_.28" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.30" expl="postcondition">
+  <goal name="WP_parameter partition_.29" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.31" expl="postcondition">
+  <goal name="WP_parameter partition_.30" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.32" expl="postcondition">
+  <goal name="WP_parameter partition_.31" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.33" expl="postcondition">
+  <goal name="WP_parameter partition_.32" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.34" expl="postcondition">
+  <goal name="WP_parameter partition_.33" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.35" expl="precondition">
+  <goal name="WP_parameter partition_.34" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.36" expl="variant decrease">
+  <goal name="WP_parameter partition_.35" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.37" expl="precondition">
+  <goal name="WP_parameter partition_.36" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.38" expl="precondition">
+  <goal name="WP_parameter partition_.37" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.39" expl="precondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.39.1" expl="precondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.39.1.1" expl="precondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.39.1.1.1" expl="precondition">
+  <goal name="WP_parameter partition_.38" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.38.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.38.0.0" expl="precondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.38.0.0.0" expl="precondition" proved="true">
      <proof prover="4"><result status="valid" time="0.09" steps="23"/></proof>
      </goal>
     </transf>
@@ -142,232 +140,232 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.40" expl="precondition">
+  <goal name="WP_parameter partition_.39" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.41" expl="precondition">
+  <goal name="WP_parameter partition_.40" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.42" expl="postcondition">
+  <goal name="WP_parameter partition_.41" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.43" expl="postcondition">
+  <goal name="WP_parameter partition_.42" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.44" expl="postcondition">
+  <goal name="WP_parameter partition_.43" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.45" expl="postcondition">
+  <goal name="WP_parameter partition_.44" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.46" expl="postcondition">
+  <goal name="WP_parameter partition_.45" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.47" expl="postcondition">
+  <goal name="WP_parameter partition_.46" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.07" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.48" expl="postcondition">
+  <goal name="WP_parameter partition_.47" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.49" expl="postcondition">
+  <goal name="WP_parameter partition_.48" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.50" expl="postcondition">
+  <goal name="WP_parameter partition_.49" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.51" expl="postcondition">
+  <goal name="WP_parameter partition_.50" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.52" expl="postcondition">
+  <goal name="WP_parameter partition_.51" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.53" expl="postcondition">
+  <goal name="WP_parameter partition_.52" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.54" expl="postcondition">
+  <goal name="WP_parameter partition_.53" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.55" expl="postcondition">
+  <goal name="WP_parameter partition_.54" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.56" expl="loop invariant init">
+  <goal name="WP_parameter partition_.55" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.57" expl="loop invariant init">
+  <goal name="WP_parameter partition_.56" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.58" expl="index in array bounds">
+  <goal name="WP_parameter partition_.57" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.59" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.58" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.60" expl="loop invariant preservation">
+  <goal name="WP_parameter partition_.59" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.61" expl="loop variant decrease">
+  <goal name="WP_parameter partition_.60" expl="loop variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.62" expl="precondition">
+  <goal name="WP_parameter partition_.61" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.63" expl="variant decrease">
+  <goal name="WP_parameter partition_.62" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.64" expl="precondition">
+  <goal name="WP_parameter partition_.63" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.65" expl="precondition">
+  <goal name="WP_parameter partition_.64" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.66" expl="precondition">
+  <goal name="WP_parameter partition_.65" expl="precondition" proved="true">
   <proof prover="4" timelimit="15"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.67" expl="precondition">
+  <goal name="WP_parameter partition_.66" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.68" expl="precondition">
+  <goal name="WP_parameter partition_.67" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.69" expl="postcondition">
+  <goal name="WP_parameter partition_.68" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.70" expl="postcondition">
+  <goal name="WP_parameter partition_.69" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.71" expl="postcondition">
+  <goal name="WP_parameter partition_.70" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.72" expl="postcondition">
+  <goal name="WP_parameter partition_.71" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.73" expl="postcondition">
+  <goal name="WP_parameter partition_.72" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.74" expl="postcondition">
+  <goal name="WP_parameter partition_.73" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.75" expl="postcondition">
+  <goal name="WP_parameter partition_.74" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.76" expl="postcondition">
+  <goal name="WP_parameter partition_.75" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.77" expl="postcondition">
+  <goal name="WP_parameter partition_.76" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.78" expl="postcondition">
+  <goal name="WP_parameter partition_.77" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.79" expl="postcondition">
+  <goal name="WP_parameter partition_.78" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.80" expl="postcondition">
+  <goal name="WP_parameter partition_.79" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.81" expl="postcondition">
+  <goal name="WP_parameter partition_.80" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.82" expl="postcondition">
+  <goal name="WP_parameter partition_.81" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.83" expl="precondition">
+  <goal name="WP_parameter partition_.82" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.84" expl="variant decrease">
+  <goal name="WP_parameter partition_.83" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.85" expl="precondition">
+  <goal name="WP_parameter partition_.84" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.86" expl="precondition">
+  <goal name="WP_parameter partition_.85" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.87" expl="precondition">
+  <goal name="WP_parameter partition_.86" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.88" expl="precondition">
+  <goal name="WP_parameter partition_.87" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.89" expl="precondition">
+  <goal name="WP_parameter partition_.88" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.90" expl="postcondition">
+  <goal name="WP_parameter partition_.89" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.91" expl="postcondition">
+  <goal name="WP_parameter partition_.90" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.92" expl="postcondition">
+  <goal name="WP_parameter partition_.91" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.93" expl="postcondition">
+  <goal name="WP_parameter partition_.92" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.94" expl="postcondition">
+  <goal name="WP_parameter partition_.93" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.95" expl="postcondition">
+  <goal name="WP_parameter partition_.94" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.96" expl="postcondition">
+  <goal name="WP_parameter partition_.95" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.97" expl="postcondition">
+  <goal name="WP_parameter partition_.96" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.98" expl="postcondition">
+  <goal name="WP_parameter partition_.97" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.99" expl="postcondition">
+  <goal name="WP_parameter partition_.98" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.100" expl="postcondition">
+  <goal name="WP_parameter partition_.99" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.101" expl="postcondition">
+  <goal name="WP_parameter partition_.100" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.102" expl="postcondition">
+  <goal name="WP_parameter partition_.101" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.103" expl="postcondition">
+  <goal name="WP_parameter partition_.102" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.104" expl="precondition">
+  <goal name="WP_parameter partition_.103" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.105" expl="precondition">
+  <goal name="WP_parameter partition_.104" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.106" expl="precondition">
+  <goal name="WP_parameter partition_.105" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.107" expl="precondition">
+  <goal name="WP_parameter partition_.106" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.108" expl="precondition">
+  <goal name="WP_parameter partition_.107" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="0"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.109" expl="assertion">
+  <goal name="WP_parameter partition_.108" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.110" expl="precondition">
+  <goal name="WP_parameter partition_.109" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.111" expl="postcondition">
+  <goal name="WP_parameter partition_.110" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.112" expl="postcondition">
+  <goal name="WP_parameter partition_.111" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05" steps="132"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.113" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.113.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.113.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.113.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.112" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.112.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.112.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.112.0.0.0" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.61" steps="376"/></proof>
      </goal>
     </transf>
@@ -376,13 +374,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.114" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.114.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.114.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.114.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.113" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.113.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.113.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.113.0.0.0" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.16" steps="142"/></proof>
      </goal>
     </transf>
@@ -391,13 +389,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.115" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.115.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.115.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.115.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.114" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.114.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.114.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.114.0.0.0" expl="postcondition" proved="true">
      <proof prover="4" timelimit="15"><result status="valid" time="0.31" steps="187"/></proof>
      </goal>
     </transf>
@@ -406,22 +404,22 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.116" expl="precondition">
+  <goal name="WP_parameter partition_.115" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.117" expl="postcondition">
+  <goal name="WP_parameter partition_.116" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.118" expl="postcondition">
+  <goal name="WP_parameter partition_.117" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05" steps="133"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.119" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.119.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.119.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.119.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.118" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.118.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.118.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.118.0.0.0" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.58" steps="435"/></proof>
      </goal>
     </transf>
@@ -430,13 +428,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.120" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.120.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.120.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.120.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.119" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.119.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.119.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.119.0.0.0" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.32" steps="199"/></proof>
      </goal>
     </transf>
@@ -445,13 +443,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.121" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter partition_.121.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter partition_.121.1.1" expl="postcondition">
-    <transf name="inline_goal">
-     <goal name="WP_parameter partition_.121.1.1.1" expl="postcondition">
+  <goal name="WP_parameter partition_.120" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter partition_.120.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter partition_.120.0.0" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="WP_parameter partition_.120.0.0.0" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.61" steps="502"/></proof>
      </goal>
     </transf>
@@ -460,416 +458,36 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter partition_.122" expl="postcondition">
+  <goal name="WP_parameter partition_.121" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.123" expl="postcondition">
+  <goal name="WP_parameter partition_.122" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.124" expl="postcondition">
+  <goal name="WP_parameter partition_.123" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.125" expl="postcondition">
+  <goal name="WP_parameter partition_.124" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter partition_.126" expl="postcondition">
+  <goal name="WP_parameter partition_.125" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="33"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter partition" expl="VC for partition">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter partition.1" expl="precondition">
+ <goal name="WP_parameter partition" expl="VC for partition" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter partition.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter partition.2" expl="postcondition">
+  <goal name="WP_parameter partition.1" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter partition.3" expl="postcondition">
+  <goal name="WP_parameter partition.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter partition.4" expl="postcondition">
+  <goal name="WP_parameter partition.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="1.39"/></proof>
-  <metas>
-   <ts_pos name="ref" arity="1" id="2316"
-    ip_theory="Ref">
-    <ip_library name="ref"/>
-    <ip_qualid name="ref"/>
-   </ts_pos>
-   <ls_pos name="zero" id="290"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="zero"/>
-   </ls_pos>
-   <ls_pos name="one" id="291"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="one"/>
-   </ls_pos>
-   <ls_pos name="infix &lt;" id="292"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="infix &lt;"/>
-   </ls_pos>
-   <ls_pos name="infix &gt;" id="295"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="infix &gt;"/>
-   </ls_pos>
-   <ls_pos name="infix +" id="1461"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="infix +"/>
-   </ls_pos>
-   <ls_pos name="prefix -" id="1462"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="prefix -"/>
-   </ls_pos>
-   <ls_pos name="infix *" id="1463"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="infix *"/>
-   </ls_pos>
-   <ls_pos name="prefix !" id="2322"
-    ip_theory="Ref">
-    <ip_library name="ref"/>
-    <ip_qualid name="prefix !"/>
-   </ls_pos>
-   <ls_pos name="get" id="2468"
-    ip_theory="Map">
-    <ip_library name="map"/>
-    <ip_qualid name="get"/>
-   </ls_pos>
-   <ls_pos name="set" id="2471"
-    ip_theory="Map">
-    <ip_library name="map"/>
-    <ip_qualid name="set"/>
-   </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="2491"
-    ip_theory="Map">
-    <ip_library name="map"/>
-    <ip_qualid name="mixfix [&lt;-]"/>
-   </ls_pos>
-   <ls_pos name="occ" id="2698"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ"/>
-   </ls_pos>
-   <ls_pos name="get" id="2903"
-    ip_theory="Array">
-    <ip_library name="array"/>
-    <ip_qualid name="get"/>
-   </ls_pos>
-   <ls_pos name="set" id="2918"
-    ip_theory="Array">
-    <ip_library name="array"/>
-    <ip_qualid name="set"/>
-   </ls_pos>
-   <ls_pos name="mixfix []" id="2943"
-    ip_theory="Array">
-    <ip_library name="array"/>
-    <ip_qualid name="mixfix []"/>
-   </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="2960"
-    ip_theory="Array">
-    <ip_library name="array"/>
-    <ip_qualid name="mixfix [&lt;-]"/>
-   </ls_pos>
-   <ls_pos name="array_eq" id="3372"
-    ip_theory="ArrayEq">
-    <ip_library name="array"/>
-    <ip_qualid name="array_eq"/>
-   </ls_pos>
-   <pr_pos name="Assoc" id="1464"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Assoc"/>
-   </pr_pos>
-   <pr_pos name="Unit_def_l" id="1471"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Unit_def_l"/>
-   </pr_pos>
-   <pr_pos name="Unit_def_r" id="1474"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Unit_def_r"/>
-   </pr_pos>
-   <pr_pos name="Inv_def_l" id="1477"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Inv_def_l"/>
-   </pr_pos>
-   <pr_pos name="Inv_def_r" id="1480"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Inv_def_r"/>
-   </pr_pos>
-   <pr_pos name="Comm" id="1483"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CommutativeGroup"/>
-    <ip_qualid name="Comm"/>
-    <ip_qualid name="Comm"/>
-   </pr_pos>
-   <pr_pos name="Assoc" id="1488"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Assoc"/>
-    <ip_qualid name="Assoc"/>
-   </pr_pos>
-   <pr_pos name="Mul_distr_l" id="1495"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Mul_distr_l"/>
-   </pr_pos>
-   <pr_pos name="Mul_distr_r" id="1502"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Mul_distr_r"/>
-   </pr_pos>
-   <pr_pos name="Comm" id="1520"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Comm"/>
-    <ip_qualid name="Comm"/>
-   </pr_pos>
-   <pr_pos name="Unitary" id="1525"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Unitary"/>
-   </pr_pos>
-   <pr_pos name="NonTrivialRing" id="1528"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="NonTrivialRing"/>
-   </pr_pos>
-   <pr_pos name="Refl" id="1540"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Refl"/>
-   </pr_pos>
-   <pr_pos name="Trans" id="1543"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Trans"/>
-   </pr_pos>
-   <pr_pos name="Antisymm" id="1550"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Antisymm"/>
-   </pr_pos>
-   <pr_pos name="Total" id="1555"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="Total"/>
-   </pr_pos>
-   <pr_pos name="ZeroLessOne" id="1560"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="ZeroLessOne"/>
-   </pr_pos>
-   <pr_pos name="CompatOrderMult" id="1568"
-    ip_theory="Int">
-    <ip_library name="int"/>
-    <ip_qualid name="CompatOrderMult"/>
-   </pr_pos>
-   <pr_pos name="Select_eq" id="2504"
-    ip_theory="Map">
-    <ip_library name="map"/>
-    <ip_qualid name="Select_eq"/>
-   </pr_pos>
-   <pr_pos name="Select_neq" id="2513"
-    ip_theory="Map">
-    <ip_library name="map"/>
-    <ip_qualid name="Select_neq"/>
-   </pr_pos>
-   <pr_pos name="exchange_set" id="2604"
-    ip_theory="MapExchange">
-    <ip_library name="map"/>
-    <ip_qualid name="exchange_set"/>
-   </pr_pos>
-   <pr_pos name="occ_right_no_add" id="2712"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_right_no_add"/>
-   </pr_pos>
-   <pr_pos name="occ_bounds" id="2730"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_bounds"/>
-   </pr_pos>
-   <pr_pos name="occ_append" id="2739"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_append"/>
-   </pr_pos>
-   <pr_pos name="occ_neq" id="2750"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_neq"/>
-   </pr_pos>
-   <pr_pos name="occ_exists" id="2761"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_exists"/>
-   </pr_pos>
-   <pr_pos name="occ_pos" id="2772"
-    ip_theory="Occ">
-    <ip_library name="map"/>
-    <ip_qualid name="occ_pos"/>
-   </pr_pos>
-   <meta name="remove_logic">
-    <meta_arg_ls id="290"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="291"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="292"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="295"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="1461"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="1462"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="1463"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2322"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2468"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2471"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2491"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2698"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2903"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2918"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2943"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="2960"/>
-   </meta>
-   <meta name="remove_logic">
-    <meta_arg_ls id="3372"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1464"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1471"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1474"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1477"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1480"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1483"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1488"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1495"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1502"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1520"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1525"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1528"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1540"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1543"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1550"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1555"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1560"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1568"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2504"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2513"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2604"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2712"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2730"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2739"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2750"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2761"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="2772"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="2316"/>
-   </meta>
-   <goal name="WP_parameter partition.4" expl="postcondition">
-   <transf name="eliminate_builtin">
-    <goal name="WP_parameter partition.4.1" expl="postcondition">
-    <proof prover="0"><result status="valid" time="1.76"/></proof>
-    <proof prover="1"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </metas>
   </goal>
  </transf>
  </goal>

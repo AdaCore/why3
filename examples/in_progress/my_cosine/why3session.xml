@@ -8,8 +8,8 @@
 <prover id="3" name="Coq" version="8.6" timelimit="2" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.4.1" timelimit="2" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Alt-Ergo" version="1.30" alternative="alt" timelimit="2" steplimit="0" memlimit="4000"/>
-<file name="../my_cosine.mlw" expanded="true">
-<theory name="M" sum="e6984a9af2ab6c45ac0e8af4e992df4e" expanded="true">
+<file name="../my_cosine.mlw">
+<theory name="M" sum="e6984a9af2ab6c45ac0e8af4e992df4e">
  <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
  <transf name="split_goal_wp">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
@@ -31,9 +31,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="IEEEfloat" sum="c893577268cab3bfe222359ad1fe8705" expanded="true">
- <goal name="WP_parameter my_cosine" expl="VC for my_cosine" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="IEEEfloat" sum="c893577268cab3bfe222359ad1fe8705">
+ <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.99" steps="1636"/></proof>
   </goal>
@@ -52,7 +52,7 @@
   <proof prover="2" obsolete="true"><result status="unknown" time="0.19"/></proof>
   <proof prover="4"><result status="timeout" time="2.00"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.6" expl="6. postcondition" expanded="true">
+  <goal name="WP_parameter my_cosine.6" expl="6. postcondition">
   <proof prover="0"><result status="timeout" time="1.98"/></proof>
   <proof prover="1"><result status="unknown" time="0.02"/></proof>
   <proof prover="2" obsolete="true"><result status="unknown" time="0.16"/></proof>
@@ -61,9 +61,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Combined" sum="08dfc24481780ce0dd81f93fbcf0e3b2" expanded="true">
- <goal name="WP_parameter my_cosine" expl="VC for my_cosine" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="Combined" sum="08dfc24481780ce0dd81f93fbcf0e3b2">
+ <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.51" steps="1636"/></proof>
   </goal>
@@ -82,15 +82,15 @@
   <goal name="WP_parameter my_cosine.6" expl="6. precondition">
   <proof prover="0"><result status="valid" time="0.15" steps="236"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.7" expl="7. precondition" expanded="true">
+  <goal name="WP_parameter my_cosine.7" expl="7. precondition">
   <proof prover="0"><result status="timeout" time="1.98"/></proof>
   <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.8" expl="8. precondition" expanded="true">
+  <goal name="WP_parameter my_cosine.8" expl="8. precondition">
   <proof prover="0"><result status="timeout" time="3.99"/></proof>
   <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.9" expl="9. postcondition" expanded="true">
+  <goal name="WP_parameter my_cosine.9" expl="9. postcondition">
   <proof prover="0"><result status="timeout" time="2.00"/></proof>
   <proof prover="1"><result status="unknown" time="0.02"/></proof>
   <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>

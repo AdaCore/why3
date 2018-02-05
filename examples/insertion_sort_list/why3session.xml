@@ -4,13 +4,13 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.3" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../insertion_sort_list.mlw" expanded="true">
-<theory name="InsertionSort" sum="91e56d209382cbe929b3eea3af4124bd" expanded="true">
- <goal name="Transitive.Trans" expl="" expanded="true">
+<file name="../insertion_sort_list.mlw">
+<theory name="InsertionSort" sum="91e56d209382cbe929b3eea3af4124bd">
+ <goal name="Transitive.Trans" expl="">
  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter insert" expl="VC for insert" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter insert" expl="VC for insert">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter insert.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
@@ -32,13 +32,13 @@
   <goal name="WP_parameter insert.7" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.58" steps="741"/></proof>
   </goal>
-  <goal name="WP_parameter insert.8" expl="postcondition" expanded="true">
+  <goal name="WP_parameter insert.8" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.21"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter insertion_sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="2"/></proof>
   </goal>

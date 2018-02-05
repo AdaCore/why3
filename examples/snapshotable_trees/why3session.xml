@@ -3,12 +3,12 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../snapshotable_trees.mlw" expanded="true">
+<file name="../snapshotable_trees.mlw">
 <theory name="Tree" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Enum" sum="45de2fc48f315537f2d1cee3a237ebf6" expanded="true">
- <goal name="WP_parameter enum" expl="VC for enum" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="Enum" sum="45de2fc48f315537f2d1cee3a237ebf6">
+ <goal name="WP_parameter enum" expl="VC for enum">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter enum.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -21,7 +21,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Iterator" sum="4a873877ca1dc0df83bf388f54870f1c" expanded="true">
+<theory name="Iterator" sum="4a873877ca1dc0df83bf388f54870f1c">
  <goal name="WP_parameter create_iterator" expl="VC for create_iterator">
  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
@@ -40,23 +40,23 @@
  <proof prover="1"><result status="valid" time="0.08" steps="378"/></proof>
  </goal>
 </theory>
-<theory name="ITree" sum="371ef89b8328e6b1805f537498166bc0" expanded="true">
+<theory name="ITree" sum="371ef89b8328e6b1805f537498166bc0">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="WP_parameter contains" expl="VC for contains">
  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter add" expl="VC for add">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter add.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter add.2" expl="type invariant">
   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add.3" expl="postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter add.3" expl="postcondition">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter add.3.1" expl="VC for add">
    <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
@@ -80,9 +80,9 @@
  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="Harness" sum="67dff5996f85b9ade2ebec156d0d9fd6" expanded="true">
- <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="Harness" sum="67dff5996f85b9ade2ebec156d0d9fd6">
+ <goal name="WP_parameter test" expl="VC for test">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter test.1" expl="assertion">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>

@@ -5,32 +5,32 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../cubic_root.mlw" expanded="true">
-<theory name="CubicRoot" sum="bd6b06b70998f07296840836ae28bb1a" expanded="true">
- <goal name="WP_parameter cubic_root" expl="VC for cubic_root" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter cubic_root.1" expl="loop invariant init" expanded="true">
+<file name="../cubic_root.mlw">
+<theory name="CubicRoot" sum="bd6b06b70998f07296840836ae28bb1a">
+ <goal name="WP_parameter cubic_root" expl="VC for cubic_root">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter cubic_root.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.2" expl="loop invariant init" expanded="true">
+  <goal name="WP_parameter cubic_root.2" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.3" expl="loop invariant init" expanded="true">
+  <goal name="WP_parameter cubic_root.3" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.4" expl="loop invariant preservation" expanded="true">
+  <goal name="WP_parameter cubic_root.4" expl="loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.5" expl="loop invariant preservation" expanded="true">
+  <goal name="WP_parameter cubic_root.5" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.6" expl="loop invariant preservation" expanded="true">
+  <goal name="WP_parameter cubic_root.6" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.7" expl="loop variant decrease" expanded="true">
+  <goal name="WP_parameter cubic_root.7" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter cubic_root.8" expl="postcondition" expanded="true">
+  <goal name="WP_parameter cubic_root.8" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>
