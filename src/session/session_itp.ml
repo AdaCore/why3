@@ -1855,7 +1855,6 @@ let rec save_goal s ctxt fmt pnid =
     (save_bool_def "proved" false) (pn_proved s pnid);
   let sum = Termcode.string_of_checksum pn.proofn_checksum in
   let shape = Termcode.string_of_shape pn.proofn_shape in
-  assert (shape <> "");
   Compress.Compress_z.output_string ctxt.ch_shapes sum;
   Compress.Compress_z.output_char ctxt.ch_shapes ' ';
   Compress.Compress_z.output_string ctxt.ch_shapes shape;
