@@ -515,7 +515,7 @@ use import FreshVariables
 
 (* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:
-    forall sigma1 sigma3:env, pi1 pi3:stack, s1 s2:stmt, n:int.
+    forall n:int, sigma1 sigma3:env, pi1 pi3:stack, s1 s2:stmt.
       many_steps sigma1 pi1 (Sseq s1 s2) sigma3 pi3 Sskip n ->
       exists sigma2:env, pi2:stack, n1 n2:int.
         many_steps sigma1 pi1 s1 sigma2 pi2 Sskip n1 /\
