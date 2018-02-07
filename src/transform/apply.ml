@@ -223,7 +223,7 @@ let replace_subst lp lv f1 f2 withed_terms t =
   in
 
   let is_replaced, t =
-    t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t) None t in
+    replace None f1 f2 t in
   match is_replaced with
   | None -> raise (Arg_trans "rewrite: no term matching the given pattern")
   | Some(subst_ty,subst) ->
@@ -240,6 +240,9 @@ let rewrite_in rev with_terms h h1 =
           let lp, lv, f = intros t in
           let t1, t2 = (match f.t_node with
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+              (* Support to rewrite from the right *)
+              if rev then (t1, t2) else (t2, t1)
+          | Tbinop (Tiff, t1, t2) ->
               (* Support to rewrite from the right *)
               if rev then (t1, t2) else (t2, t1)
           | _ -> raise (Arg_bad_hypothesis ("rewrite", f))) in
