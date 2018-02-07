@@ -46,7 +46,7 @@ module Array32
   let defensive_set (a: array 'a) (i: int32) (v: 'a)
     ensures { 0 <= to_int i < to_int a.length }
     ensures { a = (old a)[to_int i <- v] }
-    raises  { OutOfBounds -> to_int i < 0 \/ to_int i >= to_int a.length }
+    raises  { OutOfBounds -> (to_int i < 0 \/ to_int i >= to_int a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
@@ -161,7 +161,7 @@ module Array31
   let defensive_set (a: array 'a) (i: int31) (v: 'a)
     ensures { 0 <= to_int i < to_int a.length }
     ensures { a = (old a)[to_int i <- v] }
-    raises  { OutOfBounds -> to_int i < 0 \/ to_int i >= to_int a.length }
+    raises  { OutOfBounds -> (to_int i < 0 \/ to_int i >= to_int a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
@@ -276,7 +276,7 @@ module Array63
   let defensive_set (a: array63 'a) (i: int63) (v: 'a)
     ensures { 0 <= to_int i < to_int a.length }
     ensures { a = (old a)[to_int i <- v] }
-    raises  { OutOfBounds -> to_int i < 0 \/ to_int i >= to_int a.length }
+    raises  { OutOfBounds -> (to_int i < 0 \/ to_int i >= to_int a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
