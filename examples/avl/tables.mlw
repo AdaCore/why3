@@ -68,7 +68,7 @@ module MapBase
 
       3) If it exists, the middle element has key equivalent to the selector *)
   predicate selected (k:K.t) (e:split (D.t 'a)) =
-    let s = rebuild e in
+    let _s = rebuild e in
     upper_bound_s k e.left /\ lower_bound_s k e.right /\
     match e.middle with None -> true | Some d -> CO.eq k d.key end
 
