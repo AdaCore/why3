@@ -49,7 +49,7 @@ module Array
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val make (n: int) (v: 'a) : array 'a
+  val function make (n: int) (v: 'a) : array 'a
     requires { [@expl:array creation size] n >= 0 }
     ensures { forall i:int. 0 <= i < n -> result[i] = v }
     ensures { result.length = n }
