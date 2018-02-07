@@ -2,6 +2,7 @@ open Why3
 open Format
 open Json_util
 
+let debug_server = Debug.register_flag ~desc:"Debug gnat_server" "gnat_server"
 let debug = false
 
 module Gnat_Protocol = struct
@@ -127,28 +128,58 @@ then List.rev (filter l) *)
     end
   in aux
 
+let debug_to_file s =
+  if Debug.test_flag debug_server then
+    begin
+      let oc = open_out_gen [Open_append] 0 "/tmp/gnat_server.log" in
+      Printf.fprintf oc "%s" s;
+      close_out oc
+    end
+
 let main_loop () =
 
   let read_lines = read_lines Unix.stdin in
   (* attempt to run the first timeout handler *)
   while true do
     try
+      debug_to_file "[gnat_server loop]\n";
       let time = Unix.gettimeofday () in
-      let delay =
+      let timeout =
         match !timeout_handler, !idle_handler with
-        | _, [_] -> 0.0
-        | [], _ -> 1.0
-        | (_, t, _) :: _ , _ -> min (time -. t) 0.0
+        (* When a transformation has been triggered by the user, we don't want
+           to wait during Unix.select because we already want to execute the
+           transformation. *)
+        | _, _ :: _ -> 0.0
+        (* The value 1.0 is a random choice which does not respond to a clear
+           specification requirement. *)
+        | [], [] -> 1.0
+        (* We allow the delay given to select to be at most the time remaining
+           before the next timeout function wants to be executed.
+        *)
+        | (_, t, _) :: _ , _ -> max (t -. time) 0.0
       in
       let output =
         if Gnat_Protocol.has_notification () then [Unix.stdout] else [] in
-      let l1, l2, _ = Unix.select [Unix.stdin] output [] delay in
+      debug_to_file ("[Begin selecting with timeout: " ^
+                     (string_of_float timeout) ^ "]\n");
+      let l1, l2, _ = Unix.select [Unix.stdin] output [] timeout in
+      debug_to_file "[End selecting]\n";
+      debug_to_file "[Trying to handle request]\n@.";
       if l1 <> [] then
-          List.iter Gnat_Protocol.push_one_request_string (read_lines true);
+        begin
+          let () = debug_to_file "[Trying to read_lines]\n@." in
+          let rl = read_lines true in
+          let () = debug_to_file "[Successfully read_lines]\n@." in
+          List.iter Gnat_Protocol.push_one_request_string rl;
+        end;
+      debug_to_file "[Trying to handle notifications]\n@.";
       if l2 <> [] then
           while Gnat_Protocol.has_notification () do
             Gnat_Protocol.communicate_notification ()
           done;
+
+      let time = Unix.gettimeofday () in
+      debug_to_file "[timeout_handler]\n";
       match !timeout_handler with
       | (ms,t,f) :: rem when t <= time ->
           timeout_handler := rem;
@@ -159,6 +190,7 @@ let main_loop () =
           (* no idle handler *)
           begin
             (* attempt to run the first idle handler *)
+            debug_to_file "[idle_handler]\n";
             match !idle_handler with
             | (p,f) :: rem ->
                 idle_handler := rem;
