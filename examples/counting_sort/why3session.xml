@@ -2,18 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../counting_sort.mlw" proved="true">
-<theory name="Spec" proved="true" sum="2431021609b0878e2404bd4e3d969c6c">
+<theory name="Spec" proved="true" sum="7321666aec9fecd30a161f3c27f5da95">
  <goal name="VC k" expl="VC for k" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC eqlt" expl="VC for eqlt" proved="true">
- <proof prover="2"><result status="valid" time="0.76" steps="756"/></proof>
+ <proof prover="2"><result status="valid" time="0.76" steps="828"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" proved="true" sum="32fd5d67b56daf3b3191082c5ddc18a0">
+<theory name="CountingSort" proved="true" sum="7dc4b56b2b85019a89435b491922cc31">
  <goal name="VC counting_sort" expl="VC for counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC counting_sort.0" expl="array creation size" proved="true">
@@ -77,10 +78,10 @@
   <proof prover="2"><result status="valid" time="0.04" steps="76"/></proof>
   </goal>
   <goal name="VC counting_sort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="7"><result status="valid" time="0.11"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC counting_sort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="7" timelimit="10" memlimit="4000"><result status="valid" time="0.47"/></proof>
+  <proof prover="7" timelimit="10" memlimit="4000"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC counting_sort.22" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.10" steps="202"/></proof>
@@ -112,7 +113,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" proved="true" sum="dea755b72a27cfb6ec981cb64b37b3d4">
+<theory name="InPlaceCountingSort" proved="true" sum="5228d909430fe25c78cff001a951e966">
  <goal name="VC in_place_counting_sort" expl="VC for in_place_counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC in_place_counting_sort.0" expl="array creation size" proved="true">
@@ -179,7 +180,7 @@
   <proof prover="2"><result status="valid" time="0.05" steps="81"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.22" expl="loop invariant preservation" proved="true">
   <proof prover="7"><result status="valid" time="0.13"/></proof>
@@ -214,7 +215,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" proved="true" sum="02aaca74a488552e6454523b6a9bde7f">
+<theory name="Harness" proved="true" sum="28e8abfc409b018965296c7ff809f176">
  <goal name="VC harness" expl="VC for harness" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC harness.0" expl="array creation size" proved="true">
