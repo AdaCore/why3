@@ -2,53 +2,53 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.7.1" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="5" name="Coq" version="8.6.1" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="8" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../dfa_example.mlw" expanded="true">
-<theory name="DfaExample" sum="dd8fae77d607d67a93d10a5e7b2617f8" expanded="true">
- <goal name="nil_notin_r1" expl="">
+<file name="../dfa_example.mlw" proved="true">
+<theory name="DfaExample" proved="true" sum="8b182d4c6b2d88551595aee1ff3eae1c">
+ <goal name="nil_notin_r1" proved="true">
+ <proof prover="0" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="0.26"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
- <proof prover="5" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="0.26"/></proof>
  <proof prover="7"><result status="valid" time="0.08" steps="140"/></proof>
  </goal>
- <goal name="VC all_in_r0" expl="VC for all_in_r0" expanded="true">
+ <goal name="VC all_in_r0" expl="VC for all_in_r0" proved="true">
  <proof prover="2"><result status="valid" time="0.03" steps="222"/></proof>
  </goal>
- <goal name="words_in_r1_end_with_one" expl="">
+ <goal name="words_in_r1_end_with_one" proved="true">
  <proof prover="8"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="VC words_in_r1_suffix_in_r1" expl="VC for words_in_r1_suffix_in_r1" expanded="true">
+ <goal name="VC words_in_r1_suffix_in_r1" expl="VC for words_in_r1_suffix_in_r1" proved="true">
  <proof prover="1"><result status="valid" time="3.06"/></proof>
  </goal>
- <goal name="VC zero_w_in_r1" expl="VC for zero_w_in_r1" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC zero_w_in_r1.1" expl="assertion">
+ <goal name="VC zero_w_in_r1" expl="VC for zero_w_in_r1" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC zero_w_in_r1.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="VC zero_w_in_r1.2" expl="postcondition">
+  <goal name="VC zero_w_in_r1.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC one_w_in_r1" expl="VC for one_w_in_r1" expanded="true">
- <proof prover="2"><result status="valid" time="2.22" steps="6899"/></proof>
+ <goal name="VC one_w_in_r1" expl="VC for one_w_in_r1" proved="true">
+ <proof prover="2"><result status="valid" time="2.22" steps="6829"/></proof>
  </goal>
- <goal name="zero_w_in_r2" expl="">
+ <goal name="zero_w_in_r2" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
  </goal>
- <goal name="one_w_in_r2" expl="">
+ <goal name="one_w_in_r2" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
  </goal>
- <goal name="VC astate1" expl="VC for astate1" expanded="true">
+ <goal name="VC astate1" expl="VC for astate1" proved="true">
  <proof prover="2"><result status="valid" time="0.59" steps="3042"/></proof>
  </goal>
- <goal name="VC astate2" expl="VC for astate2" expanded="true">
- <proof prover="2"><result status="valid" time="0.75" steps="3708"/></proof>
+ <goal name="VC astate2" expl="VC for astate2" proved="true">
+ <proof prover="2"><result status="valid" time="0.75" steps="3925"/></proof>
  </goal>
 </theory>
 </file>

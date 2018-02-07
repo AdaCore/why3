@@ -6,9 +6,9 @@
 <prover id="1" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.6.1" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.5" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
 <file name="../vstte12_bfs.mlw" proved="true">
 <theory name="Graph" proved="true" sum="8e37a9e21c8d4d37e6f9fb98b6bc91dc">
  <goal name="path_nonneg" proved="true">
@@ -217,7 +217,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="83"/></proof>
   </goal>
   <goal name="VC bfs.7" expl="postcondition" proved="true">
-  <proof prover="4" edited="vstte12_bfs_BFS_VC_bfs_1.v"><result status="valid" time="0.54"/></proof>
+  <proof prover="7" edited="vstte12_bfs_BFS_VC_bfs_1.v"><result status="valid" time="0.54"/></proof>
   </goal>
  </transf>
  </goal>

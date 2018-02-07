@@ -2,135 +2,135 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.20.prv" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../residual.mlw" expanded="true">
-<theory name="Residuals" sum="989782ac8a88c888c1546cd628e042ff" expanded="true">
- <goal name="VC accepts_epsilon" expl="VC for accepts_epsilon">
- <transf name="split_goal_wp">
-  <goal name="VC accepts_epsilon.1" expl="variant decrease">
+<file name="../residual.mlw" proved="true">
+<theory name="Residuals" proved="true" sum="7626d24dde22aa6bc3fe43cd4373a346">
+ <goal name="VC accepts_epsilon" expl="VC for accepts_epsilon" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC accepts_epsilon.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
-  <goal name="VC accepts_epsilon.2" expl="variant decrease">
+  <goal name="VC accepts_epsilon.1" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="VC accepts_epsilon.3" expl="variant decrease">
+  <goal name="VC accepts_epsilon.2" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
-  <goal name="VC accepts_epsilon.4" expl="variant decrease">
+  <goal name="VC accepts_epsilon.3" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="VC accepts_epsilon.5" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC accepts_epsilon.5.1" expl="VC for accepts_epsilon">
+  <goal name="VC accepts_epsilon.4" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC accepts_epsilon.4.0" expl="VC for accepts_epsilon" proved="true">
    <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="VC accepts_epsilon.5.2" expl="VC for accepts_epsilon">
+   <goal name="VC accepts_epsilon.4.1" expl="VC for accepts_epsilon" proved="true">
    <proof prover="9"><result status="valid" time="0.05" steps="428"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="inversion_mem_star_gen" expl="">
- <transf name="induction_pr">
-  <goal name="inversion_mem_star_gen.1" expl="">
+ <goal name="inversion_mem_star_gen" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="inversion_mem_star_gen.0" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.2" expl="">
+  <goal name="inversion_mem_star_gen.1" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.3" expl="">
+  <goal name="inversion_mem_star_gen.2" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.4" expl="">
+  <goal name="inversion_mem_star_gen.3" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.5" expl="">
+  <goal name="inversion_mem_star_gen.4" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.6" expl="">
+  <goal name="inversion_mem_star_gen.5" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="inversion_mem_star_gen.7" expl="">
+  <goal name="inversion_mem_star_gen.6" proved="true">
   <proof prover="6"><result status="valid" time="0.17"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="inversion_mem_star" expl="">
+ <goal name="inversion_mem_star" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="22"/></proof>
  </goal>
- <goal name="VC residual" expl="VC for residual">
- <transf name="split_goal_wp">
-  <goal name="VC residual.1" expl="variant decrease">
+ <goal name="VC residual" expl="VC for residual" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC residual.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
-  <goal name="VC residual.2" expl="variant decrease">
+  <goal name="VC residual.1" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
-  <goal name="VC residual.3" expl="variant decrease">
+  <goal name="VC residual.2" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="VC residual.4" expl="variant decrease">
+  <goal name="VC residual.3" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="VC residual.5" expl="variant decrease">
+  <goal name="VC residual.4" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="VC residual.6" expl="variant decrease">
+  <goal name="VC residual.5" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
-  <goal name="VC residual.7" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC residual.7.1" expl="postcondition">
-   <transf name="split_goal_wp">
-    <goal name="VC residual.7.1.1" expl="postcondition">
+  <goal name="VC residual.6" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC residual.6.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC residual.6.0.0" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.03" steps="135"/></proof>
     </goal>
-    <goal name="VC residual.7.1.2" expl="postcondition">
+    <goal name="VC residual.6.0.1" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.04" steps="135"/></proof>
     </goal>
-    <goal name="VC residual.7.1.3" expl="postcondition">
+    <goal name="VC residual.6.0.2" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.06" steps="215"/></proof>
     </goal>
-    <goal name="VC residual.7.1.4" expl="postcondition">
+    <goal name="VC residual.6.0.3" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.05" steps="144"/></proof>
     </goal>
-    <goal name="VC residual.7.1.5" expl="postcondition">
-    <proof prover="1" edited="residual_Residuals_VC_residual_1.v"><result status="valid" time="0.30"/></proof>
+    <goal name="VC residual.6.0.4" expl="postcondition" proved="true">
+    <proof prover="0" edited="residual_Residuals_VC_residual_1.v"><result status="valid" time="0.30"/></proof>
     </goal>
-    <goal name="VC residual.7.1.6" expl="postcondition">
-    <proof prover="9" timelimit="1"><result status="valid" time="0.33" steps="862"/></proof>
+    <goal name="VC residual.6.0.5" expl="postcondition" proved="true">
+    <proof prover="9" timelimit="1"><result status="valid" time="0.33" steps="1157"/></proof>
     </goal>
-    <goal name="VC residual.7.1.7" expl="postcondition">
+    <goal name="VC residual.6.0.6" expl="postcondition" proved="true">
     <proof prover="9" timelimit="10" memlimit="4000"><result status="valid" time="0.74" steps="1616"/></proof>
     </goal>
    </transf>
    </goal>
-   <goal name="VC residual.7.2" expl="postcondition">
-   <transf name="split_goal_wp">
-    <goal name="VC residual.7.2.1" expl="postcondition">
+   <goal name="VC residual.6.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC residual.6.1.0" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="55"/></proof>
     </goal>
-    <goal name="VC residual.7.2.2" expl="postcondition">
+    <goal name="VC residual.6.1.1" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="55"/></proof>
     </goal>
-    <goal name="VC residual.7.2.3" expl="postcondition">
+    <goal name="VC residual.6.1.2" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.03" steps="137"/></proof>
     </goal>
-    <goal name="VC residual.7.2.4" expl="postcondition">
+    <goal name="VC residual.6.1.3" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="74"/></proof>
     </goal>
-    <goal name="VC residual.7.2.5" expl="postcondition">
-    <proof prover="1" edited="residual_Residuals_VC_residual_2.v"><result status="valid" time="0.40"/></proof>
+    <goal name="VC residual.6.1.4" expl="postcondition" proved="true">
+    <proof prover="0" edited="residual_Residuals_VC_residual_2.v"><result status="valid" time="0.40"/></proof>
     </goal>
-    <goal name="VC residual.7.2.6" expl="postcondition">
-    <proof prover="1" edited="residual_Residuals_VC_residual_3.v"><result status="valid" time="0.31"/></proof>
+    <goal name="VC residual.6.1.5" expl="postcondition" proved="true">
+    <proof prover="0" edited="residual_Residuals_VC_residual_3.v"><result status="valid" time="0.31"/></proof>
     </goal>
-    <goal name="VC residual.7.2.7" expl="postcondition">
+    <goal name="VC residual.6.1.6" expl="postcondition" proved="true">
     <proof prover="10"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
@@ -139,33 +139,33 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC decide_mem" expl="VC for decide_mem">
- <transf name="split_goal_wp">
-  <goal name="VC decide_mem.1" expl="variant decrease">
+ <goal name="VC decide_mem" expl="VC for decide_mem" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC decide_mem.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC decide_mem.2" expl="postcondition">
+  <goal name="VC decide_mem.1" expl="postcondition" proved="true">
   <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Test" sum="023a98c280f1d3500ceb9f682feef513">
- <goal name="VC a" expl="VC for a">
+<theory name="Test" proved="true" sum="023a98c280f1d3500ceb9f682feef513">
+ <goal name="VC a" expl="VC for a" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="VC aa" expl="VC for aa">
+ <goal name="VC aa" expl="VC for aa" proved="true">
  <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="VC astar" expl="VC for astar">
+ <goal name="VC astar" expl="VC for astar" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="VC test_astar" expl="VC for test_astar">
- <transf name="split_goal_wp">
+ <goal name="VC test_astar" expl="VC for test_astar" proved="true">
+ <transf name="split_goal_wp" proved="true" >
  </transf>
  </goal>
 </theory>
-<theory name="DFA" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="DFA" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 </file>
 </why3session>

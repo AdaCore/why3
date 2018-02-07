@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../kmp.mlw" proved="true">
@@ -28,7 +28,7 @@
  <proof prover="7"><result status="valid" time="0.42"/></proof>
  </goal>
  <goal name="matches_left_weakening" proved="true">
- <proof prover="1" edited="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"><result status="valid" time="0.42"/></proof>
+ <proof prover="3" edited="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"><result status="valid" time="0.42"/></proof>
  </goal>
  <goal name="matches_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -43,7 +43,7 @@
  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="next_is_maximal" proved="true">
- <proof prover="1" edited="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"><result status="valid" time="0.38"/></proof>
+ <proof prover="3" edited="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="next_1_0" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
@@ -125,7 +125,7 @@
   <proof prover="6"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="VC initnext.18" expl="loop invariant preservation" proved="true">
-  <proof prover="1" edited="kmp_KnuthMorrisPratt_VC_initnext_1.v"><result status="valid" time="0.44"/></proof>
+  <proof prover="3" edited="kmp_KnuthMorrisPratt_VC_initnext_1.v"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="VC initnext.19" expl="loop invariant preservation" proved="true">
   <proof prover="6" timelimit="1"><result status="valid" time="0.38" steps="554"/></proof>
@@ -147,7 +147,7 @@
   <proof prover="6"><result status="valid" time="0.03" steps="80"/></proof>
   </goal>
   <goal name="VC initnext.24" expl="loop invariant preservation" proved="true">
-  <proof prover="1" edited="kmp_KnuthMorrisPratt_VC_initnext_2.v"><result status="valid" time="0.57"/></proof>
+  <proof prover="3" edited="kmp_KnuthMorrisPratt_VC_initnext_2.v"><result status="valid" time="0.57"/></proof>
   </goal>
   <goal name="VC initnext.25" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>

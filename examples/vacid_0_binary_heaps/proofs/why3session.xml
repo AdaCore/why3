@@ -3,11 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../heapsort.mlw" proved="true">
 <theory name="HeapSort" proved="true" sum="3430c903445fdbc270aeabc2b14533ab">
  <goal name="VC min_of_sorted" expl="VC for min_of_sorted" proved="true">
@@ -233,17 +233,17 @@
  <proof prover="5"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="Elements_union" proved="true">
- <proof prover="1" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.40"/></proof>
+ <proof prover="6" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="Elements_add1" proved="true">
- <proof prover="1" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.37"/></proof>
+ <proof prover="6" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.37"/></proof>
  </goal>
  <goal name="Elements_remove_last" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="Occ_elements" proved="true">
- <proof prover="1" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.38"/></proof>
+ <proof prover="6" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="VC elements_set_outside" expl="VC for elements_set_outside" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -259,7 +259,7 @@
  </transf>
  </goal>
  <goal name="Elements_set_inside" proved="true">
- <proof prover="1" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="0.41"/></proof>
+ <proof prover="6" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="0.41"/></proof>
  </goal>
  <goal name="Elements_set_inside2" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
@@ -341,7 +341,7 @@
    <proof prover="5"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC insert.6.4" expl="VC for insert" proved="true">
-   <proof prover="2"><result status="valid" time="1.33" steps="693"/></proof>
+   <proof prover="2"><result status="valid" time="1.09" steps="693"/></proof>
    <proof prover="3"><result status="valid" time="0.60" steps="262"/></proof>
    </goal>
    <goal name="VC insert.6.5" expl="VC for insert" proved="true">
@@ -419,7 +419,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="16"/></proof>
   </goal>
   <goal name="VC extractMin.5" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="1.16" steps="1039"/></proof>
+  <proof prover="2"><result status="valid" time="1.16" steps="1037"/></proof>
   <proof prover="3"><result status="valid" time="1.64" steps="717"/></proof>
   </goal>
   <goal name="VC extractMin.6" expl="postcondition" proved="true">
@@ -501,7 +501,7 @@
    <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
    </goal>
    <goal name="VC extractMin.14.2" expl="VC for extractMin" proved="true">
-   <proof prover="2"><result status="valid" time="4.16" steps="2411"/></proof>
+   <proof prover="2"><result status="valid" time="4.16" steps="2409"/></proof>
    <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC extractMin.14.3" expl="VC for extractMin" proved="true">
@@ -527,7 +527,7 @@
   <proof prover="3"><result status="valid" time="0.03" steps="36"/></proof>
   </goal>
   <goal name="VC extractMin.17" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="2.28" steps="1504"/></proof>
+  <proof prover="2"><result status="valid" time="2.28" steps="1502"/></proof>
   <proof prover="3"><result status="valid" time="2.77" steps="761"/></proof>
   </goal>
   <goal name="VC extractMin.18" expl="postcondition" proved="true">
