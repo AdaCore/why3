@@ -166,6 +166,14 @@ module DijkstraShortestPath
     (x<>u \/ (x=u /\ not (S.mem y su))) ->
     (S.mem y s \/ S.mem y q) /\ d[y] <= d[x] + weight x y
 
+ lemma inside_or_exit:
+    forall s, src, v, d. S.mem src s -> path src v d ->
+      S.mem v s
+      \/
+      exists y. exists z. exists dy.
+        S.mem y s /\ not (S.mem z s) /\ Fset.mem z (g_succ y) /\
+        path src y dy /\ (dy + weight y z <= d)
+
   (* Algorithm's code. *)
 
   let shortest_path_code (src dst: vertex)
