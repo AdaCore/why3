@@ -1889,8 +1889,7 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   | ieee_float.RoundingMode.RTZ =>
       ((is_positive x) -> (is_finite x) /\ ((to_real x) = max_real)) /\
       (~ (is_positive x) -> (is_finite x) /\ ((to_real x) = (-max_real)%R))
-  | (ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE) =>
-      is_infinite x
+  | ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE => is_infinite x
   end.
 
 (* Why3 assumption *)

@@ -200,27 +200,28 @@ let unambig_fs fs =
 
 let lparen_r fmt () = fprintf fmt "@[<1>("
 let rparen_r fmt () = fprintf fmt ")@]"
-let print_paren_r fmt x =
-  print_list_delim ~start:lparen_r ~stop:rparen_r ~sep:comma fmt x
+let print_paren_r f =
+  print_list_delim ~start:lparen_r ~stop:rparen_r ~sep:comma f
 
 let arrow fmt () = fprintf fmt " ->@ "
 let print_arrow_list fmt x = print_list_suf arrow fmt x
 
-let rec print_pat info fmt p = match p.pat_node with
+let rec print_pattern info fmt p = print_pat false info fmt p
+and print_pat op info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
   | Pvar v -> print_vs fmt v
   | Pas (p,v) ->
-      fprintf fmt "(%a as %a)" (print_pat info) p print_vs v
+      fprintf fmt (protect_on op "%a as %a") (print_pat true info) p print_vs v
   | Por (p,q) ->
-      fprintf fmt "(%a|%a)" (print_pat info) p (print_pat info) q
+      fprintf fmt (protect_on op "%a|%a") (print_pat true info) p (print_pat true info) q
   | Papp (cs,pl) when is_fs_tuple cs ->
-      fprintf fmt "%a" (print_paren_r (print_pat info)) pl
+      print_paren_r (print_pat false info) fmt pl
   | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> syntax_arguments s (print_pat info) fmt pl
-        | _ when pl = [] -> (print_ls_real info) fmt cs
-        | _ -> fprintf fmt "@[<1>(%a@ %a)@]"
-          (print_ls_real info) cs (print_list space (print_pat info)) pl
+        | Some s -> syntax_arguments s (print_pat true info) fmt pl
+        | _ when pl = [] -> print_ls_real info fmt cs
+        | _ -> fprintf fmt (protect_on op "%a@ %a")
+          (print_ls_real info) cs (print_list space (print_pat true info)) pl
       end
 
 let print_vsty info fmt v =
@@ -343,7 +344,7 @@ and print_tnode ?(boxed=false) opl opr info fmt t = match t.t_node with
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<4>| %a =>@ %a@]"
-    (print_pat info) p (print_term info) t;
+    (print_pattern info) p (print_term info) t;
   Svs.iter forget_var p.pat_vars
 
 (** Declarations *)
