@@ -46,30 +46,29 @@ type direction =
      | Bottom
      | Right
 
-(* FIXME
 
 (** Math functions about the result of a product. Incomplete product generate None *)
 function left_diag (m: matrix int) (i: int) (j: int) : option int =
 	 if (i < m.rows /\ j >= 0 /\ i >= 3 /\ j < m.columns - 3) then
-	    Some (((get m i j) * (get m (i - 1) (j + 1)) * (get m (i - 2) (j + 2)) * (get m (i-3) (j+3))))
+	    Some (((m.elts i j) * (m.elts (i - 1) (j + 1)) * (m.elts (i - 2) (j + 2)) * (m.elts (i-3) (j+3))))
 	 else
 	    None
 
 function right_diag (m: matrix int) (i: int) (j: int) : option int =
 	 if (i < m.rows - 3 /\ i >= 0 /\ j < m.columns - 3 /\ j >= 0) then
-	    Some (((get m i j) * (get m (i + 1) (j + 1)) * (get m (i + 2) (j + 2)) * (get m (i+3) (j+3))))
+	    Some (((m.elts i j) * (m.elts (i + 1) (j + 1)) * (m.elts (i + 2) (j + 2)) * (m.elts (i+3) (j+3))))
 	 else
 	    None
 
 function line (m: matrix int) (i: int) (j: int) : option int =
 	 if (0 <= j < m.columns /\ i >= 0 /\ i < m.rows - 3) then
-	    Some ((get m i j) * (get m (i+1) j) * (get m (i+2) j) * (get m (i+3) j))
+	    Some ((m.elts i j) * (m.elts (i+1) j) * (m.elts (i+2) j) * (m.elts (i+3) j))
 	 else
 	    None
 
 function column (m: matrix int) (i: int) (j: int) : option int =
 	 if (0 <= i < m.rows /\ j >= 0 /\ j < m.columns - 3) then
-	    Some ((get m i j) * (get m i (j+1)) * (get m i (j+2)) * (get m i (j + 3)))
+	    Some ((m.elts i j) * (m.elts i (j+1)) * (m.elts i (j+2)) * (m.elts i (j + 3)))
 	 else
 	    None
 
@@ -219,6 +218,5 @@ let find_max (m: matrix int) =
   assert { Some !cur_max = compute4 m !cur_i !cur_j !cur_d};
   !cur_max;;
 
-*)
 
 end

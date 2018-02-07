@@ -3,104 +3,35 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../euler011.mlw" expanded="true">
-<theory name="ProductFour" sum="6b895d12180984925f2348b31ce477c9" expanded="true">
- <goal name="WP_parameter right_diag_c" expl="VC for right_diag_c">
- <proof prover="0"><result status="valid" time="0.02" steps="86"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../euler011.mlw" proved="true">
+<theory name="ProductFour" proved="true" sum="198ea0b4432ff2d6dfa161c7e7577d5c">
+ <goal name="VC right_diag_c" expl="VC for right_diag_c" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="107"/></proof>
  </goal>
- <goal name="WP_parameter left_diag_c" expl="VC for left_diag_c">
- <proof prover="0"><result status="valid" time="0.03" steps="85"/></proof>
+ <goal name="VC left_diag_c" expl="VC for left_diag_c" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="107"/></proof>
  </goal>
- <goal name="WP_parameter line_c" expl="VC for line_c">
- <proof prover="0"><result status="valid" time="0.03" steps="81"/></proof>
+ <goal name="VC line_c" expl="VC for line_c" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
  </goal>
- <goal name="WP_parameter column_c" expl="VC for column_c">
- <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+ <goal name="VC column_c" expl="VC for column_c" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="80"/></proof>
  </goal>
- <goal name="WP_parameter find_max" expl="VC for find_max">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter find_max.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.2" expl="2. postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.2.1" expl="1. postcondition">
-   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="VC find_max" expl="VC for find_max" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC find_max.0" expl="loop invariant init" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.0.0" expl="loop invariant init" proved="true">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.4" expl="4. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.5" expl="5. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.6" expl="6. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.7" expl="7. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.8" expl="8. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.9" expl="9. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.02" steps="57"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.10" expl="10. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.11" expl="11. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.11.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="2.39" steps="29645"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.12" expl="12. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.13" expl="13. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.13.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.55" steps="17813"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.14" expl="14. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.15" expl="15. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.15.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.51" steps="17795"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.16" expl="16. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.17" expl="17. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.17.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.82" steps="17814"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.18" expl="18. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.19" expl="19. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.19.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.19.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.19.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.48" steps="5103"/></proof>
+   <goal name="VC find_max.0.1" expl="loop invariant init" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.0.1.0" expl="loop invariant init" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.0.1.0.0" expl="loop invariant init" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
      </goal>
     </transf>
     </goal>
@@ -108,1824 +39,1240 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.20" expl="20. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC find_max.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.21" expl="21. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.21.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.21.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.21.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.49" steps="5092"/></proof>
+  <goal name="VC find_max.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC find_max.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="74"/></proof>
+  </goal>
+  <goal name="VC find_max.4" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC find_max.5" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="181"/></proof>
+  </goal>
+  <goal name="VC find_max.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC find_max.7" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.7.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.7.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.7.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.10" steps="117"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.22" expl="22. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.23" expl="23. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.23.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.80" steps="17795"/></proof>
+   <goal name="VC find_max.7.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.18"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.24" expl="24. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  <goal name="VC find_max.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.25" expl="25. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.25.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.50" steps="6158"/></proof>
+  <goal name="VC find_max.9" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.9.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.13" steps="229"/></proof>
+   </goal>
+   <goal name="VC find_max.9.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.77"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.26" expl="26. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC find_max.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.27" expl="27. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.27.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.72" steps="6146"/></proof>
-   </goal>
-  </transf>
+  <goal name="VC find_max.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.26" steps="597"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.28" expl="28. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.29" expl="29. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.29.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.00" steps="9106"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.30" expl="30. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.31" expl="31. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.31.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.31.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.31.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.46" steps="4989"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.32" expl="32. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.33" expl="33. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.33.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.33.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.33.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.52" steps="4978"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.34" expl="34. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.35" expl="35. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.35.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.35.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.35.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.75" steps="7528"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.36" expl="36. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.37" expl="37. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.37.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.37.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.37.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.50" steps="5027"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.38" expl="38. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.39" expl="39. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.39.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.49" steps="6018"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.40" expl="40. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.41" expl="41. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.41.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.41.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.41.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.76" steps="7515"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.42" expl="42. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.43" expl="43. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.43.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.49" steps="6018"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.44" expl="44. loop invariant preservation">
+  <goal name="VC find_max.12" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.45" expl="45. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.62" steps="6006"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.46" expl="46. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.47" expl="47. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.89" steps="9093"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.48" expl="48. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.49" expl="49. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.60" steps="6023"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.50" expl="50. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.51" expl="51. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.51.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.72" steps="6012"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.52" expl="52. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.53" expl="53. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.53.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.53.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.53.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.78" steps="7516"/></proof>
+  <goal name="VC find_max.13" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.13.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.13.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.13.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.09" steps="129"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
+   <goal name="VC find_max.13.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.54" expl="54. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
+  <goal name="VC find_max.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.55" expl="55. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.52" steps="6019"/></proof>
+  <goal name="VC find_max.15" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.15.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.15.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.15.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.10" steps="142"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.15.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter find_max.56" expl="56. loop invariant preservation">
+  <goal name="VC find_max.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC find_max.17" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.17.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="219"/></proof>
+   </goal>
+   <goal name="VC find_max.17.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.16"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.18" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.19" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.26" steps="411"/></proof>
+  </goal>
+  <goal name="VC find_max.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC find_max.21" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.21.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.14" steps="246"/></proof>
+   </goal>
+   <goal name="VC find_max.21.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC find_max.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.23" steps="589"/></proof>
+  </goal>
+  <goal name="VC find_max.24" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+  </goal>
+  <goal name="VC find_max.25" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="421"/></proof>
+  </goal>
+  <goal name="VC find_max.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.27" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="655"/></proof>
+  </goal>
+  <goal name="VC find_max.28" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.57" expl="57. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.62" steps="6007"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.58" expl="58. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.59" expl="59. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.59.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.88" steps="9018"/></proof>
+  <goal name="VC find_max.29" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.29.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.28" steps="596"/></proof>
+   </goal>
+   <goal name="VC find_max.29.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.60" expl="60. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.61" expl="61. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.52" steps="6007"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.62" expl="62. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.63" expl="63. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.50" steps="5996"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.64" expl="64. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.65" expl="65. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.65.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.87" steps="8939"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.66" expl="66. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.67" expl="67. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.67.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.67.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.67.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="1.13" steps="9795"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.68" expl="68. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.69" expl="69. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.69.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.69.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.69.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.86" steps="9782"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.70" expl="70. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.71" expl="71. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.71.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.71.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.71.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.54" steps="5137"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.72" expl="72. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.73" expl="73. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.73.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.73.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.73.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.55" steps="5165"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.74" expl="74. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.75" expl="75. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.63" steps="6132"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.76" expl="76. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.77" expl="77. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.77.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.59" steps="6143"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.78" expl="78. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.79" expl="79. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.68" steps="6132"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.80" expl="80. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.81" expl="81. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.81.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.71" steps="6119"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.82" expl="82. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.83" expl="83. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.83.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.83.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.83.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.53" steps="5091"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.84" expl="84. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.03" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.85" expl="85. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.85.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.85.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.85.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.54" steps="5070"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.86" expl="86. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.87" expl="87. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.69" steps="6046"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.88" expl="88. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.03" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.89" expl="89. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.57" steps="6047"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.90" expl="90. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.91" expl="91. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.91.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.60" steps="6073"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.92" expl="92. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.93" expl="93. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.58" steps="6061"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.94" expl="94. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.95" expl="95. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.72" steps="6035"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.96" expl="96. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.97" expl="97. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.97.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.65" steps="6061"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.98" expl="98. loop invariant preservation">
+  <goal name="VC find_max.30" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.99" expl="99. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.99.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.99.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.99.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.52" steps="5078"/></proof>
+  <goal name="VC find_max.31" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.31.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.31.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.31.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.09" steps="136"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.100" expl="100. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.101" expl="101. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.65" steps="6082"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.102" expl="102. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.103" expl="103. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.55" steps="6047"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.104" expl="104. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.105" expl="105. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.105.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.62" steps="6036"/></proof>
+   <goal name="VC find_max.31.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.106" expl="106. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.107" expl="107. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.107.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.107.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.107.1.1.1" expl="1. loop invariant preservation">
-     <transf name="eliminate_definition">
-      <goal name="WP_parameter find_max.107.1.1.1.1" expl="1. loop invariant preservation">
-      <proof prover="0"><result status="valid" time="0.60" steps="5045"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.108" expl="108. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.109" expl="109. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.109.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.65" steps="6062"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.110" expl="110. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.111" expl="111. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.57" steps="6049"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.112" expl="112. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.113" expl="113. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.57" steps="6023"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.114" expl="114. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.115" expl="115. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.71" steps="6050"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.116" expl="116. loop invariant preservation">
+  <goal name="VC find_max.32" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.117" expl="117. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.117.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.61" steps="6037"/></proof>
+  <goal name="VC find_max.33" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="625"/></proof>
+  </goal>
+  <goal name="VC find_max.34" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.35" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.35.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.33" steps="655"/></proof>
+   </goal>
+   <goal name="VC find_max.35.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.118" expl="118. loop invariant preservation">
+  <goal name="VC find_max.36" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.37" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.36" steps="510"/></proof>
+  </goal>
+  <goal name="VC find_max.38" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC find_max.39" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.39.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC find_max.39.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.39.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.39.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.12" steps="174"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.40" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC find_max.41" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="242"/></proof>
+  </goal>
+  <goal name="VC find_max.42" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.43" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="369"/></proof>
+  </goal>
+  <goal name="VC find_max.44" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC find_max.45" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.45.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="252"/></proof>
+   </goal>
+   <goal name="VC find_max.45.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.46" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.47" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.25" steps="561"/></proof>
+  </goal>
+  <goal name="VC find_max.48" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.49" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.33" steps="564"/></proof>
+  </goal>
+  <goal name="VC find_max.50" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC find_max.51" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.51.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.20" steps="465"/></proof>
+   </goal>
+   <goal name="VC find_max.51.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.52" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC find_max.53" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.53.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.12" steps="252"/></proof>
+   </goal>
+   <goal name="VC find_max.53.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.54" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="VC find_max.55" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.55.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.26" steps="449"/></proof>
+   </goal>
+   <goal name="VC find_max.55.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.56" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC find_max.57" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.57.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.17" steps="264"/></proof>
+   </goal>
+   <goal name="VC find_max.57.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.44"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.58" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC find_max.59" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.59.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.59.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.59.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.07" steps="123"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.59.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.60" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+  </goal>
+  <goal name="VC find_max.61" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="493"/></proof>
+  </goal>
+  <goal name="VC find_max.62" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.63" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="585"/></proof>
+  </goal>
+  <goal name="VC find_max.64" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+  </goal>
+  <goal name="VC find_max.65" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.30" steps="555"/></proof>
+  </goal>
+  <goal name="VC find_max.66" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="VC find_max.67" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.67.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.67.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.67.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.10" steps="139"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.67.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.68" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.69" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.69.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC find_max.69.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.69.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.69.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.16" steps="181"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.70" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC find_max.71" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="461"/></proof>
+  </goal>
+  <goal name="VC find_max.72" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.73" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.28" steps="473"/></proof>
+  </goal>
+  <goal name="VC find_max.74" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC find_max.75" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.75.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC find_max.75.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.75.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.75.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.08" steps="141"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.76" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="VC find_max.77" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.38" steps="613"/></proof>
+  </goal>
+  <goal name="VC find_max.78" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="VC find_max.79" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.79.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC find_max.79.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.79.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.79.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.09" steps="149"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.80" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.81" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.81.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC find_max.81.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.81.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.81.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.13" steps="182"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.82" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="VC find_max.83" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.83.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.83.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.83.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.13" steps="172"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.83.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.84" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="VC find_max.85" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.85.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC find_max.85.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.85.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.85.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.21" steps="339"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.86" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="VC find_max.87" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.57" steps="1061"/></proof>
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC find_max.88" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+  <goal name="VC find_max.89" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.89.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.89.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.89.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.12" steps="169"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.89.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.90" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="VC find_max.91" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.91.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.91.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.91.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.08" steps="141"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="138"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.91.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.16"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.92" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.93" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.93.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.93.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.93.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.14" steps="171"/></proof>
+     <proof prover="1"><result status="valid" time="0.07" steps="143"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.93.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.94" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.95" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="450"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.96" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.97" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.97.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC find_max.97.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.40" steps="752"/></proof>
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.98" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.99" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.23" steps="532"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC find_max.100" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.101" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.101.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.101.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.101.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.14" steps="168"/></proof>
+     <proof prover="1"><result status="valid" time="0.08" steps="137"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.101.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.102" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.103" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.103.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.103.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.103.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.08" steps="141"/></proof>
+     <proof prover="1"><result status="valid" time="0.08" steps="138"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.103.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.17"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.104" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.105" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.105.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.105.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.105.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.13" steps="170"/></proof>
+     <proof prover="1"><result status="valid" time="0.07" steps="142"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.105.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.106" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.107" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.107.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.107.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.107.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.10" steps="133"/></proof>
+     <proof prover="1"><result status="valid" time="0.04" steps="126"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.107.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.108" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.109" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.109.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.109.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.109.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.11" steps="137"/></proof>
+     <proof prover="1"><result status="valid" time="0.07" steps="134"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.109.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.110" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.111" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.111.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.111.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.111.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.09" steps="142"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="131"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.111.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.112" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.113" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.113.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.113.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.113.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.05" steps="87"/></proof>
+     <proof prover="1"><result status="valid" time="0.03" steps="97"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.113.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.114" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.115" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="366"/></proof>
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC find_max.116" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.117" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.117.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.13" steps="264"/></proof>
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC find_max.117.1" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="150"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.118" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.119" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.29" steps="589"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC find_max.120" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC find_max.121" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="578"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC find_max.122" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.123" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.123.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC find_max.123.1" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.123.1.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.123.1.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.12" steps="177"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="149"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.124" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.125" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="254"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.126" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.127" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.127.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.29" steps="510"/></proof>
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC find_max.127.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.128" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.129" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="265"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC find_max.130" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.131" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.27" steps="579"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC find_max.132" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.133" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="739"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC find_max.134" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.135" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.135.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC find_max.135.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.41" steps="751"/></proof>
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.136" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.137" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.37" steps="619"/></proof>
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC find_max.138" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.139" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.139.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.139.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.139.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.11" steps="141"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="138"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.139.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.140" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.141" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.141.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.141.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.141.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.14" steps="170"/></proof>
+     <proof prover="1"><result status="valid" time="0.07" steps="142"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.141.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.142" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.143" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.143.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.143.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.143.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.12" steps="165"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.143.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.144" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.145" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.145.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.145.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.145.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.08" steps="137"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.145.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.146" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.147" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.147.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.147.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.147.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.13" steps="167"/></proof>
+     <proof prover="1"><result status="valid" time="0.07" steps="139"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.147.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.15"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.148" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.149" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.149.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.149.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.149.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.04" steps="98"/></proof>
+     <proof prover="1"><result status="valid" time="0.04" steps="105"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.149.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.150" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.151" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.151.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.28" steps="508"/></proof>
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC find_max.151.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.152" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.153" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.153.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.153.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.153.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.06" steps="107"/></proof>
+     <proof prover="1"><result status="valid" time="0.04" steps="110"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.153.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.154" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.155" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.155.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.22" steps="468"/></proof>
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC find_max.155.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.156" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.157" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.157.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.157.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.157.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.10" steps="147"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.157.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.158" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC find_max.159" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.159.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.159.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.159.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0"><result status="valid" time="0.12" steps="166"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="138"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.159.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.160" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.161" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.161.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.14" steps="279"/></proof>
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC find_max.161.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.162" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find_max.163" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.163.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC find_max.163.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC find_max.163.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.08" steps="133"/></proof>
+     <proof prover="1"><result status="valid" time="0.06" steps="130"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC find_max.163.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find_max.164" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.119" expl="119. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.119.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.119.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.119.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.68" steps="7410"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+  <goal name="VC find_max.165" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC find_max.165.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.16" steps="298"/></proof>
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC find_max.165.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.68"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find_max.120" expl="120. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC find_max.166" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="173"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter find_max.121" expl="121. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.121.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.00" steps="11727"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.122" expl="122. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.123" expl="123. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.123.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="1.05" steps="11713"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.124" expl="124. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.125" expl="125. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.74" steps="6158"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.126" expl="126. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.127" expl="127. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.74" steps="6144"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.128" expl="128. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.129" expl="129. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.129.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.129.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.129.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.64" steps="5152"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.130" expl="130. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.131" expl="131. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.131.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.131.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.131.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.66" steps="5124"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.132" expl="132. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.133" expl="133. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.54" steps="6132"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.134" expl="134. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.135" expl="135. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.70" steps="6119"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.136" expl="136. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.137" expl="137. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.68" steps="6094"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.138" expl="138. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.139" expl="139. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.65" steps="6058"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.140" expl="140. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.141" expl="141. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.141.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.57" steps="6046"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.142" expl="142. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.143" expl="143. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.143.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.61" steps="6046"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.144" expl="144. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.145" expl="145. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.145.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.62" steps="6073"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.146" expl="146. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.147" expl="147. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.63" steps="6060"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.148" expl="148. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.149" expl="149. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.59" steps="6034"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.150" expl="150. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.151" expl="151. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.58" steps="6060"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.152" expl="152. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.153" expl="153. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.72" steps="6047"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.154" expl="154. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.155" expl="155. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.155.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.62" steps="6082"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.156" expl="156. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.157" expl="157. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.75" steps="6046"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.158" expl="158. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.159" expl="159. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.63" steps="6034"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.160" expl="160. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.161" expl="161. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.82" steps="6034"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.162" expl="162. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.163" expl="163. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.70" steps="6060"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.164" expl="164. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.165" expl="165. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.70" steps="6048"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.166" expl="166. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.167" expl="167. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.61" steps="6022"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.168" expl="168. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.169" expl="169. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.57" steps="6048"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.170" expl="170. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.171" expl="171. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.75" steps="6035"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.172" expl="172. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.172.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.04" steps="185"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.173" expl="173. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.174" expl="174. assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.175" expl="175. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="104"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.176" expl="176. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.177" expl="177. assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.178" expl="178. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.179" expl="179. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.180" expl="180. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.181" expl="181. loop invariant init">
+  <goal name="VC find_max.167" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.182" expl="182. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.183" expl="183. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.184" expl="184. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.185" expl="185. loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.185.1" expl="1. loop invariant init">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.185.1.1" expl="1. loop invariant init">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.185.1.1.1" expl="1. loop invariant init">
-     <proof prover="0"><result status="valid" time="0.02" steps="196"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.186" expl="186. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.187" expl="187. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.187.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.187.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.187.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="4.92" steps="56066"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.188" expl="188. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.189" expl="189. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.189.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.189.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.189.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="3.79" steps="41360"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.190" expl="190. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.191" expl="191. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.191.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.191.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.191.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="3.73" steps="41325"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.192" expl="192. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.193" expl="193. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.193.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.193.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.193.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="3.11" steps="35349"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.194" expl="194. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.195" expl="195. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.195.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.195.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.195.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.47" steps="5019"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.196" expl="196. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.197" expl="197. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.69" steps="5971"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.198" expl="198. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.199" expl="199. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.199.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.199.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.199.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="3.18" steps="35313"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.200" expl="200. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.201" expl="201. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.201.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.60" steps="5970"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.202" expl="202. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.203" expl="203. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.54" steps="5958"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.204" expl="204. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.205" expl="205. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.205.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.00" steps="9091"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.206" expl="206. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.207" expl="207. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.207.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.62" steps="5984"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.208" expl="208. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.209" expl="209. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.209.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.62" steps="5972"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.210" expl="210. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.211" expl="211. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.91" steps="8959"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.212" expl="212. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.213" expl="213. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.213.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.33" steps="40923"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.214" expl="214. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.215" expl="215. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.215.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.27" steps="40579"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.216" expl="216. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.217" expl="217. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.87" steps="8946"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.218" expl="218. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.219" expl="219. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.219.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.49" steps="40579"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.220" expl="220. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.221" expl="221. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.221.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.33" steps="40549"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.222" expl="222. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.223" expl="223. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="1.01" steps="9077"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.224" expl="224. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.225" expl="225. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.67" steps="5974"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.226" expl="226. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.227" expl="227. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.79" steps="5962"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.228" expl="228. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.229" expl="229. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.229.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="1.01" steps="8946"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.230" expl="230. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.231" expl="231. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.231.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.24" steps="40584"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.232" expl="232. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.233" expl="233. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.233.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.31" steps="40556"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.234" expl="234. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.235" expl="235. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.235.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.235.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.235.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.79" steps="7483"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.236" expl="236. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.237" expl="237. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.237.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.53" steps="40592"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.238" expl="238. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.239" expl="239. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.239.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="4.17" steps="41004"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.240" expl="240. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.241" expl="241. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.241.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.241.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.241.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.78" steps="7451"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.242" expl="242. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.243" expl="243. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.243.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.243.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.243.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="2.27" steps="20900"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.244" expl="244. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.245" expl="245. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.245.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.245.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.245.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="2.11" steps="20879"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.246" expl="246. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.247" expl="247. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.37" steps="3064"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.248" expl="248. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.249" expl="249. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.34" steps="3049"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.250" expl="250. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.251" expl="251. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.48" steps="3038"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.252" expl="252. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.253" expl="253. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.253.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.253.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.253.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.29" steps="2554"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.254" expl="254. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.255" expl="255. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.255.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.255.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.255.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.33" steps="2553"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.256" expl="256. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.257" expl="257. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.37" steps="3028"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.258" expl="258. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.259" expl="259. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.259.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.53" steps="3058"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.260" expl="260. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.261" expl="261. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.51" steps="3043"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.262" expl="262. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.263" expl="263. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.37" steps="3033"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.264" expl="264. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.265" expl="265. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.265.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.39" steps="3038"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.266" expl="266. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="48"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.267" expl="267. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.267.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.267.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.267.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.12" steps="50805"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.268" expl="268. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.269" expl="269. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.269.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.269.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.269.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="9.53" steps="74962"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.270" expl="270. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.271" expl="271. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3028"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.272" expl="272. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.03" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.273" expl="273. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.273.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.273.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.273.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.40" steps="73322"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.274" expl="274. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.275" expl="275. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.275.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.275.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.275.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="12.43" steps="130932"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.276" expl="276. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.277" expl="277. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.47" steps="3048"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.278" expl="278. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.279" expl="279. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.279.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.279.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.279.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.30" steps="2549"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.280" expl="280. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.281" expl="281. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.36" steps="3023"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.282" expl="282. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.283" expl="283. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3028"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.284" expl="284. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.285" expl="285. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.285.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.285.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.285.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.29" steps="70584"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.286" expl="286. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.287" expl="287. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.287.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.287.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.287.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="9.47" steps="92930"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.288" expl="288. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.289" expl="289. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.33" steps="3018"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.290" expl="290. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.291" expl="291. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.291.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.291.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.291.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="12.44" steps="122494"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.292" expl="292. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.293" expl="293. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.293.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.293.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.293.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="16.16" steps="160238"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.294" expl="294. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.295" expl="295. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="1.20" steps="8901"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.296" expl="296. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.297" expl="297. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.297.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.297.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.297.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="2.19" steps="20883"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.298" expl="298. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.299" expl="299. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.299.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.299.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.299.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.99" steps="20858"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.300" expl="300. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.301" expl="301. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.36" steps="3057"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.302" expl="302. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.303" expl="303. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.303.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.303.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.303.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.32" steps="2554"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.304" expl="304. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.305" expl="305. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3031"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.306" expl="306. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.307" expl="307. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.31" steps="3046"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.308" expl="308. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.309" expl="309. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.30" steps="3031"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.310" expl="310. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.311" expl="311. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.31" steps="3020"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.312" expl="312. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.313" expl="313. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.32" steps="3051"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.314" expl="314. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.315" expl="315. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.315.1" expl="1. loop invariant preservation">
-   <proof prover="0"><result status="valid" time="0.38" steps="3036"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.316" expl="316. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.317" expl="317. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3026"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.318" expl="318. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.319" expl="319. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.38" steps="3031"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.320" expl="320. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.321" expl="321. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.321.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.321.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.321.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="5.27" steps="49885"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.322" expl="322. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.323" expl="323. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.323.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.323.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.323.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.56" steps="72426"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.324" expl="324. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.325" expl="325. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3021"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.326" expl="326. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.327" expl="327. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.327.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.327.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.327.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.16" steps="73300"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.328" expl="328. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.329" expl="329. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.329.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.329.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.329.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="13.12" steps="125946"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.330" expl="330. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.331" expl="331. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3041"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.332" expl="332. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.333" expl="333. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.38" steps="3026"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.334" expl="334. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.335" expl="335. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.35" steps="3016"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.336" expl="336. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.337" expl="337. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.337.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.337.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.337.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.31" steps="2535"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.338" expl="338. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.339" expl="339. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.339.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.339.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.339.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="7.60" steps="70581"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.340" expl="340. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.341" expl="341. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.341.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.341.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.341.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="9.29" steps="87927"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.342" expl="342. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.343" expl="343. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.343.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.343.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.343.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0"><result status="valid" time="0.29" steps="2525"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.344" expl="344. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.345" expl="345. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.345.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.345.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.345.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="11.40" steps="109998"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.346" expl="346. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.347" expl="347. loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.347.1" expl="1. loop invariant preservation">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.347.1.1" expl="1. loop invariant preservation">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.347.1.1.1" expl="1. loop invariant preservation">
-     <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="8.58" steps="114714"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.348" expl="348. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.75" steps="5983"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.349" expl="349. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.350" expl="350. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter find_max.350.1" expl="1. assertion">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter find_max.350.1.1" expl="1. assertion">
-    <transf name="inline_goal">
-     <goal name="WP_parameter find_max.350.1.1.1" expl="1. assertion">
-     <transf name="split_goal_wp">
-      <goal name="WP_parameter find_max.350.1.1.1.1" expl="1. assertion">
-      <transf name="introduce_premises">
-       <goal name="WP_parameter find_max.350.1.1.1.1.1" expl="1. assertion">
-       <transf name="inline_goal">
-        <goal name="WP_parameter find_max.350.1.1.1.1.1.1" expl="1. assertion">
-        <proof prover="0"><result status="valid" time="0.05" steps="48"/></proof>
-        </goal>
-       </transf>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find_max.351" expl="351. postcondition">
-  <proof prover="0"><result status="valid" time="0.33" steps="3365"/></proof>
-  </goal>
-  <goal name="WP_parameter find_max.352" expl="352. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.168" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.169" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find_max.170" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="302"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="168"/></proof>
+  </goal>
+  <goal name="VC find_max.171" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC find_max.172" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
