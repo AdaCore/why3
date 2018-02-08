@@ -11,33 +11,47 @@
  <proof prover="1"><result status="valid" time="2.86" steps="906"/></proof>
  </goal>
 </theory>
-<theory name="ListCursorImpl" proved="true" sum="9c26980f775fc1daf0f91a03e3228b78">
- <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
- </goal>
- <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="56"/></proof>
- </goal>
- <goal name="VC create" expl="VC for create" proved="true">
+<theory name="ListCursorImpl" proved="true" sum="5c9d2123d18fe945b303f391ec90daed">
+ <goal name="VC cursor" expl="VC for cursor" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
- </goal>
- <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="51"/></proof>
- </goal>
- <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="66"/></proof>
- </goal>
- <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.13" steps="465"/></proof>
  </goal>
  <goal name="VC snoc_Cons" expl="VC for snoc_Cons" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="99"/></proof>
  </goal>
- <goal name="VC cursor" expl="VC for cursor" proved="true">
+ <goal name="VC next" expl="VC for next" proved="true">
+ <proof prover="1"><result status="valid" time="0.13" steps="465"/></proof>
+ </goal>
+ <goal name="VC has_next" expl="VC for has_next" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="66"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="51"/></proof>
+ </goal>
+ <goal name="ListCursor.VC create" expl="VC for create" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
  </goal>
+ <goal name="ListCursor.C.VC next" expl="VC for next" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="56"/></proof>
+ </goal>
+ <goal name="ListCursor.C.VC has_next" expl="VC for has_next" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+ </goal>
 </theory>
-<theory name="TestListCursor" proved="true" sum="33ee0b7261aba8db53cfa2c709b8e643">
+<theory name="TestListCursor" proved="true" sum="5e03d6040df40972278e1bab8d1137ac">
+ <goal name="sum_of_list" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="sum_of_list.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="sum_of_list.0.0" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
+   </goal>
+   <goal name="sum_of_list.0.1" proved="true">
+   <proof prover="1"><result status="valid" time="3.48" steps="1147"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
  <goal name="VC list_sum" expl="VC for list_sum" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC list_sum.0" expl="loop invariant init" proved="true">
@@ -73,37 +87,35 @@
   </goal>
  </transf>
  </goal>
- <goal name="sum_of_list" proved="true">
- <transf name="induction_ty_lex" proved="true" >
-  <goal name="sum_of_list.0" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="sum_of_list.0.0" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="sum_of_list.0.1" proved="true">
-   <proof prover="1"><result status="valid" time="3.48" steps="1147"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
 </theory>
-<theory name="TestListCursorLink" proved="true" sum="d9ca5c2e030c4310aa371641265a3c3d">
- <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
- </goal>
- <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="59"/></proof>
- </goal>
- <goal name="VC create" expl="VC for create" proved="true">
+<theory name="TestListCursorLink" proved="true" sum="57ad90333a0eff06c751d7979b07b08c">
+ <goal name="TestListCursor.ListCursor.VC create" expl="VC for create" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
  </goal>
+ <goal name="TestListCursor.ListCursor.C.VC next" expl="VC for next" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="59"/></proof>
+ </goal>
+ <goal name="TestListCursor.ListCursor.C.VC has_next" expl="VC for has_next" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+ </goal>
 </theory>
-<theory name="ArrayCursorImpl" proved="true" sum="f36514ec4c22f2c7d3f35f8c338695c2">
+<theory name="ArrayCursorImpl" proved="true" sum="06468482e282d9cf2035e73ba7373228">
+ <goal name="VC cursor" expl="VC for cursor" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
  <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
  </goal>
  <goal name="VC next" expl="VC for next" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="74"/></proof>
+ </goal>
+ <goal name="ArrayCursor.VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+ </goal>
+ <goal name="ArrayCursor.C.VC next" expl="VC for next" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC next.0" expl="precondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
@@ -120,26 +132,11 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
- </goal>
- <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="74"/></proof>
- </goal>
- <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
- </goal>
- <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
- </goal>
- <goal name="VC cursor" expl="VC for cursor" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+ <goal name="ArrayCursor.C.VC has_next" expl="VC for has_next" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="TestArrayCursor" proved="true" sum="281da0963cf7b6642f718202a9751a9d">
- <goal name="VC harness1" expl="VC for harness1" proved="true">
- <proof prover="0"><result status="valid" time="0.16"/></proof>
- </goal>
+<theory name="TestArrayCursor" proved="true" sum="e8bf3a2e2fb131431b5954f022a066e5">
  <goal name="VC array_sum" expl="VC for array_sum" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC array_sum.0" expl="loop invariant init" proved="true">
@@ -171,16 +168,19 @@
   </goal>
  </transf>
  </goal>
-</theory>
-<theory name="TestArrayCursorLink" proved="true" sum="4002e144b9727d29301916fdb1ed01dc">
- <goal name="VC has_next" expl="VC for has_next" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+ <goal name="VC harness1" expl="VC for harness1" proved="true">
+ <proof prover="0"><result status="valid" time="0.16"/></proof>
  </goal>
- <goal name="VC next" expl="VC for next" proved="true">
+</theory>
+<theory name="TestArrayCursorLink" proved="true" sum="bd5b8257a304b6e001c68fe1ad36299a">
+ <goal name="TestArrayCursor.ArrayCursor.VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
+ </goal>
+ <goal name="TestArrayCursor.ArrayCursor.C.VC next" expl="VC for next" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
  </goal>
- <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
+ <goal name="TestArrayCursor.ArrayCursor.C.VC has_next" expl="VC for has_next" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
 </theory>
 </file>

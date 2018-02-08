@@ -6,7 +6,7 @@
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_fm2012_LRS.mlw" proved="true">
-<theory name="LCP" proved="true" sum="0d8d777cafa4f407ff5a85cbab07b14b">
+<theory name="LCP" proved="true" sum="6ba1bd1774b9932b65de8fc6dd0ced01">
  <goal name="not_common_prefix_if_last_char_are_different" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -36,12 +36,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" proved="true" sum="523fc5ff0f0b07599de4484009c7f2e5">
+<theory name="LCP_test" proved="true" sum="ffa1ff78a78b5c6690dae5e6bc055648">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" proved="true" sum="5fcd59f8d4b64106db72a10e08cfed53">
+<theory name="SuffixSort" proved="true" sum="9819bcbc29a33d928f776dcbe5e08ce0">
  <goal name="VC compare" expl="VC for compare" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC compare.0" expl="precondition" proved="true">
@@ -145,7 +145,7 @@
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC sort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.47" steps="494"/></proof>
+  <proof prover="0"><result status="valid" time="0.75" steps="618"/></proof>
   </goal>
   <goal name="VC sort.21" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
@@ -183,12 +183,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" proved="true" sum="f6f5f741b9dc130f0a8607a040d91544">
+<theory name="SuffixSort_test" proved="true" sum="d4ec12d81d0c746c7fa7a444f2917dc8">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.34"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" proved="true" sum="d73eab9d245382d053b90a74ab35cd99">
+<theory name="SuffixArray" proved="true" sum="707c0eae8f52d13a67f399ca4490c613">
  <goal name="VC suffixArray" expl="VC for suffixArray" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -249,12 +249,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" proved="true" sum="52a99b42cbb4456b3b8a7b0a2ade66a8">
+<theory name="SuffixArray_test" proved="true" sum="b5583c29b4b8c83da2090de5b40dd460">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="LRS" proved="true" sum="ad81d082c2eb896c12f7884767d18a30">
+<theory name="LRS" proved="true" sum="0af12e7da206bada3d139e836f9797aa">
  <goal name="lcp_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
  </goal>
@@ -362,7 +362,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" proved="true" sum="5db99886d40b2a0b6d95a589412a35d5">
+<theory name="LRS_test" proved="true" sum="f89733b6659e6099b03a321c15129e06">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>

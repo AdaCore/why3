@@ -5,7 +5,7 @@
 <prover id="0" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="36" steplimit="0" memlimit="1000"/>
 <file name="../insertion_sort.mlw" proved="true">
-<theory name="InsertionSort" proved="true" sum="7d409220b2aeb21118af4d3b09cba578">
+<theory name="InsertionSort" proved="true" sum="f15d16b0aa8edb88df314c3410aa655b">
  <goal name="VC insertion_sort" expl="VC for insertion_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC insertion_sort.0" expl="loop invariant init" proved="true">
@@ -71,16 +71,16 @@
  </transf>
  </goal>
  <goal name="VC test1" expl="VC for test1" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
  <goal name="VC test2" expl="VC for test2" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
  </goal>
 </theory>
-<theory name="InsertionSortGen" proved="true" sum="c44c33bed0cc21d37f76c87132b82598">
+<theory name="InsertionSortGen" proved="true" sum="f1a4031b8ce80859842a7a90e9e30ee3">
  <goal name="VC insertion_sort" expl="VC for insertion_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC insertion_sort.0" expl="loop invariant init" proved="true">
