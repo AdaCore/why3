@@ -400,15 +400,19 @@ let unproved_vc_continue obj obj_rec =
   if GoalSet.is_empty obj_rec.to_be_proved then raise Exit;
   obj, Work_Left
 
-(* TODO in gnatprove there should be only one transformations... do
-   we want to change that ? *)
+(* This function only gets the subgoals of the gnat_split transformation. It is
+   part of a code that should not be used when other transformations (manual
+   proof) are applied. *)
 let subsubgoals s (g: goal_id) =
-  let transf = Session_itp.get_transformations s g in
-  match transf with
-  | [transf] -> Session_itp.get_sub_tasks s transf
-  | [] -> []
-  | _ -> assert false
-
+  let transfs = Session_itp.get_transformations s g in
+  try
+    let tr =
+      List.find (fun x -> List.mem (Session_itp.get_transf_name s x) strategy)
+      transfs
+    in
+    Session_itp.get_sub_tasks s tr
+  with
+    Not_found -> []
 
 (* Functor that takes a scheduler and provides functions to schedule
    transformations and proof attempts *)
