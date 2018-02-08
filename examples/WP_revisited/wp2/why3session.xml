@@ -7,8 +7,8 @@
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="4000"/>
 <prover id="10" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../wp2.mlw">
-<theory name="Imp" proved="true" sum="f3661204c80feb75b62ccf116b3666de">
+<file name="../wp2.mlw" proved="true">
+<theory name="Imp" proved="true">
  <goal name="VC subst_term" expl="VC for subst_term" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
@@ -59,7 +59,7 @@
  <proof prover="2" edited="wp2_Imp_many_steps_seq_1.v"><result status="valid" time="0.41"/></proof>
  </goal>
 </theory>
-<theory name="TestSemantics" proved="true" sum="81f077fa8a10954dfc35419c4c73d562">
+<theory name="TestSemantics" proved="true">
  <goal name="Test13" proved="true">
  <proof prover="6"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
@@ -104,7 +104,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HoareLogic" proved="true" sum="93b33bf8ba33a3e11bad99be022b7b5c">
+<theory name="HoareLogic" proved="true">
  <goal name="consequence_rule" proved="true">
  <transf name="introduce_premises" proved="true" >
   <goal name="consequence_rule.0" proved="true">
@@ -141,7 +141,7 @@
  <proof prover="2" edited="wp2_HoareLogic_while_rule_ext_1.v"><result status="valid" time="0.54"/></proof>
  </goal>
 </theory>
-<theory name="WP" sum="824e712b722ae62773f2f50aa9d4bb44">
+<theory name="WP" proved="true">
  <goal name="assigns_refl" proved="true">
  <proof prover="6"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
@@ -195,8 +195,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC wp" expl="VC for wp">
- <transf name="split_goal_wp" >
+ <goal name="VC wp" expl="VC for wp" proved="true">
+ <transf name="split_goal_wp" proved="true" >
   <goal name="VC wp.0" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
@@ -212,8 +212,8 @@
   <goal name="VC wp.4" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
-  <goal name="VC wp.5" expl="postcondition">
-  <transf name="split_goal_wp" >
+  <goal name="VC wp.5" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
    <goal name="VC wp.5.0" expl="postcondition" proved="true">
    <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
@@ -229,7 +229,8 @@
    <goal name="VC wp.5.4" expl="postcondition" proved="true">
    <proof prover="6"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
-   <goal name="VC wp.5.5" expl="postcondition">
+   <goal name="VC wp.5.5" expl="postcondition" proved="true">
+   <proof prover="2" timelimit="0" edited="wp2_WP_VC_wp_1.v"><result status="valid" time="0.52"/></proof>
    </goal>
   </transf>
   </goal>
