@@ -4,8 +4,13 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../quicksort.mlw" proved="true">
+<<<<<<< HEAD
 <theory name="Quicksort" proved="true" sum="2a868e31374bafdd7feffbd9eccfa58d">
  <goal name="VC quick_rec" expl="VC for quick_rec" proved="true">
+=======
+<theory name="Quicksort" proved="true">
+ <goal name="WP_parameter quick_rec" expl="VC for quick_rec" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC quick_rec.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
@@ -103,6 +108,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Shuffle" proved="true" sum="5784873acff0f6be9471667822c9d384">
  <goal name="VC shuffle" expl="VC for shuffle" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="53"/></proof>
@@ -116,6 +122,20 @@
 <theory name="Quicksort3way" proved="true" sum="71958d8c4aeb3e8a7700c71c49103067">
  <goal name="VC quick_rec" expl="VC for quick_rec" proved="true">
  <proof prover="0"><result status="valid" time="3.51" steps="6499"/></proof>
+=======
+<theory name="Shuffle" proved="true">
+ <goal name="WP_parameter shuffle" expl="VC for shuffle" proved="true">
+ <proof prover="4" timelimit="1"><result status="valid" time="0.03" steps="42"/></proof>
+ </goal>
+</theory>
+<theory name="QuicksortWithShuffle" proved="true">
+ <goal name="WP_parameter qs" expl="VC for qs" proved="true">
+ <proof prover="4"><result status="valid" time="0.02" steps="12"/></proof>
+ </goal>
+</theory>
+<theory name="Quicksort3way" proved="true">
+ <goal name="WP_parameter quick_rec" expl="VC for quick_rec" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC quick_rec.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
@@ -252,9 +272,15 @@
  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Test" proved="true" sum="d5d60b2323c955244d4f499a3a11e8ce">
  <goal name="VC test1" expl="VC for test1" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
+=======
+<theory name="Test" proved="true">
+ <goal name="WP_parameter test1" expl="VC for test1" proved="true">
+ <proof prover="4"><result status="valid" time="0.02" steps="6"/></proof>
+>>>>>>> new_ide
  </goal>
  <goal name="VC test2" expl="VC for test2" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>

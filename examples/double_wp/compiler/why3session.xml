@@ -5,8 +5,13 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../compiler.mlw" proved="true">
+<<<<<<< HEAD
 <theory name="Compile_aexpr" proved="true" sum="92a9a5d6f2ec0d9ff94405e1c114f3c3">
  <goal name="VC compile_aexpr" expl="VC for compile_aexpr" proved="true">
+=======
+<theory name="Compile_aexpr" proved="true">
+ <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC compile_aexpr.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="63"/></proof>
@@ -117,8 +122,13 @@
  <proof prover="0"><result status="valid" time="0.05" steps="87"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Compile_bexpr" proved="true" sum="e2228d736b99d90f78b1518737430864">
  <goal name="VC compile_bexpr" expl="VC for compile_bexpr" proved="true">
+=======
+<theory name="Compile_bexpr" proved="true">
+ <goal name="WP_parameter compile_bexpr" expl="VC for compile_bexpr" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC compile_bexpr.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="39"/></proof>
@@ -330,11 +340,16 @@
  <proof prover="0"><result status="valid" time="0.08" steps="151"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Compile_com" proved="true" sum="811cd6941f8ab581067af7bc7f6180e9">
  <goal name="loop_variant_lemma" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
  <goal name="loop_variant_acc" proved="true">
+=======
+<theory name="Compile_com" proved="true">
+ <goal name="WP_parameter compile_com" expl="VC for compile_com" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="loop_variant_acc.0" proved="true">
   <proof prover="0"><result status="valid" time="0.12" steps="200"/></proof>

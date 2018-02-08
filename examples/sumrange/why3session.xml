@@ -6,10 +6,14 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../sumrange.mlw" proved="true">
+<<<<<<< HEAD
 <theory name="ArraySum" proved="true" sum="35530cac0d54573c3b9b0419e022b4af">
  <goal name="VC sum" expl="VC for sum" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
+=======
+<theory name="ArraySum" proved="true">
+>>>>>>> new_ide
  <goal name="sum_right" proved="true">
  <transf name="assert" proved="true" arg1="(forall x. 0 &lt; x &lt; j -&gt; sum a (j-x) j = sum a (j-x) (j-1) + a[j-1])">
   <goal name="sum_right.0" proved="true">
@@ -36,8 +40,15 @@
  </transf>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Simple" proved="true" sum="536e63a588e47f5041939b9f8616f06a">
  <goal name="VC query" expl="VC for query" proved="true">
+=======
+<theory name="Simple" proved="true">
+ <goal name="WP_parameter query" expl="VC for query" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC query.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -57,7 +68,11 @@
  </transf>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="ExtraLemmas" proved="true" sum="ddab900ac444a25f6dac7438ba71f1e1">
+=======
+<theory name="ExtraLemmas" proved="true">
+>>>>>>> new_ide
  <goal name="sum_concat" proved="true">
  <transf name="induction" proved="true" arg1="k">
   <goal name="sum_concat.0" expl="base case" proved="true">
@@ -116,8 +131,13 @@
  </transf>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="CumulativeArray" proved="true" sum="dbfc0a756b3b0611a7e8df85b06d61fc">
  <goal name="VC create" expl="VC for create" proved="true">
+=======
+<theory name="CumulativeArray" proved="true">
+ <goal name="WP_parameter create" expl="VC for create" proved="true">
+>>>>>>> new_ide
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC query" expl="VC for query" proved="true">
@@ -127,9 +147,15 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="CumulativeTree" proved="true" sum="bda92602ed6d9bd0fac959f9de0e0aea">
  <goal name="VC indexes" expl="VC for indexes" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
+=======
+<theory name="CumulativeTree" proved="true">
+ <goal name="WP_parameter tree_of_array" expl="VC for tree_of_array" proved="true">
+ <proof prover="3"><result status="valid" time="0.43"/></proof>
+>>>>>>> new_ide
  </goal>
  <goal name="VC tree_of_array" expl="VC for tree_of_array" proved="true">
  <transf name="split_goal_wp" proved="true" >

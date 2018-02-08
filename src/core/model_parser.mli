@@ -26,6 +26,7 @@ type float_type =
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array

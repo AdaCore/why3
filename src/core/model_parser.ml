@@ -38,6 +38,7 @@ type float_type =
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array
@@ -113,6 +114,10 @@ let rec convert_model_value value : Json_base.json =
   | Decimal (int_part, fract_part) ->
       let m = Mstr.add "type" (Json_base.String "Decimal") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json_base.String (int_part^"."^fract_part)) m in
+      Json_base.Record m
+  | Fraction (num, den) ->
+      let m = Mstr.add "type" (Json_base.String "Fraction") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (num^"/"^den)) m in
       Json_base.Record m
   | Unparsed s ->
       let m = Mstr.add "type" (Json_base.String "Unparsed") Stdlib.Mstr.empty in
@@ -204,6 +209,7 @@ and print_model_value_human fmt (v: model_value) =
   match v with
   | Integer s -> fprintf fmt "%s" s
   | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
+  | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
   | Array arr -> print_array_human fmt arr

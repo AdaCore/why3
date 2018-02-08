@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<<<<<<< HEAD
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../topological_sorting.mlw" proved="true">
@@ -12,6 +13,17 @@
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC dfs.0" expl="exceptional postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
+=======
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../topological_sorting.mlw">
+<theory name="Graph">
+</theory>
+<theory name="Static">
+ <goal name="WP_parameter dfs" expl="VC for dfs">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter dfs.1" expl="loop invariant init">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+>>>>>>> new_ide
   </goal>
   <goal name="VC dfs.1" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -178,6 +190,7 @@
  </transf>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="Online_graph" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Online_Basic" proved="true" sum="919620d1ed2e5f1374e242d0e300a007">
@@ -188,6 +201,15 @@
   </goal>
   <goal name="VC create.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
+=======
+<theory name="Online_graph">
+</theory>
+<theory name="Online_Basic">
+ <goal name="WP_parameter create" expl="VC for create">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter create.1" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+>>>>>>> new_ide
   </goal>
  </transf>
  </goal>

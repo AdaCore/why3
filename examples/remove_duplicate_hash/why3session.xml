@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<<<<<<< HEAD
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../remove_duplicate_hash.mlw" proved="true">
 <theory name="Spec" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -13,6 +14,19 @@
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC remove_duplicate.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+=======
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../remove_duplicate_hash.mlw">
+<theory name="Spec">
+</theory>
+<theory name="MutableSet">
+</theory>
+<theory name="RemoveDuplicate">
+ <goal name="WP_parameter remove_duplicate" expl="VC for remove_duplicate">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter remove_duplicate.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+>>>>>>> new_ide
   </goal>
   <goal name="VC remove_duplicate.1" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>

@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<<<<<<< HEAD
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../same_fringe.mlw" expanded="true">
 <theory name="SameFringe" sum="1c3eb5da5aabdd582ab28945cc80e7ac" expanded="true">
@@ -45,6 +46,76 @@
 <theory name="Test" sum="ad6ba0036be3ae49b3f5d70c11096248" expanded="true">
  <goal name="VC test1" expl="VC for test1" expanded="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+=======
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../same_fringe.mlw">
+<theory name="SameFringe">
+ <goal name="WP_parameter enum" expl="VC for enum">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter enum.1" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter enum.2" expl="variant decrease">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter enum.3" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.05" steps="40"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter eq_enum" expl="VC for eq_enum">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter eq_enum.1" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter eq_enum.2" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter eq_enum.3" expl="variant decrease">
+  <proof prover="3" timelimit="10"><result status="valid" time="0.00" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter eq_enum.4" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter eq_enum.5" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter eq_enum.6" expl="postcondition">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter same_fringe" expl="VC for same_fringe">
+ <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="14"/></proof>
+ </goal>
+ <goal name="WP_parameter test1" expl="VC for test1">
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter test2" expl="VC for test2">
+ <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter test3" expl="VC for test3">
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter leaf" expl="VC for leaf">
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter test4" expl="VC for test4">
+ <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter test5" expl="VC for test5">
+ <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter bench" expl="VC for bench">
+ <proof prover="3" memlimit="4000"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+</theory>
+<theory name="Test">
+ <goal name="WP_parameter test1" expl="VC for test1">
+ <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
+>>>>>>> new_ide
  </goal>
  <goal name="VC test2" expl="VC for test2" expanded="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>

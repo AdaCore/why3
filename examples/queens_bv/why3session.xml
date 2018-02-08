@@ -13,9 +13,13 @@
 <prover id="8" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../queens_bv.mlw" proved="true">
-<theory name="S" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="S" proved="true">
 </theory>
+<<<<<<< HEAD
 <theory name="Solution" proved="true" sum="33e8246862579e1e8655468bf3a248ab">
+=======
+<theory name="Solution" proved="true">
+>>>>>>> new_ide
  <goal name="partial_solution_eq_prefix" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="44"/></proof>
  </goal>
@@ -24,6 +28,7 @@
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="BitsSpec" proved="true" sum="8fbc46ea269d029380a41104bd31dc1e">
  <goal name="VC t" expl="VC for t" proved="true">
  <proof prover="7"><result status="valid" time="0.03"/></proof>
@@ -32,6 +37,13 @@
 <theory name="Bits" proved="true" sum="6c62e04243120c79ca8d250f6d3a2909">
  <goal name="VC t" expl="VC for t" proved="true">
  <proof prover="7"><result status="valid" time="0.03"/></proof>
+=======
+<theory name="BitsSpec" proved="true">
+</theory>
+<theory name="Bits" proved="true">
+ <goal name="WP_parameter empty" expl="VC for empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
+>>>>>>> new_ide
  </goal>
  <goal name="VC empty" expl="VC for empty" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="95"/></proof>
@@ -118,8 +130,13 @@
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="NQueensBits" proved="true" sum="758a7663eed2f4fcd885dbfdc36e417b">
  <goal name="VC t" expl="VC for t" proved="true">
+=======
+<theory name="NQueensBits" proved="true">
+ <goal name="WP_parameter t" expl="VC for t" proved="true">
+>>>>>>> new_ide
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC t.0" expl="assertion" proved="true">
   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.82" steps="537"/></proof>

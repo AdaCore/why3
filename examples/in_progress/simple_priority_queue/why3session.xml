@@ -6,15 +6,15 @@
 <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<file name="../simple_priority_queue.mlw" expanded="true">
-<theory name="SimplePrioriyQueue" sum="beb801704d23774a2acf9928565fee63" expanded="true">
- <goal name="numof_occ" expanded="true">
+<file name="../simple_priority_queue.mlw">
+<theory name="SimplePrioriyQueue">
+ <goal name="numof_occ">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.02"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_wp">
   <goal name="numof_occ.1" expl="1.">
   <proof prover="3" timelimit="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="numof_occ.2" expl="2." expanded="true">
+  <goal name="numof_occ.2" expl="2.">
   <proof prover="0" timelimit="10" obsolete="true"><result status="timeout" time="10.04"/></proof>
   <proof prover="1" timelimit="10" obsolete="true"><result status="timeout" time="10.02"/></proof>
   <proof prover="2"><result status="timeout" time="5.97"/></proof>
@@ -28,9 +28,9 @@
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add" expanded="true">
+ <goal name="WP_parameter add" expl="VC for add">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter add.1" expl="1. index in array bounds">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -64,7 +64,7 @@
   <goal name="WP_parameter add.11" expl="11. type invariant">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.12" expl="12. type invariant" expanded="true">
+  <goal name="WP_parameter add.12" expl="12. type invariant">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.03"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="2"><result status="timeout" time="5.98"/></proof>
@@ -82,7 +82,7 @@
   <goal name="WP_parameter add.16" expl="16. type invariant">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.17" expl="17. type invariant" expanded="true">
+  <goal name="WP_parameter add.17" expl="17. type invariant">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.03"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.98"/></proof>
@@ -111,9 +111,9 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter remove" expl="VC for remove" expanded="true">
+ <goal name="WP_parameter remove" expl="VC for remove">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter remove.1" expl="1. index in array bounds">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -151,7 +151,7 @@
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="3" timelimit="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter remove.11" expl="11. postcondition" expanded="true">
+  <goal name="WP_parameter remove.11" expl="11. postcondition">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.08"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="2"><result status="timeout" time="5.98"/></proof>
@@ -172,7 +172,7 @@
   <goal name="WP_parameter remove.16" expl="16. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove.17" expl="17. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter remove.17" expl="17. loop invariant preservation">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.07"/></proof>
   <proof prover="1" obsolete="true"><result status="unknown" time="0.19"/></proof>
   <proof prover="2"><result status="timeout" time="5.99"/></proof>
@@ -181,7 +181,7 @@
   <goal name="WP_parameter remove.18" expl="18. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.19" expl="19. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter remove.19" expl="19. loop invariant preservation">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.11"/></proof>
   <proof prover="1" obsolete="true"><result status="unknown" time="0.14"/></proof>
   <proof prover="2"><result status="timeout" time="5.96"/></proof>
@@ -193,13 +193,13 @@
   <goal name="WP_parameter remove.21" expl="21. type invariant">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter remove.22" expl="22. type invariant" expanded="true">
+  <goal name="WP_parameter remove.22" expl="22. type invariant">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.08"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="2"><result status="timeout" time="5.98"/></proof>
   <proof prover="3"><result status="timeout" time="5.99"/></proof>
   </goal>
-  <goal name="WP_parameter remove.23" expl="23. type invariant" expanded="true">
+  <goal name="WP_parameter remove.23" expl="23. type invariant">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.08"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.99"/></proof>
@@ -209,7 +209,7 @@
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="3" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter remove.25" expl="25. postcondition" expanded="true">
+  <goal name="WP_parameter remove.25" expl="25. postcondition">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.03"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.98"/></proof>
@@ -240,7 +240,7 @@
   <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
   <proof prover="3" timelimit="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter remove.33" expl="33. postcondition" expanded="true">
+  <goal name="WP_parameter remove.33" expl="33. postcondition">
   <proof prover="0" obsolete="true"><result status="timeout" time="5.07"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
   <proof prover="2"><result status="timeout" time="5.97"/></proof>

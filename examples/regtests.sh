@@ -81,6 +81,7 @@ echo "=== Programs that remain to be ported ==="
 echo ""
 run_dir to_port
 run_dir WP_revisited
+run_dir prover "-L prover --debug ignore_unused_vars"
 echo ""
 
 echo "=== Standard Library ==="
@@ -110,7 +111,6 @@ echo ""
 run_dir logic
 run_dir bitvectors "-L bitvectors"
 echo ""
-
 
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`

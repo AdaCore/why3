@@ -19,7 +19,7 @@ exception Not_value
 let rec get_variables_term (table: correspondence_table) t =
   match t with
   | Variable _ | Function_Local_Variable _ | Boolean _ | Integer _
-  | Decimal _ | Float _ | Other _ | Bitvector _ -> table
+  | Decimal _ | Fraction _ | Float _ | Other _ | Bitvector _ -> table
   | Array a ->
     get_variables_array table a
   | Ite (t1, t2, t3, t4) ->
@@ -153,7 +153,8 @@ and refine_array table a =
    their value. *)
 and refine_function table term =
   match term with
-  | Integer _ | Decimal _ | Float _ | Other _ | Bitvector _ | Boolean _ -> term
+  | Integer _ | Decimal _ | Float _ | Fraction _
+    | Other _ | Bitvector _ | Boolean _ -> term
   | Cvc4_Variable v ->
     begin
       try (
@@ -238,6 +239,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   match t with
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
+  | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
   | Float f -> Model_parser.Float (convert_float f)
   | Bitvector bv -> Model_parser.Bitvector bv
   | Boolean b -> Model_parser.Boolean b

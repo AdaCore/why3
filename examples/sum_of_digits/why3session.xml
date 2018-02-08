@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../sum_of_digits.mlw">
+<theory name="Euler290">
+ <goal name="Base" proved="true">
+ <proof prover="2" timelimit="10"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="Empty" proved="true">
+ <proof prover="2" timelimit="10"><result status="valid" time="0.07" steps="56"/></proof>
+ </goal>
+ <goal name="Induc">
+ </goal>
+ <goal name="WP_parameter sd" expl="VC for sd" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="5"><result status="valid" time="0.44"/></proof>
+ </goal>
+ <goal name="WP_parameter f" expl="VC for f" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter f.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter f.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="3.11"/></proof>
+  </goal>
+  <goal name="WP_parameter f.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter f.3" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter f.4" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter f.5" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter f.6" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter f.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter f.8" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter f.8.0" expl="VC for f" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="WP_parameter f.8.1" expl="VC for f" proved="true">
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="2"><result status="valid" time="0.07" steps="14"/></proof>
+   </goal>
+   <goal name="WP_parameter f.8.2" expl="VC for f" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="29"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter f.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter f.10" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

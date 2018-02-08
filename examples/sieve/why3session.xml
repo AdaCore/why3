@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<<<<<<< HEAD
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -59,6 +60,46 @@
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
+=======
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../sieve.mlw">
+<theory name="Sieve">
+ <goal name="WP_parameter incr" expl="VC for incr">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="WP_parameter sieve" expl="VC for sieve">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter sieve.1" expl="array creation size">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.2" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.3" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.4" expl="loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.5" expl="loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.6" expl="type invariant">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.7" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.8" expl="loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter sieve.9" expl="loop invariant init">
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
+>>>>>>> new_ide
   </goal>
   <goal name="VC sieve.8" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>

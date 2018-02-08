@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<<<<<<< HEAD
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../skew_heaps.mlw" proved="true">
 <theory name="Heap" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -10,6 +11,49 @@
 <theory name="SkewHeaps" proved="true" sum="63aa80fdc4832811bc58d8fdcff29c30">
  <goal name="VC root_is_min" expl="VC for root_is_min" proved="true">
  <proof prover="1"><result status="valid" time="0.65" steps="1358"/></proof>
+=======
+<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../skew_heaps.mlw">
+<theory name="Heap">
+</theory>
+<theory name="SkewHeaps">
+ <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter root_is_min.1" expl="unreachable point">
+  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.2" expl="variant decrease">
+  <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.3" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.4" expl="variant decrease">
+  <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.5" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.6" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.7" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.8" expl="variant decrease">
+  <proof prover="2"><result status="valid" time="0.00" steps="24"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.9" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.10" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter root_is_min.11" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+>>>>>>> new_ide
  </goal>
  <goal name="VC empty" expl="VC for empty" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
@@ -27,11 +71,76 @@
  <proof prover="1"><result status="valid" time="0.02" steps="144"/></proof>
  </goal>
 </theory>
+<<<<<<< HEAD
 <theory name="HeapSort" proved="true" sum="36984cdc5144dd34796210d23d1a6846">
  <goal name="VC heapsort" expl="VC for heapsort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC heapsort.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+=======
+<theory name="HeapSort">
+ <goal name="WP_parameter heapsort" expl="VC for heapsort">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter heapsort.1" expl="postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.2" expl="postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.3" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.4" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.5" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.6" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.7" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.8" expl="type invariant">
+  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.9" expl="index in array bounds">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.10" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.11" expl="loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.12" expl="loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.13" expl="loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.14" expl="loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.15" expl="type invariant">
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.16" expl="postcondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.17" expl="postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.18" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.19" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter heapsort.20" expl="index in array bounds">
+  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
+>>>>>>> new_ide
   </goal>
   <goal name="VC heapsort.1" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.08" steps="74"/></proof>

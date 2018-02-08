@@ -40,7 +40,6 @@ type theory = {
   mutable theory_goals          : proofNodeID list;
   theory_parent_name            : string;
   theory_is_detached            : bool;
-  mutable theory_checksum       : Termcode.checksum option;
 }
 
 let theory_name t = t.theory_name
@@ -321,9 +320,11 @@ let get_encapsulating_file s any =
       let th = get_encapsulating_theory s any in
       theory_parent s th
 
+(*
 let set_obsolete s paid b =
   let pa = get_proof_attempt_node s paid in
   pa.proof_obsolete <- b
+ *)
 
 let check_if_already_exists s pid t args =
     let sub_transfs = get_transformations s pid in
@@ -1076,13 +1077,10 @@ let load_theory session parent_name old_provers acc th =
   match th.Xml.name with
   | "theory" ->
     let thname = load_ident th in
-    let csum = string_attribute_opt "sum" th in
-    let checksum = Opt.map Termcode.checksum_of_string csum in
     let goals = List.rev (List.fold_left (fun goals th -> match th.Xml.name with
         | "goal" -> (gen_proofNodeID session) :: goals
         | _ -> goals) [] th.Xml.elements) in
     let mth = { theory_name = thname;
-                theory_checksum = checksum;
                 theory_is_detached = true;
                 theory_goals = goals;
                 theory_parent_name = parent_name;
@@ -1290,24 +1288,6 @@ let load_session (dir : string) =
 
 (* -------------------- merge/update session --------------------------- *)
 
-module CombinedTheoryChecksum = struct
-
-  let b = Buffer.create 1024
-
-  let f () pn =
-    let c = pn.proofn_checksum in
-    Buffer.add_string b (Termcode.string_of_checksum c)
-
-  let compute s th =
-    let () =
-      List.fold_left (fun () id -> let pn = get_proofNode s id in f () pn)
-        () (theory_goals th)
-    in
-    let c = Termcode.buffer_checksum b in
-    Buffer.clear b; c
-
-end
-
 (** Pairing *)
 
 module Goal = struct
@@ -1364,7 +1344,6 @@ let save_detached_theory parent_name old_s detached_theory s =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
   in
   { theory_name = detached_theory.theory_name;
-    theory_checksum = detached_theory.theory_checksum;
     theory_is_detached = true;
     theory_goals = goalsID;
     theory_parent_name = parent_name }
@@ -1510,12 +1489,6 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
        let pn = get_proofNode old_s id in
        Hstr.add old_goals_table (get_goal_name pn) id)
     old_th.theory_goals;
-  let to_checksum = CombinedTheoryChecksum.compute s th in
-  let same_theory_checksum =
-    match old_th.theory_checksum with
-    | None -> false
-    | Some c -> Termcode.equal_checksum c to_checksum
-  in
   let new_goals = ref [] in
   (* merge goals *)
   List.iter
@@ -1528,7 +1501,6 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
            (Hstr.find old_goals_table new_goal_name) in
          Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
-           not same_theory_checksum &&
              let s1 = new_goal.proofn_checksum in
              let s2 = old_goal.proofn_checksum in
              Debug.dprintf debug "[merge_theory] goal has checksum@.";
@@ -1560,30 +1532,7 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_goals <- th.theory_goals @ save_detached_goals old_s detached s (Theory th);
-  (* If we are not using shapes, we want to recover the goals that were
-     "wrongly" marked as obsolete during AssoGoals.simple_associate. The
-     condition for this to be correct is to check that the checksum of the
-     theory was good and that we did not find any detached during the theory
-     merge. TODO: we may want to improve this by having a new mode which
-     merges the old_th without looking at shapes when checksums of theories is
-     the same (with or without shapes ?).
-  *)
-  if not (use_shapes || !found_detached)
-  then
-    begin
-      Debug.dprintf
-        debug
-        "[Session] since shapes were not used for pairing, we compute the \
-         checksum of the full theory, to estimate the obsolete status for \
-         goals.@.";
-      if same_theory_checksum then
-        (* we set all_goals as non obsolete *)
-        fold_all_any_of_theory s (fun () any ->
-          match any with
-          | APa pa -> set_obsolete s pa false
-          | _ -> ()) () th
-    end
+  th.theory_goals <- th.theory_goals @ save_detached_goals old_s detached s (Theory th)
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
@@ -1597,7 +1546,6 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   let tasks = Task.split_theory th None None in
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
   let theory = { theory_name = th.Theory.th_name;
-                 theory_checksum = None;
                  theory_is_detached = detached;
                  theory_goals = goalsID;
                  theory_parent_name = parent_name;
@@ -1898,9 +1846,6 @@ let save_ident fmt id =
   in
   fprintf fmt "name=\"%a\"" save_string n
 
-let save_checksum fmt s =
-  fprintf fmt "%s" (Termcode.string_of_checksum s)
-
 let rec save_goal s ctxt fmt pnid =
   let pn = get_proofNode s pnid in
   fprintf fmt
@@ -1910,7 +1855,6 @@ let rec save_goal s ctxt fmt pnid =
     (save_bool_def "proved" false) (pn_proved s pnid);
   let sum = Termcode.string_of_checksum pn.proofn_checksum in
   let shape = Termcode.string_of_shape pn.proofn_shape in
-  assert (shape <> "");
   Compress.Compress_z.output_string ctxt.ch_shapes sum;
   Compress.Compress_z.output_char ctxt.ch_shapes ' ';
   Compress.Compress_z.output_string ctxt.ch_shapes shape;
@@ -1944,15 +1888,10 @@ and save_trans s ctxt fmt (tid,t) =
   fprintf fmt "@]@\n</transf>"
 
 let save_theory s ctxt fmt t =
-  (* commented out since the session needs to be updated for goals to
-     have a checksum *)
-  let c = CombinedTheoryChecksum.compute s t in
-  t.theory_checksum <- Some c;
   fprintf fmt
-    "@\n@[<v 1>@[<h><theory@ %a%a%a>@]"
+    "@\n@[<v 1>@[<h><theory@ %a%a>@]"
     save_ident t.theory_name
-    (save_bool_def "proved" false) (th_proved s t)
-    (opt save_checksum "sum") t.theory_checksum;
+    (save_bool_def "proved" false) (th_proved s t);
   List.iter (save_goal s ctxt fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 

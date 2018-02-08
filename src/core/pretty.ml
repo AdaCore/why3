@@ -259,7 +259,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
+     begin
+       match t.t_ty with
+       | Some {ty_node = Tyapp (ts,[])}
+            when ts_equal ts ts_int || ts_equal ts ts_real ->
+          Number.print_constant fmt c
+       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+                            print_ty ty
+       | None -> assert false
+     end
   | Tapp (_, [t1]) when Slab.mem label_coercion t.t_label &&
                         Debug.test_noflag debug_print_coercions ->
       print_lterm pri fmt (t_label t1.t_label t1)

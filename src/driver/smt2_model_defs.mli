@@ -28,6 +28,7 @@ type array =
 and term =
   | Integer of string
   | Decimal of (string * string)
+  | Fraction of (string * string)
   | Float of float_type
   | Other of string
   | Array of array
