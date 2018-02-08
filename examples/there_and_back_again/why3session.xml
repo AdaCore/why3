@@ -2,7 +2,6 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<<<<<<< HEAD
 <prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -12,18 +11,6 @@
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC convolution_rec.0" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
-=======
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.7.1" timelimit="20" steplimit="0" memlimit="1000"/>
-<file name="../there_and_back_again.mlw">
-<theory name="Convolution">
- <goal name="WP_parameter convolution_rec" expl="VC for convolution_rec">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter convolution_rec.1" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
->>>>>>> new_ide
   </goal>
   <goal name="VC convolution_rec.1" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
@@ -40,19 +27,11 @@
  <proof prover="3"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
-<<<<<<< HEAD
 <theory name="Palindrome" proved="true" sum="d0f8af8821345efc5f0e4b9af61c739b">
  <goal name="VC palindrome_rec" expl="VC for palindrome_rec" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC palindrome_rec.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
-=======
-<theory name="Palindrome">
- <goal name="WP_parameter palindrome_rec" expl="VC for palindrome_rec">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter palindrome_rec.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
->>>>>>> new_ide
   </goal>
   <goal name="VC palindrome_rec.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>

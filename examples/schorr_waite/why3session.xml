@@ -6,36 +6,9 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../schorr_waite.mlw" proved="true">
-<<<<<<< HEAD
 <theory name="SchorrWaite" proved="true" sum="a0e0f2e3bd8fb11fdd77d21fc5c8dc37">
  <goal name="VC null" expl="VC for null" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
-=======
-<theory name="SchorrWaite" proved="true">
- <goal name="WP_parameter tl_stackNodes" expl="VC for tl_stackNodes" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter tl_stackNodes.0" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter tl_stackNodes.1" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter cons_not_in" expl="VC for cons_not_in" proved="true">
- <transf name="inline_goal" proved="true" >
-  <goal name="WP_parameter cons_not_in.0" expl="VC for cons_not_in" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter cons_not_in.0.0" expl="assertion" proved="true">
-   <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.03"/></proof>
-   </goal>
-   <goal name="WP_parameter cons_not_in.0.1" expl="postcondition" proved="true">
-   <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
->>>>>>> new_ide
  </goal>
  <goal name="VC tl_stackNodes" expl="VC for tl_stackNodes" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>

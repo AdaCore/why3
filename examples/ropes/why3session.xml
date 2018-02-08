@@ -7,28 +7,20 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../ropes.mlw" proved="true">
-<<<<<<< HEAD
 <theory name="String" proved="true" sum="07d9d0f3e492f325ffbd6a5edfc0223d">
  <goal name="VC empty" expl="VC for empty" proved="true">
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  </goal>
-=======
-<theory name="String" proved="true">
->>>>>>> new_ide
  <goal name="app_assoc" proved="true">
  <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Sig" proved="true">
+<theory name="Sig" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<<<<<<< HEAD
 <theory name="Rope" proved="true" sum="af6ab81cc6074d528eb4d87eee9c5785">
  <goal name="VC length" expl="VC for length" proved="true">
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  </goal>
-=======
-<theory name="Rope" proved="true">
->>>>>>> new_ide
  <goal name="rope_length_is_string_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="rope_length_is_string_length.0" proved="true">
@@ -55,28 +47,9 @@
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<<<<<<< HEAD
 <theory name="Balance" proved="true" sum="0befed5a432231810bbeef01cda58f1e">
  <goal name="VC max" expl="VC for max" proved="true">
  <proof prover="5"><result status="valid" time="0.01"/></proof>
-=======
-<theory name="Balance" proved="true">
- <goal name="WP_parameter string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter string_of_array_concat.0" expl="variant decrease" proved="true">
-  <proof prover="4" timelimit="30"><result status="valid" time="0.04" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter string_of_array_concat.1" expl="precondition" proved="true">
-  <proof prover="4" timelimit="30"><result status="valid" time="0.04" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter string_of_array_concat.2" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter string_of_array_concat.3" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="10"><result status="valid" time="0.06" steps="33"/></proof>
-  </goal>
- </transf>
->>>>>>> new_ide
  </goal>
  <goal name="VC string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
  <proof prover="5"><result status="valid" time="0.09"/></proof>

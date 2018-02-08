@@ -4,7 +4,6 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../register_allocation.mlw" proved="true">
-<<<<<<< HEAD
 <theory name="Spec" proved="true" sum="d7167b694c01b0aff1b5f69d6678a402">
  <goal name="VC exec_append" expl="VC for exec_append" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
@@ -13,16 +12,6 @@
 <theory name="DWP" proved="true" sum="e22595fd2574bc3e7eb21556a53b912f">
  <goal name="VC nil" expl="VC for nil" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
-=======
-<theory name="Spec" proved="true">
- <goal name="WP_parameter exec_append" expl="VC for exec_append" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
- </goal>
-</theory>
-<theory name="DWP" proved="true">
- <goal name="WP_parameter prefix $" expl="VC for prefix $" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
->>>>>>> new_ide
  </goal>
  <goal name="VC cons" expl="VC for cons" proved="true">
  <proof prover="0"><result status="valid" time="0.11" steps="121"/></proof>
@@ -122,27 +111,7 @@
     </goal>
    </transf>
    </goal>
-<<<<<<< HEAD
    <goal name="VC compile.13.2" expl="precondition" proved="true">
-=======
-  </transf>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="InfinityOfRegisters" proved="true">
- <goal name="WP_parameter compile" expl="VC for compile" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter compile.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.2" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.2.0" expl="precondition" proved="true">
->>>>>>> new_ide
    <transf name="compute_specified" proved="true" >
     <goal name="VC compile.13.2.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
@@ -232,7 +201,6 @@
   <goal name="VC compile.18" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-<<<<<<< HEAD
   <goal name="VC compile.19" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
@@ -253,19 +221,6 @@
   </goal>
   <goal name="VC compile.25" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
-=======
- </transf>
- </goal>
- <goal name="WP_parameter recover" expl="VC for recover" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
- </goal>
-</theory>
-<theory name="FiniteNumberOfRegisters" proved="true">
- <goal name="WP_parameter compile" expl="VC for compile" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter compile.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
->>>>>>> new_ide
   </goal>
   <goal name="VC compile.26" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
@@ -358,19 +313,8 @@
   </goal>
  </transf>
  </goal>
-<<<<<<< HEAD
  <goal name="VC k" expl="VC for k" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
-=======
-</theory>
-<theory name="OptimalNumberOfRegisters" proved="true">
- <goal name="measure_nonneg" proved="true">
- <transf name="induction_ty_lex" proved="true" >
-  <goal name="measure_nonneg.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
- </transf>
->>>>>>> new_ide
  </goal>
 </theory>
 <theory name="OptimalNumberOfRegisters" proved="true" sum="5fb8dd717f71d0a623d142d343b48638">
