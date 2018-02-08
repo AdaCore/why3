@@ -109,7 +109,6 @@ let goalmap : Gnat_expl.check GoalMap.t = GoalMap.create 17
 
 let total_nb_goals : int ref = ref 0
 let nb_objectives : int ref = ref 0
-let nb_goals_done : int ref = ref 0
 
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
@@ -118,8 +117,7 @@ let clear () =
    GoalMap.clear goalmap;
    GoalSet.reset not_interesting;
    total_nb_goals := 0;
-   nb_objectives := 0;
-   nb_goals_done  := 0
+   nb_objectives := 0
 
 let find e =
    try Gnat_expl.HCheck.find explmap e
@@ -470,7 +468,6 @@ let register_result c goal result =
      (* The prover run was scheduled just to get counterexample *)
      obj, Not_Proved
    end else begin
-     incr nb_goals_done;
      if result then begin
      (* goal has been proved, we only need to store that info *)
        if not (GoalSet.is_empty obj_rec.to_be_proved) then obj, Work_Left
@@ -504,9 +501,7 @@ let register_result c goal result =
          end
      with Exit ->
        (* if we cannot simplify, the objective has been disproved *)
-       let n = GoalSet.count obj_rec.to_be_scheduled in
        GoalSet.reset obj_rec.to_be_scheduled;
-       nb_goals_done := !nb_goals_done + n;
 
        if Gnat_config.counterexamples then begin
          (* The goal will be scheduled to get a counterexample *)
