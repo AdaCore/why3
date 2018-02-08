@@ -351,19 +351,16 @@ let objective_status obj =
       Work_Left
 
 let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
-   (* Check whether the goal has been tried already *)
+  (* Check whether the goal has been tried already *)
   let proof_attempt_set = Session_itp.get_proof_attempt_ids s g in
   try
-      Whyconf.Hprover.iter (fun pr paid ->
-        let pa = Session_itp.get_proof_attempt_node s paid in
-        (* only count non-obsolete proof attempts with identical
-           options *)
-        if not pa.Session_itp.proof_obsolete &&
-        pr = prover &&
-        pa.Session_itp.limit = Gnat_config.limit ~prover:prover.Whyconf.prover_name then
-           raise Exit) proof_attempt_set;
-        false
-  with Exit -> true
+    let paid = Whyconf.Hprover.find proof_attempt_set prover in
+    let pa = Session_itp.get_proof_attempt_node s paid in
+    (* only count non-obsolete proof attempts with identical
+       options *)
+    (not pa.Session_itp.proof_obsolete &&
+    pa.Session_itp.limit = Gnat_config.limit ~prover:prover.Whyconf.prover_name)
+  with Not_found -> false
 
 let all_provers_tried s g =
   List.for_all (fun p -> has_been_tried_by s g p) Gnat_config.provers
