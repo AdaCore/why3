@@ -211,6 +211,16 @@ decimal:
 fraction:
 | LPAREN ps DIV ps integer ps integer ps RPAREN
     { ($5, $7) }
+(* Integer from z3 can be written 1.0 *)
+| LPAREN ps DIV ps decimal ps decimal ps RPAREN
+    { let (num, numdot) = $5 in
+      let (dec, decdot) = $7 in
+      if numdot = "0" && decdot = "0" then
+        (num, dec)
+      else
+        (* Should not happen. If it does, change the parsing *)
+        assert (false)
+    }
 
 (* Example:
    (_ bv2048 16) *)
