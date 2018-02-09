@@ -109,11 +109,20 @@ let connect_internal () =
     Filename.temp_file "why3server" "sock"
   in
   let exec = Filename.concat Config.libdir "why3server" in
-  let pid = Unix.create_process exec
+  let pid =
+    (* use this version for debugging the C code
+    Unix.create_process "valgrind"
+    [|"/usr/bin/valgrind";exec; "--socket"; socket_name;
+      "--single-client";
+      "-j"; string_of_int !max_running_provers|]
+    Unix.stdin Unix.stdout Unix.stderr
+     *)
+    Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
-    Unix.stdin Unix.stdout Unix.stderr in
+    Unix.stdin Unix.stdout Unix.stderr
+  in
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =

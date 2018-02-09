@@ -16,7 +16,8 @@
 #include "options.h"
 
 int parallel = 1;
-char* basename = NULL;
+/* global data doesn't need null initialization, so none provided here */
+char* socketname;
 bool logging = false;
 bool single_client = false;
 
@@ -65,7 +66,7 @@ void parse_options(int argc, char **argv) {
          break;
 
        case 's':
-         basename = optarg;
+         socketname = optarg;
          break;
 
        case '?':
@@ -77,12 +78,11 @@ void parse_options(int argc, char **argv) {
      }
   }
   if (optind < argc) {
-    printf("extra arguments, stopping\n");
+    printf("extra arguments, stopping [opt_index=%d,argc=%d]\n",optind,argc);
     exit(1);
   }
-  if (basename == NULL) {
+  if (socketname == NULL) {
     printf("need to specify a socket name using --socket\n");
     exit(1);
   }
 }
-

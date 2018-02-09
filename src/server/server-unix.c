@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <poll.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -65,6 +66,7 @@ struct pollfd* poll_list;
 int poll_num = 0;
 int poll_len = 0;
 
+// global pointers are initialized with NULL by C semantics
 plist processes;
 plist clients;
 char *current_dir;
@@ -75,12 +77,11 @@ static int cpipe[2];
 void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
-  int i;
   if (server_sock != -1) {
     close(server_sock);
   }
   if (clients != NULL) {
-     for (i = 0; i < list_length(clients); i++) {
+     for (int i = 0; i < list_length(clients); i++) {
        close(((pclient) clients->data[i])->fd);
      }
   }
@@ -102,8 +103,7 @@ void add_to_poll_list(int sock, short events) {
 }
 
 struct pollfd* poll_list_lookup(int fd) {
-  int i;
-  for (i = 0; i < poll_num; i++) {
+  for (int i = 0; i < poll_num; i++) {
     if (poll_list[i].fd == fd) {
       return poll_list+i;
     }
@@ -206,23 +206,47 @@ size_t unix_path_max() {
   return sizeof(struct sockaddr_un) - offsetof(struct sockaddr_un, sun_path);
 }
 
-void server_init_listening(char* basename, int parallel) {
+void server_init_listening(char* socketname, int parallel) {
   struct sockaddr_un addr;
   int res;
-  init_logging();
+  int cur_dir;
+  char *socketname_copy1, *socketname_copy2, *dirn, *filen;
+
+  // Initialize current_dir pointer. Do that here because we switch the
+  // directory temporarily below.
   current_dir = get_cur_dir();
+
+  // Before opening the socket, we switch to the dir of the socket. This
+  // workaround is needed because Unix sockets only support relatively short
+  // paths (~100 chars depending on the system). We also open a file
+  // descriptor to the current dir so that we can switch back afterwards.
+
+  socketname_copy1 = strdup(socketname);
+  socketname_copy2 = strdup(socketname);
+  dirn = dirname(socketname_copy1);
+  filen = basename(socketname_copy2);
+  cur_dir = open(".", O_RDONLY);
+  if (cur_dir == -1) {
+    shutdown_with_msg("error when opening current directory");
+  }
+  res = chdir(dirn);
+  if (res == -1) {
+    shutdown_with_msg("error when switching to socket directory");
+  }
+
+  init_logging();
   queue = init_queue(100);
   clients = init_list(parallel);
   addr.sun_family = AF_UNIX;
   poll_len = 2 + parallel;
   poll_list = (struct pollfd*) malloc(sizeof(struct pollfd) * poll_len);
   poll_num = 0;
-  if (strlen(basename) + 1 > unix_path_max()) {
-    shutdown_with_msg("basename too long");
+  if (strlen(filen) + 1 > unix_path_max()) {
+    shutdown_with_msg("basename of filename too long");
   }
-  memcpy(addr.sun_path, basename, strlen(basename) + 1);
+  memcpy(addr.sun_path, filen, strlen(filen) + 1);
   server_sock = socket(AF_UNIX, SOCK_STREAM, 0);
-  res = unlink(basename);
+  res = unlink(filen);
   // we delete the file if present
   if (res == -1 && errno != ENOENT) {
     shutdown_with_msg("error deleting socket");
@@ -235,6 +259,16 @@ void server_init_listening(char* basename, int parallel) {
   if (res == -1) {
     shutdown_with_msg("error listening on socket");
   }
+  res = fchdir(cur_dir);
+  if (res == -1) {
+    shutdown_with_msg("error when switching back to current directory");
+  }
+  res = close(cur_dir);
+  if (res == -1) {
+    shutdown_with_msg("error closing descriptor to current dir");
+  }
+  free(socketname_copy1);
+  free(socketname_copy2);
   add_to_poll_list(server_sock, POLLIN);
   processes = init_list(parallel);
   setup_child_pipe();
@@ -257,7 +291,6 @@ pid_t create_process(char* cmd,
                      int timelimit,
                      int memlimit) {
   struct rlimit res;
-  int i;
   char** unix_argv;
   int count = argc;
   // in the case of usestdin, the last argument is in fact not passed to
@@ -268,7 +301,7 @@ pid_t create_process(char* cmd,
   unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
   unix_argv[0] = cmd;
   unix_argv[count + 1] = NULL;
-  for (i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     unix_argv[i + 1] = argv[i];
   }
 
@@ -436,6 +469,8 @@ void handle_child_events() {
   }
 }
 
+/*@ requires r != NULL && r->req_type == REQ_RUN;
+  @*/
 void run_request (prequest r) {
   char* outfile;
   int out_descr;
@@ -467,6 +502,20 @@ void run_request (prequest r) {
   send_started_msg_to_client(client, r->id);
 }
 
+void remove_from_queue(pqueue p, char *id) {
+  // inefficient, but what else?
+  pqueue tmp = init_queue(p->capacity);
+  while (!queue_is_empty(p)) {
+    prequest r = queue_pop(p);
+    if (strcmp(r->id,id)) queue_push(tmp, r);
+  }
+  while (!queue_is_empty(tmp)) {
+    prequest r = queue_pop(tmp);
+    queue_push(p, r);
+  }
+  free_queue(tmp);
+}
+
 void handle_msg(pclient client, int key) {
   prequest r;
   char* buf;
@@ -486,11 +535,22 @@ void handle_msg(pclient client, int key) {
       break;
     r = parse_request(buf + old, cur - old, key);
     if (r) {
-      if (list_length(processes) < parallel) {
-        run_request(r);
+      switch (r->req_type) {
+      case REQ_RUN:
+        if (list_length(processes) < parallel) {
+          run_request(r);
+          free_request(r);
+        } else {
+          queue_push(queue, (void*) r);
+        }
+        break;
+      case REQ_INTERRUPT:
+        // removes all occurrences of r->id from the queue
+        remove_from_queue(queue, r->id);
+        // kill all processes whose id is r->id;
+        // TODO kill_processes(processes, r->id);
         free_request(r);
-      } else {
-        queue_push(queue, (void*) r);
+        break;
       }
     }
     //skip newline
@@ -503,7 +563,7 @@ void handle_msg(pclient client, int key) {
 }
 
 void shutdown_server() {
-  unlink(basename);
+  unlink(socketname);
   shutdown_with_msg("last client disconnected");
 }
 
@@ -544,13 +604,12 @@ void schedule_new_jobs() {
 }
 
 int main(int argc, char **argv) {
-  int i;
   char ch;
   int res;
   struct pollfd* cur;
   pclient client;
   parse_options(argc, argv);
-  server_init_listening(basename, parallel);
+  server_init_listening(socketname, parallel);
   while (1) {
     schedule_new_jobs();
     while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
@@ -558,7 +617,7 @@ int main(int argc, char **argv) {
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
-    for (i = 0; i < poll_num; i++) {
+    for (int i = 0; i < poll_num; i++) {
       cur = (struct pollfd*) poll_list + i;
       if (cur->revents == 0) {
         continue;
