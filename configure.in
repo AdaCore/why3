@@ -172,7 +172,7 @@ if test "$OCAMLC" = no ; then
 fi
 
 # we extract Ocaml version number
-OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
 case "$OCAMLVERSION" in
@@ -194,7 +194,7 @@ if test "$OCAMLOPT" = no ; then
 	AC_MSG_WARN(Cannot find ocamlopt; bytecode compilation only.)
 else
 	AC_MSG_CHECKING(ocamlopt version)
-	TMPVERSION=`$OCAMLOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+	TMPVERSION=`$OCAMLOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(differs from ocamlc; ocamlopt discarded.)
 	    OCAMLOPT=no
@@ -215,7 +215,7 @@ fi
 AC_CHECK_PROG(OCAMLCDOTOPT,ocamlc.opt,ocamlc.opt,no)
 if test "$OCAMLCDOTOPT" != no ; then
 	AC_MSG_CHECKING(ocamlc.opt version)
-	TMPVERSION=`$OCAMLCDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+	TMPVERSION=`$OCAMLCDOTOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(differs from ocamlc; ocamlc.opt discarded.)
 	else
@@ -229,7 +229,7 @@ if test "$OCAMLOPT" != no ; then
     AC_CHECK_PROG(OCAMLOPTDOTOPT,ocamlopt.opt,ocamlopt.opt,no)
     if test "$OCAMLOPTDOTOPT" != no ; then
 	AC_MSG_CHECKING(ocamlc.opt version)
-	TMPVER=`$OCAMLOPTDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+	TMPVER=`$OCAMLOPTDOTOPT -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 	if test "$TMPVER" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(differs from ocamlc; ocamlopt.opt discarded.)
 	else
@@ -280,7 +280,7 @@ if test "$MENHIR" = no ; then
 	AC_MSG_ERROR(Cannot find menhir.)
 fi
 
-MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version* *\(.*\)$,\1,p'`
+MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
 case "$MENHIRVERSION" in
    200*|201[[0-4]]*|20150[[1-5]]*)
       AC_MSG_ERROR(You need Menhir 20150629 or higher.);;
@@ -542,7 +542,7 @@ fi
 if test "$enable_coq_support" = yes; then
    COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
    AC_MSG_CHECKING(Coq version)
-   COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
+   COQVERSION=[`$COQC -v | sed -n -e 's|.*version *\([^ ]*\) .*$|\1|p'`]
 
    #Even if the name of the variable is CAMLP4 the value can be camlp5
    CAMLP4BIN=`$COQC -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
@@ -652,7 +652,7 @@ else
     else
         PVSLIB=`$PVS -where`
         AC_MSG_CHECKING(PVS version)
-        PVSVERSION=`$PVS -version | sed -n -e 's|.*Version* *\([[^ ]]*\)$|\1|p' `
+        PVSVERSION=[`$PVS -version | sed -n -e 's|.*Version *\([^ ]*\)$|\1|p'`]
 
         case $PVSVERSION in
           6.*)
@@ -693,7 +693,7 @@ else
        reason_isabelle_support=" (isabelle not found)"
     else
         AC_MSG_CHECKING(Isabelle version)
-        ISABELLEDETECTEDVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
+        ISABELLEDETECTEDVERSION=[`$ISABELLE version | sed -n -e 's|Isabelle\([^:]*\).*$|\1|p'`]
 
         case $ISABELLEDETECTEDVERSION in
           2016-1*)
