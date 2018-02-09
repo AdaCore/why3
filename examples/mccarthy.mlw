@@ -1,13 +1,20 @@
 
-(* McCarthy's ``91'' function. *)
+(** {1 McCarthy's ``91'' function}
+
+authors: Jean-Christophe Filliâtre, Martin Clochard, Claude Marché
+witness: Andrei Paskevich
+
+*)
 
 module McCarthy91
 
   use import int.Int
 
+  (** {2 Specification} *)
+
   function spec (x: int) : int = if x <= 100 then 91 else x-10
 
-  (* traditional recursive implementation *)
+  (** {2 traditional recursive implementation} *)
 
   let rec f91 (n:int) : int variant { 101-n }
     ensures { result = spec n }
@@ -16,7 +23,7 @@ module McCarthy91
     else
       n - 10
 
-  (* non-recursive implementation using a while loop *)
+  (** {2 non-recursive implementation using a while loop} *)
 
   use import ref.Ref
 
@@ -39,10 +46,12 @@ module McCarthy91
     done;
     !n
 
-  (* Use a 'morally' irrelevant control flow from a recursive function
+  (** {2 irrelevance of control flow}
+
+     We use a 'morally' irrelevant control flow from a recursive function
      to ease proof (the recursive structure does not contribute to the
      program execution). This is a technique for proving derecursified
-     programs. See verifythis_2016_tree_traversal for a more
+     programs. See [verifythis_2016_tree_traversal] for a more
      complex example. *)
 
   exception Stop
@@ -74,5 +83,83 @@ module McCarthy91
     = let u = !n in bloc (); if u <= 100 then (aux (); aux ()) in
     try aux (); bloc (); absurd
     with Stop -> !n end
+
+  (** {2 Variant using a general 'ghost coroutine' approach}
+
+    Yet another variant. Assume we want to prove the imperative code:
+{h <pre>
+e := 1; r := n;
+while e > 0
+  if r > 100 then r := r - 10; e := e - 1;
+             else r := r + 11; e := e + 1;
+end-while
+return r
+</pre>}
+we annotate the various program points:
+{h <pre>
+{ 0 } e := 1;
+{ 1 } r := n;
+{ 2 } while e > 0
+  { 3 }
+  if r > 100 then { 4 } r := r - 10; { 5 } e := e - 1;
+             else { 6 } r := r + 11; { 7 } e := e + 1;
+end-while
+{ 8 }
+return r
+</pre>}
+
+we define the small-step semantics of this code by the following [step] function
+
+*)
+
+type state = { n:int ; mutable pc : int; mutable e : int ; mutable r : int }
+
+val now : state
+
+val step () : unit
+  requires { 0 <= now.pc < 8 }
+  writes  { now }
+  ensures { old now.pc = 0 -> now = { (old now) with pc = 1 ; e = 1 } }
+  ensures { old now.pc = 1 -> now = { (old now) with pc = 2 ; r = old now.n } }
+  ensures { old now.pc = 2 /\ old now.e > 0 -> now = { (old now) with pc = 3 } }
+  ensures { old now.pc = 2 /\ old now.e <= 0 -> now = { (old now) with pc = 8 } }
+  ensures { old now.pc = 3 /\ old now.r > 100 -> now = { (old now) with pc = 4 } }
+  ensures { old now.pc = 3 /\ old now.r <= 100 -> now = { (old now) with pc = 6 } }
+  ensures { old now.pc = 4 -> now = { (old now) with pc = 5 ; r = old now.r - 10 } }
+  ensures { old now.pc = 5 -> now = { (old now) with pc = 2 ; e = old now.e - 1 } }
+  ensures { old now.pc = 6 -> now = { (old now) with pc = 7 ; r = old now.r + 11 } }
+  ensures { old now.pc = 7 -> now = { (old now) with pc = 2 ; e = old now.e + 1 } }
+
+(** we prove the code by a ghost function that gives back the recursive
+  structure of the original recursive definition *)
+
+let rec aux () : unit
+  requires { now.pc = 2 /\ now.e > 0 }
+  writes  { now }
+  variant  { 101 - now.r }
+  ensures  { now.pc = 2 /\ now.r = spec(old now.r) /\ now.e = old now.e - 1 }
+= let r0 = now.r in
+  step (); (* execution of condition of while *)
+  step (); (* execution of condition of if *)
+  if r0 > 100 then begin
+       step (); (* assignment r := r - 10 *)
+       step ()  (* assignment e := e - 1  *)
+       end
+  else (* r0 <= 100 *)
+     begin
+       step (); (* assignment r := r + 11 *)
+       step (); (* assignment e := e + 1 *)
+       aux ();
+       aux ()
+     end
+
+let main () : unit
+  requires { now.pc = 0 /\ now.n >= 0 }
+  writes  { now }
+  ensures { now.pc = 8 /\ now.r = spec now.n }
+= step (); (* assignment e := 1 *)
+  step (); (* assignment r := n *)
+  aux ();
+  step() (* loop exit *)
 
 end
