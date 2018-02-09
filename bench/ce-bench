@@ -14,30 +14,33 @@ esac
 
 cd $dir
 
-run_cvc4_15 () {
-  printf "  $1... "
-  ../bin/why3prove.opt -P "CVC4,1.5" --timelimit 1 --get-ce $1 | \
-  # This ad hoc sed removes any timing information from counterexamples output.
-  # Counterexamples in JSON format cannot match this regexp.
-  sed 's/ ([0-9]\+\.[0-9]\+s)//' > $1.out
-  if cmp $1.oracle $1.out > /dev/null 2>&1 ; then
+# $1 = prover, $2 = file
+run () {
+    printf "  $2 ($1)... "
+    f="$2_$1"
+    ../bin/why3prove.opt -P "$1" --timelimit 1 --get-ce "$2.mlw" | \
+        # This ad hoc sed removes any timing information from counterexamples output.
+        # Counterexamples in JSON format cannot match this regexp.
+        sed 's/ ([0-9]\+\.[0-9]\+s)//' > "$f.out"
+    if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
      echo "ok"
   else
      if $updateoracle; then
-        echo "Updating oracle for $1"
-        mv $1.out $1.oracle
+        echo "Updating oracle for $2, prover $1"
+        mv "$f.out" "$f.oracle"
      else
        echo "FAILED!"
        echo "diff is the following:"
-       diff $1.oracle $1.out
+       diff "$f.oracle" "$f.out"
      fi
   fi
 }
 
 
 
-
-
-for f in ce/*.mlw; do
-    run_cvc4_15 $f
+for file in ce/*.mlw; do
+    filebase=`basename $file .mlw`
+    run CVC4,1.5 ce/$filebase
+    run Z3,4.5.0 ce/$filebase
+    run Z3,4.6.0 ce/$filebase
 done
