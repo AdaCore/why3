@@ -1333,14 +1333,13 @@ use import int.Int
 use import int.Power
 use import MP64Coeffs
 
-type t = | IE int exp | I int | E exp | R
+type t = | I int | E exp | R
 
 let constant mpzero: t = I 0
 let constant mpone: t = I 1
 
 function mpinterp (t:t) (y:evars) : int
 = match t with
-  | IE n e -> n * (power M.radix (interp_exp e y))
   | I n -> n
   | E e -> power M.radix (interp_exp e y)
   | R -> M.radix
@@ -1387,7 +1386,6 @@ use import list.List
 
 predicate pos_exp (t:t) (y:evars)
 = match t with
-  | IE _ e
   | E e -> 0 <= interp_exp e y
   | I _ | R -> true
   end
@@ -1417,16 +1415,6 @@ let rec function m (t:t) : R.coeff
   ensures { forall y. pos_exp t y -> minterp result y
             = from_int (mpinterp t y) }
 = match t with
-  | IE n e ->
-    let r = ((n,1), e) in
-    assert { forall y. pos_exp t y -> minterp r y = from_int (mpinterp t y)
-             by let ie = interp_exp e y in
-                minterp r y = qinterp (n, 1) *. pow rradix (from_int ie)
-                = from_int n *. pow rradix (from_int ie)
-                = from_int n *. from_int (power M.radix ie)
-                = from_int (n * power M.radix ie)
-                = from_int (mpinterp t y) };
-    r
   | I n -> ((n,1), Lit 0)
   | E e -> ((1,1), e)
   | R -> ((1,1), Lit 1) (* or ((radix, 1), Lit 0) ? *)
@@ -1484,6 +1472,364 @@ let mp_decision (l: context') (g: equality') : bool
   raises  { R.Absurd -> true | Unknown -> true | Q.Unknown -> true }
 =
   R.decision (m_ctx l) (m_eq g)
+
+end
+
+module EqPropMP
+
+use import int.Int
+use import LinearDecisionIntMP
+use import array.Array
+use import int.MinMax
+use import option.Option
+use import list.List
+use import list.Append
+
+
+use MP64Coeffs as E
+
+let rec predicate expr_bound' (e:expr') (b:int)
+  variant { e }
+= match e with
+  | Sum e1 e2 | Diff e1 e2 -> expr_bound' e1 b && expr_bound' e2 b
+  | ProdL e _ | ProdR _ e -> expr_bound' e b
+  | Var n -> 0 <= n <= b
+  | Coeff _ -> true
+  end
+
+let predicate eq_bound' (eq:equality') (b:int)
+= match eq with (e1,e2) -> expr_bound' e1 b && expr_bound' e2 b end
+
+let rec predicate ctx_bound' (ctx:context') (b:int)
+= match ctx with Nil -> true | Cons eq t -> eq_bound' eq b && ctx_bound' t b end
+
+let rec lemma expr_bound_w' (e:expr') (b1 b2:int)
+  requires { b1 <= b2 }
+  requires { expr_bound' e b1 }
+  ensures  { expr_bound' e b2 }
+  variant  { e }
+= match e with
+  | Sum e1 e2 | Diff e1 e2 ->
+    expr_bound_w' e1 b1 b2; expr_bound_w' e2 b1 b2
+  | ProdL e _ | ProdR _ e -> expr_bound_w' e b1 b2
+  | _ -> ()
+  end
+
+lemma eq_bound_w': forall e:equality', b1 b2:int. eq_bound' e b1 -> b1 <= b2 -> eq_bound' e b2
+
+let rec lemma ctx_bound_w' (l:context') (b1 b2:int)
+  requires { ctx_bound' l b1 }
+  requires { b1 <= b2 }
+  ensures  { ctx_bound' l b2 }
+  variant  { l }
+= match l with Nil -> () | Cons _ t -> ctx_bound_w' t b1 b2 end
+
+let rec function max_var' (e:expr') : int
+  variant { e }
+  requires { valid_expr' e }
+  ensures { 0 <= result }
+  ensures { expr_bound' e result }
+= match e with
+  | Var i -> i
+  | Coeff _ -> 0
+  | Sum e1 e2 | Diff e1 e2 -> max (max_var' e1) (max_var' e2)
+  | ProdL e _ | ProdR _ e -> max_var' e
+  end
+
+let function max_var_e' (e:equality') : int
+  requires { valid_eq' e }
+  ensures { 0 <= result }
+  ensures { eq_bound' e result }
+= match e with (e1,e2) -> max (max_var' e1) (max_var' e2) end
+
+let rec function max_var_ctx' (l:context') : int
+  variant { l }
+  requires { valid_ctx' l }
+  ensures { 0 <= result }
+  ensures { ctx_bound' l result }
+= match l with
+  | Nil -> 0
+  | Cons e t -> max (max_var_e' e) (max_var_ctx' t)
+  end
+
+let rec lemma interp_ctx_valid' (ctx:context') (g:equality')
+  ensures { forall y z. interp_eq' g y z -> interp_ctx' ctx g y z }
+  variant  { ctx }
+= match ctx with Nil -> () | Cons _ t -> interp_ctx_valid' t g end
+
+let rec lemma interp_ctx_wr' (ctx l:context') (g:equality')
+  ensures { forall y z. interp_ctx' ctx g y z -> interp_ctx' (ctx ++ l) g y z }
+  variant { ctx }
+= match ctx with
+  | Nil -> ()
+  | Cons _ t -> interp_ctx_wr' t l g  end
+
+let rec lemma interp_ctx_wl' (ctx l: context') (g:equality')
+  ensures { forall y z. interp_ctx' ctx g y z -> interp_ctx' (l ++ ctx) g y z }
+  variant { l }
+= match l with Nil -> () | Cons _ t -> interp_ctx_wl' ctx t g  end
+
+
+let lemma interp_ctx_cons' (e:equality') (l:context') (g:equality')
+  requires { forall y z. (interp_eq' e y z -> interp_ctx' l g y z) }
+  ensures { forall y z. interp_ctx' (Cons e l) g y z }
+= ()
+
+predicate ctx_impl_ctx' (c1 c2: context')
+= match c2 with
+  | Nil -> true
+  | Cons eq t -> ctx_impl_ctx' c1 t /\ forall y z. y=z -> interp_ctx' c1 eq y z
+  end
+
+predicate ctx_holds' (c: context') (y z:vars)
+= match c with
+  | Nil -> true
+  | Cons h t -> interp_eq' h y z /\ ctx_holds' t y z
+  end
+
+let rec lemma holds_interp_ctx' (l:context') (g:equality') (y z:vars)
+  requires { ctx_holds' l y z -> interp_eq' g y z }
+  ensures { interp_ctx' l g y z }
+  variant { l }
+= match l with
+  | Nil -> ()
+  | Cons h t ->
+    if interp_eq' h y z then holds_interp_ctx' t g y z
+  end
+
+let rec lemma interp_holds' (l:context') (g:equality') (y z:vars)
+  requires { interp_ctx' l g y z }
+  requires { ctx_holds' l y z }
+  ensures  { interp_eq' g y z }
+  variant  { l }
+= match l with
+  | Nil -> ()
+  | Cons _ t -> interp_holds' t g y z
+  end
+
+let rec lemma impl_holds' (c1 c2: context') (y z: vars)
+  requires { ctx_impl_ctx' c1 c2 }
+  requires { y=z }
+  requires { ctx_holds' c1 y z }
+  ensures  { ctx_holds' c2 y z }
+  variant  { c2 }
+= match c2 with
+  | Nil -> ()
+  | Cons h t -> interp_holds' c1 h y z; impl_holds' c1 t y z
+  end
+
+let rec lemma ctx_impl' (c1 c2: context') (g:equality') (y z: vars)
+  requires { ctx_impl_ctx' c1 c2 }
+  requires { y=z }
+  requires { interp_ctx' c2 g y z }
+  ensures  { interp_ctx' c1 g y z }
+  variant  { c2 }
+= if ctx_holds' c1 y z
+  then begin
+       impl_holds' c1 c2 y z;
+       interp_holds' c2 g y z;
+       holds_interp_ctx' c1 g y z
+       end
+
+let rec lemma interp_ctx_impl' (ctx: context') (g1 g2:equality')
+  requires { forall y z. interp_eq' g1 y z -> interp_eq' g2 y z }
+  ensures  { forall y z. interp_ctx' ctx g1 y z -> interp_ctx' ctx g2 y z }
+  variant  { ctx }
+= match ctx with Nil -> () | Cons _ t -> interp_ctx_impl' t g1 g2 end
+
+let lemma impl_cons (c1 c2:context') (e:equality') (y z:vars)
+  requires { ctx_impl_ctx' c1 c2 }
+  requires { forall y z. interp_ctx' c1 e y z }
+  ensures  { ctx_impl_ctx' c1 (Cons e c2) }
+= ()
+
+let rec lemma impl_wl' (c1 c2:context') (e:equality')
+  requires { ctx_impl_ctx' c1 c2 }
+  ensures  { ctx_impl_ctx' (Cons e c1) c2 }
+  variant  { c2 }
+= match c2 with
+  | Nil -> ()
+  | Cons h t -> interp_ctx_wl' c1 (Cons e Nil) h; impl_wl' c1 t e
+  end
+
+let rec lemma impl_self (c:context')
+  ensures { ctx_impl_ctx' c c }
+  variant { c }
+= match c with
+  | Nil -> ()
+  | Cons h t -> (impl_self t; impl_wl' c t h)
+  end
+
+predicate is_eq_tbl (a:array (option E.exp)) (l:context')
+= forall i. 0 <= i < length a ->
+  match a[i] with
+  | None -> true
+  | Some e -> forall y z. y=z -> ctx_holds' l y z
+              -> E.interp_exp (E.Var i) z = E.interp_exp e z
+  end
+
+let prop_ctx (l:context') (g:equality') : (context', equality')
+  requires { valid_ctx' l }
+  requires { valid_eq' g }
+  returns { rl, rg -> valid_ctx' rl /\ valid_eq' rg
+                   /\ forall y z. y=z -> interp_ctx' rl rg y z
+                   -> interp_ctx' l g y z }
+  returns { rl, rg -> forall y z. y=z -> ctx_holds' l y z
+                      -> pos_ctx' l z -> pos_eq' g z
+                      -> (pos_ctx' rl z /\ pos_eq' rg z) }
+  raises { OutOfBounds -> true }
+=
+  let m = max (max_var_ctx' l) (max_var_e' g) in
+  let a : array (option E.exp) = Array.make (m+1) None in
+  let rec exp_of_expr' (e:expr') : option E.exp
+    returns { | None -> true
+              | Some ex -> forall y z. y=z -> interp' e y z = E.interp_exp ex z }
+    variant { e }
+  = match e with
+    | Var i -> Some (E.Var i)
+    | Sum e1 e2 ->
+      let r1,r2 = (exp_of_expr' e1, exp_of_expr' e2) in
+      match r1,r2 with
+      | Some ex1, Some ex2 -> Some (E.Plus ex1 ex2)
+      | _ -> None
+      end
+    | Diff e1 e2 ->
+      let r1,r2 = (exp_of_expr' e1, exp_of_expr' e2) in
+      match r1,r2 with
+      | Some ex1, Some ex2 -> Some (E.Sub ex1 ex2)
+      | _ -> None
+      end
+    | Coeff (I n) -> Some (E.Lit n)
+    | _ -> None
+    end
+  in
+  let fill_tbl_eq (eq:equality') : unit
+    requires { eq_bound' eq m }
+    ensures { forall l. is_eq_tbl (old a) l ->
+              is_eq_tbl a (Cons eq l) }
+  = match eq with
+    | Var i, e | e, Var i ->
+      let r = exp_of_expr' e in
+      match r with
+        | None -> ()
+        | Some ex ->
+          (*let ghost vi = exp_of_expr' (Var i) in
+          assert { vi = Some (E.Var i) };*)
+          assert { forall l y z. y=z -> ctx_holds' (Cons eq l) y z ->
+                   E.interp_exp ex z = interp' e y z
+                   = interp' (Var i) y z = y i };
+          a[i] <- Some ex
+      end
+    | _ -> ()
+    end
+  in
+  let rec fill_tbl_ctx (l:context') : unit
+    requires { is_eq_tbl a Nil }
+    ensures { is_eq_tbl a l }
+    requires { ctx_bound' l m }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons eq l -> fill_tbl_ctx l; fill_tbl_eq eq
+    end
+  in
+  fill_tbl_ctx l;
+  let rec propagate_exp (e:E.exp)
+    ensures { forall y z. y=z -> ctx_holds' l y z ->
+              E.interp_exp e z = E.interp_exp result z }
+    variant { e }
+    raises { OutOfBounds -> true }
+  = match e with
+    | E.Lit _ -> e
+    | E.Var i -> match (defensive_get a i) with Some e' -> e' | None -> e end
+    | E.Plus e1 e2 -> E.Plus (propagate_exp e1) (propagate_exp e2)
+    | E.Sub e1 e2 -> E.Sub (propagate_exp e1) (propagate_exp e2)
+    | E.Minus e -> E.Minus (propagate_exp e)
+    end
+  in
+  let propagate_coeff (c:t)
+    ensures { forall y z. y=z -> ctx_holds' l y z ->
+              interp_eq' (Coeff c, Coeff result) y z }
+    ensures { forall y z. y = z -> ctx_holds' l y z ->
+              pos_exp c z -> pos_exp result z }
+    raises { OutOfBounds -> true }
+  = match c with
+    | I _ -> c
+    | E e -> E (propagate_exp e)
+    | R -> R
+    end
+  in
+  let rec propagate_c (c:cprod)
+    ensures { forall y z. y=z -> ctx_holds' l y z ->
+              interp_c c y z = interp_c result y z }
+    variant { c }
+    raises { OutOfBounds -> true }
+    ensures { forall y z. y = z -> ctx_holds' l y z ->
+              pos_cprod c z -> pos_cprod result z }
+  = match c with
+    | C c -> C (propagate_coeff c)
+    | Times c1 c2 -> Times (propagate_c c1) (propagate_c c2)
+    end
+  in
+  let rec propagate_e (e:expr')
+    requires { expr_bound' e m }
+    ensures { forall y z. y=z -> ctx_holds' l y z -> interp_eq' (e,result) y z }
+    variant { e }
+    raises { OutOfBounds -> true }
+    requires { valid_expr' e }
+    ensures { valid_expr' result }
+    ensures { forall y z. y = z -> ctx_holds' l y z
+              -> pos_expr' e z -> pos_expr' result z }
+  = match e with
+    | Var _ -> e (* match a[i] with Some e' -> e' | None -> e end*)
+    | ProdL e c -> ProdL (propagate_e e) (propagate_c c)
+    | ProdR c e -> ProdR (propagate_c c) (propagate_e e)
+    | Sum e1 e2 -> Sum (propagate_e e1) (propagate_e e2)
+    | Diff e1 e2 -> Diff (propagate_e e1) (propagate_e e2)
+    | Coeff c -> Coeff (propagate_coeff c)
+    end
+  in
+  let rec propagate_eq (eq:equality')
+    requires { eq_bound' eq m }
+    ensures { forall y z. y=z -> interp_ctx' l eq y z <-> interp_ctx' l result y z }
+    raises { OutOfBounds -> true }
+    requires { valid_eq' eq }
+    ensures { valid_eq' result }
+    ensures { forall y z. y = z -> ctx_holds' l y z
+              -> pos_eq' eq z -> pos_eq' result z }
+  = match eq with (a,b) -> (propagate_e a, propagate_e b) end
+  in
+  let rec propagate (acc:context') : context'
+    requires { ctx_bound' acc m }
+    requires { ctx_impl_ctx' l acc }
+    ensures { ctx_impl_ctx' l result }
+    variant { acc }
+    requires { valid_ctx' acc }
+    ensures  { valid_ctx' result }
+    ensures { forall y z. y = z -> ctx_holds' l y z
+              -> pos_ctx' acc z -> pos_ctx' result z }
+    raises { OutOfBounds -> true }
+  = match acc with
+     | Nil -> Nil
+     | Cons h t ->
+       let h' = propagate_eq h in
+       let t' = propagate t in
+       Cons h' t'
+    end
+  in
+  propagate l, propagate_eq g
+
+  use LinearDecisionRationalMP as R
+
+  let prop_mp_decision (l:context') (g:equality') : bool
+    requires { valid_ctx' l }
+    requires { valid_eq' g }
+    ensures { forall y z. result ->  pos_ctx' l z -> pos_eq' g z
+                          -> y = z -> interp_ctx' l g y z }
+    raises { | OutOfBounds -> true | E.Unknown -> true
+             | E.Q.Unknown -> true | R.Absurd -> true}
+  = let l', g' = prop_ctx l g in
+    mp_decision l' g'
 
 end
 

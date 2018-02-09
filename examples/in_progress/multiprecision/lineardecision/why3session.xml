@@ -2599,7 +2599,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="LinearDecisionIntMP" proved="true" sum="3c4d4e0c4648780078dd2690cd550e95">
+<theory name="LinearDecisionIntMP" proved="true" sum="18892c11ded1939c80cebe2acad43ce7">
  <goal name="VC mpzero" expl="VC for mpzero" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2699,47 +2699,22 @@
  </goal>
  <goal name="VC m" expl="VC for m" proved="true">
  <transf name="split_goal_wp" proved="true" >
-  <goal name="VC m.0" expl="assertion" proved="true">
+  <goal name="VC m.0" expl="postcondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
-   <goal name="VC m.0.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.06"/></proof>
-   </goal>
-   <goal name="VC m.0.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="1.84"/></proof>
-   </goal>
-   <goal name="VC m.0.2" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.08" steps="74"/></proof>
-   </goal>
-   <goal name="VC m.0.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="VC m.0.4" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.08" steps="35"/></proof>
-   </goal>
-   <goal name="VC m.0.5" expl="VC for m" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="20"/></proof>
+   <goal name="VC m.0.0" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="3.15"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC m.1" expl="postcondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="VC m.1.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
-   </goal>
-   <goal name="VC m.1.1" expl="postcondition" proved="true">
-   <transf name="compute_in_goal" proved="true" >
-    <goal name="VC m.1.1.0" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.06" steps="68"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="VC m.1.2" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="92"/></proof>
-   </goal>
-   <goal name="VC m.1.3" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.12" steps="98"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="86"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="VC m.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="90"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2761,7 +2736,7 @@
  </goal>
  <goal name="VC m_eq" expl="VC for m_eq" proved="true">
  <proof prover="1"><result status="valid" time="0.30"/></proof>
- <proof prover="2"><result status="valid" time="0.38"/></proof>
+ <proof prover="2"><result status="valid" time="0.60"/></proof>
  </goal>
  <goal name="VC m_ctx" expl="VC for m_ctx" proved="true">
  <proof prover="0"><result status="valid" time="0.09" steps="492"/></proof>
@@ -2770,7 +2745,811 @@
  <proof prover="2"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
-<theory name="TestMP" proved="true" sum="772ba346049009c99e431140871e0a1c">
+<theory name="EqPropMP" proved="true" sum="ec6ea2aefdf89e144853eeeb91be979e">
+ <goal name="VC expr_bound&#39;" expl="VC for expr_bound'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC expr_bound&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="VC expr_bound&#39;.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.35"/></proof>
+  </goal>
+  <goal name="VC expr_bound&#39;.2" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="VC expr_bound&#39;.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="VC expr_bound&#39;.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="VC expr_bound&#39;.5" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.35"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC eq_bound&#39;" expl="VC for eq_bound'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+ </transf>
+ </goal>
+ <goal name="VC ctx_bound&#39;" expl="VC for ctx_bound'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+ </transf>
+ </goal>
+ <goal name="VC expr_bound_w&#39;" expl="VC for expr_bound_w'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC expr_bound_w&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="33"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="34"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.6" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.8" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.9" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.43"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.11" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="34"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.12" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.13" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.15" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.16" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="VC expr_bound_w&#39;.18" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="199"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="eq_bound_w&#39;" proved="true">
+ <proof prover="0"><result status="valid" time="0.09" steps="69"/></proof>
+ </goal>
+ <goal name="VC ctx_bound_w&#39;" expl="VC for ctx_bound_w'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC ctx_bound_w&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="VC ctx_bound_w&#39;.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="34"/></proof>
+  </goal>
+  <goal name="VC ctx_bound_w&#39;.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC ctx_bound_w&#39;.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="75"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_var&#39;" expl="VC for max_var'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_var&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.2" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.40"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.6" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.42"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.8" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.10" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.12" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="VC max_var&#39;.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="297"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_var_e&#39;" expl="VC for max_var_e'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_var_e&#39;.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="VC max_var_e&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var_e&#39;.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var_e&#39;.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.41"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_var_ctx&#39;" expl="VC for max_var_ctx'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_var_ctx&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC max_var_ctx&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC max_var_ctx&#39;.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC max_var_ctx&#39;.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.39"/></proof>
+  </goal>
+  <goal name="VC max_var_ctx&#39;.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="131"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_ctx_valid&#39;" expl="VC for interp_ctx_valid'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_ctx_valid&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC interp_ctx_valid&#39;.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_ctx_wr&#39;" expl="VC for interp_ctx_wr'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_ctx_wr&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="VC interp_ctx_wr&#39;.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="134"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_ctx_wl&#39;" expl="VC for interp_ctx_wl'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_ctx_wl&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.25"/></proof>
+  </goal>
+  <goal name="VC interp_ctx_wl&#39;.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.56"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_ctx_cons&#39;" expl="VC for interp_ctx_cons'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_ctx_cons&#39;.0" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC holds_interp_ctx&#39;" expl="VC for holds_interp_ctx'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC holds_interp_ctx&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="VC holds_interp_ctx&#39;.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="44"/></proof>
+  </goal>
+  <goal name="VC holds_interp_ctx&#39;.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.43"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_holds&#39;" expl="VC for interp_holds'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_holds&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC interp_holds&#39;.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="60"/></proof>
+  </goal>
+  <goal name="VC interp_holds&#39;.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="36"/></proof>
+  </goal>
+  <goal name="VC interp_holds&#39;.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC impl_holds&#39;" expl="VC for impl_holds'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC impl_holds&#39;.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="57"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.2" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="37"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC impl_holds&#39;.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="58"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC ctx_impl&#39;" expl="VC for ctx_impl'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC ctx_impl&#39;.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC ctx_impl&#39;.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC interp_ctx_impl&#39;" expl="VC for interp_ctx_impl'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC interp_ctx_impl&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC interp_ctx_impl&#39;.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC interp_ctx_impl&#39;.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC impl_cons" expl="VC for impl_cons" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC impl_cons.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC impl_wl&#39;" expl="VC for impl_wl'" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC impl_wl&#39;.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC impl_wl&#39;.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="34"/></proof>
+  </goal>
+  <goal name="VC impl_wl&#39;.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="118"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC impl_self" expl="VC for impl_self" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC impl_self.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC impl_self.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC impl_self.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="122"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC prop_ctx" expl="VC for prop_ctx" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC prop_ctx.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.2" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.40"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.45"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.5" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.6" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.30" steps="736"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="148"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="421"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.10" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="362"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.11" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.29" steps="429"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.12" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="142"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.13" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="386"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.14" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="348"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.15" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.58" steps="3613"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.16" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="142"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.17" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="386"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.18" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="348"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.19" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="1.61" steps="3534"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="207"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.21" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.22" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.23" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.24" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.25" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="56"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.26" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.27" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.28" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.29" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.30" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.54"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.31" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.32" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.41"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.33" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.39"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.34" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="59"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.35" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.36" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.37" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.47"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.38" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.43"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.39" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="61"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.40" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.41" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.42" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.42"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.43" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="59"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.44" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.45" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.46" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.47" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="98"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.48" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="72"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.49" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.50" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.51" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.52" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="140"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.53" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="65"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.54" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.55" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.56" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.48"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.57" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="65"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.58" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="130"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.59" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.60" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.61" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.62" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.63" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.64" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.42"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.65" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.66" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.67" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="115"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.68" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.69" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="155"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.70" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.71" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.72" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.45"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.73" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.74" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.75" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.93" steps="243"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.76" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.77" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="155"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.78" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.79" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.80" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.81" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.82" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.83" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.48"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.84" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="51"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.85" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.86" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="117"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.87" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.88" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="165"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.89" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.90" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.91" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.92" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="50"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.93" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.94" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.45"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.95" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="51"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.96" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.97" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="201"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.98" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.99" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="165"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.100" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.101" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.102" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.103" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.104" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="72"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.105" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.106" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.107" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.108" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.109" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.110" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.62"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.111" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.112" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.113" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.114" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.115" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.116" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.117" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.118" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="55"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.119" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.120" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.121" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="55"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.122" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="56"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.123" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.124" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="111"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.125" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.126" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="179"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.127" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.128" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.129" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.130" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.131" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.132" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.133" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.134" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.135" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.136" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_ctx.137" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC prop_mp_decision" expl="VC for prop_mp_decision" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC prop_mp_decision.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.5" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.6" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.7" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC prop_mp_decision.8" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestMP" proved="true" sum="54b0a67931669fb32f854c77e4210ef4">
  <goal name="g" proved="true">
  <transf name="reflection_f" proved="true" arg1="mp_decision">
   <goal name="g.0" expl="reification check" proved="true">
@@ -2780,7 +3559,7 @@
   <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="g.2" proved="true">
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.28"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2792,10 +3571,10 @@
    <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
    </goal>
    <goal name="g&#39;.0.1" proved="true">
-   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   <proof prover="2"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="g&#39;.0.2" proved="true">
-   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   <proof prover="2"><result status="valid" time="0.25"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2811,10 +3590,10 @@
     <proof prover="0"><result status="valid" time="0.04" steps="29"/></proof>
     </goal>
     <goal name="g&#39;&#39;.0.0.1" proved="true">
-    <proof prover="2"><result status="valid" time="0.12"/></proof>
+    <proof prover="2"><result status="valid" time="0.27"/></proof>
     </goal>
     <goal name="g&#39;&#39;.0.0.2" proved="true">
-    <proof prover="2"><result status="valid" time="0.11"/></proof>
+    <proof prover="2"><result status="valid" time="0.28"/></proof>
     </goal>
    </transf>
    </goal>
