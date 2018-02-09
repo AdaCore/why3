@@ -163,6 +163,8 @@ AC_PROG_CC
 AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
+AC_DEFUN([AX_VERSION_GE], [AS_VERSION_COMPARE([$1],[$2],[$4],[$3],[$3])])
+
 # Check for Ocaml compilers
 
 # we first look for ocamlc in the path; if not present, we fail
@@ -175,10 +177,8 @@ fi
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
-case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.[[0-2]])
-        AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher);;
-esac
+AX_VERSION_GE([$OCAMLVERSION], 4.02.3, [],
+  [AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher.)])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
@@ -281,10 +281,8 @@ if test "$MENHIR" = no ; then
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
-case "$MENHIRVERSION" in
-   200*|201[[0-4]]*|20150[[1-5]]*)
-      AC_MSG_ERROR(You need Menhir 20150629 or higher.);;
-esac
+AX_VERSION_GE([$MENHIRVERSION], 20150629, [],
+  [AC_MSG_ERROR(You need Menhir 20150629 or higher.)])
 
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
