@@ -10,8 +10,8 @@ module Choice
   (* Axiom of choice : we can explicitely pick an element whom
      existence is proven. *)
   
-  function choice (p:pred 'a) : 'a
-  axiom choice_behaviour : forall p:pred 'a,x:'a.
+  function choice (p: 'a -> bool) : 'a
+  axiom choice_behaviour : forall p: 'a -> bool, x: 'a.
     p x -> p (choice p)
   
 end
