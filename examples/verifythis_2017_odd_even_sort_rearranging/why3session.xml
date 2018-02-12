@@ -5,1224 +5,376 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2017_odd_even_sort_rearranging.mlw" expanded="true">
-<theory name="Top" sum="35ab5bd0a5a6e5c277ad0fdb15cf562a" expanded="true">
- <goal name="VC array_max" expl="VC for array_max">
- <transf name="split_goal_wp">
-  <goal name="VC array_max.1" expl="postcondition">
+<file name="../verifythis_2017_odd_even_sort_rearranging.mlw" proved="true">
+<theory name="Top" proved="true" sum="dcfdae99dfc2d4018614b1dba0f478fc">
+ <goal name="VC array_max" expl="VC for array_max" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC array_max.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="VC array_max.2" expl="index in array bounds">
+  <goal name="VC array_max.1" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC array_max.3" expl="loop invariant init">
+  <goal name="VC array_max.2" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC array_max.4" expl="loop invariant init">
+  <goal name="VC array_max.3" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC array_max.5" expl="index in array bounds">
+  <goal name="VC array_max.4" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC array_max.6" expl="index in array bounds">
+  <goal name="VC array_max.5" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC array_max.7" expl="loop variant decrease">
+  <goal name="VC array_max.6" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC array_max.8" expl="loop invariant preservation">
+  <goal name="VC array_max.7" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC array_max.9" expl="loop invariant preservation">
+  <goal name="VC array_max.8" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC array_max.10" expl="loop variant decrease">
+  <goal name="VC array_max.9" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC array_max.11" expl="loop invariant preservation">
+  <goal name="VC array_max.10" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC array_max.12" expl="loop invariant preservation">
+  <goal name="VC array_max.11" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC array_max.13" expl="postcondition">
+  <goal name="VC array_max.12" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="aux_pos" expl="">
- <proof prover="1"><result status="valid" time="0.12"/></proof>
+ <goal name="aux_pos" proved="true">
+ <proof prover="1"><result status="valid" time="0.56"/></proof>
  </goal>
- <goal name="VC entropy_pos" expl="VC for entropy_pos">
- <transf name="split_goal_wp">
-  <goal name="VC entropy_pos.1" expl="variant decrease">
+ <goal name="VC entropy_pos" expl="VC for entropy_pos" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC entropy_pos.0" expl="variant decrease" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC entropy_pos.2" expl="precondition">
+  <goal name="VC entropy_pos.1" expl="precondition" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC entropy_pos.3" expl="precondition">
+  <goal name="VC entropy_pos.2" expl="precondition" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC entropy_pos.4" expl="assertion">
+  <goal name="VC entropy_pos.3" expl="assertion" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="VC entropy_pos.5" expl="assertion">
+  <goal name="VC entropy_pos.4" expl="assertion" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC entropy_pos.6" expl="postcondition">
+  <goal name="VC entropy_pos.5" expl="postcondition" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC decompose_entropy" expl="VC for decompose_entropy">
- <transf name="split_goal_wp">
-  <goal name="VC decompose_entropy.1" expl="postcondition">
+ <goal name="VC decompose_entropy" expl="VC for decompose_entropy" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC decompose_entropy.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.2" expl="precondition">
+  <goal name="VC decompose_entropy.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.3" expl="precondition">
+  <goal name="VC decompose_entropy.2" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.4" expl="precondition">
+  <goal name="VC decompose_entropy.3" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.5" expl="precondition">
+  <goal name="VC decompose_entropy.4" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.6" expl="postcondition">
+  <goal name="VC decompose_entropy.5" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC inst_ext" expl="VC for inst_ext">
- <transf name="split_goal_wp">
-  <goal name="VC inst_ext.1" expl="assertion">
+ <goal name="VC inst_ext" expl="VC for inst_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC inst_ext.0" expl="assertion" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC inst_ext.2" expl="postcondition">
+  <goal name="VC inst_ext.1" expl="postcondition" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.19" steps="205"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC my_swap" expl="VC for my_swap">
- <transf name="split_goal_wp">
-  <goal name="VC my_swap.1" expl="precondition">
+ <goal name="VC my_swap" expl="VC for my_swap" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC my_swap.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC my_swap.2" expl="precondition">
+  <goal name="VC my_swap.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC my_swap.3" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC my_swap.3.1" expl="VC for my_swap">
+  <goal name="VC my_swap.2" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC my_swap.2.0" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
    </goal>
-   <goal name="VC my_swap.3.2" expl="VC for my_swap">
+   <goal name="VC my_swap.2.1" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
-   <goal name="VC my_swap.3.3" expl="VC for my_swap">
+   <goal name="VC my_swap.2.2" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="VC my_swap.3.4" expl="VC for my_swap">
+   <goal name="VC my_swap.2.3" expl="VC for my_swap" proved="true">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="bool" ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="tuple0" ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="unit" ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="map" arity="2" id="map" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="map"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="ref" ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="infix =" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="infix @" ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
-    <ls_pos name="set" id="set" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="zero" id="zero" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="one" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="prefix -" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="infix +" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="infix *" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="infix &gt;=" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="abs" id="abs" ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="abs"/>
-    </ls_pos>
-    <ls_pos name="div" id="div" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="div"/>
-    </ls_pos>
-    <ls_pos name="mod" id="mod" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="mod"/>
-    </ls_pos>
-    <ls_pos name="sum" id="sum" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum"/>
-    </ls_pos>
-    <ls_pos name="map_eq_sub" id="map_eq_sub" ip_theory="MapEq">
-     <ip_library name="map"/>
-     <ip_qualid name="map_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="occ" id="occ" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ"/>
-    </ls_pos>
-    <ls_pos name="permut" id="permut" ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut"/>
-    </ls_pos>
-    <ls_pos name="elts" id="elts" ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="elts"/>
-    </ls_pos>
-    <ls_pos name="length" id="length" ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="length"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]1" ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="sorted_sub" id="sorted_sub" ip_theory="IntArraySorted">
-     <ip_library name="array"/>
-     <ip_qualid name="M"/>
-     <ip_qualid name="sorted_sub"/>
-    </ls_pos>
-    <ls_pos name="sorted_sub" id="sorted_sub1" ip_theory="IntArraySorted">
-     <ip_library name="array"/>
-     <ip_qualid name="sorted_sub"/>
-    </ls_pos>
-    <ls_pos name="sorted" id="sorted" ip_theory="IntArraySorted">
-     <ip_library name="array"/>
-     <ip_qualid name="sorted"/>
-    </ls_pos>
-    <ls_pos name="array_eq_sub" id="array_eq_sub" ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="array_eq" id="array_eq" ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq"/>
-    </ls_pos>
-    <ls_pos name="permut" id="permut1" ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut"/>
-    </ls_pos>
-    <ls_pos name="permut_sub" id="permut_sub" ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub"/>
-    </ls_pos>
-    <ls_pos name="permut_all" id="permut_all" ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_all"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="prefix !" ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="even" id="even" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even"/>
-    </ls_pos>
-    <ls_pos name="odd" id="odd" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="odd"/>
-    </ls_pos>
-    <ls_pos name="array_max" id="array_max" ip_theory="Top">
-     <ip_qualid name="array_max"/>
-    </ls_pos>
-    <ls_pos name="entropy" id="entropy" ip_theory="Top">
-     <ip_qualid name="entropy"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="Assoc" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="Unit_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="Unit_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="Inv_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="Inv_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="Assoc1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulAssoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulComm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="Unitary" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="Refl" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="Trans" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="Antisymm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="Total" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Abs_le" id="Abs_le" ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_le"/>
-    </pr_pos>
-    <pr_pos name="Abs_pos" id="Abs_pos" ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_mod" id="Div_mod" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mod"/>
-    </pr_pos>
-    <pr_pos name="Div_bound" id="Div_bound" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_bound"/>
-    </pr_pos>
-    <pr_pos name="Mod_bound" id="Mod_bound" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_bound"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_pos" id="Div_sign_pos"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_neg" id="Div_sign_neg"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_pos" id="Mod_sign_pos"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_neg" id="Mod_sign_neg"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Rounds_toward_zero" id="Rounds_toward_zero"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Rounds_toward_zero"/>
-    </pr_pos>
-    <pr_pos name="Div_1" id="Div_1" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_1"/>
-    </pr_pos>
-    <pr_pos name="Mod_1" id="Mod_1" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_1"/>
-    </pr_pos>
-    <pr_pos name="Div_inf" id="Div_inf" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_inf"/>
-    </pr_pos>
-    <pr_pos name="Mod_inf" id="Mod_inf" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_inf"/>
-    </pr_pos>
-    <pr_pos name="Div_mult" id="Div_mult" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mult"/>
-    </pr_pos>
-    <pr_pos name="Mod_mult" id="Mod_mult" ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_mult"/>
-    </pr_pos>
-    <pr_pos name="sum_def" id="sum_def" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_def"/>
-    </pr_pos>
-    <pr_pos name="sum_left" id="sum_left" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_left"/>
-    </pr_pos>
-    <pr_pos name="sum_ext" id="sum_ext" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_ext"/>
-    </pr_pos>
-    <pr_pos name="sum_le" id="sum_le" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_le"/>
-    </pr_pos>
-    <pr_pos name="sum_zero" id="sum_zero" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_zero"/>
-    </pr_pos>
-    <pr_pos name="sum_nonneg" id="sum_nonneg" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_nonneg"/>
-    </pr_pos>
-    <pr_pos name="sum_decomp" id="sum_decomp" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="sum_decomp"/>
-    </pr_pos>
-    <pr_pos name="shift_left" id="shift_left" ip_theory="Sum">
-     <ip_library name="int"/>
-     <ip_qualid name="shift_left"/>
-    </pr_pos>
-    <pr_pos name="exchange_set" id="exchange_set" ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange_set"/>
-    </pr_pos>
-    <pr_pos name="occ_empty" id="occ_empty" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_empty"/>
-    </pr_pos>
-    <pr_pos name="occ_right_no_add" id="occ_right_no_add" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_right_add" id="occ_right_add" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_add"/>
-    </pr_pos>
-    <pr_pos name="occ_left_no_add" id="occ_left_no_add" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_left_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_left_add" id="occ_left_add" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_left_add"/>
-    </pr_pos>
-    <pr_pos name="occ_bounds" id="occ_bounds" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_bounds"/>
-    </pr_pos>
-    <pr_pos name="occ_append" id="occ_append" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_append"/>
-    </pr_pos>
-    <pr_pos name="occ_neq" id="occ_neq" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_neq"/>
-    </pr_pos>
-    <pr_pos name="occ_exists" id="occ_exists" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exists"/>
-    </pr_pos>
-    <pr_pos name="occ_pos" id="occ_pos" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_pos"/>
-    </pr_pos>
-    <pr_pos name="occ_eq" id="occ_eq" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_eq"/>
-    </pr_pos>
-    <pr_pos name="occ_exchange" id="occ_exchange" ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exchange"/>
-    </pr_pos>
-    <pr_pos name="permut_trans" id="permut_trans" ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_trans"/>
-    </pr_pos>
-    <pr_pos name="permut_exists" id="permut_exists" ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_exists"/>
-    </pr_pos>
-    <pr_pos name="array&apos;invariant" id="array&apos;invariant"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="array&apos;invariant"/>
-    </pr_pos>
-    <pr_pos name="mixfix [&lt;-]_spec" id="mixfix [&lt;-]_spec"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]_spec"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_sub" id="exchange_permut_sub"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_sub"/>
-    </pr_pos>
-    <pr_pos name="permut_sub_weakening" id="permut_sub_weakening"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub_weakening"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_all" id="exchange_permut_all"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_all"/>
-    </pr_pos>
-    <pr_pos name="even_or_odd" id="even_or_odd" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_or_odd"/>
-    </pr_pos>
-    <pr_pos name="even_not_odd" id="even_not_odd" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_not_odd"/>
-    </pr_pos>
-    <pr_pos name="odd_not_even" id="odd_not_even" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="odd_not_even"/>
-    </pr_pos>
-    <pr_pos name="even_odd" id="even_odd" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_odd"/>
-    </pr_pos>
-    <pr_pos name="odd_even" id="odd_even" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="odd_even"/>
-    </pr_pos>
-    <pr_pos name="even_even" id="even_even" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_even"/>
-    </pr_pos>
-    <pr_pos name="odd_odd" id="odd_odd" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="odd_odd"/>
-    </pr_pos>
-    <pr_pos name="even_2k" id="even_2k" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_2k"/>
-    </pr_pos>
-    <pr_pos name="odd_2k1" id="odd_2k1" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="odd_2k1"/>
-    </pr_pos>
-    <pr_pos name="even_mod2" id="even_mod2" ip_theory="Parity">
-     <ip_library name="number"/>
-     <ip_qualid name="even_mod2"/>
-    </pr_pos>
-    <pr_pos name="array_max_spec" id="array_max_spec" ip_theory="Top">
-     <ip_qualid name="array_max_spec"/>
-    </pr_pos>
-    <pr_pos name="aux_pos" id="aux_pos" ip_theory="Top">
-     <ip_qualid name="aux_pos"/>
-    </pr_pos>
-    <pr_pos name="entropy_pos" id="entropy_pos" ip_theory="Top">
-     <ip_qualid name="entropy_pos"/>
-    </pr_pos>
-    <pr_pos name="decompose_entropy" id="decompose_entropy" ip_theory="Top">
-     <ip_qualid name="decompose_entropy"/>
-    </pr_pos>
-    <pr_pos name="inst_ext" id="inst_ext" ip_theory="Top">
-     <ip_qualid name="inst_ext"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix ="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix @"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="set"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="zero"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="one"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="prefix -"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix +"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix *"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &lt;"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &gt;="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="abs"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="div"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mod"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="sum"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="map_eq_sub"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="occ"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="permut"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="elts"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="length"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="sorted_sub"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="sorted_sub1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="sorted"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="array_eq_sub"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="array_eq"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="permut1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="permut_sub"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="permut_all"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="prefix !"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="even"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="odd"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="array_max"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="entropy"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unitary"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="NonTrivialRing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Refl"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Trans"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Antisymm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Total"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="ZeroLessOne"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderAdd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderMult"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Abs_le"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Abs_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_mod"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_bound"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_bound"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_sign_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_sign_neg"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_sign_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_sign_neg"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Rounds_toward_zero"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_inf"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_inf"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Div_mult"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mod_mult"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_def"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_left"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_ext"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_le"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_zero"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_nonneg"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="sum_decomp"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="shift_left"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="exchange_set"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_empty"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_right_no_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_right_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_left_no_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_left_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_bounds"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_append"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_neq"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_exists"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_eq"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="occ_exchange"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="permut_trans"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="permut_exists"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="array&apos;invariant"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="mixfix [&lt;-]_spec"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="exchange_permut_sub"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="permut_sub_weakening"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="exchange_permut_all"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_or_odd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_not_odd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="odd_not_even"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_odd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="odd_even"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_even"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="odd_odd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_2k"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="odd_2k1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="even_mod2"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="array_max_spec"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="aux_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="entropy_pos"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="decompose_entropy"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="inst_ext"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="real"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="bool"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="tuple0"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="unit"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="map"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="ref"/>
-    </meta>
-    <goal name="VC my_swap.3.4" expl="VC for my_swap">
-    <transf name="eliminate_builtin">
-     <goal name="VC my_swap.3.4.1" expl="VC for my_swap">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
-     <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.08"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
    </goal>
-   <goal name="VC my_swap.3.5" expl="VC for my_swap">
+   <goal name="VC my_swap.2.4" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC my_swap.4" expl="precondition">
+  <goal name="VC my_swap.3" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="VC my_swap.5" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC my_swap.5.1" expl="VC for my_swap">
+  <goal name="VC my_swap.4" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC my_swap.4.0" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="16"/></proof>
    </goal>
-   <goal name="VC my_swap.5.2" expl="VC for my_swap">
+   <goal name="VC my_swap.4.1" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
    </goal>
-   <goal name="VC my_swap.5.3" expl="VC for my_swap">
+   <goal name="VC my_swap.4.2" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
-   <goal name="VC my_swap.5.4" expl="VC for my_swap">
+   <goal name="VC my_swap.4.3" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.5" expl="VC for my_swap">
+   <goal name="VC my_swap.4.4" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.6" expl="VC for my_swap">
+   <goal name="VC my_swap.4.5" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.7" expl="VC for my_swap">
+   <goal name="VC my_swap.4.6" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
-   <goal name="VC my_swap.5.8" expl="VC for my_swap">
+   <goal name="VC my_swap.4.7" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC my_swap.6" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.76" steps="58"/></proof>
+  <goal name="VC my_swap.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.50" steps="58"/></proof>
   </goal>
-  <goal name="VC my_swap.7" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.77" steps="56"/></proof>
+  <goal name="VC my_swap.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.52" steps="56"/></proof>
   </goal>
-  <goal name="VC my_swap.8" expl="precondition">
-  <proof prover="2"><result status="valid" time="4.85" steps="56"/></proof>
+  <goal name="VC my_swap.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="4.10" steps="56"/></proof>
   </goal>
-  <goal name="VC my_swap.9" expl="postcondition">
+  <goal name="VC my_swap.8" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC my_swap.10" expl="postcondition">
+  <goal name="VC my_swap.9" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC local_order_implies_sort_sub" expl="VC for local_order_implies_sort_sub">
- <transf name="split_goal_wp">
-  <goal name="VC local_order_implies_sort_sub.1" expl="variant decrease">
+ <goal name="VC local_order_implies_sort_sub" expl="VC for local_order_implies_sort_sub" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC local_order_implies_sort_sub.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.2" expl="precondition">
+  <goal name="VC local_order_implies_sort_sub.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.3" expl="precondition">
+  <goal name="VC local_order_implies_sort_sub.2" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.4" expl="assertion">
+  <goal name="VC local_order_implies_sort_sub.3" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.5" expl="postcondition">
+  <goal name="VC local_order_implies_sort_sub.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC odd_even_sort" expl="VC for odd_even_sort">
- <transf name="split_goal_wp">
-  <goal name="VC odd_even_sort.1" expl="loop invariant init">
+ <goal name="VC odd_even_sort" expl="VC for odd_even_sort" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC odd_even_sort.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.2" expl="loop invariant init">
+  <goal name="VC odd_even_sort.1" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.3" expl="loop invariant init">
+  <goal name="VC odd_even_sort.2" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.4" expl="loop invariant init">
+  <goal name="VC odd_even_sort.3" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.5" expl="loop invariant init">
+  <goal name="VC odd_even_sort.4" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.6" expl="loop invariant init">
+  <goal name="VC odd_even_sort.5" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.7" expl="loop invariant init">
+  <goal name="VC odd_even_sort.6" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.8" expl="loop invariant init">
+  <goal name="VC odd_even_sort.7" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.9" expl="index in array bounds">
+  <goal name="VC odd_even_sort.8" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.10" expl="index in array bounds">
+  <goal name="VC odd_even_sort.9" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.11" expl="precondition">
+  <goal name="VC odd_even_sort.10" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.12" expl="precondition">
+  <goal name="VC odd_even_sort.11" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.13" expl="loop variant decrease">
+  <goal name="VC odd_even_sort.12" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.14" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.13" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.09" steps="259"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.15" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.14" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.16" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.15" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.17" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.16" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.18" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.17" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.19" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.18" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.20" expl="loop variant decrease">
+  <goal name="VC odd_even_sort.19" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.21" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.20" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.22" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.21" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.23" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.22" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.24" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.23" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.25" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.24" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.26" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.25" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.27" expl="loop invariant init">
+  <goal name="VC odd_even_sort.26" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.28" expl="loop invariant init">
+  <goal name="VC odd_even_sort.27" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.29" expl="loop invariant init">
+  <goal name="VC odd_even_sort.28" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.30" expl="loop invariant init">
+  <goal name="VC odd_even_sort.29" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.31" expl="loop invariant init">
+  <goal name="VC odd_even_sort.30" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.32" expl="loop invariant init">
+  <goal name="VC odd_even_sort.31" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.10" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.33" expl="loop invariant init">
+  <goal name="VC odd_even_sort.32" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.34" expl="index in array bounds">
+  <goal name="VC odd_even_sort.33" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.35" expl="index in array bounds">
+  <goal name="VC odd_even_sort.34" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.36" expl="precondition">
+  <goal name="VC odd_even_sort.35" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.37" expl="precondition">
+  <goal name="VC odd_even_sort.36" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.38" expl="loop variant decrease">
+  <goal name="VC odd_even_sort.37" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.39" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.38" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.26" steps="373"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.40" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.39" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.41" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.40" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.42" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.41" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.43" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.42" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.10" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.44" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.43" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.45" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.44" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.46" expl="loop variant decrease">
+  <goal name="VC odd_even_sort.45" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.47" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.46" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.48" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.47" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.49" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.48" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.50" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.49" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.51" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.50" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.52" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.51" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.53" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.52" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.54" expl="loop variant decrease">
+  <goal name="VC odd_even_sort.53" expl="loop variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.55" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.54" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.56" expl="loop invariant preservation">
+  <goal name="VC odd_even_sort.55" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="1.73" steps="1802"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.57" expl="postcondition">
+  <goal name="VC odd_even_sort.56" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.58" expl="postcondition">
+  <goal name="VC odd_even_sort.57" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>

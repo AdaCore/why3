@@ -1248,9 +1248,9 @@ let collapse_proven_goals () =
 let () =
   let i = view_factory#add_item
             "Collapse proven goals"
-            ~key: GdkKeysyms._C
             ~callback:(fun () -> collapse_proven_goals ())
   in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
   i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
 
   let i = view_factory#add_item
@@ -1357,9 +1357,9 @@ let () =
 
   let i = view_factory#add_item
             "Expand all below node "
-            ~key:GdkKeysyms._E
             ~callback:(fun () -> expand_row ~all:true)
   in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E;
   i#misc#set_tooltip_markup "Expand all nodes of the tree view";
 
   let i = view_factory#add_item

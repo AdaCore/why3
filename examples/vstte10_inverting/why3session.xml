@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="30" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../vstte10_inverting.mlw" proved="true">
-<theory name="InvertingAnInjection" proved="true" sum="8b7fd916422a55e4335d0eb82e4c640d">
+<theory name="InvertingAnInjection" proved="true" sum="9b32790376ddb75d382681493a52fc8c">
  <goal name="VC inverting" expl="VC for inverting" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC inverting.0" expl="loop invariant init" proved="true">
@@ -24,7 +24,7 @@
   <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC inverting.4" expl="postcondition" proved="true">
-  <proof prover="6" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
+  <proof prover="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="VC inverting.5" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
@@ -54,7 +54,7 @@
    <proof prover="2" timelimit="10"><result status="valid" time="0.00" steps="7"/></proof>
    </goal>
    <goal name="VC inverting2.5.1" expl="VC for inverting2" proved="true">
-   <proof prover="6" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="0.39"/></proof>
+   <proof prover="0" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="0.39"/></proof>
    </goal>
    <goal name="VC inverting2.5.2" expl="VC for inverting2" proved="true">
    <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
@@ -70,7 +70,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Test" proved="true" sum="d971fbbbccb0cd37522be3ccfa26f33e">
+<theory name="Test" proved="true" sum="643b6a43aad1851ab86701dd92ec3eec">
  <goal name="VC test" expl="VC for test" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC test.0" expl="array creation size" proved="true">

@@ -146,11 +146,11 @@ module Compile_com
   meta rewrite_def function loop_invariant
 
   function loop_variant (c:com) (test:bexpr) : post 'a =
-    fun _ _ msj msi -> let VMS pj sj mj = msj in let VMS pi si mi = msi in
+    fun _ _ msj msi -> let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
        ceval mi c mj /\ beval mi test
   lemma loop_variant_lemma : forall c test,x:'a,p msj msi.
     loop_variant c test x p msj msi =
-      let VMS pj sj mj = msj in let VMS pi si mi = msi in
+      let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
       ceval mi c mj /\ beval mi test
   meta rewrite lemma loop_variant_lemma
 

@@ -72,6 +72,7 @@ run_dir double_wp "-L double_wp"
 run_dir avl "-L avl"
 run_dir foveoos11-cm
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
+run_dir WP_revisited
 echo ""
 
 echo "Score on ported programs : $success/$total"
@@ -80,7 +81,7 @@ echo ""
 echo "=== Programs that remain to be ported ==="
 echo ""
 run_dir to_port
-run_dir WP_revisited
+run_dir prover "-L prover --debug ignore_unused_vars"
 echo ""
 
 echo "=== Standard Library ==="
@@ -110,7 +111,6 @@ echo ""
 run_dir logic
 run_dir bitvectors "-L bitvectors"
 echo ""
-
 
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`

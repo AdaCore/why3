@@ -2,29 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../tortoise_and_hare.mlw" expanded="true">
-<theory name="TortoiseAndHare" sum="0f115aa19db42adfa5a102e578b43dba" expanded="true">
- <goal name="VC x0" expl="VC for x0">
- <transf name="split_goal_wp">
+<file name="../tortoise_and_hare.mlw" proved="true">
+<theory name="TortoiseAndHare" proved="true" sum="fd314625be83484821f1c350d0b4c874">
+ <goal name="VC x0" expl="VC for x0" proved="true">
+ <transf name="split_goal_wp" proved="true" >
  </transf>
  </goal>
- <goal name="cycle_induction" expl="">
- <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"><result status="valid" time="0.36"/></proof>
+ <goal name="cycle_induction" proved="true">
+ <proof prover="0" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"><result status="valid" time="0.36"/></proof>
  </goal>
- <goal name="VC tortoise_hare" expl="VC for tortoise_hare">
- <transf name="split_goal_wp">
-  <goal name="VC tortoise_hare.1" expl="loop invariant init">
+ <goal name="VC tortoise_hare" expl="VC for tortoise_hare" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC tortoise_hare.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="76"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC tortoise_hare.2" expl="loop variant decrease">
-  <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"><result status="valid" time="0.44"/></proof>
+  <goal name="VC tortoise_hare.1" expl="loop variant decrease" proved="true">
+  <proof prover="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"><result status="valid" time="0.44"/></proof>
   </goal>
-  <goal name="VC tortoise_hare.3" expl="loop invariant preservation">
-  <proof prover="1" timelimit="10" memlimit="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"><result status="valid" time="0.56"/></proof>
+  <goal name="VC tortoise_hare.2" expl="loop invariant preservation" proved="true">
+  <proof prover="0" timelimit="10" memlimit="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"><result status="valid" time="0.56"/></proof>
   </goal>
  </transf>
  </goal>

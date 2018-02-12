@@ -9,7 +9,7 @@
 <prover id="4" name="Z3" version="4.3.2" timelimit="60" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../sudoku_reloaded.mlw">
-<theory name="Grid" sum="328980bca6907861757055864cfa29a1">
+<theory name="Grid">
  <goal name="grid_eq_sub">
  <proof prover="5"><result status="valid" time="0.03" steps="14"/></proof>
  </goal>
@@ -20,7 +20,7 @@
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" sum="5b3bced86a36ca4a1d9a35b676b3eb00">
+<theory name="TheClassicalSudokuGrid">
  <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
  <transf name="split_goal_wp">
   <goal name="WP_parameter classical_sudoku.1" expl="1. integer overflow">
@@ -1156,7 +1156,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Solver" sum="90a5cba0dfc2acb64daf0916e73db25b">
+<theory name="Solver">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
  <transf name="split_goal_wp">
   <goal name="WP_parameter check_valid_chunk.1" expl="1. integer overflow">
@@ -1754,7 +1754,7 @@
  <proof prover="5"><result status="valid" time="0.13" steps="92"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="7db7aec6ae7938923728c6990a431933">
+<theory name="Test">
  <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>

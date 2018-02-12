@@ -7,7 +7,7 @@
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../generate_all_trees.mlw" proved="true">
-<theory name="GenerateAllTrees" proved="true" sum="b93e4f37f99ee1a8ba3f4c7dcec8bd17">
+<theory name="GenerateAllTrees" proved="true" sum="012f781402890ed42f17657fa1f6281b">
  <goal name="size_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="size_nonneg.0" proved="true">
@@ -55,10 +55,10 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC combine.1" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.02" steps="141"/></proof>
+  <proof prover="9"><result status="valid" time="0.02" steps="131"/></proof>
   </goal>
   <goal name="VC combine.2" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.28" steps="1378"/></proof>
+  <proof prover="9"><result status="valid" time="0.52" steps="2512"/></proof>
   </goal>
   <goal name="VC combine.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
@@ -73,7 +73,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC combine.7" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.14" steps="801"/></proof>
+  <proof prover="9"><result status="valid" time="0.37" steps="2097"/></proof>
   </goal>
   <goal name="VC combine.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.14"/></proof>
@@ -104,13 +104,13 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC all_trees.4" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.00" steps="170"/></proof>
+  <proof prover="9"><result status="valid" time="0.00" steps="168"/></proof>
   </goal>
   <goal name="VC all_trees.5" expl="loop invariant init" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="VC all_trees.6" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.01" steps="146"/></proof>
+  <proof prover="9"><result status="valid" time="0.01" steps="148"/></proof>
   </goal>
   <goal name="VC all_trees.7" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -128,25 +128,25 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC all_trees.12" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.04" steps="116"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC all_trees.13" expl="loop invariant preservation" proved="true">
   <proof prover="9"><result status="valid" time="0.05" steps="151"/></proof>
   </goal>
   <goal name="VC all_trees.14" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="1.21"/></proof>
+  <proof prover="2"><result status="valid" time="0.94"/></proof>
   </goal>
   <goal name="VC all_trees.15" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="9"><result status="valid" time="0.04" steps="175"/></proof>
   </goal>
   <goal name="VC all_trees.16" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC all_trees.17" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC all_trees.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

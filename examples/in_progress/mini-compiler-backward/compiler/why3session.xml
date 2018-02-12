@@ -7,8 +7,8 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<file name="../compiler.mlw" expanded="true">
-<theory name="Compile_aexpr" sum="fcc145758ffe9a1e86691f9ad4df7019">
+<file name="../compiler.mlw">
+<theory name="Compile_aexpr">
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_aexpr.1" expl="1. precondition">
@@ -281,7 +281,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Compile_bexpr" sum="2043df15111fb72f3650d432c0f44f2c">
+<theory name="Compile_bexpr">
  <goal name="WP_parameter compile_bexpr" expl="VC for compile_bexpr">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_bexpr.1" expl="1. precondition">
@@ -815,7 +815,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Compile_com" sum="d7806721690b8161988598ae2a606fd7" expanded="true">
+<theory name="Compile_com">
  <goal name="WP_parameter compile_com" expl="VC for compile_com">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_com.1" expl="1. precondition">

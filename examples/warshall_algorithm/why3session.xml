@@ -2,77 +2,77 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../warshall_algorithm.mlw" expanded="true">
-<theory name="WarshallAlgorithm" sum="a3dff1c028478f1ee872e245ca350094" expanded="true">
- <goal name="weakening" expl="">
- <transf name="induction_pr">
-  <goal name="weakening.1" expl="">
+<file name="../warshall_algorithm.mlw" proved="true">
+<theory name="WarshallAlgorithm" proved="true" sum="ecf4af3017216c8dd52091b722a10199">
+ <goal name="weakening" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="weakening.0" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="weakening.2" expl="">
+  <goal name="weakening.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="decomposition" expl="" expanded="true">
- <proof prover="0" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="0.93"/></proof>
+ <goal name="decomposition" proved="true">
+ <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="0.93"/></proof>
  </goal>
- <goal name="VC transitive_closure" expl="VC for transitive_closure" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC transitive_closure.1" expl="loop invariant init">
+ <goal name="VC transitive_closure" expl="VC for transitive_closure" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC transitive_closure.0" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="25"/></proof>
   </goal>
-  <goal name="VC transitive_closure.2" expl="loop invariant init">
+  <goal name="VC transitive_closure.1" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="33"/></proof>
   </goal>
-  <goal name="VC transitive_closure.3" expl="loop invariant init">
+  <goal name="VC transitive_closure.2" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="65"/></proof>
   </goal>
-  <goal name="VC transitive_closure.4" expl="index in matrix bounds">
+  <goal name="VC transitive_closure.3" expl="index in matrix bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC transitive_closure.5" expl="index in matrix bounds">
+  <goal name="VC transitive_closure.4" expl="index in matrix bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="VC transitive_closure.6" expl="index in matrix bounds">
+  <goal name="VC transitive_closure.5" expl="index in matrix bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC transitive_closure.7" expl="index in matrix bounds">
+  <goal name="VC transitive_closure.6" expl="index in matrix bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC transitive_closure.8" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC transitive_closure.8.1" expl="loop invariant preservation">
+  <goal name="VC transitive_closure.7" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC transitive_closure.7.0" expl="loop invariant preservation" proved="true">
    <proof prover="4"><result status="valid" time="0.30" steps="431"/></proof>
    </goal>
-   <goal name="VC transitive_closure.8.2" expl="loop invariant preservation">
+   <goal name="VC transitive_closure.7.1" expl="loop invariant preservation" proved="true">
    <proof prover="4"><result status="valid" time="0.03" steps="127"/></proof>
    </goal>
-   <goal name="VC transitive_closure.8.3" expl="loop invariant preservation">
+   <goal name="VC transitive_closure.7.2" expl="loop invariant preservation" proved="true">
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC transitive_closure.9" expl="loop invariant preservation">
+  <goal name="VC transitive_closure.8" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="85"/></proof>
   </goal>
-  <goal name="VC transitive_closure.10" expl="loop invariant preservation">
+  <goal name="VC transitive_closure.9" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC transitive_closure.11" expl="loop invariant preservation">
+  <goal name="VC transitive_closure.10" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC transitive_closure.12" expl="loop invariant preservation">
+  <goal name="VC transitive_closure.11" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC transitive_closure.13" expl="postcondition">
+  <goal name="VC transitive_closure.12" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC transitive_closure.14" expl="postcondition">
+  <goal name="VC transitive_closure.13" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>

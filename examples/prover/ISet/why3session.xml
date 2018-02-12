@@ -5,9 +5,9 @@
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../ISet.mlw">
-<theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Types">
 </theory>
-<theory name="Logic" sum="c17c500242761ed13e43d61096ad66ec">
+<theory name="Logic">
  <goal name="WP_parameter iset_ok_char" expl="VC for iset_ok_char">
  <transf name="split_goal_wp">
   <goal name="WP_parameter iset_ok_char.1" expl="postcondition">
@@ -25,7 +25,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" sum="867a9d1c228fff56b15db91e573f7f3e">
+<theory name="Impl">
  <goal name="WP_parameter insert" expl="VC for insert">
  <transf name="split_goal_wp">
   <goal name="WP_parameter insert.1" expl="postcondition">

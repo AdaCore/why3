@@ -6,7 +6,7 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../sumrange.mlw" proved="true">
-<theory name="ArraySum" proved="true" sum="84d42e79b8b31848d49798a8156db47f">
+<theory name="ArraySum" proved="true" sum="35530cac0d54573c3b9b0419e022b4af">
  <goal name="VC sum" expl="VC for sum" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -36,7 +36,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Simple" proved="true" sum="0288a09f92315e71ce34d53015fbd008">
+<theory name="Simple" proved="true" sum="536e63a588e47f5041939b9f8616f06a">
  <goal name="VC query" expl="VC for query" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC query.0" expl="loop invariant init" proved="true">
@@ -57,7 +57,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="ExtraLemmas" proved="true" sum="b82118e6c7e00e202e4dbffc0ebed6c9">
+<theory name="ExtraLemmas" proved="true" sum="ddab900ac444a25f6dac7438ba71f1e1">
  <goal name="sum_concat" proved="true">
  <transf name="induction" proved="true" arg1="k">
   <goal name="sum_concat.0" expl="base case" proved="true">
@@ -116,7 +116,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="CumulativeArray" proved="true" sum="85c99a62d707f3f333073fef33b2b93c">
+<theory name="CumulativeArray" proved="true" sum="dbfc0a756b3b0611a7e8df85b06d61fc">
  <goal name="VC create" expl="VC for create" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -127,7 +127,7 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="CumulativeTree" proved="true" sum="8f8c8d34a706bbdd983b837325c9383e">
+<theory name="CumulativeTree" proved="true" sum="bda92602ed6d9bd0fac959f9de0e0aea">
  <goal name="VC indexes" expl="VC for indexes" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -159,10 +159,10 @@
    <goal name="VC tree_of_array.7.0" expl="assertion" proved="true">
    <transf name="destruct_alg" proved="true" arg1="r">
     <goal name="VC tree_of_array.7.0.0" expl="assertion" proved="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <proof prover="3"><result status="valid" time="0.08"/></proof>
     </goal>
     <goal name="VC tree_of_array.7.0.1" expl="assertion" proved="true">
-    <proof prover="3"><result status="valid" time="0.08"/></proof>
+    <proof prover="3"><result status="valid" time="0.03"/></proof>
     </goal>
    </transf>
    </goal>
@@ -275,7 +275,7 @@
  </transf>
  </goal>
  <goal name="VC depth_is_log" expl="VC for depth_is_log" proved="true">
- <proof prover="1"><result status="valid" time="0.77" steps="881"/></proof>
+ <proof prover="1"><result status="valid" time="0.77" steps="889"/></proof>
  </goal>
  <goal name="VC update_aux_complexity" expl="VC for update_aux_complexity" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -307,7 +307,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC update_aux_complexity.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.13"/></proof>
+  <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC update_aux_complexity.10" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -328,7 +328,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC update_aux_complexity.16" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
  </transf>
  </goal>

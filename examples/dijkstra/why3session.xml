@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<file name="../dijkstra.mlw" proved="true">
+<theory name="DijkstraShortestPath" proved="true" sum="f43c8510648b244af89ea0c53249d555">
+ <goal name="VC relax" expl="VC for relax" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC relax.0" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC relax.1" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC relax.2" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC relax.3" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Length_nonneg" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="Length_nonneg.0" proved="true">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="Length_nonneg.1" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Path_inversion" proved="true">
+ <proof prover="7"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="Path_shortest_path" proved="true">
+ <transf name="induction" proved="true" arg1="d">
+  <goal name="Path_shortest_path.0" expl="base case" proved="true">
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="Path_shortest_path.1" expl="recursive case" proved="true">
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Main_lemma" proved="true">
+ <proof prover="7"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="Completeness_lemma" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="Completeness_lemma.0" proved="true">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="Completeness_lemma.1" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="inside_or_exit" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="inside_or_exit.0" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="inside_or_exit.1" proved="true">
+  <transf name="case" proved="true" arg1="(mem z s)">
+   <goal name="inside_or_exit.1.0" expl="true case" proved="true">
+   <proof prover="7"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="inside_or_exit.1.1" expl="false case" proved="true">
+   <proof prover="7"><result status="valid" time="0.65"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC shortest_path_code" expl="VC for shortest_path_code" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC shortest_path_code.0" expl="loop invariant init" proved="true">
+  <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="290"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.1" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.2" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.3" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.4" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.5" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.6" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="2.74"/></proof>
+  <proof prover="5"><result status="valid" time="1.46"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.7" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.8" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.9" expl="assertion" proved="true">
+  <transf name="destruct" proved="true" arg1="H">
+   <goal name="VC shortest_path_code.9.0" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC shortest_path_code.9.1" expl="assertion" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="107"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC shortest_path_code.10" expl="loop variant decrease" proved="true">
+  <proof prover="7"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.11" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.12" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="inv">
+   <goal name="VC shortest_path_code.12.0" expl="VC for shortest_path_code" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC shortest_path_code.12.0.0" expl="VC for shortest_path_code" proved="true">
+    <proof prover="7"><result status="valid" time="0.12"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.1" expl="VC for shortest_path_code" proved="true">
+    <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.56" steps="1316"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.2" expl="VC for shortest_path_code" proved="true">
+    <proof prover="7"><result status="valid" time="0.02"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.3" expl="VC for shortest_path_code" proved="true">
+    <proof prover="7"><result status="valid" time="0.13"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.4" expl="VC for shortest_path_code" proved="true">
+    <proof prover="7"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.5" expl="VC for shortest_path_code" proved="true">
+    <proof prover="8"><result status="valid" time="1.44" steps="2783"/></proof>
+    </goal>
+    <goal name="VC shortest_path_code.12.0.6" expl="VC for shortest_path_code" proved="true">
+    <transf name="case" proved="true" arg1="(v = v1)">
+     <goal name="VC shortest_path_code.12.0.6.0" expl="true case" proved="true">
+     <proof prover="4" memlimit="2000"><result status="valid" time="2.10" steps="2672"/></proof>
+     </goal>
+     <goal name="VC shortest_path_code.12.0.6.1" expl="false case" proved="true">
+     <proof prover="8"><result status="valid" time="0.96" steps="2031"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC shortest_path_code.13" expl="loop invariant preservation" proved="true">
+  <proof prover="8" timelimit="5" memlimit="2000"><result status="valid" time="3.98" steps="11623"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.14" expl="loop variant decrease" proved="true">
+  <proof prover="7"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.15" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.16" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.17" expl="loop invariant preservation" proved="true">
+  <transf name="cut" proved="true" arg1="(inv_succ src visited q d)">
+   <goal name="VC shortest_path_code.17.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC shortest_path_code.17.1" proved="true">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC shortest_path_code.18" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC shortest_path_code.19" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.46"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

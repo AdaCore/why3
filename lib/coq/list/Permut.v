@@ -22,9 +22,9 @@ Require list.Reverse.
 Require list.NumOcc.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (l1:(list a))
-  (l2:(list a)): Prop := forall (x:a), ((list.NumOcc.num_occ x
-  l1) = (list.NumOcc.num_occ x l2)).
+Definition permut {a:Type} {a_WT:WhyType a} (l1:(list a)) (l2:(list a)) :
+    Prop :=
+  forall (x:a), ((list.NumOcc.num_occ x l1) = (list.NumOcc.num_occ x l2)).
 
 (* Why3 goal *)
 Lemma Permut_refl {a:Type} {a_WT:WhyType a} :

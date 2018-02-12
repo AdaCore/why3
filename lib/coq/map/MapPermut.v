@@ -19,9 +19,9 @@ Require map.Map.
 Require map.Occ.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (m1:(Z -> a)) (m2:(Z -> a)) (l:Z)
-  (u:Z): Prop := forall (v:a), ((map.Occ.occ v m1 l u) = (map.Occ.occ v m2 l
-  u)).
+Definition permut {a:Type} {a_WT:WhyType a} (m1:Z -> a) (m2:Z -> a) (l:Z)
+    (u:Z) : Prop :=
+  forall (v:a), ((map.Occ.occ v m1 l u) = (map.Occ.occ v m2 l u)).
 
 (* Why3 goal *)
 Lemma permut_trans {a:Type} {a_WT:WhyType a} :

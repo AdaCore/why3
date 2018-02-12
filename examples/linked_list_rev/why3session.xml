@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="4000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../linked_list_rev.mlw" proved="true">
+<theory name="InPlaceRev" proved="true" sum="b256ae5d139b8dbf3bc86e9535191250">
+ <goal name="VC null" expl="VC for null" proved="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC mem_decomp" expl="VC for mem_decomp" proved="true">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC list_seg_frame_ext" expl="VC for list_seg_frame_ext" proved="true">
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="VC list_seg_functional" expl="VC for list_seg_functional" proved="true">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC list_seg_sublistl" expl="VC for list_seg_sublistl" proved="true">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="VC list_seg_no_repet" expl="VC for list_seg_no_repet" proved="true">
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="VC list_seg_append" expl="VC for list_seg_append" proved="true">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="VC app" expl="VC for app" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC app.0" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC app.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.3" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC app.4" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.5" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC app.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC app.7" expl="unreachable point" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.8" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC app.9" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC app.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC app.11" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.12" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.13" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC app.14" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.15" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.16" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC app.17" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC app.18" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC app.19" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.20" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC app.21" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC in_place_reverse" expl="VC for in_place_reverse" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC in_place_reverse.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.3" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.5" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.6" expl="unreachable point" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.7" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.8" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.9" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.10" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.12" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="InPlaceRevSeq" proved="true" sum="3f9f9b46a12c9b522d7b7fe0fb8d46e7">
+ <goal name="VC null" expl="VC for null" proved="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="non_empty_seq" proved="true">
+ <proof prover="5"><result status="valid" time="0.31"/></proof>
+ </goal>
+ <goal name="VC mem_decomp" expl="VC for mem_decomp" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC mem_decomp.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mem_decomp.1" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mem_decomp.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mem_decomp.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mem_decomp.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC mem_decomp.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="242"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="list_seg_frame_ext" proved="true">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC list_seg_functional" expl="VC for list_seg_functional" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_functional.0" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.4" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="232"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="305"/></proof>
+  </goal>
+  <goal name="VC list_seg_functional.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC list_seg_tail" expl="VC for list_seg_tail" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_tail.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_tail.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC list_seg_tail.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="143"/></proof>
+  </goal>
+  <goal name="VC list_seg_tail.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC list_seg_tail.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.13" steps="398"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC list_seg_append" expl="VC for list_seg_append" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_append.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_append.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC list_seg_append.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC list_seg_append.3" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC list_seg_append.3.0" expl="precondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC list_seg_append.3.0.0" expl="precondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.10"/></proof>
+    </goal>
+    <goal name="VC list_seg_append.3.0.1" expl="precondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.11"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC list_seg_append.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.29" steps="783"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="seq_tail_append" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
+ </goal>
+ <goal name="VC list_seg_prefix" expl="VC for list_seg_prefix" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_prefix.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC list_seg_prefix.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC list_seg_prefix.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_prefix.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC list_seg_prefix.4" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC list_seg_prefix.4.0" expl="precondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC list_seg_prefix.4.0.0" expl="precondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.07"/></proof>
+    </goal>
+    <goal name="VC list_seg_prefix.4.0.1" expl="precondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.10"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC list_seg_prefix.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="705"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC list_seg_sublistl" expl="VC for list_seg_sublistl" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_sublistl.0" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC list_seg_sublistl.6" expl="postcondition" proved="true">
+  <transf name="destruct" proved="true" arg1="H">
+   <goal name="VC list_seg_sublistl.6.0" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="(l1 = empty)">
+    <goal name="VC list_seg_sublistl.6.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="2.76"/></proof>
+    </goal>
+    <goal name="VC list_seg_sublistl.6.0.1" expl="postcondition" proved="true">
+    <transf name="assert" proved="true" arg1="(forall l:seq &#39;a. empty ++ l = l)">
+     <goal name="VC list_seg_sublistl.6.0.1.0" proved="true">
+     <transf name="assert" proved="true" arg1="(forall l:seq &#39;a. empty ++ l == l)">
+      <goal name="VC list_seg_sublistl.6.0.1.0.0" proved="true">
+      <proof prover="1" memlimit="1000"><result status="valid" time="0.01" steps="27"/></proof>
+      </goal>
+      <goal name="VC list_seg_sublistl.6.0.1.0.1" proved="true">
+      <proof prover="2"><result status="valid" time="0.04"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="VC list_seg_sublistl.6.0.1.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.06"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC list_seg_sublistl.6.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="get_tail" proved="true">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="tail_suffix" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="69"/></proof>
+ </goal>
+ <goal name="VC list_seg_no_repet" expl="VC for list_seg_no_repet" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_seg_no_repet.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.1" expl="precondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC list_seg_no_repet.1.0" expl="precondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC list_seg_no_repet.2" expl="precondition" proved="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.56" steps="845"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.5" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.6" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.7" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.9" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="1.64"/></proof>
+  </goal>
+  <goal name="VC list_seg_no_repet.10" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC app" expl="VC for app" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC app.0" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.78"/></proof>
+  </goal>
+  <goal name="VC app.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.3" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.4" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.5" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.6" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.8" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC app.9" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.59"/></proof>
+  </goal>
+  <goal name="VC app.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC app.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC app.12" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC app.13" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC app.14" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC app.14.0" expl="loop invariant preservation" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC app.14.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC app.14.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="3"><result status="valid" time="0.03" steps="103"/></proof>
+     </goal>
+     <goal name="VC app.14.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="3"><result status="valid" time="0.10" steps="328"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC app.15" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC app.16" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC app.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="1.22" steps="1035"/></proof>
+  </goal>
+  <goal name="VC app.18" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC app.19" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC app.20" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC app.21" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.55"/></proof>
+  </goal>
+  <goal name="VC app.22" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.45" steps="2244"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC in_place_reverse" expl="VC for in_place_reverse" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC in_place_reverse.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.3" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.6" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.72"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.8" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.9" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.10" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC in_place_reverse.10.0" expl="loop invariant preservation" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC in_place_reverse.10.0.0" expl="loop invariant preservation" proved="true">
+    <proof prover="2"><result status="valid" time="0.08"/></proof>
+    </goal>
+    <goal name="VC in_place_reverse.10.0.1" expl="loop invariant preservation" proved="true">
+    <proof prover="3"><result status="valid" time="0.15" steps="331"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC in_place_reverse.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="VC in_place_reverse.12" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC in_place_reverse.12.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1" timelimit="30"><result status="valid" time="16.15" steps="8570"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC in_place_reverse.13" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.29" steps="929"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

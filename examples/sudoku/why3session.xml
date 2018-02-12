@@ -6,7 +6,7 @@
 <prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../sudoku.mlw" proved="true">
-<theory name="Grid" proved="true" sum="cbca290e095cfd9ab71f15e07720fbe7">
+<theory name="Grid" proved="true" sum="fd9d1da5edc930d62206db15518cd327">
  <goal name="grid_eq_sub" proved="true">
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -17,12 +17,12 @@
  <proof prover="8"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" proved="true" sum="fa83c894957683d718a4c3075424bb73">
+<theory name="TheClassicalSudokuGrid" proved="true" sum="06693bbf08f80fb55c381ae7a0fbe627">
  <goal name="VC classical_sudoku" expl="VC for classical_sudoku" proved="true">
- <proof prover="5"><result status="valid" time="0.70"/></proof>
+ <proof prover="5"><result status="valid" time="1.16"/></proof>
  </goal>
 </theory>
-<theory name="Solver" proved="true" sum="00c593a44d8e85acdf2d2f8e0978c75f">
+<theory name="Solver" proved="true" sum="ef5a03fdbd43ea90da38603f360d585c">
  <goal name="VC check_valid_chunk" expl="VC for check_valid_chunk" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC check_valid_chunk.0" expl="index in array bounds" proved="true">
@@ -41,10 +41,10 @@
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC check_valid_chunk.5" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC check_valid_chunk.6" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC check_valid_chunk.7" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02"/></proof>
@@ -53,7 +53,7 @@
   <proof prover="8"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC check_valid_chunk.9" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC check_valid_chunk.10" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="48"/></proof>
@@ -333,7 +333,7 @@
    <proof prover="8"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="VC solve_aux.50.4" expl="assertion" proved="true">
-   <proof prover="8"><result status="valid" time="0.17"/></proof>
+   <proof prover="8"><result status="valid" time="0.29"/></proof>
    </goal>
   </transf>
   </goal>
@@ -464,7 +464,7 @@
  <proof prover="8"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Test" proved="true" sum="caa1717ebc0934be8bd2cc2ed6740883">
+<theory name="Test" proved="true" sum="f5030b712d7f68e6d6b143d48d204740">
  <goal name="VC test0" expl="VC for test0" proved="true">
  <proof prover="8"><result status="valid" time="0.03"/></proof>
  </goal>

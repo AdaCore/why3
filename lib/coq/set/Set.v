@@ -44,7 +44,7 @@ Hint Unfold mem.
 
 (* Why3 assumption *)
 Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> bool)
-           (s2:a -> bool) : Prop :=
+    (s2:a -> bool) : Prop :=
   forall (x:a), (mem x s1) <-> (mem x s2).
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
@@ -68,7 +68,7 @@ Qed.
 
 (* Why3 assumption *)
 Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> bool) (s2:a -> bool) :
-           Prop :=
+    Prop :=
   forall (x:a), (mem x s1) -> mem x s2.
 
 (* Why3 goal *)

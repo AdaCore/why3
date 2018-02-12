@@ -10,8 +10,8 @@
 <prover id="10" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Coq" version="8.5pl2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../mp.mlw" expanded="true">
-<theory name="N" sum="8df1de97578c86ece7bf16f2d513589d" expanded="true">
+<file name="../mp.mlw">
+<theory name="N">
  <goal name="limb_max_bound">
  <proof prover="10"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
@@ -362,8 +362,8 @@
  <proof prover="9"><result status="valid" time="0.02"/></proof>
  <proof prover="12"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter compare_limbs" expl="VC for compare_limbs" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter compare_limbs" expl="VC for compare_limbs">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter compare_limbs.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -1167,8 +1167,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mul" expl="VC for mul" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter mul" expl="VC for mul">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter mul.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -1206,7 +1206,7 @@
   <goal name="WP_parameter mul.12" expl="12. precondition">
   <proof prover="10"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter mul.13" expl="13. assertion" expanded="true">
+  <goal name="WP_parameter mul.13" expl="13. assertion">
   <proof prover="11" edited="mp_N_WP_parameter_mul_1.v"><result status="valid" time="0.65"/></proof>
   </goal>
   <goal name="WP_parameter mul.14" expl="14. postcondition">
