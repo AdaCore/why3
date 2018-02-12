@@ -3,25 +3,36 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../mccarthy.mlw" proved="true">
-<theory name="McCarthy91" proved="true">
- <goal name="WP_parameter f91" expl="VC for f91" proved="true">
+<file name="../mccarthy.mlw" expanded="true">
+<theory name="McCarthy91" sum="3124401c83f9fccd5387bad3a9f2247a">
+ <goal name="WP_parameter f91" expl="VC for f91">
  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
  </goal>
- <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec">
  <proof prover="0"><result status="valid" time="0.11" steps="171"/></proof>
  </goal>
- <goal name="WP_parameter f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <goal name="WP_parameter f91_pseudorec" expl="VC for f91_pseudorec">
  <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
  </goal>
- <goal name="WP_parameter aux" expl="VC for aux" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="67"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+</theory>
+<theory name="McCarthyWithCoroutines" sum="6a236641cbf9885dcfb5f4f450971761" expanded="true">
+ <goal name="WP_parameter aux1" expl="VC for aux1" expanded="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter main" expl="VC for main" proved="true">
+ <goal name="WP_parameter mccarthy1" expl="VC for mccarthy1" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter aux2" expl="VC for aux2" expanded="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="47"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter mccarthy2" expl="VC for mccarthy2" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

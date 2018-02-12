@@ -84,82 +84,132 @@ module McCarthy91
     try aux (); bloc (); absurd
     with Stop -> !n end
 
+
+end
+
+module McCarthyWithCoroutines
+
+
+  use import int.Int
+  use import ref.Ref
+
+  function spec (x: int) : int = if x <= 100 then 91 else x-10
+
   (** {2 Variant using a general 'ghost coroutine' approach}
 
-    Yet another variant. Assume we want to prove the imperative code:
+    Assume we want to prove the imperative code:
 {h <pre>
-e := 1; r := n;
-while e > 0
-  if r > 100 then r := r - 10; e := e - 1;
-             else r := r + 11; e := e + 1;
-end-while
-return r
+e <- 1; r <- n;
+loop
+  if r > 100 { r <- r - 10; e <- e - 1; if e = 0 break }
+        else { r <- r + 11; e <- e + 1 }
+end-loop
 </pre>}
 we annotate the various program points:
 {h <pre>
-{ 0 } e := 1;
-{ 1 } r := n;
-{ 2 } while e > 0
-  { 3 }
-  if r > 100 then { 4 } r := r - 10; { 5 } e := e - 1;
-             else { 6 } r := r + 11; { 7 } e := e + 1;
-end-while
+{ 0 } e <- 1;
+{ 1 } r <- n;
+      loop
+{ 2 } if r > 100 then { 3 } r <- r - 10; { 4 } e <- e - 1; { 5 } if e=0 then break;
+                 else { 6 } r <- r + 11; { 7 } e <- e + 1;
+end-loop
 { 8 }
-return r
 </pre>}
 
 we define the small-step semantics of this code by the following [step] function
 
 *)
 
-type state = { n:int ; mutable pc : int; mutable e : int ; mutable r : int }
 
-val now : state
+  val pc : ref int
+  val n : ref int
+  val e : ref int
+  val r : ref int
 
-val step () : unit
-  requires { 0 <= now.pc < 8 }
-  writes  { now }
-  ensures { old now.pc = 0 -> now = { (old now) with pc = 1 ; e = 1 } }
-  ensures { old now.pc = 1 -> now = { (old now) with pc = 2 ; r = old now.n } }
-  ensures { old now.pc = 2 /\ old now.e > 0 -> now = { (old now) with pc = 3 } }
-  ensures { old now.pc = 2 /\ old now.e <= 0 -> now = { (old now) with pc = 8 } }
-  ensures { old now.pc = 3 /\ old now.r > 100 -> now = { (old now) with pc = 4 } }
-  ensures { old now.pc = 3 /\ old now.r <= 100 -> now = { (old now) with pc = 6 } }
-  ensures { old now.pc = 4 -> now = { (old now) with pc = 5 ; r = old now.r - 10 } }
-  ensures { old now.pc = 5 -> now = { (old now) with pc = 2 ; e = old now.e - 1 } }
-  ensures { old now.pc = 6 -> now = { (old now) with pc = 7 ; r = old now.r + 11 } }
-  ensures { old now.pc = 7 -> now = { (old now) with pc = 2 ; e = old now.e + 1 } }
+  val step () : unit
+    requires { 0 <= !pc < 8 }
+    writes   { pc, e, r }
+    ensures { old !pc = 0 -> !pc = 1 /\ !e = 1 /\ !r = old !r }
+    ensures { old !pc = 1 -> !pc = 2 /\ !e = old !e /\ !r = !n }
+    ensures { old !pc = 2 /\ old !r > 100 -> !pc = 3 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 2 /\ old !r <= 100 -> !pc = 6 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 3 -> !pc = 4 /\ !e = old !e /\ !r = old !r - 10 }
+    ensures { old !pc = 4 -> !pc = 5 /\ !e = old !e - 1 /\ !r = old !r }
+    ensures { old !pc = 5 /\ old !e = 0 -> !pc = 8 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 2 /\ old !e <> 0 -> !pc = 2 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 6 -> !pc = 7 /\ !e = old !e /\ !r = old !r + 11 }
+    ensures { old !pc = 7 -> !pc = 2 /\ !e = old !e + 1 /\ !r = old !r }
 
-(** we prove the code by a ghost function that gives back the recursive
-  structure of the original recursive definition *)
-
-let rec aux () : unit
-  requires { now.pc = 2 /\ now.e > 0 }
-  writes  { now }
-  variant  { 101 - now.r }
-  ensures  { now.pc = 2 /\ now.r = spec(old now.r) /\ now.e = old now.e - 1 }
-= let r0 = now.r in
-  step (); (* execution of condition of while *)
-  step (); (* execution of condition of if *)
-  if r0 > 100 then begin
-       step (); (* assignment r := r - 10 *)
-       step ()  (* assignment e := e - 1  *)
+  let rec aux1 () : unit
+    requires { !pc = 2 /\ !e > 0 }
+    variant  { 101 - !r }
+    ensures  { !pc = 2 /\ !r = spec(old !r) /\ !e = old !e - 1 }
+  = step (); (* execution of 'if r > 100' *)
+    if !pc = 3 then begin
+       step (); (* assignment r <- r - 10 *)
+       step (); (* assignment e <- e - 1  *)
+       step (); (* execution of 'if e = 0' *)
        end
-  else (* r0 <= 100 *)
-     begin
-       step (); (* assignment r := r + 11 *)
-       step (); (* assignment e := e + 1 *)
-       aux ();
-       aux ()
-     end
+    else begin
+       step (); (* assignment r <- r + 11 *)
+       step (); (* assignment e <- e + 1 *)
+       aux1 ();
+       aux1 ()
+       end
 
-let main () : unit
-  requires { now.pc = 0 /\ now.n >= 0 }
-  writes  { now }
-  ensures { now.pc = 8 /\ now.r = spec now.n }
-= step (); (* assignment e := 1 *)
-  step (); (* assignment r := n *)
-  aux ();
-  step() (* loop exit *)
+  let mccarthy1 ()
+    requires { !pc = 0 /\ !n >= 0 }
+    ensures { !r = spec !n }
+  = step (); (* assignment e <- 1 *)
+    step (); (* assignment r <- n *)
+    aux1 (); (* loop *)
+    step() (* loop exit *)
+
+(** {2 a variant with not-so-small steps}
+
+we annotate the important program points:
+{h <pre>
+{ 0 } e <- 1;
+      r <- n;
+      loop
+{ 1 }   if r > 100 { r <- r - 10; e <- e - 1; { 2 } if e = 0 break; }
+              else { r <- r + 11; e <- e + 1; }
+      end-loop
+end-while
+{ 3 }
+return r
+</pre>}
+
+we define the not-so-small-step semantics of this code by the following [next] function
+
+*)
+
+  val next () : unit
+    requires { 0 <= !pc < 3 }
+    writes   { pc, e, r }
+    ensures { old !pc = 0 -> !pc = 1 /\ !e = 1 /\ !r = !n }
+    ensures { old !pc = 1 /\ old !r > 100 ->
+              !pc = 2 /\ !r = old !r - 10 /\ !e = old !e - 1 }
+    ensures { old !pc = 1 /\ old !r <= 100 ->
+              !pc = 1 /\ !r = old !r + 11 /\ !e = old !e + 1 }
+    ensures { old !pc = 2 /\ old !e = 0 -> !pc = 3 /\ !r = old !r /\ !e = old !e }
+    ensures { old !pc = 2 /\ old !e <> 0 -> !pc = 1 /\ !r = old !r /\ !e = old !e }
+
+  (* [aux2] performs as may loop iterations as needed so as to reach program point 2
+     from program point 1 *)
+  let rec aux2 () : unit
+    requires { !pc = 1 /\ !e > 0 }
+    variant  { 101 - !r }
+    ensures  { !pc = 2 /\ !r = spec(old !r) /\ !e = old !e - 1 }
+  = next ();
+    if !pc <> 2 then begin aux2 (); next (); aux2 () end
+
+
+  let mccarthy2 ()
+    requires { !pc = 0 /\ !n >= 0 }
+    ensures { !pc = 3 /\ !r = spec !n }
+  = next (); (* assignments e <- 1; r <- n *)
+    aux2 (); (* loop *)
+    next ()
 
 end
