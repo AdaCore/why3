@@ -136,30 +136,30 @@ we define the small-step semantics of this code by the following [step] function
     ensures { old !pc = 3 -> !pc = 4 /\ !e = old !e /\ !r = old !r - 10 }
     ensures { old !pc = 4 -> !pc = 5 /\ !e = old !e - 1 /\ !r = old !r }
     ensures { old !pc = 5 /\ old !e = 0 -> !pc = 8 /\ !e = old !e /\ !r = old !r }
-    ensures { old !pc = 2 /\ old !e <> 0 -> !pc = 2 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 5 /\ old !e <> 0 -> !pc = 2 /\ !e = old !e /\ !r = old !r }
     ensures { old !pc = 6 -> !pc = 7 /\ !e = old !e /\ !r = old !r + 11 }
     ensures { old !pc = 7 -> !pc = 2 /\ !e = old !e + 1 /\ !r = old !r }
 
   let rec aux1 () : unit
     requires { !pc = 2 /\ !e > 0 }
     variant  { 101 - !r }
-    ensures  { !pc = 2 /\ !r = spec(old !r) /\ !e = old !e - 1 }
+    ensures  { !pc = 5 /\ !r = spec(old !r) /\ !e = old !e - 1 }
   = step (); (* execution of 'if r > 100' *)
     if !pc = 3 then begin
        step (); (* assignment r <- r - 10 *)
        step (); (* assignment e <- e - 1  *)
-       step (); (* execution of 'if e = 0' *)
        end
     else begin
        step (); (* assignment r <- r + 11 *)
        step (); (* assignment e <- e + 1 *)
        aux1 ();
+       step (); (* 'if e=0' must be false *)
        aux1 ()
        end
 
   let mccarthy1 ()
     requires { !pc = 0 /\ !n >= 0 }
-    ensures { !r = spec !n }
+    ensures { !pc = 8 /\ !r = spec !n }
   = step (); (* assignment e <- 1 *)
     step (); (* assignment r <- n *)
     aux1 (); (* loop *)
