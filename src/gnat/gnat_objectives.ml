@@ -34,15 +34,17 @@ module GoalMap = Session_itp.Hpn
 module GoalSet : sig
    (* module to provide mutable sets on goals *)
    type t
-   val empty : unit -> t
+   val empty    : unit -> t
    val is_empty : t -> bool
-   val add : t -> goal_id -> unit
-   val remove : t -> goal_id -> unit
-   val choose : t -> goal_id
-   val mem    : t -> goal_id -> bool
-   val count  : t -> int
-   val reset : t -> unit
-   val iter   : (goal_id -> unit) -> t -> unit
+   val add      : t -> goal_id -> unit
+   val remove   : t -> goal_id -> unit
+   val choose   : t -> goal_id
+   val mem      : t -> goal_id -> bool
+   val count    : t -> int
+   val reset    : t -> unit
+   val iter     : (goal_id -> unit) -> t -> unit
+   val exists   : (goal_id -> bool) -> t -> bool
+   val for_all  : (goal_id -> bool) -> t -> bool
 end =
 struct
    (* We use an ordered set instead of a hashed set here so that we have
@@ -65,6 +67,10 @@ struct
      t := S.empty
    let iter f t =
      S.iter f !t
+   let exists f t =
+     S.exists f !t
+   let for_all f t =
+     S.for_all f !t
 
    exception Found of goal_id
    let choose t =
@@ -960,13 +966,7 @@ let is_valid_not_ce session g =
 let session_proved_status c obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
    let session = c.Controller_itp.controller_session in
-   try
-     GoalSet.iter
-       (fun x ->
-         if not (is_valid_not_ce session x) then raise Exit)
-       obj_rec.toplevel;
-     true
-   with Exit -> false
+   GoalSet.for_all (fun x -> is_valid_not_ce session x) obj_rec.toplevel
 
 let finished_but_not_valid_or_unedited pa =
   (* return true if the proof attempt in argument has terminated, but did not
