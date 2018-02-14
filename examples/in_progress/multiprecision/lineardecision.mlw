@@ -1773,6 +1773,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   in
   let rec propagate_e (e:expr')
     requires { expr_bound' e m }
+    ensures { expr_bound' result m }
     ensures { forall y z. y=z -> ctx_holds' l y z -> interp_eq' (e,result) y z }
     variant { e }
     raises { OutOfBounds -> true }
@@ -1791,6 +1792,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   in
   let rec propagate_eq (eq:equality')
     requires { eq_bound' eq m }
+    ensures { eq_bound' result m }
     ensures { forall y z. y=z -> interp_ctx' l eq y z <-> interp_ctx' l result y z }
     raises { OutOfBounds -> true }
     requires { valid_eq' eq }
@@ -1801,6 +1803,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   in
   let rec propagate (acc:context') : context'
     requires { ctx_bound' acc m }
+    ensures { ctx_bound' result m }
     requires { ctx_impl_ctx' l acc }
     ensures { ctx_impl_ctx' l result }
     variant { acc }
@@ -1817,7 +1820,8 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
        Cons h' t'
     end
   in
-  propagate l, propagate_eq g
+  propagate (propagate (propagate l)),
+  propagate_eq (propagate_eq (propagate_eq g))
 
   use LinearDecisionRationalMP as R
 
@@ -1835,7 +1839,7 @@ end
 
 module TestMP
 
-use import LinearDecisionIntMP
+use import EqPropMP
 use import mach.int.UInt64
 use import int.Int
 use import int.Power

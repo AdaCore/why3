@@ -503,6 +503,24 @@ let build_vars_map renv prev =
         raise (Exit "vars not matched"));
   if debug then Format.printf "all vars matched@.";
   let prev, prs =
+    (*let rec aux (ds,prs) i =
+      if i >= renv.fr then ds, prs
+      else
+        let vy = Mterm.find i renv.store in
+        let y = Mvs.find vy subst in
+        let et = t_equ
+                   (t_app fs_func_app [y; t_nat_const i]
+                          t.t_ty)
+                   t in
+        if debug then Format.printf "%a %d = %a@."
+                                    Pretty.print_vs vy i Pretty.print_term t;
+        let pr = create_prsymbol (Ident.id_fresh "y_val") in
+        let d = create_prop_decl Paxiom pr et in
+        aux (d::ds, pr::prs) (i+1)
+    in
+    let ds, prs = aux ([],[]) 0 in
+    let prev = List.fold_left Task.add_decl prev ds in
+    prev,prs in*)
     Mterm.fold
       (fun t (vy,i) (prev,prs) ->
         let y = Mvs.find vy subst in
@@ -512,7 +530,8 @@ let build_vars_map renv prev =
                    t in
         if debug then Format.printf "%a %d = %a@."
                                     Pretty.print_vs vy i Pretty.print_term t;
-        let pr = create_prsymbol (Ident.id_fresh "y_val") in
+        let s = Format.sprintf "y_val%d" i in
+        let pr = create_prsymbol (Ident.id_fresh s) in
         let d = create_prop_decl Paxiom pr et in
         Task.add_decl prev d, pr::prs)
       renv.store (prev,prs) in
@@ -602,12 +621,12 @@ open Expr
 open Ity
 
 exception CannotReduce
-exception Raised of string * string
 
 let append l = List.fold_left (fun acc s -> acc^":"^s) "" l
 
 type value =
   | Vconstr of rsymbol * field list
+  | Vtuple of value list
   | Vint of BigInt.t
   | Vbool of bool
   | Vvoid
@@ -617,12 +636,16 @@ type value =
 
 and field = Fimmutable of value | Fmutable of value ref
 
+exception Raised of xsymbol * value option * string
+
 open Format
 
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
   | Vint i -> fprintf fmt "%a" Number.print_constant (Number.const_of_big_int i)
+  | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
+                        (Pp.print_list Pp.comma print_value) l
   | Vconstr (rs, lf) -> fprintf fmt "@[<hov 2>(%a@ %a)@]"
                                 Expr.print_rs rs
                                 (Pp.print_list Pp.space print_field) lf
@@ -667,6 +690,7 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
+exception Tuple
 exception Constructor
 exception Field
 
@@ -675,6 +699,7 @@ let get_decl env mm rs =
   if debug then Format.printf "get_decl@.";
   let id = rs.rs_name in
   if debug then Format.printf "looking for rs %s@." id.id_string;
+  if is_rs_tuple rs then raise Tuple;
   let pm = find_module_id env mm id in
   if debug then Format.printf "pmodule %s@."
                               (pm.Pmodule.mod_theory.Theory.th_name.id_string);
@@ -946,9 +971,8 @@ let rec matching info v pat =
   | Pvar vs -> add_vs vs v info
   | Ptuple pl ->
      begin match v with
-     | Vconstr (rs, l) ->
-        assert (is_rs_tuple rs);
-        List.fold_left2 matching info (List.map field_get l) pl
+     | Vtuple l ->
+        List.fold_left2 matching info l pl
      | _ -> assert false
      end
   | Por (p1, p2) ->
@@ -1031,6 +1055,9 @@ let rec interp_expr info (e:Mltree.expr) : value =
            if is_mutable then Fmutable (ref v) else Fimmutable v
          in
          Vconstr(rs, List.map2 field_of_expr rs.rs_cty.cty_args le)
+      | Tuple ->
+         if debug then Format.printf "tuple@.";
+         Vtuple (List.map (interp_expr info) le)
       | Field ->
          if debug then Format.printf "field@.";
          (* TODO keep field info when applying constructors, use here ?*)
@@ -1127,16 +1154,38 @@ let rec interp_expr info (e:Mltree.expr) : value =
                   (fun info rd -> add_fundecl rd.rec_sym (Dlet ld) info)
                   info rdl in
      interp_expr info e
-  | Eraise (xs,_)  ->
+  | Eraise (xs, oe)  ->
      if debug then Format.printf "Eraise %s@." xs.xs_name.id_string;
-     raise (Raised (xs.xs_name.id_string, append info.cs))
+     let ov = match oe with
+       | None -> None
+       | Some e -> Some (interp_expr info e) in
+     raise (Raised (xs, ov, append info.cs))
   | Eexn  _ -> if debug then Format.printf "Eexn@.";
                          raise CannotReduce
   | Eabsurd -> if debug then Format.printf "Eabsurd@.";
                raise CannotReduce
   | Ehole -> if debug then Format.printf "Ehole@.";
              raise CannotReduce
-  | Etry _-> if debug then Format.printf "Etry@."; raise CannotReduce)
+  | Etry (e,bl) ->
+     try interp_expr info e
+     with (Raised (xs, ov, _)  as e) ->
+          let rec aux = function
+            | [] -> if debug then Format.printf "Etry: uncaught exception@.";
+                    raise e
+            | (xs', pvl, e) :: bl when xs_equal xs xs' ->
+               begin match pvl, ov with
+               | [], None -> interp_expr info e
+               | l, Some (Vtuple l') when (List.length l = List.length l') ->
+                  let info = List.fold_left2 (fun info pv v -> add_pv pv v info)
+                                             info l l' in
+                  interp_expr info e
+               | [pv], Some v ->
+                  interp_expr (add_pv pv v info) e
+               | _ -> if debug then Format.printf "Etry: bad arity@.";
+                      aux bl end
+            | _::bl -> aux bl
+          in
+          aux bl)
 
 let eval_fun decl info = match decl with
   | Dlet (Lsym (_rs, _, _vl, expr)) ->
@@ -1148,8 +1197,11 @@ let rec value_of_term t =
   | Ttrue -> Vbool true
   | Tfalse -> Vbool false
   | Term.Tapp (ls, lp) when ls.ls_constr > 0 ->
-     Vconstr ((restore_rs ls),
-              (List.map (fun t -> Fimmutable (value_of_term t)) lp))
+     let rs = restore_rs ls in
+     if is_rs_tuple rs
+     then Vtuple (List.map value_of_term lp)
+     else Vconstr ((restore_rs ls),
+                   (List.map (fun t -> Fimmutable (value_of_term t)) lp))
   | Tnot t -> begin match value_of_term t with
               | Vbool b -> Vbool (not b)
               | _ -> raise CannotReduce end
@@ -1161,6 +1213,7 @@ let rec term_of_value = function
   | Vbool true -> t_bool_true
   | Vbool false -> t_bool_false
   | Vint i -> t_bigint_const i
+  | Vtuple l -> t_tuple (List.map term_of_value l)
   | Vconstr (rs, lf) ->
      t_app (ls_of_rs rs) (List.map (fun f -> term_of_value (field_get f)) lf)
            (ls_of_rs rs).ls_value
@@ -1256,8 +1309,8 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
           if debug then Format.printf "eval_fun@.";
           let res =
             try term_of_value (eval_fun decl info)
-            with Raised (s1, s2) ->
-              Format.eprintf "Raised %s %s@." s1 s2;
+            with Raised (xs,_,s) ->
+              Format.eprintf "Raised %s %s@." (xs.xs_name.id_string) s;
               raise (ReductionFail renv) (*(try eval_fun decl info with Raised _ -> Vbool false)*) in
           if debug then Format.printf "res %a@." Pretty.print_term res;
           let rinfo = {renv with subst = Mvs.add vres res renv.subst} in
