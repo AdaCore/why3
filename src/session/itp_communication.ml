@@ -106,7 +106,7 @@ type ide_request =
   | Add_file_req            of string
   | Set_config_param        of string * int
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool * bool
+  | Get_task                of node_ID * bool * bool
   | Focus_req               of node_ID
   | Unfocus_req
   | Remove_subtree          of node_ID

@@ -1476,9 +1476,9 @@ let on_selected_row r =
       if detached then
         task_view#source_buffer#set_text ""
       else
-        let b = gconfig.intro_premises in
+        let _b = gconfig.intro_premises in
         let c = gconfig.show_full_context in
-        send_request (Get_task(id,b,c,true))
+        send_request (Get_task(id,c,true))
     | NProofAttempt ->
        let (pa, _obs, _l) = Hint.find node_id_pa id in
        let output_text =
@@ -1508,13 +1508,13 @@ let on_selected_row r =
        if detached then
          task_view#source_buffer#set_text ""
        else
-         let b = gconfig.intro_premises in
+         let _b = gconfig.intro_premises in
          let c = gconfig.show_full_context in
-         send_request (Get_task(id,b,c,true))
+         send_request (Get_task(id,c,true))
     | _ ->
-       let b = gconfig.intro_premises in
+       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
-       send_request (Get_task(id,b,c,true))
+       send_request (Get_task(id,c,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 

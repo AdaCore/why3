@@ -354,7 +354,7 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
   try
-    let task = Session_itp.get_raw_task c.controller_session id in
+    let task = Session_itp.get_task c.controller_session id in
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
@@ -545,7 +545,7 @@ let schedule_proof_attempt c id pr
 let create_file_rel_path c pr pn =
   let session = c.controller_session in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  let task = Session_itp.get_raw_task session pn in
+  let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
@@ -603,7 +603,7 @@ let prepare_edition c ?file pn pr ~notification =
   in
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
-  let task = Session_itp.get_raw_task session pn in
+  let task = Session_itp.get_task session pn in
   let driver = snd (Hprover.find c.controller_provers pr) in
   Driver.print_task ~cntexample:false ?old driver fmt task;
   Opt.iter close_in old;
@@ -940,7 +940,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
   | Some pr' ->
      try
        if pr' <> pr then callback id (UpgradeProver pr');
-       let _ = get_raw_task c.controller_session parid in
+       let _ = get_task c.controller_session parid in
        schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
@@ -1229,7 +1229,7 @@ later on. We do has if proof fails. *)
   in
   Debug.dprintf debug "Bisecting with %a started.@."
                 Whyconf.print_prover prover;
-  let t = get_raw_task ses goal_id in
+  let t = get_task ses goal_id in
   match Eliminate_definition.bisect_step t with
   | Eliminate_definition.BSdone _ -> assert false
   | Eliminate_definition.BSstep(rem,kont) -> bisect_step rem kont

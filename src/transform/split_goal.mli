@@ -56,8 +56,3 @@ val split_premise_full : Task.task Trans.trans
 val split_goal_right : Task.task Trans.tlist
 val split_all_right : Task.task Trans.tlist
 val split_premise_right : Task.task Trans.trans
-
-val split_goal_wp : Task.task Trans.tlist
-val split_all_wp : Task.task Trans.tlist
-val split_premise_wp : Task.task Trans.trans
-

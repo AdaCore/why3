@@ -33,5 +33,8 @@ val intros :  Decl.prsymbol -> Term.term -> Decl.decl list
 
 val introduce_premises : Task.task Trans.trans
 
+
+(* superseded by split_goal_wp
 val split_intro : Task.task Trans.tlist
 (** [split_intro] is [split_goal_wp] followed by [introduce_premises] *)
+ *)

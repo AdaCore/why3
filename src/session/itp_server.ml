@@ -77,7 +77,7 @@ let unproven_goals_below_id cont id =
 (****** Exception handling *********)
 
 let p s id =
-  let _,tables = Session_itp.get_task s id in
+  let _,tables = Session_itp.get_task_name_table s id in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in
   (Pretty.create pr apr pr pr false)
@@ -270,7 +270,7 @@ let print_request fmt r =
   | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b,c,loc)           -> fprintf fmt "get task(%d,%b,%b,%b)" nid b c loc
+  | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Focus_req _nid                  -> fprintf fmt "focus"
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
@@ -772,7 +772,7 @@ end
       | Some label_detection ->
           (match node with
           | APn pr_node ->
-              let task = Session_itp.get_raw_task session pr_node in
+              let task = Session_itp.get_task session pr_node in
               let b = label_detection task in
               if b then
                 add_focused_node node
@@ -880,12 +880,8 @@ end
     reset_and_send_the_whole_tree ()
 
   (* -- send the task -- *)
-  let task_of_id d id do_intros show_full_context loc =
-    let task,tables = get_task d.cont.controller_session id in
-    let task =
-      if do_intros then task else
-        get_raw_task d.cont.controller_session id
-    in
+  let task_of_id d id show_full_context loc =
+    let task,tables = get_task_name_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
@@ -896,11 +892,11 @@ end
     in
     task_text, loc_color_list
 
-  let send_task nid do_intros show_full_context loc =
+  let send_task nid show_full_context loc =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-       let s, list_loc = task_of_id d id do_intros show_full_context loc in
+       let s, list_loc = task_of_id d id show_full_context loc in
        P.notify (Task (nid, s, list_loc))
     | ATh t ->
        P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
@@ -908,7 +904,7 @@ end
        let pa = get_proof_attempt_node  d.cont.controller_session pid in
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
+       let s, list_loc = task_of_id d parid show_full_context loc in
        let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
        (* Display the result of the prover *)
        let prover_ce =
@@ -935,7 +931,7 @@ end
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
-       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
+       let s, list_loc = task_of_id d parid show_full_context loc in
        P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
                        String.concat " " (name :: args) ^ "\n", list_loc))
 
@@ -1321,7 +1317,7 @@ end
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
          Hint.mem model_any from_id && Hint.mem model_any to_id
-     | Get_task(nid,_,_,_) ->
+     | Get_task(nid,_,_) ->
          Hint.mem model_any nid
      | Command_req (nid, _) ->
          if not (Itp_communication.is_root nid) then
@@ -1391,7 +1387,7 @@ end
         read_and_send f
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b,c,loc)         -> send_task nid b c loc
+    | Get_task(nid,b,loc)         -> send_task nid b loc
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin

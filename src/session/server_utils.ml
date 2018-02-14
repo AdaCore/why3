@@ -372,7 +372,7 @@ type command =
   | Other        of string * string list
 
 let query_on_task cont f id args =
-  let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+  let _,table = Session_itp.get_task_name_table cont.Controller_itp.controller_session id in
   try Query (f cont table args) with
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"

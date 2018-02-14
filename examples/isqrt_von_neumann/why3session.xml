@@ -7,7 +7,8 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../isqrt_von_neumann.mlw" proved="true">
+<prover id="5" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../isqrt_von_neumann.mlw">
 <theory name="VonNeumann16" proved="true">
  <goal name="sqr_add" proved="true">
  <proof prover="2" timelimit="1"><result status="valid" time="0.36"/></proof>
@@ -48,34 +49,34 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.11" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.14" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.15" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.16" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.18" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.19" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.20" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.21" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -84,7 +85,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.24" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -96,13 +97,13 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.27" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.28" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.29" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.30" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
@@ -126,7 +127,7 @@
   <proof prover="3"><result status="valid" time="0.68"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.37" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter isqrt16.38" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -137,7 +138,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="VonNeumann32" proved="true">
+<theory name="VonNeumann32">
  <goal name="sqr_add" proved="true">
  <transf name="unfold" proved="true" arg1="sqr">
   <goal name="sqr_add.0" proved="true">
@@ -145,8 +146,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter isqrt32" expl="VC for isqrt32" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <goal name="WP_parameter isqrt32" expl="VC for isqrt32">
+ <transf name="split_goal_wp" >
   <goal name="WP_parameter isqrt32.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -184,22 +185,22 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.28"/></proof>
+  <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.14" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.15" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.16"/></proof>
+  <proof prover="3"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.16" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.18"/></proof>
+  <proof prover="3"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.19"/></proof>
+  <proof prover="3"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.18" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
@@ -208,7 +209,7 @@
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.20" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.59"/></proof>
+  <proof prover="3"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.21" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.26"/></proof>
@@ -217,28 +218,31 @@
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.24" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.33"/></proof>
   </goal>
-  <goal name="WP_parameter isqrt32.25" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="16.47"/></proof>
+  <goal name="WP_parameter isqrt32.25" expl="loop invariant preservation">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="3" timelimit="30"><result status="unknown" time="29.61"/></proof>
+  <proof prover="4"><result status="timeout" time="1.01"/></proof>
+  <proof prover="5"><result status="unknown" time="1.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.26" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.27" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.17"/></proof>
+  <proof prover="3"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.28" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.29" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.11"/></proof>
+  <proof prover="3"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.30" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.51"/></proof>
+  <proof prover="3"><result status="valid" time="0.28"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.31" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.31"/></proof>
@@ -256,10 +260,10 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.36" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="100"><result status="valid" time="113.42"/></proof>
+  <proof prover="3" timelimit="100"><result status="valid" time="66.28"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.37" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.30"/></proof>
+  <proof prover="3"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="WP_parameter isqrt32.38" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.22"/></proof>
@@ -318,52 +322,55 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.10" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.11" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.13" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.14" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="1.32"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.23"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.15" expl="assertion" proved="true">
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.73"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.16" expl="assertion" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.62"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.30"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.17" expl="assertion" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.87"/></proof>
+  <proof prover="3"><result status="valid" time="1.00"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.18" expl="assertion" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.60"/></proof>
+  <proof prover="3"><result status="valid" time="1.90"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.19" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.55"/></proof>
+  <proof prover="3"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.20" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.70"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.21" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.54"/></proof>
+  <proof prover="0"><result status="highfailure" time="0.88"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="2.36"/></proof>
+  <proof prover="4"><result status="timeout" time="1.01"/></proof>
+  <proof prover="5"><result status="unknown" time="1.00"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.22" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.76"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.79"/></proof>
+  <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.24" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.25" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="1.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.69"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.26" expl="loop invariant preservation" proved="true">
   <transf name="replace" proved="true" arg1="num" arg2="(sub num1 b)">
@@ -424,21 +431,21 @@
   <goal name="WP_parameter isqrt64.29" expl="loop variant decrease" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter isqrt64.29.0" expl="VC for isqrt64" proved="true">
-   <proof prover="3"><result status="valid" time="0.73"/></proof>
+   <proof prover="3"><result status="valid" time="0.58"/></proof>
    </goal>
    <goal name="WP_parameter isqrt64.29.1" expl="VC for isqrt64" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.44"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.00"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter isqrt64.30" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.66"/></proof>
+  <proof prover="3"><result status="valid" time="0.55"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.31" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.64"/></proof>
+  <proof prover="3"><result status="valid" time="0.55"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.32" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.80"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.68"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.33" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="1.07"/></proof>
@@ -467,7 +474,7 @@
      <goal name="WP_parameter isqrt64.39.0.0.0" expl="VC for isqrt64" proved="true">
      <transf name="assert" proved="true" arg1="(x = add (sqr res_g) num)">
       <goal name="WP_parameter isqrt64.39.0.0.0.0" proved="true">
-      <proof prover="3" timelimit="5"><result status="valid" time="1.84"/></proof>
+      <proof prover="3" timelimit="5"><result status="valid" time="1.28"/></proof>
       </goal>
       <goal name="WP_parameter isqrt64.39.0.0.0.1" expl="VC for isqrt64" proved="true">
       <transf name="unfold" proved="true" arg1="sqr">
@@ -486,7 +493,7 @@
            <proof prover="3"><result status="valid" time="0.01"/></proof>
            </goal>
            <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.0.1.1" proved="true">
-           <proof prover="3"><result status="unknown" time="0.94"/></proof>
+           <proof prover="3" obsolete="true"><result status="unknown" time="0.94"/></proof>
            <proof prover="4"><result status="valid" time="0.14" steps="241"/></proof>
            </goal>
           </transf>
@@ -755,10 +762,10 @@
   <goal name="WP_parameter isqrt64.40" expl="loop variant decrease" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter isqrt64.40.0" expl="VC for isqrt64" proved="true">
-   <proof prover="3"><result status="valid" time="0.58"/></proof>
+   <proof prover="3"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="WP_parameter isqrt64.40.1" expl="VC for isqrt64" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.00"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.70"/></proof>
    </goal>
   </transf>
   </goal>
