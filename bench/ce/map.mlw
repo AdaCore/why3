@@ -7,9 +7,9 @@ module M
   (**********************************************************
    ** Getting counterexamples for terms of primitive types **
    **********************************************************)
-  val y "model" "model_trace:y" :ref int
+  val y :ref int
 
-  let incr ( x23 "model" "model_trace:x23" : ref int ): unit
+  let incr ( x23 : ref int ): unit
   ensures { "model_vc_post" !x23 = old !x23 + 2 + !y }
   =
   (*#"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#*)
@@ -17,7 +17,7 @@ module M
   x23 := !x23 + 1;
   x23 := !x23 + 1
 
-  let test_loop ( x "model" "model_trace:x" : ref int ): unit
+  let test_loop ( x : ref int ): unit
   ensures { "model_vc_post" !x < old !x }
   =
   'L: incr x;

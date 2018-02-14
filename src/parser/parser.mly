@@ -36,21 +36,18 @@ end
   let floc s e = Loc.extract (s,e)
 
   let model_label = Ident.create_label "model"
-  let model_projected = Ident.create_label "model_projected"
+(*  let model_projected = Ident.create_label "model_projected"*)
 
+(*
   let is_model_label l =
     match l with
     | Lpos _ -> false
     | Lstr lab ->
       (lab = model_label) || (lab = model_projected)
 
-
   let model_lab_present labels =
-    try
-      ignore(List.find is_model_label labels);
-      true
-    with Not_found ->
-      false
+    List.exists is_model_label labels
+*)
 
   let model_trace_regexp = Str.regexp "model_trace:"
 
@@ -64,21 +61,25 @@ end
       with Not_found -> false
 
   let model_trace_lab_present labels =
-    try
-      ignore(List.find is_model_trace_label labels);
-      true
-    with Not_found ->
-      false
+    List.exists is_model_trace_label labels
 
-  let add_model_trace name labels =
-    if (model_lab_present labels) && (not (model_trace_lab_present labels)) then
-      (Lstr (Ident.create_label ("model_trace:" ^ name)))::labels
+  let add_model_trace id =
+    if model_trace_lab_present id.id_lab then
+      id
     else
-      labels
+      let l =
+        (Lstr (Ident.create_label ("model_trace:" ^ id.id_str)))
+        ::(Lstr model_label) :: id.id_lab in
+      { id with id_lab = l }
 
   let add_lab id l =
-    let l = add_model_trace id.id_str l in
     { id with id_lab = l }
+
+  let add_model_labels (b : binder) =
+    match b with
+    | (loc, Some id, ghost, ty) ->
+      (loc, Some (add_model_trace id), ghost, ty)
+    | _ -> b
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
@@ -483,7 +484,7 @@ binder:
     { match $1 with
       | PTtyapp (Qident id, [])
       | PTparen (PTtyapp (Qident id, [])) ->
-             [floc $startpos $endpos, Some id, false, None]
+          [floc $startpos $endpos, Some id, false, None]
       | _ -> [floc $startpos $endpos, None, false, Some $1] }
 | LEFTPAR GHOST ty RIGHTPAR
     { match $3 with
@@ -584,7 +585,8 @@ term_:
 | MATCH comma_list2(term) WITH match_cases(term) END
     { Tmatch (mk_term (Ttuple $2) $startpos($2) $endpos($2), $4) }
 | quant comma_list1(quant_vars) triggers DOT term
-    { Tquant ($1, List.concat $2, $3, $5) }
+    { let l = List.map add_model_labels (List.concat $2) in
+      Tquant ($1, l, $3, $5) }
 | EPSILON
     { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
 | label term %prec prec_named
@@ -658,11 +660,11 @@ quant:
 numeral:
 | INTEGER { Number.ConstInt (mk_int_const false $1) }
 | REAL    { Number.ConstReal (mk_real_const false $1) }
- 
+
 (* Program declarations *)
 
 pdecl:
-| VAL top_ghost labels(lident_rich) type_v          { Dval ($3, $2, $4) }
+| VAL top_ghost labels(lident_rich) type_v          { Dval (add_model_trace $3, $2, $4) }
 | LET top_ghost labels(lident_rich) fun_defn        { Dfun ($3, $2, $4) }
 | LET top_ghost labels(lident_rich) EQUAL fun_expr  { Dfun ($3, $2, $5) }
 | LET REC with_list1(rec_defn)                      { Drec $3 }
@@ -697,7 +699,8 @@ rec_defn:
     { $2, $1, ($3, $4, $8, spec_union $5 $7) }
 
 fun_defn:
-| binders cast? spec EQUAL spec seq_expr { ($1, $2, $6, spec_union $3 $5) }
+| binders cast? spec EQUAL spec seq_expr {
+  (List.map add_model_labels $1, $2, $6, spec_union $3 $5) }
 
 fun_expr:
 | FUN binders spec ARROW spec seq_expr { ($2, None, $6, spec_union $3 $5) }

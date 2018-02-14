@@ -2,43 +2,80 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.5-prerelease" alternative="alt" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.5-prerelease" alternative="alt" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../cvc4-models.mlw">
 <theory name="M">
+ <goal name="G">
+ </goal>
+ <goal name="WP_parameter test_post" expl="VC for test_post">
+ </goal>
  <goal name="WP_parameter incr" expl="VC for incr">
  <proof prover="0" obsolete="true"><result status="unknown" time="0.00" steps="896"/></proof>
- <transf name="split_goal_wp">
-  <goal name="WP_parameter incr.1" expl="1. postcondition">
+ <transf name="split_goal_wp" >
+  <goal name="WP_parameter incr.0" expl="postcondition">
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter test_loop" expl="VC for test_loop">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter test_loop.1" expl="1. loop invariant init">
-  <proof prover="0"><result status="unknown" time="0.00" steps="813"/></proof>
+ <transf name="split_goal_wp" >
+  <goal name="WP_parameter test_loop.0" expl="loop invariant init">
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.00" steps="813"/></proof>
   </goal>
-  <goal name="WP_parameter test_loop.2" expl="2. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="866"/></proof>
+  <goal name="WP_parameter test_loop.1" expl="loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01" steps="866"/></proof>
   </goal>
-  <goal name="WP_parameter test_loop.3" expl="3. postcondition">
-  <proof prover="0"><result status="unknown" time="0.00" steps="916"/></proof>
+  <goal name="WP_parameter test_loop.2" expl="loop variant decrease">
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.00" steps="916"/></proof>
+  </goal>
+  <goal name="WP_parameter test_loop.3" expl="postcondition">
   </goal>
  </transf>
+ </goal>
+ <goal name="WP_parameter test_map" expl="VC for test_map">
+ </goal>
+ <goal name="WP_parameter test_map_multidim1" expl="VC for test_map_multidim1">
+ </goal>
+ <goal name="WP_parameter test_map_multidim2" expl="VC for test_map_multidim2">
+ </goal>
+ <goal name="WP_parameter record_match_eval_test1" expl="VC for record_match_eval_test1">
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter record_match_eval_test2" expl="VC for record_match_eval_test2">
+ </goal>
+ <goal name="WP_parameter record_match_eval_test3" expl="VC for record_match_eval_test3">
+ </goal>
+ <goal name="WP_parameter record_match_eval_test4" expl="VC for record_match_eval_test4">
+ </goal>
+ <goal name="WP_parameter test_record_match_eval_test5" expl="VC for test_record_match_eval_test5">
+ </goal>
+ <goal name="WP_parameter map_record_proj_test1" expl="VC for map_record_proj_test1">
+ </goal>
+ <goal name="WP_parameter record_map_proj_test2" expl="VC for record_map_proj_test2">
+ </goal>
+ <goal name="WP_parameter record_map_proj_test3" expl="VC for record_map_proj_test3">
+ </goal>
+ <goal name="WP_parameter proj_map_test1" expl="VC for proj_map_test1">
+ </goal>
+ <goal name="WP_parameter proj_map_test2" expl="VC for proj_map_test2">
+ </goal>
+ <goal name="WP_parameter proj_test" expl="VC for proj_test">
  </goal>
 </theory>
 </file>
 <file name="../cvc4-models.why">
 <theory name="T">
- <goal name="g_binop">
- </goal>
  <goal name="g_no_lab">
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
  </goal>
  <goal name="g_lab0">
  </goal>
  <goal name="g2_lab">
  </goal>
  <goal name="newgoal">
- <proof prover="0"><result status="unknown" time="0.00" steps="549"/></proof>
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.00" steps="549"/></proof>
+ </goal>
+ <goal name="g_binop">
  </goal>
 </theory>
 <theory name="ModelInt">

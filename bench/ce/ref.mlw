@@ -3,11 +3,7 @@ module M
   use import list.List
   use import int.Int
 
-  type int_type = Integer int
-
-  goal G : forall x "model" : int_type. match x with Integer y -> y > 0 end
-
-  let test_post (x "model" "model_trace:x" : int) (y "model" "model_trace:y" : ref int): unit
+  let test_post (x: int) (y  : ref int): unit
     ensures { "model_vc_post" old !y >= x }
       =
       y := x - 1 + !y
@@ -15,9 +11,9 @@ module M
   (**********************************************************
    ** Getting counterexamples for terms of primitive types **
    **********************************************************)
-  val y "model" "model_trace:y" :ref int
+  val y :ref int
 
-  let incr ( x23 "model" "model_trace:x23" : ref int ): unit
+  let incr ( x23: ref int ): unit
   ensures { "model_vc_post" !x23 = old !x23 + 2 + !y }
   =
   (*#"random_path.random" 62 27 32#*)
@@ -25,7 +21,7 @@ module M
   x23 := !x23 + 1;
   x23 := !x23 + 1
 
-  let test_loop ( x "model" "model_trace:x" : ref int ): unit
+  let test_loop ( x: ref int ): unit
   ensures { "model_vc_post" !x < old !x }
   =
   'L: incr x;

@@ -1,0 +1,15 @@
+module M
+  use import ref.Ref
+  use import list.List
+  use import int.Int
+
+  type int_type = Integer int
+
+  goal G : forall x : int_type. match x with Integer y -> y > 0 end
+
+  let test_post (x : int) (y : ref int): unit
+    ensures { "model_vc_post" old !y >= x }
+      =
+      y := x - 1 + !y
+
+end
