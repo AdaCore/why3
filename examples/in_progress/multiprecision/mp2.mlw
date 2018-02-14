@@ -5283,7 +5283,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           assert { value (xd at SmallDiv) sy =
                     vlx + power radix (sy - 2) * xp0
                     + power radix (sy - 1) * xp1 };  (*nonlinear*)
-          assert { value (x at SubProd) (sy + (!i at StartLoop) - 1) = value (x at SubProd) !i + power radix !i * value (xd at SubProd) sy };
+          assert { value (x at SubProd) (sy + (!i at StartLoop) - 1)
+                   = value (x at SubProd) !i + power radix !i * value (xd at SubProd) sy };
           assert { value (old x) sx =
                   (value !qp (sx - sy - !i)
                    + qh * power radix (sx - sy - !i))
