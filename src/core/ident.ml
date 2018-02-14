@@ -99,6 +99,24 @@ let get_model_trace_string ~labels =
   | _ -> ""
 
 
+(** Naming convention *)
+
+let infix  s = "infix "  ^ s
+let prefix s = "prefix " ^ s
+let mixfix s = "mixfix " ^ s
+
+let kind_of_fix s =
+  let len = String.length s in
+  if len < 7 then `None else
+  let inf = String.sub s 0 6 in
+  if inf = "infix "  then `Infix (String.sub s 6 (len - 6)) else
+  let prf = String.sub s 0 7 in
+  if prf = "prefix " then `Prefix (String.sub s 7 (len - 7)) else
+  let prf = String.sub s 0 7 in
+  if prf = "mixfix " then `Mixfix (String.sub s 7 (len - 7)) else
+  `None
+
+
 (** Identifiers *)
 
 type ident = {

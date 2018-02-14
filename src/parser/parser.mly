@@ -27,10 +27,6 @@ end
 
   open Ptree
 
-  let infix  s = "infix "  ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
-
   let qualid_last = function Qident x | Qdot (_, x) -> x.id_str
 
   let floc s e = Loc.extract (s,e)
@@ -90,11 +86,11 @@ end
 
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
 
-  let get_op s e = Qident (mk_id (mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
-  let sub_op s e = Qident (mk_id (mixfix "[_.._]") s e)
-  let above_op s e = Qident (mk_id (mixfix "[_..]") s e)
-  let below_op s e = Qident (mk_id (mixfix "[.._]") s e)
+  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
+  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
+  let sub_op s e = Qident (mk_id (Ident.mixfix "[_.._]") s e)
+  let above_op s e = Qident (mk_id (Ident.mixfix "[_..]") s e)
+  let below_op s e = Qident (mk_id (Ident.mixfix "[.._]") s e)
 
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -729,8 +725,8 @@ expr_:
 | expr LARROW expr
     { match $1.expr_desc with
       | Eidapp (q, [e1]) -> Eassign (e1, q, $3)
-      | Eidapp (Qident id, [e1;e2]) when id.id_str = mixfix "[]" ->
-          Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
+      | Eidapp (Qident id, [e1;e2]) when id.id_str = Ident.mixfix "[]" ->
+          Eidapp (Qident {id with id_str = Ident.mixfix "[]<-"}, [e1;e2;$3])
       | _ -> raise Error }
 | LET top_ghost pattern EQUAL seq_expr IN seq_expr
     { match $3.pat_desc with
@@ -993,21 +989,21 @@ lident_op_id:
     { (* parentheses are removed from the location *)
       let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
       let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
-      mk_id (infix "*") s e }
+      mk_id (Ident.infix "*") s e }
 
 lident_op:
-| op_symbol               { infix $1 }
-| op_symbol UNDERSCORE    { prefix $1 }
-| MINUS     UNDERSCORE    { prefix "-" }
-| EQUAL                   { infix "=" }
-| MINUS                   { infix "-" }
-| OPPREF                  { prefix $1 }
-| LEFTSQ RIGHTSQ          { mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW   { mixfix "[]<-" }
-| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { mixfix "[_.._]" }
-| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { mixfix "[.._]" }
-| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { mixfix "[_..]" }
+| op_symbol               { Ident.infix $1 }
+| op_symbol UNDERSCORE    { Ident.prefix $1 }
+| MINUS     UNDERSCORE    { Ident.prefix "-" }
+| EQUAL                   { Ident.infix "=" }
+| MINUS                   { Ident.infix "-" }
+| OPPREF                  { Ident.prefix $1 }
+| LEFTSQ RIGHTSQ          { Ident.mixfix "[]" }
+| LEFTSQ LARROW RIGHTSQ   { Ident.mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW   { Ident.mixfix "[]<-" }
+| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[_.._]" }
+| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[.._]" }
+| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { Ident.mixfix "[_..]" }
 
 op_symbol:
 | OP1 { $1 }
@@ -1018,22 +1014,22 @@ op_symbol:
 | GT  { ">" }
 
 %inline oppref:
-| o = OPPREF { mk_id (prefix o)  $startpos $endpos }
+| o = OPPREF { mk_id (Ident.prefix o)  $startpos $endpos }
 
 prefix_op:
-| op_symbol { mk_id (prefix $1)  $startpos $endpos }
-| MINUS     { mk_id (prefix "-") $startpos $endpos }
+| op_symbol { mk_id (Ident.prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (Ident.prefix "-") $startpos $endpos }
 
 %inline infix_op:
-| o = OP1   { mk_id (infix o)    $startpos $endpos }
-| o = OP2   { mk_id (infix o)    $startpos $endpos }
-| o = OP3   { mk_id (infix o)    $startpos $endpos }
-| o = OP4   { mk_id (infix o)    $startpos $endpos }
-| EQUAL     { mk_id (infix "=")  $startpos $endpos }
-| LTGT      { mk_id (infix "<>") $startpos $endpos }
-| LT        { mk_id (infix "<")  $startpos $endpos }
-| GT        { mk_id (infix ">")  $startpos $endpos }
-| MINUS     { mk_id (infix "-")  $startpos $endpos }
+| o = OP1   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP2   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP3   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP4   { mk_id (Ident.infix o)    $startpos $endpos }
+| EQUAL     { mk_id (Ident.infix "=")  $startpos $endpos }
+| LTGT      { mk_id (Ident.infix "<>") $startpos $endpos }
+| LT        { mk_id (Ident.infix "<")  $startpos $endpos }
+| GT        { mk_id (Ident.infix ">")  $startpos $endpos }
+| MINUS     { mk_id (Ident.infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 
