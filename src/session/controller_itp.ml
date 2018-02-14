@@ -872,8 +872,8 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
 
 let copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
   let s = c.controller_session in
-  if is_below s from_any to_any || is_below s to_any from_any
-  then raise BadCopyPaste;
+  if is_below s to_any from_any then
+    raise BadCopyPaste;
   match from_any, to_any with
   | APn _, APn _ ->
      copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any
