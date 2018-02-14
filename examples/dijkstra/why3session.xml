@@ -27,10 +27,10 @@
  </goal>
  <goal name="Path_shortest_path" proved="true">
  <transf name="induction" proved="true" arg1="d">
-  <goal name="Path_shortest_path.0" proved="true">
+  <goal name="Path_shortest_path.0" expl="base case" proved="true">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="Path_shortest_path.1" proved="true">
+  <goal name="Path_shortest_path.1" expl="recursive case" proved="true">
   <proof prover="4" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
@@ -55,10 +55,10 @@
   </goal>
   <goal name="inside_or_exit.1" proved="true">
   <transf name="case" proved="true" arg1="(mem z s)">
-   <goal name="inside_or_exit.1.0" proved="true">
+   <goal name="inside_or_exit.1.0" expl="true case" proved="true">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="inside_or_exit.1.1" proved="true">
+   <goal name="inside_or_exit.1.1" expl="false case" proved="true">
    <proof prover="4"><result status="valid" time="0.84"/></proof>
    </goal>
   </transf>
@@ -130,10 +130,10 @@
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.6" expl="VC for shortest_path_code" proved="true">
     <transf name="case" proved="true" arg1="(v = v1)">
-     <goal name="WP_parameter shortest_path_code.11.0.6.0" expl="VC for shortest_path_code" proved="true">
+     <goal name="WP_parameter shortest_path_code.11.0.6.0" expl="true case" proved="true">
      <proof prover="3"><result status="valid" time="0.70"/></proof>
      </goal>
-     <goal name="WP_parameter shortest_path_code.11.0.6.1" expl="VC for shortest_path_code" proved="true">
+     <goal name="WP_parameter shortest_path_code.11.0.6.1" expl="false case" proved="true">
      <proof prover="4"><result status="valid" time="0.12"/></proof>
      </goal>
     </transf>
