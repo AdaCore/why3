@@ -2,9 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../random_access_list.mlw">
 <theory name="RandomAccessList" proved="true" sum="bc666a4aee215394f9fcf9cec5bdbc38">
@@ -36,7 +37,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC nth_flatten.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.29"/></proof>
+  <proof prover="1" timelimit="1" memlimit="1000"><result status="valid" time="0.29"/></proof>
   </goal>
  </transf>
  </goal>
@@ -230,10 +231,10 @@
    <proof prover="2"><result status="valid" time="0.02" steps="74"/></proof>
    </goal>
    <goal name="VC cons.1.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC cons.1.2" expl="postcondition" proved="true">
-   <proof prover="0" memlimit="2000"><result status="valid" time="1.08"/></proof>
+   <proof prover="0"><result status="valid" time="1.15"/></proof>
    </goal>
   </transf>
   </goal>
@@ -305,12 +306,16 @@
   <goal name="VC tail.4" expl="postcondition">
   <transf name="destruct_alg" arg1="l">
    <goal name="VC tail.4.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC tail.4.1" expl="postcondition">
+   <proof prover="0"><result status="timeout" time="10.00"/></proof>
+   <proof prover="1"><result status="timeout" time="10.00"/></proof>
+   <proof prover="3"><result status="timeout" time="10.01"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="unknown" time="10.50"/></proof>
    </goal>
    <goal name="VC tail.4.2" expl="postcondition" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
@@ -342,12 +347,16 @@
   <goal name="VC fupdate.6" expl="postcondition">
   <transf name="destruct_alg" arg1="l">
    <goal name="VC fupdate.6.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC fupdate.6.1" expl="postcondition">
+   <proof prover="0"><result status="timeout" time="10.00"/></proof>
+   <proof prover="1"><result status="unknown" time="10.82"/></proof>
+   <proof prover="3"><result status="timeout" time="10.02"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="unknown" time="10.32"/></proof>
    </goal>
    <goal name="VC fupdate.6.2" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.06" steps="224"/></proof>
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="225"/></proof>
    </goal>
   </transf>
   </goal>
