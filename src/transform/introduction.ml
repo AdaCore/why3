@@ -76,14 +76,6 @@ let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
-(*
-let split_intro =
-  Trans.compose_l Split_goal.split_goal_wp (Trans.singleton introduce_premises)
-
-let () = Trans.register_transform_l "split_intro" split_intro
-  ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
-    the@ implication@ antecedents@ to@ premises."
- *)
 
 (** Destruction of existential quantifiers in axioms.
     Contributed by Nicolas Jeannerod [niols@niols.fr] *)
