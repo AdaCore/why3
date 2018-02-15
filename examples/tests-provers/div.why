@@ -53,4 +53,7 @@ theory ComputerDivTest
   goal smoke5 : div_m1_m2 = -1
   goal smoke6 : mod_m1_m2 = 1
 
+  goal div_pos_neg: forall x y. x>=0 -> y<0 -> div x y <= 0
+
+
 end
