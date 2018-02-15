@@ -99,10 +99,16 @@ end
 theory int.ComputerDivision
 
   prelude "logic comp_div: int, int -> int"
-  prelude "axiom comp_div_def: forall x, y:int. x >= 0 and y > 0 -> comp_div(x,y) = x / y"
+  prelude "axiom comp_div_def1: forall x, y:int. x >= 0 and y > 0 -> comp_div(x,y) = x / y"
+  prelude "axiom comp_div_def2: forall x, y:int. x <= 0 and y > 0 -> comp_div(x,y) = - ((-x) / y)"
+  prelude "axiom comp_div_def3: forall x, y:int. x >= 0 and y < 0 -> comp_div(x,y) = - (x / (-y)))"
+  prelude "axiom comp_div_def4: forall x, y:int. x <= 0 and y < 0 -> comp_div(x,y) = (-x) / (-y)"
 
   prelude "logic comp_mod: int, int -> int"
-  prelude "axiom comp_mod_def: forall x, y:int. x >= 0 and y > 0 -> comp_mod(x,y) = x % y"
+  prelude "axiom comp_mod_def1: forall x, y:int. x >= 0 and y > 0 -> comp_mod(x,y) = x % y"
+  prelude "axiom comp_mod_def2: forall x, y:int. x <= 0 and y > 0 -> comp_mod(x,y) = -((-x) % y)"
+  prelude "axiom comp_mod_def3: forall x, y:int. x >= 0 and y < 0 -> comp_mod(x,y) = x % (-y)"
+  prelude "axiom comp_mod_def4: forall x, y:int. x <= 0 and y < 0 -> comp_mod(x,y) = -((-x) % (-y)"
 
   syntax function div "comp_div(%1,%2)"
   syntax function mod "comp_mod(%1,%2)"
