@@ -145,6 +145,7 @@ type config_strategy = {
 }
 
 (* a default set of strategies *)
+(*
 let default_strategies =
   List.map
     (fun (name,desc,shortcut,code) ->
@@ -161,6 +162,7 @@ let default_strategies =
       "Compute", "Compute@ in@ goal", "c",
       "t compute_in_goal exit";
     ]
+ *)
 
 let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
@@ -576,7 +578,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies ~default:default_strategies rc in
+  let strategies = get_strategies ~default:[] rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
