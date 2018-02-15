@@ -13,29 +13,33 @@
 <file name="../euler001.mlw" proved="true">
 <theory name="DivModHints" proved="true">
  <goal name="mod_div_unique" proved="true">
- <transf name="assert" proved="true" arg1="(q - div x y) * y + (r - mod x y) = 0">
+ <transf name="introduce_premises" proved="true" >
   <goal name="mod_div_unique.0" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="mod_div_unique.1" proved="true">
-  <transf name="case" proved="true" arg1="q - div x y &gt;= 1">
-   <goal name="mod_div_unique.1.0" expl="true case" proved="true">
-   <proof prover="6"><result status="valid" time="0.11"/></proof>
+  <transf name="assert" proved="true" arg1="(q - div x y) * y + (r - mod x y) = 0">
+   <goal name="mod_div_unique.0.0" proved="true">
+   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="mod_div_unique.1.1" expl="false case" proved="true">
-   <transf name="case" proved="true" arg1="q - div x y &lt;= -1">
-    <goal name="mod_div_unique.1.1.0" expl="false case (true case)" proved="true">
-    <transf name="assert" proved="true" arg1="(y * (q - div x y) &lt;= - y)">
-     <goal name="mod_div_unique.1.1.0.0" proved="true">
-     <proof prover="2"><result status="valid" time="0.46"/></proof>
+   <goal name="mod_div_unique.0.1" proved="true">
+   <transf name="case" proved="true" arg1="q - div x y &gt;= 1">
+    <goal name="mod_div_unique.0.1.0" expl="true case" proved="true">
+    <proof prover="6"><result status="valid" time="0.12"/></proof>
+    </goal>
+    <goal name="mod_div_unique.0.1.1" expl="false case" proved="true">
+    <transf name="case" proved="true" arg1="q - div x y &lt;= -1">
+     <goal name="mod_div_unique.0.1.1.0" expl="false case (true case)" proved="true">
+     <transf name="assert" proved="true" arg1="(y * (q - div x y) &lt;= - y)">
+      <goal name="mod_div_unique.0.1.1.0.0" proved="true">
+      <proof prover="2"><result status="valid" time="0.68"/></proof>
+      </goal>
+      <goal name="mod_div_unique.0.1.1.0.1" expl="false case (true case)" proved="true">
+      <proof prover="7"><result status="valid" time="0.01"/></proof>
+      </goal>
+     </transf>
      </goal>
-     <goal name="mod_div_unique.1.1.0.1" expl="false case (true case)" proved="true">
-     <proof prover="7"><result status="valid" time="0.01"/></proof>
+     <goal name="mod_div_unique.0.1.1.1" expl="false case" proved="true">
+     <proof prover="7"><result status="valid" time="0.02"/></proof>
      </goal>
     </transf>
-    </goal>
-    <goal name="mod_div_unique.1.1.1" expl="false case" proved="true">
-    <proof prover="7"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
    </goal>

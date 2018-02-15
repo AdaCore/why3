@@ -62,29 +62,6 @@
  </goal>
  <goal name="inversion_mem_star_gen" proved="true">
  <proof prover="8" edited="residual_Residuals_inversion_mem_star_gen_1.v"><result status="valid" time="0.28"/></proof>
- <transf name="induction_arg_pr" proved="true" arg1="H2">
-  <goal name="inversion_mem_star_gen.0" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.1" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.2" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.3" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.4" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.5" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.6" proved="true">
-  <proof prover="5"><result status="valid" time="0.12"/></proof>
-  </goal>
- </transf>
  <transf name="induction_pr" proved="true" >
   <goal name="inversion_mem_star_gen.0" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
@@ -106,6 +83,33 @@
   </goal>
   <goal name="inversion_mem_star_gen.6" proved="true">
   <proof prover="6"><result status="valid" time="0.17"/></proof>
+  </goal>
+ </transf>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="inversion_mem_star_gen.0" proved="true">
+  <transf name="induction_arg_pr" proved="true" arg1="H2">
+   <goal name="inversion_mem_star_gen.0.0" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.1" proved="true">
+   <proof prover="5"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.2" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.3" proved="true">
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.4" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.5" proved="true">
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.6" proved="true">
+   <proof prover="5"><result status="valid" time="0.15"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
