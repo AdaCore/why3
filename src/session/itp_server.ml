@@ -894,46 +894,67 @@ end
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-       let s, list_loc = task_of_id d id show_full_context loc in
-       P.notify (Task (nid, s, list_loc))
-    | ATh t ->
-       P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
-    | APa pid ->
-       let pa = get_proof_attempt_node  d.cont.controller_session pid in
-       let parid = pa.parent in
-       let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s, list_loc = task_of_id d parid show_full_context loc in
-       let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
-       (* Display the result of the prover *)
-       let prover_ce =
-         match pa.proof_state with
-         | Some res ->
-             let result =
-               Pp.string_of Call_provers.print_prover_answer
-                 res.Call_provers.pr_answer
-             in
-             let ce_result =
-               Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
-                 res.Call_provers.pr_model
-             in
-             if ce_result = "" then
-               result ^ "\n\n" ^ "The prover did not return counterexamples."
-             else
-               result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
-         | None -> "Result of the prover not available.\n"
-       in
-       P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
-    | AFile f ->
-       P.notify (Task (nid, "File " ^ file_name f, []))
-    | ATn tid ->
-       let name = get_transf_name d.cont.controller_session tid in
-       let args = get_transf_args d.cont.controller_session tid in
-       let parid = get_trans_parent d.cont.controller_session tid in
-       let s, list_loc = task_of_id d parid show_full_context loc in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
-                       String.concat " " (name :: args) ^ "\n", list_loc))
+    let any = any_from_node_ID nid in
+    if Session_itp.is_detached d.cont.controller_session any then
+      match any with
+      | APn _id ->
+        let s = "Goal is detached and cannot be printed" in
+        P.notify (Task (nid, s, []))
+      | ATh t ->
+          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, []))
+      | APa pid ->
+          let pa = get_proof_attempt_node  d.cont.controller_session pid in
+          let name = Pp.string_of Whyconf.print_prover pa.prover in
+          let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
+          P.notify (Task (nid, prover_text, []))
+      | AFile f ->
+          P.notify (Task (nid, "Detached file " ^ file_name f, []))
+      | ATn tid ->
+          let name = get_transf_name d.cont.controller_session tid in
+          let args = get_transf_args d.cont.controller_session tid in
+          P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
+                          String.concat " " (name :: args) ^ "\n", []))
+    else
+      match any with
+      | APn id ->
+          let s, list_loc = task_of_id d id show_full_context loc in
+          P.notify (Task (nid, s, list_loc))
+      | ATh t ->
+          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
+      | APa pid ->
+          let pa = get_proof_attempt_node  d.cont.controller_session pid in
+          let parid = pa.parent in
+          let name = Pp.string_of Whyconf.print_prover pa.prover in
+          let s, list_loc = task_of_id d parid show_full_context loc in
+          let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
+          (* Display the result of the prover *)
+          let prover_ce =
+            match pa.proof_state with
+            | Some res ->
+                let result =
+                  Pp.string_of Call_provers.print_prover_answer
+                    res.Call_provers.pr_answer
+                in
+                let ce_result =
+                  Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                    res.Call_provers.pr_model
+                in
+                if ce_result = "" then
+                  result ^ "\n\n" ^ "The prover did not return counterexamples."
+                else
+                  result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+            | None -> "Result of the prover not available.\n"
+          in
+          P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
+      | AFile f ->
+          P.notify (Task (nid, "File " ^ file_name f, []))
+      | ATn tid ->
+          let name = get_transf_name d.cont.controller_session tid in
+          let args = get_transf_args d.cont.controller_session tid in
+          let parid = get_trans_parent d.cont.controller_session tid in
+          let s, list_loc = task_of_id d parid show_full_context loc in
+          P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
+                          String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 
