@@ -154,7 +154,7 @@ let load_strategies cont =
        Stdlib.Hstr.add cont.Controller_itp.controller_strategies name
                        (name, shortcut, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
-       Format.eprintf "Fatal: loading strategy '%s' failed: %s@." name msg;
+       Format.eprintf "Fatal: loading strategy '%s' failed: %s \nSolve this problem in your why3.conf file and retry.@." name msg;
        exit 1)
     strategies
 
