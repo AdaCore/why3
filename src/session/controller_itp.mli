@@ -86,7 +86,7 @@ end
 type controller = private
   { mutable controller_session : Session_itp.session;
     controller_config : Whyconf.config;
-    controller_env : Env.env;
+    mutable controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
     controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;

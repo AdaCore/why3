@@ -78,7 +78,7 @@ let print_strategy_status fmt st =
 type controller =
   { mutable controller_session: Session_itp.session;
     controller_config : Whyconf.config;
-    controller_env: Env.env;
+    mutable controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
     controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
@@ -225,6 +225,7 @@ let print_session fmt c =
 
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
+  c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
 (*  try
  *)
