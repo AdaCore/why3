@@ -1667,6 +1667,8 @@ predicate is_eq_tbl (a:array (option E.exp)) (l:context')
   | Some e -> forall y z. y=z -> ctx_holds' l y z
               -> E.interp_exp (E.Var i) z = E.interp_exp e z
   end
+use import int.NumOf
+use import array.NumOfEq
 
 let prop_ctx (l:context') (g:equality') : (context', equality')
   requires { valid_ctx' l }
@@ -1713,8 +1715,6 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
       match r with
         | None -> ()
         | Some ex ->
-          (*let ghost vi = exp_of_expr' (Var i) in
-          assert { vi = Some (E.Var i) };*)
           assert { forall l y z. y=z -> ctx_holds' (Cons eq l) y z ->
                    E.interp_exp ex z = interp' e y z
                    = interp' (Var i) y z = y i };
@@ -1734,6 +1734,54 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     end
   in
   fill_tbl_ctx l;
+  (* a contains equalities, let us propagate them so that
+     only a single pass on the context is needed *)
+  let seen = Array.make (m+1) false in
+  let rec propagate_in_tbl (i:int) : unit
+    requires { is_eq_tbl a l }
+    ensures { is_eq_tbl a l }
+    raises { OutOfBounds -> true }
+    variant { numof seen false 0 (m+1) }
+    requires { seen[i] = false }
+    ensures { seen[i] = true }
+    ensures { forall j. old seen[j] -> seen[j] }
+  =
+    label Start in
+    let rec prop (e:E.exp) : E.exp
+      requires { is_eq_tbl a l }
+      ensures { is_eq_tbl a l }
+      ensures { forall y z. y=z -> ctx_holds' l y z ->
+                E.interp_exp e z = E.interp_exp result z }
+      ensures { forall j. old seen[j] -> seen[j] }
+      raises { OutOfBounds -> true }
+      requires { numof seen false 0 (m+1) < numof (seen at Start) false 0 (m+1) }
+      variant { e }
+      = match e with
+        | E.Lit _ -> e
+        | E.Var j ->
+          if (not (defensive_get seen j)) then propagate_in_tbl j;
+          match (defensive_get a j) with
+          | None -> e
+          | Some e' -> e'
+          end
+        | E.Plus e1 e2 -> E.Plus (prop e1) (prop e2)
+        | E.Sub e1 e2 -> E.Sub (prop e1) (prop e2)
+        | E.Minus e -> E.Minus (prop e)
+        end
+    in
+    defensive_set seen i true;
+    assert { numof seen false 0 (m+1) < numof (old seen) false 0 (m+1)
+             by forall j. 0 <= j < m+1 -> (old seen)[j] -> seen[j]
+             so not (old seen)[i] so seen[i] };
+    match a[i] with
+    | None -> ()
+    | Some e -> a[i] <- Some (prop e)
+    end;
+  in
+  for i = 0 to m do
+    invariant { is_eq_tbl a l }
+    if not seen[i] then propagate_in_tbl i;
+  done;
   let rec propagate_exp (e:E.exp)
     ensures { forall y z. y=z -> ctx_holds' l y z ->
               E.interp_exp e z = E.interp_exp result z }
@@ -1782,7 +1830,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     ensures { forall y z. y = z -> ctx_holds' l y z
               -> pos_expr' e z -> pos_expr' result z }
   = match e with
-    | Var _ -> e (* match a[i] with Some e' -> e' | None -> e end*)
+    | Var _ -> e
     | ProdL e c -> ProdL (propagate_e e) (propagate_c c)
     | ProdR c e -> ProdR (propagate_c c) (propagate_e e)
     | Sum e1 e2 -> Sum (propagate_e e1) (propagate_e e2)
@@ -1820,8 +1868,9 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
        Cons h' t'
     end
   in
-  propagate (propagate (propagate l)),
-  propagate_eq (propagate_eq (propagate_eq g))
+  (*propagate (propagate (propagate l)),
+  propagate_eq (propagate_eq (propagate_eq g))*)
+  propagate l, propagate_eq g
 
   use LinearDecisionRationalMP as R
 

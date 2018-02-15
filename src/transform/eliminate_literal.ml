@@ -72,7 +72,8 @@ let elim le_int le_real neg_real type_kept kn
       in
       let f = t_forall_close [v] [] f in
       let ax_decl = create_prop_decl Paxiom pr f in
-      let add_decl t d = try Task.add_decl t d with UnknownIdent _ -> t in
+      let add_decl t d = try Task.add_decl t d
+                         with UnknownIdent _ -> t in (*FIXME*)
       (known_lit, List.fold_left add_decl task [ty_decl; ls_decl; ax_decl])
   | Dtype ts when Mts.exists (fun ts' _ -> ts_equal ts ts') float_metas
                && not (Sts.mem ts type_kept) ->
