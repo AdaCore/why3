@@ -2,15 +2,22 @@
 
 dir=`dirname $0`
 
+updateoracle=false
+files=""
+
+while test $# != 0; do
 case "$1" in
   "-update-oracle")
         updateoracle=true;;
-  "")
-        updateoracle=false;;
   *)
-        echo "$0: Unknown option '$1'"
-        exit 2
+       files="$files $1"
 esac
+shift
+done
+
+if test "$files" = "" ; then
+    files="ce/*.mlw"
+fi
 
 cd $dir
 
@@ -38,7 +45,7 @@ run () {
 
 
 
-for file in ce/*.mlw; do
+for file in $files; do
     filebase=`basename $file .mlw`
     run CVC4,1.5 ce/$filebase
     run Z3,4.5.0 ce/$filebase

@@ -1,2 +1,14 @@
-ce/map.mlw M WP_parameter incr : Timeout
-ce/map.mlw M WP_parameter test_loop : Timeout
+ce/map.mlw ModelMap t1 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 5:
+i = {"type" : "Integer" , "val" : "0" }
+t = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "1" } },
+{"others" : {"type" : "Integer" ,
+"val" : "1" } }] }
+
+ce/map.mlw M WP_parameter test_map : Timeout
+ce/map.mlw M WP_parameter test_map_multidim1 : Timeout
+ce/map.mlw M WP_parameter test_map_multidim2 : Timeout
+ce/map.mlw M WP_parameter proj_map_test1 : Timeout
+ce/map.mlw M WP_parameter proj_map_test2 : Timeout

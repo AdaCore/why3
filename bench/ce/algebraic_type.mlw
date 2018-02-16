@@ -1,15 +1,39 @@
 module M
-  use import ref.Ref
-  use import list.List
   use import int.Int
 
   type int_type = Integer int
 
   goal G : forall x : int_type. match x with Integer y -> y > 0 end
 
-  let test_post (x : int) (y : ref int): unit
-    ensures { "model_vc_post" old !y >= x }
-      =
-      y := x - 1 + !y
+(*
+  (*********************************
+   ** Non-terminating projections **
+   *********************************)
+   (* Warning: if definition of the following projections are present,
+      the proof of everything below will not terminate. *)
+  function projfl "model_trace:.projfl" (l : list int_type) : int
+  =
+  match l with
+  | Nil -> 0
+  | Cons (Integer n) _ -> n
+  | _ -> 0
+  end
+  meta "inline : no" function projfl
+  meta "model_projection" function projfl
+
+  (* list int_type will be projected using projfl to int,
+     int will be projected using projfi, projf1, and projf2
+     Warning: does not terminate. *)
+  let proj_test ( l "model_projected" : list int_type) : int
+  ensures { result > 0  }
+  =
+  match l with
+  | Nil -> 1
+  | Cons (Integer n) _ -> n
+  | _ -> 1
+  end
+
+
+*)
 
 end
