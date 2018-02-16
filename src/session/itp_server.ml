@@ -329,6 +329,7 @@ let print_notify fmt n =
       print_msg fmt msg
   | Dead s                             -> fprintf fmt "dead :%s" s
   | File_contents (_f, _s)             -> fprintf fmt "file contents"
+  | Source_and_ce (_s)                 -> fprintf fmt "source and ce"
   | Task (ni, _s, list_loc)            ->
       fprintf fmt "task for node_ID %d which contains a list of loc %a"
         ni print_list_loc list_loc
@@ -557,6 +558,7 @@ let get_modified_node n =
   | Dead _ -> None
   | Task (nid, _, _) -> Some nid
   | File_contents _ -> None
+  | Source_and_ce _ -> None
 
 
 type focus =
@@ -892,6 +894,22 @@ end
     in
     task_text, loc_color_list
 
+  (* This notify the counterexample tab which should contain a counterexample
+     interleaved with source code
+   *)
+  let notify_ce_tab s res any =
+    let f = get_encapsulating_file s any in
+    let filename = Sysutil.absolutize_filename
+      (Session_itp.get_dir s) (file_name f)
+    in
+    let source_code = Sysutil.file_contents filename in
+    let ce_result =
+      Model_parser.interleave_with_source res.Call_provers.pr_model
+        filename source_code
+    in
+    P.notify (Source_and_ce ce_result)
+
+
   let send_task nid show_full_context loc =
     let d = get_server_data () in
     let any = any_from_node_ID nid in
@@ -935,6 +953,7 @@ end
                   Pp.string_of Call_provers.print_prover_answer
                     res.Call_provers.pr_answer
                 in
+                notify_ce_tab d.cont.controller_session res any;
                 let ce_result =
                   Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
                     res.Call_provers.pr_model

@@ -2275,6 +2275,11 @@ let treat_notification n =
       with
       | Not_found -> create_source_view file_name content
     end
+  | Source_and_ce (content) ->
+    begin
+      messages_notebook#goto_page counterexample_page;
+      counterexample_view#source_buffer#set_text content;
+    end
   | Dead _ ->
      print_message ~kind:1 ~notif_kind:"Server Dead ?"
                         "Server sent the notification '%a'. Please report."

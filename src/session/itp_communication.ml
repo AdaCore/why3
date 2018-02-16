@@ -100,6 +100,8 @@ type notification =
      etc) *)
   | File_contents of string * string
   (* File_contents (filename, contents) *)
+  | Source_and_ce of string
+  (* Source interleaved with counterexamples: contents *)
 
 type ide_request =
   | Command_req             of node_ID * string

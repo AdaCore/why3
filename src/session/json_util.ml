@@ -127,6 +127,7 @@ let convert_notification_constructor n =
   | Dead _                       -> String "Dead"
   | Task _                       -> String "Task"
   | File_contents _              -> String "File_contents"
+  | Source_and_ce _              -> String "Source_and_ce"
 
 let convert_node_type_string nt =
   match nt with
@@ -368,7 +369,10 @@ let print_notification_to_json (n: notification): json =
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
-           "content", String s])
+           "content", String s]
+  | Source_and_ce (s) ->
+      convert_record ["notification", cc n;
+                      "content", String s])
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -698,6 +702,11 @@ let parse_notification constr j =
     let f = get_string (get_field j "file") in
     let s = get_string (get_field j "content") in
     File_contents(f,s)
+
+  | "Source_and_ce" ->
+    let s = get_string (get_field j "content") in
+    Source_and_ce(s)
+
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 
