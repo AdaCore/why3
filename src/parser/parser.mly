@@ -747,11 +747,14 @@ expr_:
       | _ -> raise Error }
 | LET top_ghost pattern EQUAL seq_expr IN seq_expr
     { match $3.pat_desc with
-      | Pvar id -> Elet (id, $2, $5, $7)
+      | Pvar id ->
+          let id = add_model_trace id in
+          Elet (id, $2, $5, $7)
       | Pwild -> Elet (id_anonymous $3.pat_loc, $2, $5, $7)
       | Ptuple [] -> Elet (id_anonymous $3.pat_loc, $2,
           { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
       | Pcast ({pat_desc = Pvar id}, ty) ->
+          let id = add_model_trace id in
           Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
       | Pcast ({pat_desc = Pwild}, ty) ->
           let id = id_anonymous $3.pat_loc in
@@ -764,7 +767,8 @@ expr_:
             | Gnone -> $5 in
           Ematch (e, [$3, $7]) }
 | LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { Elet ($3, $2, $5, $7) }
+    { let id = add_model_trace $3 in
+      Elet (id, $2, $5, $7) }
 | LET top_ghost labels(lident_nq) fun_defn IN seq_expr
     { Efun ($3, $2, $4, $6) }
 | LET top_ghost labels(lident_op_id) fun_defn IN seq_expr
@@ -786,7 +790,8 @@ expr_:
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { Ewhile ($2, $4, $5) }
 | FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
-    { Efor ($2, $4, $5, $6, $8, $9) }
+    { let id = add_model_trace $2 in
+      Efor (id, $4, $5, $6, $8, $9) }
 | ABSURD
     { Eabsurd }
 | RAISE uqualid
@@ -939,12 +944,14 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS labels(lident_nq) { Pas ($1,$3) }
+| mk_pat(pat_uni_) AS labels(lident_nq) {
+  let id = add_model_trace $3 in Pas ($1,id) }
 | mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
-| labels(lident_nq)                     { Pvar $1 }
+| labels(lident_nq)                     {
+  let id = add_model_trace $1 in Pvar id }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern_ RIGHTPAR             { $2 }
