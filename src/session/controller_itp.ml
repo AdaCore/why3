@@ -91,17 +91,9 @@ let set_session_max_tasks n =
   session_max_tasks := n;
   Prove_client.set_max_running_provers n
 
-let create_controller config env ses =
-  let c =
-    {
-      controller_session = ses;
-      controller_config = config;
-      controller_env = env;
-      controller_provers = Whyconf.Hprover.create 7;
-      controller_strategies = Stdlib.Hstr.create 7;
-      controller_running_proof_attempts = Hpan.create 17;
-    }
-  in
+let load_drivers c =
+  let env = c.controller_env in
+  let config = c.controller_config in
   let provers = Whyconf.get_provers config in
   Whyconf.Mprover.iter
     (fun _ p ->
@@ -113,7 +105,20 @@ let create_controller config env ses =
          "[Controller_itp] error while loading driver for prover %a: %a@."
          Whyconf.print_prover p.Whyconf.prover
          Exn_printer.exn_printer e)
-    provers;
+    provers
+
+let create_controller config env ses =
+  let c =
+    {
+      controller_session = ses;
+      controller_config = config;
+      controller_env = env;
+      controller_provers = Whyconf.Hprover.create 7;
+      controller_strategies = Stdlib.Hstr.create 7;
+      controller_running_proof_attempts = Hpan.create 17;
+    }
+  in
+  load_drivers c;
   c
 
 
@@ -226,6 +231,8 @@ let print_session fmt c =
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
+  Whyconf.Hprover.reset c.controller_provers;
+  load_drivers c;
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
 (*  try
  *)
