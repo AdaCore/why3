@@ -950,9 +950,6 @@ let counterexample_view =
     ()
 
 
-
-
-
 let message_zone =
   let sv = GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
@@ -1270,6 +1267,7 @@ let () =
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   task_view#source_buffer#set_language why_lang;
+  counterexample_view#source_buffer#set_language why_lang;
   Gconfig.set_fonts ()
 
 
