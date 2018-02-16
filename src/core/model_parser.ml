@@ -307,7 +307,7 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser =  string -> model_element list
+type raw_model_parser = Stdlib.Sstr.t -> string -> model_element list
 
 (*
 ***************************************************************
@@ -673,18 +673,19 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
-    let raw_model = raw_mp input in
+    let list_proj = printer_mapping.list_projections in
+    let raw_model = raw_mp list_proj input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s);
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_raw_model_parser s =
+let lookup_raw_model_parser s : raw_model_parser =
   try snd (Hstr.find model_parsers s)
   with Not_found -> raise (UnknownModelParser s)
 
-let lookup_model_parser s =
+let lookup_model_parser s : model_parser =
   make_mp_from_raw (lookup_raw_model_parser s)
 
 let list_model_parsers () =
@@ -692,4 +693,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ -> [])
+  (fun _ _ -> [])

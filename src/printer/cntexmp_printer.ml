@@ -75,6 +75,8 @@ let model_label = Ident.create_label "model"
   (* This label identifies terms that should be in counter-example. *)
 let model_vc_term_label = Ident.create_label "model_vc"
   (* This label identifies the term that triggers the VC. *)
+let model_projection = Ident.create_label "model_projection"
+
 
 let add_model_element (el: term) info_model =
 (** Add element el (term) to info_model.

@@ -309,81 +309,91 @@ let print_table t =
 (* Given a to_rep and its corresponding of_rep in the model gives a guessed
    value to unknown variables using constant of_rep/to_rep and "else" case of
    the ITE.*)
-let corres_else_element table to_rep of_rep =
+let corres_else_element table to_rep =
   let (_key1, (_b1, to_rep)) = to_rep in
-  let (_key2, (_b2, of_rep)) = of_rep in
+  (*let (_key2, (_b2, of_rep)) = of_rep in*)
   let to_rep = match to_rep with
   | Term t -> t
   | Function (_, t) -> t
   | Noelement -> raise Not_value in
-
+(*
   let of_rep = match of_rep with
   | Term t -> t
   | Function (_, t) -> t
   | Noelement -> raise Not_value in
-
-  let rec corres_else_element table to_rep of_rep =
-    match (to_rep, of_rep) with
-    | Ite (_, _, _, to_rep), _ -> corres_else_element table to_rep of_rep
-    | _, Ite (_, _, _, of_rep) -> corres_else_element table to_rep of_rep
-    | t, Cvc4_Variable cvc ->
+*)
+  let cvc = ref None in
+  let rec corres_else_element table to_rep =
+    match to_rep with
+    | Ite (Function_Local_Variable _v, Cvc4_Variable v, _, to_rep) ->
+        cvc := Some v;
+        corres_else_element table to_rep
+    | t ->
         (* Make all variables not already guessed equal to the else case *)
-        let s = remove_end_num cvc in
-        add_all_cvc s table (false, Term t)
-    | _ -> table
+      begin
+        match !cvc with
+        | None -> table
+        | Some cvc ->
+            (* Last element of the if is added for all unassigned variables of
+               same name. *)
+            let s = remove_end_num cvc in
+            add_all_cvc s table (false, Term t)
+      end
   in
-  (* Case where to_rep, of_rep are constant values *)
-  let table =
-    match (to_rep, of_rep) with
-    | t, Cvc4_Variable cvc ->
-        Mstr.add cvc (false, Term t) table
-    | _ -> table
-  in
-  corres_else_element table to_rep of_rep
+  corres_else_element table to_rep
 
-let to_rep_of_rep (table: correspondence_table) =
-  let to_reps =
+let to_rep_of_rep (table: correspondence_table) (projections_list: Stdlib.Sstr.t) =
+  let projections_lists =
+    Mstr.fold (fun key value acc ->
+      if Stdlib.Sstr.mem key projections_list then
+        (key, value) :: acc else acc) table [] in
+(*
     List.sort (fun x y -> String.compare (fst x) (fst y))
       (Mstr.fold (fun key value acc ->
         if has_prefix "to_rep" key then
         (key,value) :: acc else acc) table []) in
-
+*)
+(*
   let of_reps =
     List.sort (fun x y -> String.compare (fst x) (fst y))
       (Mstr.fold (fun key value acc -> if has_prefix "of_rep" key then
         (key,value) :: acc else acc) table []) in
+*)
+  List.fold_left (fun table to_rep ->
+      corres_else_element table to_rep)
+    table projections_lists
+(*
+  let to_rep_of_rep table to_reps =
+    List.fold_left (fun table to_rep ->
+      corres_else_element table to_rep)
+    table projections_lists
+(*
+    match to_reps with
+    | to_rep :: tl1 ->
+      let table = corres_else_element table to_rep in
+      to_rep_of_rep table tl1
+    | [] -> table*)
+  in
 
-  let rec to_rep_of_rep table to_reps of_reps =
-    match to_reps, of_reps with
-    | to_rep :: tl1, of_rep :: tl2 ->
-      let table = corres_else_element table to_rep of_rep in
-      to_rep_of_rep table tl1 tl2
-    | [], [] -> table
-    | _ -> table (* Error case *) in
+  to_rep_of_rep table projections_list
+*)
 
-  to_rep_of_rep table to_reps of_reps
-
-
-let create_list (table: correspondence_table) =
+let create_list (projections_list: Stdlib.Sstr.t) (table: correspondence_table) =
 
   (* First populate the table with all references to a cvc variable *)
   let table = get_all_var table in
 
-  (* First recover the values of variables that can be recovered in to/of_rep *)
+  (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if has_prefix "of_rep" key && not (String.contains key '!') then
-        add_vars_to_table acc value else acc) table table in
-
-  (* of_rep is done before to_rep because we complete from value with the
-     else branch of the function *)
-  let table =
-    Mstr.fold (fun key value acc ->
-      if has_prefix "to_rep" key && not (String.contains key '!') then
-        add_vars_to_table acc value else acc) table table in
+      if Stdlib.Sstr.mem key projections_list then
+        add_vars_to_table acc value
+      else
+        acc)
+      table table in
 
   (* Recover values from the combination of to_rep and of_rep *)
-  let table = to_rep_of_rep table in
+  let table = to_rep_of_rep table projections_list in
 
   (* Then substitute all variables with their values *)
   let table =
