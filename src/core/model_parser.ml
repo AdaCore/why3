@@ -443,14 +443,8 @@ let interleave_with_source
     let model_file = StringMap.find filename model.model_files in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      let lines = Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1) in
-      let remove_last_element list =
-	let list_rev = List.rev list in
-	match list_rev with
-	| _ :: tail -> List.rev tail
-	| _ -> List.rev list_rev
-      in
-      remove_last_element lines in
+      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+    in
     let (source_code, _) = List.fold_left
       (interleave_line
 	 start_comment end_comment me_name_trans model_file)

@@ -904,8 +904,9 @@ end
     in
     let source_code = Sysutil.file_contents filename in
     let ce_result =
-      Model_parser.interleave_with_source res.Call_provers.pr_model
-        filename source_code
+      Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+        ?me_name_trans:None res.Call_provers.pr_model ~filename:filename
+         ~source_code:source_code
     in
     P.notify (Source_and_ce ce_result)
 
@@ -953,7 +954,6 @@ end
                   Pp.string_of Call_provers.print_prover_answer
                     res.Call_provers.pr_answer
                 in
-                notify_ce_tab d.cont.controller_session res any;
                 let ce_result =
                   Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
                     res.Call_provers.pr_model
@@ -961,7 +961,10 @@ end
                 if ce_result = "" then
                   result ^ "\n\n" ^ "The prover did not return counterexamples."
                 else
-                  result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+                  begin
+                    notify_ce_tab d.cont.controller_session res any;
+                    result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+                  end
             | None -> "Result of the prover not available.\n"
           in
           P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
