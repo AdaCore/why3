@@ -53,7 +53,6 @@ end
 module LinearEquationsDecision
 
 use import int.Int
-
 type coeff
 
 clone LinearEquationsCoeffs as C with type t = coeff
@@ -296,6 +295,8 @@ let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
                  norm_eq_aux e2 ae ac
   end
 
+use import debug.Debug
+
 let norm_eq (e:equality) : (expr, coeff)
   returns { (ex, c) -> forall y z.
             interp_eq e y z <-> interp_eq (ex, Cst c) y z }
@@ -473,8 +474,6 @@ let sub_expr (e1 e2:expr)
            = C.(+) (C.(+) v1 (C.( *) v2 (C.(-_) C.aone))) v2
            = C.(+) (C.(+) v1 (C.(-_) v2)) v2 = v1 };
   r
-
-use import debug.Debug
 
 let rec same_eq (eq1 eq2: equality) : bool
   ensures { result -> forall y z. interp_eq eq1 y z -> interp_eq eq2 y z }
@@ -660,15 +659,17 @@ let linear_decision (l: context) (g: equality) : bool
     variant { length l - i }
     requires { length l - i = length ctx }
     requires { 0 <= i <= length l }
-    raises  { C.Unknown -> true }
     raises  { Absurd -> true }
   = match ctx with
     | Nil -> ()
     | Cons e t ->
       assert { i < length l };
-      let ex, c = norm_eq e in
-      if (not (C.eq c C.czero)) then b[i] <- C.add b[i] c;
-      fill_expr ex i;
+      try
+        let ex, c = norm_eq e in
+        if (not (C.eq c C.czero)) then b[i] <- C.add b[i] c;
+        fill_expr ex i;
+      with C.Unknown -> () (* some equalities are in the context but cannot be normalized, typically they are useless, ignore them *)
+      end;
       fill_ctx t (i+1)
     end in
   let rec fill_goal (ex:expr) : unit
@@ -808,7 +809,7 @@ use import int.Abs
 type t = (int, int)
 type rvars = int -> real
 
-exception Unknown
+exception QError
 
 let constant rzero = (0,1)
 let constant rone = (1,1)
@@ -889,10 +890,10 @@ let simp (t:t) : t
 
 let radd (a b:t)
   ensures { forall y. rinterp result y = rinterp a y +. rinterp b y }
-  raises  { Unknown -> true }
+  raises  { QError -> true }
 = match (a,b) with
   | (n1,d1), (n2,d2) ->
-  if d1 = 0 || d2 = 0 then raise Unknown
+  if d1 = 0 || d2 = 0 then raise QError
   else begin
     let r = (n1*d2 + n2*d1, d1*d2) in
     let ghost d = from_int d1 *. from_int d2 in
@@ -908,10 +909,10 @@ let radd (a b:t)
 
 let rmul (a b:t)
   ensures { forall y. rinterp result y = rinterp a y *. rinterp b y }
-  raises  { Unknown -> true }
+  raises  { QError -> true }
 = match (a,b) with
   | (n1,d1), (n2, d2) ->
-    if d1 = 0 || d2 = 0 then raise Unknown
+    if d1 = 0 || d2 = 0 then raise QError
     else begin
       let r =  (n1*n2, d1*d2) in
       assert { forall y. rinterp r y = rinterp a y *. rinterp b y
@@ -939,9 +940,9 @@ let rinv (a:t)
   requires { not req a rzero }
   ensures { not req result rzero }
   ensures { forall y. rinterp result y *. rinterp a y = 1.0 }
-  raises  { Unknown -> true }
+  raises  { QError -> true }
 = match a with
-  | (n,d) -> if n = 0 || d = 0 then raise Unknown else (d,n)
+  | (n,d) -> if n = 0 || d = 0 then raise QError else (d,n)
   end
 
 end
@@ -952,7 +953,7 @@ use import RationalCoeffs
 use import real.RealInfix
 use import real.FromInt
 
-clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = Unknown, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 end
 
@@ -963,21 +964,21 @@ use import int.Int
 function id (t:int) (v:int -> int) : int = t
 let predicate eq (a b:int) = a=b
 
-exception Unknown
+exception NError
 let inv (t:int) : int
   (*ensures { forall v: int -> int. id result v * id t v = one }*)
   ensures { not (eq result zero) }
-  raises { Unknown -> true }
-= raise Unknown
+  raises { NError -> true }
+= raise NError
 
 clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = int, type C.cvars = int->int,function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = (*), val C.opp = (-_), val C.eq = eq, val C.inv = inv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 
 use import real.FromInt
-
 use import RationalCoeffs
 use LinearDecisionRational as R
 use import list.List
+
 let function m (x:int) : (int, int)
   ensures { forall z. rinterp result z = from_int x }
   = (x,1)
@@ -1029,7 +1030,7 @@ let int_decision (l: context') (g: equality') : bool
   requires { valid_ctx' l }
   requires { valid_eq' g }
   ensures { forall y z. result -> interp_ctx' l g y z }
-  raises  { R.Absurd -> true | (* R.NonLinear -> true | *) Unknown -> true }
+  raises  { R.Absurd -> true | QError -> true }
 = R.decision (m_ctx l) (m_eq g)
 
 end
@@ -1043,6 +1044,7 @@ use import int.Int
 use import real.RealInfix
 use import real.FromInt
 
+meta "compute_max_steps" 0x10000
 meta coercion function from_int
 
 goal g: forall x y: real.
@@ -1055,6 +1057,8 @@ module TestInt
 
 use import LinearDecisionInt
 use import int.Int
+
+meta "compute_max_steps" 0x10000
 
 goal g: forall x y:int.
      3 * x + 2 * y = 21 ->
@@ -1111,7 +1115,7 @@ function minterp (t:t) (y:evars) : real
   qinterp q *. pow rradix (from_int (interp_exp e y))
   end
 
-exception Unknown
+exception MPError
 
 let rec opp_exp (e:exp)
   ensures { forall y. interp_exp result y = - interp_exp e y }
@@ -1129,19 +1133,19 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
             if s
             then interp_exp result y = interp_exp e1 y + interp_exp e2 y
             else interp_exp result y = interp_exp e1 y - interp_exp e2 y }
-  raises  { Unknown -> true }
+  raises  { MPError -> true }
   variant { e2, e1 }
 =
   let rec add_atom (e a:exp) (s:bool) : (exp, bool)
     returns { r, _ -> forall y.
               if s then interp_exp r y = interp_exp e y + interp_exp a y
                    else interp_exp r y = interp_exp e y - interp_exp a y }
-    raises { Unknown -> true }
+    raises { MPError -> true }
     variant { e }
   = match (e,a) with
-    | Lit n1, Lit n2 -> (if s then Lit (n1+n2) else Lit (n1-n2)), true
+    | Lit n1, Lit n2 -> (if s then Lit (n1+n2) else Lit (n1-n2)), True
     | Lit n, Var i
-      -> if n = 0 then (if s then Var i else Minus (Var i)), true
+      -> if n = 0 then (if s then Var i else Minus (Var i)), True
          else (if s then Plus e a else Sub e a), False
     | Var i, Lit n
       -> if n = 0 then Var i, true
@@ -1159,6 +1163,9 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
                       else
                         if i = j then Lit 0, True
                         else Sub e a, False
+    | Minus (Var i), Minus (Var j) ->
+      if (not s) && (i=j) then Lit 0, true
+      else (if s then Plus e a else Sub e a), False
     | Minus _, Minus _ -> (if s then Plus e a else Sub e a), False
     | Plus e1 e2, _ ->
       let r, b = add_atom e1 a s in
@@ -1179,7 +1186,7 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
            if b then Sub e1 r, True
            else if s then Sub (Plus e1 a) e2, False
                 else Sub e1 (Plus e2 a), False
-    | _ -> raise Unknown
+    | _ -> raise MPError
     end
   in
   match e2 with
@@ -1204,14 +1211,14 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
 
 let add_exp (e1 e2:exp) : exp
   ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
-  raises  { Unknown -> True }
+  raises  { MPError -> True }
 = add_sub_exp e1 e2 True
 
 
 let rec zero_exp (e:exp) : bool
   ensures { result -> forall y. interp_exp e y = 0 }
   variant { e }
-  raises  { Unknown -> true }
+  raises  { MPError -> true }
 =
   let rec all_zero (e:exp) : bool
     ensures { result -> forall y. interp_exp e y = 0 }
@@ -1230,7 +1237,7 @@ let rec zero_exp (e:exp) : bool
 let rec same_exp (e1 e2: exp)
   ensures { result -> forall y. interp_exp e1 y = interp_exp e2 y }
   variant { e1, e2 }
-  raises  { Unknown -> true }
+  raises  { MPError -> true }
 = match e1, e2 with
   | Lit n1, Lit n2 -> n1 = n2
   | Var v1, Var v2 -> v1 = v2
@@ -1240,8 +1247,8 @@ let rec same_exp (e1 e2: exp)
 
 let madd (a b:t)
   ensures { forall y. minterp result y = minterp a y +. minterp b y }
-  raises  { Unknown -> true }
-  raises  { Q.Unknown -> true }
+  raises  { MPError -> true }
+  raises  { Q.QError -> true }
 = match a, b with
   | (q1, e1), (q2, e2) ->
     if Q.req q1 Q.rzero then b
@@ -1256,13 +1263,13 @@ let madd (a b:t)
                   = qinterp q1 *. p +. qinterp q2 *. p
                   = minterp a y +. minterp b y };
       (q,e1) end
-    else (print a; print b; raise Unknown)
+    else raise MPError
   end
 
 let mmul (a b:t)
   ensures { forall y. minterp result y = minterp a y *. minterp b y }
-  raises  { Q.Unknown -> true }
-  raises  { Unknown -> true }
+  raises  { Q.QError -> true }
+  raises  { MPError -> true }
 = match a, b with
   | (q1,e1), (q2,e2) ->
     let q = Q.rmul q1 q2 in
@@ -1310,7 +1317,7 @@ let minv (a:t)
   requires { not meq a mzero }
   ensures  { not meq result mzero }
 (*  ensures  { forall y. minterp result y *. minterp a y = 1.0 } no need to prove this*)
-  raises   { Q.Unknown -> true }
+  raises   { Q.QError -> true }
 = match a with
   | (q,e) -> (Q.rinv q, opp_exp e)
   end
@@ -1324,7 +1331,7 @@ use import real.RealInfix
 
 type coeff = t
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = Q.Unknown, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = MPError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 end
 module LinearDecisionIntMP
@@ -1349,18 +1356,18 @@ function mpinterp (t:t) (y:evars) : int
 
 let mpadd (a b:t) : t
   ensures { forall y. mpinterp result y = mpinterp a y + mpinterp b y }
-  raises  { Unknown -> true }
-= raise Unknown
+  raises  { MPError -> true }
+= raise MPError
 
 let mpmul (a b:t) : t
   ensures { forall y. mpinterp result y = mpinterp a y * mpinterp b y }
-  raises  { Unknown -> true }
-= raise Unknown
+  raises  { MPError -> true }
+= raise MPError
 
 let mpopp (a:t) : t
   ensures { forall y. mpinterp result y = - mpinterp a y }
-  raises  { Unknown -> true }
-= raise Unknown
+  raises  { MPError -> true }
+= raise MPError
 
 let predicate mpeq (a b:t)
   ensures { result -> forall y. mpinterp a y = mpinterp b y }
@@ -1370,8 +1377,8 @@ let predicate mpeq (a b:t)
 
 let mpinv (a:t) : t
   ensures { not mpeq result mpzero }
-  raises  { Unknown -> true }
-= raise Unknown
+  raises  { MPError -> true }
+= raise MPError
 
 
 clone export LinearEquationsDecision with type C.a = int, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
@@ -1469,7 +1476,7 @@ let mp_decision (l: context') (g: equality') : bool
   requires { valid_eq' g }
   ensures  { forall y z. result -> pos_ctx' l z -> pos_eq' g z
              -> interp_ctx' l g y z }
-  raises  { R.Absurd -> true | Unknown -> true | Q.Unknown -> true }
+  raises  { R.Absurd -> true | MPError -> true | Q.QError -> true }
 =
   R.decision (m_ctx l) (m_eq g)
 
@@ -1868,8 +1875,6 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
        Cons h' t'
     end
   in
-  (*propagate (propagate (propagate l)),
-  propagate_eq (propagate_eq (propagate_eq g))*)
   propagate l, propagate_eq g
 
   use LinearDecisionRationalMP as R
@@ -1879,8 +1884,8 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     requires { valid_eq' g }
     ensures { forall y z. result ->  pos_ctx' l z -> pos_eq' g z
                           -> y = z -> interp_ctx' l g y z }
-    raises { | OutOfBounds -> true | E.Unknown -> true
-             | E.Q.Unknown -> true | R.Absurd -> true}
+    raises { | OutOfBounds -> true | E.MPError -> true
+             | E.Q.QError -> true | R.Absurd -> true}
   = let l', g' = prop_ctx l g in
     mp_decision l' g'
 
@@ -1892,6 +1897,8 @@ use import EqPropMP
 use import mach.int.UInt64
 use import int.Int
 use import int.Power
+
+meta "compute_max_steps" 0x10000
 
 goal g: forall i x c r: int.
   0 <= i ->
@@ -1921,6 +1928,8 @@ module Test2
 
 use import int.Int
 use import LinearDecisionInt
+
+meta "compute_max_steps" 0x10000
 
 goal g: forall x y z: int.
   x + y = 0 ->
@@ -1965,6 +1974,8 @@ end
 module TestFmla
 
 use import Fmla
+
+meta "compute_max_steps" 0x10000
 
 goal g:
      forall a: value.

@@ -4,6 +4,7 @@ open Decl
 open Ident
 open Task
 open Args_wrapper
+open Generic_arg_trans_utils
 
 exception NoReification
 exception Exit of string
@@ -299,7 +300,7 @@ let rec reify_term renv t rt =
       end
   and invert_interp renv ls (t:term) =
     let ld = try Opt.get (find_logic_definition renv.kn ls)
-             with _ ->
+             with Invalid_argument _ ->
                   if debug
                   then Format.printf "did not find def of %a@."
                                      Pretty.print_ls ls;
@@ -336,7 +337,7 @@ let rec reify_term renv t rt =
            raise NoReification
   and invert_ctx_interp renv ls t l g =
     let ld = try Opt.get (find_logic_definition renv.kn ls)
-             with _ ->
+             with Invalid_argument _ ->
                   if debug
                   then Format.printf "did not find def of %a@." Pretty.print_ls ls;
                   raise NoReification
@@ -400,6 +401,9 @@ let rec reify_term renv t rt =
                   match td.td_node with
                   | Decl {d_node = Dprop (Paxiom, _, e)}
                     -> add_to_ctx (renv, ctx) e
+                  | Decl {d_node = Dlogic [ls, ld]} when ls.ls_args = []
+                    ->
+                     add_to_ctx (renv, ctx) (ls_defn_axiom ld)
                   | _-> renv,ctx)
                              (renv, (t_app nil [] (Some ty_list_g))) renv.task in
           { renv with subst = Mvs.add l ctx renv.subst }
@@ -552,6 +556,7 @@ let build_goals do_trans prev prs subst env lp g rt =
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
   if debug then Format.printf "building cut indication rt %a g %a@."
                               Pretty.print_term rt Pretty.print_term g;
+  let compute_hyp pr = Compute.normalize_hyp None (Some pr) env in
   let compute_in_goal = Compute.normalize_goal_transf_all env in
   let ltask_r =
     try let ci =
@@ -566,31 +571,28 @@ let build_goals do_trans prev prs subst env lp g rt =
           | _ -> raise Not_found in
         if debug then Format.printf "cut ok@.";
         Trans.apply (Cut.cut ci (Some "interp")) task_r
-    with _ ->
+    with Arg_trans _ | TypeMismatch _ | Not_found ->
          if debug then Format.printf "no cut found@.";
-         let t = Trans.apply (Ind_itp.revert_tr_symbol [Tsprsymbol hr]) task_r in
          if do_trans
          then
-           let t = Trans.apply compute_in_goal t in
+           let t = Trans.apply (compute_hyp hr) task_r in
            match t with
            | [t] ->
-              let rewrite pr = Apply.rewrite None false pr None in
-              let lt, prs =
-                List.fold_left
-                  (fun (acc, f) pr ->
-                    try (Lists.apply (Trans.apply (rewrite pr)) acc,f)
-                    with _ -> acc, pr::f)
-                  ([t],[]) prs in
-              (* for the prs that failed once, trying again seems to work ? *)
-              List.fold_left
-                (fun acc pr ->
-                  try Lists.apply (Trans.apply (rewrite pr)) acc
-                  with _ -> acc)
-                lt (List.rev prs)
-
+              let rewrite pr = Apply.rewrite None false pr (Some hr) in
+              let rewrites lt =
+                 List.fold_left
+                   (fun (acc, b) pr ->
+                    try (Lists.apply (Trans.apply (rewrite pr)) acc,true)
+                    with Arg_trans  _ -> acc, b)
+                   (lt,false) prs in
+              let rec rewrite_loop lt =
+                let (lt, b) = rewrites lt in
+                if b then rewrite_loop lt
+                else lt in
+              rewrite_loop [t]
            | [] -> []
            | _ -> assert false
-         else [t] in
+         else [task_r] in
   let lt = List.map (fun ng -> Task.add_decl prev
                        (create_prop_decl Pgoal (create_prsymbol (id_fresh "G")) ng))
                     inst_lp in
@@ -1172,18 +1174,20 @@ let rec interp_expr info (e:Mltree.expr) : value =
           let rec aux = function
             | [] -> if debug then Format.printf "Etry: uncaught exception@.";
                     raise e
-            | (xs', pvl, e) :: bl when xs_equal xs xs' ->
-               begin match pvl, ov with
-               | [], None -> interp_expr info e
-               | l, Some (Vtuple l') when (List.length l = List.length l') ->
-                  let info = List.fold_left2 (fun info pv v -> add_pv pv v info)
-                                             info l l' in
-                  interp_expr info e
-               | [pv], Some v ->
-                  interp_expr (add_pv pv v info) e
-               | _ -> if debug then Format.printf "Etry: bad arity@.";
-                      aux bl end
-            | _::bl -> aux bl
+            | (xs', pvl, e) :: bl ->
+               if xs_equal xs xs'
+               then begin
+                 match pvl, ov with
+                 | [], None -> interp_expr info e
+                 | l, Some (Vtuple l') when (List.length l = List.length l') ->
+                    let info = List.fold_left2 (fun info pv v -> add_pv pv v info)
+                                               info l l' in
+                    interp_expr info e
+                 | [pv], Some v ->
+                    interp_expr (add_pv pv v info) e
+                 | _ -> if debug then Format.printf "Etry: bad arity@.";
+                        aux bl end
+               else aux bl
           in
           aux bl)
 
@@ -1192,21 +1196,28 @@ let eval_fun decl info = match decl with
      interp_expr info expr
   | _ -> raise CannotReduce
 
-let rec value_of_term t =
+let rec value_of_term kn t =
   match t.t_node with
   | Ttrue -> Vbool true
   | Tfalse -> Vbool false
   | Term.Tapp (ls, lp) when ls.ls_constr > 0 ->
      let rs = restore_rs ls in
      if is_rs_tuple rs
-     then Vtuple (List.map value_of_term lp)
+     then Vtuple (List.map (value_of_term kn) lp)
      else Vconstr ((restore_rs ls),
-                   (List.map (fun t -> Fimmutable (value_of_term t)) lp))
-  | Tnot t -> begin match value_of_term t with
+                   (List.map (fun t -> Fimmutable (value_of_term kn t)) lp))
+  | Tnot t -> begin match value_of_term kn t with
               | Vbool b -> Vbool (not b)
               | _ -> raise CannotReduce end
   (* TODO Tbinop maybe *)
   | Tconst (Number.ConstInt ic) -> Vint (Number.compute_int_constant ic)
+  | Term.Tapp (ls,[]) ->
+     begin match find_logic_definition kn ls with
+     | None -> raise CannotReduce
+     | Some ld ->
+        let _,t = open_ls_defn ld in
+        value_of_term kn t
+     end
   | _ -> raise CannotReduce
 
 let rec term_of_value = function
@@ -1241,8 +1252,8 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
           let pmod = Pmodule.restore_module th in
           let rs = Pmodule.ns_find_rs pmod.Pmodule.mod_export [s] in
           if o = None then Some (pmod, rs)
-          else (if debug then Format.printf "Name conflict %s@." s;
-                raise (Exit "module found twice"))
+          else (let es = Format.sprintf "module or function %s found twice" s in
+                raise (Exit es))
         with Not_found -> o)
       ths None in
   let (_pmod, rs) = if o = None
@@ -1295,7 +1306,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
                     if debug then Format.printf "value of term %a for arg %a@."
                                                 Pretty.print_term t
                                                 Pretty.print_vs vs;
-                    Mid.add vs.vs_name (value_of_term t) vars end
+                    Mid.add vs.vs_name (value_of_term kn t) vars end
                 else vars)
               Mid.empty
               (Mvs.bindings renv.subst) in
