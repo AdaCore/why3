@@ -5,6 +5,10 @@ Line 46:
 rec_map.f_map = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "1" } }] }
+Line 47:
+old rec_map.f_map = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "1" } }] }
 
 ce/record_map.mlw M WP_parameter record_map_proj_test3 : Unknown (other)
 Counter-example model:File record_map.mlw:
@@ -12,8 +16,23 @@ Line 51:
 re_rec_map.f_map = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "1" } }] }
+re_rec_map.g_bool = {"type" : "Boolean" ,
+"val" : false }
 Line 53:
 rec_map.f_map = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
+rec_map.g_bool = {"type" : "Boolean" ,
+"val" : false }
+Line 54:
+old re_rec_map.f_map = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "1" } }] }
+old re_rec_map.g_bool = {"type" : "Boolean" ,
+"val" : false }
+old rec_map.f_map = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+old rec_map.g_bool = {"type" : "Boolean" ,
+"val" : false }
 

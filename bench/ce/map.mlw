@@ -17,18 +17,18 @@ module M
    **************************************)
   use import map.Map
   let test_map (x : ref (map int int)) : unit
-  ensures { "model_vc" !x[0] <> !x[1] }
+  ensures { !x[0] <> !x[1] }
   =
   x := Map.set !x 0 3
 
   (* Multi-dimensional maps *)
   let test_map_multidim1 (x : ref (map int (map int int))) : unit
-  ensures { "model_vc" !x[0][0] <> !x[1][1] }
+  ensures { !x[0][0] <> !x[1][1] }
   =
   x := Map.set !x 0 (Map.get !x 1)
 
   let test_map_multidim2 (x : ref (map int (map int int))) : unit
-  ensures { "model_vc" !x[0][0] <> !x[1][1] }
+  ensures { !x[0][0] <> !x[1][1] }
   =
   let x0 = Map.get !x 0 in
   let x0 = Map.set x0 0 3 in
@@ -62,14 +62,14 @@ module M
      projfi, projf1, and projf2
      Warning: cvc4 is not able to handle projections there  *)
   let proj_map_test1 (x "model_projected" : ref (map int int)) : unit
-  ensures { "model_vc" !x[0] <> !x[1] }
+  ensures { !x[0] <> !x[1] }
   =
   x := Map.set !x 0 3
 
   (* No projection function for bool -> the array should be
      present in counterexample as it is. *)
   let proj_map_test2 (x "model_projected" : ref (map int bool)) : unit
-  ensures { "model_vc" !x[0] <> !x[1] }
+  ensures { !x[0] <> !x[1] }
   =
   x := Map.set !x 0 true
 

@@ -4,9 +4,16 @@ module M
   use import int.Int
 
   let test_post (x: int) (y  : ref int): unit
-    ensures { "model_vc_post" old !y >= x }
+    ensures {old !y >= x }
       =
       y := x - 1 + !y
+
+  let test_post2 (x: int) (y  : ref int): unit
+    requires {x > 42}
+    ensures {old !y > !y + x}
+      =
+      y := x - 1 + !y
+
 
   (**********************************************************
    ** Getting counterexamples for terms of primitive types **
@@ -14,7 +21,7 @@ module M
   val y :ref int
 
   let incr ( x23: ref int ): unit
-  ensures { "model_vc_post" !x23 = old !x23 + 2 + !y }
+  ensures { !x23 = old !x23 + 2 + !y }
   =
   (*#"random_path.random" 62 27 32#*)
   y := !y + 1;
@@ -22,11 +29,11 @@ module M
   x23 := !x23 + 1
 
   let test_loop ( x: ref int ): unit
-  ensures { "model_vc_post" !x < old !x }
+  ensures { !x < old !x }
   =
   'L: incr x;
   'M: while !x > 0 do
-  invariant { "model_vc" !x > at !x 'L + at !x 'M }
+  invariant { !x > at !x 'L + at !x 'M }
   variant { !x }
     x := !x - 1
   done

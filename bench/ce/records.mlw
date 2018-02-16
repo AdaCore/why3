@@ -25,7 +25,7 @@ module M
   meta "model_projection" function projf_r_g
 
   let record_match_eval_test1 (x : r) : int
-  ensures { "model_vc_post" result = 1 }
+  ensures { result = 1 }
   =
   if x.g then
     x.f
@@ -43,7 +43,7 @@ module M
   x := { !x with f = 6}
 
   let record_match_eval_test4 (x : ref r) : r
-  ensures { "model_vc_post" result.g }
+  ensures { result.g }
   =
   x := { !x with f = 6 };
   !x
@@ -51,7 +51,7 @@ module M
   val re "model_projected" : ref r
 
   let test_record_match_eval_test5 (x : ref r) : r
-  ensures { "model_vc_post" result = !re }
+  ensures { result = !re }
   =
   x := { !x with f = 6 };
   !x

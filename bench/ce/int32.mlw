@@ -2,11 +2,11 @@ module Ce_int32
 
   use import ref.Ref
   use export mach.int.Int32
-  
-  let dummy_update (r: ref int32) 
+
+  let dummy_update (r: ref int32)
     requires { to_int !r = 22}
-    ensures { "model_vc" to_int !r = 42} =
+    ensures {to_int !r = 42} =
     r := of_int 42;
     r := !r + !r;
-    
+
 end
