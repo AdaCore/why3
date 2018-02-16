@@ -193,6 +193,14 @@ module RandomAccessListWithSeq
            (fun i -> let (x0, x1) = s[div i 2] in
                      if mod i 2 = 0 then x0 else x1)
 
+  lemma cons_flatten : forall x y :'a,s:seq ('a,'a).
+    let a = flatten (cons (x,y) s) in
+    let b = cons x (cons y (flatten s)) in
+    a = b by a == b by forall i. 0 <= i < a.length -> a[i] = b[i]
+    by (i <= 1 so (cons (x,y) s)[div i 2] = (x,y))
+       \/ (i >= 2 so (cons (x,y) s)[div i 2] = s[div (i-2) 2]
+       )
+
   function elements (l: ral 'a) : seq 'a =
     match l with
     | Empty    -> empty
@@ -240,7 +248,10 @@ module RandomAccessListWithSeq
     match l with
     | Empty    -> absurd
     | One _ l1 -> Zero l1
-    | Zero  l1 -> let (_, x1) = lookup 0 l1 in One x1 (tail l1)
+    | Zero  l1 -> let (_, x1) as p = lookup 0 l1 in
+      let tl = tail l1 in
+      assert { elements l1 == cons p (elements tl) };
+      One x1 tl
     end
 
   (** update in O(log n)
@@ -255,14 +266,22 @@ module RandomAccessListWithSeq
 
   let rec fupdate (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
-    variant  { i, l}
-    ensures  { elements result == setf (elements l) i f}
+    variant  { i, l }
+    ensures  { elements result == setf (elements l) i f }
     =
     match l with
     | Empty    -> absurd
     | One x l1 -> if i = 0 then One (f x) l1 else
                   cons x (fupdate f (i-1) (Zero l1))
-    | Zero l1  -> Zero (fupdate (aux i f) (div i 2) l1)
+    | Zero l1  ->
+      let ul1 = fupdate (aux i f) (div i 2) l1 in
+      let res = Zero ul1 in
+      assert { forall j. 0 <= j < length (elements res) ->
+        (elements res)[j] = (setf (elements l) i f)[j]
+        by div j 2 <> div i 2 ->
+          (elements ul1)[div j 2] = (elements l1)[div j 2]
+      };
+      res
     end
 
   let function f (y: 'a) : 'a -> 'a = fun _ -> y
