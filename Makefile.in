@@ -271,10 +271,11 @@ src/coq-tactic/why3tac.cmx: WARNINGS:=$(WARNINGS)-58
 # build targets
 
 byte: lib/why3/why3.cma
-opt:  lib/why3/why3.cmxa
+opt:  lib/why3/why3.cmxa lib/why3/why3.cmxs
 
 lib/why3/why3.cma: lib/why3/why3.cmo
 lib/why3/why3.cmxa: lib/why3/why3.cmx
+lib/why3/why3.cmxs: lib/why3/why3.cmx
 
 lib/why3/why3.cmo: $(LIBCMO)
 	$(SHOW) 'Linking  $@'
@@ -1451,10 +1452,11 @@ byte: $(OCAMLLIBS_CMO)
 opt:  $(OCAMLLIBS_CMX)
 
 byte: lib/why3/why3extract.cma
-opt:  lib/why3/why3extract.cmxa
+opt:  lib/why3/why3extract.cmxa lib/why3/why3extract.cmxs
 
 lib/why3/why3extract.cma: lib/why3/why3extract.cmo
 lib/why3/why3extract.cmxa: lib/why3/why3extract.cmx
+lib/why3/why3extract.cmxs: lib/why3/why3extract.cmx
 
 lib/why3/why3extract.cmo: $(OCAMLLIBS_CMO)
 	$(SHOW) 'Linking  $@'

@@ -27,9 +27,9 @@ let () = Debug.set_flag Dterm.debug_ignore_unused_var
 let mk_id ~loc name =
   { id_str = name; id_lab = []; id_loc = loc }
 
-let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
-let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
-let mixfix ~loc s = Qident (mk_id ~loc ("mixfix " ^ s))
+let infix  ~loc s = Qident (mk_id ~loc (Ident.infix s))
+let prefix ~loc s = Qident (mk_id ~loc (Ident.prefix s))
+let mixfix ~loc s = Qident (mk_id ~loc (Ident.mixfix s))
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }

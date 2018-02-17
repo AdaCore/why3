@@ -60,6 +60,22 @@ val get_model_trace_label : labels : Slab.t -> Slab.elt
 (** Return a label of the form ["model_trace:*"].
     Throws [Not_found] if there is no such label. *)
 
+(** {2 Naming convention } *)
+
+val infix: string -> string
+(** Apply the naming convention for infix operator (+) *)
+
+val prefix: string -> string
+(** Apply the naming convention for prefix operator *)
+
+val mixfix: string -> string
+(** Apply the naming convention for mixfix operator *)
+
+val kind_of_fix: string -> [ `None
+                           | `Prefix of string
+                           | `Infix  of string
+                           | `Mixfix of string ]
+
 (** {2 Identifiers} *)
 
 type ident = private {

@@ -34,12 +34,8 @@
   let empty_annotation =
     { loop_invariant = []; loop_variant = [] }
 
-  let infix  s = "infix "  ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
-
-  let get_op s e = Qident (mk_id (mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
+  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
+  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
 
   let empty_spec = {
     sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
@@ -328,9 +324,9 @@ term_sub_:
 | AND     { Tand }
 
 %inline infix_op:
-| PLUS   { mk_id (infix "+") $startpos $endpos }
-| MINUS  { mk_id (infix "-") $startpos $endpos }
-| TIMES  { mk_id (infix "*") $startpos $endpos }
+| PLUS   { mk_id (Ident.infix "+") $startpos $endpos }
+| MINUS  { mk_id (Ident.infix "-") $startpos $endpos }
+| TIMES  { mk_id (Ident.infix "*") $startpos $endpos }
 | c=CMP  { let op = match c with
           | Beq -> "="
           | Bneq -> "<>"
@@ -339,10 +335,10 @@ term_sub_:
           | Bgt  -> ">"
           | Bge  -> ">="
           | Badd|Bsub|Bmul|Bdiv|Bmod|Band|Bor -> assert false in
-           mk_id (infix op) $startpos $endpos }
+           mk_id (Ident.infix op) $startpos $endpos }
 
 %inline prefix_op:
-| MINUS { mk_id (prefix "-")  $startpos $endpos }
+| MINUS { mk_id (Ident.prefix "-")  $startpos $endpos }
 
 %inline div_mod_op:
 | DIV  { mk_id "div" $startpos $endpos }
