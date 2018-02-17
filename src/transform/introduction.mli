@@ -33,6 +33,3 @@ val intros :
      premises of [goal G : f] *)
 
 val introduce_premises : Task.task Trans.trans
-
-val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal_wp] followed by [introduce_premises] *)

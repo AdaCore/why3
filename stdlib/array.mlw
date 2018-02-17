@@ -45,7 +45,7 @@ module Array
   let defensive_set (a: array 'a) (i: int) (v: 'a)
     ensures { 0 <= i < length a }
     ensures { a = (old a)[i <- v] }
-    raises  { OutOfBounds -> i < 0 \/ i >= length a /\ a = old a }
+    raises  { OutOfBounds -> (i < 0 \/ i >= length a) /\ a = old a }
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 

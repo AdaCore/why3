@@ -135,13 +135,6 @@ let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
-let split_intro =
-  Trans.compose_l Split_goal.split_goal_wp (Trans.singleton introduce_premises)
-
-let () = Trans.register_transform_l "split_intro" split_intro
-  ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
-    the@ implication@ antecedents@ to@ premises."
-
 
 (** Destruction of existential quantifiers in axioms.
     Contributed by Nicolas Jeannerod [niols@niols.fr] *)
@@ -171,3 +164,28 @@ let () = Trans.register_transform
            "introduce_exists"
            (Trans.decl eliminate_exists None)
            ~desc:"Replace axioms of the form 'exists x. P' by 'constant x axiom P'."
+
+
+let simplify_intros =
+  Trans.compose Simplify_formula.simplify_trivial_quantification introduce_premises
+
+let split_intros_goal_wp =
+  Trans.compose_l Split_goal.split_goal_right (Trans.singleton simplify_intros)
+
+let split_intros_all_wp =
+  Trans.compose_l Split_goal.split_all_right (Trans.singleton simplify_intros)
+
+let split_intros_premise_wp =
+  Trans.compose Split_goal.split_premise_right simplify_intros
+
+let () = Trans.register_transform_l
+           "split_intros_goal_wp" split_intros_goal_wp
+           ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ by@ simplify_trivial_quantifications@ followed@ by@ introduce_premises)."
+
+let () = Trans.register_transform_l
+           "split_intros_intros_all_wp" split_intros_all_wp
+           ~desc:"Same@ as@ split_intros_goal_wp,@ but@ also@ split@ premises."
+
+let () = Trans.register_transform
+           "split_intros_premise_wp" split_intros_premise_wp
+           ~desc:"Same@ as@ split_intros_all_wp,@ but@ split@ only@ premises."

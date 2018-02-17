@@ -30,6 +30,8 @@ type integer_constant = {
 type real_literal = private
   | RConstDec of string * string * string option (* int / frac / exp *)
   | RConstHex of string * string * string option
+  (** If you want to write the constant 1/3 you need to use the
+      division function from the real theory *)
 
 type real_constant = {
     rc_negative : bool;
@@ -60,6 +62,9 @@ val const_of_int : int -> constant
 val const_of_big_int : BigInt.t -> constant
 
 val real_const_dec : string -> string -> string option -> real_literal
+(** [real_const_dec integer_part decimal_part exp] return the real that corresponds to
+    "integer_part.decimal_part * 10^exp". By default exp is 0.
+*)
 val real_const_hex : string -> string -> string option -> real_literal
 
 (** Pretty-printing *)

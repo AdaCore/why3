@@ -31,12 +31,8 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let infix  s = "infix "  ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
-
-  let get_op s e = Qident (mk_id (mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
+  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
+  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
 
   let empty_spec = {
     sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
@@ -337,17 +333,17 @@ term_sub_:
           | Bgt  -> ">"
           | Bge  -> ">="
           | Badd|Bsub|Bmul|Bdiv|Bmod|Band|Bor -> assert false in
-           mk_id (infix op) $startpos $endpos }
+           mk_id (Ident.infix op) $startpos $endpos }
 
 %inline prefix_op:
-| MINUS { mk_id (prefix "-")  $startpos $endpos }
+| MINUS { mk_id (Ident.prefix "-")  $startpos $endpos }
 
 %inline infix_op_234:
 | DIV    { mk_id "div" $startpos $endpos }
 | MOD    { mk_id "mod" $startpos $endpos }
-| PLUS   { mk_id (infix "+") $startpos $endpos }
-| MINUS  { mk_id (infix "-") $startpos $endpos }
-| TIMES  { mk_id (infix "*") $startpos $endpos }
+| PLUS   { mk_id (Ident.infix "+") $startpos $endpos }
+| MINUS  { mk_id (Ident.infix "-") $startpos $endpos }
+| TIMES  { mk_id (Ident.infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }

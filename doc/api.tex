@@ -300,7 +300,7 @@ let four : Term.term =
 let int_theory : Theory.theory =
   Env.read_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
+  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix "+"]
 let two_plus_two : Term.term =
   Term.t_app_infer plus_symbol [two;two]
 let fmla3 : Term.term = Term.t_equ two_plus_two four
@@ -332,9 +332,9 @@ obtain the symbols from \texttt{Int}.
 let zero : Term.term =
   Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
 let mult_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix "*"]
 let ge_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
+  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix ">="]
 \end{ocamlcode}
 The next step is to introduce the variable $x$ with the type int.
 \begin{ocamlcode}

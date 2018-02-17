@@ -86,9 +86,9 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 let extract_op s =
   (*let s = ls.ls_name.id_string in*)
-  try Some (Strings.remove_prefix "infix " s) with Not_found ->
-  try Some (Strings.remove_prefix "prefix " s) with Not_found ->
-  None
+  match Ident.kind_of_fix s with
+  | `None | `Mixfix _ -> None
+  | `Prefix s | `Infix s -> Some s
 
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')

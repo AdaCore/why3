@@ -127,6 +127,7 @@ let convert_notification_constructor n =
   | Dead _                       -> String "Dead"
   | Task _                       -> String "Task"
   | File_contents _              -> String "File_contents"
+  | Source_and_ce _              -> String "Source_and_ce"
 
 let convert_node_type_string nt =
   match nt with
@@ -176,9 +177,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Set_config_param(s,n) ->
       convert_record ["ide_request", cc r;
            "param", String s; "value", Int n]
-  | Get_task(n,b,c,loc) ->
+  | Get_task(n,b,loc) ->
       convert_record ["ide_request", cc r;
-           "node_ID", Int n; "do_intros", Bool b; "full_context", Bool c ; "loc", Bool loc]
+           "node_ID", Int n; "full_context", Bool b ; "loc", Bool loc]
   | Get_file_contents s ->
       convert_record ["ide_request", cc r;
            "file", String s]
@@ -368,7 +369,10 @@ let print_notification_to_json (n: notification): json =
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
-           "content", String s])
+           "content", String s]
+  | Source_and_ce (s) ->
+      convert_record ["notification", cc n;
+                      "content", String s])
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -432,10 +436,9 @@ let parse_request (constr: string) j =
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in
-    let b = get_bool_opt (get_field j "do_intros") false in
-    let c = get_bool_opt (get_field j "full_context") false in
+    let b = get_bool_opt (get_field j "full_context") false in
     let loc = get_bool_opt (get_field j "loc") false in
-    Get_task(n,b,c,loc)
+    Get_task(n,b,loc)
 
   | "Remove_subtree" ->
     let n = get_int (get_field j "node_ID") in
@@ -699,6 +702,11 @@ let parse_notification constr j =
     let f = get_string (get_field j "file") in
     let s = get_string (get_field j "content") in
     File_contents(f,s)
+
+  | "Source_and_ce" ->
+    let s = get_string (get_field j "content") in
+    Source_and_ce(s)
+
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 

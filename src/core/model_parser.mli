@@ -309,8 +309,10 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =  string -> model_element list
-(** Parses the input string into model elements. *)
+type raw_model_parser =  Stdlib.Sstr.t -> string -> model_element list
+(** Parses the input string into model elements. It contains the list of
+    projections that are collected in the task.
+ *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

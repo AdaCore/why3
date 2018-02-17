@@ -122,7 +122,7 @@ type session = {
   session_prover_ids            : int Hprover.t;
   (* tasks *)
   session_raw_tasks : Task.task Hpn.t;
-  session_tasks : (Task.task * Trans.naming_table) Hpn.t;
+  session_task_tables : Trans.naming_table Hpn.t;
   (* proved status *)
   file_state: bool Hstr.t;
   th_state: bool Ident.Hid.t;
@@ -223,18 +223,19 @@ let get_proofNode (s : session) (id : proofNodeID) =
     Hint.find s.proofNode_table id
   with Not_found -> raise BadID
 
-let get_raw_task s id =
+let get_task s id =
   Hpn.find s.session_raw_tasks id
 
-let get_task s n =
-  try
-    Hpn.find s.session_tasks n
+let get_task_name_table s n =
+  let t = get_task s n in
+  let table = try
+    Hpn.find s.session_task_tables n
   with Not_found ->
-    let t = get_raw_task s n in
-    let ti = Trans.apply Introduction.introduce_premises t in
-    let ta = Args_wrapper.build_naming_tables ti in
-    Hpn.add s.session_tasks n (ti,ta);
-    ti,ta
+    let ta = Args_wrapper.build_naming_tables t in
+    Hpn.add s.session_task_tables n ta;
+    ta
+  in
+  t,table
 
 let get_transfNode (s : session) (id : transID) =
   try
@@ -278,7 +279,7 @@ let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
 let goal_is_detached s pn =
-  try let (_:Task.task) = get_raw_task s pn in false
+  try let (_:Task.task) = get_task s pn in false
   with Not_found -> true
 
 let transf_is_detached s tn =
@@ -527,7 +528,7 @@ let empty_session ?from dir =
     session_shape_version = shape_version;
     session_prover_ids = prover_ids;
     session_raw_tasks = Hpn.create 97;
-    session_tasks = Hpn.create 97;
+    session_task_tables = Hpn.create 97;
     file_state = Hstr.create 3;
     th_state = Ident.Hid.create 7;
     tn_state = Htn.create 97;
@@ -1361,37 +1362,14 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 exception NoProgress
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
-  let task, subtasks =
-    let raw_task = get_raw_task s id in
-    let task,table = get_task s id in
-    try
-      let new_task_list = Trans.apply_transform_args name env args table raw_task in
-      (* If any generated task is equal to the former task, then we made no
+  let task,table = get_task_name_table s id in
+  let subtasks = Trans.apply_transform_args name env args table task in
+  (* If any generated task is equal to the former task, then we made no
          progress because we need to prove more lemmas than before *)
-      if List.exists (fun t -> Task.task_equal t raw_task) new_task_list then
-        begin
-          Debug.dprintf debug "[apply_trans_to_goal] apply_transform on raw task made no progress@.";
-          raise NoProgress
-        end
-      else
-        raw_task, new_task_list
-    with
-    (* if apply_transform fails for any reason, we try to apply
-       the same transformation on the "introduced" task instead *)
-    | Generic_arg_trans_utils.Arg_trans _
-    | Trans.TransFailure _
-    | NoProgress as e ->
-       Debug.dprintf debug "[apply_trans_to_goal] info: apply_transform raised exception %a@."
-                     Exn_printer.exn_printer e;
-       task, Trans.apply_transform_args name env args table task
-    | e ->
-       Debug.dprintf debug "[apply_trans_to_goal] warning: apply_transform raised unexpected %a@."
-                     Exn_printer.exn_printer e;
-       task, Trans.apply_transform_args name env args table task
-  in
   match subtasks with
   | [t'] when Task.task_equal t' task && not allow_no_effect ->
-     raise Exit
+     Debug.dprintf debug "[apply_trans_to_goal] apply_transform made no progress@.";
+     raise NoProgress
   | _ -> subtasks
 
 

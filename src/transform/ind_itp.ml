@@ -20,8 +20,8 @@ open Args_wrapper
 (* Documentation of induction:
 
    From task [delta, x: int, delta'(x) |- G(x)], variable x and term bound, builds the tasks:
-   [delta, x: int, x < bound, delta'(x) |- G(x)] and
-   [delta, x: int, x >= bound, (forall n, n < x -> delta'(n) -> G(n)), delta'(x) |- G(x)]
+   [delta, x: int, x <= bound, delta'(x) |- G(x)] and
+   [delta, x: int, x > bound, (forall n, n < x -> delta'(n) -> G(n)), delta'(x) |- G(x)]
 
    x cannot occur in delta as it can only appear after its declaration (by
    construction of the task). Also, G is not part of delta'.
@@ -253,15 +253,15 @@ let induction x bound env =
               (t_implies (Term.t_app_infer lt_int [t_var n; x]) (t_replace x (t_var n) t_delta'))
           in
 
-          (* x_ge_bound = bound <= x *)
-          let x_ge_bound_t = t_app_infer le_int [bound; x] in
-          let x_ge_bound =
-            create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_ge_bound_t in
+          (* x_gt_bound = bound < x *)
+          let x_gt_bound_t = t_app_infer lt_int [bound; x] in
+          let x_gt_bound =
+            create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_gt_bound_t in
           let rec_pr = create_prsymbol (gen_ident "Hrec") in
           let hrec = create_prop_decl Paxiom rec_pr t_delta' in
           let lab_rec = Ident.create_label "expl:recursive case" in
           let d = create_prop_decl Pgoal pr (t_label_add lab_rec t) in
-          [x_ge_bound; hrec; d]
+          [x_gt_bound; hrec; d]
     | Dprop (_p, _pr, _t) ->
         if !x_is_passed then
           begin

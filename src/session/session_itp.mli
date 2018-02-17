@@ -87,8 +87,8 @@ val is_below: session -> any -> any -> bool
 type proof_parent = Trans of transID | Theory of theory
 
 
-val get_raw_task : session -> proofNodeID -> Task.task
-val get_task : session -> proofNodeID -> Task.task * Trans.naming_table
+val get_task : session -> proofNodeID -> Task.task
+val get_task_name_table : session -> proofNodeID -> Task.task * Trans.naming_table
 
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :
@@ -191,12 +191,13 @@ val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
     proof_script field equal to [file].
 *)
 
+exception NoProgress
 val apply_trans_to_goal :
   allow_no_effect:bool -> session -> Env.env -> string -> string list ->
   proofNodeID -> Task.task list
 (** [apply_trans_to_goal s env tr args id] applies the transformation
   [tr] with arguments [args] to the goal [id], and returns the
-  subtasks.  raises [Exit] if [allow_no_effect] is false and [tr]
+  subtasks.  raises [NoProgress] if [allow_no_effect] is false and [tr]
   returns the task unchanged *)
 
 val graft_transf : session -> proofNodeID -> string -> string list ->

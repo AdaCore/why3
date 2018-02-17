@@ -1,0 +1,58 @@
+module M
+
+  use import map.Map
+  use import int.Int
+
+  type r = {f [@model_trace:.field_f] :int; g:bool}
+
+  (* Projection functions *)
+  function projf_r_f [@model_trace:.f] (x : r) : int
+  =
+  x.f
+  function projf_r_g [@model_trace:.g] (x : r) : bool
+  =
+  x.g
+  meta "inline:no" function projf_r_f
+  meta "model_projection" function projf_r_f
+  meta "inline:no" function projf_r_g
+  meta "model_projection" function projf_r_g
+
+
+  (***********************************************************
+   ** Getting counterexamples for records and maps together **
+   ***********************************************************)
+  (*** Records and maps together ***)
+  type r_map = {f_map:map bool int; g_bool:bool}
+
+  function projf_r_map_f_map [@model_trace:.f_map] (rec_map : r_map) : map bool int
+  =
+  rec_map.f_map
+  function projf_r_map_g [@model_trace:.g_map] (rec_map : r_map) : bool
+  =
+  rec_map.g_bool
+  meta "inline:no" function projf_r_map_f_map
+  meta "model_projection" function projf_r_map_f_map
+
+  meta "inline:no" function projf_r_map_g
+  meta "model_projection" function projf_r_map_g
+
+  (* Tests *)
+  (* Warning: does not terminate *)
+  let map_record_proj_test1 (map_rec [@model_projected] : map bool r)
+  ensures { result = 0 }
+  =
+  map_rec[true].f
+
+  let record_map_proj_test2 (rec_map [@model_projected] : r_map)
+  ensures { result = 0 }
+  =
+  rec_map.f_map[true]
+
+  val re_rec_map [@model_projected] : r_map
+
+  let record_map_proj_test3 (rec_map [@model_projected] : r_map)
+  ensures { result = re_rec_map }
+  =
+  rec_map
+
+end

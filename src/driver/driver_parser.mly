@@ -12,9 +12,6 @@
 %{
   open Driver_ast
 
-  let infix s  = "infix " ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
 %}
 
 %token <int> INTEGER
@@ -136,15 +133,15 @@ ident:
 
 ident_rich:
 | ident                     { $1 }
-| LEFTPAR_STAR_RIGHTPAR     { infix "*" }
+| LEFTPAR_STAR_RIGHTPAR     { Ident.infix "*" }
 | LEFTPAR operator RIGHTPAR { $2 }
 
 operator:
-| OPERATOR              { infix $1 }
-| OPERATOR UNDERSCORE   { prefix $1 }
-| LEFTSQ RIGHTSQ        { mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
+| OPERATOR              { Ident.infix $1 }
+| OPERATOR UNDERSCORE   { Ident.prefix $1 }
+| LEFTSQ RIGHTSQ        { Ident.mixfix "[]" }
+| LEFTSQ LARROW RIGHTSQ { Ident.mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW { Ident.mixfix "[]<-" }
 
 (* Types *)
 

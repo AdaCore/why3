@@ -29,8 +29,7 @@ int copy_up_to_semicolon(char* buf, int begin, int len, char** result);
 
 int count_semicolons(char* buf, int len) {
   int cnt = 0;
-  int i = 0;
-  for (i = 0; i < len; i++) {
+  for (int i = 0; i < len; i++) {
     if (buf[i] == ';') {
       cnt++;
     }
@@ -57,7 +56,6 @@ int copy_up_to_semicolon(char* buf, int begin, int len, char** result) {
 
 prequest parse_request(char* str_req, int len, int key) {
   int numargs, semic, parallel_arg;
-  int i = 0;
   int pos = 0;
   prequest req;
   char* tmp;
@@ -121,17 +119,16 @@ prequest parse_request(char* str_req, int len, int key) {
   free(tmp);
   pos = copy_up_to_semicolon(str_req, pos, len, &(req->cmd));
   req->args = (char**)malloc(sizeof(char*) * (numargs));
-  for (i = 0; i < numargs; i++) {
+  for (int i = 0; i < numargs; i++) {
     pos = copy_up_to_semicolon(str_req, pos, len, &(req->args[i]));
   }
   return req;
 }
 
 void print_request(prequest r) {
-  int i;
   if (r) {
     printf("%s %d %d %s", r->id, r->timeout, r->memlimit, r->cmd);
-    for (i = 0; i < r->numargs; i++) {
+    for (int i = 0; i < r->numargs; i++) {
        printf(" %s", r->args[i]);
     }
   } else {
@@ -140,9 +137,8 @@ void print_request(prequest r) {
 }
 
 void free_request(prequest r) {
-  int i;
   free(r->cmd);
-  for (i = 0;i < r->numargs; i++) {
+  for (int i = 0;i < r->numargs; i++) {
     free(r->args[i]);
   }
   free(r->args);

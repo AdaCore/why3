@@ -44,6 +44,7 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
+  mutable list_projs: Stdlib.Sstr.t;
   }
 
 let ident_printer () =
@@ -86,6 +87,8 @@ let print_ident_label info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
+  if Slab.mem model_projection ls.ls_name.id_label then
+    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -409,7 +412,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f =
       let model_list = print_info_model cntexample info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; };
+				queried_terms = model_list;
+                                list_projections = info.list_projs;};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
@@ -467,7 +471,9 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     info_model = S.empty;
     info_vc_term = vc_info;
-    info_in_goal = false;} in
+    info_in_goal = false;
+    list_projs = Stdlib.Sstr.empty;
+  } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function

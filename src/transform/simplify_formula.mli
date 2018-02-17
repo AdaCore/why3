@@ -18,6 +18,8 @@ val fmla_remove_quant : Term.term -> Term.term
 (** transforms \exists x. x == y /\ F into F[y/x]
     and \forall x. x <> y \/ F into F[y/x] *)
 
+val simplify_trivial_quantification : Task.task Trans.trans
+
 val fmla_cond_subst: (Term.term -> Term.term -> bool) -> Term.term -> Term.term
 (** given a formula [f] containing some equality or disequality [t1] ?= [t2]
     such that [filter t1 t2] (resp [filter t2 t1]) evaluates to true,

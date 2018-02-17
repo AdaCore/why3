@@ -1,0 +1,114 @@
+ce/map.mlw ModelMap t1 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 5:
+i = {"type" : "Integer" , "val" : "0" }
+t = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "43" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
+ce/map.mlw M WP_parameter test_map : Unknown (other)
+Counter-example model:File map.mlw:
+Line 19:
+x = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 20:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 22:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
+ce/map.mlw M WP_parameter test_map_multidim1 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 25:
+x = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 26:
+x = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 28:
+x = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+
+ce/map.mlw M WP_parameter test_map_multidim2 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 30:
+x = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 31:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 35:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+
+ce/map.mlw M WP_parameter proj_map_test1 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 64:
+x = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 65:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 67:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
+ce/map.mlw M WP_parameter proj_map_test2 : Unknown (other)
+Counter-example model:File map.mlw:
+Line 71:
+x = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" ,
+"val" : false } }] }
+Line 72:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
+"value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" ,
+"val" : false } }] }
+Line 74:
+x = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
+"value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" ,
+"val" : false } }] }
+

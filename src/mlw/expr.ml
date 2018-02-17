@@ -1182,20 +1182,20 @@ let forget_let_defn = function
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
 let extract_op {id_string = s} =
-  try Some (Strings.remove_prefix "infix " s) with Not_found ->
-  try Some (Strings.remove_prefix "prefix " s) with Not_found ->
-  None
+  match Ident.kind_of_fix s with
+  | `None | `Mixfix _ -> None
+  | `Prefix s | `Infix s -> Some s
 
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
 let print_rs fmt ({rs_name = {id_string = nm}} as s) =
-  if nm = "mixfix []" then pp_print_string fmt "([])" else
-  if nm = "mixfix []<-" then pp_print_string fmt "([]<-)" else
-  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
-  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
-  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
-  if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
+  if nm = Ident.mixfix "[]" then pp_print_string fmt "([])" else
+  if nm = Ident.mixfix "[]<-" then pp_print_string fmt "([]<-)" else
+  if nm = Ident.mixfix "[<-]" then pp_print_string fmt "([<-])" else
+  if nm = Ident.mixfix "[_..]" then pp_print_string fmt "([_..])" else
+  if nm = Ident.mixfix "[.._]" then pp_print_string fmt "([.._])" else
+  if nm = Ident.mixfix "[_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op s.rs_name, s.rs_logic with
   | Some x, _ ->
       fprintf fmt "(%s%s%s)"

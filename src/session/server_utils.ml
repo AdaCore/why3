@@ -154,7 +154,7 @@ let load_strategies cont =
        Stdlib.Hstr.add cont.Controller_itp.controller_strategies name
                        (name, shortcut, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
-       Format.eprintf "Fatal: loading strategy '%s' failed: %s@." name msg;
+       Format.eprintf "Fatal: loading strategy '%s' failed: %s \nSolve this problem in your why3.conf file and retry.@." name msg;
        exit 1)
     strategies
 
@@ -372,7 +372,7 @@ type command =
   | Other        of string * string list
 
 let query_on_task cont f id args =
-  let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+  let _,table = Session_itp.get_task_name_table cont.Controller_itp.controller_session id in
   try Query (f cont table args) with
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"
@@ -380,6 +380,7 @@ let query_on_task cont f id args =
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
+  (* We first try to apply a command from commands_table (itp_server.ml) *)
   match Stdlib.Hstr.find commands_table cmd with
   | (_, f) ->
     begin
@@ -395,6 +396,34 @@ let interp commands_table cont id s =
       | Qtask _, _ -> QError "please select a goal first"
     end
   | exception Not_found ->
+     (* If the command entered is not in the commands_table, we first try to
+        apply a transformation, then a prover, then a strategy and finally an
+        interactive command.
+      *)
+   if id != None &&
+     Session_itp.is_detached cont.Controller_itp.controller_session (Opt.get id)
+   then
+      match cmd, args with
+      | "help", _ ->
+        let text = Pp.sprintf
+                         "Please type a command among the following (automatic completion available)@\n\
+                          @\n\
+                          @ <transformation name> [arguments]@\n\
+                          @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+                          @ <query> [arguments]@\n\
+                          @ <strategy shortcut>@\n\
+                          @ mark @\n\
+                          @ clean @\n\
+                          @ replay @\n\
+                          @ bisect @\n\
+                          @ help <transformation_name> @\n\
+                          @ list_ide_command @ \n\
+                          @\n\
+                          Available queries are:@\n@[%a@]" help_on_queries commands_table
+                  in
+                  Help_message text
+      | _ -> QError ("Command cannot be applied on a detached node")
+   else
      begin
        try
          let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in

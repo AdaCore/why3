@@ -20,11 +20,11 @@
 
 #include <ntstatus.h>
 #include <windows.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <tchar.h>
-#include <assert.h>
 #include "queue.h"
 #include "request.h"
 #include "options.h"
@@ -39,6 +39,7 @@
 #define READOP 0
 #define WRITEOP 1
 
+// constants to distinguish between events from sockets and processes
 #define SOCKET 0
 #define PROCESS 1
 
@@ -69,10 +70,16 @@ typedef struct {
    char* outfile;
 } t_proc, *pproc;
 
-pserver server_socket = NULL;
-int server_key = 0;
-plist clients = NULL;
-plist processes = NULL;
+// AFAIU, there is no connection queue or something like that, so we need to
+// create several socket instances to be able to process several clients that
+// would connect almost at the same time. The two variables below will be
+// allocated to arrays of equal length, holding the socket handle and the
+// "key" (used for IO Completion Port) for each socket instance.
+pserver* server_socket;
+int* server_key;
+
+plist clients;
+plist processes;
 char current_dir[MAX_PATH];
 
 int gen_key = 1;
@@ -95,28 +102,29 @@ int key_of_ms_key(ULONG_PTR ms) {
 
 void init();
 
-char* socket_name = NULL;
+char* pipe_name;
 
-HANDLE completion_port = NULL;
+HANDLE completion_port;
 
 void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
   pproc proc;
-  int i;
   if (completion_port != NULL) {
     CloseHandle (completion_port);
   }
-  if (server_socket != NULL) {
-    CloseHandle (server_socket->handle);
+  for (int i = 0; i < parallel; i++) {
+     if (server_socket[i] != NULL) {
+       CloseHandle (server_socket[i]->handle);
+     }
   }
   if (clients != NULL) {
-     for (i = 0; i < list_length(clients); i++) {
+     for (int i = 0; i < list_length(clients); i++) {
        CloseHandle(((pclient) clients->data[i])->handle);
      }
   }
   if (processes != NULL) {
-     for (i = 0; i < list_length(processes); i++) {
+     for (int i = 0; i < list_length(processes); i++) {
        proc = processes->data[i];
        CloseHandle(proc->handle);
        CloseHandle(proc->job);
@@ -169,12 +177,14 @@ void try_write(pclient client) {
    }
 }
 
-void create_server_socket () {
+// create a server socket and store it in the ith component of the
+// server_socket array
+void create_server_socket (int socket_num) {
    pserver server;
    int key = keygen();
    server = (pserver) malloc(sizeof(t_server));
    server->handle = CreateNamedPipe(
-      socket_name,
+      pipe_name,
       PIPE_ACCESS_DUPLEX |
       FILE_FLAG_OVERLAPPED,     // non-blocking IO
       PIPE_TYPE_MESSAGE |       // message-type pipe
@@ -191,8 +201,8 @@ void create_server_socket () {
    add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
    ZeroMemory(&server->connect, sizeof(OVERLAPPED));
    server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
-   server_socket = server;
-   server_key = key;
+   server_socket[socket_num] = server;
+   server_key[socket_num] = key;
    if (!ConnectNamedPipe(server->handle, (LPOVERLAPPED) &server->connect)) {
       DWORD err = GetLastError();
       if (err == ERROR_IO_PENDING) {
@@ -292,18 +302,16 @@ void run_request (prequest r) {
 
    /* Now take care of the arguments */
    {
-     int k;
-     for (k = 0; k < argcount; k++)
+     for (int k = 0; k < argcount; k++)
        {
          char *ca = r->args[k]; /* current arg */
-         int ca_index; /* index of the current character in ca */
          int need_quote = 1; /* set to 1 if quotes are needed */
 
          /* Should we quote the string ? */
          if (strlen(ca) > 0)
             need_quote = 0;
 
-         for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+         for (int ca_index = 0; ca_index < strlen(ca); ca_index++)
            {
              if (ca[ca_index] == ' ' || ca[ca_index] == '"')
                {
@@ -322,7 +330,7 @@ void run_request (prequest r) {
              /* Open the double quoted string */
              cmd[cl_index] = '"'; cl_index++;
 
-             for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+             for (int ca_index = 0; ca_index < strlen(ca); ca_index++)
                {
 
                  /* We have a double in the argument. It should be escaped
@@ -333,8 +341,7 @@ void run_request (prequest r) {
                         They should be quoted.  */
                      if (ca_index > 0 && ca[ca_index - 1] == '\\')
                        {
-                         int j;
-                         for (j = ca_index - 1; j >= 0 && ca[j] == '\\' ;j--)
+                         for (int j = ca_index - 1; j >= 0 && ca[j] == '\\' ;j--)
                            {
                              cmd[cl_index] = '\\'; cl_index++;
                            }
@@ -352,8 +359,7 @@ void run_request (prequest r) {
                         They should be quoted.  */
                      if (ca[ca_index] == '\\' && ca_index + 1 == strlen(ca))
                        {
-                         int j;
-                         for (j = ca_index; j >= 0 && ca[j] == '\\' ;j--)
+                         for (int j = ca_index; j >= 0 && ca[j] == '\\' ;j--)
                            {
                              cmd[cl_index] = '\\'; cl_index++;
                            }
@@ -481,15 +487,18 @@ void do_read(pclient client) {
             (LPOVERLAPPED) &client->read);
 }
 
-void accept_client(int key) {
+// the server socket with [key] and whose handle is stored in the [socket_num]
+// component of the server_socket array, has received a client request. Handle
+// it and create a new server socket instance for this socket number
+void accept_client(int key, int socket_num) {
    pclient client = (pclient) malloc(sizeof(t_client));
-   client->handle = server_socket->handle;
+   client->handle = server_socket[socket_num]->handle;
    client->readbuf = init_readbuf(BUFSIZE);
    client->writebuf = init_writebuf(16);
    init_connect_data(&(client->read), READOP);
    init_connect_data(&(client->write), WRITEOP);
-   free(server_socket);
-   create_server_socket();
+   free(server_socket[socket_num]);
+   create_server_socket(socket_num);
    list_append(clients, key, (void*)client);
    do_read(client);
 }
@@ -626,18 +635,40 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
 }
 
 void init() {
+   // The socketname variable may contain a full path, but on Windows,
+   // pipe sockets live in a special address space. We throw away the
+   // path info and just use the basename of the socketname variable.
+   char* socketname_copy, *my_pipe_name;
    GetCurrentDirectory(MAX_PATH, current_dir);
+   socketname_copy = strdup(socketname);
+   my_pipe_name = basename(socketname_copy);
    // on windows, named pipes live in a special address space
-   socket_name = (char*) malloc(sizeof(char) * (strlen(basename) + 10));
-   strcpy(socket_name, TEXT("\\\\.\\pipe\\"));
-   strcat(socket_name, basename);
+   pipe_name = (char*) malloc(sizeof(char) * (strlen(my_pipe_name) + 10));
+   strcpy(pipe_name, TEXT("\\\\.\\pipe\\"));
+   strcat(pipe_name, my_pipe_name);
 
    queue = init_queue(100);
    clients = init_list(16);
    processes = init_list(16);
 
+   server_socket = (pserver*) malloc(parallel * sizeof(pserver));
+   server_key = (int*) malloc(parallel * sizeof(int));
+
    init_logging();
-   create_server_socket();
+   for (int i = 0; i < parallel; i++) {
+      create_server_socket(i);
+   }
+   free(socketname_copy);
+}
+
+// If the key in argument corresponds to a server socket, return the server
+// socket number, else return -1.
+int get_server_num (int key) {
+   for (int i=0; i < parallel; i++) {
+      if (server_key[i] == key)
+         return i;
+   }
+   return -1;
 }
 
 int main(int argc, char **argv) {
@@ -645,6 +676,7 @@ int main(int argc, char **argv) {
    ULONG_PTR mskey;
    int key;
    int kind;
+   int server_num;
    LPOVERLAPPED ov;
    p_conn_data conn;
    BOOL res;
@@ -668,13 +700,14 @@ int main(int argc, char **argv) {
       }
       key = key_of_ms_key(mskey);
       kind = kind_of_ms_key(mskey);
+      server_num = get_server_num(key);
       switch (kind) {
          case SOCKET:
-            if (key == server_key) {
+            if (server_num != -1) {
                if (!res && GetLastError () != ERROR_PIPE_CONNECTED) {
                   shutdown_with_msg("error connecting client");
                } else {
-                  accept_client(key);
+                  accept_client(key, server_num);
                }
                break;
             }

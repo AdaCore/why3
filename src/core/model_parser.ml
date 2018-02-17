@@ -307,7 +307,7 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser =  string -> model_element list
+type raw_model_parser = Stdlib.Sstr.t -> string -> model_element list
 
 (*
 ***************************************************************
@@ -443,14 +443,8 @@ let interleave_with_source
     let model_file = StringMap.find filename model.model_files in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      let lines = Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1) in
-      let remove_last_element list =
-	let list_rev = List.rev list in
-	match list_rev with
-	| _ :: tail -> List.rev tail
-	| _ -> List.rev list_rev
-      in
-      remove_last_element lines in
+      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+    in
     let (source_code, _) = List.fold_left
       (interleave_line
 	 start_comment end_comment me_name_trans model_file)
@@ -673,18 +667,19 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
-    let raw_model = raw_mp input in
+    let list_proj = printer_mapping.list_projections in
+    let raw_model = raw_mp list_proj input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s);
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_raw_model_parser s =
+let lookup_raw_model_parser s : raw_model_parser =
   try snd (Hstr.find model_parsers s)
   with Not_found -> raise (UnknownModelParser s)
 
-let lookup_model_parser s =
+let lookup_model_parser s : model_parser =
   make_mp_from_raw (lookup_raw_model_parser s)
 
 let list_model_parsers () =
@@ -692,4 +687,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ -> [])
+  (fun _ _ -> [])

@@ -143,24 +143,6 @@ type config_strategy = {
   strategy_shortcut : string;
 }
 
-(* a default set of strategies *)
-let default_strategies =
-  List.map
-    (fun (name,desc,shortcut,code) ->
-      let s = ref Rc.empty_section in
-      s := Rc.set_string !s "name" name;
-      s := Rc.set_string !s "desc" desc;
-      s := Rc.set_string !s "shortcut" shortcut;
-      s := Rc.set_string !s "code" code;
-      !s)
-    [ "Split", "Split@ conjunctions@ in@ goal", "s",
-      "t split_goal_wp exit";
-      "Inline", "Inline@ function@ symbols@ once", "i",
-      "t inline_goal exit";
-      "Compute", "Compute@ in@ goal", "c",
-      "t compute_in_goal exit";
-    ]
-
 let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
     | [] -> default
@@ -575,7 +557,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies ~default:default_strategies rc in
+  let strategies = get_strategies ~default:[] rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
