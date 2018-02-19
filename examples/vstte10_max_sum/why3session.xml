@@ -7,7 +7,7 @@
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte10_max_sum.mlw" proved="true">
-<theory name="MaxAndSum" proved="true" sum="b976f9ca750b8c1c80c08a0b29e1766f">
+<theory name="MaxAndSum" proved="true">
  <goal name="VC max_sum" expl="VC for max_sum" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC max_sum.0" expl="loop invariant init" proved="true">
@@ -40,7 +40,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="MaxAndSum2" proved="true" sum="3b17ecd78c4b7b09399698b75f36f8ce">
+<theory name="MaxAndSum2" proved="true">
  <goal name="VC max_sum" expl="VC for max_sum" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC max_sum.0" expl="loop invariant init" proved="true">
@@ -64,12 +64,16 @@
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC max_sum.4.2" expl="VC for max_sum" proved="true">
-   <transf name="assert" proved="true" arg1="(i*m1 &lt;= i * m)">
-    <goal name="VC max_sum.4.2.0" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC max_sum.4.2.1" expl="VC for max_sum" proved="true">
-    <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC max_sum.4.2.0" expl="VC for max_sum" proved="true">
+    <transf name="assert" proved="true" arg1="(i*m1 &lt;= i * m)">
+     <goal name="VC max_sum.4.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="VC max_sum.4.2.0.1" expl="VC for max_sum" proved="true">
+     <proof prover="1"><result status="valid" time="0.01"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -90,7 +94,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TestCase" proved="true" sum="f8a7521530cf5f070ee0b6861f146137">
+<theory name="TestCase" proved="true">
  <goal name="VC test" expl="VC for test" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC test.0" expl="array creation size" proved="true">
