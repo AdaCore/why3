@@ -8,7 +8,7 @@
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <file name="../isqrt_von_neumann.mlw" proved="true">
-<theory name="VonNeumann16" proved="true" sum="59b5b24b57ef952abc97fb1234c3c694">
+<theory name="VonNeumann16" proved="true">
  <goal name="sqr_add2" proved="true">
  <proof prover="2" timelimit="1"><result status="valid" time="0.16"/></proof>
  </goal>
@@ -146,7 +146,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="VonNeumann32" proved="true" sum="a57d47d5f425cff2844cab527ccbb700">
+<theory name="VonNeumann32" proved="true">
  <goal name="sqr_add2" proved="true">
  <transf name="unfold" proved="true" arg1="sqr">
   <goal name="sqr_add2.0" proved="true">
@@ -238,16 +238,20 @@
   <proof prover="3"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC isqrt32.27" expl="loop invariant preservation" proved="true">
-  <transf name="replace" proved="true" arg1="res_g" arg2="(add res_g1 bits_g1)">
+  <transf name="introduce_premises" proved="true" >
    <goal name="VC isqrt32.27.0" expl="loop invariant preservation" proved="true">
-   <transf name="rewrite" proved="true" arg1="sqr_add2">
+   <transf name="replace" proved="true" arg1="res_g" arg2="(add res_g1 bits_g1)">
     <goal name="VC isqrt32.27.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="3"><result status="valid" time="0.56"/></proof>
+    <transf name="rewrite" proved="true" arg1="sqr_add2">
+     <goal name="VC isqrt32.27.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="3"><result status="valid" time="0.57"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC isqrt32.27.0.1" proved="true">
+    <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
-   </goal>
-   <goal name="VC isqrt32.27.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
@@ -299,7 +303,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="VonNeumann64" proved="true" sum="e768ce68a4c3f5b339012f1e62fce00d">
+<theory name="VonNeumann64" proved="true">
  <goal name="sqr_add2" proved="true">
  <transf name="unfold" proved="true" arg1="sqr">
   <goal name="sqr_add2.0" proved="true">
@@ -398,16 +402,20 @@
   <proof prover="3"><result status="valid" time="1.08"/></proof>
   </goal>
   <goal name="VC isqrt64.27" expl="loop invariant preservation" proved="true">
-  <transf name="replace" proved="true" arg1="res_g" arg2="(add res_g1 bits_g1)">
+  <transf name="introduce_premises" proved="true" >
    <goal name="VC isqrt64.27.0" expl="loop invariant preservation" proved="true">
-   <transf name="rewrite" proved="true" arg1="sqr_add2">
+   <transf name="replace" proved="true" arg1="res_g" arg2="(add res_g1 bits_g1)">
     <goal name="VC isqrt64.27.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="3" timelimit="30"><result status="valid" time="7.43"/></proof>
+    <transf name="rewrite" proved="true" arg1="sqr_add2">
+     <goal name="VC isqrt64.27.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="3" timelimit="30"><result status="valid" time="5.15"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC isqrt64.27.0.1" proved="true">
+    <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
-   </goal>
-   <goal name="VC isqrt64.27.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
