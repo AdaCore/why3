@@ -6,7 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../binary_sort.mlw" proved="true">
-<theory name="BinarySort" proved="true" sum="62d22e1f5b6d78cb6d29fe59a962a286">
+<theory name="BinarySort" proved="true">
  <goal name="VC occ_shift" expl="VC for occ_shift" proved="true">
  <proof prover="0"><result status="valid" time="0.54"/></proof>
  </goal>
@@ -76,12 +76,16 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC binary_sort.21" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(j=k)">
-   <goal name="VC binary_sort.21.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="1.66" steps="1017"/></proof>
-   </goal>
-   <goal name="VC binary_sort.21.1" expl="false case (loop invariant preservation)" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.75" steps="689"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC binary_sort.21.0" expl="loop invariant preservation" proved="true">
+   <transf name="case" proved="true" arg1="(j=k)">
+    <goal name="VC binary_sort.21.0.0" expl="true case (loop invariant preservation)" proved="true">
+    <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="1.50" steps="1017"/></proof>
+    </goal>
+    <goal name="VC binary_sort.21.0.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="1" timelimit="1"><result status="valid" time="0.80" steps="689"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
