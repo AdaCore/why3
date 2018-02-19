@@ -210,28 +210,32 @@
    <goal name="VC relax.1.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC relax.1.0.0" expl="postcondition" proved="true">
-    <transf name="case" proved="true" arg1="(v=v1)">
-     <goal name="VC relax.1.0.0.0" expl="true case (postcondition)" proved="true">
-     <transf name="split_goal_wp" proved="true" >
-      <goal name="VC relax.1.0.0.0.0" expl="VC for relax" proved="true">
-      <proof prover="1"><result status="valid" time="0.06" steps="107"/></proof>
+    <transf name="introduce_premises" proved="true" >
+     <goal name="VC relax.1.0.0.0" expl="postcondition" proved="true">
+     <transf name="case" proved="true" arg1="(v=v1)">
+      <goal name="VC relax.1.0.0.0.0" expl="true case (postcondition)" proved="true">
+      <transf name="split_goal_wp" proved="true" >
+       <goal name="VC relax.1.0.0.0.0.0" expl="VC for relax" proved="true">
+       <proof prover="1"><result status="valid" time="0.04" steps="107"/></proof>
+       </goal>
+       <goal name="VC relax.1.0.0.0.0.1" expl="VC for relax" proved="true">
+       <proof prover="1"><result status="valid" time="0.15" steps="443"/></proof>
+       </goal>
+       <goal name="VC relax.1.0.0.0.0.2" expl="VC for relax" proved="true">
+       <proof prover="1" timelimit="5"><result status="valid" time="1.35" steps="4082"/></proof>
+       </goal>
+       <goal name="VC relax.1.0.0.0.0.3" expl="VC for relax" proved="true">
+       <proof prover="1"><result status="valid" time="0.02" steps="99"/></proof>
+       </goal>
+       <goal name="VC relax.1.0.0.0.0.4" expl="VC for relax" proved="true">
+       <proof prover="1"><result status="valid" time="0.03" steps="107"/></proof>
+       </goal>
+      </transf>
       </goal>
-      <goal name="VC relax.1.0.0.0.1" expl="VC for relax" proved="true">
-      <proof prover="1"><result status="valid" time="0.29" steps="443"/></proof>
-      </goal>
-      <goal name="VC relax.1.0.0.0.2" expl="VC for relax" proved="true">
-      <proof prover="1" timelimit="5"><result status="valid" time="2.03" steps="4082"/></proof>
-      </goal>
-      <goal name="VC relax.1.0.0.0.3" expl="VC for relax" proved="true">
-      <proof prover="1"><result status="valid" time="0.06" steps="99"/></proof>
-      </goal>
-      <goal name="VC relax.1.0.0.0.4" expl="VC for relax" proved="true">
-      <proof prover="1"><result status="valid" time="0.06" steps="107"/></proof>
+      <goal name="VC relax.1.0.0.0.1" expl="false case (postcondition)" proved="true">
+      <proof prover="1"><result status="valid" time="0.36" steps="1172"/></proof>
       </goal>
      </transf>
-     </goal>
-     <goal name="VC relax.1.0.0.1" expl="false case (postcondition)" proved="true">
-     <proof prover="1"><result status="valid" time="0.69" steps="1172"/></proof>
      </goal>
     </transf>
     </goal>
