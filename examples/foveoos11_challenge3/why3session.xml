@@ -5,7 +5,7 @@
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../foveoos11_challenge3.mlw" proved="true">
-<theory name="TwoEqualElements" proved="true" sum="86cd4130d775f486016d77a819e33160">
+<theory name="TwoEqualElements" proved="true">
  <goal name="VC two_equal_elements" expl="VC for two_equal_elements" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC two_equal_elements.0" expl="array creation size" proved="true">
@@ -53,12 +53,16 @@
   <goal name="VC two_equal_elements.14" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="appear_twice">
    <goal name="VC two_equal_elements.14.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
-    <goal name="VC two_equal_elements.14.0.0" proved="true">
-    <proof prover="1"><result status="valid" time="0.09"/></proof>
-    </goal>
-    <goal name="VC two_equal_elements.14.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC two_equal_elements.14.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="VC two_equal_elements.14.0.0.0" proved="true">
+     <proof prover="1"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="VC two_equal_elements.14.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.03"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -104,12 +108,16 @@
   <goal name="VC two_equal_elements.26" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="appear_twice">
    <goal name="VC two_equal_elements.26.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
-    <goal name="VC two_equal_elements.26.0.0" proved="true">
-    <proof prover="1"><result status="valid" time="0.06"/></proof>
-    </goal>
-    <goal name="VC two_equal_elements.26.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC two_equal_elements.26.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="VC two_equal_elements.26.0.0.0" proved="true">
+     <proof prover="1"><result status="valid" time="0.05"/></proof>
+     </goal>
+     <goal name="VC two_equal_elements.26.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.03"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -133,12 +141,16 @@
   <goal name="VC two_equal_elements.32" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="appear_twice">
    <goal name="VC two_equal_elements.32.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
-    <goal name="VC two_equal_elements.32.0.0" proved="true">
-    <proof prover="1"><result status="valid" time="0.13"/></proof>
-    </goal>
-    <goal name="VC two_equal_elements.32.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC two_equal_elements.32.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="VC two_equal_elements.32.0.0.0" proved="true">
+     <proof prover="1"><result status="valid" time="0.12"/></proof>
+     </goal>
+     <goal name="VC two_equal_elements.32.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.02"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
