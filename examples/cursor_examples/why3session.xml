@@ -6,12 +6,12 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../cursor_examples.mlw" proved="true">
-<theory name="TestCursor" proved="true" sum="4c6babb04c51cb21c0e11617bac06fa4">
+<theory name="TestCursor" proved="true">
  <goal name="VC sum" expl="VC for sum" proved="true">
  <proof prover="1"><result status="valid" time="2.86" steps="906"/></proof>
  </goal>
 </theory>
-<theory name="ListCursorImpl" proved="true" sum="5c9d2123d18fe945b303f391ec90daed">
+<theory name="ListCursorImpl" proved="true">
  <goal name="VC cursor" expl="VC for cursor" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
  </goal>
@@ -37,7 +37,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="TestListCursor" proved="true" sum="5e03d6040df40972278e1bab8d1137ac">
+<theory name="TestListCursor" proved="true">
  <goal name="sum_of_list" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="sum_of_list.0" proved="true">
@@ -75,7 +75,7 @@
   <goal name="VC list_sum.6" expl="loop invariant preservation" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="VC list_sum.6.0" expl="loop invariant preservation" proved="true">
-   <proof prover="1"><result status="valid" time="4.55" steps="1488"/></proof>
+   <proof prover="1"><result status="valid" time="4.55" steps="1512"/></proof>
    </goal>
   </transf>
   </goal>
@@ -88,7 +88,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TestListCursorLink" proved="true" sum="57ad90333a0eff06c751d7979b07b08c">
+<theory name="TestListCursorLink" proved="true">
  <goal name="TestListCursor.ListCursor.VC create" expl="VC for create" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
  </goal>
@@ -99,7 +99,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
 </theory>
-<theory name="ArrayCursorImpl" proved="true" sum="06468482e282d9cf2035e73ba7373228">
+<theory name="ArrayCursorImpl" proved="true">
  <goal name="VC cursor" expl="VC for cursor" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
@@ -136,7 +136,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="TestArrayCursor" proved="true" sum="e8bf3a2e2fb131431b5954f022a066e5">
+<theory name="TestArrayCursor" proved="true">
  <goal name="VC array_sum" expl="VC for array_sum" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC array_sum.0" expl="loop invariant init" proved="true">
@@ -172,7 +172,7 @@
  <proof prover="0"><result status="valid" time="0.16"/></proof>
  </goal>
 </theory>
-<theory name="TestArrayCursorLink" proved="true" sum="bd5b8257a304b6e001c68fe1ad36299a">
+<theory name="TestArrayCursorLink" proved="true">
  <goal name="TestArrayCursor.ArrayCursor.VC create" expl="VC for create" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
  </goal>

@@ -8,7 +8,19 @@
 <prover id="3" name="Eprover" version="1.8-001" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2017_tree_buffer.mlw" proved="true">
-<theory name="Spec" proved="true" sum="f81cd12de5762a9794a2c90b468f0bf7">
+<theory name="Spec" proved="true">
+ <goal name="VC take" expl="VC for take" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC get" expl="VC for get" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
  <goal name="VC take_lemma" expl="VC for take_lemma" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC take_lemma.0" expl="variant decrease" proved="true">
@@ -34,22 +46,13 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC get" expl="VC for get" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC add" expl="VC for add" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC empty" expl="VC for empty" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC take" expl="VC for take" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
 </theory>
-<theory name="Caterpillar" proved="true" sum="858bf387bab69a5422686fa063b215ba">
- <goal name="VC cat_get" expl="VC for cat_get" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+<theory name="Caterpillar" proved="true">
+ <goal name="VC cat" expl="VC for cat" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="VC cat_empty" expl="VC for cat_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="VC cat_add" expl="VC for cat_add" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -98,14 +101,26 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC cat_empty" expl="VC for cat_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
- </goal>
- <goal name="VC cat" expl="VC for cat" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ <goal name="VC cat_get" expl="VC for cat_get" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
 </theory>
-<theory name="RealTime" proved="true" sum="6213b063b0cb9ccc4f02e03f1c0dfa99">
+<theory name="RealTime" proved="true">
+ <goal name="VC rt" expl="VC for rt" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="VC de_allocate" expl="VC for de_allocate" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC process_queue" expl="VC for process_queue" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="VC rt_empty" expl="VC for rt_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="VC rt_get" expl="VC for rt_get" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
  <goal name="VC rt_add" expl="VC for rt_add" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC rt_add.0" expl="precondition" proved="true">
@@ -134,21 +149,6 @@
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC rt_get" expl="VC for rt_get" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
- </goal>
- <goal name="VC rt_empty" expl="VC for rt_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
- </goal>
- <goal name="VC process_queue" expl="VC for process_queue" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- </goal>
- <goal name="VC de_allocate" expl="VC for de_allocate" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC rt" expl="VC for rt" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
 </theory>
 </file>
