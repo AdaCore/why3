@@ -6,7 +6,7 @@
 <prover id="11" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../bitwalker.mlw" proved="true">
-<theory name="Bitwalker" proved="true" sum="9f78b35011f44d38f665317325a6307e">
+<theory name="Bitwalker" proved="true">
  <goal name="nth64" proved="true">
  <proof prover="10"><result status="valid" time="0.02" steps="91"/></proof>
  </goal>
@@ -232,12 +232,16 @@
   <proof prover="12"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC poke_8bit_array.5" expl="postcondition" proved="true">
-  <transf name="case" proved="true" arg1="(div i 8 = o)">
-   <goal name="VC poke_8bit_array.5.0" expl="true case (postcondition)" proved="true">
-   <proof prover="10"><result status="valid" time="0.10" steps="262"/></proof>
-   </goal>
-   <goal name="VC poke_8bit_array.5.1" expl="false case (postcondition)" proved="true">
-   <proof prover="10"><result status="valid" time="0.14" steps="176"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC poke_8bit_array.5.0" expl="postcondition" proved="true">
+   <transf name="case" proved="true" arg1="(div i 8 = o)">
+    <goal name="VC poke_8bit_array.5.0.0" expl="true case (postcondition)" proved="true">
+    <proof prover="10"><result status="valid" time="0.15" steps="262"/></proof>
+    </goal>
+    <goal name="VC poke_8bit_array.5.0.1" expl="false case (postcondition)" proved="true">
+    <proof prover="10"><result status="valid" time="0.12" steps="176"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
