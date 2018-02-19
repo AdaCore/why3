@@ -71,8 +71,10 @@ let get_label labels regexp =
 let print_label fmt l =
   fprintf fmt "\"%s\"" l.lab_string
 
+(* already in Ident
 let model_label = Ident.create_label "model"
   (* This label identifies terms that should be in counter-example. *)
+ *)
 let model_vc_term_label = Ident.create_label "model_vc"
   (* This label identifies the term that triggers the VC. *)
 let model_projection = Ident.create_label "model_projection"

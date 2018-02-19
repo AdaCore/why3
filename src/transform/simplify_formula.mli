@@ -14,11 +14,19 @@ val fmla_simpl : Term.term -> Term.term
 val simplify_formula :  Task.task Trans.trans
 val simplify_formula_and_task :  Task.task list Trans.trans
 
-val fmla_remove_quant : Term.term -> Term.term
+val fmla_remove_quant : keep_model_vars:bool -> Term.term -> Term.term
 (** transforms \exists x. x == y /\ F into F[y/x]
-    and \forall x. x <> y \/ F into F[y/x] *)
+    and \forall x. x <> y \/ F into F[y/x]
+
+    if [keep_model_vars] is true, then variables that hold a label for
+    counterexamples are always kept.
+ *)
 
 val simplify_trivial_quantification : Task.task Trans.trans
+
+val simplify_trivial_wp_quantification : Task.task Trans.trans
+(** same as [simplify_trivial_quantification] but keep variables that
+    hold a counterexample label *)
 
 val fmla_cond_subst: (Term.term -> Term.term -> bool) -> Term.term -> Term.term
 (** given a formula [f] containing some equality or disequality [t1] ?= [t2]

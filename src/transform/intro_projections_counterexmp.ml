@@ -63,7 +63,8 @@ let debug_decl decl =
 *)
 
 (* Label for terms that should be in counterexample *)
-let model_label = Ident.create_label "model"
+(* already in Ident
+   let model_label = Ident.create_label "model" *)
 (* Label for terms that should be projected in counterexample *)
 let model_proj_label = Ident.create_label "model_projected"
 

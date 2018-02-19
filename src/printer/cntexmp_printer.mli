@@ -40,8 +40,6 @@ val get_label: unit Ident.Mlab.t -> Str.regexp -> Ident.label
 
 val print_label: Format.formatter -> Ident.label -> unit
 
-val model_label: Ident.label
-
 val model_projection: Ident.label
 
 val model_vc_term_label: Ident.label

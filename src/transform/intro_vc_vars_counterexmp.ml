@@ -22,8 +22,10 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_label = Ident.create_label "model"
+(* let model_label = Ident.create_label "model"
+  already in Ident
   (* Identifies terms that should be in counterexample and should not be projected. *)
+ *)
 let model_projected_label = Ident.create_label "model_projected"
   (* Identifies terms that should be in counterexample and should be projected. *)
 let model_vc_label = Ident.create_label "model_vc"
