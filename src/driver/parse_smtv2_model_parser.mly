@@ -182,7 +182,7 @@ args_lists:
 (* TODO This is inefficient and should be done in a left recursive way *)
 
 args:
-| name SPACE ireturn_type { $1 }
+| name SPACE ireturn_type { $1, $3 }
 
 name:
 | ATOM { $1 }
@@ -235,8 +235,8 @@ boolean:
 (* BEGIN IGNORED TYPES *)
 (* Types are badly parsed (for future use) but never saved *)
 ireturn_type:
-| tname {}
-| LPAREN idata_type RPAREN {}
+| tname { Some $1 }
+| LPAREN idata_type RPAREN { None }
 
 isort_def:
 | tname SPACE integer { }
