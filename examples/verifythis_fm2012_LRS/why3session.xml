@@ -6,7 +6,7 @@
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_fm2012_LRS.mlw" proved="true">
-<theory name="LCP" proved="true" sum="6ba1bd1774b9932b65de8fc6dd0ced01">
+<theory name="LCP" proved="true">
  <goal name="not_common_prefix_if_last_char_are_different" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -36,12 +36,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" proved="true" sum="ffa1ff78a78b5c6690dae5e6bc055648">
+<theory name="LCP_test" proved="true">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" proved="true" sum="9819bcbc29a33d928f776dcbe5e08ce0">
+<theory name="SuffixSort" proved="true">
  <goal name="VC compare" expl="VC for compare" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC compare.0" expl="precondition" proved="true">
@@ -183,12 +183,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" proved="true" sum="d4ec12d81d0c746c7fa7a444f2917dc8">
+<theory name="SuffixSort_test" proved="true">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.34"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" proved="true" sum="707c0eae8f52d13a67f399ca4490c613">
+<theory name="SuffixArray" proved="true">
  <goal name="VC suffixArray" expl="VC for suffixArray" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -249,12 +249,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" proved="true" sum="b5583c29b4b8c83da2090de5b40dd460">
+<theory name="SuffixArray_test" proved="true">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="LRS" proved="true" sum="0af12e7da206bada3d139e836f9797aa">
+<theory name="LRS" proved="true">
  <goal name="lcp_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
  </goal>
@@ -315,18 +315,22 @@
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC lrs.16" expl="assertion" proved="true">
-  <transf name="assert" proved="true" arg1="(surjective (suffixes sa).elts a.length)">
-   <goal name="VC lrs.16.0" proved="true">
-   <proof prover="2"><result status="valid" time="0.07"/></proof>
-   </goal>
-   <goal name="VC lrs.16.1" expl="assertion" proved="true">
-   <transf name="unfold" proved="true" arg1="surjective" arg2="in" arg3="h">
-    <goal name="VC lrs.16.1.0" expl="assertion" proved="true">
-    <transf name="instantiate" proved="true" arg1="h" arg2="x">
-     <goal name="VC lrs.16.1.0.0" expl="assertion" proved="true">
-     <transf name="instantiate" proved="true" arg1="h" arg2="y">
-      <goal name="VC lrs.16.1.0.0.0" expl="assertion" proved="true">
-      <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC lrs.16.0" expl="assertion" proved="true">
+   <transf name="assert" proved="true" arg1="(surjective (suffixes sa).elts a.length)">
+    <goal name="VC lrs.16.0.0" proved="true">
+    <proof prover="2"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="VC lrs.16.0.1" expl="assertion" proved="true">
+    <transf name="unfold" proved="true" arg1="surjective" arg2="in" arg3="h">
+     <goal name="VC lrs.16.0.1.0" expl="assertion" proved="true">
+     <transf name="instantiate" proved="true" arg1="h" arg2="x">
+      <goal name="VC lrs.16.0.1.0.0" expl="assertion" proved="true">
+      <transf name="instantiate" proved="true" arg1="h" arg2="y">
+       <goal name="VC lrs.16.0.1.0.0.0" expl="assertion" proved="true">
+       <proof prover="2"><result status="valid" time="0.06"/></proof>
+       </goal>
+      </transf>
       </goal>
      </transf>
      </goal>
@@ -346,11 +350,15 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC lrs.20" expl="postcondition" proved="true">
-  <transf name="instantiate" proved="true" arg1="H7" arg2="x">
+  <transf name="introduce_premises" proved="true" >
    <goal name="VC lrs.20.0" expl="postcondition" proved="true">
-   <transf name="instantiate" proved="true" arg1="Hinst" arg2="y">
+   <transf name="instantiate" proved="true" arg1="H7" arg2="x">
     <goal name="VC lrs.20.0.0" expl="postcondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.06"/></proof>
+    <transf name="instantiate" proved="true" arg1="Hinst" arg2="y">
+     <goal name="VC lrs.20.0.0.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -362,7 +370,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" proved="true" sum="f89733b6659e6099b03a321c15129e06">
+<theory name="LRS_test" proved="true">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
