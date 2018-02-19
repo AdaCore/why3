@@ -5,12 +5,12 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../sieve.mlw" proved="true">
-<theory name="Sieve" proved="true" sum="9e8d2ffc2d02ce7d351479f88b024d29">
+<theory name="Sieve" proved="true">
  <goal name="VC incr" expl="VC for incr" proved="true">
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -46,12 +46,7 @@
    <proof prover="1"><result status="valid" time="0.08"/></proof>
    <transf name="introduce_premises" proved="true" >
     <goal name="VC sieve.7.1.0" expl="loop invariant init" proved="true">
-    <proof prover="3" memlimit="4000"><result status="valid" time="0.05"/></proof>
-    </goal>
-   </transf>
-   <transf name="remove" proved="true" arg1="H12">
-    <goal name="VC sieve.7.1.0" expl="loop invariant init" proved="true">
-    <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
