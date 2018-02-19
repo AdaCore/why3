@@ -7,11 +7,11 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../max_matrix.mlw" proved="true">
-<theory name="Bitset" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Bitset" proved="true">
 </theory>
-<theory name="HashTable" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="HashTable" proved="true">
 </theory>
-<theory name="MaxMatrixMemo" proved="true" sum="8d7b30e2c7649c347d569a340e5c4810">
+<theory name="MaxMatrixMemo" proved="true">
  <goal name="VC n" expl="VC for n" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -36,9 +36,9 @@
   <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
   <goal name="VC maximum.4" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_intros_goal_wp" proved="true" >
    <goal name="VC maximum.4.0" expl="VC for maximum" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
    <goal name="VC maximum.4.1" expl="VC for maximum" proved="true">
    <transf name="right" proved="true" >
@@ -51,13 +51,13 @@
      <proof prover="2"><result status="valid" time="0.10"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.2" expl="VC for maximum" proved="true">
-     <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="59"/></proof>
+     <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="57"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.3" expl="VC for maximum" proved="true">
      <proof prover="3"><result status="valid" time="0.06"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.4" expl="VC for maximum" proved="true">
-     <proof prover="1" memlimit="2000"><result status="valid" time="4.08" steps="3072"/></proof>
+     <proof prover="1" memlimit="2000"><result status="valid" time="4.08" steps="3019"/></proof>
      </goal>
     </transf>
     </goal>
@@ -66,7 +66,7 @@
   </transf>
   </goal>
   <goal name="VC maximum.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="3.06"/></proof>
+  <proof prover="0"><result status="valid" time="2.49"/></proof>
   </goal>
   <goal name="VC maximum.6" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="141"/></proof>
