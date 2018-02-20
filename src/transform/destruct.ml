@@ -220,7 +220,7 @@ let () = wrap_and_register
     "instantiate"
     (Tprsymbol (Ttermlist Ttrans)) instantiate
 
-let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\, \/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_alg."
+let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_alg."
     "destruct" (Tprsymbol Ttrans_l) destruct
 
 let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type"
