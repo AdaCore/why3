@@ -272,6 +272,8 @@ module N
     requires { valid x sz }
     requires { valid r sz }
     ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
   =
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
@@ -288,6 +290,8 @@ module N
       invariant { plength !rp = plength r }
       invariant { !xp.offset = x.offset + !i }
       invariant { !rp.offset = r.offset + !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+                  (pelts r)[j] = old (pelts r)[j] }
       C.set !rp (C.get !xp);
       rp.contents <- C.incr !rp one;
       xp.contents <- C.incr !xp one;
@@ -403,6 +407,8 @@ module N
   let zero (r:t) (sz:int32) : unit
     requires { valid r sz }
     ensures { value r sz = 0 }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
   =
     let i = ref (Int32.of_int 0) in
     let lzero = Limb.of_int 0 in
@@ -410,6 +416,8 @@ module N
       invariant { 0 <= !i <= sz }
       variant { sz - !i }
       invariant { value r !i = 0 }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       set_ofs r !i lzero;
       value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
       i := Int32.(+) !i (Int32.of_int 1);
@@ -428,6 +436,8 @@ module N
     ensures { value r sz + (power radix sz) * result =
               value x sz + y }
     ensures { 0 <= result <= 1 }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
@@ -438,7 +448,9 @@ module N
       invariant { 0 <= !i <= sz }
       invariant { !i > 0 -> 0 <= !c <= 1 }
       invariant { value r !i + (power radix !i) * !c =
-                  value x !i + y}
+                  value x !i + y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       label StartLoop in
       lx := get_ofs x !i;
@@ -472,7 +484,9 @@ module N
       invariant { !c  = 0 }
       invariant { 0 <= !i <= sz }
       invariant { value r !i + (power radix !i) * !c =
-                  value x !i + y}
+                  value x !i + y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       lx := get_ofs x !i;
       set_ofs r !i !lx;
@@ -497,6 +511,8 @@ module N
     ensures { 0 <= result <= 1 }
     ensures { value r sz + (power radix sz) * result =
             value x sz + value y sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
     =
     let limb_zero = Limb.of_int 0 in
@@ -510,6 +526,8 @@ module N
       invariant { value r !i + (power radix !i) * !c =
                 value x !i + value y !i }
       invariant { 0 <= !c <= 1 }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       label StartLoop in
       lx := get_ofs x !i;
       ly := get_ofs y !i;
@@ -558,6 +576,8 @@ module N
     requires { valid r sx }
     ensures { value r sx + (power radix sx) * result =
               value x sx + value y sy }
+    ensures { forall j. (j < offset r \/ offset r + sx <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
  =
@@ -572,6 +592,8 @@ module N
       invariant { value r !i + (power radix !i) * !c =
                 value x !i + value y !i }
       invariant { 0 <= !c <= 1 }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       label StartLoop in
       lx := get_ofs x !i;
       ly := get_ofs y !i;
@@ -614,6 +636,8 @@ module N
       invariant { value r !i + (power radix !i) * !c =
                 value x !i + value y sy }
       invariant { 0 <= !c <= 1 }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       (if (Limb.(=) !c (Limb.of_int 0)) then raise Break);
       label StartLoop2 in
       lx := get_ofs x !i;
@@ -653,6 +677,8 @@ module N
       invariant { !i = sx \/ !c = 0 }
       invariant { value r !i + power radix !i * !c =
                 value x !i + value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       assert { !c = 0 by !i < sx };
       lx := get_ofs x !i;
       set_ofs r !i !lx;
@@ -878,6 +904,8 @@ module N
     requires { 0 < sz }
     ensures { value r sz - power radix sz * result
               = value x sz - y }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
@@ -890,6 +918,8 @@ module N
       invariant { !i > 0 -> 0 <= !b <= 1 }
       invariant { value r !i - power radix !i * !b
                   = value x !i - y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       label StartLoop in
       lx := get_ofs x !i;
@@ -925,6 +955,8 @@ module N
       invariant { 0 <= !i <= sz }
       invariant { value r !i - power radix !i * !b
                    = value x !i - y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       lx := get_ofs x !i;
       set_ofs r !i !lx;
@@ -948,6 +980,8 @@ module N
     ensures { 0 <= result <= 1 }
     ensures { value r sz - power radix sz * result
               = value x sz - value y sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
@@ -960,6 +994,8 @@ module N
       invariant { 0 <= !i <= sz }
       invariant { value r !i - (power radix !i) * !b
                   = value x !i - value y !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       invariant { 0 <= !b <= 1 }
       label StartLoop in
       lx := get_ofs x !i;
@@ -1010,6 +1046,8 @@ module N
     requires { valid r sx }
     ensures { value r sx  - power radix sx * result
               = value x sx - value y sy }
+    ensures { forall j. (j < offset r \/ offset r + sx <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
@@ -1024,6 +1062,8 @@ module N
       invariant { 0 <= !i <= sy }
       invariant { value r !i - power radix !i * !b =
                   value x !i - value y !i }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       invariant { 0 <= !b <= 1 }
       label StartLoop in
       lx := get_ofs x !i;
@@ -1065,6 +1105,8 @@ module N
       invariant { sy <= !i <= sx }
       invariant { value r !i - power radix !i * !b =
                   value x !i - value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       invariant { 0 <= !b <= 1 }
       (if (Limb.(=) !b (Limb.of_int 0)) then raise Break);
       label StartLoop2 in
@@ -1105,6 +1147,8 @@ module N
       invariant { !i = sx \/ !b = 0 }
       invariant { value r !i - power radix !i * !b =
                 value x !i - value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       assert { !b = 0 by !i < sx };
       lx := get_ofs x !i;
       set_ofs r !i !lx;
@@ -1267,6 +1311,8 @@ module N
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
                 = value x sz * y }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
@@ -1278,6 +1324,8 @@ module N
       invariant { 0 <= !i <= sz }
       invariant { value r !i + (power radix !i) * !c =
                   value x !i * y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       label StartLoop in
       lx := get_ofs x !i;
       let rl, rh = Limb.mul_double !lx y in
@@ -1343,7 +1391,7 @@ module N
             = value (old r) sz
               + value x sz * y }
     writes { r.data.elts }
-    ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
+    ensures { forall j. (j < r.offset \/ r.offset + sz <= j) ->
               (pelts r)[j] = (pelts (old r))[j] }
   =
     let limb_zero = Limb.of_int 0 in
@@ -1466,24 +1514,23 @@ module N
     writes { r.data.elts }
     ensures { value r (sz + sz)
               = value x sz * value y sz }
+    ensures { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
   =
     zero r sz;
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
     let rp = ref (C.incr r (Int32.of_int 0)) in
     let ly = ref limb_zero in
-    let c = ref limb_zero in
     let i = ref (Int32.of_int 0) in
     while Int32.(<) !i sz do
       invariant { 0 <= !i <= sz }
-      invariant { value r (!i + sz)
-                    + (power radix (!i + sz)) * !c
-                  = value x sz
-                      * value y !i }
+      invariant { value r (!i + sz) = value x sz * value y !i }
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
       invariant { pelts !rp = pelts r }
-      invariant { 0 <= !c <= 1 } (*TODO c=0*)
+      invariant { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       label StartLoop in
       value_concat r !i (!i + sz);
@@ -1501,14 +1548,12 @@ module N
                    (j < (!rp).offset
                     so (pelts !rp)[j] = (pelts !rp at StartLoop)[j]
                          = (pelts r at StartLoop)[j]) };
-      let (res, carry) = add_with_carry c' limb_zero !c in
       label BeforeCarry in
       value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
-                        r.offset (r.offset + p2i !i) res;
-      set_ofs !rp sz res;
-      assert { (pelts !rp)[offset !rp + sz] = res
+                        r.offset (r.offset + p2i !i) c';
+      set_ofs !rp sz c';
+      assert { (pelts !rp)[offset !rp + sz] = c'
                 = (pelts r)[offset r + (!i + sz)] };
-      c:= carry;
       assert { value r !i = value (r at BeforeCarry) !i
              = value (r at StartLoop) !i};
       value_tail r (!i + sz);
@@ -1528,101 +1573,10 @@ module N
       assert { value x sz * value y (!i + 1)
                = value x sz * value y !i + (power radix !i) * (value x sz * !ly) };
              (* nonlinear *)
-      assert { value r (!i + sz + 1)
-                    + (power radix (!i + sz + 1)) * !c
-                  = value x sz * value y (!i+1)
-               (*by power radix (k + sz) = power radix k * power radix sz
-               so
-                 value r (!i + sz)
-                    + (power radix (!i + sz)) * !c
-               = value r (k + sz)
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix k) * (power radix sz) * radix * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (res + radix * !c)
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (c' + (!c at StartLoop))
-               = value r k + (power radix k)
-                    * (value !rp sz
-                      + power radix sz * c'
-                      + (power radix sz) * (!c at StartLoop))
-               = value r k + (power radix k)
-                    * (value (!rp at StartLoop) sz
-                       + value x sz * !ly
-                       + (power radix sz) * (!c at StartLoop))
-               = value r k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop)))
-               = value (r at StartLoop) k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop)))
-               = value (r at StartLoop) k
-                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
-                                              (r.offset+k+ sz))
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop)))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop)))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * value x sz * !ly
-                 + power radix k * power radix sz * ((!c at StartLoop))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * power radix sz * ((!c at StartLoop))
-                 + power radix k * value x sz * !ly
-               = value (r at StartLoop) (k + sz)
-                 + power radix (k + sz) * ((!c at StartLoop))
-                 + power radix k * value x sz * !ly
-               = value x sz * value y k
-                + power radix k * value x sz * !ly
-               = value x sz *
-                 (value y k + power radix k * !ly)
-               = value x sz * value y !i *)
-             };
+      assert { value r (!i + sz + 1) = value x sz * value y (!i+1) };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
-    done;
-    value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
-    value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sz);
-    value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sz);
-    assert { 0 <= value x sz < power radix sz };
-    assert { 0 <= value y sz < power radix sz };
-    prod_compat_strict_r (value y (p2i sz)) (power radix (p2i sz))
-                         (power radix (p2i sz));
-    assert { !c = 0 by
-             0 < power radix sz
-             so
-             value r (sz + sz)
-                    + (power radix (sz + sz)) * !c
-                  = value x sz
-                      * value y sz
-             so
-             (power radix (sz + sz))*(!c) <=
-                    value x sz
-                    * value y sz
-                    <= (power radix sz) * value y sz
-                    < (power radix sz)*(power radix sz)
-             so
-             (power radix (sz + sz))*(!c) <
-                    (power radix sz)*(power radix sz)  }
+    done
 
  let addmul_limbs (r x y:t) (sz:int32) : limb
     requires { sz > 0 }
@@ -1812,6 +1766,8 @@ module N
     requires { valid r (sy + sx) }
     writes   { r.data.elts }
     ensures  { value r (sy + sx) = value x sx * value y sy }
+    ensures { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
     (*ensures  { result = (pelts r)[r.offset + sx + sy - 1] }*)
   =
     let ly = ref (C.get y) in
@@ -1832,6 +1788,8 @@ module N
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
       invariant { pelts !rp = pelts r }
+      invariant { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
       variant { sy - !i }
       label StartLoop in
       value_concat r !i (!i + sx);
