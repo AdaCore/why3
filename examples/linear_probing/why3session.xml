@@ -7,10 +7,10 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linear_probing.mlw" proved="true">
-<theory name="HashedTypeWithDummy" proved="true" sum="72593de5f5ec5288d057864a4ad54480">
+<theory name="HashedTypeWithDummy" proved="true">
  <goal name="VC neq" expl="VC for neq" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -18,7 +18,7 @@
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" proved="true" sum="d9d9cf7475379a09d7da7805b75df3dd">
+<theory name="LinearProbing" proved="true">
  <goal name="VC bucket" expl="VC for bucket" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
@@ -270,31 +270,54 @@
      <proof prover="7"><result status="valid" time="0.08"/></proof>
      </goal>
      <goal name="VC add.9.0.0.1" expl="VC for add" proved="true">
-     <transf name="subst_all" proved="true" >
+     <transf name="inline_all" proved="true" >
       <goal name="VC add.9.0.0.1.0" expl="VC for add" proved="true">
-      <transf name="case" proved="true" arg1="(i=i1)">
-       <goal name="VC add.9.0.0.1.0.0" expl="true case" proved="true">
-       <proof prover="6"><result status="valid" time="0.01" steps="37"/></proof>
-       </goal>
-       <goal name="VC add.9.0.0.1.0.1" expl="false case" proved="true">
-       <proof prover="6"><result status="valid" time="0.34" steps="411"/></proof>
+      <proof prover="7"><result status="valid" time="0.16"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="VC add.9.0.0.2" expl="VC for add" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC add.9.0.0.2.0" expl="VC for add" proved="true">
+      <transf name="subst_all" proved="true" >
+       <goal name="VC add.9.0.0.2.0.0" expl="VC for add" proved="true">
+       <transf name="case" proved="true" arg1="(i=i1)">
+        <goal name="VC add.9.0.0.2.0.0.0" expl="true case" proved="true">
+        <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="53"/></proof>
+        </goal>
+        <goal name="VC add.9.0.0.2.0.0.1" expl="false case" proved="true">
+        <transf name="inline_all" proved="true" >
+         <goal name="VC add.9.0.0.2.0.0.1.0" expl="false case" proved="true">
+         <proof prover="7"><result status="valid" time="0.13"/></proof>
+         </goal>
+        </transf>
+        <transf name="split_all_full" >
+         <goal name="VC add.9.0.0.2.0.0.1.0" expl="false case">
+         <proof prover="4" timelimit="10" memlimit="4000"><undone/></proof>
+         <proof prover="6"><result status="timeout" time="10.01"/></proof>
+         <proof prover="7" timelimit="10" memlimit="4000"><result status="unknown" time="9.71"/></proof>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
        </goal>
       </transf>
       </goal>
      </transf>
      </goal>
-     <goal name="VC add.9.0.0.2" expl="VC for add" proved="true">
-     <transf name="inline_all" proved="true" >
-      <goal name="VC add.9.0.0.2.0" expl="VC for add" proved="true">
-      <proof prover="7"><result status="valid" time="0.16"/></proof>
+     <goal name="VC add.9.0.0.3" expl="VC for add" proved="true">
+     <transf name="split_all_full" proved="true" >
+      <goal name="VC add.9.0.0.3.0" expl="VC for add" proved="true">
+      <proof prover="4"><result status="valid" time="0.96"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="VC add.9.0.0.3" expl="VC for add" proved="true">
-     <proof prover="4"><result status="valid" time="0.23"/></proof>
-     </goal>
      <goal name="VC add.9.0.0.4" expl="VC for add" proved="true">
-     <proof prover="4"><result status="valid" time="0.20"/></proof>
+     <transf name="split_all_full" proved="true" >
+      <goal name="VC add.9.0.0.4.0" expl="VC for add" proved="true">
+      <proof prover="4"><result status="valid" time="0.91"/></proof>
+      </goal>
+     </transf>
      </goal>
      <goal name="VC add.9.0.0.5" expl="VC for add" proved="true">
      <transf name="inline_all" proved="true" >
@@ -306,16 +329,12 @@
      <goal name="VC add.9.0.0.6" expl="VC for add" proved="true">
      <transf name="inline_all" proved="true" >
       <goal name="VC add.9.0.0.6.0" expl="VC for add" proved="true">
-      <proof prover="7"><result status="valid" time="0.13"/></proof>
+      <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.19"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="VC add.9.0.0.7" expl="VC for add" proved="true">
-     <transf name="inline_all" proved="true" >
-      <goal name="VC add.9.0.0.7.0" expl="VC for add" proved="true">
-      <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.40"/></proof>
-      </goal>
-     </transf>
+     <proof prover="7"><result status="valid" time="0.20"/></proof>
      </goal>
     </transf>
     </goal>
