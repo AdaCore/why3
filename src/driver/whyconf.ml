@@ -488,22 +488,24 @@ let load_policy provers acc (_,section) =
 let load_strategy strategies section =
   try
     let name = get_string section "name" in
-    try
-      let (_:int) = String.index name ' ' in
-      Warning.emit "[Warning] cannot load a strategy: invalid name '%s'@\nNote: spaces are not allowed anymore in strategy names.@\nPlease rerun 'why3 config --detect' or fix why3.conf manually@." name;
+    let name =
+      try
+        let (_:int) = String.index name ' ' in
+        Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+        String.map (function ' ' -> '_' | c -> c) name
+      with Not_found -> name
+    in
+    let desc = get_string section "desc" in
+    let shortcut = get_string ~default:"" section "shortcut" in
+    let code = get_string section "code" in
+    Mstr.add
+      name
+      { strategy_name = name;
+        strategy_desc = desc;
+        strategy_code = code;
+        strategy_shortcut = shortcut;
+      }
       strategies
-    with Not_found ->
-      let desc = get_string section "desc" in
-      let shortcut = get_string ~default:"" section "shortcut" in
-      let code = get_string section "code" in
-      Mstr.add
-        name
-        { strategy_name = name;
-          strategy_desc = desc;
-          strategy_code = code;
-          strategy_shortcut = shortcut;
-        }
-        strategies
   with
     MissingField s ->
     Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
