@@ -286,8 +286,10 @@ module N
       invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset !i }
       invariant { pelts !xp = pelts x }
       invariant { pelts !rp = pelts r }
-      invariant { plength !xp = plength x }
-      invariant { plength !rp = plength r }
+      invariant { !xp.min = min x }
+      invariant { !xp.max = x.max }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { !xp.offset = x.offset + !i }
       invariant { !rp.offset = r.offset + !i }
       invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
@@ -1528,6 +1530,8 @@ module N
       invariant { value r (!i + sz) = value x sz * value y !i }
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { pelts !rp = pelts r }
       invariant { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
                 -> (pelts r)[j] = old (pelts r)[j] }
@@ -1603,6 +1607,8 @@ module N
                   = value (old r) (!i + sz)
                     + value x sz * value y !i }
       invariant { (!rp).offset = r.offset + !i }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { r.data = (!rp).data }
       invariant { 0 <= !c <= 1 }
       invariant { forall j. (!rp).offset + sz <= j ->
@@ -1787,6 +1793,8 @@ module N
       invariant { value r (!i + sx) = value x sx * value y !i }
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { pelts !rp = pelts r }
       invariant { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
                 -> (pelts r)[j] = old (pelts r)[j] }
@@ -2012,8 +2020,12 @@ module N
       invariant { (!rp).offset = r.offset + !i }
       invariant { (!xp).offset = x.offset + !i }
       invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { pelts !rp = pelts r }
       invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
       invariant { pelts !xp = pelts x }
       invariant { !high <= radix - power 2 (cnt) }
       label StartLoop in
@@ -2146,7 +2158,11 @@ module N
       invariant { (!rp).offset = r.offset + !i }
       invariant { (!xp).offset = x.offset + !i }
       invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
       invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
       invariant { pelts !rp = pelts r }
       invariant { pelts !xp = pelts x }
       invariant { !low < c}
@@ -2249,7 +2265,7 @@ module N
   (** Based on Niels Möller and Torbjörn Granlund, “Improved
       division by invariant integers” 2010 *)
 
-  use import int.MinMax
+  use int.MinMax as MM
 
   predicate reciprocal (v d:limb) =
     v = (div (radix*radix - 1) (d)) - radix
@@ -2382,7 +2398,7 @@ module N
     prod_compat_strict_r (l2i ul) radix (radix - l2i d);
     prod_compat_strict_r (l2i d) radix (radix - q0);
     assert { (* Theorem 2 of Möller&Granlund 2010 *)
-             (max (radix - d) (q0 + 1)) - radix <= cr < max (radix - d) q0
+             (MM.max (radix - d) (q0 + 1)) - radix <= cr < MM.max (radix - d) q0
              by radix * cr = uh * k + ul * (radix - d) + q0 * d - radix * d
              so (uh * k + ul * (radix - d) >= 0
                 by uh >= 0 /\ k >= 0 /\ ul >= 0 /\ radix - d >= 0)
@@ -2396,7 +2412,7 @@ module N
              so (q0 - radix) * d > (q0 - radix) * radix
              so radix * cr > (q0 - radix) * radix
              so cr > q0 - radix
-             so (let m = max (radix - d) (q0 +1) in
+             so (let m = MM.max (radix - d) (q0 +1) in
                 cr >= m - radix
                 by (cr + radix >= - d + radix
                    /\ (cr + radix > q0 so cr + radix >= q0 + 1))
@@ -2413,7 +2429,7 @@ module N
                         = radix * (radix - d) + (d - radix) * d +  q0 * d
                         = radix * (radix - d) - d * (radix - d) + q0 * d
                         = (radix - d) * (radix - d) + q0 * d)
-             so let m = max (radix - d) q0 in
+             so let m = MM.max (radix - d) q0 in
                 radix - d <= m
              so (radix - d) * (radix - d) <= m* (radix - d)
              so (q0 * d <= m * d by 0 <= q0 <= m /\ 0 < d)
@@ -2426,7 +2442,7 @@ module N
     assert { cr >= 0 -> r' = cr };
     assert { cr < 0 ->
            ( r' = cr + radix
-             by cr >= max (radix - d) (q0 + 1) - radix
+             by cr >= MM.max (radix - d) (q0 + 1) - radix
              so cr >= - d
              so cr + radix >= radix - d >= 0
              so 0 <= cr + radix < radix
@@ -2434,8 +2450,8 @@ module N
              so r' = mod (cr + radix) radix ) };
     assert { cr < 0 ->
                 ( !r > !ql
-                by max (radix - d) (q0 + 1) >= q0 + 1 > q0
-                so cr >= (max (radix - d) (q0 +1)) - radix > q0 - radix
+                by MM.max (radix - d) (q0 + 1) >= q0 + 1 > q0
+                so cr >= (MM.max (radix - d) (q0 +1)) - radix > q0 - radix
                 so r' = cr + radix > q0 - radix + radix = q0 ) };
     assert { 1 <= cq <= radix };
     assert { (!qh = cq \/ (!qh = 0 /\ cq = radix)
@@ -2464,7 +2480,7 @@ module N
       assert { cr >= 0 ->
                   (!r = cr + d
                   by r' = cr
-                  so r' < max (radix - d) q0
+                  so r' < MM.max (radix - d) q0
                   so r' > q0
                   so 0 <= r' < radix - d
                   so d <= r' + d < radix
@@ -2476,7 +2492,7 @@ module N
       assert { cr < 0 ->
                   ( !r = r' + d - radix
                   by r' = cr + radix < radix
-                  so cr >= max (radix - d) (q0 + 1) - radix
+                  so cr >= MM.max (radix - d) (q0 + 1) - radix
                         >= radix - d - radix = - d
                   so r' = cr + radix >= radix - d
                   so !r = mod (r' + d) radix
@@ -2496,7 +2512,7 @@ module N
                 so u = radix * d + cr
                      = (radix - 1) * d + d + cr
                      = (radix - 1) * d + d + r' - radix
-                so r' = cr + radix >= max (radix - d) (q0 + 1)
+                so r' = cr + radix >= MM.max (radix - d) (q0 + 1)
                    >= radix - d
                 so radix + radix >= d + r' >= radix
                 so !r = mod (d + r') radix = d + r' - radix
@@ -2565,8 +2581,6 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let one = Int32.of_int 1 in
     let msb = Int32.(-) sz one in
     let lx = ref limb_zero in
-    let xp = ref (C.incr x msb) in
-    let qp = ref (C.incr q msb) in
     let i = ref msb in
     let r = ref limb_zero in
     (*normalize divisor*)
@@ -2582,12 +2596,6 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       while (Int32.(>=) !i zero) do
         variant   { p2i !i }
         invariant { -1 <= !i <= msb }
-        invariant { (!qp).offset = q.offset + !i }
-        invariant { (!xp).offset = x.offset + !i }
-        invariant { plength !qp = plength q }
-        invariant { plength !xp = plength x }
-        invariant { pelts !qp = pelts q }
-        invariant { pelts !xp = pelts x }
         invariant { !r < ry }
         invariant { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
                     = value_sub (pelts q) (q.offset + !i + 1)
@@ -2598,7 +2606,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         invariant { mod (!r) mult = 0 }
         assert { !i >= 0 };
         label StartLoop in
-        lx := C.get !xp;
+        lx := C.get_ofs x !i;
         (*TODO lshift in place would simplify things*)
         let l,h = lsld_ext !lx (Limb.of_int32 clz) in
         mod_mult mult (l2i y) 0;
@@ -2660,16 +2668,15 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         r:=rem;
         assert { qu * ry + !r = l + radix * h + radix * (!r at StartLoop) };
                (* coerced div2by1 postcondition *)
-        value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
+        value_sub_update_no_change (pelts q) (q.offset + p2i !i)
+                                   (q.offset + 1 + p2i !i)
                                    (q.offset + p2i sz) qu;
-        C.set !qp qu;
+        C.set_ofs q !i qu;
         assert { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
                     = value_sub (pelts q) (q.offset + !i + 1)
                                           (q.offset + sz)
                       * ry
                       + (!r at StartLoop) }; (* previous invariant is still true *)
-        xp.contents <- C.incr !xp (-1);
-        qp.contents <- C.incr !qp (-1);
         value_sub_head (pelts x) (x.offset + int32'int !i) (x.offset + p2i sz);
         value_sub_head (pelts q) (q.offset + int32'int !i) (q.offset + p2i sz);
         assert { l + radix * h = mult * !lx }; (*lsld_ext postcondition *)
@@ -2747,28 +2754,19 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         i := Int32.(-) !i one;
       done;
       let ghost res = lsr !r (Limb.of_int32 clz) in
-      assert { !r = res * mult
-               so
-               mult * value x sz
-                = value q sz * ry + !r
-                = value q sz * y * mult + !r
-                = value q sz * y * mult + res * mult
-                = (value q sz * y + res) * mult
-              so
-              value x sz
-                = value q sz * y + res };
+      assert { value x sz = value q sz * y + res
+               by !r = res * mult
+               so mult * value x sz
+                  = value q sz * ry + !r
+                  = value q sz * y * mult + !r
+                  = value q sz * y * mult + res * mult
+                  = (value q sz * y + res) * mult };
       lsr !r (Limb.of_int32 clz) end
     else begin
       let v = invert_limb y in
       while (Int32.(>=) !i zero) do
         variant   { p2i !i }
         invariant { -1 <= !i <= msb }
-        invariant { (!qp).offset = q.offset + !i }
-        invariant { (!xp).offset = x.offset + !i }
-        invariant { plength !qp = plength q }
-        invariant { plength !xp = plength x }
-        invariant { pelts !qp = pelts q }
-        invariant { pelts !xp = pelts x }
         invariant { !r < y }
         invariant { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
                     = value_sub (pelts q) (q.offset + !i + 1)
@@ -2778,14 +2776,13 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         assert { !i >= 0 };
         label StartLoop in
         let ghost k = p2i !i in
-        lx := C.get !xp;
+        lx := C.get_ofs x !i;
         let (qu, rem) = div2by1_inv !r !lx y v in
         r := rem;
-        value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
+        value_sub_update_no_change (pelts q) (q.offset + p2i !i)
+                                   (q.offset + 1 + p2i !i)
                                    (q.offset + p2i sz) qu;
-        C.set !qp qu;
-        xp.contents <- C.incr !xp (-1);
-        qp.contents <- C.incr !qp (-1);
+        C.set_ofs q !i qu;
         i := Int32.(-) !i one;
         value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
         value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
@@ -2947,7 +2944,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                        (radix * radix)
                  = mod cr (radix*radix)
                };
-    let ghost m = max (radix * radix - d) (q0 * radix) in
+    let ghost m = MM.max (radix * radix - d) (q0 * radix) in
     assert { (* Theorem 3 of Moller&Granlund 2010 *)
              m - radix * radix <= cr < m
             by
@@ -3265,7 +3262,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                if cr >= 0
                then r' = cr
                     so rl + radix * rh = mod (cr + d) (radix * radix)
-                    so cr < max (radix * radix - d) (q0*radix)
+                    so cr < MM.max (radix * radix - d) (q0*radix)
                     so (cr >= q0 * radix
                        by
                           r' = radix * !r1 + !r0
@@ -3854,7 +3851,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       invariant { (!qp).offset = q.offset + !i }
       invariant { (!xp).offset = x.offset + sy + !i - 2 }
       invariant { plength !qp = plength q }
+      invariant { !qp.min = q.min }
+      invariant { !qp.max = q.max }
       invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
       invariant { pelts !qp = pelts q }
       invariant { pelts !xp = pelts x }
       invariant { value (old x) sx =
@@ -5817,6 +5818,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       invariant { 0 <= !i <= sx - 2 }
       invariant { !xp.offset = x.offset + !i }
       invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
       invariant { pelts !xp = pelts x }
       invariant { value x sx
                   = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
@@ -6314,7 +6317,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                value_sub_shift_no_change (pelts x) x.offset
                                          (p2i sx) (p2i sx) limb_zero;
                set_ofs q (Int32.(-) sx sy) limb_zero;
-               value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy)
+               value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+               ()
              end
            end
         end

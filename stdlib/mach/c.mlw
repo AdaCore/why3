@@ -10,15 +10,21 @@ module C
   predicate in_bounds (n:int) = min_int32 <= n <= max_int32
   use import ref.Ref
 
+  type zone
+
+  constant null_zone : zone
+
   (* we would like to specify "abstract" here.  but it would prevent
      to give implementations to the following routines
      pb with specifying alias in the surface language
    *)
-  type ptr 'a = private {
+  type ptr 'a = abstract {
     mutable data : array 'a ;
     offset : int ;
+    mutable min : int ;
+    mutable max : int ;
+    zone : zone ;
   }
-  (*invariant { in_us_bounds data.length, offset }*)
 
   let ghost function plength (p:ptr 'a) : int
   = p.data.length
@@ -29,36 +35,36 @@ module C
   val p2i (n:int32):int
     ensures { result = Int32.to_int n }
 
-  (*val predicate is_null (p:ptr 'a) : bool
-    ensures { result <-> plength p = 0 }*)
-
   val null () : ptr 'a
-    ensures { plength result = 0 }
+    ensures { result.zone = null_zone }
 
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
-    requires { p.offset + ofs <= plength p }
+    requires { p.min <= p.offset + ofs <= p.max }
     ensures { result.offset = p.offset + ofs }
     ensures { plength result = plength p }
     ensures { pelts result = pelts p }
     ensures { result.data = p.data }
+    ensures { result.min = p.min }
+    ensures { result.max = p.max }
+    ensures { result.zone = p.zone }
     alias { p.data with result.data }
 
   val get (p:ptr 'a) : 'a
-    requires { 0 <= p.offset < plength p }
+    requires { p.min <= p.offset < p.max }
     ensures { result = (pelts p)[p.offset] }
 
   let get_ofs (p:ptr 'a) (ofs:int32) : 'a
-    requires { 0 <= p.offset + ofs < plength p }
+    requires { p.min <= p.offset + ofs < p.max }
     ensures { result = (pelts p)[p.offset + ofs] }
   = get (incr p ofs)
 
   val set (p:ptr 'a) (v:'a) : unit
-    requires { 0 <= p.offset < plength p }
+    requires { p.min <= p.offset < p.max }
     ensures { pelts p = Map.set (pelts (old p)) p.offset v }
     writes { p.data.elts }
 
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
-    requires { 0 <= p.offset + ofs < plength p }
+    requires { p.min <= p.offset + ofs < p.max }
     ensures { pelts p = Map.set (pelts (old p))
               (p.offset + ofs) v }
     ensures { (pelts p)[p.offset + ofs] = v }
@@ -67,10 +73,10 @@ module C
     set (incr p ofs) v
 
   predicate valid_ptr_shift (p:ptr 'a) (i:int) =
-    0 <= p.offset + i < plength p
+    p.min <= p.offset + i < p.max
 
   predicate valid (p:ptr 'a) (sz:int) =
-    in_bounds sz /\ 0 <= sz /\ 0 <= p.offset /\ p.offset + sz <= plength p
+    in_bounds sz /\ 0 <= sz /\ 0 <= p.min <= p.offset /\ p.offset + sz <= p.max <= plength p
 
   let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
     requires { valid p sz }
@@ -78,29 +84,66 @@ module C
   = ()
 
   val malloc (sz:uint32) : ptr 'a
-    requires { sz > 0 }
-    ensures { plength result = sz \/ plength result = 0 }
+    requires { 0 <= sz }
+    ensures { result.zone <> null_zone -> plength result = sz }
     ensures { result.offset = 0 }
+    ensures { result.min = 0 }
+    ensures { result.max = plength result }
 
   val free (p:ptr 'a) : unit
     requires { p.offset = 0 }
+    requires { p.min = 0 }
+    requires { p.max = plength p }
+    writes { p }
     writes { p.data }
-    ensures { plength p = 0 }
 
   val realloc (p:ptr 'a) (sz:int32) : ptr 'a
-    requires { sz > 0 } (* for simplicity, though 0 is legal in C *)
+    requires { 0 <= sz }
     requires { p.offset = 0 }
+    requires { p.min = 0 }
+    requires { p.max = plength p }
     requires { plength p > 0 }
+    writes { p }
     writes { p.data }
-    ensures { plength result = sz \/ plength result = 0 }
-    ensures { plength result = sz -> plength p = 0 }
-    ensures { plength result = sz ->
+    ensures { result.min = 0 }
+    ensures { result.max = plength result }
+    ensures { result.offset = 0 }
+    ensures { result.zone <> null_zone -> plength result = sz }
+    ensures { result.zone <> null_zone ->
                 forall i:int. 0 <= i < plength (old p) /\ i < sz ->
                   (pelts result)[i] = (pelts (old p))[i] }
-    ensures { plength result <> sz -> p = old p }
+    ensures { result.zone = null_zone -> p = old p }
 
   val predicate is_not_null (p:ptr 'a) : bool
-    ensures { result <-> plength p <> 0 }
+    ensures { result <-> p.zone <> null_zone }
+
+  val incr_split (p:ptr 'a) (i:int32) : ptr 'a
+    requires { 0 <= i }
+    requires { p.min <= p.offset + i <= p.max }
+    writes   { p.max }
+    writes   { p.data }
+    ensures  { result.offset = p.offset + i }
+    ensures  { p.max = p.offset + i }
+    ensures  { result.min = p.offset + i }
+    ensures  { result.max = old p.max }
+    ensures  { result.zone = p.zone }
+    ensures  { p.data = old p.data }
+    ensures  { result.data = old p.data }
+    (* NOT alias result.data old p.data *)
+
+  val join (p1 p2: ptr 'a) : unit
+    requires { p1.zone = p2.zone }
+    requires { p1.max = p2.min }
+    writes   { p1.max }
+    writes   { p1.data.elts }
+    writes   { p2 }
+    writes   { p2.data }
+    ensures  { p1.max = old p2.max }
+    ensures  { plength p1 = old plength p1 }
+    ensures  { forall i. old p1.min <= i < old p1.max ->
+                         (pelts p1)[i] = old (pelts p1)[i] }
+    ensures  { forall i. old p2.min <= i < old p2.max ->
+                         (pelts p1)[i] = old (pelts p2)[i] }
 
   val c_assert (e:bool) : unit
     ensures { e }
