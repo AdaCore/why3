@@ -949,6 +949,8 @@ let counterexample_view =
     ~packing:scrolled_counterexample_view#add
     ()
 
+(* Allow colors locations on counterexample view *)
+let () = create_colors counterexample_view
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -1159,10 +1161,13 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
 
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
-let color_loc ~color loc =
+let color_loc ?(ce=false) ~color loc =
   let f, l, b, e = Loc.get loc in
   try
-    let (_, v, _, _) = get_source_view_table f in
+    let v = if ce then counterexample_view else
+      let (_, v, _, _) = get_source_view_table f in
+      v
+    in
     let color = convert_color color in
     color_loc ~color v l b e
   with
@@ -1202,6 +1207,14 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     with Not_found -> None
   in
   scroll_to_loc ~force_tab_switch:false loc_of_goal
+
+(* Erase the colors and apply the colors given by l (which come from the task)
+   to the counterexample tab *)
+let apply_loc_on_ce (l: (Loc.position * color) list) =
+  erase_color_loc counterexample_view;
+  List.iter (fun (loc, color) ->
+    color_loc ~ce:true ~color loc) l
+
 
 (*******************)
 (* The "View" menu *)
@@ -2283,10 +2296,11 @@ let treat_notification n =
       with
       | Not_found -> create_source_view file_name content
     end
-  | Source_and_ce (content) ->
+  | Source_and_ce (content, list_loc) ->
     begin
       messages_notebook#goto_page counterexample_page;
       counterexample_view#source_buffer#set_text content;
+      apply_loc_on_ce list_loc
     end
   | Dead _ ->
      print_message ~kind:1 ~notif_kind:"Server Dead ?"

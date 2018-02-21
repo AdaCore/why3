@@ -260,8 +260,10 @@ val interleave_with_source :
   ?me_name_trans:(model_element_name -> string) ->
   model ->
   filename:string ->
+  rel_filename:string ->
   source_code:string ->
-  string
+  locations:(Loc.position * 'a) list ->
+  string * (Loc.position * 'a) list
 (** Given a source code and a counter-example model interleaves
     the source code with information in about the counter-example.
     That is, for each location in counter-example trace creates
@@ -273,10 +275,14 @@ val interleave_with_source :
     @param me_name_trans see print_model
     @param model counter-example model
     @param filename the file name of the source
+    @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
+    @param locations the source locations that are found in the code
 
     @return the source code with added comments with information
-    about counter-example model
+    about counter-example model. The second part of the pair are
+    locations modified so that it takes into account that counterexamples
+    were added.
 *)
 
 (*

@@ -411,25 +411,55 @@ let get_padding line =
     Str.matched_string line
   with Not_found -> ""
 
+(* This assumes that l is sorted and split the list of locations in two:
+   those that are applied on this line and the others. For those that are on
+   this line, we split the locations that appear on several lines. *)
+let rec partition_loc line lc l =
+  match l with
+  | (hd,a) :: tl ->
+      let (hdf, hdl, hdfc, hdlc) = Loc.get hd in
+      if hdl = line then
+        if hdlc > lc then
+          let old_sloc = Loc.user_position hdf hdl hdfc lc in
+          let newlc = hdlc - lc in
+          let new_sloc = Loc.user_position hdf (hdl + 1) 1 newlc in
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          ((new_sloc,a) :: rem_loc, (old_sloc,a) :: new_loc)
+        else
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          (rem_loc, (hd,a) :: new_loc)
+      else
+        (l, [])
+  | _ -> (l, [])
+
+(* Change a locations so that it points to a different line number *)
+let add_offset off (loc, a) =
+  let (f, l, fc, lc) = Loc.get loc in
+  (Loc.user_position f (l + off) fc lc, a)
+
 let interleave_line
     start_comment
     end_comment
     me_name_trans
     model_file
-    (source_code, line_number)
+    (source_code, line_number, offset, remaining_locs, locs)
     line =
+  let remaining_locs, list_loc =
+    partition_loc line_number (String.length line) remaining_locs
+  in
+  let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
     print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
       (get_padding line) ^
-	start_comment ^
-	(flush_str_formatter ()) ^
-	end_comment in
+        start_comment ^
+        (flush_str_formatter ()) ^
+        end_comment in
 
-    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1)
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + 1, remaining_locs, list_loc @ locs)
   with Not_found ->
-    (source_code ^ line, line_number + 1)
+    (source_code ^ line, line_number + 1, offset, remaining_locs, list_loc @ locs)
 
 
 let interleave_with_source
@@ -438,21 +468,29 @@ let interleave_with_source
     ?(me_name_trans = why_name_trans)
     model
     ~filename
-    ~source_code =
+    ~rel_filename
+    ~source_code
+    ~locations =
+  let locations =
+    List.sort (fun x y -> compare (fst x) (fst y))
+      (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)
+  in
   try
     let model_file = StringMap.find filename model.model_files in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
       Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
     in
-    let (source_code, _) = List.fold_left
-      (interleave_line
-	 start_comment end_comment me_name_trans model_file)
-      ("", 1)
-      (src_lines_up_to_last_cntexmp_el source_code model_file) in
-    source_code
+    let (source_code, _, _, _, gen_loc) =
+      List.fold_left
+        (interleave_line
+           start_comment end_comment me_name_trans model_file)
+        ("", 1, 0, locations, [])
+        (src_lines_up_to_last_cntexmp_el source_code model_file)
+    in
+    source_code, gen_loc
   with Not_found ->
-    source_code
+    source_code, locations
 
 
 (*

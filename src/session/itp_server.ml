@@ -329,7 +329,7 @@ let print_notify fmt n =
       print_msg fmt msg
   | Dead s                             -> fprintf fmt "dead :%s" s
   | File_contents (_f, _s)             -> fprintf fmt "file contents"
-  | Source_and_ce (_s)                 -> fprintf fmt "source and ce"
+  | Source_and_ce (_s, _list_loc)      -> fprintf fmt "source and ce"
   | Task (ni, _s, list_loc)            ->
       fprintf fmt "task for node_ID %d which contains a list of loc %a"
         ni print_list_loc list_loc
@@ -894,22 +894,15 @@ end
     in
     task_text, loc_color_list
 
-  (* This notify the counterexample tab which should contain a counterexample
-     interleaved with source code
-   *)
-  let notify_ce_tab s res any =
+  let create_ce_tab s res any list_loc =
     let f = get_encapsulating_file s any in
     let filename = Sysutil.absolutize_filename
       (Session_itp.get_dir s) (file_name f)
     in
     let source_code = Sysutil.file_contents filename in
-    let ce_result =
-      Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
-        ?me_name_trans:None res.Call_provers.pr_model ~filename:filename
-         ~source_code:source_code
-    in
-    P.notify (Source_and_ce ce_result)
-
+    Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+      ?me_name_trans:None res.Call_provers.pr_model ~filename:filename ~rel_filename:(file_name f)
+      ~source_code:source_code ~locations:list_loc
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
@@ -944,10 +937,10 @@ end
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
-          let s, list_loc = task_of_id d parid show_full_context loc in
+          let s, old_list_loc = task_of_id d parid show_full_context loc in
           let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
           (* Display the result of the prover *)
-          let prover_ce =
+          begin
             match pa.proof_state with
             | Some res ->
                 let result =
@@ -956,18 +949,26 @@ end
                 in
                 let ce_result =
                   Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
-                    res.Call_provers.pr_model
+                  res.Call_provers.pr_model
                 in
                 if ce_result = "" then
-                  result ^ "\n\n" ^ "The prover did not return counterexamples."
+                  let result_pr =
+                    result ^ "\n\n" ^ "The prover did not return counterexamples."
+                  in
+                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
                 else
                   begin
-                    notify_ce_tab d.cont.controller_session res any;
-                    result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+                    let result_pr =
+                      result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+                    in
+                    let (source_result, list_loc) =
+                      create_ce_tab d.cont.controller_session res any old_list_loc
+                    in
+                    P.notify (Source_and_ce (source_result, list_loc));
+                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
                   end
-            | None -> "Result of the prover not available.\n"
-          in
-          P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
+            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
+          end
       | AFile f ->
           P.notify (Task (nid, "File " ^ file_name f, []))
       | ATn tid ->
