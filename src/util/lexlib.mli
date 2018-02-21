@@ -20,3 +20,5 @@ val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
 val remove_leading_plus : string -> string
 
 val remove_underscores : string -> string
+
+val illegal_character : char -> Lexing.lexbuf -> 'a
