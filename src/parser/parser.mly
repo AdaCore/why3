@@ -31,6 +31,10 @@ end
 
   let floc s e = Loc.extract (s,e)
 
+  let debug_auto_model =
+    Debug.register_flag ~desc:"When set, model labels are not added during parsing"
+      "no_auto_model"
+
   let model_label = Ident.create_label "model"
 (*  let model_projected = Ident.create_label "model_projected"*)
 
@@ -60,7 +64,8 @@ end
     List.exists is_model_trace_label labels
 
   let add_model_trace id =
-    if model_trace_lab_present id.id_lab then
+    if Debug.test_flag debug_auto_model || model_trace_lab_present id.id_lab
+    then
       id
     else
       let l =
