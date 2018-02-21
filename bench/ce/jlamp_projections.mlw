@@ -4,18 +4,19 @@ module Abstract
 use import int.Int
 
 type byte
-function to_rep "model_projection" byte : int
+function to_int byte : int
+meta "model_projection" function to_int
 predicate in_range (x : int) = -128 <= x <= 127
-axiom range_axiom : forall x:byte. in_range (to_rep x)
+axiom range_axiom : forall x:byte. in_range (to_int x)
 
 
 val of_int (x:int) : byte
   requires { in_range x }
-  ensures { to_rep result = x }
+  ensures { to_int result = x }
 
 val add (x y : byte) : byte
-  requires { "expl:integer overflow" in_range (to_rep x + to_rep y) }
-  ensures { to_rep result = to_rep x + to_rep y }
+  requires { "expl:integer overflow" in_range (to_int x + to_int y) }
+  ensures { to_int result = to_int x + to_int y }
 
 use import ref.Ref
 
