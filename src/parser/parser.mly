@@ -35,63 +35,33 @@ end
     Debug.register_flag ~desc:"When set, model labels are not added during parsing"
       "no_auto_model"
 
-  let model_label = Ident.create_label "model"
-(*  let model_projected = Ident.create_label "model_projected"*)
-
-(*
-  let is_model_label l =
-    match l with
-    | Lpos _ -> false
-    | Lstr lab ->
-      (lab = model_label) || (lab = model_projected)
-
-  let model_lab_present labels =
-    List.exists is_model_label labels
-*)
-
-  let model_trace_regexp = Str.regexp "model_trace:"
-
-  let is_model_trace_label l =
-    match l with
-    | Lpos _ -> false
-    | Lstr lab ->
-      try
-	ignore(Str.search_forward model_trace_regexp lab.Ident.lab_string 0);
-	true
-      with Not_found -> false
-
-  let model_trace_lab_present labels =
-    List.exists is_model_trace_label labels
-
-  let add_model_trace id =
-    if Debug.test_flag debug_auto_model || model_trace_lab_present id.id_lab
-    then
-      id
-    else
-      let l =
-        (Lstr (Ident.create_label ("model_trace:" ^ id.id_str)))
-        ::(Lstr model_label) :: id.id_lab in
-      { id with id_lab = l }
-
   let add_lab id l =
     { id with id_lab = l }
+
+  let add_model_trace_label id =
+    if Debug.test_flag debug_auto_model then id else
+    let is_model_trace_label l =
+      match l with
+      | Lpos _ -> false
+      | Lstr lab -> Ident.is_model_trace_label lab
+    in
+    if List.exists is_model_trace_label id.id_lab then id else
+      let l =
+        (Lstr (Ident.create_model_trace_label id.id_str))
+        ::(Lstr Ident.model_label) :: id.id_lab in
+      { id with id_lab = l }
 
   let add_model_labels (b : binder) =
     match b with
     | (loc, Some id, ghost, ty) ->
-      (loc, Some (add_model_trace id), ghost, ty)
+      (loc, Some (add_model_trace_label id), ghost, ty)
     | _ -> b
 
-  let model_vc_label = Ident.create_label "model_vc"
-
-  let model_vc_post_label = Ident.create_label "model_vc_post"
-
   let add_model_vc_label t =
-    {t with term_desc = Tnamed (Lstr model_vc_label, t)}
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_label, t)}
 
   let add_model_vc_post_label t =
-    {t with term_desc = Tnamed (Lstr model_vc_post_label, t)}
-
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_post_label, t)}
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
@@ -676,7 +646,7 @@ numeral:
 (* Program declarations *)
 
 pdecl:
-| VAL top_ghost labels(lident_rich) type_v          { Dval (add_model_trace $3, $2, $4) }
+| VAL top_ghost labels(lident_rich) type_v          { Dval (add_model_trace_label $3, $2, $4) }
 | LET top_ghost labels(lident_rich) fun_defn        { Dfun ($3, $2, $4) }
 | LET top_ghost labels(lident_rich) EQUAL fun_expr  { Dfun ($3, $2, $5) }
 | LET REC with_list1(rec_defn)                      { Drec $3 }
@@ -760,13 +730,13 @@ expr_:
 | LET top_ghost pattern EQUAL seq_expr IN seq_expr
     { match $3.pat_desc with
       | Pvar id ->
-          let id = add_model_trace id in
+          let id = add_model_trace_label id in
           Elet (id, $2, $5, $7)
       | Pwild -> Elet (id_anonymous $3.pat_loc, $2, $5, $7)
       | Ptuple [] -> Elet (id_anonymous $3.pat_loc, $2,
           { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
       | Pcast ({pat_desc = Pvar id}, ty) ->
-          let id = add_model_trace id in
+          let id = add_model_trace_label id in
           Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
       | Pcast ({pat_desc = Pwild}, ty) ->
           let id = id_anonymous $3.pat_loc in
@@ -779,7 +749,7 @@ expr_:
             | Gnone -> $5 in
           Ematch (e, [$3, $7]) }
 | LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { let id = add_model_trace $3 in
+    { let id = add_model_trace_label $3 in
       Elet (id, $2, $5, $7) }
 | LET top_ghost labels(lident_nq) fun_defn IN seq_expr
     { Efun ($3, $2, $4, $6) }
@@ -802,7 +772,7 @@ expr_:
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { Ewhile ($2, $4, $5) }
 | FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
-    { let id = add_model_trace $2 in
+    { let id = add_model_trace_label $2 in
       Efor (id, $4, $5, $6, $8, $9) }
 | ABSURD
     { Eabsurd }
@@ -963,13 +933,13 @@ pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | mk_pat(pat_uni_) AS labels(lident_nq) {
-  let id = add_model_trace $3 in Pas ($1,id) }
+  let id = add_model_trace_label $3 in Pas ($1,id) }
 | mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
 | labels(lident_nq)                     {
-  let id = add_model_trace $1 in Pvar id }
+  let id = add_model_trace_label $1 in Pvar id }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern_ RIGHTPAR             { $2 }

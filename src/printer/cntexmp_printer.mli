@@ -42,8 +42,6 @@ val print_label: Format.formatter -> Ident.label -> unit
 
 val model_projection: Ident.label
 
-val model_vc_term_label: Ident.label
-
 val add_model_element: Term.term -> S.t -> S.t
 
 val add_old: string -> string

@@ -143,12 +143,20 @@ val id_unique_label :
 
 (** {2 labels for handling counterexamples} *)
 
-val model_label: label
+val model_label : label
+val model_projected_label : label
+val model_vc_label : label
+val model_vc_post_label : label
 
-val has_model_label: ident -> bool
+val has_a_model_label : ident -> bool
+(** [true] when [ident] has one of the labels above. *)
 
 val remove_model_labels : labels : Slab.t -> Slab.t
-(** Returns a copy of labels without labels ["model"] and ["model_projected"]. *)
+(** Returns a copy of labels without [model_label] and [model_projected_label]. *)
+
+val create_model_trace_label : string -> label
+
+val is_model_trace_label : label -> bool
 
 val append_to_model_trace_label : labels : Slab.t ->
   to_append : string ->

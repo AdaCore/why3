@@ -112,7 +112,7 @@ let rec fmla_quant ~keep_model_vars sign f = function
   | [] -> [], f
   | vs::l ->
      let vsl, f = fmla_quant ~keep_model_vars sign f l in
-     if keep_model_vars && has_model_label vs.vs_name then
+     if keep_model_vars && has_a_model_label vs.vs_name then
        vs::vsl, f
      else
       try

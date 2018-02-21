@@ -71,14 +71,7 @@ let get_label labels regexp =
 let print_label fmt l =
   fprintf fmt "\"%s\"" l.lab_string
 
-(* already in Ident
-let model_label = Ident.create_label "model"
-  (* This label identifies terms that should be in counter-example. *)
- *)
-let model_vc_term_label = Ident.create_label "model_vc"
-  (* This label identifies the term that triggers the VC. *)
 let model_projection = Ident.create_label "model_projection"
-
 
 let add_model_element (el: term) info_model =
 (** Add element el (term) to info_model.
@@ -131,8 +124,8 @@ let model_trace_for_postcondition ~labels (info: vc_term_info)  =
   with Not_found ->
     (* no model_trace label => the term represents the return value *)
     Slab.add
-      (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" info.vc_func_name)  ^ "@result"))
+      (Ident.create_model_trace_label
+	 ((Opt.get_def "" info.vc_func_name)  ^ "@result"))
       labels
 
 let get_fun_name name =
@@ -149,7 +142,7 @@ let check_enter_vc_term t in_goal vc_term_info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if in_goal && Slab.mem model_vc_term_label t.t_label then begin
+  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc;
     try
@@ -164,6 +157,6 @@ let check_enter_vc_term t in_goal vc_term_info =
 
 let check_exit_vc_term t in_goal info =
   (* Check whether the term triggering VC is exited. *)
-  if in_goal && Slab.mem model_vc_term_label t.t_label then begin
+  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
     info.vc_inside <- false;
   end
