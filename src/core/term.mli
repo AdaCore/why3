@@ -462,9 +462,12 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
     mapping [mt] and term variables by mapping [mv] in term [t] *)
 
 val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
-(** [t_subst_types mt mv t] substitutes type variables by
-    mapping [mt] simultaneously in substitution [mv] and in term [t].
-    This operation may rename the variables in [t]. *)
+(** [t_subst_types mt mv t] substitutes type variables of term [t] by
+    mapping [mt]. This operation may rename the variables in [t], and
+    the same renaming is simultaneously applied to the variables of
+    the substitution [mv] (both domain and codomain).
+    Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
+       returns ({z:int -> t:int},(f z))   *)
 
 (** {2 Find free variables and type variables} *)
 
