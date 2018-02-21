@@ -31,6 +31,10 @@ let meta_invalid_trigger =
   Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
   ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
 
+(* Meta to tag projection functions *)
+let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
@@ -45,6 +49,7 @@ type info = {
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
   mutable list_projs: Stdlib.Sstr.t;
+  meta_model_projection: Sls.t
   }
 
 let ident_printer () =
@@ -87,7 +92,7 @@ let print_ident_label info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
-  if Slab.mem model_projection ls.ls_name.id_label then
+  if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
@@ -473,6 +478,7 @@ let print_task args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_in_goal = false;
     list_projs = Stdlib.Sstr.empty;
+    meta_model_projection = Task.on_tagged_ls meta_projection task;
   } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
