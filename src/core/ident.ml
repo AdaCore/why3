@@ -38,6 +38,11 @@ let create_label s = Hslab.hashcons {
   lab_tag    = -1
 }
 
+let list_label () =
+  let acc = ref [] in
+  Hslab.iter (fun label -> acc := label.lab_string :: !acc);
+  !acc
+
 let lab_equal : label -> label -> bool = (==)
 let lab_hash lab = lab.lab_tag
 let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag

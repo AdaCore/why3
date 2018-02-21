@@ -27,6 +27,8 @@ val lab_hash : label -> int
 
 val create_label : string -> label
 
+val list_label: unit -> string list
+
 (** {2 Naming convention } *)
 
 val infix: string -> string
