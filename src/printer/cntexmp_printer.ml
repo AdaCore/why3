@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
 open Ident
 open Term
 
@@ -56,23 +55,6 @@ end
 
 module S = Set.Make(TermCmp)
 
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counter-example with name "name" *)
-
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
-let print_label fmt l =
-  fprintf fmt "\"%s\"" l.lab_string
-
-let model_projection = Ident.create_label "model_projection"
-
 let add_model_element (el: term) info_model =
 (** Add element el (term) to info_model.
     If an element with the same hash (the same set of labels + the same
@@ -112,7 +94,7 @@ let model_trace_for_postcondition ~labels (info: vc_term_info)  =
      model_trace label in a form function_name@result
   *)
   try
-    let trace_label = get_label labels model_trace_regexp in
+    let trace_label = get_model_trace_label ~labels in
     let lab_str = add_old trace_label.lab_string in
     if lab_str = trace_label.lab_string then
       labels
@@ -148,7 +130,10 @@ let check_enter_vc_term t in_goal vc_term_info =
     try
       (* Label "model_func" => the VC is postcondition or precondition *)
       (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func") in
+      let fun_label =
+        Slab.choose (Slab.filter (fun l -> Strings.has_prefix "model_func:" l.lab_string)
+                                 t.t_label)
+      in
       vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
     with Not_found ->
       (* No label "model_func" => the VC is not postcondition or precondition *)

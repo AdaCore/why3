@@ -81,6 +81,8 @@ let ident_printer () =
 let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+
 let print_ident_label info fmt id =
   if info.info_show_labels then
     fprintf fmt "%s %a"
