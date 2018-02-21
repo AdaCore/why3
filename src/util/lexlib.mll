@@ -17,10 +17,12 @@
 
   exception UnterminatedComment
   exception UnterminatedString
+  exception IllegalCharacter of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
+    | IllegalCharacter s -> fprintf fmt "illegal character %s" s
     | _ -> raise e)
 
   let newline lexbuf =
@@ -42,7 +44,15 @@
 
 let newline = '\n'
 
-rule comment = parse
+rule utf8_tail b n = parse
+  | eof
+      { false }
+  | ['\128'-'\191'] as c
+      { Buffer.add_char b c;
+        n == 1 || utf8_tail b (n - 1) lexbuf }
+  | _ { false }
+
+and comment = parse
   | "(*)"
       { comment lexbuf }
   | "*)"
@@ -104,4 +114,24 @@ and string = parse
       Bytes.unsafe_to_string t
     end else s
 
+  let illegal_character c lexbuf =
+    let loc = loc lexbuf in
+    let b = Buffer.create 2 in
+    Buffer.add_char b c;
+    let n =
+      match c with
+      | '\000'..'\127' -> 0
+      | '\192'..'\223' -> 1
+      | '\224'..'\239' -> 2
+      | '\240'..'\247' -> 3
+      | _ -> -1 in
+    if n <> 0 && (n == -1 || not (utf8_tail b n lexbuf)) then begin
+      (* invalid encoding, convert the first character to a utf8 one *)
+      Buffer.reset b;
+      let c = Char.code c in
+      Buffer.add_char b (Char.chr (0xC0 lor (c lsr 6)));
+      Buffer.add_char b (Char.chr (c land 0xBF));
+    end;
+    (* TODO: check that the buffer does not hold a utf8 character in one of the invalid ranges *)
+    raise (Loc.Located (loc, IllegalCharacter (Buffer.contents b)))
 }

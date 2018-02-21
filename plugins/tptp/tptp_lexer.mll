@@ -19,14 +19,12 @@
 
   (* lexical errors *)
 
-  exception IllegalCharacter of char
   exception IllegalLexeme of string
   exception UnterminatedComment
   exception UnknownDDW of string
   exception UnknownDW of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | IllegalLexeme s -> fprintf fmt "illegal lexeme %s" s
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
@@ -216,7 +214,7 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (IllegalCharacter c) }
+      { Lexlib.illegal_character c lexbuf }
 
 and comment_block = parse
   | "*/"
