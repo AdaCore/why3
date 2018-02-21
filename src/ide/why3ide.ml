@@ -998,6 +998,7 @@ let add_to_log =
 let print_message ~kind ~notif_kind fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
+              let s = try_convert s in
               add_to_log notif_kind s;
               if kind>0 then
                 begin
@@ -2270,6 +2271,7 @@ let treat_notification n =
          task_view#scroll_to_mark `INSERT
        end
   | File_contents (file_name, content) ->
+     let content = try_convert content in
     begin
       try
         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
