@@ -111,7 +111,9 @@ let add_vars_to_table table value =
         | None -> table
         | Some type_value ->
             Mstr.fold (fun key (_b, elt) acc ->
-              let match_str = Str.regexp ("_" ^ type_value ^ "_") in
+              let match_str_z3 = type_value ^ "!" in
+              let match_str_cvc4 = "_" ^ type_value ^ "_" in
+              let match_str = Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
               match Str.search_forward match_str (remove_end_num key) 0 with
               | exception Not_found -> acc
               | _ ->
