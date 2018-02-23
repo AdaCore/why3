@@ -1101,10 +1101,14 @@ let rec is_obsolete_verified session goal =
     (fun tf -> List.for_all (is_obsolete_verified session) (Session_itp.get_sub_tasks session tf))
     (Session_itp.get_transformations session goal)
 
+let trans_is_obsolete_verified session tn =
+  Session_itp.tn_proved session tn ||
+  let sub_tasks = Session_itp.get_sub_tasks session tn in
+  List.for_all (is_obsolete_verified session) sub_tasks
+
 let rec replay_transf c tf =
   let session = c.Controller_itp.controller_session in
-  let tf_proves_goal = Session_itp.tn_proved session tf in
-  if tf_proves_goal then
+  if trans_is_obsolete_verified session tf then
     List.iter (replay_goal c) (Session_itp.get_sub_tasks session tf)
   else
     ()
