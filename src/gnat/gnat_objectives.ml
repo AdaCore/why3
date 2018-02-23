@@ -337,14 +337,14 @@ let init_cont () =
   (* Init why3server *)
   init ();
   (* Reloading file to get an up to date controller/session. *)
-  try
-    let (_: exn list), (_: bool), (_: bool) =
+  let (le: exn list), (_: bool), (_: bool) =
       Controller_itp.reload_files c ~use_shapes in
-    c
-  with
-  | e ->
+  match le with
+  | [] -> c
+  | e :: _ ->
       Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not reload files of the session")
+        (Pp.sprintf "could not reload files of the session: %a"
+           Exn_printer.exn_printer e)
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
