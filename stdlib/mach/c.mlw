@@ -14,10 +14,6 @@ module C
 
   constant null_zone : zone
 
-  (* we would like to specify "abstract" here.  but it would prevent
-     to give implementations to the following routines
-     pb with specifying alias in the surface language
-   *)
   type ptr 'a = abstract {
     mutable data : array 'a ;
     offset : int ;
@@ -105,8 +101,8 @@ module C
     requires { plength p > 0 }
     writes { p }
     writes { p.data }
-    ensures { result.min = 0 }
-    ensures { result.max = plength result }
+    ensures { result.zone <> null_zone -> result.min = 0 }
+    ensures { result.zone <> null_zone -> result.max = plength result }
     ensures { result.offset = 0 }
     ensures { result.zone <> null_zone -> plength result = sz }
     ensures { result.zone <> null_zone ->
@@ -127,8 +123,10 @@ module C
     ensures  { result.min = p.offset + i }
     ensures  { result.max = old p.max }
     ensures  { result.zone = p.zone }
-    ensures  { p.data = old p.data }
-    ensures  { result.data = old p.data }
+    ensures  { pelts p = old pelts p }
+    ensures  { plength p = old plength p }
+    ensures  { pelts result = old pelts p }
+    ensures  { plength result = old plength p }
     (* NOT alias result.data old p.data *)
 
   val join (p1 p2: ptr 'a) : unit

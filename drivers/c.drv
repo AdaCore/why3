@@ -278,6 +278,9 @@ module mach.c.C
   syntax val p2i "%1"
   syntax converter p2i "%1"
 
+  syntax val incr_split "%1+(%2)"
+  syntax val join "(void)0"
+
   syntax val c_assert "assert ( %1 )"
 
   syntax val print_space "printf(\" \")"
