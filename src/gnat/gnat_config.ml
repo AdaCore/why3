@@ -199,6 +199,9 @@ let options = Arg.align [
           " The name of the socket to be used";
    "--debug", Arg.Tuple [Arg.Set opt_debug; Arg.Set opt_standalone],
           " Enable debug mode; also deactivates why3server";
+   "--debug-why3", Arg.String (fun s -> let debug = Debug.register_flag s ~desc:"" in
+                                        Debug.set_flag debug),
+          " Enable a debug flag from Why3";
    "--debug-server", Arg.Set opt_debug,
           " Enable debug mode and keep why3server activated";
    "--debug-gnat-server", Arg.Unit debug_gnat_server,
