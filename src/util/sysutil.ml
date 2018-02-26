@@ -169,28 +169,6 @@ let normalize_filename f =
   file_of_path (List.rev (aux (path_of_file f) []))
                                *)
 
-
-(* This is used to remove extra ".." in a file path which are not needed. This
-   code was designed to be architecture-independant.
-   It should work on directory like "/home/stuff/../dir" without removing the
-   "/".
- *)
-let normalize_filename f =
-  let l = Str.full_split (Str.regexp Filename.dir_sep) f in
-  let rec aux acc l =
-    match l with
-    | Str.Text k :: Str.Delim _ :: Str.Text s :: Str.Delim _ :: tl
-      when s = Filename.parent_dir_name && k != Filename.parent_dir_name ->
-        aux acc tl
-    | hd :: tl ->
-        aux (hd :: acc) tl
-    | [] -> acc
-  in
-  let l = aux [] l in
-  List.fold_left
-    (fun acc x -> match x with | Str.Delim a -> a ^ acc | Str.Text s -> s ^ acc)
-    "" l
-
 let relativize_filename base f =
   let rec aux ab af =
     match ab,af with
@@ -210,18 +188,11 @@ let relativize_filename base f =
   in
   file_of_path (aux (path_of_file base) (path_of_file f))
 
-let relativize_filename base f =
-  normalize_filename (relativize_filename base f)
-
 let absolutize_filename dirname f =
   if Filename.is_relative f then
     Filename.concat dirname f
   else
     f
-
-let absolutize_filename dirname f =
-  normalize_filename (absolutize_filename dirname f)
-
 
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"
