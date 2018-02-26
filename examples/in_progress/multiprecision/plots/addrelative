@@ -64,7 +64,7 @@ set encoding default
 unset polar
 unset parametric
 unset decimalsign
-set view 81, 116, 1, 1
+set view 70, 7, 1, 1
 set samples 100, 100
 set isosamples 10, 10
 set surface
@@ -124,7 +124,7 @@ set ylabel ""
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
 set y2label "" 
 set y2label  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
-set yrange [ 3.00000 : * ] noreverse nowriteback
+set yrange [ * : * ] noreverse nowriteback
 set y2range [ * : * ] noreverse nowriteback
 set zlabel "" 
 set zlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
@@ -151,5 +151,6 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-splot '<paste bench/gmpdiv bench/why3div' u 1:2:(($2<$1)?(($6-$3)/$3):1/0)
+splot '<paste ../bench/gmpadd ../bench/why3add' u 1:2:(($6-$3)/$3)
+pause mouse keypress
 #    EOF

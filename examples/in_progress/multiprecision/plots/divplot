@@ -31,7 +31,7 @@ set timefmt x2 "%d/%m/%y,%H:%M"
 set x2data 
 set boxwidth
 set style fill  empty border
-set style rectangle back fc lt -3 fillstyle   solid 1.00 border lt -1
+set style rectangle back fc  lt -3 fillstyle   solid 1.00 border lt -1
 set style circle radius graph 0.02, first 0, 0 
 set style ellipse size graph 0.05, 0.03, first 0 angle 0 units xy
 set dummy x,y
@@ -64,7 +64,7 @@ set encoding default
 unset polar
 unset parametric
 unset decimalsign
-set view 40, 114, 1, 1
+set view 64, 74, 1, 1
 set samples 100, 100
 set isosamples 10, 10
 set surface
@@ -114,19 +114,19 @@ set rrange [ * : * ] noreverse nowriteback
 set trange [ * : * ] noreverse nowriteback
 set urange [ * : * ] noreverse nowriteback
 set vrange [ * : * ] noreverse nowriteback
-set xlabel "" 
+set xlabel "Numerator size" 
 set xlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set xrange [ * : * ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback
-set ylabel "" 
+set ylabel "Denominator size" 
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
 set y2label "" 
 set y2label  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
 set yrange [ * : * ] noreverse nowriteback
 set y2range [ * : * ] noreverse nowriteback
-set zlabel "" 
+set zlabel "Time" 
 set zlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set zrange [ * : * ] noreverse nowriteback
 set cblabel "" 
@@ -138,7 +138,7 @@ set bmargin  -1
 set rmargin  -1
 set tmargin  -1
 set locale "en_US.UTF-8"
-set pm3d implicit at s
+set pm3d explicit at s
 set pm3d scansautomatic
 set pm3d interpolate 1,1 flush begin noftriangles nohidden3d corners2color mean
 set palette positive nops_allcF maxcolors 0 gamma 1.5 color model RGB 
@@ -151,6 +151,6 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-splot '<paste bench/gmpdiv bench/why3div' u 1:2:(($6-$3)/$3)
+splot "../bench/why3div", "../bench/gmpdiv"
 pause mouse keypress
 #    EOF

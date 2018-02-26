@@ -151,7 +151,6 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-set table "addrelative.dat"
-splot '<paste bench/gmpadd bench/why3add' u 1:2:(($6-$3)/$3)
-unset table
+splot '<paste ../bench/minigmpmul ../bench/why3mul' u 1:2:(($6-$3)/$3)
+pause mouse keypress
 #    EOF

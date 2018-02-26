@@ -151,7 +151,6 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-set table "divrelative.dat"
-splot '<paste bench/gmpdiv bench/why3div' u 1:2:(($6-$3)/$3)
-unset table
+splot '<paste ../bench/gmpdiv ../bench/why3div' u 1:2:(($6-$3)/$3)
+pause mouse keypress
 #    EOF

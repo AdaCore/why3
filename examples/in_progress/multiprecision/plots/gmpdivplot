@@ -64,7 +64,7 @@ set encoding default
 unset polar
 unset parametric
 unset decimalsign
-set view 70, 7, 1, 1
+set view 40, 114, 1, 1
 set samples 100, 100
 set isosamples 10, 10
 set surface
@@ -151,6 +151,6 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "wxt"
-splot '<paste bench/minigmpadd bench/why3add' u 1:2:(($6-$3)/$3)
+splot '<paste ../bench/gmpdiv ../bench/minigmpdiv' u 1:2:(($6-$3)/$3)
 pause mouse keypress
 #    EOF
