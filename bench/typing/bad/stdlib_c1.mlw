@@ -1,0 +1,8 @@
+use import mach.c.C
+
+let main () diverges =
+  let p = malloc 10 in
+  c_assert (is_not_null p);
+  let q = incr p 0_ in
+  free q;
+  set p (42:int)
