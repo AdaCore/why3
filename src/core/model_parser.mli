@@ -259,7 +259,6 @@ val interleave_with_source :
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
-  filename:string ->
   rel_filename:string ->
   source_code:string ->
   locations:(Loc.position * 'a) list ->
@@ -274,7 +273,6 @@ val interleave_with_source :
     @param end_comment the string that ends a comment
     @param me_name_trans see print_model
     @param model counter-example model
-    @param filename the file name of the source
     @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
     @param locations the source locations that are found in the code

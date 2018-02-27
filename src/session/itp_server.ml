@@ -901,7 +901,7 @@ end
     in
     let source_code = Sysutil.file_contents filename in
     Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
-      ?me_name_trans:None res.Call_provers.pr_model ~filename:filename ~rel_filename:(file_name f)
+      ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
       ~source_code:source_code ~locations:list_loc
 
   let send_task nid show_full_context loc =

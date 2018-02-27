@@ -467,7 +467,6 @@ let interleave_with_source
     ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
     model
-    ~filename
     ~rel_filename
     ~source_code
     ~locations =
@@ -476,7 +475,15 @@ let interleave_with_source
       (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)
   in
   try
-    let model_file = StringMap.find filename model.model_files in
+    (* There is no way to compare rel_filename and the locations of filename in
+       the file because they contain extra ".." which cannot be reliably removed
+       (because of potential symbolic link). So, we use the basename.
+    *)
+    let model_files =
+      StringMap.filter (fun k _ -> Filename.basename k = Filename.basename rel_filename)
+        model.model_files
+    in
+    let model_file = snd (StringMap.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
       Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
