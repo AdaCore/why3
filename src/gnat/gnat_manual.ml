@@ -57,7 +57,7 @@ let resize_shape sh limit =
 
 let compute_filename s contain_dir theory goal expl driver =
   let th_name_no_sanit = (Session_itp.theory_name theory).Ident.id_string in
-  let task = Session_itp.get_raw_task s goal in
+  let task = Session_itp.get_task s goal in
   let why_fn =
     Driver.file_of_task driver
                         th_name_no_sanit

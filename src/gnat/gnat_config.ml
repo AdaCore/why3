@@ -64,6 +64,16 @@ let opt_prepare_shared = ref false
 
 let opt_why3_conf_file : string option ref = ref None
 
+(* Always set the debug flag that prevents from adding "model" labels everywhere
+   during parsing. In SPARK, these labels are inserted during transformations
+   from Ada code.
+*)
+let debug_no_auto_model =
+  Debug.register_flag ~desc:"When set, model labels are not added during parsing"
+    "no_auto_model"
+
+let () = Debug.set_flag debug_no_auto_model
+
 let set_why3_conf s =
   if s != "" then
     opt_why3_conf_file := Some s

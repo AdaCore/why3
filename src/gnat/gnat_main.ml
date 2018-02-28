@@ -46,7 +46,7 @@ let rec is_trivial fml =
 let register_goal s goal_id =
    (* Register the goal by extracting the explanation and trace. If the goal is
     * trivial, do not register *)
-     let task = Session_itp.get_raw_task s goal_id in
+     let task = Session_itp.get_task s goal_id in
      let fml = Task.task_goal_fmla task in
      match is_trivial fml, Gnat_expl.search_labels fml with
      | true, None ->
@@ -181,7 +181,7 @@ let report_messages c obj =
         else
           Opt.map (fun pa -> Session_itp.get_proof_attempt_parent s pa) unproved_pa
       in
-      let unproved_task = Opt.map (fun x -> Session_itp.get_raw_task s x) unproved_goal in
+      let unproved_task = Opt.map (fun x -> Session_itp.get_task s x) unproved_goal in
       let (tracefile, trace) =
         match unproved_goal, Gnat_config.proof_mode with
         | Some goal, (Gnat_config.Progressive | Gnat_config.Per_Path) ->

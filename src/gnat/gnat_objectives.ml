@@ -601,7 +601,7 @@ let apply_split_goal_if_needed c g =
 exception Found_loc of Gnat_loc.loc
 
 let extract_sloc (s: Session_itp.session) (main_goal: goal_id) =
-   let task, _naming_table = Session_itp.get_task s main_goal in
+   let task = Session_itp.get_task s main_goal in
    let goal_ident = (Task.task_goal task).Decl.pr_name in
    let label_set = goal_ident.Ident.id_label in
    try
@@ -631,7 +631,7 @@ let iter_subps c f =
    let acc = ref [] in
    let _: unit =
      iter_main_goals s (fun g ->
-       let task, _naming_table = Session_itp.get_task s g in
+       let task = Session_itp.get_task s g in
        if task = None then ()
        else acc := mk_subp_goal s g :: !acc) in
    List.iter f !acc
@@ -640,7 +640,7 @@ let matches_subp_filter s subp =
    match Gnat_config.limit_subp with
    | None -> true
    | Some lab ->
-         let task, _naming_table = Session_itp.get_task s subp.subp_goal in
+         let task = Session_itp.get_task s subp.subp_goal in
          let goal_ident = (Task.task_goal task).Decl.pr_name in
          let label_set = goal_ident.Ident.id_label in
          Ident.Slab.mem lab label_set
@@ -745,7 +745,7 @@ let add_to_stat prover pr stat =
 
    let save_vc ~cntexample c goal (prover: Whyconf.prover) =
       let check = get_objective goal in
-      let task, _naming_table =
+      let task =
         Session_itp.get_task c.Controller_itp.controller_session goal in
       let driver =
         snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
@@ -766,7 +766,7 @@ let add_to_stat prover pr stat =
        | _ -> acc
      in
      fun goal ->
-       let task = Session_itp.get_raw_task s goal in
+       let task = Session_itp.get_task s goal in
        let f = Task.task_goal_fmla task in
        compute_trace Gnat_loc.S.empty f
 
