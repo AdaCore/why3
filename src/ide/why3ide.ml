@@ -165,6 +165,7 @@ module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 
 let files : string Queue.t = Queue.create ()
 let opt_parser = ref None
+let opt_batch = ref None
 
 let spec = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
@@ -176,7 +177,8 @@ let spec = [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<file> add file to the project (ignored if it is already there)";
 *)
-  Termcode.arg_extra_expl_prefix
+  Termcode.arg_extra_expl_prefix;
+  "--batch", Arg.String (fun s -> opt_batch := Some s), "";
 ]
 
 let usage_str = sprintf
@@ -385,12 +387,17 @@ let () =
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
 
+let window_width,window_height,window_title =
+  match !opt_batch with
+  | Some _ -> 1024, 768, "Why3 Batch Mode"
+  | None -> gconfig.window_width, gconfig.window_height, "Why3 Interactive Proof Session"
+
 let main_window : GWindow.window =
   let w = GWindow.window
             ~allow_grow:true ~allow_shrink:true
-            ~width:gconfig.window_width
-            ~height:gconfig.window_height
-            ~title:"Why3 Interactive Proof Session" ()
+            ~width:window_width
+            ~height:window_height
+            ~title:window_title ()
   in
   (* callback to record the new size of the main window when changed, so
    that on restart the window size is the same as the last session *)
@@ -2246,6 +2253,7 @@ let treat_notification n =
      main_window#show ();
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
+     Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
@@ -2323,7 +2331,40 @@ let () =
   in
   ()
 
+(***************************************************)
+(* simulate some user actions and take screenshots *)
+(***************************************************)
 
+let batch s =
+  let cmd = ref (Strings.split ';' s) in
+  let last = ref (Sys.time ()) in
+  fun () ->
+  let t = Sys.time () in
+  if not !initialization_complete || t -. !last < 0.1 then true else
+  match !cmd with
+  | c :: tl ->
+    cmd := tl;
+    last := t;
+    begin match Strings.split ' ' c with
+    | [""] -> ()
+    | ["view"; "task"] -> notebook#goto_page 0
+    | ["view"; "source"] -> notebook#goto_page 1
+    | ["wait"; w] ->
+      let w = int_of_string w in
+      if w > 0 then cmd := Printf.sprintf "wait %d" (w - 1) :: !cmd
+    | "type" :: cmd ->
+      let cmd = Strings.join " " cmd in
+      add_command list_commands cmd;
+      interp cmd
+    | ["snap"; f] ->
+      let s = Printf.sprintf "import -window \"%s\" %s" window_title f in
+      if Sys.command s <> 0 then Printf.eprintf "Command failed: %s\n%!" s
+    | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c
+    end;
+    true
+  | _ ->
+    exit_function_unsafe ();
+    false
 
 (***********************)
 (* start the interface *)
@@ -2335,4 +2376,9 @@ let () =
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
   print_message ~kind:1 ~notif_kind:"Info" "Welcome to Why3 IDE\ntype 'help' for help\n";
+  begin match !opt_batch with
+  | Some s ->
+    let (_ : GMain.Idle.id) = GMain.Idle.add ~prio:300 (backtrace_and_exit (batch s)) in ()
+  | None -> ()
+  end;
   GMain.main ()
