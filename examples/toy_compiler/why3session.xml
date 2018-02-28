@@ -7,14 +7,14 @@
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="3" steplimit="0" memlimit="1000"/>
-<file name="../toy_compiler.mlw" expanded="true">
-<theory name="Expr" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<file name="../toy_compiler.mlw">
+<theory name="Expr">
 </theory>
-<theory name="StackMachine" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="StackMachine">
 </theory>
-<theory name="Compiler" sum="56cb07989459c2864870cbfd325df5d5" expanded="true">
- <goal name="WP_parameter soundness_gen" expl="VC for soundness_gen" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="Compiler">
+ <goal name="WP_parameter soundness_gen" expl="VC for soundness_gen">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter soundness_gen.1" expl="assertion">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.51"/></proof>
@@ -77,7 +77,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter soundness" expl="VC for soundness" expanded="true">
+ <goal name="WP_parameter soundness" expl="VC for soundness">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.13"/></proof>
  <proof prover="5"><result status="valid" time="0.03" steps="15"/></proof>

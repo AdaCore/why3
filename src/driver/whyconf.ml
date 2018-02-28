@@ -146,24 +146,6 @@ type config_strategy = {
   strategy_shortcut : string;
 }
 
-(* a default set of strategies *)
-let default_strategies =
-  List.map
-    (fun (name,desc,shortcut,code) ->
-      let s = ref Rc.empty_section in
-      s := Rc.set_string !s "name" name;
-      s := Rc.set_string !s "desc" desc;
-      s := Rc.set_string !s "shortcut" shortcut;
-      s := Rc.set_string !s "code" code;
-      !s)
-    [ "Split", "Split@ conjunctions@ in@ goal", "s",
-      "t split_goal_wp exit";
-      "Inline", "Inline@ function@ symbols@ once", "i",
-      "t inline_goal exit";
-      "Compute", "Compute@ in@ goal", "c",
-      "t compute_in_goal exit";
-    ]
-
 let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
     | [] -> default
@@ -515,22 +497,24 @@ let load_policy provers acc (_,section) =
 let load_strategy strategies section =
   try
     let name = get_string section "name" in
-    try
-      let (_:int) = String.index name ' ' in
-      Warning.emit "[Warning] cannot load a strategy: invalid name '%s'@\nNote: spaces are not allowed anymore in strategy names.@\nPlease rerun 'why3 config --detect' or fix why3.conf manually@." name;
+    let name =
+      try
+        let (_:int) = String.index name ' ' in
+        Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+        String.map (function ' ' -> '_' | c -> c) name
+      with Not_found -> name
+    in
+    let desc = get_string section "desc" in
+    let shortcut = get_string ~default:"" section "shortcut" in
+    let code = get_string section "code" in
+    Mstr.add
+      name
+      { strategy_name = name;
+        strategy_desc = desc;
+        strategy_code = code;
+        strategy_shortcut = shortcut;
+      }
       strategies
-    with Not_found ->
-      let desc = get_string section "desc" in
-      let shortcut = get_string ~default:"" section "shortcut" in
-      let code = get_string section "code" in
-      Mstr.add
-        name
-        { strategy_name = name;
-          strategy_desc = desc;
-          strategy_code = code;
-          strategy_shortcut = shortcut;
-        }
-        strategies
   with
     MissingField s ->
     Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
@@ -586,7 +570,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies ~default:default_strategies rc in
+  let strategies = get_strategies ~default:[] rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;

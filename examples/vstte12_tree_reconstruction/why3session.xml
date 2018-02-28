@@ -7,8 +7,8 @@
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.7.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../vstte12_tree_reconstruction.mlw" expanded="true">
-<theory name="Tree" sum="94da36b854220cd722a2d451bd7b45a0">
+<file name="../vstte12_tree_reconstruction.mlw">
+<theory name="Tree">
  <goal name="depths_head" expl="">
  <transf name="induction_ty_lex">
   <goal name="depths_head.1" expl="">
@@ -52,7 +52,7 @@
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="TreeReconstruction" sum="51f93448aee207eaecaa456d1d46298c">
+<theory name="TreeReconstruction">
  <goal name="WP_parameter build_rec" expl="VC for build_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter build_rec.1" expl="exceptional postcondition">
@@ -95,7 +95,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="56c03581d3b05363d5c47a3a9faf947c">
+<theory name="Harness">
  <goal name="WP_parameter harness" expl="VC for harness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="postcondition">
@@ -110,7 +110,7 @@
  <proof prover="4" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"><result status="valid" time="0.38"/></proof>
  </goal>
 </theory>
-<theory name="ZipperBasedTermination" sum="68cebb9857482610e9524fbc061fb285">
+<theory name="ZipperBasedTermination">
  <goal name="WP_parameter tc" expl="VC for tc">
  <transf name="split_goal_wp">
   <goal name="WP_parameter tc.1" expl="variant decrease">
@@ -131,7 +131,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="ZipperBased" sum="3445bf6bce561868d94ea5facd4b83d1">
+<theory name="ZipperBased">
  <goal name="forest_depths_append" expl="">
  <proof prover="4" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
  </goal>

@@ -6,10 +6,10 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="30" steplimit="0" memlimit="1000"/>
-<file name="../mjrty.mlw" expanded="true">
-<theory name="Mjrty" sum="ea7f059624235396e1991b6120fe9e65" expanded="true">
- <goal name="WP_parameter mjrty" expl="VC for mjrty" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<file name="../mjrty.mlw">
+<theory name="Mjrty">
+ <goal name="WP_parameter mjrty" expl="VC for mjrty">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter mjrty.1" expl="index in array bounds">
   <proof prover="4" timelimit="5"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>

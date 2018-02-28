@@ -70,6 +70,7 @@ type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
   queried_terms : Term.term Stdlib.Mstr.t;
+  list_projections: Stdlib.Sstr.t;
 }
 
 type printer_args = {
@@ -93,6 +94,7 @@ let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
   queried_terms = Stdlib.Mstr.empty;
+  list_projections = Stdlib.Sstr.empty;
 }
 
 let register_printer ~desc s p =

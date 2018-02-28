@@ -6,10 +6,10 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../find.mlw" expanded="true">
-<theory name="FIND" sum="3990c1312eeacb1b1999b452e270c312" expanded="true">
- <goal name="WP_parameter find" expl="VC for find" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<file name="../find.mlw">
+<theory name="FIND">
+ <goal name="WP_parameter find" expl="VC for find">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter find.1" expl="loop invariant init">
   <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
@@ -110,7 +110,7 @@
   <goal name="WP_parameter find.21" expl="assertion">
   <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter find.22" expl="loop invariant preservation" expanded="true">
+  <goal name="WP_parameter find.22" expl="loop invariant preservation">
   <proof prover="0" edited="find_WP_FIND_WP_parameter_find_4.v"><result status="valid" time="3.39"/></proof>
   </goal>
   <goal name="WP_parameter find.23" expl="loop variant decrease">

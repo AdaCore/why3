@@ -3,31 +3,31 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vstte10_aqueue.mlw" expanded="true">
-<theory name="AmortizedQueue" sum="0dd9b6ea85470a63255bbd626cd7aa66" expanded="true">
- <goal name="WP_parameter empty" expl="VC for empty" expanded="true">
+<file name="../vstte10_aqueue.mlw">
+<theory name="AmortizedQueue">
+ <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
- <goal name="WP_parameter head" expl="VC for head" expanded="true">
+ <goal name="WP_parameter head" expl="VC for head">
  <proof prover="1"><result status="valid" time="0.03" steps="57"/></proof>
  </goal>
- <goal name="WP_parameter create" expl="VC for create" expanded="true">
+ <goal name="WP_parameter create" expl="VC for create">
  <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
  </goal>
- <goal name="WP_parameter tail" expl="VC for tail" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter tail.1" expl="unreachable point" expanded="true">
+ <goal name="WP_parameter tail" expl="VC for tail">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter tail.1" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter tail.2" expl="precondition" expanded="true">
+  <goal name="WP_parameter tail.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter tail.3" expl="postcondition" expanded="true">
+  <goal name="WP_parameter tail.3" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.05" steps="59"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter enqueue" expl="VC for enqueue" expanded="true">
+ <goal name="WP_parameter enqueue" expl="VC for enqueue">
  <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
  </goal>
 </theory>

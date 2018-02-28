@@ -11,31 +11,35 @@
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.7.1" timelimit="1" steplimit="0" memlimit="0"/>
 <file name="../euler001.mlw" proved="true">
-<theory name="DivModHints" proved="true" sum="6f77cd46f4f6ca514a80124063f6a33c">
+<theory name="DivModHints" proved="true">
  <goal name="mod_div_unique" proved="true">
- <transf name="assert" proved="true" arg1="(q - div x y) * y + (r - mod x y) = 0">
+ <transf name="introduce_premises" proved="true" >
   <goal name="mod_div_unique.0" proved="true">
-  <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="mod_div_unique.1" proved="true">
-  <transf name="case" proved="true" arg1="q - div x y &gt;= 1">
-   <goal name="mod_div_unique.1.0" expl="true case" proved="true">
-   <proof prover="6"><result status="valid" time="0.11"/></proof>
+  <transf name="assert" proved="true" arg1="(q - div x y) * y + (r - mod x y) = 0">
+   <goal name="mod_div_unique.0.0" proved="true">
+   <proof prover="5" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="mod_div_unique.1.1" expl="false case" proved="true">
-   <transf name="case" proved="true" arg1="q - div x y &lt;= -1">
-    <goal name="mod_div_unique.1.1.0" expl="false case (true case)" proved="true">
-    <transf name="assert" proved="true" arg1="(y * (q - div x y) &lt;= - y)">
-     <goal name="mod_div_unique.1.1.0.0" proved="true">
-     <proof prover="2"><result status="valid" time="0.46"/></proof>
+   <goal name="mod_div_unique.0.1" proved="true">
+   <transf name="case" proved="true" arg1="q - div x y &gt;= 1">
+    <goal name="mod_div_unique.0.1.0" expl="true case" proved="true">
+    <proof prover="6"><result status="valid" time="0.12"/></proof>
+    </goal>
+    <goal name="mod_div_unique.0.1.1" expl="false case" proved="true">
+    <transf name="case" proved="true" arg1="q - div x y &lt;= -1">
+     <goal name="mod_div_unique.0.1.1.0" expl="false case (true case)" proved="true">
+     <transf name="assert" proved="true" arg1="(y * (q - div x y) &lt;= - y)">
+      <goal name="mod_div_unique.0.1.1.0.0" proved="true">
+      <proof prover="2"><result status="valid" time="0.68"/></proof>
+      </goal>
+      <goal name="mod_div_unique.0.1.1.0.1" expl="false case (true case)" proved="true">
+      <proof prover="7"><result status="valid" time="0.01"/></proof>
+      </goal>
+     </transf>
      </goal>
-     <goal name="mod_div_unique.1.1.0.1" expl="false case (true case)" proved="true">
-     <proof prover="7"><result status="valid" time="0.01"/></proof>
+     <goal name="mod_div_unique.0.1.1.1" expl="false case" proved="true">
+     <proof prover="7"><result status="valid" time="0.02"/></proof>
      </goal>
     </transf>
-    </goal>
-    <goal name="mod_div_unique.1.1.1" expl="false case" proved="true">
-    <proof prover="7"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
    </goal>
@@ -147,7 +151,7 @@
  <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="TriangularNumbers" proved="true" sum="5dd3402674ce736b7bf98870de3440c5">
+<theory name="TriangularNumbers" proved="true">
  <goal name="tr_mod_2" proved="true">
  <proof prover="8" edited="euler001_TriangularNumbers_tr_mod_2_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
@@ -161,7 +165,7 @@
  <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="SumMultiple" proved="true" sum="2cf339916c4ccc3d2e62d08da52c4e58">
+<theory name="SumMultiple" proved="true">
  <goal name="mod_15" proved="true">
  <proof prover="0"><result status="valid" time="0.13"/></proof>
  <proof prover="3"><result status="valid" time="0.13" steps="76"/></proof>
@@ -206,7 +210,7 @@
  <proof prover="8" edited="euler001_SumMultiple_Closed_Formula_1.v"><result status="valid" time="0.36"/></proof>
  </goal>
 </theory>
-<theory name="Euler001" proved="true" sum="ac5e739bc4723e5c8ba7bae0a1b7655c">
+<theory name="Euler001" proved="true">
  <goal name="WP_parameter solve" expl="VC for solve" proved="true">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>

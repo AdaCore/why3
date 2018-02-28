@@ -28,6 +28,7 @@ type array =
 and term =
   | Integer of string
   | Decimal of (string * string)
+  | Fraction of (string * string)
   | Float of float_type
   | Other of string
   | Array of array
@@ -42,7 +43,7 @@ and term =
   | To_array of term
 
 type definition =
-  | Function of variable list * term
+  | Function of (variable * string option) list * term
   | Term of term (* corresponding value of a term *)
   | Noelement
 
@@ -56,7 +57,7 @@ val add_element: (string * definition) option ->
   correspondence_table -> bool -> correspondence_table
 
 
-val make_local: variable list -> term -> term
+val make_local: (variable * string option) list -> term -> term
 
 val print_term: Format.formatter -> term -> unit
 val print_def: Format.formatter -> definition -> unit

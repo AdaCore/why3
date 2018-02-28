@@ -327,20 +327,12 @@ let generate_auto_strategies config =
     (fun p (lev,b) ->
      if b then eprintf "  Prover %a will be used in Auto level >= %d@."
                        Whyconf.print_prover p lev) prover_auto_levels;
-  (* Split *)
-  let code = "t split_goal_wp exit" in
+  (* Split VCs *)
+  let code = "t split_intros_goal_wp exit" in
   let split = {
-      strategy_name = "Split";
-      strategy_desc = "Split@ the@ goal@ into@ subgoals";
+      strategy_name = "Split_VC";
+      strategy_desc = "Split@ the@ VC@ into@ subgoals";
       strategy_shortcut = "s";
-      strategy_code = code }
-  in
-  (* Inline *)
-  let code = "t introduce_premises next next: t inline_goal exit" in
-  let inline = {
-      strategy_name = "Inline";
-      strategy_desc = "Inline@ definitions@ in@ the@ conclusion@ of@ the@ goal";
-      strategy_shortcut = "i";
       strategy_code = code }
   in
   (* Auto level 0 and 1 *)
@@ -361,7 +353,7 @@ let generate_auto_strategies config =
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
-  fprintf str_formatter "t split_goal_wp start@\n";
+  fprintf str_formatter "t split_all_full start@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto1 = {
@@ -380,14 +372,14 @@ let generate_auto_strategies config =
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level2;
-  fprintf str_formatter "t split_goal_wp start@\n";
+  fprintf str_formatter "t split_all_full start@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level2;
   fprintf str_formatter "t introduce_premises afterintro@\n";
   fprintf str_formatter "afterintro:@\n";
   fprintf str_formatter "t inline_goal afterinline@\n";
   fprintf str_formatter "g trylongertime@\n";
   fprintf str_formatter "afterinline:@\n";
-  fprintf str_formatter "t split_goal_wp start@\n";
+  fprintf str_formatter "t split_all_full start@\n";
   fprintf str_formatter "trylongertime:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level2;
   let code = flush_str_formatter () in
@@ -400,9 +392,7 @@ let generate_auto_strategies config =
   add_strategy
     (add_strategy
        (add_strategy
-          (add_strategy
-             (add_strategy config inline)
-             split) auto0) auto1) auto2
+          (add_strategy config split) auto0) auto1) auto2
 
 let detect_exec env data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in

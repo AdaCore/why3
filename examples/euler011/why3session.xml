@@ -3,8 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../euler011.mlw" proved="true">
-<theory name="ProductFour" proved="true" sum="aad83d7f85f8a78672dc9ba3859e80b8">
+<theory name="ProductFour" proved="true">
  <goal name="WP_parameter right_diag_c" expl="VC for right_diag_c" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="92"/></proof>
  </goal>
@@ -1883,31 +1884,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter find_max.349" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter find_max.349.0" expl="assertion" proved="true">
-   <transf name="introduce_premises" proved="true" >
-    <goal name="WP_parameter find_max.349.0.0" expl="assertion" proved="true">
-    <transf name="inline_goal" proved="true" >
-     <goal name="WP_parameter find_max.349.0.0.0" expl="assertion" proved="true">
-     <transf name="split_goal_wp" proved="true" >
-      <goal name="WP_parameter find_max.349.0.0.0.0" expl="assertion" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter find_max.349.0.0.0.0.0" expl="assertion" proved="true">
-       <transf name="inline_goal" proved="true" >
-        <goal name="WP_parameter find_max.349.0.0.0.0.0.0" expl="assertion" proved="true">
-        <proof prover="0"><result status="valid" time="0.08" steps="187"/></proof>
-        </goal>
-       </transf>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter find_max.350" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.89" steps="3455"/></proof>

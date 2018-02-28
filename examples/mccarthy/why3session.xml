@@ -3,8 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="3124401c83f9fccd5387bad3a9f2247a" expanded="true">
+<theory name="McCarthy91" sum="3124401c83f9fccd5387bad3a9f2247a">
  <goal name="WP_parameter f91" expl="VC for f91">
  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
  </goal>
@@ -13,6 +15,59 @@
  </goal>
  <goal name="WP_parameter f91_pseudorec" expl="VC for f91_pseudorec">
  <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
+ </goal>
+</theory>
+<theory name="McCarthyWithCoroutines" sum="4ecb35e1b075d752d176ace453b26ef5" expanded="true">
+ <goal name="WP_parameter aux1" expl="VC for aux1">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter aux1.1" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.2" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.3" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.4" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.5" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.6" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.7" expl="variant decrease">
+  <proof prover="1"><result status="valid" time="0.02" steps="44"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.8" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.03" steps="65"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.9" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.10" expl="variant decrease">
+  <proof prover="1"><result status="valid" time="0.03" steps="47"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.11" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="55"/></proof>
+  </goal>
+  <goal name="WP_parameter aux1.12" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="54"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter mccarthy1" expl="VC for mccarthy1">
+ <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
+ </goal>
+ <goal name="WP_parameter aux2" expl="VC for aux2">
+ <proof prover="1"><result status="valid" time="0.00" steps="47"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter mccarthy2" expl="VC for mccarthy2">
+ <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

@@ -10,8 +10,8 @@
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../vstte12_bfs.mlw" expanded="true">
-<theory name="Graph" sum="10d5eee1471152f5d43a60614e7153a9" expanded="true">
+<file name="../vstte12_bfs.mlw">
+<theory name="Graph">
  <goal name="path_nonneg" expl="">
  <transf name="induction_pr">
   <goal name="path_nonneg.1" expl="">
@@ -45,7 +45,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BFS" sum="c6c718224f5e1dd24d6307a7051436ab" expanded="true">
+<theory name="BFS">
  <goal name="WP_parameter fill_next" expl="VC for fill_next">
  <transf name="split_goal_wp">
   <goal name="WP_parameter fill_next.1" expl="loop invariant init">

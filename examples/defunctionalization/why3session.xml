@@ -7,10 +7,10 @@
 <prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../defunctionalization.mlw" expanded="true">
-<theory name="Expr" sum="d41d8cd98f00b204e9800998ecf8427e">
+<file name="../defunctionalization.mlw">
+<theory name="Expr">
 </theory>
-<theory name="DirectSem" sum="3be4abccf10b3c3ad3536caca09f3fd6">
+<theory name="DirectSem">
  <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
@@ -26,7 +26,7 @@
  <proof prover="4" memlimit="4000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="CPS" sum="8f9027832b61c952aefa1969021de6a2">
+<theory name="CPS">
  <goal name="cps_correct_expr" expl="">
  <transf name="induction_ty_lex">
   <goal name="cps_correct_expr.1" expl="">
@@ -43,7 +43,7 @@
  <proof prover="4" memlimit="4000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization" sum="1b45dd90e3ac71422788c0ff2ce8122c">
+<theory name="Defunctionalization">
  <goal name="size_e_pos" expl="">
  <transf name="induction_ty_lex">
   <goal name="size_e_pos.1" expl="">
@@ -86,7 +86,7 @@
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization2" sum="2f6bf3ac33c579e5f632ca4418410a24">
+<theory name="Defunctionalization2">
  <goal name="WP_parameter continue_2" expl="VC for continue_2">
  <transf name="split_goal_wp">
   <goal name="WP_parameter continue_2.1" expl="variant decrease">
@@ -167,7 +167,7 @@
  <proof prover="4" memlimit="4000"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="SemWithError" sum="db9b9207dce5dad3536d1272e752c4b4">
+<theory name="SemWithError">
  <goal name="cps_correct_expr" expl="">
  <transf name="induction_ty_lex">
   <goal name="cps_correct_expr.1" expl="">
@@ -337,7 +337,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="ReductionSemantics" sum="9b12f4be7ff7e96a8993ee44958fb0c0">
+<theory name="ReductionSemantics">
  <goal name="WP_parameter contract" expl="VC for contract">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
@@ -447,7 +447,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="RWithError" sum="b401d05a19c873b3bdd1a3982846d919">
+<theory name="RWithError">
  <goal name="size_c_pos" expl="">
  <transf name="induction_ty_lex">
   <goal name="size_c_pos.1" expl="">

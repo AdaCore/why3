@@ -108,6 +108,8 @@ type notification =
      etc) *)
   | File_contents of string * string
   (** File_contents (filename, contents) *)
+  | Source_and_ce of string * (Loc.position * color) list
+  (** Source interleaved with counterexamples: contents and list color loc *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -117,10 +119,9 @@ type ide_request =
   | Add_file_req            of string
   | Set_config_param        of string * int
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool * bool
-  (** [Get_task(id,b,c,loc)] requests for the text of the task in node
-      [id].  When [b] is true then quantified variables and hypotheses
-      are introduced as local definitions. When [c] is true then the
+  | Get_task                of node_ID * bool * bool
+  (** [Get_task(id,b,loc)] requests for the text of the task in node
+      [id].  When [b] is true then the
       full context is show.  When [loc] is false the locations are not
       returned *)
   | Focus_req               of node_ID

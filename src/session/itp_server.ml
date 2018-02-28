@@ -77,7 +77,7 @@ let unproven_goals_below_id cont id =
 (****** Exception handling *********)
 
 let p s id =
-  let _,tables = Session_itp.get_task s id in
+  let _,tables = Session_itp.get_task_name_table s id in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in
   (Pretty.create pr apr pr pr false)
@@ -270,7 +270,7 @@ let print_request fmt r =
   | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b,c,loc)           -> fprintf fmt "get task(%d,%b,%b,%b)" nid b c loc
+  | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Focus_req _nid                  -> fprintf fmt "focus"
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
@@ -329,6 +329,7 @@ let print_notify fmt n =
       print_msg fmt msg
   | Dead s                             -> fprintf fmt "dead :%s" s
   | File_contents (_f, _s)             -> fprintf fmt "file contents"
+  | Source_and_ce (_s, _list_loc)      -> fprintf fmt "source and ce"
   | Task (ni, _s, list_loc)            ->
       fprintf fmt "task for node_ID %d which contains a list of loc %a"
         ni print_list_loc list_loc
@@ -557,6 +558,7 @@ let get_modified_node n =
   | Dead _ -> None
   | Task (nid, _, _) -> Some nid
   | File_contents _ -> None
+  | Source_and_ce _ -> None
 
 
 type focus =
@@ -772,7 +774,7 @@ end
       | Some label_detection ->
           (match node with
           | APn pr_node ->
-              let task = Session_itp.get_raw_task session pr_node in
+              let task = Session_itp.get_task session pr_node in
               let b = label_detection task in
               if b then
                 add_focused_node node
@@ -880,12 +882,8 @@ end
     reset_and_send_the_whole_tree ()
 
   (* -- send the task -- *)
-  let task_of_id d id do_intros show_full_context loc =
-    let task,tables = get_task d.cont.controller_session id in
-    let task =
-      if do_intros then task else
-        get_raw_task d.cont.controller_session id
-    in
+  let task_of_id d id show_full_context loc =
+    let task,tables = get_task_name_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
@@ -896,45 +894,90 @@ end
     in
     task_text, loc_color_list
 
-  let send_task nid do_intros show_full_context loc =
+  let create_ce_tab s res any list_loc =
+    let f = get_encapsulating_file s any in
+    let filename = Sysutil.absolutize_filename
+      (Session_itp.get_dir s) (file_name f)
+    in
+    let source_code = Sysutil.file_contents filename in
+    Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+      ?me_name_trans:None res.Call_provers.pr_model ~filename:filename ~rel_filename:(file_name f)
+      ~source_code:source_code ~locations:list_loc
+
+  let send_task nid show_full_context loc =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-       let s, list_loc = task_of_id d id do_intros show_full_context loc in
-       P.notify (Task (nid, s, list_loc))
-    | ATh t ->
-       P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
-    | APa pid ->
-       let pa = get_proof_attempt_node  d.cont.controller_session pid in
-       let parid = pa.parent in
-       let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
-       (* Display the result of the prover *)
-       let prover_ce =
-         match pa.proof_state with
-         | Some res ->
-             let result =
-               Pp.string_of Call_provers.print_prover_answer
-                 res.Call_provers.pr_answer
-             in
-             let ce_result =
-               Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
-                 res.Call_provers.pr_model
-             in
-             result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
-         | None -> "Result of the prover not available.\n"
-       in
-       P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
-    | AFile f ->
-       P.notify (Task (nid, "File " ^ file_name f, []))
-    | ATn tid ->
-       let name = get_transf_name d.cont.controller_session tid in
-       let args = get_transf_args d.cont.controller_session tid in
-       let parid = get_trans_parent d.cont.controller_session tid in
-       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
-                       String.concat " " (name :: args) ^ "\n", list_loc))
+    let any = any_from_node_ID nid in
+    if Session_itp.is_detached d.cont.controller_session any then
+      match any with
+      | APn _id ->
+        let s = "Goal is detached and cannot be printed" in
+        P.notify (Task (nid, s, []))
+      | ATh t ->
+          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, []))
+      | APa pid ->
+          let pa = get_proof_attempt_node  d.cont.controller_session pid in
+          let name = Pp.string_of Whyconf.print_prover pa.prover in
+          let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
+          P.notify (Task (nid, prover_text, []))
+      | AFile f ->
+          P.notify (Task (nid, "Detached file " ^ file_name f, []))
+      | ATn tid ->
+          let name = get_transf_name d.cont.controller_session tid in
+          let args = get_transf_args d.cont.controller_session tid in
+          P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
+                          String.concat " " (name :: args) ^ "\n", []))
+    else
+      match any with
+      | APn id ->
+          let s, list_loc = task_of_id d id show_full_context loc in
+          P.notify (Task (nid, s, list_loc))
+      | ATh t ->
+          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
+      | APa pid ->
+          let pa = get_proof_attempt_node  d.cont.controller_session pid in
+          let parid = pa.parent in
+          let name = Pp.string_of Whyconf.print_prover pa.prover in
+          let s, old_list_loc = task_of_id d parid show_full_context loc in
+          let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
+          (* Display the result of the prover *)
+          begin
+            match pa.proof_state with
+            | Some res ->
+                let result =
+                  Pp.string_of Call_provers.print_prover_answer
+                    res.Call_provers.pr_answer
+                in
+                let ce_result =
+                  Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                  res.Call_provers.pr_model
+                in
+                if ce_result = "" then
+                  let result_pr =
+                    result ^ "\n\n" ^ "The prover did not return counterexamples."
+                  in
+                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                else
+                  begin
+                    let result_pr =
+                      result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
+                    in
+                    let (source_result, list_loc) =
+                      create_ce_tab d.cont.controller_session res any old_list_loc
+                    in
+                    P.notify (Source_and_ce (source_result, list_loc));
+                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                  end
+            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
+          end
+      | AFile f ->
+          P.notify (Task (nid, "File " ^ file_name f, []))
+      | ATn tid ->
+          let name = get_transf_name d.cont.controller_session tid in
+          let args = get_transf_args d.cont.controller_session tid in
+          let parid = get_trans_parent d.cont.controller_session tid in
+          let s, list_loc = task_of_id d parid show_full_context loc in
+          P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
+                          String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 
@@ -1318,7 +1361,7 @@ end
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
          Hint.mem model_any from_id && Hint.mem model_any to_id
-     | Get_task(nid,_,_,_) ->
+     | Get_task(nid,_,_) ->
          Hint.mem model_any nid
      | Command_req (nid, _) ->
          if not (Itp_communication.is_root nid) then
@@ -1388,7 +1431,7 @@ end
         read_and_send f
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b,c,loc)         -> send_task nid b c loc
+    | Get_task(nid,b,loc)         -> send_task nid b loc
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin

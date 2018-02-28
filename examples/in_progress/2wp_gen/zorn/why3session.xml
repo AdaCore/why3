@@ -5,9 +5,9 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" memlimit="1000"/>
 <file name="../zorn.mlw">
-<theory name="Zorn" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Zorn">
 </theory>
-<theory name="ZornProof" sum="ec60b3936ceac8b7c7e3c840622f551a">
+<theory name="ZornProof">
  <goal name="choose_ub_builder">
  <proof prover="1"><result status="valid" time="0.36"/></proof>
  </goal>
@@ -40,9 +40,9 @@
  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="WellOrder" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="WellOrder">
 </theory>
-<theory name="WellOrderProof" sum="95b5475e469c614aa865e019736a6061">
+<theory name="WellOrderProof">
  <goal name="completion_well_ordered">
  <transf name="split_goal_wp">
   <goal name="completion_well_ordered.1" expl="1.">

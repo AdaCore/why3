@@ -27,58 +27,41 @@ end
 
   open Ptree
 
-  let infix  s = "infix "  ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
-
   let qualid_last = function Qident x | Qdot (_, x) -> x.id_str
 
   let floc s e = Loc.extract (s,e)
 
-  let model_label = Ident.create_label "model"
-  let model_projected = Ident.create_label "model_projected"
-
-  let is_model_label l =
-    match l with
-    | Lpos _ -> false
-    | Lstr lab ->
-      (lab = model_label) || (lab = model_projected)
-
-
-  let model_lab_present labels =
-    try
-      ignore(List.find is_model_label labels);
-      true
-    with Not_found ->
-      false
-
-  let model_trace_regexp = Str.regexp "model_trace:"
-
-  let is_model_trace_label l =
-    match l with
-    | Lpos _ -> false
-    | Lstr lab ->
-      try
-	ignore(Str.search_forward model_trace_regexp lab.Ident.lab_string 0);
-	true
-      with Not_found -> false
-
-  let model_trace_lab_present labels =
-    try
-      ignore(List.find is_model_trace_label labels);
-      true
-    with Not_found ->
-      false
-
-  let add_model_trace name labels =
-    if (model_lab_present labels) && (not (model_trace_lab_present labels)) then
-      (Lstr (Ident.create_label ("model_trace:" ^ name)))::labels
-    else
-      labels
+  let debug_auto_model =
+    Debug.register_flag ~desc:"When set, model labels are not added during parsing"
+      "no_auto_model"
 
   let add_lab id l =
-    let l = add_model_trace id.id_str l in
     { id with id_lab = l }
+
+  let add_model_trace_label id =
+    if Debug.test_flag debug_auto_model then id else
+    let is_model_trace_label l =
+      match l with
+      | Lpos _ -> false
+      | Lstr lab -> Ident.is_model_trace_label lab
+    in
+    if List.exists is_model_trace_label id.id_lab then id else
+      let l =
+        (Lstr (Ident.create_model_trace_label id.id_str))
+        ::(Lstr Ident.model_label) :: id.id_lab in
+      { id with id_lab = l }
+
+  let add_model_labels (b : binder) =
+    match b with
+    | (loc, Some id, ghost, ty) ->
+      (loc, Some (add_model_trace_label id), ghost, ty)
+    | _ -> b
+
+  let add_model_vc_label t =
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_label, t)}
+
+  let add_model_vc_post_label t =
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_post_label, t)}
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
@@ -90,11 +73,11 @@ end
 
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
 
-  let get_op s e = Qident (mk_id (mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
-  let sub_op s e = Qident (mk_id (mixfix "[_.._]") s e)
-  let above_op s e = Qident (mk_id (mixfix "[_..]") s e)
-  let below_op s e = Qident (mk_id (mixfix "[.._]") s e)
+  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
+  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
+  let sub_op s e = Qident (mk_id (Ident.mixfix "[_.._]") s e)
+  let above_op s e = Qident (mk_id (Ident.mixfix "[_..]") s e)
+  let below_op s e = Qident (mk_id (Ident.mixfix "[.._]") s e)
 
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -483,7 +466,7 @@ binder:
     { match $1 with
       | PTtyapp (Qident id, [])
       | PTparen (PTtyapp (Qident id, [])) ->
-             [floc $startpos $endpos, Some id, false, None]
+          [floc $startpos $endpos, Some id, false, None]
       | _ -> [floc $startpos $endpos, None, false, Some $1] }
 | LEFTPAR GHOST ty RIGHTPAR
     { match $3 with
@@ -584,7 +567,8 @@ term_:
 | MATCH comma_list2(term) WITH match_cases(term) END
     { Tmatch (mk_term (Ttuple $2) $startpos($2) $endpos($2), $4) }
 | quant comma_list1(quant_vars) triggers DOT term
-    { Tquant ($1, List.concat $2, $3, $5) }
+    { let l = List.map add_model_labels (List.concat $2) in
+    Tquant ($1, l, $3, $5) }
 | EPSILON eps_var DOT term
     { Teps ($2, $4) }
 | label term %prec prec_named
@@ -661,11 +645,11 @@ quant:
 numeral:
 | INTEGER { Number.ConstInt (mk_int_const false $1) }
 | REAL    { Number.ConstReal (mk_real_const false $1) }
- 
+
 (* Program declarations *)
 
 pdecl:
-| VAL top_ghost labels(lident_rich) type_v          { Dval ($3, $2, $4) }
+| VAL top_ghost labels(lident_rich) type_v          { Dval (add_model_trace_label $3, $2, $4) }
 | LET top_ghost labels(lident_rich) fun_defn        { Dfun ($3, $2, $4) }
 | LET top_ghost labels(lident_rich) EQUAL fun_expr  { Dfun ($3, $2, $5) }
 | LET REC with_list1(rec_defn)                      { Drec $3 }
@@ -700,7 +684,8 @@ rec_defn:
     { $2, $1, ($3, $4, $8, spec_union $5 $7) }
 
 fun_defn:
-| binders cast? spec EQUAL spec seq_expr { ($1, $2, $6, spec_union $3 $5) }
+| binders cast? spec EQUAL spec seq_expr {
+  (List.map add_model_labels $1, $2, $6, spec_union $3 $5) }
 
 fun_expr:
 | FUN binders spec ARROW spec seq_expr { ($2, None, $6, spec_union $3 $5) }
@@ -742,16 +727,19 @@ expr_:
 | expr LARROW expr
     { match $1.expr_desc with
       | Eidapp (q, [e1]) -> Eassign (e1, q, $3)
-      | Eidapp (Qident id, [e1;e2]) when id.id_str = mixfix "[]" ->
-          Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
+      | Eidapp (Qident id, [e1;e2]) when id.id_str = Ident.mixfix "[]" ->
+          Eidapp (Qident {id with id_str = Ident.mixfix "[]<-"}, [e1;e2;$3])
       | _ -> raise Error }
 | LET top_ghost pattern EQUAL seq_expr IN seq_expr
     { match $3.pat_desc with
-      | Pvar id -> Elet (id, $2, $5, $7)
+      | Pvar id ->
+          let id = add_model_trace_label id in
+          Elet (id, $2, $5, $7)
       | Pwild -> Elet (id_anonymous $3.pat_loc, $2, $5, $7)
       | Ptuple [] -> Elet (id_anonymous $3.pat_loc, $2,
           { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
       | Pcast ({pat_desc = Pvar id}, ty) ->
+          let id = add_model_trace_label id in
           Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
       | Pcast ({pat_desc = Pwild}, ty) ->
           let id = id_anonymous $3.pat_loc in
@@ -764,7 +752,8 @@ expr_:
             | Gnone -> $5 in
           Ematch (e, [$3, $7]) }
 | LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { Elet ($3, $2, $5, $7) }
+    { let id = add_model_trace_label $3 in
+      Elet (id, $2, $5, $7) }
 | LET top_ghost labels(lident_nq) fun_defn IN seq_expr
     { Efun ($3, $2, $4, $6) }
 | LET top_ghost labels(lident_op_id) fun_defn IN seq_expr
@@ -786,7 +775,8 @@ expr_:
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { Ewhile ($2, $4, $5) }
 | FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
-    { Efor ($2, $4, $5, $6, $8, $9) }
+    { let id = add_model_trace_label $2 in
+      Efor (id, $4, $5, $6, $8, $9) }
 | ABSURD
     { Eabsurd }
 | RAISE uqualid
@@ -802,7 +792,8 @@ expr_:
 | ABSTRACT spec seq_expr END
     { Eabstract($3, $2) }
 | assertion_kind LEFTBRC term RIGHTBRC
-    { Eassert ($1, $3) }
+    { let t = add_model_vc_label $3 in
+      Eassert ($1, t) }
 | label expr %prec prec_named
     { Enamed ($1, $2) }
 | expr cast
@@ -879,11 +870,13 @@ spec:
 
 single_spec:
 | REQUIRES LEFTBRC term RIGHTBRC
-    { { empty_spec with sp_pre = [$3] } }
+    { let t = add_model_vc_label $3 in
+      { empty_spec with sp_pre = [t] } }
 | ENSURES LEFTBRC ensures RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
-    { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
+    { let l = List.map (fun (x, t) -> x, add_model_vc_post_label t) $3 in
+      { empty_spec with sp_post = [floc $startpos($3) $endpos($3), l] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | READS  LEFTBRC comma_list0(lqualid) RIGHTBRC
@@ -900,20 +893,23 @@ single_spec:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar id) $startpos $endpos, $1] }
+      let t = add_model_vc_post_label $1 in
+      [mk_pat (Pvar id) $startpos $endpos, t] }
 
 raises:
 | uqualid ARROW term
-    { $1, mk_pat (Ptuple []) $startpos($1) $endpos($1), $3 }
+    { let t = add_model_vc_post_label $3 in
+      $1, mk_pat (Ptuple []) $startpos($1) $endpos($1), t }
 | uqualid pat_arg ARROW term
-    { $1, $2, $4 }
+    { let t = add_model_vc_post_label $4 in
+      $1, $2, t }
 
 xsymbol:
 | uqualid
     { $1, mk_pat Pwild $startpos $endpos, mk_term Ttrue $startpos $endpos }
 
 invariant:
-| INVARIANT LEFTBRC term RIGHTBRC { $3 }
+| INVARIANT LEFTBRC term RIGHTBRC { add_model_vc_label $3 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }
@@ -939,12 +935,14 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS labels(lident_nq) { Pas ($1,$3) }
+| mk_pat(pat_uni_) AS labels(lident_nq) {
+  let id = add_model_trace_label $3 in Pas ($1,id) }
 | mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
-| labels(lident_nq)                     { Pvar $1 }
+| labels(lident_nq)                     {
+  let id = add_model_trace_label $1 in Pvar id }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern_ RIGHTPAR             { $2 }
@@ -1006,21 +1004,21 @@ lident_op_id:
     { (* parentheses are removed from the location *)
       let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
       let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
-      mk_id (infix "*") s e }
+      mk_id (Ident.infix "*") s e }
 
 lident_op:
-| op_symbol               { infix $1 }
-| op_symbol UNDERSCORE    { prefix $1 }
-| MINUS     UNDERSCORE    { prefix "-" }
-| EQUAL                   { infix "=" }
-| MINUS                   { infix "-" }
-| OPPREF                  { prefix $1 }
-| LEFTSQ RIGHTSQ          { mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW   { mixfix "[]<-" }
-| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { mixfix "[_.._]" }
-| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { mixfix "[.._]" }
-| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { mixfix "[_..]" }
+| op_symbol               { Ident.infix $1 }
+| op_symbol UNDERSCORE    { Ident.prefix $1 }
+| MINUS     UNDERSCORE    { Ident.prefix "-" }
+| EQUAL                   { Ident.infix "=" }
+| MINUS                   { Ident.infix "-" }
+| OPPREF                  { Ident.prefix $1 }
+| LEFTSQ RIGHTSQ          { Ident.mixfix "[]" }
+| LEFTSQ LARROW RIGHTSQ   { Ident.mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW   { Ident.mixfix "[]<-" }
+| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[_.._]" }
+| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[.._]" }
+| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { Ident.mixfix "[_..]" }
 
 op_symbol:
 | OP1 { $1 }
@@ -1031,22 +1029,22 @@ op_symbol:
 | GT  { ">" }
 
 %inline oppref:
-| o = OPPREF { mk_id (prefix o)  $startpos $endpos }
+| o = OPPREF { mk_id (Ident.prefix o)  $startpos $endpos }
 
 prefix_op:
-| op_symbol { mk_id (prefix $1)  $startpos $endpos }
-| MINUS     { mk_id (prefix "-") $startpos $endpos }
+| op_symbol { mk_id (Ident.prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (Ident.prefix "-") $startpos $endpos }
 
 %inline infix_op:
-| o = OP1   { mk_id (infix o)    $startpos $endpos }
-| o = OP2   { mk_id (infix o)    $startpos $endpos }
-| o = OP3   { mk_id (infix o)    $startpos $endpos }
-| o = OP4   { mk_id (infix o)    $startpos $endpos }
-| EQUAL     { mk_id (infix "=")  $startpos $endpos }
-| LTGT      { mk_id (infix "<>") $startpos $endpos }
-| LT        { mk_id (infix "<")  $startpos $endpos }
-| GT        { mk_id (infix ">")  $startpos $endpos }
-| MINUS     { mk_id (infix "-")  $startpos $endpos }
+| o = OP1   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP2   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP3   { mk_id (Ident.infix o)    $startpos $endpos }
+| o = OP4   { mk_id (Ident.infix o)    $startpos $endpos }
+| EQUAL     { mk_id (Ident.infix "=")  $startpos $endpos }
+| LTGT      { mk_id (Ident.infix "<>") $startpos $endpos }
+| LT        { mk_id (Ident.infix "<")  $startpos $endpos }
+| GT        { mk_id (Ident.infix ">")  $startpos $endpos }
+| MINUS     { mk_id (Ident.infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 

@@ -10,8 +10,8 @@
 <prover id="5" name="CVC4" version="1.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sudoku.mlw" expanded="true">
-<theory name="Grid" sum="9ce0854a2894013f9a78f258cc9c1f77" expanded="true">
+<file name="../sudoku.mlw">
+<theory name="Grid">
  <goal name="grid_eq_sub" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -32,13 +32,13 @@
  <proof prover="5"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" sum="cb5c76473aa3fa0d46e0f181f092cdea" expanded="true">
+<theory name="TheClassicalSudokuGrid">
  <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
  <proof prover="2" timelimit="6"><result status="valid" time="0.78"/></proof>
  <proof prover="3" timelimit="6"><result status="valid" time="0.71"/></proof>
  </goal>
 </theory>
-<theory name="Solver" sum="b1eb5f1c031ccf8d5083bccd4830815f" expanded="true">
+<theory name="Solver">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
  <transf name="split_goal_wp">
   <goal name="WP_parameter check_valid_chunk.1" expl="index in array bounds">
@@ -701,7 +701,7 @@
  <proof prover="4"><result status="valid" time="0.10" steps="48"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="52b56776da33e4cc2828957e1fc5d981" expanded="true">
+<theory name="Test">
  <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>

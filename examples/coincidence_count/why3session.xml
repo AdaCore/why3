@@ -5,8 +5,8 @@
 <prover id="0" name="Z3" version="4.3.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../coincidence_count.mlw" expanded="true">
-<theory name="CoincidenceCount" sum="07967eb04865e6a3bf0d51bf4c3d124b" expanded="true">
+<file name="../coincidence_count.mlw">
+<theory name="CoincidenceCount">
  <goal name="drop_left" expl="">
  <proof prover="2"><result status="valid" time="0.15" steps="486"/></proof>
  </goal>
@@ -16,8 +16,8 @@
  <goal name="not_mem_inter_l" expl="">
  <proof prover="1"><result status="valid" time="1.01" steps="585"/></proof>
  </goal>
- <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter coincidence_count.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>

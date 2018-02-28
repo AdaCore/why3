@@ -255,6 +255,7 @@ let treat_notification fmt n =
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
   | File_contents _ -> fprintf fmt "got a File_contents notification not yet supported@." (* TODO *)
+  | Source_and_ce _ -> fprintf fmt "got a Source_and_ce notification not yet supported@." (* TODO *)
   | Next_Unproven_Node_Id _ -> fprintf fmt "got a Next_Unproven_Node_Id notification not yet supported@." (* TODO *)
   | Task (id, s, _list_loc)       ->
     (* coloring the source is useless in shell *)
@@ -353,18 +354,16 @@ let interp _chout fmt cmd =
     match l with
     | ["goto"; n] when int_of_string n < !max_ID ->
         cur_id := int_of_string n;
-        let b = false (* TODO: allow user to customize printing with intros or not *) in
         let c = false (* TODO *) in
-        send_request (Get_task(!cur_id,b,c,false));
+        send_request (Get_task(!cur_id,c,false));
         print_session fmt
     | _ ->
         begin
           match cmd with
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" ->
-             let b = false (* TODO: allow user to customize printing with intros or not *) in
              let c = false (* TODO *) in
-             send_request (Get_task(!cur_id,b,c,false))
+             send_request (Get_task(!cur_id,c,false))
           | "p" -> print_session fmt
           | _ -> send_request (Command_req (!cur_id, cmd))
         end

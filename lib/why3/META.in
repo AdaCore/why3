@@ -2,6 +2,7 @@ description = "Why3 library"
 version = "@VERSION@"
 archive(byte) = "why3.cma"
 archive(native) = "why3.cmxa"
+plugin(native) = "why3.cmxs"
 requires = "str unix num dynlink @ZIPLIB@ @MENHIRLIB@"
 
 package "extract" (
@@ -10,4 +11,5 @@ package "extract" (
   requires = "@BIGINTPKG@"
   archive(byte) = "why3extract.cma"
   archive(native) = "why3extract.cmxa"
+  plugin(native) = "why3extract.cmxs"
 )

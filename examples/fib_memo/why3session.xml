@@ -4,23 +4,23 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../fib_memo.mlw" expanded="true">
-<theory name="FibMemo" sum="8aecd56cbee2e50ea90a8cb0a8cb0f2c" expanded="true">
- <goal name="WP_parameter fibo" expl="VC for fibo" expanded="true">
+<file name="../fib_memo.mlw">
+<theory name="FibMemo">
+ <goal name="WP_parameter fibo" expl="VC for fibo">
  <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
  </goal>
- <goal name="WP_parameter memo_fibo" expl="VC for memo_fibo" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter memo_fibo.1" expl="postcondition" expanded="true">
+ <goal name="WP_parameter memo_fibo" expl="VC for memo_fibo">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter memo_fibo.1" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter memo_fibo.2" expl="variant decrease">
   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter memo_fibo.3" expl="precondition" expanded="true">
+  <goal name="WP_parameter memo_fibo.3" expl="precondition">
   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter memo_fibo.4" expl="postcondition" expanded="true">
+  <goal name="WP_parameter memo_fibo.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>

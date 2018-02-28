@@ -555,4 +555,3 @@ let () = Trans.register_transform_l "split_all_wp" split_all_wp
   ~desc:"Same@ as@ split_goal_wp,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_wp" split_premise_wp
   ~desc:"Same@ as@ split_all_wp,@ but@ split@ only@ premises."
-

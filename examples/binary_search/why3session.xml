@@ -7,21 +7,21 @@
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../binary_search.mlw" proved="true">
-<theory name="BinarySearch" proved="true" sum="7bf7883d6e8fde9d87f261fd912923e0">
+<theory name="BinarySearch" proved="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.03"/></proof>
  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
  <proof prover="5" timelimit="10"><result status="valid" time="0.17" steps="59"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchAnyMidPoint" proved="true" sum="617e28329136ba275ecf8ba02bcc2957">
+<theory name="BinarySearchAnyMidPoint" proved="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.03"/></proof>
  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
  <proof prover="5" timelimit="10"><result status="valid" time="0.02" steps="44"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" proved="true" sum="bf7b08f3631f7a99219dd72d9ff9e24f">
+<theory name="BinarySearchInt32" proved="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter binary_search.0" expl="integer overflow" proved="true">
@@ -106,7 +106,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BinarySearchBoolean" proved="true" sum="665a5152cccd5f2361968000d62eb210">
+<theory name="BinarySearchBoolean" proved="true">
  <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="1"><result status="valid" time="0.07" steps="118"/></proof>
  </goal>

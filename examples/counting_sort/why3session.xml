@@ -10,12 +10,12 @@
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../counting_sort.mlw" proved="true">
-<theory name="Spec" proved="true" sum="f4f03f730d4046e7d5d93001f753810e">
+<theory name="Spec" proved="true">
  <goal name="WP_parameter eqlt" expl="VC for eqlt" proved="true">
  <proof prover="2"><result status="valid" time="0.18"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" proved="true" sum="9a988c9279181d24d9c77ec4106168a8">
+<theory name="CountingSort" proved="true">
  <goal name="WP_parameter counting_sort" expl="VC for counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter counting_sort.0" expl="array creation size" proved="true">
@@ -247,7 +247,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" proved="true" sum="caba8df3fd739f1de24d022b696cad77">
+<theory name="InPlaceCountingSort" proved="true">
  <goal name="WP_parameter in_place_counting_sort" expl="VC for in_place_counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter in_place_counting_sort.0" expl="array creation size" proved="true">
@@ -494,7 +494,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" proved="true" sum="4044ec456c7673e876928293c824f56f">
+<theory name="Harness" proved="true">
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter harness.0" expl="array creation size" proved="true">

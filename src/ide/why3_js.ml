@@ -549,6 +549,8 @@ let interpNotif (n: notification) =
       sendRequest (Get_task (string_of_int nid))
   | File_contents (_f,_s) ->
      PE.error_print_msg "Notification File_contents not handled yet"
+  | Source_and_ce _ ->
+     PE.error_print_msg "Notification Source_and_ce not handled yet"
   | Next_Unproven_Node_Id (_nid1,_nid2) ->
      PE.error_print_msg "Notification Next_Unproven_Node_Id not handled yet"
   | Task (nid, task, _list_loc) -> (* TODO add color on sources *)

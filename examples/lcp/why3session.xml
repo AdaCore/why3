@@ -6,13 +6,13 @@
 <prover id="3" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lcp.mlw" expanded="true">
-<theory name="LCP" sum="006d28f7c33cebbbe4d534e37fa537d6" expanded="true">
- <goal name="not_eqseq" expl="" expanded="true">
+<file name="../lcp.mlw">
+<theory name="LCP">
+ <goal name="not_eqseq" expl="">
  <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter lcp" expl="VC for lcp" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter lcp" expl="VC for lcp">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter lcp.1" expl="loop invariant init">
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
@@ -31,9 +31,9 @@
   <goal name="WP_parameter lcp.6" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter lcp.7" expl="postcondition" expanded="true">
-  <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter lcp.7.1" expl="postcondition" expanded="true">
+  <goal name="WP_parameter lcp.7" expl="postcondition">
+  <transf name="inline_goal">
+   <goal name="WP_parameter lcp.7.1" expl="postcondition">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.18"/></proof>

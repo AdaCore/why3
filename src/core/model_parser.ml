@@ -38,6 +38,7 @@ type float_type =
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array
@@ -113,6 +114,10 @@ let rec convert_model_value value : Json_base.json =
   | Decimal (int_part, fract_part) ->
       let m = Mstr.add "type" (Json_base.String "Decimal") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json_base.String (int_part^"."^fract_part)) m in
+      Json_base.Record m
+  | Fraction (num, den) ->
+      let m = Mstr.add "type" (Json_base.String "Fraction") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (num^"/"^den)) m in
       Json_base.Record m
   | Unparsed s ->
       let m = Mstr.add "type" (Json_base.String "Unparsed") Stdlib.Mstr.empty in
@@ -204,6 +209,7 @@ and print_model_value_human fmt (v: model_value) =
   match v with
   | Integer s -> fprintf fmt "%s" s
   | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
+  | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
   | Array arr -> print_array_human fmt arr
@@ -301,7 +307,7 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser =  string -> model_element list
+type raw_model_parser = Stdlib.Sstr.t -> string -> model_element list
 
 (*
 ***************************************************************
@@ -405,25 +411,55 @@ let get_padding line =
     Str.matched_string line
   with Not_found -> ""
 
+(* This assumes that l is sorted and split the list of locations in two:
+   those that are applied on this line and the others. For those that are on
+   this line, we split the locations that appear on several lines. *)
+let rec partition_loc line lc l =
+  match l with
+  | (hd,a) :: tl ->
+      let (hdf, hdl, hdfc, hdlc) = Loc.get hd in
+      if hdl = line then
+        if hdlc > lc then
+          let old_sloc = Loc.user_position hdf hdl hdfc lc in
+          let newlc = hdlc - lc in
+          let new_sloc = Loc.user_position hdf (hdl + 1) 1 newlc in
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          ((new_sloc,a) :: rem_loc, (old_sloc,a) :: new_loc)
+        else
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          (rem_loc, (hd,a) :: new_loc)
+      else
+        (l, [])
+  | _ -> (l, [])
+
+(* Change a locations so that it points to a different line number *)
+let add_offset off (loc, a) =
+  let (f, l, fc, lc) = Loc.get loc in
+  (Loc.user_position f (l + off) fc lc, a)
+
 let interleave_line
     start_comment
     end_comment
     me_name_trans
     model_file
-    (source_code, line_number)
+    (source_code, line_number, offset, remaining_locs, locs)
     line =
+  let remaining_locs, list_loc =
+    partition_loc line_number (String.length line) remaining_locs
+  in
+  let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
     print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
       (get_padding line) ^
-	start_comment ^
-	(flush_str_formatter ()) ^
-	end_comment in
+        start_comment ^
+        (flush_str_formatter ()) ^
+        end_comment in
 
-    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1)
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + 1, remaining_locs, list_loc @ locs)
   with Not_found ->
-    (source_code ^ line, line_number + 1)
+    (source_code ^ line, line_number + 1, offset, remaining_locs, list_loc @ locs)
 
 
 let interleave_with_source
@@ -432,27 +468,29 @@ let interleave_with_source
     ?(me_name_trans = why_name_trans)
     model
     ~filename
-    ~source_code =
+    ~rel_filename
+    ~source_code
+    ~locations =
+  let locations =
+    List.sort (fun x y -> compare (fst x) (fst y))
+      (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)
+  in
   try
     let model_file = StringMap.find filename model.model_files in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      let lines = Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1) in
-      let remove_last_element list =
-	let list_rev = List.rev list in
-	match list_rev with
-	| _ :: tail -> List.rev tail
-	| _ -> List.rev list_rev
-      in
-      remove_last_element lines in
-    let (source_code, _) = List.fold_left
-      (interleave_line
-	 start_comment end_comment me_name_trans model_file)
-      ("", 1)
-      (src_lines_up_to_last_cntexmp_el source_code model_file) in
-    source_code
+      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+    in
+    let (source_code, _, _, _, gen_loc) =
+      List.fold_left
+        (interleave_line
+           start_comment end_comment me_name_trans model_file)
+        ("", 1, 0, locations, [])
+        (src_lines_up_to_last_cntexmp_el source_code model_file)
+    in
+    source_code, gen_loc
   with Not_found ->
-    source_code
+    source_code, locations
 
 
 (*
@@ -667,18 +705,19 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
-    let raw_model = raw_mp input in
+    let list_proj = printer_mapping.list_projections in
+    let raw_model = raw_mp list_proj input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s);
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_raw_model_parser s =
+let lookup_raw_model_parser s : raw_model_parser =
   try snd (Hstr.find model_parsers s)
   with Not_found -> raise (UnknownModelParser s)
 
-let lookup_model_parser s =
+let lookup_model_parser s : model_parser =
   make_mp_from_raw (lookup_raw_model_parser s)
 
 let list_model_parsers () =
@@ -686,4 +725,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ -> [])
+  (fun _ _ -> [])

@@ -8,16 +8,16 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../linear_probing.mlw" proved="true">
-<theory name="HashedTypeWithDummy" proved="true" sum="1a73ab98c4fbad8200fe4d1b2ea507e8">
+<theory name="HashedTypeWithDummy" proved="true">
  <goal name="WP_parameter neq" expl="VC for neq" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" proved="true" sum="4910a66acb99936519108ba8402e5c87">
+<theory name="LinearProbing" proved="true">
  <goal name="bucket_bounds" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
- <goal name="WP_parameter numof_eq" expl="VC for numof_eq" proved="true">
+ <goal name="NumOfDummy.WP_parameter numof_eq" expl="VC for numof_eq" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter numof_eq.0" expl="variant decrease" proved="true">
   <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="7"/></proof>
@@ -36,7 +36,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter dummy_const" expl="VC for dummy_const" proved="true">
+ <goal name="NumOfDummy.WP_parameter dummy_const" expl="VC for dummy_const" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter dummy_const.0" expl="variant decrease" proved="true">
   <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="3"/></proof>
@@ -341,7 +341,7 @@
     <goal name="WP_parameter resize.24.0.0" expl="type invariant" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter resize.24.0.0.0" expl="VC for resize" proved="true">
-     <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+     <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
      <proof prover="2"><result status="valid" time="0.03"/></proof>
      <proof prover="4"><result status="valid" time="0.01"/></proof>
      </goal>
@@ -361,11 +361,11 @@
      <proof prover="4"><result status="valid" time="0.03"/></proof>
      </goal>
      <goal name="WP_parameter resize.24.0.0.6" expl="VC for resize" proved="true">
-     <proof prover="2"><result status="valid" time="0.11"/></proof>
+     <proof prover="0"><result status="valid" time="0.52" steps="204"/></proof>
+     <proof prover="2"><result status="valid" time="0.09"/></proof>
      </goal>
      <goal name="WP_parameter resize.24.0.0.7" expl="VC for resize" proved="true">
-     <proof prover="0"><result status="valid" time="1.27" steps="296"/></proof>
-     <proof prover="2"><result status="valid" time="0.54"/></proof>
+     <proof prover="2"><result status="valid" time="0.28"/></proof>
      </goal>
     </transf>
     </goal>
@@ -600,7 +600,7 @@
    <proof prover="0" timelimit="1"><result status="valid" time="0.01" steps="24"/></proof>
    </goal>
    <goal name="WP_parameter delete.12.3" expl="precondition" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="84"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.02" steps="84"/></proof>
    </goal>
    <goal name="WP_parameter delete.12.4" expl="precondition" proved="true">
    <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
@@ -818,10 +818,10 @@
   <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter remove.14" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>

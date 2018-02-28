@@ -5,9 +5,9 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../matrices.mlw">
-<theory name="MatrixGen" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MatrixGen">
 </theory>
-<theory name="Matrix" sum="862099dd531bba3a8ce8aca77f580ae7">
+<theory name="Matrix">
  <goal name="set_def1">
  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
  </goal>
@@ -21,17 +21,17 @@
  <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
  </goal>
 </theory>
-<theory name="FixedMatrix" sum="81d1f6ecddc981db1f906002ad2c6515">
+<theory name="FixedMatrix">
  <goal name="rows_and_cols_nonnegative">
  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="SquareFixedMatrix" sum="8866fe956f3cb17788b7229e8763a520">
+<theory name="SquareFixedMatrix">
  <goal name="r_and_c_nonnegative">
  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="MatrixArithmetic" sum="179a17c543d2ee8c5d1128db6e7ac5b9">
+<theory name="MatrixArithmetic">
  <goal name="zero_neutral">
  <transf name="split_goal_wp">
   <goal name="zero_neutral.1" expl="1.">
@@ -179,7 +179,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BlockMul" sum="a0d8b3f3a9391a77a23d88b4d4a63f23">
+<theory name="BlockMul">
  <goal name="WP_parameter block_mul_ij" expl="VC for block_mul_ij">
  <proof prover="2"><result status="valid" time="0.47" steps="452"/></proof>
  </goal>

@@ -1,13 +1,20 @@
 
-(* McCarthy's ``91'' function. *)
+(** {1 McCarthy's ``91'' function}
+
+authors: Jean-Christophe Filliâtre, Martin Clochard, Claude Marché
+witness: Andrei Paskevich
+
+*)
 
 module McCarthy91
 
   use import int.Int
 
+  (** {2 Specification} *)
+
   function spec (x: int) : int = if x <= 100 then 91 else x-10
 
-  (* traditional recursive implementation *)
+  (** {2 traditional recursive implementation} *)
 
   let rec f91 (n:int) : int variant { 101-n }
     ensures { result = spec n }
@@ -16,7 +23,7 @@ module McCarthy91
     else
       n - 10
 
-  (* non-recursive implementation using a while loop *)
+  (** {2 non-recursive implementation using a while loop} *)
 
   use import ref.Ref
 
@@ -39,10 +46,12 @@ module McCarthy91
     done;
     !n
 
-  (* Use a 'morally' irrelevant control flow from a recursive function
+  (** {2 irrelevance of control flow}
+
+     We use a 'morally' irrelevant control flow from a recursive function
      to ease proof (the recursive structure does not contribute to the
      program execution). This is a technique for proving derecursified
-     programs. See verifythis_2016_tree_traversal for a more
+     programs. See [verifythis_2016_tree_traversal] for a more
      complex example. *)
 
   exception Stop
@@ -74,5 +83,133 @@ module McCarthy91
     = let u = !n in bloc (); if u <= 100 then (aux (); aux ()) in
     try aux (); bloc (); absurd
     with Stop -> !n end
+
+
+end
+
+module McCarthyWithCoroutines
+
+
+  use import int.Int
+  use import ref.Ref
+
+  function spec (x: int) : int = if x <= 100 then 91 else x-10
+
+  (** {2 Variant using a general 'ghost coroutine' approach}
+
+    Assume we want to prove the imperative code:
+{h <pre>
+e <- 1; r <- n;
+loop
+  if r > 100 { r <- r - 10; e <- e - 1; if e = 0 break }
+        else { r <- r + 11; e <- e + 1 }
+end-loop
+</pre>}
+we annotate the various program points:
+{h <pre>
+{ 0 } e <- 1;
+{ 1 } r <- n;
+      loop
+{ 2 } if r > 100 then { 3 } r <- r - 10; { 4 } e <- e - 1; { 5 } if e=0 then break;
+                 else { 6 } r <- r + 11; { 7 } e <- e + 1;
+end-loop
+{ 8 }
+</pre>}
+
+we define the small-step semantics of this code by the following [step] function
+
+*)
+
+
+  val pc : ref int
+  val n : ref int
+  val e : ref int
+  val r : ref int
+
+  val step () : unit
+    requires { 0 <= !pc < 8 }
+    writes   { pc, e, r }
+    ensures { old !pc = 0 -> !pc = 1 /\ !e = 1 /\ !r = old !r }
+    ensures { old !pc = 1 -> !pc = 2 /\ !e = old !e /\ !r = !n }
+    ensures { old !pc = 2 /\ old !r > 100 -> !pc = 3 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 2 /\ old !r <= 100 -> !pc = 6 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 3 -> !pc = 4 /\ !e = old !e /\ !r = old !r - 10 }
+    ensures { old !pc = 4 -> !pc = 5 /\ !e = old !e - 1 /\ !r = old !r }
+    ensures { old !pc = 5 /\ old !e = 0 -> !pc = 8 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 5 /\ old !e <> 0 -> !pc = 2 /\ !e = old !e /\ !r = old !r }
+    ensures { old !pc = 6 -> !pc = 7 /\ !e = old !e /\ !r = old !r + 11 }
+    ensures { old !pc = 7 -> !pc = 2 /\ !e = old !e + 1 /\ !r = old !r }
+
+  let rec aux1 () : unit
+    requires { !pc = 2 /\ !e > 0 }
+    variant  { 101 - !r }
+    ensures  { !pc = 5 /\ !r = spec(old !r) /\ !e = old !e - 1 }
+  = step (); (* execution of 'if r > 100' *)
+    if !pc = 3 then begin
+       step (); (* assignment r <- r - 10 *)
+       step (); (* assignment e <- e - 1  *)
+       end
+    else begin
+       step (); (* assignment r <- r + 11 *)
+       step (); (* assignment e <- e + 1 *)
+       aux1 ();
+       step (); (* 'if e=0' must be false *)
+       aux1 ()
+       end
+
+  let mccarthy1 ()
+    requires { !pc = 0 /\ !n >= 0 }
+    ensures { !pc = 8 /\ !r = spec !n }
+  = step (); (* assignment e <- 1 *)
+    step (); (* assignment r <- n *)
+    aux1 (); (* loop *)
+    step() (* loop exit *)
+
+(** {2 a variant with not-so-small steps}
+
+we annotate the important program points:
+{h <pre>
+{ 0 } e <- 1;
+      r <- n;
+      loop
+{ 1 }   if r > 100 { r <- r - 10; e <- e - 1; { 2 } if e = 0 break; }
+              else { r <- r + 11; e <- e + 1; }
+      end-loop
+end-while
+{ 3 }
+return r
+</pre>}
+
+we define the not-so-small-step semantics of this code by the following [next] function
+
+*)
+
+  val next () : unit
+    requires { 0 <= !pc < 3 }
+    writes   { pc, e, r }
+    ensures { old !pc = 0 -> !pc = 1 /\ !e = 1 /\ !r = !n }
+    ensures { old !pc = 1 /\ old !r > 100 ->
+              !pc = 2 /\ !r = old !r - 10 /\ !e = old !e - 1 }
+    ensures { old !pc = 1 /\ old !r <= 100 ->
+              !pc = 1 /\ !r = old !r + 11 /\ !e = old !e + 1 }
+    ensures { old !pc = 2 /\ old !e = 0 -> !pc = 3 /\ !r = old !r /\ !e = old !e }
+    ensures { old !pc = 2 /\ old !e <> 0 -> !pc = 1 /\ !r = old !r /\ !e = old !e }
+
+  (* [aux2] performs as may loop iterations as needed so as to reach program point 2
+     from program point 1 *)
+  let rec aux2 () : unit
+    requires { !pc = 1 /\ !e > 0 }
+    variant  { 101 - !r }
+    ensures  { !pc = 2 /\ !r = spec(old !r) /\ !e = old !e - 1 }
+  = next ();
+    if !pc <> 2 then begin aux2 (); next (); aux2 () end
+
+
+  let mccarthy2 ()
+    requires { !pc = 0 /\ !n >= 0 }
+    ensures { !pc = 3 /\ !r = spec !n }
+  = next (); (* assignments e <- 1; r <- n *)
+    aux2 (); (* loop *)
+    next ()
 
 end

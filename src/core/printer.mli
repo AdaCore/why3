@@ -41,6 +41,8 @@ type printer_mapping = {
   queried_terms : Term.term Stdlib.Mstr.t;
   (* The list of terms that were queried for the counter-example
      by the printer *)
+  list_projections: Stdlib.Sstr.t;
+  (* List of projections as printed in the model *)
 }
 
 type printer_args = {

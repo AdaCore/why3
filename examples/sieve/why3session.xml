@@ -7,13 +7,13 @@
 <prover id="2" name="CVC3" version="2.4.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sieve.mlw" expanded="true">
-<theory name="Sieve" sum="d115fe5e5af941951e4965bf44172e0d" expanded="true">
+<file name="../sieve.mlw">
+<theory name="Sieve">
  <goal name="WP_parameter incr" expl="VC for incr">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter sieve" expl="VC for sieve" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter sieve" expl="VC for sieve">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter sieve.1" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>

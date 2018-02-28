@@ -5,13 +5,14 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linked_list_rev.mlw" proved="true">
-<theory name="Disjoint" proved="true" sum="c3965d4cf0dcc69449e7184be1a4f78f">
+<theory name="Disjoint" proved="true">
  <goal name="WP_parameter mem_decomp" expl="VC for mem_decomp" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
  </goal>
 </theory>
-<theory name="InPlaceRev" proved="true" sum="573f9a2020aaf7bdd09114d86bca3186">
+<theory name="InPlaceRev" proved="true">
  <goal name="WP_parameter list_seg_frame_ext" expl="VC for list_seg_frame_ext" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="115"/></proof>
  </goal>
@@ -132,7 +133,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceRevSeq" proved="true" sum="cff5cc2a9e9ae9dc7b253e22f6ce02e8">
+<theory name="InPlaceRevSeq" proved="true">
  <goal name="non_empty_seq" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
  </goal>
@@ -287,6 +288,11 @@
   </goal>
   <goal name="WP_parameter list_seg_sublistl.6" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.21" steps="567"/></proof>
+  <transf name="remove" proved="true" arg1="real,bool,func,pred,tuple0,unit,tuple2,ref,memory,next,(@),zero,one,( * ),(&gt;=),([&lt;-]),empty,set,([&lt;-]),snoc,create,reverse,(!),mem,disjoint,no_repet,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Select_eq,Select_neq,length_nonnegative,empty_length,set_def1,set_def2,set_def3,extensionality,cons_length,cons_get,snoc_length,snoc_get,snoc_last,sub_length,sub_get,concat_get1,create_length,create_get,non_empty_seq,list_seg_frame_ext,list_seg_tail,list_seg_append,seq_tail_append,list_seg_prefix">
+   <goal name="WP_parameter list_seg_sublistl.6.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.87" steps="574"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -411,7 +417,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter app.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="4.64"/></proof>
+  <proof prover="0"><result status="valid" time="5.34"/></proof>
   </goal>
   <goal name="WP_parameter app.16" expl="loop variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.05" steps="131"/></proof>
@@ -429,7 +435,7 @@
   <proof prover="0"><result status="valid" time="1.74"/></proof>
   </goal>
   <goal name="WP_parameter app.21" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="4.16"/></proof>
+  <proof prover="2"><result status="valid" time="4.68"/></proof>
   </goal>
  </transf>
  </goal>

@@ -81,13 +81,9 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 let extract_op s =
   (*let s = ls.ls_name.id_string in*)
-  let len = String.length s in
-  if len < 7 then None else
-  let inf = String.sub s 0 6 in
-  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
-  let prf = String.sub s 0 7 in
-  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
-  None
+  match Ident.kind_of_fix s with
+  | `None | `Mixfix _ -> None
+  | `Prefix s | `Infix s -> Some s
 
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
@@ -241,7 +237,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
+     begin
+       match t.t_ty with
+       | Some {ty_node = Tyapp (ts,[])}
+            when ts_equal ts ts_int || ts_equal ts ts_real ->
+          Number.print_constant fmt c
+       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+                            print_ty ty
+       | None -> assert false
+     end
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->

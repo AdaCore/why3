@@ -24,6 +24,11 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
+(* Meta to tag projection functions *)
+let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
+
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls =
@@ -122,6 +127,8 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
+  mutable list_projs : Stdlib.Sstr.t;
+  meta_model_projection : Sls.t;
 }
 
 let debug_print_term message t =
@@ -168,11 +175,11 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
-let model_projected_label = Ident.create_label "model_projected"
-
 let collect_model_ls info ls =
+  if Sls.mem ls info.meta_model_projection then
+    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
-  Slab.mem model_projected_label ls.ls_name.id_label) then
+  Slab.mem Ident.model_projected_label ls.ls_name.id_label) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -507,7 +514,8 @@ let print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f = match k with
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; }
+				queried_terms = model_list;
+                                list_projections = info.list_projs;}
   | Plemma| Pskip -> assert false
 
 
@@ -568,7 +576,10 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;
-    info_printer = ident_printer () } in
+    info_printer = ident_printer ();
+    list_projs = Stdlib.Sstr.empty;
+    meta_model_projection = Task.on_tagged_ls meta_projection task;
+  } in
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;
   print_th_prelude task fmt args.th_prelude;

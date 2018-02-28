@@ -108,10 +108,13 @@ let rec equ_simp f = t_label_copy f (match f.t_node with
        t_equ_simp (equ_simp f1) (equ_simp f2)
   | _ -> t_map equ_simp f)
 
-let rec fmla_quant sign f = function
+let rec fmla_quant ~keep_model_vars sign f = function
   | [] -> [], f
   | vs::l ->
-      let vsl, f = fmla_quant sign f l in
+     let vsl, f = fmla_quant ~keep_model_vars sign f l in
+     if keep_model_vars && has_a_model_label vs.vs_name then
+       vs::vsl, f
+     else
       try
         fmla_find_subst (Svs.singleton vs) vs sign f;
         vs::vsl, f
@@ -119,7 +122,7 @@ let rec fmla_quant sign f = function
         let f = t_subst_single vs t f in
         vsl, equ_simp f
 
-let rec fmla_remove_quant f =
+let rec fmla_remove_quant ~keep_model_vars f =
   match f.t_node with
     | Tquant (k,fb) ->
         let vsl,trl,f',close = t_open_quant_cb fb in
@@ -128,10 +131,10 @@ let rec fmla_remove_quant f =
           else
             let sign = match k with
               | Tforall -> false | Texists -> true in
-            let vsl, f' = fmla_quant sign f' vsl in
-            let f' = fmla_remove_quant f' in
+            let vsl, f' = fmla_quant ~keep_model_vars sign f' vsl in
+            let f' = fmla_remove_quant ~keep_model_vars f' in
             t_quant k (close vsl [] f')
-    | _ -> Term.t_map fmla_remove_quant f
+    | _ -> Term.t_map (fmla_remove_quant ~keep_model_vars) f
 
 (*let fmla_remove_quant f =
   Format.eprintf "@[<hov>%a =>|@\n" Pretty.print_fmla f;
@@ -142,7 +145,10 @@ let rec fmla_remove_quant f =
 *)
 
 let simplify_trivial_quantification =
-  Trans.rewrite fmla_remove_quant None
+  Trans.rewrite (fmla_remove_quant ~keep_model_vars:false) None
+
+let simplify_trivial_wp_quantification =
+  Trans.rewrite (fmla_remove_quant ~keep_model_vars:true) None
 
 let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
@@ -152,7 +158,9 @@ let () = Trans.register_transform
      - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
 
 let simplify_trivial_quantification_in_goal =
-  Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
+  Trans.goal
+    (fun pr f ->
+     [create_prop_decl Pgoal pr (fmla_remove_quant ~keep_model_vars:false f)])
 
 let () = Trans.register_transform
   "simplify_trivial_quantification_in_goal"

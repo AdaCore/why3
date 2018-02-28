@@ -11,15 +11,22 @@
 
 open Stdlib
 open Smt2_model_defs
-open Strings
 
 exception Not_value
+
+
+(* Printing function *)
+let print_table t =
+  Format.eprintf "Table key and value@.";
+  Mstr.iter (fun key e -> Format.eprintf "%s %a@." key print_def (snd e)) t;
+  Format.eprintf "End table@."
+
 
 (* Adds all referenced cvc4 variables found in the term t to table *)
 let rec get_variables_term (table: correspondence_table) t =
   match t with
   | Variable _ | Function_Local_Variable _ | Boolean _ | Integer _
-  | Decimal _ | Float _ | Other _ | Bitvector _ -> table
+  | Decimal _ | Fraction _ | Float _ | Other _ | Bitvector _ -> table
   | Array a ->
     get_variables_array table a
   | Ite (t1, t2, t3, t4) ->
@@ -57,78 +64,78 @@ let get_all_var (table: correspondence_table) =
     | _, Function (_, t) -> get_variables_term table t
     | _, Term t -> get_variables_term table t) table table
 
-(* Return true if key is s suffixed with a number *)
-(* We should change the code of this function (Str still forbidden) *)
-let is_prefix_num key s =
-  if (String.length s >= String.length key) || String.length s = 0 then
-    false
-  else
-    try
-      let b = ref (has_prefix s key) in
-      for i = String.length s to String.length key - 1 do
-        b := !b && (String.get key i <= '9') && (String.get key i >= '0')
-      done;
-      !b
-    with
-    | _ -> false
-
-(* Add all variables referenced in the model to the table *)
-let add_all_cvc s table t =
-  Mstr.fold (fun key _element acc ->
-    if is_prefix_num key s then
-      try
-        if snd (Mstr.find key acc) = Noelement then
-          Mstr.add key t acc
-        else acc
-      with Not_found -> acc
-    else
-      acc) table table
-
 exception Bad_variable
 
 (* Get the "radical" of a variable *)
 let remove_end_num s =
   let n = ref (String.length s - 1) in
-  while String.get s !n <= '9' && String.get s !n >= '0' && !n >= 0 do
-    n := !n - 1
-  done;
-  try
-    String.sub s 0 (!n + 1)
-  with
-  | _ -> s
+  if !n <= 0 then s else
+  begin
+    while String.get s !n <= '9' && String.get s !n >= '0' && !n >= 0 do
+      n := !n - 1
+    done;
+    try
+      String.sub s 0 (!n + 1)
+    with
+    | _ -> s
+  end
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
 let add_vars_to_table table value =
-  let rec add_vars_to_table (table: correspondence_table) value =
-    let t = match (snd value) with
-    | Term t -> t
-    | Function (_, t) -> t
-    | Noelement -> raise Bad_variable in
-    match t with
+  let rec add_vars_to_table ~type_value (table: correspondence_table) value =
+    match value with
     | Ite (Cvc4_Variable cvc, Function_Local_Variable _x, t1, t2) ->
         begin
           let table = Mstr.add cvc (false, Term t1) table in
-          add_vars_to_table table (false, Term t2)
+          add_vars_to_table ~type_value table t2
         end
     | Ite (Function_Local_Variable _x, Cvc4_Variable cvc, t1, t2) ->
         begin
           let table = Mstr.add cvc (false, Term t1) table in
-          add_vars_to_table table (false, Term t2)
+          add_vars_to_table ~type_value table t2
         end
     | Ite (t, Function_Local_Variable _x, Cvc4_Variable cvc, t2) ->
         begin
           let table = Mstr.add cvc (false, Term t) table in
-          add_vars_to_table table (false, Term t2)
+          add_vars_to_table ~type_value table t2
         end
     | Ite (Function_Local_Variable _x, t, Cvc4_Variable cvc, t2) ->
         begin
           let table = Mstr.add cvc (false, Term t) table in
-          add_vars_to_table table (false, Term t2)
+          add_vars_to_table ~type_value table t2
         end
     | Ite (_, _, _, _) -> table
-    | _ -> table
+    | _ ->
+      begin
+        match type_value with
+        | None -> table
+        | Some type_value ->
+            Mstr.fold (fun key (_b, elt) acc ->
+              let match_str_z3 = type_value ^ "!" in
+              let match_str_cvc4 = "_" ^ type_value ^ "_" in
+              let match_str = Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
+              match Str.search_forward match_str (remove_end_num key) 0 with
+              | exception Not_found -> acc
+              | _ ->
+                  if elt == Noelement then
+                    Mstr.add key (false, Term value) acc
+                  else
+                    acc)
+              table table
+      end
   in
-  add_vars_to_table table value
+
+  let type_value, t = match (snd value) with
+  | Term t -> (None, t)
+  | Function (cvc_var_list, t) ->
+    begin
+      match cvc_var_list with
+      | [(_, type_value)] -> (type_value, t)
+      | _ -> (None, t)
+    end
+  | Noelement -> raise Bad_variable in
+
+  add_vars_to_table ~type_value table t
 
 let rec refine_definition table t =
   match t with
@@ -153,7 +160,8 @@ and refine_array table a =
    their value. *)
 and refine_function table term =
   match term with
-  | Integer _ | Decimal _ | Float _ | Other _ | Bitvector _ | Boolean _ -> term
+  | Integer _ | Decimal _ | Float _ | Fraction _
+    | Other _ | Bitvector _ | Boolean _ -> term
   | Cvc4_Variable v ->
     begin
       try (
@@ -238,6 +246,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   match t with
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
+  | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
   | Float f -> Model_parser.Float (convert_float f)
   | Bitvector bv -> Model_parser.Bitvector bv
   | Boolean b -> Model_parser.Boolean b
@@ -295,93 +304,19 @@ let convert_to_model_element name t =
       let value = convert_to_model_value t in
       Model_parser.create_model_element ~name ~value ()
 
-(* Printing function *)
-let print_table t =
-  Format.eprintf "Table key and value@.";
-  Mstr.iter (fun key e -> Format.eprintf "%s %a@." key print_def (snd e)) t;
-  Format.eprintf "End table@."
-
-
-(* Analysis function to get the value of Cvc4 variable contained in the model *)
-
-(* Given a to_rep and its corresponding of_rep in the model gives a guessed
-   value to unknown variables using constant of_rep/to_rep and "else" case of
-   the ITE.*)
-let corres_else_element table to_rep of_rep =
-  let (_key1, (_b1, to_rep)) = to_rep in
-  let (_key2, (_b2, of_rep)) = of_rep in
-  let to_rep = match to_rep with
-  | Term t -> t
-  | Function (_, t) -> t
-  | Noelement -> raise Not_value in
-
-  let of_rep = match of_rep with
-  | Term t -> t
-  | Function (_, t) -> t
-  | Noelement -> raise Not_value in
-
-  let rec corres_else_element table to_rep of_rep =
-    match (to_rep, of_rep) with
-    | Ite (_, _, _, to_rep), _ -> corres_else_element table to_rep of_rep
-    | _, Ite (_, _, _, of_rep) -> corres_else_element table to_rep of_rep
-    | t, Cvc4_Variable cvc ->
-        (* Make all variables not already guessed equal to the else case *)
-        let s = remove_end_num cvc in
-        add_all_cvc s table (false, Term t)
-    | _ -> table
-  in
-  (* Case where to_rep, of_rep are constant values *)
-  let table =
-    match (to_rep, of_rep) with
-    | t, Cvc4_Variable cvc ->
-        Mstr.add cvc (false, Term t) table
-    | _ -> table
-  in
-  corres_else_element table to_rep of_rep
-
-let to_rep_of_rep (table: correspondence_table) =
-  let to_reps =
-    List.sort (fun x y -> String.compare (fst x) (fst y))
-      (Mstr.fold (fun key value acc ->
-        if has_prefix "to_rep" key then
-        (key,value) :: acc else acc) table []) in
-
-  let of_reps =
-    List.sort (fun x y -> String.compare (fst x) (fst y))
-      (Mstr.fold (fun key value acc -> if has_prefix "of_rep" key then
-        (key,value) :: acc else acc) table []) in
-
-  let rec to_rep_of_rep table to_reps of_reps =
-    match to_reps, of_reps with
-    | to_rep :: tl1, of_rep :: tl2 ->
-      let table = corres_else_element table to_rep of_rep in
-      to_rep_of_rep table tl1 tl2
-    | [], [] -> table
-    | _ -> table (* Error case *) in
-
-  to_rep_of_rep table to_reps of_reps
-
-
-let create_list (table: correspondence_table) =
+let create_list (projections_list: Stdlib.Sstr.t) (table: correspondence_table) =
 
   (* First populate the table with all references to a cvc variable *)
   let table = get_all_var table in
 
-  (* First recover the values of variables that can be recovered in to/of_rep *)
+  (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if has_prefix "of_rep" key && not (String.contains key '!') then
-        add_vars_to_table acc value else acc) table table in
-
-  (* of_rep is done before to_rep because we complete from value with the
-     else branch of the function *)
-  let table =
-    Mstr.fold (fun key value acc ->
-      if has_prefix "to_rep" key && not (String.contains key '!') then
-        add_vars_to_table acc value else acc) table table in
-
-  (* Recover values from the combination of to_rep and of_rep *)
-  let table = to_rep_of_rep table in
+      if Stdlib.Sstr.mem key projections_list then
+        add_vars_to_table acc value
+      else
+        acc)
+      table table in
 
   (* Then substitute all variables with their values *)
   let table =

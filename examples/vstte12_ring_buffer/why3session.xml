@@ -9,7 +9,7 @@
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Coq" version="8.7.1" timelimit="20" steplimit="0" memlimit="4000"/>
 <file name="../vstte12_ring_buffer.mlw" proved="true">
-<theory name="RingBuffer" proved="true" sum="26430d7276801894a93171f8cee6215b">
+<theory name="RingBuffer" proved="true">
  <goal name="WP_parameter create" expl="VC for create" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
@@ -146,15 +146,19 @@
    <proof prover="1"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="WP_parameter pop.5.6" expl="VC for pop" proved="true">
-   <transf name="destruct" proved="true" arg1="H">
+   <transf name="introduce_premises" proved="true" >
     <goal name="WP_parameter pop.5.6.0" expl="VC for pop" proved="true">
     <transf name="destruct" proved="true" arg1="H">
      <goal name="WP_parameter pop.5.6.0.0" expl="VC for pop" proved="true">
      <transf name="destruct" proved="true" arg1="H">
       <goal name="WP_parameter pop.5.6.0.0.0" expl="VC for pop" proved="true">
-      <transf name="instantiate" proved="true" arg1="H" arg2="i+1">
+      <transf name="destruct" proved="true" arg1="H">
        <goal name="WP_parameter pop.5.6.0.0.0.0" expl="VC for pop" proved="true">
-       <proof prover="5"><result status="valid" time="0.02"/></proof>
+       <transf name="instantiate" proved="true" arg1="H" arg2="i+1">
+        <goal name="WP_parameter pop.5.6.0.0.0.0.0" expl="VC for pop" proved="true">
+        <proof prover="5"><result status="valid" time="0.03"/></proof>
+        </goal>
+       </transf>
        </goal>
       </transf>
       </goal>
@@ -185,7 +189,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" proved="true" sum="e3241b00117c592bb16e9a8f2c8a2ec7">
+<theory name="Harness" proved="true">
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter harness.0" expl="precondition" proved="true">
@@ -329,7 +333,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RingBufferSeq" proved="true" sum="0e3e0b6b2bbc3a62580635767dbf726e">
+<theory name="RingBufferSeq" proved="true">
  <goal name="WP_parameter create" expl="VC for create" proved="true">
  <proof prover="0" timelimit="6" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
@@ -349,7 +353,7 @@
  <proof prover="0" timelimit="6" memlimit="1000"><result status="valid" time="0.03" steps="62"/></proof>
  </goal>
 </theory>
-<theory name="HarnessSeq" proved="true" sum="32d72051ef9a3c8c44c07eb7037eaa7d">
+<theory name="HarnessSeq" proved="true">
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>

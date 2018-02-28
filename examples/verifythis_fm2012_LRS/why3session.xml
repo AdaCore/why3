@@ -9,8 +9,8 @@
 <prover id="13" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="14" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="15" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="4000"/>
-<file name="../verifythis_fm2012_LRS.mlw" expanded="true">
-<theory name="LCP" sum="4aa1e19acaf0f262df8367a51920ca9a">
+<file name="../verifythis_fm2012_LRS.mlw">
+<theory name="LCP">
  <goal name="not_common_prefix_if_last_char_are_different" expl="">
  <proof prover="12"><result status="valid" time="0.01" steps="10"/></proof>
  <proof prover="13"><result status="valid" time="0.01"/></proof>
@@ -74,12 +74,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" sum="cbfaebfd23a72e23f08a718c1cabfed1">
+<theory name="LCP_test">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="12" timelimit="5" memlimit="4000"><result status="valid" time="0.02" steps="14"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" sum="1cada19952e82f5b6dd2c178b4ebb04c">
+<theory name="SuffixSort">
  <goal name="WP_parameter compare" expl="VC for compare">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compare.1" expl="postcondition">
@@ -517,12 +517,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" sum="fd047e9b8bfb9e13bc02bbb8a1736180">
+<theory name="SuffixSort_test">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="12" timelimit="5"><result status="valid" time="0.16" steps="92"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" sum="e978008b36625835144890719929905d">
+<theory name="SuffixArray">
  <goal name="WP_parameter select" expl="VC for select">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
@@ -661,12 +661,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" sum="9883ffb389f7277a57763aa710714850">
+<theory name="SuffixArray_test">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="12" timelimit="5"><result status="valid" time="0.02" steps="26"/></proof>
  </goal>
 </theory>
-<theory name="LRS" sum="df8a2e3d90d292b968d811fc43bfd355">
+<theory name="LRS">
  <goal name="lcp_sym" expl="">
  <proof prover="12"><result status="valid" time="0.01" steps="40"/></proof>
  <proof prover="14"><result status="valid" time="0.02"/></proof>
@@ -861,7 +861,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" sum="f1e7666deafe4370d2220b6d1250e512">
+<theory name="LRS_test">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="12" timelimit="5"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>

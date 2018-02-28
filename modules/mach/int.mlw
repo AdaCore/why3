@@ -44,7 +44,10 @@ module Bounded_int
   constant min : int
   constant max : int
 
+
   function to_int (n:t) : int
+
+  meta "model_projection" function to_int
 
   predicate in_bounds (n:int) = min <= n <= max
 

@@ -5,8 +5,8 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../mergesort_queue.mlw" expanded="true">
-<theory name="MergesortQueue" sum="3c38c1216cfab92b40972e70acecfeff" expanded="true">
+<file name="../mergesort_queue.mlw">
+<theory name="MergesortQueue">
  <goal name="Transitive.Trans" expl="">
  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
@@ -188,8 +188,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mergesort" expl="VC for mergesort" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter mergesort" expl="VC for mergesort">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter mergesort.1" expl="loop invariant init">
   <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
@@ -202,7 +202,7 @@
   <goal name="WP_parameter mergesort.4" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort.5" expl="loop invariant preservation" expanded="true">
+  <goal name="WP_parameter mergesort.5" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="2.76"/></proof>
   <proof prover="8" timelimit="10" memlimit="4000"><result status="valid" time="5.89"/></proof>
   </goal>

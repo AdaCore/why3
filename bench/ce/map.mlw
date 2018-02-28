@@ -1,30 +1,78 @@
+theory ModelMap
+
+use import map.Map
+
+goal t1 : forall t:map int int, i : int.
+   get (set t 0 42) i = get t i
+
+end
+
 module M
-  use import ref.Ref
-  use import list.List
+
   use import int.Int
+  use import ref.Ref
 
-
-  (**********************************************************
-   ** Getting counterexamples for terms of primitive types **
-   **********************************************************)
-  val y "model" "model_trace:y" :ref int
-
-  let incr ( x23 "model" "model_trace:x23" : ref int ): unit
-  ensures { "model_vc_post" !x23 = old !x23 + 2 + !y }
+  (**************************************
+   ** Getting counterexamples for maps **
+   **************************************)
+  use import map.Map
+  let test_map (x : ref (map int int)) : unit
+  ensures { !x[0] <> !x[1] }
   =
-  (*#"/home/cmarche/recherche/why/tests/c/binary_search.c" 62 27 32#*)
-  y := !y + 1;
-  x23 := !x23 + 1;
-  x23 := !x23 + 1
+  x := Map.set !x 0 3
 
-  let test_loop ( x "model" "model_trace:x" : ref int ): unit
-  ensures { "model_vc_post" !x < old !x }
+  (* Multi-dimensional maps *)
+  let test_map_multidim1 (x : ref (map int (map int int))) : unit
+  ensures { !x[0][0] <> !x[1][1] }
   =
-  'L: incr x;
-  'M: while !x > 0 do
-  invariant { "model_vc" !x > at !x 'L + at !x 'M }
-  variant { !x }
-    x := !x - 1
-  done
+  x := Map.set !x 0 (Map.get !x 1)
+
+  let test_map_multidim2 (x : ref (map int (map int int))) : unit
+  ensures { !x[0][0] <> !x[1][1] }
+  =
+  let x0 = Map.get !x 0 in
+  let x0 = Map.set x0 0 3 in
+  x := Map.set !x 0 x0
+
+
+  (*******************************************
+   ** Definitions of projections used below **
+   *******************************************)
+  function projfi "model_trace:.projfi" (l : int) : int
+  = l
+  meta "inline : no" function projfi
+  meta "model_projection" function projfi
+
+  function projf1 "model_trace:.projf1" (l : int) : bool
+  =
+  l > 0
+  function projf2 "model_trace:.projf2" (l : int) : bool
+  =
+  l <= 0
+  meta "inline : no" function projf1
+  meta "model_projection" function projf1
+  meta "inline : no" function projf2
+  meta "model_projection" function projf2
+
+  (*******************************************************
+   ** Getting counterexamples for maps with projections **
+   ******************************************************)
+
+  (* Both indices and range of map will be projected using
+     projfi, projf1, and projf2
+     Warning: cvc4 is not able to handle projections there  *)
+  let proj_map_test1 (x "model_projected" : ref (map int int)) : unit
+  ensures { !x[0] <> !x[1] }
+  =
+  x := Map.set !x 0 3
+
+  (* No projection function for bool -> the array should be
+     present in counterexample as it is. *)
+  let proj_map_test2 (x "model_projected" : ref (map int bool)) : unit
+  ensures { !x[0] <> !x[1] }
+  =
+  x := Map.set !x 0 true
+
+
 
 end

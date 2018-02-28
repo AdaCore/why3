@@ -6,7 +6,7 @@
 <prover id="1" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../isqrt.mlw" proved="true">
-<theory name="Square" proved="true" sum="266e4aaa701863bb290853e7ea871e14">
+<theory name="Square" proved="true">
  <goal name="sqr_non_neg" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -17,7 +17,7 @@
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Simple" proved="true" sum="9253a56173520e899153b3f344520525">
+<theory name="Simple" proved="true">
  <goal name="WP_parameter isqrt" expl="VC for isqrt" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter isqrt.0" expl="loop invariant init" proved="true">
@@ -50,7 +50,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="NewtonMethod" proved="true" sum="b3c07fdcf48d4ec7b7eec7ecc14c2ff2">
+<theory name="NewtonMethod" proved="true">
  <goal name="WP_parameter sqrt" expl="VC for sqrt" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter sqrt.0" expl="postcondition" proved="true">

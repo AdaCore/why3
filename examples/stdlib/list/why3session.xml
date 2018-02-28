@@ -10,9 +10,9 @@
 <prover id="5" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../../../theories/list.why">
-<theory name="List" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="List">
 </theory>
-<theory name="Length" sum="0183bae77fb00174594c26708209e9b9">
+<theory name="Length">
  <goal name="Length_nonnegative" expl="">
  <transf name="induction_ty_lex">
   <goal name="Length_nonnegative.1" expl="">
@@ -32,9 +32,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Mem" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Mem">
 </theory>
-<theory name="Elements" sum="2bb05058c030fb70cae5ff5af2133229">
+<theory name="Elements">
  <goal name="elements_mem" expl="">
  <transf name="induction_ty_lex">
   <goal name="elements_mem.1" expl="">
@@ -43,11 +43,11 @@
  </transf>
  </goal>
 </theory>
-<theory name="Nth" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Nth">
 </theory>
-<theory name="NthNoOpt" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="NthNoOpt">
 </theory>
-<theory name="NthLength" sum="d9266a45e6affefee2f608ac92e02b74">
+<theory name="NthLength">
  <goal name="nth_none_1" expl="">
  <transf name="induction_ty_lex">
   <goal name="nth_none_1.1" expl="">
@@ -70,11 +70,11 @@
  </transf>
  </goal>
 </theory>
-<theory name="HdTl" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="HdTl">
 </theory>
-<theory name="HdTlNoOpt" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="HdTlNoOpt">
 </theory>
-<theory name="NthHdTl" sum="362e2be48a7ec4f3fd2a409683f563c4">
+<theory name="NthHdTl">
  <goal name="Nth_tl" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
  </goal>
@@ -82,7 +82,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Append" sum="ce7e370a8681125ff4fd9b422f6b088a">
+<theory name="Append">
  <goal name="Append_assoc" expl="">
  <transf name="induction_ty_lex">
   <goal name="Append_assoc.1" expl="">
@@ -133,7 +133,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NthLengthAppend" sum="bd72d274f3e891e3862464aaf7265892">
+<theory name="NthLengthAppend">
  <goal name="nth_append_1" expl="">
  <transf name="induction_ty_lex">
   <goal name="nth_append_1.1" expl="">
@@ -149,7 +149,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Reverse" sum="51d1e12e40b71fcd43d58286748cb060">
+<theory name="Reverse">
  <goal name="reverse_append" expl="">
  <transf name="induction_ty_lex">
   <goal name="reverse_append.1" expl="">
@@ -189,7 +189,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RevAppend" sum="c05c678fdccd20043127873fca4db5a1">
+<theory name="RevAppend">
  <goal name="rev_append_append_l" expl="">
  <transf name="induction_ty_lex">
   <goal name="rev_append_append_l.1" expl="">
@@ -215,9 +215,9 @@
  <proof prover="0"><result status="valid" time="0.03" steps="42"/></proof>
  </goal>
 </theory>
-<theory name="Combine" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Combine">
 </theory>
-<theory name="Sorted" sum="7facdde18584fcb12d85b5e72024425d">
+<theory name="Sorted">
  <goal name="sorted_mem" expl="">
  <transf name="split_goal_wp">
   <goal name="sorted_mem.1" expl="">
@@ -274,12 +274,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SortedInt" sum="26f2416c3c2d009f4bb97f381d2111ff">
+<theory name="SortedInt">
  <goal name="Transitive.Trans" expl="">
  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="RevSorted" sum="944df680e56b869538da44233e876bcc">
+<theory name="RevSorted">
  <goal name="Incr.Transitive.Trans" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
@@ -356,7 +356,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NumOcc" sum="2a391d96e7ca5dfac33753f8c52b74de">
+<theory name="NumOcc">
  <goal name="Num_Occ_NonNeg" expl="">
  <transf name="induction_ty_lex">
   <goal name="Num_Occ_NonNeg.1" expl="">
@@ -399,7 +399,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Permut" sum="a56cdb92510e540c6d266fec38bbb8ce">
+<theory name="Permut">
  <goal name="Permut_refl" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
@@ -434,7 +434,7 @@
  <proof prover="7" edited="list_Permut_Permut_length_2.v"><result status="valid" time="1.57"/></proof>
  </goal>
 </theory>
-<theory name="Distinct" sum="ad94f6328865dad5f532a625bdf96b79">
+<theory name="Distinct">
  <goal name="distinct_append" expl="">
  <transf name="induction_ty_lex">
   <goal name="distinct_append.1" expl="">
@@ -450,19 +450,19 @@
  </transf>
  </goal>
 </theory>
-<theory name="Prefix" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Prefix">
 </theory>
-<theory name="Sum" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Sum">
 </theory>
-<theory name="Induction" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Induction">
 </theory>
-<theory name="Map" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Map">
 </theory>
-<theory name="FoldLeft" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="FoldLeft">
 </theory>
-<theory name="FoldRight" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="FoldRight">
 </theory>
-<theory name="ListRich" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ListRich">
 </theory>
 </file>
 </why3session>

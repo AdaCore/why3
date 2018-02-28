@@ -866,20 +866,16 @@ let forget_let_defn = function
 
 let extract_op s =
   let s = s.rs_name.id_string in
-  let len = String.length s in
-  if len < 7 then None else
-  let inf = String.sub s 0 6 in
-  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
-  let prf = String.sub s 0 7 in
-  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
-  None
+  match Ident.kind_of_fix s with
+  | `None | `Mixfix _ -> None
+  | `Prefix s | `Infix s -> Some s
 
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
 let print_rs fmt s =
-  if s.rs_name.id_string = "mixfix []" then pp_print_string fmt "([])" else
-  if s.rs_name.id_string = "mixfix []<-" then pp_print_string fmt "([]<-)" else
-  if s.rs_name.id_string = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  if s.rs_name.id_string = Ident.mixfix "[]" then pp_print_string fmt "([])" else
+  if s.rs_name.id_string = Ident.mixfix "[]<-" then pp_print_string fmt "([]<-)" else
+  if s.rs_name.id_string = Ident.mixfix "[<-]" then pp_print_string fmt "([<-])" else
   match extract_op s, s.rs_logic with
   | Some s, _ ->
       let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in

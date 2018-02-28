@@ -949,9 +949,8 @@ let counterexample_view =
     ~packing:scrolled_counterexample_view#add
     ()
 
-
-
-
+(* Allow colors locations on counterexample view *)
+let () = create_colors counterexample_view
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -1001,6 +1000,7 @@ let add_to_log =
 let print_message ~kind ~notif_kind fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
+              let s = try_convert s in
               add_to_log notif_kind s;
               if kind>0 then
                 begin
@@ -1081,14 +1081,16 @@ let update_monitor =
 
 let completion_cols = new GTree.column_list
 let completion_col = completion_cols#add Gobject.Data.string
+let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
   GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
 
-let add_completion_entry s =
+let add_completion_entry (s,desc) =
   let row = completion_model#append () in
-  completion_model#set ~row ~column:completion_col s
+  completion_model#set ~row ~column:completion_col s;
+  completion_model#set ~row ~column:completion_desc ("("^desc^")")
 
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
@@ -1166,10 +1168,13 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
 
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
-let color_loc ~color loc =
+let color_loc ?(ce=false) ~color loc =
   let f, l, b, e = Loc.get loc in
   try
-    let (_, v, _, _) = get_source_view_table f in
+    let v = if ce then counterexample_view else
+      let (_, v, _, _) = get_source_view_table f in
+      v
+    in
     let color = convert_color color in
     color_loc ~color v l b e
   with
@@ -1209,6 +1214,14 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     with Not_found -> None
   in
   scroll_to_loc ~force_tab_switch:false loc_of_goal
+
+(* Erase the colors and apply the colors given by l (which come from the task)
+   to the counterexample tab *)
+let apply_loc_on_ce (l: (Loc.position * color) list) =
+  erase_color_loc counterexample_view;
+  List.iter (fun (loc, color) ->
+    color_loc ~ce:true ~color loc) l
+
 
 (*******************)
 (* The "View" menu *)
@@ -1277,6 +1290,7 @@ let () =
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   task_view#source_buffer#set_language why_lang;
+  counterexample_view#source_buffer#set_language why_lang;
   Gconfig.set_fonts ()
 
 
@@ -1479,13 +1493,9 @@ let on_selected_row r =
     let typ = get_node_type id in
     match typ with
     | NGoal ->
-      let detached = get_node_detached id in
-      if detached then
-        task_view#source_buffer#set_text ""
-      else
-        let b = gconfig.intro_premises in
+        let _b = gconfig.intro_premises in
         let c = gconfig.show_full_context in
-        send_request (Get_task(id,b,c,true))
+        send_request (Get_task(id,c,true))
     | NProofAttempt ->
        let (pa, _obs, _l) = Hint.find node_id_pa id in
        let output_text =
@@ -1511,17 +1521,13 @@ let on_selected_row r =
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
        counterexample_view#scroll_to_mark `INSERT;
-       let detached = get_node_detached id in
-       if detached then
-         task_view#source_buffer#set_text ""
-       else
-         let b = gconfig.intro_premises in
-         let c = gconfig.show_full_context in
-         send_request (Get_task(id,b,c,true))
-    | _ ->
-       let b = gconfig.intro_premises in
+       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
-       send_request (Get_task(id,b,c,true))
+       send_request (Get_task(id,c,true))
+    | _ ->
+       let _b = gconfig.intro_premises in
+       let c = gconfig.show_full_context in
+       send_request (Get_task(id,c,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
@@ -1906,7 +1912,7 @@ let parse_shortcut_as_key s =
 let add_submenu_strategy (shortcut,strategy) =
   let  i = create_menu_item
              strategies_factory
-             strategy
+             (String.map (function '_' -> ' ' | c -> c) strategy)
              ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
   Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
@@ -1935,9 +1941,9 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
-  List.iter add_completion_entry transformations;
+  List.iter (fun s -> add_completion_entry (s,"transformation")) transformations;
   (* add the name of the commands *)
-  List.iter add_completion_entry commands;
+  List.iter (fun s -> add_completion_entry (s,"command")) commands;
   (* todo: add queries *)
 
   (* add provers *)
@@ -1945,7 +1951,8 @@ let init_completion provers transformations strategies commands =
   let all_strings =
     List.fold_left (fun acc (s,_,p) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." s p;
-                    if s = "" then p :: acc else s :: p :: acc) [] provers
+                    let acc = (p,"prover") :: acc in
+                    if s = "" then acc else (s,"shortcut for prover "^p) :: acc) [] provers
   in
   List.iter add_completion_entry all_strings;
   let provers_sorted =
@@ -1958,13 +1965,18 @@ let init_completion provers transformations strategies commands =
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
-                    if shortcut = "" then strategy :: acc else shortcut :: strategy :: acc)
+                    let acc = (strategy, "strategy") :: acc in
+                    if shortcut = "" then acc else
+                      (shortcut, "shortcut for strategy "^strategy) :: acc)
                    [] strategies
   in
   List.iter add_completion_entry all_strings;
   List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
+  (* does not work: it replaces the previous column as text result
+  command_entry_completion#set_text_column completion_desc;
+   *)
   command_entry_completion#set_match_func match_function;
 
   command_entry#set_completion command_entry_completion
@@ -2279,6 +2291,7 @@ let treat_notification n =
          task_view#scroll_to_mark `INSERT
        end
   | File_contents (file_name, content) ->
+     let content = try_convert content in
     begin
       try
         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
@@ -2289,6 +2302,12 @@ let treat_notification n =
         b := false;
       with
       | Not_found -> create_source_view file_name content
+    end
+  | Source_and_ce (content, list_loc) ->
+    begin
+      messages_notebook#goto_page counterexample_page;
+      counterexample_view#source_buffer#set_text content;
+      apply_loc_on_ce list_loc
     end
   | Dead _ ->
      print_message ~kind:1 ~notif_kind:"Server Dead ?"

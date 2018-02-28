@@ -31,6 +31,10 @@ let meta_invalid_trigger =
   Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
   ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
 
+(* Meta to tag projection functions *)
+let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
@@ -44,6 +48,8 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
+  mutable list_projs: Stdlib.Sstr.t;
+  meta_model_projection: Sls.t
   }
 
 let ident_printer () =
@@ -75,6 +81,8 @@ let ident_printer () =
 let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+
 let print_ident_label info fmt id =
   if info.info_show_labels then
     fprintf fmt "%s %a"
@@ -86,6 +94,8 @@ let print_ident_label info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
+  if Sls.mem ls info.meta_model_projection then
+    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -413,7 +423,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f =
       let model_list = print_info_model cntexample info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; };
+				queried_terms = model_list;
+                                list_projections = info.list_projs;};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma| Pskip -> assert false
@@ -471,7 +482,10 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     info_model = S.empty;
     info_vc_term = vc_info;
-    info_in_goal = false;} in
+    info_in_goal = false;
+    list_projs = Stdlib.Sstr.empty;
+    meta_model_projection = Task.on_tagged_ls meta_projection task;
+  } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function

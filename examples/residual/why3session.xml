@@ -11,7 +11,7 @@
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../residual.mlw" proved="true">
-<theory name="Residuals" proved="true" sum="751887864908ee3d56cf65a325b5bea0">
+<theory name="Residuals" proved="true">
  <goal name="WP_parameter accepts_epsilon" expl="VC for accepts_epsilon" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter accepts_epsilon.0" expl="postcondition" proved="true">
@@ -62,29 +62,6 @@
  </goal>
  <goal name="inversion_mem_star_gen" proved="true">
  <proof prover="8" edited="residual_Residuals_inversion_mem_star_gen_1.v"><result status="valid" time="0.28"/></proof>
- <transf name="induction_arg_pr" proved="true" arg1="H2">
-  <goal name="inversion_mem_star_gen.0" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.1" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.2" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.3" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.4" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.5" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="inversion_mem_star_gen.6" proved="true">
-  <proof prover="5"><result status="valid" time="0.12"/></proof>
-  </goal>
- </transf>
  <transf name="induction_pr" proved="true" >
   <goal name="inversion_mem_star_gen.0" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
@@ -106,6 +83,33 @@
   </goal>
   <goal name="inversion_mem_star_gen.6" proved="true">
   <proof prover="6"><result status="valid" time="0.17"/></proof>
+  </goal>
+ </transf>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="inversion_mem_star_gen.0" proved="true">
+  <transf name="induction_arg_pr" proved="true" arg1="H2">
+   <goal name="inversion_mem_star_gen.0.0" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.1" proved="true">
+   <proof prover="5"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.2" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.3" proved="true">
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.4" proved="true">
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.5" proved="true">
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="inversion_mem_star_gen.0.6" proved="true">
+   <proof prover="5"><result status="valid" time="0.15"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -191,13 +195,13 @@
  </transf>
  </goal>
 </theory>
-<theory name="Test" proved="true" sum="b1a665b01fa289fa209c670a5754de10">
+<theory name="Test" proved="true">
  <goal name="WP_parameter test_astar" expl="VC for test_astar" proved="true">
  <transf name="split_goal_wp" proved="true" >
  </transf>
  </goal>
 </theory>
-<theory name="DFA" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="DFA" proved="true">
 </theory>
 </file>
 </why3session>
