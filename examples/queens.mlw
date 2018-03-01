@@ -132,16 +132,9 @@ module NQueensSets
           partial_solution !k !col /\
           sorted !sol (!s at L) !s /\
           (forall i j: int. mem i (diff (!e at L) !e) -> mem j !e -> i < j) }
-(*
-        invariant {
-          (forall t: solution.
-           (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (!e at L) !e))
-           <-
-           (exists i: int. (!s at L) <= i < !s /\ eq_sol t !sol[i])) }
-*)
         invariant { forall i:int. (!s at L) <= i < !s -> 
-           solution !sol[i] /\ eq_prefix !col !sol[i] !k /\ mem !sol[i][!k] (diff (!e at L) !e)
-           (* /\ 0 <= !sol[i][!k] <= !min *) }
+           solution !sol[i] /\ eq_prefix !col !sol[i] !k /\ 
+           mem !sol[i][!k] (diff (!e at L) !e) }
         invariant {
           (forall t: solution.
            (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (!e at L) !e))

@@ -397,13 +397,6 @@ h12 f e s1 sol1 k1 col1
 (((h13,h14),(h15,(h16,(h17,(h18,h19))))),(h20,(h21,(h22,h23)))) h24 h25 d
 (h26,h27) col2 h28 k2 h29 o2 h30 h31 o3 h32 h33 h34 s2 sol2 k3 col3
 (h35,(h36,(h37,(h38,(h39,h40))))) f1 h41 k4 h42 o4 h43 e1 h44.
-(*
-intros col k sol s a b c (h1,(h2,(h3,(h4,(h5,(h6,h7)))))) h8 h9 o h10
-        o1 h11 h12 f e s1 sol1 k1 col1
-        ((h13,h14),(h15,(h16,(h17,(h18,(h19,(h20,(h21,h22)))))))) h23 h24 d
-        (h25,h26) col2 h27 k2 h28 o2 h29 h30 o3 h31 h32 h33 s2 sol2 k3 col3
-        (h34,(h35,(h36,(h37,(h38,h39))))) f1 h40 k4 h41 o4 h42 e1 h43.
-*)
 red; intros i j hij.
 assert (case: (j < s1 \/ s1 <= j)%Z) by omega. destruct case.
 do 2 (rewrite <- h40; try omega).
@@ -428,21 +421,12 @@ assert (ha: eq_prefix col1 (sol1 i) k /\
   omega.
 destruct ha as (ha,hb).
 
-(*
-destruct (h21 (sol1 i)) as (_,(_,hi)).
-intuition.
-destruct hi.
-exists i; intuition.
-red; intuition.
-clear h20.
-*)
 destruct (h38 (sol2 j)) as (_,hj).
 destruct hj.
 exists j; intuition.
 red; intuition.
 clear h37.
 
-  
 exists k; intuition.
 (* eq_prefix ... *)
 rewrite <- h40; try omega.
