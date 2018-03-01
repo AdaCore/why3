@@ -25,6 +25,7 @@ we show how this file is handled in the \why GUI
 (Section~\ref{sec:gui}) then in batch mode using the \texttt{why3}
 executable (Section~\ref{sec:batch}).
 
+%EXECUTE cp examples/logic/hello_proof.why doc/
 
 \section{Getting Started with the GUI}
 \label{sec:gui}
@@ -34,9 +35,10 @@ files, and check the validity of goals with external provers, in a
 friendly way. This section presents the basic use of this GUI. Please
 refer to Section~\ref{sec:ideref} for a more complete description.
 
+%EXECUTE bin/why3 ide --batch "wait 1;snap doc/gui-1.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
-  \includegraphics[width=\textwidth]{gui-0-70-1.png}
+  \includegraphics[width=\textwidth]{gui-1.png}
   \caption{The GUI when started the very first time}
   \label{fig:gui1}
 \end{figure}
@@ -70,10 +72,10 @@ allows to browse inside the theories.
 In this tree view, we have a structured view of the file: this file
 contains one theory, itself containing three goals.
 
-
+%EXECUTE bin/why3 ide --batch "type next;wait 1;snap doc/gui-2.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
- \includegraphics[width=\textwidth]{gui-0-70-2.png}
+ \includegraphics[width=\textwidth]{gui-2.png}
   \caption{The GUI with goal G1 selected}
   \label{fig:gui2}
 \end{figure}
@@ -94,10 +96,11 @@ or the parent file. Let us now select the theory ``HelloProof'' and
 click on the \textsf{Simplify} button. After a short time, you should
 get the display of Figure~\ref{fig:gui3}.
 
+%EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 5;snap doc/gui-3.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
-\includegraphics[width=\textwidth]{gui-0-70-3.png}
-  \caption{The GUI after Simplify prover is run on each goal}
+\includegraphics[width=\textwidth]{gui-3.png}
+  \caption{The GUI after running the Alt-Ergo prover on each goal}
   \label{fig:gui3}
 \end{figure}
 
@@ -120,10 +123,11 @@ have two subgoals, and you can try again a prover on them, for example
 Simplify. We already have a lot of goals and proof attempts, so it is a good idea to close the sub-trees which are already proved: this can be done by the menu \textsf{View/Collapse proved goals}, or even better by its shortcut ``Ctrl-C''.
 You should see now what is displayed on Figure~\ref{fig:gui4}.
 
+%EXECUTE bin/why3 ide --batch "type alt-ergo;wait 5;type next;wait 1;type split_goal_wp;wait 2;snap doc/gui-4.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
- \includegraphics[width=\textwidth]{gui-0-70-4.png}
-  \caption{The GUI after splitting goal $G_2$ and collapsing proved goals}
+ \includegraphics[width=\textwidth]{gui-4.png}
+  \caption{The GUI after splitting goal $G_2$}
   \label{fig:gui4}
 \end{figure}
 
@@ -300,6 +304,8 @@ hello_proof.why HelloProof G2 : Valid (0.00s)
 \end{verbatim}
 Section~\ref{sec:transformations} gives the description of the various
 transformations available.
+
+%EXECUTE rm doc/hello_proof.why
 
 %%% Local Variables:
 %%% mode: latex

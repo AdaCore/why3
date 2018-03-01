@@ -387,16 +387,16 @@ let () =
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
 
-let window_width,window_height,window_title =
+let window_title =
   match !opt_batch with
-  | Some _ -> 1024, 768, "Why3 Batch Mode"
-  | None -> gconfig.window_width, gconfig.window_height, "Why3 Interactive Proof Session"
+  | Some _ -> "Why3 Batch Mode"
+  | None -> "Why3 Interactive Proof Session"
 
 let main_window : GWindow.window =
   let w = GWindow.window
             ~allow_grow:true ~allow_shrink:true
-            ~width:window_width
-            ~height:window_height
+            ~width:gconfig.window_width
+            ~height:gconfig.window_height
             ~title:window_title ()
   in
   (* callback to record the new size of the main window when changed, so
@@ -2354,11 +2354,13 @@ let batch s =
       if w > 0 then cmd := Printf.sprintf "wait %d" (w - 1) :: !cmd
     | "type" :: cmd ->
       let cmd = Strings.join " " cmd in
+      command_entry#misc#grab_focus ();
       add_command list_commands cmd;
       interp cmd
-    | ["snap"; f] ->
-      let s = Printf.sprintf "import -window \"%s\" %s" window_title f in
-      if Sys.command s <> 0 then Printf.eprintf "Command failed: %s\n%!" s
+    | "snap" :: cmd ->
+      let cmd = Strings.join " " cmd in
+      let cmd = Printf.sprintf "import -window \"%s\" -define png:include-chunk=none %s" window_title cmd in
+      if Sys.command cmd <> 0 then Printf.eprintf "Batch command failed: %s\n%!" cmd
     | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c
     end;
     true
