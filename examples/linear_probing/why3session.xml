@@ -7,7 +7,7 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linear_probing.mlw" proved="true">
 <theory name="HashedTypeWithDummy" proved="true">
@@ -283,19 +283,12 @@
        <goal name="VC add.9.0.0.2.0.0" expl="VC for add" proved="true">
        <transf name="case" proved="true" arg1="(i=i1)">
         <goal name="VC add.9.0.0.2.0.0.0" expl="true case" proved="true">
-        <proof prover="6" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="53"/></proof>
+        <proof prover="6"><result status="valid" time="0.03" steps="53"/></proof>
         </goal>
         <goal name="VC add.9.0.0.2.0.0.1" expl="false case" proved="true">
         <transf name="inline_all" proved="true" >
          <goal name="VC add.9.0.0.2.0.0.1.0" expl="false case" proved="true">
          <proof prover="7"><result status="valid" time="0.13"/></proof>
-         </goal>
-        </transf>
-        <transf name="split_all_full" >
-         <goal name="VC add.9.0.0.2.0.0.1.0" expl="false case">
-         <proof prover="4" timelimit="10" memlimit="4000"><undone/></proof>
-         <proof prover="6"><result status="timeout" time="10.01"/></proof>
-         <proof prover="7" timelimit="10" memlimit="4000"><result status="unknown" time="9.71"/></proof>
          </goal>
         </transf>
         </goal>
