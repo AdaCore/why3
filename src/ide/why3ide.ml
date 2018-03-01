@@ -2340,7 +2340,7 @@ let batch s =
   let last = ref (Sys.time ()) in
   fun () ->
   let t = Sys.time () in
-  if not !initialization_complete || t -. !last < 0.1 then true else
+  if not !initialization_complete || t -. !last < 0.2 then true else
   match !cmd with
   | c :: tl ->
     cmd := tl;
@@ -2361,6 +2361,7 @@ let batch s =
       let cmd = Strings.join " " cmd in
       let cmd = Printf.sprintf "import -window \"%s\" -define png:include-chunk=none %s" window_title cmd in
       if Sys.command cmd <> 0 then Printf.eprintf "Batch command failed: %s\n%!" cmd
+    | ["save"] -> send_request Save_req
     | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c
     end;
     true

@@ -25,6 +25,7 @@ we show how this file is handled in the \why GUI
 (Section~\ref{sec:gui}) then in batch mode using the \texttt{why3}
 executable (Section~\ref{sec:batch}).
 
+%EXECUTE rm -rf doc/hello_proof/
 %EXECUTE cp examples/logic/hello_proof.why doc/
 
 \section{Getting Started with the GUI}
@@ -35,7 +36,7 @@ files, and check the validity of goals with external provers, in a
 friendly way. This section presents the basic use of this GUI. Please
 refer to Section~\ref{sec:ideref} for a more complete description.
 
-%EXECUTE bin/why3 ide --batch "wait 1;snap doc/gui-1.png" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "snap doc/gui-1.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
   \includegraphics[width=\textwidth]{gui-1.png}
@@ -72,7 +73,7 @@ allows to browse inside the theories.
 In this tree view, we have a structured view of the file: this file
 contains one theory, itself containing three goals.
 
-%EXECUTE bin/why3 ide --batch "type next;wait 1;snap doc/gui-2.png" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type next;snap -crop 1024x384+0+0 doc/gui-2.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
  \includegraphics[width=\textwidth]{gui-2.png}
@@ -96,7 +97,7 @@ or the parent file. Let us now select the theory ``HelloProof'' and
 click on the \textsf{Simplify} button. After a short time, you should
 get the display of Figure~\ref{fig:gui3}.
 
-%EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 5;snap doc/gui-3.png" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;snap -crop 1024x384+0+0 doc/gui-3.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
 \includegraphics[width=\textwidth]{gui-3.png}
@@ -123,7 +124,7 @@ have two subgoals, and you can try again a prover on them, for example
 Simplify. We already have a lot of goals and proof attempts, so it is a good idea to close the sub-trees which are already proved: this can be done by the menu \textsf{View/Collapse proved goals}, or even better by its shortcut ``Ctrl-C''.
 You should see now what is displayed on Figure~\ref{fig:gui4}.
 
-%EXECUTE bin/why3 ide --batch "type alt-ergo;wait 5;type next;wait 1;type split_goal_wp;wait 2;snap doc/gui-4.png" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_goal_wp;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
  \includegraphics[width=\textwidth]{gui-4.png}
@@ -167,9 +168,12 @@ false, \eg
 \end{whycode}
 We can reload the modified file in the IDE using menu \textsf{File/Reload}, or the shortcut ``Ctrl-R''. We get the tree view shown on Figure~\ref{fig:gui5}.
 
+%EXECUTE bin/why3 ide --batch "type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
+%EXECUTE sed -i -e 's/true -> false/false -> false/' doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type next;type expand;snap -crop 1024x384+0+0 doc/gui-5.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
-  \includegraphics[width=\textwidth]{gui-0-70-5.png}
+  \includegraphics[width=\textwidth]{gui-5.png}
   \caption{File reloaded after modifying goal $G_2$}
   \label{fig:gui5}
 \end{figure}
@@ -305,7 +309,7 @@ hello_proof.why HelloProof G2 : Valid (0.00s)
 Section~\ref{sec:transformations} gives the description of the various
 transformations available.
 
-%EXECUTE rm doc/hello_proof.why
+%EXECUTE rm -r doc/hello_proof.why doc/hello_proof/
 
 %%% Local Variables:
 %%% mode: latex
