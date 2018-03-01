@@ -80,7 +80,6 @@ echo ""
 
 echo "=== Programs that remain to be ported ==="
 echo ""
-run_dir to_port
 run_dir prover "-L prover --debug ignore_unused_vars"
 echo ""
 
