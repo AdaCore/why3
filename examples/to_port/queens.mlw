@@ -119,6 +119,10 @@ module NQueensSets
       eq_prefix (old !sol) !sol (old !s) }
   = if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
+      (* first, you show that if u is a solution with the same k-prefix as col, then
+          u[k] (the position of the queen on the row k) must belong to e *)
+      assert { forall u:solution. solution u /\ eq_prefix !col u !k ->
+               S.mem u[!k] !e };
       let f = ref 0 in
       label L in
       while not (is_empty !e) do
