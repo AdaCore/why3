@@ -375,6 +375,10 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   let ghost v0nj = { v0n } in
   let ghost vinfnj = { vinfn } in
   join r v0n;
+  assert { forall j. min r <= j < offset r
+           -> (pelts r)[j] = old (pelts r)[j]
+              by (pelts r)[j] = (pelts r)[j] at Join
+                 = (pelts r)[j] at Adds = old (pelts r)[j] };
   value_sub_frame (pelts r) (pelts rj) (offset r) (offset r + p2i n);
   assert { value r n = value rj n = lv0 };
   value_concat r n (Int32.( *) 3 n);
@@ -388,6 +392,14 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   label JoinH in
   let ghost rh = { r } in
   join r vinfn;
+  assert { forall j. min r <= j < offset r
+           -> (pelts r)[j] = old (pelts r)[j]
+              by (pelts r)[j] = (pelts r)[j] at JoinH = old (pelts r)[j] };
+  assert { forall j. offset r + sx + sy <= j < max r
+           -> (pelts r)[j] = old (pelts r)[j]
+              by (pelts r)[j] = (pelts vinfn)[j] at JoinH
+                 = (pelts vinfn)[j] at JoinMid
+                 = old (pelts r)[j] };
   value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + 3 * p2i n);
   assert { value r (3*n) = value r (3*n) at JoinH };
   value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + p2i n);
@@ -483,7 +495,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
         ensures { value x sx * value y sy < m * m * m * m' }
   assert { power radix (s+t) = m * m' };
   assert { !cy = radix - 1 -> hvinf <= m' - 2
-           (* TODO v0n (n+n) < m * m -> lvinf=0
+           (* TODO v0n (n+n) < m * m -> lvinf=0 (by value v0n (n+n) < m*m)
               -> a1*b1=m*hvinf
               -> a1=b^k*a1', b1= b^l*b1', k+l = n
               -> a1*b1 < m * (m' - 1) *) };
@@ -567,6 +579,10 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
               = (value r (n+n) + m * m * value vinf0 (s+t) at IncrM)
                 + m * m * cy2
               = value r (sx+sy) at IncrM + m * m * cy2 };
+  assert { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+             -> (pelts r)[j] = (pelts r)[j] at IncrM
+                by (pelts r)[j] = (pelts vinf0)[j]
+                   = (pelts vinf0)[j] at IncrM };
   assert { !cy <= 3 /\ value r (sx + sy)
                        = value x sx * value y sy - m * m * m * !cy
            \/ value r (sx + sy) = value x sx * value y sy + m * m * m };
@@ -582,12 +598,12 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
            so offset r + sx + sy = offset vinfn + s + t - n };
   assert { value r (sx + sy) = value r (3*n)
                                + power radix (3*n) * value vinfn (s+t-n)};
+  assert { power radix (3*n) = m * m * m
+           by power radix (3*n) = power radix (n+n+n)
+              = power radix (n+n) * power radix n
+              = power radix n * power radix n * power radix n };
   if ([@likely] Limb.(<=) !cy 3)
   then begin
-    assert { power radix (3*n) = m * m * m
-             by power radix (3*n) = power radix (n+n+n)
-                = power radix (n+n) * power radix n
-                = power radix n * power radix n * power radix n };
     assert { value r (sx+sy) = value x sx * value y sy
                                - power radix (3*n) * !cy
               by value r (sx+sy) = value x sx * value y sy - m * m * m * !cy };
@@ -631,7 +647,61 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                 = value x sx * value y sy - power radix (3*n) * !cy
                                           + power radix (3*n) * !cy };
   end
-  else decr_1 vinfn (Int32.(-) (Int32.(+) s t) n)
+  else begin
+    assert { !cy = radix - 1 };
+    assert { value r (sx+sy) = value x sx * value y sy
+                               + power radix (3*n)
+              by value r (sx+sy) = value x sx * value y sy + m * m * m };
+    value_sub_upper_bound (pelts r) (offset r) (offset r + 3 * int32'int n);
+    assert { 0 <= value vinfn (s+t-n) - 1
+             by 0 <= value x sx so 0 <= value y sy
+             so 0 <= value x sx * value y sy
+             so value r (sx + sy) >= power radix (3*n)
+             so value r (sx + sy)
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+             so value r (3*n) < power radix (3*n)
+             so power radix (3*n) * value vinfn (s+t-n) > 0
+             so value vinfn (s+t-n) > 0 };
+    decr_1 vinfn (Int32.(-) (Int32.(+) s t) n);
+    value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
+    assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
+             = value vinfn (s+t-n)
+             by pelts r = pelts vinfn
+             so offset r + 3*n = offset vinfn
+             so offset r + sx + sy = offset vinfn + s + t - n };
+    assert { value r (sx + sy) = value r (3*n)
+                                + power radix (3*n) * value vinfn (s+t-n)};
+    assert { forall j. offset r <= j < offset r + (3*n)
+             -> (pelts r)[j] = (pelts r)[j] at IncrH };
+    value_sub_frame (pelts r) (pelts rh) (offset r)
+                    (offset r + (3 * int32'int n));
+    assert { value r (sx + sy) = value x sx * value y sy
+             by value vinfn (s+t-n) = (value vinfn (s+t-n) at IncrH) - 1
+             so value r (3*n) = value r (3*n) at IncrH
+             so value r (sx + sy)
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                = value r (3*n) at IncrH
+                  + power radix (3*n) * (value vinfn (s+t-n) at IncrH - 1)
+                = (value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                         at IncrH)
+                  - power radix (3*n)
+                = value r (sx+sy) at IncrH - power radix (3*n)
+                = value x sx * value y sy };
+  end;
+  assert { forall j. min scratch <= j < offset scratch ->
+           (pelts scratch)[j] = old (pelts scratch)[j]
+           by (pelts scratch)[j] = (pelts scratch)[j] at Rec
+              = old (pelts scratch)[j] };
+  assert { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+             -> (pelts r)[j] = (pelts r)[j] at IncrH
+                by (pelts r)[j] = (pelts vinfn)[j]
+                   = (pelts vinfn)[j] at IncrH };
+  assert { forall j. min r <= j < offset r
+                     \/ offset r + sx + sy <= j < max r
+                       -> (pelts r)[j] = old (pelts r)[j]
+           by (pelts r)[j] = (pelts r)[j] at IncrH
+              = (pelts r)[j] at IncrM
+              = old (pelts r)[j] }
 
   (* Choose which multiplication algorithm is called recursively.
      Equivalent to the macros TOOM22_MUL_REC and TOOM22_MUL_N_REC
