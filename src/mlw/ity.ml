@@ -691,7 +691,8 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let ts = create_tysymbol id args NoDef in
   let fmut, ffix = Mpv.partition (fun _ m -> m) flds in
   let flbl, fout = fields_of_invariant sargs flds invl in
-  let fvis = Mpv.filter (fun f _ -> not f.pv_ghost) flds in
+  let fvis = if priv then flds else
+    Mpv.filter (fun f _ -> not f.pv_ghost) flds in
   let collect fn = Mpv.fold (fun f _ a -> fn a f.pv_ity) in
   let dargs = collect ity_freevars flds Stv.empty in
   if not (Stv.subset dargs sargs) then raise
