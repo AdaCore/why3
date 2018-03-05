@@ -1145,15 +1145,6 @@ let add_decl ~wp loc uc d =
   Loc.try3 ~loc (add_decl ~wp) loc uc d
 
 let add_pdecl ~wp _loc uc = function
-  | Dlet (id, gh, e) ->
-      let id, gh = add_lemma_label ~top:true id gh in
-      let de = dexpr (create_lenv uc) denv_empty e in
-      let ld = create_user_id id, gh, de in
-      let uc = flush_tuples uc in
-      let kn = get_known uc in
-      let lkn = Theory.get_known (get_theory uc) in
-      let ld = Mlw_dexpr.let_defn ~keep_loc:true lkn kn ld in
-      add_pdecl_with_tuples ~wp uc (create_let_decl ld)
   | Dfun (id, gh, lam) ->
       let id, gh = add_lemma_label ~top:true id gh in
       let bl, de, sp = dlambda (create_lenv uc) denv_empty lam in

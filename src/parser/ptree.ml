@@ -263,7 +263,6 @@ and lambda = binder list * pty option * expr * spec
 
 type pdecl =
   | Dval of ident * top_ghost * type_v
-  | Dlet of ident * top_ghost * expr
   | Dfun of ident * top_ghost * lambda
   | Drec of fundef list
   | Dexn of ident * pty
