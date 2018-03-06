@@ -18,5 +18,6 @@ Require map.Map.
 
 (* Why3 assumption *)
 Definition const {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}
-  (v:b): (a -> b) := fun (us:a) => v.
+    (v:b) : a -> b :=
+  fun (us:a) => v.
 
