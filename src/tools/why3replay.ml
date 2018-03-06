@@ -63,7 +63,7 @@ let set_opt_smoke = function
  *)
 
 let usage_msg = Format.sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]"
+  "Usage: %s [options] <project directory>"
   (Filename.basename Sys.argv.(0))
 
 let option_list = [
