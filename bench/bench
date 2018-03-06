@@ -7,6 +7,8 @@
 # export WHY3DATA=.
 # export WHY3LOADPATH=theories
 
+shopt -s nullglob
+
 suffix=$1
 
 # TODO: remove the hack about int.mlw once it has become builtin
@@ -32,7 +34,7 @@ goods () {
 	    echo "ok"
         fi
     done
-    rm bench_error
+    rm -f bench_error
     if test -n "$ERROR"; then
         echo "bench aborted due to the following errors:"
         cat bench_errors
