@@ -444,9 +444,10 @@ let dterm crcmap ?loc node =
         if not_arrow res then Loc.errorm ?loc:dt1.dt_loc
             "This term has type %a,@ it cannot be applied" print_dty res;
         let dtyl, dty = specialize_ls fs_func_app in
-        (* FIXME: why no conversion here? *)
-        dty_unify_app fs_func_app dterm_expected_type [dt1;dt2] dtyl;
-        mk_dty dty
+        { dt_node = DTapp (fs_func_app,
+            dty_unify_app_map fs_func_app (dterm_expected_dterm crcmap) [dt1;dt2] dtyl);
+          dt_dty  = dty;
+          dt_loc  = loc }
     | DTfapp ({dt_dty = None; dt_loc = loc},_) ->
         Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->

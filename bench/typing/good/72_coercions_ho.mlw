@@ -1,0 +1,6 @@
+type t
+type u
+function f t : u
+meta coercion function f
+constant g : u -> bool
+goal G : forall x:t. g x
