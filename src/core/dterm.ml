@@ -435,15 +435,9 @@ let dterm crcmap ?loc node =
             dty_unify_app_map ls (dterm_expected_dterm crcmap) dtl dtyl);
           dt_dty  = dty;
           dt_loc  = loc }
-    | DTfapp ({dt_dty = Some res} as dt1,dt2) ->
-        let rec not_arrow = function
-          | Dvar {contents = Dval dty} -> not_arrow dty
-          | Duty {ty_node = Tyapp (ts,_)}
-          | Dapp (ts,_) -> not (ts_equal ts Ty.ts_func)
-          | Dvar _ -> false | _ -> true in
-        if not_arrow res then Loc.errorm ?loc:dt1.dt_loc
-            "This term has type %a,@ it cannot be applied" print_dty res;
+    | DTfapp ({dt_dty = Some _} as dt1, dt2) ->
         let dtyl, dty = specialize_ls fs_func_app in
+        let dt1 = dterm_expected_dterm crcmap dt1 (List.hd dtyl) in
         { dt_node = DTapp (fs_func_app,
             dty_unify_app_map fs_func_app (dterm_expected_dterm crcmap) [dt1;dt2] dtyl);
           dt_dty  = dty;
