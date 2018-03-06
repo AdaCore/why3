@@ -28,9 +28,6 @@ module C
   let ghost function pelts (p:ptr 'a) : int -> 'a
   = p.data.elts
 
-  val p2i (n:int32):int
-    ensures { result = Int32.to_int n }
-
   val null () : ptr 'a
     ensures { result.zone = null_zone }
 
