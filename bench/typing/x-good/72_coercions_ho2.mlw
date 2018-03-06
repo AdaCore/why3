@@ -1,0 +1,5 @@
+type t
+type u
+function f t : u -> u
+meta coercion function f
+goal G : forall x:t,y:u. x y = y

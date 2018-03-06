@@ -210,6 +210,8 @@ echo ""
 
 echo "=== Checking good files ==="
 goods bench/typing/good
+goods bench/typing/x-good --parse-only
+bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/ce
 goods examples/bts
