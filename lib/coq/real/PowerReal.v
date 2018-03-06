@@ -16,7 +16,10 @@ Require Reals.Rtrigo_def.
 Require Reals.Rpower.
 Require Reals.R_sqrt.
 Require BuiltIn.
+Require int.Int.
+Require int.Power.
 Require real.Real.
+Require real.FromInt.
 Require real.Square.
 Require real.ExpLog.
 
@@ -107,5 +110,19 @@ Proof.
 intros x h1.
 replace (5 / 10)%R with (/ 2)%R by field.
 now apply Rpower_sqrt.
+Qed.
+
+(* Why3 goal *)
+Lemma pow_from_int :
+  forall (x:Z) (y:Z), (0%Z < x)%Z -> (0%Z <= y)%Z ->
+  ((Reals.Rpower.Rpower (BuiltIn.IZR x) (BuiltIn.IZR y)) =
+   (BuiltIn.IZR (int.Power.power x y))).
+Proof.
+intros x y h1 h2.
+rewrite <- Z2Nat.id with (1 := h2).
+rewrite <- pow_IZR.
+rewrite <- INR_IZR_INZ.
+apply Rpower_pow.
+now apply IZR_lt.
 Qed.
 
