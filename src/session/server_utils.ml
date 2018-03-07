@@ -361,7 +361,7 @@ type command =
   | Transform    of string * Trans.gentrans * string list
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
-  | Edit         of Whyconf.config_prover
+  | Edit         of Whyconf.prover
   | Bisect
   | Replay       of bool
   | Clean
@@ -436,7 +436,7 @@ let interp commands_table cont id s =
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
           | Some (prover_config, limit) ->
              if prover_config.Whyconf.interactive then
-               Edit (prover_config)
+               Edit prover_config.Whyconf.prover
              else
                Prove (prover_config, limit)
           | None ->
@@ -451,14 +451,7 @@ let interp commands_table cont id s =
                        let pa =
                          Session_itp.get_proof_attempt_node
                            cont.Controller_itp.controller_session id in
-                       begin try
-                           let p,_ = Whyconf.Hprover.find
-                                     cont.Controller_itp.controller_provers
-                                     pa.Session_itp.prover in
-                           Edit p
-                         with Not_found ->
-                              QError "cannot edit: uninstalled prover"
-                       end
+                       Edit pa.Session_itp.prover
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
                | "bisect", _ ->

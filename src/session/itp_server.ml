@@ -1127,9 +1127,8 @@ end
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
-  let schedule_edition (nid: node_ID) (p: Whyconf.config_prover) =
+  let schedule_edition (nid: node_ID) (prover: Whyconf.prover) =
     let d = get_server_data () in
-    let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     try
       let id =
@@ -1143,8 +1142,8 @@ end
     with Not_found ->
       P.notify
         (Message
-           (Information
-              "for edition please select either a goal or a proof attempt"))
+           (Error
+              "for edition you must select a proof attempt node"))
 
   (* ----------------- Schedule transformation -------------------- *)
 
