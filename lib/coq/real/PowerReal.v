@@ -123,6 +123,6 @@ rewrite <- Z2Nat.id with (1 := h2).
 rewrite <- pow_IZR.
 rewrite <- INR_IZR_INZ.
 apply Rpower_pow.
-now apply IZR_lt.
+now apply (IZR_lt 0).
 Qed.
 
