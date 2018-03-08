@@ -468,7 +468,7 @@ let create_let_decl ld =
     let sbs = Mpv.fold add_old cty.cty_oldies Mvs.empty in
     let f = List.fold_right t_implies cty.cty_pre (t_subst sbs f) in
     let args = List.map (fun v -> v.pv_vs) cty.cty_args in
-    let f = t_forall_close args [] f in
+    let f = t_forall_close_simp args [] f in
     let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
     create_prop_decl Paxiom (create_prsymbol id) f :: axms in
   let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms) =
