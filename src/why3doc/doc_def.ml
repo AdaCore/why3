@@ -37,8 +37,8 @@ let output_file fname =
 
 let tag_allowed_char =
   let tbl = Array.make 256 false in
-  let s = "-_:" in (* '.' is removed so as to be used as an escape char below *)
-  for i = 0 to String.length s - 1 do tbl.(Char.code s.[i]) <- true done;
+  let s = "-._~!$'()*+,;=:@/?" in (* while & is allowed in uri, it has to be escaped in html *)
+  String.iter (fun c -> tbl.(Char.code c) <- true) s;
   let span m n = for i = Char.code m to Char.code n do tbl.(i) <- true done in
   span 'A' 'Z';
   span 'a' 'z';
@@ -50,7 +50,7 @@ let pp_tag_escape =
     String.iter (fun c ->
       if tag_allowed_char c then Format.fprintf fmt "%c" c else
         let c = Char.code c in
-        Format.fprintf fmt ".%c%c" hex.[c / 16] hex.[c mod 16]) s
+        Format.fprintf fmt "%%%c%c" hex.[c / 16] hex.[c mod 16]) s
 
 let pp_tag fmt s l =
   Format.fprintf fmt "%a_%d" pp_tag_escape s l
