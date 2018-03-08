@@ -113,6 +113,8 @@ let ident_printer () =
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
+type version = V20 | V26
+
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
@@ -122,6 +124,7 @@ type info = {
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
   mutable list_projs : Stdlib.Sstr.t;
+  info_version : version;
 }
 
 let debug_print_term message t =
@@ -137,8 +140,13 @@ let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
 (** type *)
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smtv2: you must encode type polymorphism"
+  | Tyvar s ->
+      begin match info.info_version with
+      | V20 -> unsupported "smtv2: you must encode type polymorphism"
+      | V26 -> fprintf fmt "%s" (id_unique info.info_printer s.tv_name)
+      end
   | Tyapp (ts, l) ->
      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
@@ -538,14 +546,36 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
+let print_data_def info fmt (ts,cl) =
+  if (List.compare_length_with ts.ts_args 0) > 0 then
+    let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
+    fprintf fmt "@[(par (%a) (%a))@]"
+      (print_list space (print_ident info)) args
+      (print_list space (print_constructor_decl info)) cl
+  else
+    fprintf fmt "@[(%a)@]"
+      (print_list space (print_constructor_decl info)) cl
+
+let print_sort_decl info fmt (ts,_) =
+  fprintf fmt "@[(%a %d)@]"
+    (print_ident info) ts.ts_name
+    (List.length ts.ts_args)
+
 let print_decl vc_loc cntexample args info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-        (print_list space (print_data_decl info)) dl
+      begin match info.info_version with
+      | V20 ->
+          fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+            (print_list space (print_data_decl info)) dl
+      | V26 ->
+          fprintf fmt "@[<v>(declare-datatypes (%a)@ (%a))@,@]"
+            (print_list space (print_sort_decl info)) dl
+            (print_list space (print_data_def info)) dl
+      end
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
@@ -561,7 +591,7 @@ let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
-let print_task args ?old:_ fmt task =
+let print_task version args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
@@ -574,6 +604,7 @@ let print_task args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_printer = ident_printer ();
     list_projs = Stdlib.Sstr.empty;
+    info_version = version;
   } in
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;
@@ -590,5 +621,7 @@ let print_task args ?old:_ fmt task =
   print_decls task;
   pp_print_flush fmt ()
 
-let () = register_printer "smtv2" print_task
+let () = register_printer "smtv2" (print_task V20)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."
+let () = register_printer "smtv2.6" (print_task V26)
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 2.6@ format."
