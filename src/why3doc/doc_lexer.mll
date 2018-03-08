@@ -44,8 +44,6 @@
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
-  let current_file = ref ""
-
   let print_ident ?(parentheses=false) fmt lexbuf s =
     if is_keyword1 s then
       fprintf fmt "<span class=\"keyword1\">%s</span>" s
@@ -309,7 +307,6 @@ and skip_comment = parse
 {
 
   let do_file fmt fname =
-    current_file := fname;
     (* input *)
     let cin = open_in fname in
     let lb = Lexing.from_channel cin in
