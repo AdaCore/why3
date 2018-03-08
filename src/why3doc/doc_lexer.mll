@@ -59,17 +59,17 @@
           Loc.user_position f l (s + 1) (e - 1)
         else loc in
       try
-        let id, def = Glob.find loc in
+        let id, def, kind = Glob.find loc in
         match id.Ident.id_loc with
         | None -> raise Not_found
         | Some _ ->
           match def with
           | Glob.Def ->
             fprintf fmt "<a name=\"%a\">%a</a>"
-              Doc_def.pp_anchor id Pp.html_string s
+              (Doc_def.pp_anchor ~kind) id Pp.html_string s
           | Glob.Use ->
             fprintf fmt "<a href=\"%a\">%a</a>"
-              Doc_def.pp_locate id Pp.html_string s
+              (Doc_def.pp_locate ~kind) id Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
         Pp.html_string fmt s

@@ -55,7 +55,7 @@ let find_qualid get_id find ns q =
   let sl = string_list_of_qualid q in
   let r = try find ns sl with Not_found ->
     Loc.error ~loc:(qloc q) (UnboundSymbol q) in
-  if Debug.test_flag Glob.flag then Glob.use (qloc_last q) (get_id r);
+  if Debug.test_flag Glob.flag then Glob.use ~kind:"" (qloc_last q) (get_id r);
   r
 
 let find_prop_ns     ns q = find_qualid (fun pr -> pr.pr_name) ns_find_pr ns q
@@ -927,7 +927,7 @@ open Pdecl
 open Pmodule
 
 let add_pdecl ~vc muc d =
-  if Debug.test_flag Glob.flag then Sid.iter Glob.def d.pd_news;
+  if Debug.test_flag Glob.flag then Sid.iter (Glob.def ~kind:"") d.pd_news;
   add_pdecl ~vc muc d
 
 let add_decl muc d = add_pdecl ~vc:false muc (create_pure_decl d)
@@ -1189,7 +1189,8 @@ let find_module env file q =
     | Qident {id_str = nm} ->
         (try Mstr.find nm file with Not_found -> read_module env [] nm)
     | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm in
-  if Debug.test_flag Glob.flag then Glob.use (qloc_last q) m.mod_theory.th_name;
+  if Debug.test_flag Glob.flag then
+    Glob.use ~kind:"theory" (qloc_last q) m.mod_theory.th_name;
   m
 
 let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
@@ -1345,7 +1346,8 @@ let close_module loc =
   let slice = Stack.top state in
   if Debug.test_noflag debug_parse_only then begin
     let m = Loc.try1 ~loc close_module (Opt.get slice.muc) in
-    if Debug.test_flag Glob.flag then Glob.def m.mod_theory.th_name;
+    if Debug.test_flag Glob.flag then
+      Glob.def ~kind:"theory" m.mod_theory.th_name;
     slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file;
   end;
   slice.muc <- None
