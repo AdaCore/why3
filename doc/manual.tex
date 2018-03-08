@@ -63,9 +63,18 @@
 %\let\bf\bfseries
 
 \usepackage{ifthen}
+
+% avoid double spacing after '.' and ':' in texttt
+%BEGIN LATEX
+\makeatletter
+\let\ttfamily\relax
+\DeclareRobustCommand\ttfamily
+   {\not@math@alphabet\ttfamily\mathtt\fontfamily\ttdefault\selectfont\frenchspacing}
+\makeatother
+%END LATEX
+
 \input{./macros.tex}
 \input{./replayer_macros.tex}
-
 \input{./version.tex}
 
 \makeindex
