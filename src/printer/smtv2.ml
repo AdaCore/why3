@@ -547,7 +547,7 @@ let print_data_decl info fmt (ts,cl) =
     (print_list space (print_constructor_decl info)) cl
 
 let print_data_def info fmt (ts,cl) =
-  if (List.compare_length_with ts.ts_args 0) > 0 then
+  if ts.ts_args <> [] then
     let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
     fprintf fmt "@[(par (%a) (%a))@]"
       (print_list space (print_ident info)) args
