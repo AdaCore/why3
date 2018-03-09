@@ -1,0 +1,9 @@
+use import map.Map
+use import mach.c.C
+
+let main () diverges =
+  let p = malloc 10 in
+  c_assert (is_not_null p);
+  let r = C.incr p 1 in
+  let _ = decr_split r 1 in
+  set p (0:int)
