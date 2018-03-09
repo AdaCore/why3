@@ -39,12 +39,14 @@ let do_parsing model =
   | Parse_smtv2_model_lexer.SyntaxError ->
     Warning.emit
       ~loc:(get_position lexbuf)
-      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected character";
+      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
+      (Lexing.lexeme lexbuf);
     Stdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
     begin
       let loc = get_position lexbuf in
-      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model";
+      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
+      (Lexing.lexeme lexbuf);
       Stdlib.Mstr.empty
     end
 
