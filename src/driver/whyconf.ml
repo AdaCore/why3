@@ -927,13 +927,7 @@ let absolute_driver_file main s =
 
 let load_driver main env file extras =
   let file = absolute_driver_file main file in
-  try
-    Driver.load_driver_absolute env file extras
-  with e ->
-    eprintf "Fatal error while loading driver file '%s': %a@."
-            file Exn_printer.exn_printer e;
-    exit 1
-
+  Driver.load_driver_absolute env file extras
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->
