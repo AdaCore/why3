@@ -1,4 +1,4 @@
-ce/ref.mlw M VC test_post: Unknown (other) (time hidden)
+ce/ref.mlw M VC test_post: Unknown (other)
 Counter-example model:File ref.mlw:
 Line 6:
 x = {"type" : "Integer" , "val" : "1" }
@@ -9,7 +9,7 @@ old x = {"type" : "Integer" , "val" : "1" }
 old y = {"type" : "Integer" ,
 "val" : "0" }
 
-ce/ref.mlw M VC test_post2: Unknown (other) (time hidden)
+ce/ref.mlw M VC test_post2: Unknown (other)
 Counter-example model:File ref.mlw:
 Line 11:
 x = {"type" : "Integer" , "val" : "43" }
@@ -20,10 +20,10 @@ old x = {"type" : "Integer" , "val" : "43" }
 old y = {"type" : "Integer" ,
 "val" : "0" }
 
-ce/ref.mlw M VC incr: Unknown (other) (time hidden)
+ce/ref.mlw M VC incr: Unknown (other)
 Counter-example model:File ref.mlw:
 Line 21:
-y = {"type" : "Integer" , "val" : "0" }
+y = {"type" : "Integer" , "val" : "-1" }
 Line 23:
 x23 = {"type" : "Integer" ,
 "val" : "0" }
@@ -32,15 +32,36 @@ old x23 = {"type" : "Integer" , "val" : "0" }
 old y = {"type" : "Integer" ,
 "val" : "-1" }
 
-ce/ref.mlw M VC test_loop: Unknown (other) (time hidden)
+ce/ref.mlw M VC test_loop: Unknown (other)
+Counter-example model:File ref.mlw:
+Line 21:
+y = {"type" : "Integer" , "val" : "0" }
+Line 31:
+x = {"type" : "Integer" , "val" : "0" }
+Line 38:
+x = {"type" : "Integer" , "val" : "0" }
+y = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/ref.mlw M VC test_loop: Valid
+ce/ref.mlw M VC test_loop: Unknown (other)
+Counter-example model:File ref.mlw:
+Line 21:
+y = {"type" : "Integer" , "val" : "0" }
+Line 31:
+x = {"type" : "Integer" , "val" : "1" }
+Line 38:
+x = {"type" : "Integer" , "val" : "-1" }
+y = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/ref.mlw M VC test_loop: Unknown (other)
 Counter-example model:File ref.mlw:
 Line 21:
 y = {"type" : "Integer" , "val" : "-3" }
 Line 31:
 x = {"type" : "Integer" , "val" : "0" }
 Line 32:
-old x = {"type" : "Integer" , "val" : "0" }
-Line 38:
-x = {"type" : "Integer" ,
+old x = {"type" : "Integer" ,
 "val" : "0" }
 
