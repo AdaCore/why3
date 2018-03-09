@@ -7,140 +7,140 @@
 <prover id="2" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="3.2" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../vstte10_queens.mlw">
-<theory name="NQueens">
- <goal name="eq_board_set" expl="">
+<file name="../vstte10_queens.mlw" proved="true">
+<theory name="NQueens" proved="true">
+ <goal name="eq_board_set" proved="true">
  <proof prover="6" timelimit="5"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="eq_board_sym" expl="">
+ <goal name="eq_board_sym" proved="true">
  <proof prover="6" timelimit="20" memlimit="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
- <goal name="eq_board_trans" expl="">
+ <goal name="eq_board_trans" proved="true">
  <proof prover="6" timelimit="20" memlimit="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
- <goal name="eq_board_extension" expl="">
+ <goal name="eq_board_extension" proved="true">
  <proof prover="6" timelimit="20" memlimit="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
- <goal name="consistent_row_eq" expl="">
+ <goal name="consistent_row_eq" proved="true">
  <proof prover="6" timelimit="20" memlimit="0"><result status="valid" time="0.06" steps="37"/></proof>
  </goal>
- <goal name="WP_parameter check_is_consistent" expl="VC for check_is_consistent">
+ <goal name="WP_parameter check_is_consistent" expl="VC for check_is_consistent" proved="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="solution_eq_board" expl="">
+ <goal name="solution_eq_board" proved="true">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter bt_queens" expl="VC for bt_queens">
+ <goal name="WP_parameter bt_queens" expl="VC for bt_queens" proved="true">
  <proof prover="1"><result status="valid" time="1.42"/></proof>
  </goal>
- <goal name="WP_parameter queens" expl="VC for queens">
+ <goal name="WP_parameter queens" expl="VC for queens" proved="true">
  <proof prover="6" timelimit="20" memlimit="0"><result status="valid" time="0.02" steps="25"/></proof>
  </goal>
- <goal name="WP_parameter test8" expl="VC for test8">
+ <goal name="WP_parameter test8" expl="VC for test8" proved="true">
  <proof prover="6" timelimit="5"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
- <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens">
+ <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens" proved="true">
  <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="0.27"/></proof>
  </goal>
- <goal name="WP_parameter count_queens" expl="VC for count_queens">
+ <goal name="WP_parameter count_queens" expl="VC for count_queens" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
- <goal name="WP_parameter test_count_8" expl="VC for test_count_8">
+ <goal name="WP_parameter test_count_8" expl="VC for test_count_8" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="NQueens63">
- <goal name="WP_parameter check_is_consistent" expl="VC for check_is_consistent">
+<theory name="NQueens63" proved="true">
+ <goal name="WP_parameter check_is_consistent" expl="VC for check_is_consistent" proved="true">
  <proof prover="0"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter count_bt_queens.1" expl="postcondition">
+ <goal name="WP_parameter count_bt_queens" expl="VC for count_bt_queens" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter count_bt_queens.0" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.2" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.1" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.3" expl="loop invariant init">
+  <goal name="WP_parameter count_bt_queens.2" expl="loop invariant init" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.4" expl="loop invariant init">
+  <goal name="WP_parameter count_bt_queens.3" expl="loop invariant init" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.5" expl="type invariant">
+  <goal name="WP_parameter count_bt_queens.4" expl="type invariant" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.6" expl="index in array63 bounds">
+  <goal name="WP_parameter count_bt_queens.5" expl="index in array63 bounds" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.7" expl="precondition">
+  <goal name="WP_parameter count_bt_queens.6" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.8" expl="precondition">
+  <goal name="WP_parameter count_bt_queens.7" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.17" steps="115"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.9" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.8" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.10" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.9" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.11" expl="variant decrease">
+  <goal name="WP_parameter count_bt_queens.10" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.12" expl="precondition">
+  <goal name="WP_parameter count_bt_queens.11" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.13" expl="precondition">
+  <goal name="WP_parameter count_bt_queens.12" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.14" expl="precondition">
+  <goal name="WP_parameter count_bt_queens.13" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="6"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.15" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.14" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.16" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.15" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.13" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.17" expl="loop invariant preservation">
+  <goal name="WP_parameter count_bt_queens.16" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.18" expl="loop invariant preservation">
+  <goal name="WP_parameter count_bt_queens.17" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.19" expl="loop variant decrease">
+  <goal name="WP_parameter count_bt_queens.18" expl="loop variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.20" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.19" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.21" expl="integer overflow">
+  <goal name="WP_parameter count_bt_queens.20" expl="integer overflow" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.22" expl="loop invariant preservation">
+  <goal name="WP_parameter count_bt_queens.21" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.23" expl="loop invariant preservation">
+  <goal name="WP_parameter count_bt_queens.22" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.11" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.24" expl="loop variant decrease">
+  <goal name="WP_parameter count_bt_queens.23" expl="loop variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.25" expl="type invariant">
+  <goal name="WP_parameter count_bt_queens.24" expl="type invariant" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter count_bt_queens.26" expl="postcondition">
+  <goal name="WP_parameter count_bt_queens.25" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter count_queens" expl="VC for count_queens">
+ <goal name="WP_parameter count_queens" expl="VC for count_queens" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="WP_parameter test_count_8" expl="VC for test_count_8">
+ <goal name="WP_parameter test_count_8" expl="VC for test_count_8" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
