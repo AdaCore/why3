@@ -12,15 +12,15 @@ module ApplyRewrite
 
   use HighOrd
 
-  axiom H: forall x. (\z: int. x + z) =  f x
+  axiom H: forall x. (fun (z: int) -> x + z) =  f x
 
-  goal g1: (\toto. 42 + toto) = f 42
+  goal g1: (fun toto -> 42 + toto) = f 42
   
-  axiom Ha: forall x. (\z: int. x + z) 2 = 2
+  axiom Ha: forall x. (fun (z: int) -> x + z) 2 = 2
   
-  goal g3: (\toto. 42 + toto) 2 = 2 
+  goal g3: (fun toto -> 42 + toto) 2 = 2 
     
-  goal g2: (\y. y + y) = f 24
+  goal g2: (fun y -> y + y) = f 24
 end
 
 module A
@@ -34,7 +34,7 @@ module A
   
   goal g1: exists x. f x = x + 42
   
-  goal g: (\y. f y) 0 = 3
+  goal g: (fun y -> f y) 0 = 3
 
   constant b: bool
 
@@ -52,9 +52,9 @@ module Soundness
   function f0 (x y z:int) : int = x * y + z
   predicate p (f:int -> int) =
     f (-1) = 0 && forall n:int. f n = f 0 + (f 1 - f 0) * n
-  lemma A : forall y z:int. p (\x. f0 x y z) <-> y = z
-  meta rewrite prop A
-  lemma Fail : 0 = 0 /\ p (\x. f0 x x x)
+  lemma A : forall y z:int. p (fun x -> f0 x y z) <-> y = z
+  meta rewrite lemma A
+  lemma Fail : 0 = 0 /\ p (fun x -> f0 x x x)
   lemma Absurd : false
 end
 
@@ -62,7 +62,7 @@ module TestCEX
 
   use import int.Int
   
-  goal g: forall x "model". x=0
+  goal g: forall x. x=0
   
 end
 
