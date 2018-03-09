@@ -153,6 +153,9 @@ let meta_range = register_meta "range_type" [MTtysymbol; MTlsymbol]
 let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
     ~desc:"Projection@ and@ finiteness@ of@ a@ floating-point@ type."
 
+let meta_projection = register_meta "model_projection" [MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
 (** Theory *)
 
 type theory = {
