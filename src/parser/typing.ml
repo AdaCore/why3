@@ -418,6 +418,7 @@ let add_range_decl uc add_decl add_meta ts rg =
   let pj = create_fsymbol id [ty_app ts []] ty_int in
   let uc = add_decl uc (Decl.create_param_decl pj) in
   let uc = add_meta uc meta_range [MAts ts; MAls pj] in
+  let uc = add_meta uc meta_projection [MAls pj] in
   (* create max attribute *)
   let nm = ts.ts_name.id_string ^ "'maxInt" in
   let id = id_derive nm ts.ts_name in
@@ -436,6 +437,7 @@ let add_float_decl uc add_decl add_meta ts fmt =
   let id = id_derive nm ts.ts_name in
   let pj = create_fsymbol id [ty_app ts []] ty_real in
   let uc = add_decl uc (Decl.create_param_decl pj) in
+  let uc = add_meta uc meta_projection [MAls pj] in
   (* FIXME: "t'is_finite" is probably better *)
   let nm = ts.ts_name.id_string ^ "'isFinite" in
   let id = id_derive nm ts.ts_name in

@@ -62,10 +62,6 @@ let debug_decl decl =
   Debug.dprintf debug "Declaration %s @." s
 *)
 
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
 let intro_const_equal_to_term
     ~term
     ~id_new
@@ -252,7 +248,7 @@ let encapsulate env projs : Task.task Trans.trans =
   meta_transform2 (fun d -> introduce_projs env map_projs d.Task.task_decl.td_node)
 
 let intro_projections_counterexmp env =
-  Trans.on_tagged_ls meta_projection (encapsulate env)
+  Trans.on_tagged_ls Theory.meta_projection (encapsulate env)
 
 
 let () = Trans.register_env_transform "intro_projections_counterexmp" intro_projections_counterexmp
