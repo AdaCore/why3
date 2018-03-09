@@ -27,38 +27,7 @@ val lab_hash : label -> int
 
 val create_label : string -> label
 
-(* functions for working with counterexample model labels *)
-
-val remove_model_labels : labels : Slab.t -> Slab.t
-(** Returns a copy of labels without labels ["model"] and ["model_projected"]. *)
-
-val append_to_model_trace_label : labels : Slab.t ->
-  to_append : string ->
-  Slab.t
-(** The returned set of labels will contain the same set of labels
-    as argument labels except that a label of the form ["model_trace:*"]
-    will be ["model_trace:*to_append"]. *)
-
-val append_to_model_element_name : labels : Slab.t ->
-  to_append : string ->
-  Slab.t
-(** The returned set of labels will contain the same set of labels
-    as argument labels except that a label of the form ["model_trace:*@*"]
-    will be ["model_trace:*to_append@*"]. *)
-
-val get_model_element_name : labels : Slab.t -> string
-(** If labels contain a label of the form ["model_trace:name@*"],
-    return ["name"].
-    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
-
-val get_model_trace_string : labels : Slab.t -> string
-(** If labels contain a label of the form ["model_trace:mt_string"],
-    return ["mt_string"].
-    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
-
-val get_model_trace_label : labels : Slab.t -> Slab.elt
-(** Return a label of the form ["model_trace:*"].
-    Throws [Not_found] if there is no such label. *)
+val list_label: unit -> string list
 
 (** {2 Naming convention } *)
 
@@ -135,11 +104,6 @@ val id_unique :
 (** use ident_printer to generate a unique name for ident
     an optional sanitizer is applied over the printer's sanitizer *)
 
-val id_unique_label :
-  ident_printer -> ?sanitizer : (string -> string) -> ident -> string
-(** Do the same as id_unique except that it tries first to
-   use the "name:" label to generate the name instead of id.id_string *)
-
 val string_unique : ident_printer -> string -> string
 (** Uniquify string *)
 
@@ -168,3 +132,58 @@ val char_to_alnum : char -> string
 val char_to_lalnum : char -> string
 val char_to_alnumus : char -> string
 val char_to_lalnumus : char -> string
+
+
+(** {2 Name handling for ITP} *)
+
+val id_unique_label :
+  ident_printer -> ?sanitizer : (string -> string) -> ident -> string
+(** Do the same as id_unique except that it tries first to
+   use the "name:" label to generate the name instead of id.id_string *)
+
+
+
+(** {2 labels for handling counterexamples} *)
+
+val model_label : label
+val model_projected_label : label
+val model_vc_label : label
+val model_vc_post_label : label
+
+val has_a_model_label : ident -> bool
+(** [true] when [ident] has one of the labels above. *)
+
+val remove_model_labels : labels : Slab.t -> Slab.t
+(** Returns a copy of labels without [model_label] and [model_projected_label]. *)
+
+val create_model_trace_label : string -> label
+
+val is_model_trace_label : label -> bool
+
+val append_to_model_trace_label : labels : Slab.t ->
+  to_append : string ->
+  Slab.t
+(** The returned set of labels will contain the same set of labels
+    as argument labels except that a label of the form ["model_trace:*"]
+    will be ["model_trace:*to_append"]. *)
+
+val append_to_model_element_name : labels : Slab.t ->
+  to_append : string ->
+  Slab.t
+(** The returned set of labels will contain the same set of labels
+    as argument labels except that a label of the form ["model_trace:*@*"]
+    will be ["model_trace:*to_append@*"]. *)
+
+val get_model_element_name : labels : Slab.t -> string
+(** If labels contain a label of the form ["model_trace:name@*"],
+    return ["name"].
+    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
+
+val get_model_trace_string : labels : Slab.t -> string
+(** If labels contain a label of the form ["model_trace:mt_string"],
+    return ["mt_string"].
+    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
+
+val get_model_trace_label : labels : Slab.t -> Slab.elt
+(** Return a label of the form ["model_trace:*"].
+    Throws [Not_found] if there is no such label. *)

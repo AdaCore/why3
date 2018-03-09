@@ -1,0 +1,33 @@
+
+
+module Array_records
+
+   use import int.Int
+   use import array.Array
+
+   type value = int
+   type index = int
+
+   function to_rep value: int
+   meta "model_projection" function to_rep
+
+   type basic_record =
+   {
+      flag [@model_trace:flag] : bool;
+      first_value [@model_trace:first_val] : value;
+      second_value [@model_trace:sec_val] : value;
+   }
+
+   type array_of_records = array basic_record
+
+   let var_overwrite (a: array_of_records) (i: int) : unit
+     requires { a[i] = {flag = true; first_value = 3; second_value = 5}}
+     ensures { a[i].first_value = 42 }
+   =
+     a[i] <- {flag = a[i].flag; first_value= a[i].first_value; second_value = 69};
+     a[i] <- {flag = a[i].flag; first_value= 42; second_value = a[i].second_value};     
+     a[i] <- {flag = a[i].flag; first_value= 23; second_value = a[i].second_value};     
+     a[i] <- {flag = false; first_value= a[i].first_value; second_value = a[i].second_value};     
+     assert {a[i].second_value = 69};
+
+end

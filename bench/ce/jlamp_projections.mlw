@@ -1,0 +1,41 @@
+
+module Abstract
+
+use import int.Int
+
+type byte
+function to_int byte : int
+meta "model_projection" function to_int
+predicate in_range (x : int) = -128 <= x <= 127
+axiom range_axiom : forall x:byte. in_range (to_int x)
+
+
+val of_int (x:int) : byte
+  requires { in_range x }
+  ensures { to_int result = x }
+
+val add (x y : byte) : byte
+  requires { [@expl:integer overflow] in_range (to_int x + to_int y) }
+  ensures { to_int result = to_int x + to_int y }
+
+use import ref.Ref
+
+let p3 (a [@model_projected] : ref byte) =
+  a := add !a (of_int 1)
+
+end
+
+module Record
+
+use import int.Int
+use import Abstract
+
+type r = {mutable f : byte; mutable g : bool}
+
+function get_f [@model_projection] (x:r) : byte = x.f
+function get_g [@model_projection] (x:r) : bool = x.g
+
+let p4 (b [@model_projected] : r) =
+  if b.g then b.f <- add b.f (of_int 1)
+
+end

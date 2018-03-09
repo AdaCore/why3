@@ -18,53 +18,37 @@
 
   let floc s e = Loc.extract (s,e)
 
-  let model_label = Ident.create_label "model"
-(*  let model_projected = Ident.create_label "model_projected"*)
-
-(*
-  let is_model_label l = match l with
-    | Lstr lab -> Ident.lab_equal lab model_label ||
-                  Ident.lab_equal lab model_projected
-    | Lpos _ -> false
-
-  let model_lab_present labels = List.exists is_model_label labels
-*)
-
-  let is_model_trace_label l = match l with
-    | Lstr lab -> Strings.has_prefix "model_trace:" lab.Ident.lab_string
-    | Lpos _ -> false
-
-  let model_trace_lab_present labels =
-    List.exists is_model_trace_label labels
-
-  let add_model_trace id =
-    if model_trace_lab_present id.id_lab then
-      id
-    else
-      let l =
-        (Lstr (Ident.create_label ("model_trace:" ^ id.id_str)))
-        ::(Lstr model_label) :: id.id_lab in
-      { id with id_lab = l }
+  let debug_auto_model =
+    Debug.register_flag ~desc:"When set, model labels are not added during parsing"
+      "no_auto_model"
 
   let add_lab id l =
     { id with id_lab = l }
 
+  let add_model_trace_label id =
+    if Debug.test_flag debug_auto_model then id else
+    let is_model_trace_label l =
+      match l with
+      | Lpos _ -> false
+      | Lstr lab -> Ident.is_model_trace_label lab
+    in
+    if List.exists is_model_trace_label id.id_lab then id else
+      let l =
+        (Lstr (Ident.create_model_trace_label id.id_str))
+        ::(Lstr Ident.model_label) :: id.id_lab in
+      { id with id_lab = l }
+
   let add_model_labels (b : binder) =
     match b with
     | (loc, Some id, ghost, ty) ->
-      (loc, Some (add_model_trace id), ghost, ty)
+      (loc, Some (add_model_trace_label id), ghost, ty)
     | _ -> b
 
-  let model_vc_label = Ident.create_label "model_vc"
-
-  let model_vc_post_label = Ident.create_label "model_vc_post"
-
   let add_model_vc_label t =
-    {t with term_desc = Tnamed (Lstr model_vc_label, t)}
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_label, t)}
 
   let add_model_vc_post_label t =
-    {t with term_desc = Tnamed (Lstr model_vc_post_label, t)}
-
+    {t with term_desc = Tnamed (Lstr Ident.model_vc_post_label, t)}
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
@@ -689,7 +673,7 @@ numeral:
 (* Program declarations *)
 
 prog_decl:
-| VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet (add_model_trace $4, $2, $3, $5) }
+| VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet (add_model_trace_label $4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
 | LET REC with_list1(rec_defn)                         { Drec $3 }
@@ -830,7 +814,7 @@ single_expr_:
         | _ -> pat, $6 in
       match pat.pat_desc with
       | Pvar (id, gh) ->
-        let id = add_model_trace id in
+        let id = add_model_trace_label id in
         Elet (id, gh, kind, def, $8)
       | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
       | _ -> Ematch (def, [pat, $8]) }
@@ -891,7 +875,7 @@ single_expr_:
     { let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
-      let id = add_model_trace $2 in
+      let id = add_model_trace_label $2 in
       let e = mk_expr (Efor (id, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | ABSURD
@@ -1110,14 +1094,14 @@ pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | mk_pat(pat_uni_) AS ghost labels(lident_nq)
-    { let id = add_model_trace $4 in
+    { let id = add_model_trace_label $4 in
       Pas ($1,id,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
 | pat_arg_shared_                       { $1 }
 | labels(lident_nq)
-    { let id = add_model_trace $1 in
+    { let id = add_model_trace_label $1 in
       Pvar (id, false) }
 | GHOST labels(lident_nq)               { Pvar ($2,true) }
 

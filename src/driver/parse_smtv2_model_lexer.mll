@@ -28,8 +28,8 @@ let float_num = '#'('b' | 'x') hexa_num
 rule token = parse
   | '\n'
     { token lexbuf }
-  | space+ as space_str
-      { SPACE (space_str) }
+  | space+
+      { token lexbuf }
   | "store" { STORE }
   | "const" { CONST }
   | "model" {MODEL}
@@ -98,7 +98,7 @@ rule token = parse
   | eof
       { EOF }
   | _
-	{ raise SyntaxError }
+      { raise SyntaxError }
 
 and read_string buf =
   parse

@@ -23,6 +23,7 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
+let opt_list_labels = ref false
 
 let option_list = [
   "--list-transforms", Arg.Set opt_list_transforms,
@@ -35,6 +36,7 @@ let option_list = [
       " list known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " list known metas";
+  "--list-labels", Arg.Set opt_list_labels, "list used labels";
   "--print-libdir",
       Arg.Unit (fun _ -> printf "%s@." Config.libdir; exit 0),
       " print location of binary components (plugins, etc)";
@@ -150,6 +152,11 @@ let () = try
     let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
+  end;
+  if !opt_list_labels then begin
+    opt_list := true;
+    let l = List.sort String.compare (Ident.list_label ()) in
+    List.iter (fun x -> Format.eprintf "%s@." x) l
   end;
   if !opt_list then exit 0;
 

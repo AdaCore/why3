@@ -223,13 +223,12 @@ val schedule_edition :
 
 val prepare_edition :
   controller -> ?file:string -> proofNodeID -> Whyconf.prover ->
-(*
-  callback:(proofAttemptID -> proof_attempt_status -> unit) ->
- *)
-  notification:notifier -> proofAttemptID * string
-(** [prepare_edition c id pr filename] prepare for editing the proof
-    of node [id] with prover [pr], using the file name given. The
-    editor is not launched. *)
+  notification:notifier -> proofAttemptID * string * Call_provers.prover_result option
+(** [prepare_edition c ?file id pr] prepare for editing the proof of
+    node [id] with prover [pr]. The editor is not launched. The result
+    is [(pid,name,res)] where [pid] is the node id the proof_attempt,
+    [name] is the name of the file to edit, made relative to the
+    session directory, and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
 

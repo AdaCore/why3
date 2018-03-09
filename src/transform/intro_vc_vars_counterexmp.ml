@@ -22,14 +22,6 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_label = Ident.create_label "model"
-  (* Identifies terms that should be in counterexample and should not be projected. *)
-let model_projected_label = Ident.create_label "model_projected"
-  (* Identifies terms that should be in counterexample and should be projected. *)
-let model_vc_label = Ident.create_label "model_vc"
-  (* Identifies the term that triggers the VC. *)
-let model_vc_post_label = Ident.create_label "model_vc_post"
-(* Identifies the postcondition that triggers the VC. *)
 let model_trace_prefix = "model_trace:"
   (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
 
@@ -97,10 +89,6 @@ let model_trace_for_postcondition ~labels =
   with Not_found ->
     labels
 
-let is_counterexample_label l =
-  lab_equal l model_label || lab_equal l model_projected_label
-
-
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
   type t = preid
@@ -137,7 +125,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
 	     should be in counterexample, introduce new constant in location
 	     loc with all labels necessary for collecting it for counterexample
 	     and make it equal to the variable *)
-          if Slab.exists is_counterexample_label ls.id_label then
+          if Ident.has_a_model_label ls then
 	    let const_label = if info.vc_pre_or_post then
 	      model_trace_for_postcondition ~labels:ls.id_label
 	    else

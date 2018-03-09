@@ -32,27 +32,9 @@ end
 
 module S : Set.S with type elt = term and type t = Set.Make(TermCmp).t
 
-val model_trace_regexp: Str.regexp
-
-val label_starts_with: Str.regexp -> Ident.label -> bool
-
-val get_label: unit Ident.Mlab.t -> Str.regexp -> Ident.label
-
-val print_label: Format.formatter -> Ident.label -> unit
-
-val model_label: Ident.label
-
-val model_projection: Ident.label
-
-val model_vc_term_label: Ident.label
-
 val add_model_element: Term.term -> S.t -> S.t
 
-val add_old: string -> string
-
 val model_trace_for_postcondition: labels: unit Ident.Mlab.t -> vc_term_info -> unit Ident.Mlab.t
-
-val get_fun_name: string -> string
 
 val check_enter_vc_term: Term.term -> bool -> vc_term_info -> unit
 

@@ -19,8 +19,6 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable default_prover : string;
-      mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_full_context : bool;
       mutable show_labels : bool;

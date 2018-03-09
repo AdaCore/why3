@@ -432,15 +432,15 @@ let timeout_handler () =
     let q = Queue.create () in
     while not (Queue.is_empty prover_tasks_edited) do
       (* call is an EditorCall *)
-      let (_ses,_id,_pr,callback,_started,call,ores) as c =
+      let (callback,call,ores) as c =
         Queue.pop prover_tasks_edited in
       let prover_update = Call_provers.query_call call in
       match prover_update with
       | Call_provers.NoUpdates -> Queue.add c q
-      | Call_provers.ProverFinished res ->
-          let res = Opt.fold fuzzy_proof_time res ores in
+      | Call_provers.ProverFinished _res ->
+          (* res is meaningless for edition, we returned the old result *)
           (* inform the callback *)
-          callback (Done res)
+          callback (match ores with None -> Undone | Some r -> Done r)
       | _ -> assert (false) (* An edition can only return Noupdates or finished *)
     done;
     Queue.transfer q prover_tasks_edited;
@@ -595,6 +595,7 @@ let prepare_edition c ?file pn pr ~notification =
   update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
   let file = Opt.get pa.proof_script in
+  let old_res = pa.proof_state in
   let session_dir = Session_itp.get_dir session in
   let file = Filename.concat session_dir file in
   let old =
@@ -616,7 +617,7 @@ let prepare_edition c ?file pn pr ~notification =
   Driver.print_task ~cntexample:false ?old driver fmt task;
   Opt.iter close_in old;
   close_out ch;
-  panid,file
+  panid,file,old_res
 
 exception Editor_not_found
 
@@ -628,7 +629,7 @@ let schedule_edition c id pr ~callback ~notification =
   (* Make sure editor exists. Fails otherwise *)
   let editor =
     match prover_conf.Whyconf.editor with
-    | "" -> raise Editor_not_found
+    | "" -> Whyconf.(default_editor (get_main config))
     | s ->
        try
          let ed = Whyconf.editor_by_id config s in
@@ -636,7 +637,7 @@ let schedule_edition c id pr ~callback ~notification =
                               ed.Whyconf.editor_options)
        with Not_found -> raise Editor_not_found
   in
-  let panid,file = prepare_edition c id pr ~notification in
+  let panid,file,old_res = prepare_edition c id pr ~notification in
   (* Notification node *)
   let callback panid s =
     begin
@@ -663,8 +664,7 @@ let schedule_edition c id pr ~callback ~notification =
                 editor file;
   let call = Call_provers.call_editor ~command:editor file in
   callback panid Running;
-  Queue.add (c.controller_session,id,pr,callback panid,false,call,None)
-            prover_tasks_edited;
+  Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_timeout_handler ()
 
 exception TransAlreadyExists of string * string

@@ -44,8 +44,9 @@ module Bounded_int
   constant min : int
   constant max : int
 
-  function to_int [@model_projection] (n:t) : int
+  function to_int (n:t) : int
   meta coercion function to_int
+  meta "model_projection" function to_int
 
   val to_int (n:t) : int
     ensures { result = n }

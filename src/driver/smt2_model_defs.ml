@@ -43,7 +43,7 @@ and term =
   | To_array of term
 
 type definition =
-  | Function of variable list * term
+  | Function of (variable * string option) list * term
   | Term of term
   | Noelement
 
@@ -121,7 +121,7 @@ and make_local vars_lists t =
   match t with
   | Variable s ->
       begin
-        if (List.exists (fun x -> s = x) vars_lists) then
+        if (List.exists (fun x -> s = fst x) vars_lists) then
           Function_Local_Variable s
         else
           try
