@@ -319,7 +319,7 @@ install_no_local::
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
 	$(MKDIR_P) $(DATADIR)/why3/drivers
-	$(INSTALL_DATA) stdlib/*.why stdlib/*.mlw $(DATADIR)/why3/stdlib
+	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
