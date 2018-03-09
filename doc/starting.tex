@@ -40,7 +40,7 @@ refer to Section~\ref{sec:ideref} for a more complete description.
 \begin{figure}[tbp]
 %HEVEA\centering
   \includegraphics[width=\textwidth]{gui-1.png}
-  \caption{The GUI when started the very first time}
+  \caption{The GUI when started the very first time.}
   \label{fig:gui1}
 \end{figure}
 
@@ -50,21 +50,7 @@ why3 ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
 that looks like the screenshot of Figure~\ref{fig:gui1}.
-
-The left column is a tool bar which provides different actions to
-apply on goals. The section ``Provers'' displays the provers that were
-detected as installed on your computer.%
-%BEGIN LATEX
-\footnote{If not done yet, you
-  must perform prover autodetection using \texttt{why3 config
-    -{}-detect-provers}}
-%END LATEX
-%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3 config -{}-detect-provers}.)
-Three provers were detected, in this case,
-these are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
-Simplify~\cite{simplify05}.
-
-The middle part is a tree view that
+The left part is a tree view that
 allows to browse inside the theories.
 % Initially, the item of this tree
 % are closed. We can expand this view using the menu \textsf{View/Expand
@@ -72,12 +58,11 @@ allows to browse inside the theories.
 % like the screenshot of Figure~\ref{fig:gui2}.
 In this tree view, we have a structured view of the file: this file
 contains one theory, itself containing three goals.
-
 %EXECUTE bin/why3 ide --batch "type next;snap -crop 1024x384+0+0 doc/gui-2.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
  \includegraphics[width=\textwidth]{gui-2.png}
-  \caption{The GUI with goal G1 selected}
+  \caption{The GUI with goal G1 selected.}
   \label{fig:gui2}
 \end{figure}
 In Figure~\ref{fig:gui2}, we clicked on the row corresponding to
@@ -88,57 +73,64 @@ file is shown on the bottom right part.
 
 \subsection{Calling provers on goals}
 
-You are now ready to call these provers on the goals. Whenever you
-click on a prover button, this prover is called on the goal selected
+You are now ready to call provers on the goals
+%BEGIN LATEX
+\footnote{If not done yet, you
+  must perform prover autodetection using \texttt{why3 config
+    -{}-detect-provers}}.
+%END LATEX
+%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3 config -{}-detect-provers}.)
+A prover is selected using the context menu (right-click), in the
+\texttt{Provers} sub-menu.
+This prover is then called on the goal selected
 in the tree view. You can select several goals at a time, either
 by using multi-selection (typically by clicking while pressing the
 \textsf{Shift} or \textsf{Ctrl} key) or by selecting the parent theory
-or the parent file. Let us now select the theory ``HelloProof'' and
-click on the \textsf{Simplify} button. After a short time, you should
-get the display of Figure~\ref{fig:gui3}.
+or the parent file.
 
+Let us now select the theory ``HelloProof'' and
+run the Alt-Ergo prover. After a short time, you should
+get the display of Figure~\ref{fig:gui3}.
 %EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;snap -crop 1024x384+0+0 doc/gui-3.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
 \includegraphics[width=\textwidth]{gui-3.png}
-  \caption{The GUI after running the Alt-Ergo prover on each goal}
+  \caption{The GUI after running the Alt-Ergo prover on each goal.}
   \label{fig:gui3}
 \end{figure}
-
-Goal $G_1$ is now marked with a green ``checked'' icon in the
-status column. This means that the goal is proved by the Simplify
-prover. On the contrary, the two other goals are not proved, they remain
-marked with an orange question mark.
-
-You can immediately attempt to prove the remaining goals using another
-prover, \eg Alt-Ergo, by clicking on the corresponding button.
-Goal $G_3$ should be proved now, but not $G_2$.
+Goals $G_1$ and $G_3$ are now marked with a green ``checked'' icon in the
+status column. This means that these goals have been proved by Alt-Ergo.
+On the contrary, goal $G_2$ is not proved; it remains
+marked with a question mark.
+You could attempt to prove $G_2$ using another prover, though it is
+obvious here it will not succeed.
 
 \subsection{Applying transformations}
 
 Instead of calling a prover on a goal, you can apply a transformation
 to it.  Since $G_2$ is a conjunction, a possibility is to split it
-into subgoals. You can do that by clicking on the \textsf{Split}
-button of section ``Transformations'' of the left toolbar. Now you
-have two subgoals, and you can try again a prover on them, for example
-Simplify. We already have a lot of goals and proof attempts, so it is a good idea to close the sub-trees which are already proved: this can be done by the menu \textsf{View/Collapse proved goals}, or even better by its shortcut ``Ctrl-C''.
-You should see now what is displayed on Figure~\ref{fig:gui4}.
+into subgoals. You can do that by selecting \textsf{Split} in the
+\texttt{Strategies} sub-menu of the context menu. Now you have two
+subgoals, and you can try again a prover on them, for example
+Alt-Ergo. We already have a lot of goals and proof attempts, so it is
+a good idea to close the sub-trees which are already proved: this can
+be done by the menu \textsf{View/Collapse proved goals}, or even
+better by its shortcut ``Ctrl-C''.  You should see now what is
+displayed on Figure~\ref{fig:gui4}.
 
 %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_goal_wp;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
  \includegraphics[width=\textwidth]{gui-4.png}
-  \caption{The GUI after splitting goal $G_2$}
+  \caption{The GUI after splitting goal $G_2$.}
   \label{fig:gui4}
 \end{figure}
 
 The first part of goal $G_2$ is still unproved. As a last resort, we
-can try to call the Coq proof assistant. The first step is to click on
-the \textsf{Coq} button. A new sub-row appear for Coq, and
-unsurprisingly the goal is not proved by Coq either. What can be done
-now is editing the proof: select that row and then click on the
-\textsf{Edit} button in section ``Tools'' of the toolbar. This should
-launch the Coq proof editor, which is \texttt{coqide} by default (see
+can try to call the Coq proof assistant, by selecting it in the
+\texttt{Provers} list.
+A new sub-row appear for Coq, and the Coq proof editor is launched.
+(It is \texttt{coqide} by default; see
 Section~\ref{sec:ideref} for details on how to configure this). You get
 now a regular Coq file to fill in, as shown on Figure~\ref{fig:coqide}.
 Please be mindful of the comments of this file. They indicate where \why
@@ -159,10 +151,11 @@ explained below.
 
 \subsection{Modifying the input}
 
-Currently, the GUI does not allow to modify the input file. You must
+% Currently, the GUI does not allow to modify the input file.
+You must
 edit the file external by some editor of your choice. Let us assume we
-change the goal $G_2$ by replacing the first occurrence of true by
-false, \eg
+change the goal $G_2$ by replacing the first occurrence of \texttt{true} by
+\texttt{false}, \eg
 \begin{whycode}
   goal G2 : (false -> false) /\ (true \/ false)
 \end{whycode}
