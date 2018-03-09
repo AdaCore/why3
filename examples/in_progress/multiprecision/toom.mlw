@@ -72,6 +72,10 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   value_concat y n sy;
   assert { value x sx = a0 + m * a1 };
   assert { value y sy = b0 + m * b1 };
+  let r' = decr_split r 0 in
+  let ro = C.incr_split r (Int32.(+) sx sy) in
+  let scratch' = decr_split scratch 0 in
+  assert { min r = offset r /\ max r = offset r + sx + sy };
   let s_out = C.incr_split scratch (Int32.(+) n n) in
   let vinf = C.incr_split r (Int32.(+) n n) in
   label ASM1 in
@@ -80,10 +84,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   let vm1_neg = ref false in
   begin ensures { (!vm1_neg /\ value xsm1 n = a1 - a0)
                   \/ (not !vm1_neg /\ value xsm1 n = a0 - a1) }
-        ensures { forall j. (j < offset r \/ offset r + sx + sy <= j)
-                            -> (pelts r)[j] = old (pelts r)[j] }
-        ensures { forall j. j < offset scratch
-                            -> (pelts scratch)[j] = old (pelts scratch)[j] }
         ensures { min scratch = old min scratch }
         ensures { max scratch = old max scratch }
         ensures { plength scratch = old plength scratch }
@@ -128,10 +128,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   begin ensures { (!vm1_neg = (!vm1_neg at BSM1) /\ value ysm1 n = b0 - b1)
                   \/ (!vm1_neg = not (!vm1_neg at BSM1) /\ value ysm1 n = b1 - b0) }
         ensures { value xsm1 n = (value xsm1 n at BSM1) }
-        ensures  { forall j. (j < offset r \/ offset r + sx + sy <= j)
-                             -> (pelts r)[j] = old (pelts r)[j] }
-        ensures  { forall j. j < offset scratch
-                             -> (pelts scratch)[j] = old (pelts scratch)[j] }
         ensures { min scratch = old min scratch }
         ensures { max scratch = old max scratch }
         ensures { plength scratch = old plength scratch }
@@ -170,10 +166,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
         assert { value xsm1 n = value xsm1 n at Zero };
         value_concat ysm1 t n;
         assert { value ysm1 n = value ysm1 t };
-        assert { forall j. (j < offset r \/ offset r + sx + sy <= j)
-                             -> (pelts r)[j] = (pelts r)[j] at BSM1
-                 by [@case_split] (j < offset ysm1 + t \/ offset ysm1 + t <= j)
-                    so (pelts r)[j] = (pelts r)[j] at Zero };
         vm1_neg := not !vm1_neg end
       else begin
         value_concat y0 t n;
@@ -197,16 +189,12 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   toom22_mul_n_rec scratch xsm1 ysm1 s_out n (k-1);
   assert { value scratch (n+n) = asm1_abs * bsm1_abs };
   join r ysm1;
-  assert { min scratch = old min scratch };
+  assert { min scratch = offset scratch };
   assert { max scratch = max scratch at ASM1 };
   assert { plength scratch = old plength scratch };
-  assert { min r = old min r };
+  assert { min r = offset r };
   assert { max r = max r at ASM1 };
   assert { plength r = old plength r };
-  assert { forall j. (min r <= j < offset r \/ offset r + sx + sy <= j < max r)
-                     -> (pelts r)[j] = old (pelts r)[j] };
-  assert { forall j. offset r + sx + sy <= j ->
-                     (pelts vinf)[j] = old (pelts vinf)[j] };
   assert { forall j. min scratch <= j < offset scratch -> (pelts scratch)[j]
             = old (pelts scratch)[j] };
   let v0 = r in
@@ -214,12 +202,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   begin ensures { value scratch (n+n) = asm1_abs * bsm1_abs }
         ensures { value v0 (n+n) = a0 * b0 }
         ensures { value vinf (s+t) = a1 * b1 }
-        ensures { forall j. min r <= j < offset r
-                            -> (pelts r)[j] = old (pelts r)[j] }
-        ensures { forall j. offset r + sx + sy <= j < max vinf ->
-                            (pelts vinf)[j] = old (pelts vinf)[j] }
-        ensures { forall j. min scratch <= j < offset scratch
-                  -> (pelts scratch)[j] = old (pelts scratch)[j] }
         ensures { min scratch = old min scratch }
         ensures { max scratch = old max scratch }
         ensures { plength scratch = old plength scratch }
@@ -244,9 +226,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
      else toom22_mul_n_rec vinf x1 y1 s_out s (k-1));
     toom22_mul_n_rec v0 x0 y0 s_out n (k-1);
   end;
-  assert { forall j. offset r + sx + sy <= j < max r -> (pelts r)[j] = old (pelts r)[j]
-           by (pelts r)[j] = (pelts vinf)[j] at Rec
-              = (pelts r)[j] at ASM1 = old (pelts r)[j] };
   label Adds in
   value_concat v0 n (Int32.(+) n n);
   value_concat vinf n (Int32.(+) s t);
@@ -375,10 +354,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   let ghost v0nj = { v0n } in
   let ghost vinfnj = { vinfn } in
   join r v0n;
-  assert { forall j. min r <= j < offset r
-           -> (pelts r)[j] = old (pelts r)[j]
-              by (pelts r)[j] = (pelts r)[j] at Join
-                 = (pelts r)[j] at Adds = old (pelts r)[j] };
   value_sub_frame (pelts r) (pelts rj) (offset r) (offset r + p2i n);
   assert { value r n = value rj n = lv0 };
   value_concat r n (Int32.( *) 3 n);
@@ -392,14 +367,6 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   label JoinH in
   let ghost rh = { r } in
   join r vinfn;
-  assert { forall j. min r <= j < offset r
-           -> (pelts r)[j] = old (pelts r)[j]
-              by (pelts r)[j] = (pelts r)[j] at JoinH = old (pelts r)[j] };
-  assert { forall j. offset r + sx + sy <= j < max r
-           -> (pelts r)[j] = old (pelts r)[j]
-              by (pelts r)[j] = (pelts vinfn)[j] at JoinH
-                 = (pelts vinfn)[j] at JoinMid
-                 = old (pelts r)[j] };
   value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + 3 * p2i n);
   assert { value r (3*n) = value r (3*n) at JoinH };
   value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + p2i n);
@@ -688,20 +655,19 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                 = value r (sx+sy) at IncrH - power radix (3*n)
                 = value x sx * value y sy };
   end;
-  assert { forall j. min scratch <= j < offset scratch ->
-           (pelts scratch)[j] = old (pelts scratch)[j]
-           by (pelts scratch)[j] = (pelts scratch)[j] at Rec
-              = old (pelts scratch)[j] };
-  assert { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
-             -> (pelts r)[j] = (pelts r)[j] at IncrH
-                by (pelts r)[j] = (pelts vinfn)[j]
-                   = (pelts vinfn)[j] at IncrH };
-  assert { forall j. min r <= j < offset r
-                     \/ offset r + sx + sy <= j < max r
-                       -> (pelts r)[j] = old (pelts r)[j]
-           by (pelts r)[j] = (pelts r)[j] at IncrH
-              = (pelts r)[j] at IncrM
-              = old (pelts r)[j] }
+  label JoinRight in
+  let rf = { r } in
+  C.join r ro;
+  label JoinLeft in
+  C.join_r r' r;
+  assert { forall j. offset r <= j < offset r + sx + sy ->
+           (pelts r)[j] = (pelts rf)[j]
+           by (pelts r)[j] = (pelts r)[j] at JoinLeft
+              = (pelts rf)[j] };
+  value_sub_frame (pelts r) (pelts rf) (offset r) (offset r + p2i sx + p2i sy);
+  assert { value r (sx + sy) = value r (sx + sy) at JoinRight };
+  C.join_r scratch' scratch
+
 
   (* Choose which multiplication algorithm is called recursively.
      Equivalent to the macros TOOM22_MUL_REC and TOOM22_MUL_N_REC

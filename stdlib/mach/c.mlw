@@ -140,6 +140,36 @@ module C
     ensures  { forall i. old p2.min <= i < old p2.max ->
                          (pelts p1)[i] = old (pelts p2)[i] }
 
+  val decr_split (p:ptr 'a) (i:int32) : ptr 'a
+    requires { 0 <= i }
+    requires { p.min <= p.offset - i <= p.max }
+    writes   { p.min }
+    writes   { p.data }
+    ensures  { result.offset = p.offset - i }
+    ensures  { p.min = p.offset - i }
+    ensures  { result.min = old p.min }
+    ensures  { result.max = p.offset - i }
+    ensures  { result.zone = p.zone }
+    ensures  { pelts p = old pelts p }
+    ensures  { plength p = old plength p }
+    ensures  { pelts result = old pelts p }
+    ensures  { plength result = old plength p }
+    (* NOT alias result.data old p.data *)
+                   
+  val join_r (p1 p2: ptr 'a) : unit
+    requires { p1.zone = p2.zone }
+    requires { p1.max = p2.min }
+    writes   { p1 }
+    writes   { p1.data }
+    writes   { p2.min }
+    writes   { p2.data.elts }
+    ensures  { p2.min = old p1.min }
+    ensures  { plength p2 = old plength p2 }
+    ensures  { forall i. old p1.min <= i < old p1.max ->
+                         (pelts p2)[i] = old (pelts p1)[i] }
+    ensures  { forall i. old p2.min <= i < old p2.max ->
+                         (pelts p2)[i] = old (pelts p2)[i] }
+
   val c_assert (e:bool) : unit
     ensures { e }
     diverges
