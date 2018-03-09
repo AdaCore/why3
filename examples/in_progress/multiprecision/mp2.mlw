@@ -1811,6 +1811,12 @@ module N
                = value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz)) };
       ly := get_ofs y !i;
       let c' =  addmul_limb !rp x !ly sz in
+      assert { forall j. (!rp).offset + sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j]
+                 by (pelts r)[j]
+                 = (pelts !rp)[j]
+                 = (pelts !rp)[j] at StartLoop
+                 = (pelts (old r))[j]};
       assert { value !rp sz + power radix sz * c'
               = value (!rp at StartLoop) sz + value x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
@@ -1950,6 +1956,8 @@ module N
              };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
+      assert { forall j. (!rp).offset + sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j] };
     done;
     !c
 
