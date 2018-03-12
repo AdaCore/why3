@@ -30,6 +30,7 @@ and term =
   | Decimal of (string * string)
   | Fraction of (string * string)
   | Float of float_type
+  | Apply of (string * term list)
   | Other of string
   | Array of array
   | Bitvector of string
@@ -38,8 +39,7 @@ and term =
   | Function_Local_Variable of variable
   | Variable of variable
   | Ite of term * term * term * term
-  | Record of int * (term list)
-  | Discr of int * (term list)
+  | Record of string * ((string * term) list)
   | To_array of term
 
 type definition =
@@ -61,8 +61,6 @@ val make_local: (variable * string option) list -> term -> term
 
 val print_term: Format.formatter -> term -> unit
 val print_def: Format.formatter -> definition -> unit
-
-val build_record_discr: term list -> term
 
 (* Used for let bindings of z3 *)
 val substitute: (string * term) list -> term -> term

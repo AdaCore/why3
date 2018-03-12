@@ -49,7 +49,7 @@ type info = {
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
   mutable list_projs: Stdlib.Sstr.t;
-  meta_model_projection: Sls.t
+  meta_model_projection: Sls.t;
   }
 
 let ident_printer () =
@@ -420,7 +420,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f =
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
-                                list_projections = info.list_projs;};
+                                list_projections = info.list_projs;
+                                list_records = Stdlib.Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma| Pskip -> assert false

@@ -128,6 +128,7 @@ type info = {
   info_printer : ident_printer;
   mutable list_projs : Stdlib.Sstr.t;
   meta_model_projection : Sls.t;
+  mutable list_records : ((string * string) list) Stdlib.Mstr.t;
 }
 
 let debug_print_term message t =
@@ -146,7 +147,7 @@ let print_ident info fmt id =
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
   | Tyapp (ts, l) ->
-     begin match query_syntax info.info_syn ts.ts_name, l with
+      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
       | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
       | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
@@ -455,7 +456,8 @@ let print_param_decl info fmt ls =
               (print_ident info) ls.ls_name
               (print_type_value info) ls.ls_value
      *)
-    | _  -> fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
+    | _  ->
+        fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
                     (print_ident info) ls.ls_name
                     (print_list space (print_type info)) ls.ls_args
                     (print_type_value info) ls.ls_value
@@ -517,26 +519,50 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
-                                list_projections = info.list_projs;}
+                                list_projections = info.list_projs;
+                                Printer.list_records = info.list_records}
   | Plemma| Pskip -> assert false
 
 
 let print_constructor_decl info fmt (ls,args) =
-  match args with
-  | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name
-  | _ ->
-     fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
-     let _ =
-       List.fold_left2
-         (fun i ty pr ->
-          begin match pr with
-          | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
-          | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
-          end;
-          fprintf fmt " %a)" (print_type info) ty;
-          succ i) 1 ls.ls_args args
-     in
-     fprintf fmt ")@]"
+  let field_names =
+    (match args with
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
+    | _ ->
+        fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
+        let field_names, _ =
+          List.fold_left2
+          (fun (acc, i) ty pr ->
+            let field_name =
+              match pr with
+              | Some pr ->
+                  let field_name = sprintf "%a" (print_ident info) pr.ls_name in
+                  fprintf fmt "(%s" field_name;
+                  let trace_name =
+                    try
+                      let lab = Slab.choose (Slab.filter (fun x ->
+                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
+                      Strings.remove_prefix "model_trace:" lab.lab_string
+                    with
+                      Not_found -> ""
+                  in
+                  (field_name, trace_name)
+              | None ->
+                  let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
+                  fprintf fmt "(%s" field_name;
+                  (field_name, "")
+            in
+            fprintf fmt " %a)" (print_type info) ty;
+            (field_name :: acc, succ i)) ([], 1) ls.ls_args args
+        in
+        fprintf fmt ")@]";
+        List.rev field_names)
+  in
+
+  if Strings.has_prefix "mk " ls.ls_name.id_string then
+    begin
+      info.list_records <- Stdlib.Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+    end
 
 let print_data_decl info fmt (ts,cl) =
   fprintf fmt "@[(%a@ %a)@]"
@@ -580,6 +606,7 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     list_projs = Stdlib.Sstr.empty;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
+    list_records = Stdlib.Mstr.empty;
   } in
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;

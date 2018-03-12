@@ -41,11 +41,12 @@ let rec get_variables_term (table: correspondence_table) t =
     else
       Mstr.add cvc (false, Noelement) table
   | Record (_, l) ->
-    List.fold_left (fun table t -> get_variables_term table t) table l
-  | Discr (_, l) ->
-    List.fold_left (fun table t -> get_variables_term table t) table l
+    List.fold_left (fun table (_f, t) -> get_variables_term table t) table l
   | To_array t ->
     get_variables_term table t
+  | Apply (_s, lt) ->
+      List.fold_left (fun table t -> get_variables_term table t) table lt
+
 
 and get_variables_array table a =
    match a with
@@ -195,11 +196,11 @@ and refine_function table term =
   | Array a ->
     Array (refine_array table a)
   | Record (n, l) ->
-    Record (n, List.map (fun x -> refine_function table x) l)
-  | Discr (n, l) ->
-    Discr (n, List.map (fun x -> refine_function table x) l)
+    Record (n, List.map (fun (f, v) -> f, refine_function table v) l)
   | To_array t ->
     To_array (refine_function table t)
+  | Apply (s, lt) ->
+    Apply (s, List.map (refine_function table) lt)
 
 
 and refine_variable_value (table: correspondence_table) key v =
@@ -225,6 +226,7 @@ let convert_to_indice t =
   match t with
   | Integer i -> i
   | Bitvector bv -> bv
+  | Boolean b -> string_of_bool b
   | _ -> raise Not_value
 
 let rec convert_array_value (a: array) : Model_parser.model_array =
@@ -257,7 +259,8 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   | Cvc4_Variable _v -> raise Not_value (*Model_parser.Unparsed "!"*)
   (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
   | To_array t -> convert_to_model_value (Array (convert_z3_array t))
-  | Function_Local_Variable _ | Variable _ | Ite _ | Discr _ -> raise Not_value
+  | Apply (s, lt) -> Model_parser.Apply (s, List.map convert_to_model_value lt)
+  | Function_Local_Variable _ | Variable _ | Ite _ -> raise Not_value
 
 and convert_z3_array (t: term) : array =
 
@@ -281,21 +284,7 @@ and convert_z3_array (t: term) : array =
   convert_array t
 
 and convert_record l =
-  let acc = ref [] in
-  let rec convert_aux l =
-    match l with
-    | Discr (_n, l) :: tl ->
-        acc := List.map convert_to_model_value l;
-        convert_aux tl
-    | a :: tl ->
-        convert_to_model_value a :: convert_aux tl
-    | [] -> []
-  in
-  let record_field = convert_aux l in
-  {
-    Model_parser.discrs = !acc;
-    Model_parser.fields = record_field
-  }
+  List.map (fun (f, v) -> f, convert_to_model_value v) l
 
 let convert_to_model_element name t =
   match t with
@@ -304,7 +293,70 @@ let convert_to_model_element name t =
       let value = convert_to_model_value t in
       Model_parser.create_model_element ~name ~value ()
 
-let create_list (projections_list: Stdlib.Sstr.t) (table: correspondence_table) =
+let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
+
+  let rec array_apply_to_record (a: array) =
+    match a with
+    | Const x ->
+        let x = apply_to_record x in
+        Const x
+    | Store (a, t1, t2) ->
+        let a = array_apply_to_record a in
+        let t1 = apply_to_record t1 in
+        let t2 = apply_to_record t2 in
+        Store (a, t1, t2)
+
+  and apply_to_record (v: term) =
+    match v with
+    | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
+    | Cvc4_Variable _ | Function_Local_Variable _ | Variable _ | Other _ -> v
+    | Array a ->
+        Array (array_apply_to_record a)
+    | Record (s, l) ->
+        let l = List.map (fun (f,v) -> f, apply_to_record v) l in
+        Record (s, l)
+    | Apply (s, l) ->
+        let l = List.map apply_to_record l in
+        if Mstr.mem s list_records then
+          Record (s, List.combine (Mstr.find s list_records) l)
+        else
+          Apply (s, l)
+    | Ite (t1, t2, t3, t4) ->
+        let t1 = apply_to_record t1 in
+        let t2 = apply_to_record t2 in
+        let t3 = apply_to_record t3 in
+        let t4 = apply_to_record t4 in
+        Ite (t1, t2, t3, t4)
+    | To_array t1 ->
+        let t1 = apply_to_record t1 in
+        To_array t1
+
+  in
+  apply_to_record t
+
+let definition_apply_to_record list_records d =
+    match d with
+    | Function (lt, t) ->
+        Function (lt, apply_to_record list_records t)
+    | Term t -> Term (apply_to_record list_records t)
+    | Noelement -> Noelement
+
+let create_list (projections_list: Sstr.t) (list_records: ((string * string) list) Mstr.t)
+    (table: correspondence_table) =
+
+  (* Convert list_records to take replace fields with model_trace when
+     necessary. *)
+  let list_records =
+    Mstr.fold (fun key l acc ->
+      Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) list_records Mstr.empty
+  in
+
+  (* Convert Apply that were actually recorded as record to Record. *)
+  let table =
+    Mstr.fold (fun key (b, value) acc ->
+      let value = definition_apply_to_record list_records value in
+      Mstr.add key (b, value) acc) table Mstr.empty
+  in
 
   (* First populate the table with all references to a cvc variable *)
   let table = get_all_var table in
@@ -312,7 +364,7 @@ let create_list (projections_list: Stdlib.Sstr.t) (table: correspondence_table) 
   (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if Stdlib.Sstr.mem key projections_list then
+      if Sstr.mem key projections_list then
         add_vars_to_table acc value
       else
         acc)
@@ -332,6 +384,7 @@ let create_list (projections_list: Stdlib.Sstr.t) (table: correspondence_table) 
           Some t
       | _ -> None in
       try (convert_to_model_element key t :: list_acc)
-      with Not_value -> list_acc)
+      with Not_value when not (Debug.test_flag Debug.stack_trace) -> list_acc
+      | e -> raise e)
     table
     []

@@ -44,6 +44,7 @@ type model_value =
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string; (* Even array indices can exceed MAX_INT with Z3 *)
@@ -53,10 +54,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record = {
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 let array_create_constant ~value =
   {
@@ -136,6 +135,16 @@ let rec convert_model_value value : Json_base.json =
       let m = Mstr.add "type" (Json_base.String "Array") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json_base.List l) m in
       Json_base.Record m
+  | Apply (s, lt) ->
+      let lt = List.map convert_model_value lt in
+      let slt =
+        let m = Mstr.add "list" (Json_base.List lt) Stdlib.Mstr.empty in
+        let m = Mstr.add "apply" (Json_base.String s) m in
+        Json_base.Record m
+      in
+      let m = Mstr.add "type" (Json_base.String "Apply") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" slt m in
+      Json_base.Record m
   | Record r ->
       convert_record r
 
@@ -154,18 +163,19 @@ and convert_indices indices =
 
 and convert_record r =
   let m = Mstr.add "type" (Json_base.String "Record") Stdlib.Mstr.empty in
-  let fields = convert_fields r.fields in
-  let discrs = convert_discrs r.discrs in
-  let m_field_discr = Mstr.add "Field" fields Stdlib.Mstr.empty in
-  let m_field_discr = Mstr.add "Discr" discrs m_field_discr in
-  let m = Mstr.add "val" (Json_base.Record m_field_discr) m in
+  let fields = convert_fields r in
+  let m_field = Mstr.add "Field" fields Stdlib.Mstr.empty in
+  let m = Mstr.add "val" (Json_base.Record m_field) m in
   Json_base.Record m
 
 and convert_fields fields =
-  Json_base.List (List.map convert_model_value fields)
-
-and convert_discrs discrs =
-  Json_base.List (List.map convert_model_value discrs)
+  Json_base.List
+    (List.map
+       (fun (f, v) ->
+         let m = Mstr.add "field" (Json_base.String f) Stdlib.Mstr.empty in
+         let m = Mstr.add "value" (convert_model_value v) m in
+         Json_base.Record m)
+       fields)
 
 let print_model_value_sanit fmt v =
   let v = convert_model_value v in
@@ -199,11 +209,10 @@ let rec print_array_human fmt (arr: model_array) =
     arr.arr_indices;
   fprintf fmt "others => %a)" print_model_value_human arr.arr_others
 
-(* TODO there should be no record printed that way currently in Why3 *)
 and print_record_human fmt r =
-  fprintf fmt "Record(";
-  List.iter (fun x -> fprintf fmt "%a" print_model_value_human x) r.fields;
-  fprintf fmt ")"
+  fprintf fmt "%a"
+    (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
+    (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
 
 and print_model_value_human fmt (v: model_value) =
   match v with
@@ -212,6 +221,8 @@ and print_model_value_human fmt (v: model_value) =
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
+  | Apply (s, lt) ->
+    fprintf fmt "[%s %a]" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Bitvector s -> fprintf fmt "%s" s
@@ -307,7 +318,9 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser = Stdlib.Sstr.t -> string -> model_element list
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
 
 (*
 ***************************************************************
@@ -713,7 +726,8 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
-    let raw_model = raw_mp list_proj input in
+    let list_records = printer_mapping.list_records in
+    let raw_model = raw_mp list_proj list_records input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -732,4 +746,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ -> [])
+  (fun _ _ _ -> [])

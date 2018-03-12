@@ -59,23 +59,6 @@ rule token = parse
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "mk___split_fields"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_FIELD ("mk___split_fields",0)
-    | n -> MK_SPLIT_FIELD ("mk___split_fields"^n, int_of_string n) }
-  | "mk___rep"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_REP ("mk___rep", 0)
-    | n -> MK_REP ("mk___rep"^n, int_of_string n) }
-  | "mk___t"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_T ("mk___t", 0)
-    | n -> MK_T ("mk___t"^n, int_of_string n) }
-  | "mk___split_discrs"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
-    | n -> MK_SPLIT_DISCRS ("mk___split_discrs"^n, int_of_string n) }
-  | "mk" name dummy { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
   | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
 

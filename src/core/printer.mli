@@ -35,6 +35,7 @@ type printer_mapping = {
      by the printer *)
   list_projections: Stdlib.Sstr.t;
   (* List of projections as printed in the model *)
+  list_records: ((string * string) list) Stdlib.Mstr.t;
 }
 
 type printer_args = {
