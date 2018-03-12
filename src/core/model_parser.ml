@@ -465,12 +465,16 @@ let interleave_line
     let model_elements = IntMap.find line_number model_file in
     print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
-      (get_padding line) ^
-        start_comment ^
-        (flush_str_formatter ()) ^
-        end_comment in
+     (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
+    in
 
-    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + 1, remaining_locs, list_loc @ locs)
+    (* We need to know how many lines will be taken by the counterexample. This
+       is ad hoc as we don't really know how the lines are split in IDE. *)
+    let len_cnt =
+      1 + (String.length cntexmp_line) / 80
+    in
+
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + len_cnt, remaining_locs, list_loc @ locs)
   with Not_found ->
     (source_code ^ line, line_number + 1, offset, remaining_locs, list_loc @ locs)
 
