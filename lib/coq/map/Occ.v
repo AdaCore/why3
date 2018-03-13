@@ -319,3 +319,51 @@ rewrite <- h0. trivial. omega. omega.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. assumption.
 Qed.
 
+Lemma occ_single {a:Type} {a_WT:WhyType a} :
+  forall (m:Z -> a) (i:Z) (x:a),
+  occ x m i (i + 1) = if why_decidable_eq (m i) x then 1%Z else 0%Z.
+Proof.
+intros m i x.
+rewrite occ_equation'.
+unfold occ, nat_rect.
+rewrite Z.sub_diag.
+apply Zplus_0_r.
+apply Z.lt_succ_diag_r.
+Qed.
+
+Lemma occ_set {a:Type} {a_WT:WhyType a} :
+  forall (m:Z -> a) (l:Z) (u:Z) (i:Z) (x:a) (y:a),
+  (l <= i < u)%Z ->
+  occ y (map.Map.set m i x) l u = (occ y m l u +
+  (if why_decidable_eq x y then 1 else 0) -
+  if why_decidable_eq (m i) y then 1 else 0)%Z.
+Proof.
+intros m l u i x y H.
+rewrite 2!(occ_append _ _ l i u) by omega.
+rewrite 2!(occ_append _ _ i (i + 1) u) by omega.
+rewrite 2!occ_single.
+rewrite (proj1 (Map.set_def _ _ _ _) eq_refl).
+rewrite 2!(occ_eq _ (Map.set m i x) m).
+ring.
+intros j H1.
+apply Map.set_def.
+omega.
+intros j H1.
+apply Map.set_def.
+omega.
+Qed.
+
+(* Why3 goal *)
+Lemma occ_exchange {a:Type} {a_WT:WhyType a} :
+  forall (m:Z -> a) (l:Z) (u:Z) (i:Z) (j:Z) (x:a) (y:a) (z:a),
+  ((l <= i)%Z /\ (i < u)%Z) -> ((l <= j)%Z /\ (j < u)%Z) -> ~ (i = j) ->
+  ((occ z (map.Map.set (map.Map.set m i x) j y) l u) =
+   (occ z (map.Map.set (map.Map.set m i y) j x) l u)).
+Proof.
+intros m l u i j x y z h1 h2 h3.
+rewrite 4!occ_set by assumption.
+apply not_eq_sym in h3.
+rewrite 2!(proj2 (Map.set_def _ _ _ _) h3).
+ring.
+Qed.
+
