@@ -1185,9 +1185,12 @@ end
       | ATn tnid ->
         let child_ids = get_sub_tasks d.cont.controller_session tnid in
         List.iter (fun id -> apply_transform (APn id) t args) child_ids
-      | AFile _ | ATh _ ->
-        (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
-        ()
+      | AFile f ->
+        let child_ids = file_theories f in
+        List.iter (fun id -> apply_transform (ATh id) t args) child_ids
+      | ATh th ->
+        let child_ids = theory_goals th in
+        List.iter (fun id -> apply_transform (APn id) t args) child_ids
     in
     let nid = any_from_node_ID node_id in
     apply_transform nid t args

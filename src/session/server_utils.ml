@@ -430,6 +430,8 @@ let interp commands_table cont id s =
          match id with
          | Some (Session_itp.APn _id) -> Transform (cmd,t,args)
          | Some (Session_itp.ATn _tid) -> Transform (cmd, t, args)
+         | Some (Session_itp.AFile _f) -> Transform (cmd, t, args)
+         | Some (Session_itp.ATh _th) ->  Transform (cmd, t, args)
          | _ -> QError ("Please select a goal or trans node in the task tree")
        with
        | Trans.UnknownTrans _ ->
