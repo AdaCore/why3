@@ -301,7 +301,7 @@ egalite sur les type algebriques ? engendrees automatiquement ?
 \hline
 \texttt{assert \{ ... (old x) ... \}} & \texttt{assert \{ ... (x at Init) ... \}} \\
 \hline
-\texttt{\char`\\ x{.} e} & \texttt{fun x -> e} \\
+\texttt{\char`\\ x. e} & \texttt{fun x -> e} \\
 \hline
 \texttt{use HighOrd} & nothing, not needed anymore \\
 \hline
@@ -316,6 +316,10 @@ egalite sur les type algebriques ? engendrees automatiquement ?
 \texttt{"attribute"} & \texttt{[@attribute]} \\
 \hline
 \texttt{meta M prop P} & \texttt{meta M lemma P} or \texttt{meta M axiom P} or \texttt{meta M goal P} \\
+\hline
+\texttt{loop ... end} & \texttt{while true do ... done} \\
+\hline
+\texttt{type ... invariant \{ ... self.foo ... \}} & \texttt{type ... invariant \{ ... foo ... \}}\\
 \hline
 \end{tabular}
 \end{center}

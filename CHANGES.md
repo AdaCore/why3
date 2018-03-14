@@ -1,50 +1,53 @@
 :x: marks a potential source of incompatibility
 
-x syntax changes for programs; good luck!
-  * let function / let predicate / val function / val predicate
-    introduce symbols in both logic and programs
-  * overloading of program symbols
-  * no more "self" in type invariants
-  x new clause "alias" in function contracts
-x logical symbols can only be used in ghost code
-x no more polymorphic equality in programs
-  equality functions must be declared/defined on per type basis
-  (this is already done for type int in the standard library)
-x type invariants produce logical axioms
-  * a type with an invariant must be proved to be inhabited
-* local exceptions; break, continue, and return statements
-* match with exceptions
-* "for" loop on range types (including machine integers from the library)
-x no more "loop" statement (use "while true" instead)
-* vc:sp switches from traditional WP to Flanagan-Saxe-like VCgen,
-  on per expression basis
+Core
+  * improved support of counter-examples
 
-* type coercions in logic
+Language
+  * numerous changes to syntax, see documentation appendix :x:
+  * `let function`, `let predicate`, `val function`, and `val predicate`
+     introduce symbols in both logic and programs
+  * logical symbols can no longer be used in non-ghost code;
+    in particular, there is no polymorphic equality in programs any more,
+    so equality functions must be declared/defined on a per-type basis
+    (already done for type `int` in the standard library) :x:
+  * added overloading of program symbols
+  * new clause `alias` in function contracts :x:
+  * support for multiple assignments
+  * type invariants now produce logical axioms;
+    a type with an invariant must be proved to be inhabited :x:
+  * support for local exceptions using `exception ... in ...`
+  * added `break`, `continue`, and `return` statements
+  * support for `exception` branches in `match` constructs
+  * support for `for` loops on range types
+    (including machine integers from the standard library)
+  * attribute `[@vc:sp]` on an expression switches from traditional WP to
+    Flanagan-Saxe-like VC generation
+  * support for type coercions in logic using `meta coercion`
+  * deprecated `theory`; use `module` instead
 
-* new extraction to OCaml
-* new extraction to C
-
-* .why extension is now deprecated; use .mlw instead
-* "theory" now deprecated; use "module" instead
+Extraction
+  * improved extraction to OCaml
+  * added partial extraction to C
 
 Transformations
   * transformations can now have arguments
-  * new transformations assert, apply, cut, rewrite, ... à la Coq
-  * new transformations for reflection-based proofs
+  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc, à la Coq
+  * added transformations for reflection-based proofs
 
 Drivers
-* "use" is allowed
+  * support for `use` in theory drivers
 
-* counterexamples
-
-* new IDE
+IDE
   * source is now editable
-  * CLI to call transformations and provers
+  * premises are no longer implicitly introduced
+  * command-line interface to call transformations and provers
 
-* new input format for (a small subset of) Python
+Tools
+  * deprecated `.why` file extension; use `.mlw` instead
 
-* the "why3" Coq tactic is now deprecated
-
+Provers
+  * deprecated the `why3` Coq tactic
 
 Version 0.88.3, January 11, 2018
 --------------------------------
@@ -111,6 +114,9 @@ User features
   * counterexamples: better support for array values, support for
     floating-point values, support for Z3 in addition to CVC4.
     More details in the manual, section 6.3.5 "Displaying Counterexamples".
+
+Plugins
+  * new input format for a small subset of Python
 
 Provers
   * support for Isabelle 2017 (released Oct 2017)
