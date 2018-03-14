@@ -26,9 +26,13 @@ Language
   * support for type coercions in logic using `meta coercion`
   * deprecated `theory`; use `module` instead
 
+Standard library
+  * machine integers in `mach.int.*` are now range types :x:
+  * added a minimal memory model for the C language in `mach.c`
+
 Extraction
   * improved extraction to OCaml
-  * added partial extraction to C
+  * added partial extraction to C using the memory model of `mach.c`
 
 Transformations
   * transformations can now have arguments
