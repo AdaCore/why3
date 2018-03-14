@@ -1,5 +1,51 @@
 :x: marks a potential source of incompatibility
 
+x syntax changes for programs; good luck!
+  * let function / let predicate / val function / val predicate
+    introduce symbols in both logic and programs
+  * overloading of program symbols
+  * no more "self" in type invariants
+  x new clause "alias" in function contracts
+x logical symbols can only be used in ghost code
+x no more polymorphic equality in programs
+  equality functions must be declared/defined on per type basis
+  (this is already done for type int in the standard library)
+x type invariants produce logical axioms
+  * a type with an invariant must be proved to be inhabited
+* local exceptions; break, continue, and return statements
+* match with exceptions
+* "for" loop on range types (including machine integers from the library)
+x no more "loop" statement (use "while true" instead)
+* vc:sp switches from traditional WP to Flanagan-Saxe-like VCgen,
+  on per expression basis
+
+* type coercions in logic
+
+* new extraction to OCaml
+* new extraction to C
+
+* .why extension is now deprecated; use .mlw instead
+* "theory" now deprecated; use "module" instead
+
+Transformations
+  * transformations can now have arguments
+  * new transformations assert, apply, cut, rewrite, ... à la Coq
+  * new transformations for reflection-based proofs
+
+Drivers
+* "use" is allowed
+
+* counterexamples
+
+* new IDE
+  * source is now editable
+  * CLI to call transformations and provers
+
+* new input format for (a small subset of) Python
+
+* the "why3" Coq tactic is now deprecated
+
+
 Version 0.88.3, January 11, 2018
 --------------------------------
 
