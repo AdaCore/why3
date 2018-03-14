@@ -522,25 +522,21 @@ let schedule_proof_attempt c id pr
     end;
     callback panid s
   in
-  let adaptlimit,ores,proof_script =
+  let ores,proof_script =
     try
       let h = get_proof_attempt_ids ses id in
       let pa = Hprover.find h pr in
       let a = get_proof_attempt_node ses pa in
       let old_res = a.proof_state in
-      let config_pr,_ = Hprover.find c.controller_provers pr in
-      let interactive = config_pr.Whyconf.interactive in
-      let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
-      let limit = adapt_limits ~interactive ~use_steps limit a in
       let script = Opt.map (fun s ->
                             Debug.dprintf debug_sched "Script file = %s@." s;
                             Filename.concat (get_dir ses) s) a.proof_script
       in
-      limit, old_res, script
-    with Not_found | Session_itp.BadID -> limit,None,None
+      old_res, script
+    with Not_found | Session_itp.BadID -> None,None
   in
   let panid = graft_proof_attempt ~limit ses id pr in
-  Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,counterexmp,ores)
+  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)
             scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
