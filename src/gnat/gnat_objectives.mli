@@ -74,12 +74,24 @@ val get_objective : goal_id -> objective
 (* get the objective associated with a goal_id *)
 
 (* Scheduling and proof *)
-val next : objective -> goal_id list
+val next : ce:bool -> objective -> goal_id list
 (* For an objective, successive calls of [next] will return all goal_ids
    associated to the objective, by chunks of size Gnat_config.parallel. [] is
-   returned if no goal_ids are left. One can add new goal_ids to an objective at any
-   time. *)
+   returned if no goal_ids are left. One can add new goal_ids to an objective at
+   any time.
+   The ce arguments allow to query counterexamples goal instead of proof goals:
+   it is used during counterexample pass.
 
+   This is actually a scheduler heuristics: the intended behavior is to try to
+   never launch a prover on one of the subgoal of a check when another subgoal
+   already failed to prove with all provers. This assumes that there are a lot
+   of spark checks which are split into a lot of subgoals in which one subgoal
+   is not provable.
+*)
+
+val find_ce: objective -> goal_id option
+
+val next_ce : objective -> goal_id option
 
 (* Auxiliary functions *)
 
@@ -114,7 +126,7 @@ module Make (S: Controller_itp.Scheduler) : sig
 
 
 
-val register_result : Controller_itp.controller -> goal_id -> bool -> objective * status
+val register_result : ce:bool -> has_model:bool -> Controller_itp.controller -> goal_id -> bool -> objective * status
 (* Register the result of a prover for a given goal_id, and return the updated
  * status of the objective, as well as the objective itself *)
 
@@ -197,7 +209,6 @@ val session_find_unproved_pa :
 val session_find_unproved_goal :
     Controller_itp.controller -> objective -> Session_itp.proofNodeID option
 (* find the first unproved goal in a session (in subforest of objective) *)
-
 
 
 val replay : Controller_itp.controller -> unit
