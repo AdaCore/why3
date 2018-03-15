@@ -351,14 +351,14 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let cs, fl = parse_record ~loc ns km get_val fl in
       let d = DTapp (cs, fl) in
       if re then d else mk_let crcmap ~loc "q " e1 d
-  | Ptree.Tat (e1, ({id_str = l} as id)) ->
+  | Ptree.Tat (e1, ({id_str = l; id_loc = loc} as id)) ->
       Hstr.add at_uses l false;
+      let id = { id with id_str = "" } in
+      (* check if the label has actually been defined *)
+      ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
-      if not (Hstr.find at_uses l) then begin
-        (* check if the label has actually been defined *)
-        ignore (gvars (Some l) (Qident {id with id_str = ""}));
-        Loc.errorm ~loc:id.id_loc "this `at'/`old' operator is never used"
-      end;
+      if not (Hstr.find at_uses l) then Loc.errorm ~loc
+        "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTlabel (e1, Slab.empty)
   | Ptree.Tscope (q, e1) ->
