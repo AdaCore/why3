@@ -180,7 +180,7 @@ module ML = struct
     | Dmodule (_, dl) -> List.iter (iter_deps f) dl
 
   let mk_expr e_node e_ity e_effect e_label =
-    { e_node = e_node; e_ity = e_ity; e_effect = e_effect; e_label = e_label; }
+    { e_node; e_ity; e_effect; e_label; }
 
   let tunit = Ttuple []
 
@@ -646,8 +646,6 @@ module Translate = struct
           assert false (* cannot have constructors or fields *)
     end
 
-  (* exception ExtractionVal of rsymbol *)
-
   let is_val = function
     | Eexec ({c_node = Cany}, _) -> true
     | _ -> false
@@ -655,7 +653,6 @@ module Translate = struct
   let rec fun_expr_of_mask mask e =
     let open Mltree in
     let mk_e e_node = { e with e_node = e_node } in
-    (* assert (mask <> MaskGhost); *)
     match e.e_node with
     | Econst _ | Evar _   | Efun _ | Eassign _ | Ewhile _
     | Efor   _ | Eraise _ | Eexn _ | Eabsurd   | Ehole when mask = MaskGhost ->
@@ -684,8 +681,7 @@ module Translate = struct
     | Etry (e1, xspvel) ->
         let mk_xspvel (xs, pvl, ee) = (xs, pvl, fun_expr_of_mask mask ee) in
         mk_e (Etry (e1, List.map mk_xspvel xspvel))
-    | Eignore ee ->
-        let ee = fun_expr_of_mask mask ee in
+    | Eignore ee -> let ee = fun_expr_of_mask mask ee in
         mk_e (Eignore ee)
 
   (* pids: identifiers from cloned modules without definitions *)
