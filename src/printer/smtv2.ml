@@ -121,6 +121,7 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
+  info_cntexample_need_push : bool;
 }
 
 let debug_print_term message t =
@@ -497,7 +498,7 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      (*if cntexample then fprintf fmt "@[(push)@]@\n"; (* z3 specific stuff *)*)
+      if cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
       fprintf fmt "@[(check-sat)@]@\n";
       let model_list = print_info_model cntexample fmt info in
 
@@ -552,8 +553,16 @@ let set_produce_models fmt cntexample =
   if cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
+let meta_counterexmp_need_push =
+  Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
+                            ~desc:"Internal@ use@ only"
+
 let print_task args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let need_push =
+    let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
+    not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
+  in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
@@ -563,7 +572,10 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;
-    info_printer = ident_printer () } in
+    info_printer = ident_printer ();
+    info_cntexample_need_push = need_push;
+    }
+  in
   print_prelude fmt args.prelude;
   set_produce_models fmt cntexample;
   print_th_prelude task fmt args.th_prelude;
