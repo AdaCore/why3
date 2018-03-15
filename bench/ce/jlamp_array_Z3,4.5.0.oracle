@@ -1,15 +1,131 @@
-ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter g : Valid
-ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter h : Valid
-ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter f : Valid
-ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter g : Valid
-ce/jlamp_array.mlw Array WP_parameter g : Valid
-ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
-ce/jlamp_array.mlw Array WP_parameter h : Valid
-ce/jlamp_array.mlw Array WP_parameter h : Valid
-ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
+bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
+Counter-example model:File array.mlw:
+Line 32:
+a.length = {"type" : "Integer" ,
+"val" : "0" }
+File jlamp_array.mlw:
+Line 18:
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "10" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 18:
+a.length = {"type" : "Integer" , "val" : "43" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
+a = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+Line 21:
+a = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter g : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 24:
+a.length = {"type" : "Integer" , "val" : "43" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
+a = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+Line 27:
+a = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "17" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 30:
+a.length = {"type" : "Integer" , "val" : "43" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
+a = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+Line 33:
+a = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "17" ,
+"value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
+Counter-example model:File array.mlw:
+Line 32:
+a.length = {"type" : "Integer" ,
+"val" : "0" }
+File jlamp_array.mlw:
+Line 18:
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "10" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter f : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 18:
+a.length = {"type" : "Integer" , "val" : "1" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+Line 21:
+old a.elts = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter g : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter g : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 24:
+a.length = {"type" : "Integer" , "val" : "43" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+Line 27:
+old a.elts = {"type" : "Array" , "val" : [{"indice" : "17" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "2" } }] }
+
+bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
+bench/ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
+Counter-example model:File jlamp_array.mlw:
+Line 30:
+a.length = {"type" : "Integer" , "val" : "43" }
+a.elts = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
+Line 33:
+old a.elts = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
+
