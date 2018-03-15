@@ -362,7 +362,7 @@ type ghost = bool
 
 type dbinder = preid option * ghost * dity
 
-type register_old = pvsymbol -> string -> pvsymbol
+type register_old = string -> pvsymbol -> pvsymbol
 
 type 'a later = pvsymbol Mstr.t -> xsymbol Mstr.t -> register_old -> 'a
   (* specification terms are parsed and typechecked after the program
@@ -1033,8 +1033,9 @@ let find_old pvm (ovm,old) v =
         let ld = let_var id ~ghost:true e in
         Hpv.add old v ld; snd ld
 
-let register_old env v l =
-  find_old env.pvm (Mstr.find_exn (UnboundLabel l) l env.old) v
+let register_old env l =
+  let old = Mstr.find_exn (UnboundLabel l) l env.old in
+  fun v -> find_old env.pvm old v
 
 let get_later env later =
   let pvm = if Mpv.is_empty env.idx then env.pvm else

@@ -35,12 +35,8 @@ val string_list_of_qualid : Ptree.qualid -> string list
 
 val print_qualid : Format.formatter -> Ptree.qualid -> unit
 
-type global_vars = string option -> Ptree.qualid -> Ity.pvsymbol option
-
 val type_term_in_namespace :
-  Theory.namespace -> Decl.known_map -> Coercion.t -> global_vars ->
-  Ptree.term -> Term.term
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Ptree.term -> Term.term
 
 val type_fmla_in_namespace :
-  Theory.namespace -> Decl.known_map -> Coercion.t -> global_vars ->
-  Ptree.term -> Term.term
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Ptree.term -> Term.term

@@ -60,7 +60,7 @@ exception UnboundLabel of string
 
 val old_mark : string
 
-type register_old = pvsymbol -> string -> pvsymbol
+type register_old = string -> pvsymbol -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
       a registrar function. The label string must be ["'Old"] for [old]. *)
 

@@ -237,8 +237,8 @@ let type_ptree ~as_fmla t tables =
   let ns = tables.namespace in
   let crc = tables.coercion in
   if as_fmla
-  then Typing.type_fmla_in_namespace ns km crc (fun _ _ -> None) t
-  else Typing.type_term_in_namespace ns km crc (fun _ _ -> None) t
+  then Typing.type_fmla_in_namespace ns km crc t
+  else Typing.type_term_in_namespace ns km crc t
 
 exception Arg_parse_type_error of Loc.position * string * exn
 

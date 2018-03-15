@@ -207,6 +207,9 @@ let mk_closure crcmap loc ls =
   let vl = Lists.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
+(* track the use of labels *)
+let at_uses = Hstr.create 5
+
 let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
     List.fold_left (fun e1 (loc, e2) ->
@@ -218,7 +221,15 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
     | _, [] -> func_app (mk_closure crcmap loc ls) (List.rev_append al el)
   in
   let qualid_app q el = match gvars at q with
-    | Some v -> func_app (DTgvar v.pv_vs) el
+    | Some v ->
+        begin match at with
+        | Some l -> (* check for impact *)
+            let u = Opt.get (gvars None q) in
+            if not (pv_equal v u) then
+              Hstr.replace at_uses l true
+        | None -> ()
+        end;
+        func_app (DTgvar v.pv_vs) el
     | None ->
         let ls = find_lsymbol_ns ns q in
         apply_ls (qloc q) ls [] ls.ls_args el
@@ -340,8 +351,16 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let cs, fl = parse_record ~loc ns km get_val fl in
       let d = DTapp (cs, fl) in
       if re then d else mk_let crcmap ~loc "q " e1 d
-  | Ptree.Tat (e1, l) ->
-      DTlabel (dterm ns km crcmap gvars (Some l.id_str) denv e1, Slab.empty)
+  | Ptree.Tat (e1, ({id_str = l} as id)) ->
+      Hstr.add at_uses l false;
+      let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
+      if not (Hstr.find at_uses l) then begin
+        (* check if the label has actually been defined *)
+        ignore (gvars (Some l) (Qident {id with id_str = ""}));
+        Loc.errorm ~loc:id.id_loc "this `at'/`old' operator is never used"
+      end;
+      Hstr.remove at_uses l;
+      DTlabel (e1, Slab.empty)
   | Ptree.Tscope (q, e1) ->
       let ns = import_namespace ns (string_list_of_qualid q) in
       DTlabel (dterm ns km crcmap gvars at denv e1, Slab.empty)
@@ -356,14 +375,17 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTcast (d1, dty_of_pty ns pty))
 
 
-type global_vars = string option -> Ptree.qualid -> Ity.pvsymbol option
+let no_gvars at q = match at with
+  | Some _ -> Loc.errorm ~loc:(qloc q)
+      "`at' and `old' can only be used in program annotations"
+  | None -> None
 
-let type_term_in_namespace ns km crcmap gvars t =
-  let t = dterm ns km crcmap gvars None Dterm.denv_empty t in
+let type_term_in_namespace ns km crcmap t =
+  let t = dterm ns km crcmap no_gvars None Dterm.denv_empty t in
   Dterm.term ~strict:true ~keep_loc:true t
 
-let type_fmla_in_namespace ns km crcmap gvars f =
-  let f = dterm ns km crcmap gvars None Dterm.denv_empty f in
+let type_fmla_in_namespace ns km crcmap f =
+  let f = dterm ns km crcmap no_gvars None Dterm.denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
 
 
@@ -500,8 +522,15 @@ let find_local_pv muc lvm q = match q with
 
 let mk_gvars muc lvm old = fun at q ->
   match find_local_pv muc lvm q, at with
-  | Some v, Some l -> Some (old v l)
-  | v, _ -> v
+  | Some v, Some l -> Some (old l v)
+  | None, Some l ->
+      begin match q with
+      (* normally, we have no reason to call "old" without
+         a pvsymbol, but we make an exception for an empty
+         ident to check if the label is valid at Tat *)
+      | Qident {id_str = ""} -> Opt.map (old l) None
+      | _ -> None end
+  | v, None -> v
 
 let type_term muc lvm old t =
   let gvars = mk_gvars muc lvm old in
