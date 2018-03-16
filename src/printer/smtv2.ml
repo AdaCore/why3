@@ -24,6 +24,9 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
+let debug_incremental = Debug.register_info_flag "force_incremental"
+    ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
+
 (* Meta to tag projection functions *)
 let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
   ~desc:"Declares@ the@ projection."
@@ -478,7 +481,7 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model fmt info =
+let print_info_model info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
   if not (S.is_empty info_model) && info.info_cntexample then
@@ -549,7 +552,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
       if info.info_incremental then
         print_incremental_axiom info fmt;
 
-      let model_list = print_info_model fmt info in
+      let model_list = print_info_model info in
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
                                 vc_term_loc = vc_loc;
@@ -644,6 +647,7 @@ let print_task args ?old:_ fmt task =
     let incr_meta = Task.find_meta_tds task meta_incremental in
     not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)
   in
+  let incremental = Debug.test_flag debug_incremental || incremental in
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
     not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
