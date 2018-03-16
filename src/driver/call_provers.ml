@@ -202,7 +202,7 @@ let rec grep out l = match l with
       with Not_found -> grep out l end
 *)
 
-(* TODO to readd
+(* Create a regexp matching the same as the union of all regexp of the list. *)
 let craft_efficient_re l =
   let s = Format.asprintf "%a"
     (Pp.print_list_delim
@@ -213,27 +213,33 @@ let craft_efficient_re l =
   in
   Str.regexp s
 
-let greps out l =
-  let re = craft_efficient_re l in
+let analyse_result out list_re =
+  let re = craft_efficient_re list_re in
+  let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
+  let result_list = Str.full_split re out in
 
-  let l = List.map (fun (x, y) -> Str.regexp x, y) l in
-  let rec search_all_forward acc n =
-    match Str.search_forward re out n with
-    | exception Not_found -> acc
-    | m -> search_all_forward ((n, m, Str.matched_group 1 out) :: acc) m
+  let rec analyse saved_model saved_res l =
+    match l with
+    | [] ->
+        (Opt.get saved_res, saved_model)
+    | Str.Delim res :: Str.Text model :: tl ->
+        (* Parse the text of the result *)
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          (* TODO here we could parse the model to know if it is empty or not? *)
+          analyse (Some model) (Some res) tl
+    | Str.Delim res :: tl ->
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          analyse saved_model (Some res) tl
+    | _ -> assert (false) (* TODO *)
   in
-  List.fold_left (fun acc (n, m, x) ->
-    (n, m, (grep x l)) :: acc) [] (search_all_forward [] 0)
 
-let greps out l =
-  let results = greps out l in
-  List.fold_left (fun acc (n, m, res) ->
-    match acc, res with
-    | (_, Valid), _ -> None, Valid
-    | _, Invalid -> Some (n, m), Valid
-    | _, Unknown t -> Some (n, m), Unknown t
-    | _, a -> None, a) (None, Invalid) results
-*)
+  analyse None None result_list
 
 let backup_file f = f ^ ".save"
 
@@ -248,12 +254,14 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans =
-    try List.assoc int_exitcode res_parser.prp_exitcodes
-    with Not_found -> grep out (List.map (fun (a, b) -> Str.regexp a, b) res_parser.prp_regexps)
+  let ans, model =
+    try List.assoc int_exitcode res_parser.prp_exitcodes, None
+    with Not_found -> analyse_result out res_parser.prp_regexps
+
       (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
       t, None *)
   in
+  let model = match model with | Some s -> s | None -> "" in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -298,7 +306,7 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
   in
    ***)
   (* get counterexample if any *)
-  let model = res_parser.prp_model_parser out printer_mapping in
+  let model = res_parser.prp_model_parser model printer_mapping in
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
   { pr_answer = ans;

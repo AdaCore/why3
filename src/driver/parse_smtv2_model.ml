@@ -61,12 +61,12 @@ let do_parsing list_proj list_records model =
    parsing on a fresh new line ".*" ensures it *)
 let parse : raw_model_parser = fun list_proj list_records input ->
   try
-    let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
+(*    let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
     ignore (Str.search_forward r input 0);
-    let match_end = Str.match_end () in
+    let match_end = Str.match_end () in*)
     let nr = Str.regexp "^)" in
     let res = Str.search_backward nr input (String.length input) in
-    let model_string = String.sub input match_end (res + 1 - match_end) in
+    let model_string = String.sub input 0 (res + 1) in
     do_parsing list_proj list_records model_string
   with
   | Not_found -> []

@@ -483,7 +483,6 @@ let print_info_model fmt info =
   let info_model = info.info_model in
   if not (S.is_empty info_model) && info.info_cntexample then
     begin
-      fprintf fmt "@[(get-model ";
       let model_map =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
@@ -491,7 +490,6 @@ let print_info_model fmt info =
 	  Stdlib.Mstr.add s f acc)
 	info_model
 	Stdlib.Mstr.empty in
-      fprintf fmt ")@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -545,7 +543,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
       if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
-      fprintf fmt "@[(check-sat)@]@\n";
+      add_check_sat info fmt;
 
       (* If in incremental mode, we empty the list of axioms we stored *)
       if info.info_incremental then
