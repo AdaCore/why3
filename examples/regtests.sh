@@ -81,6 +81,7 @@ echo ""
 echo "=== Programs that remain to be ported ==="
 echo ""
 run_dir prover "-L prover --debug ignore_unused_vars"
+run_dir to_port/verifythis_2016_matrix_multiplication "-L to_port/verifythis_2016_matrix_multiplication"
 echo ""
 
 echo "=== Standard Library ==="
