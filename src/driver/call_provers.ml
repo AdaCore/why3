@@ -130,7 +130,7 @@ let grep_reason_unknown out =
     Other
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
@@ -187,6 +187,54 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
+(*
+let rec grep out l = match l with
+  | [] ->
+      HighFailure
+  | (re,pa) :: l ->
+      begin try
+        ignore (Str.search_forward re out 0);
+        match pa with
+        | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
+        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
+        | Failure s -> Failure (Str.replace_matched s out)
+        | HighFailure -> assert false
+      with Not_found -> grep out l end
+*)
+
+(* TODO to readd
+let craft_efficient_re l =
+  let s = Format.asprintf "%a"
+    (Pp.print_list_delim
+       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
+       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
+       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
+       (fun fmt (a, b) -> Format.fprintf fmt "%s" a)) l
+  in
+  Str.regexp s
+
+let greps out l =
+  let re = craft_efficient_re l in
+
+  let l = List.map (fun (x, y) -> Str.regexp x, y) l in
+  let rec search_all_forward acc n =
+    match Str.search_forward re out n with
+    | exception Not_found -> acc
+    | m -> search_all_forward ((n, m, Str.matched_group 1 out) :: acc) m
+  in
+  List.fold_left (fun acc (n, m, x) ->
+    (n, m, (grep x l)) :: acc) [] (search_all_forward [] 0)
+
+let greps out l =
+  let results = greps out l in
+  List.fold_left (fun acc (n, m, res) ->
+    match acc, res with
+    | (_, Valid), _ -> None, Valid
+    | _, Invalid -> Some (n, m), Valid
+    | _, Unknown t -> Some (n, m), Unknown t
+    | _, a -> None, a) (None, Invalid) results
+*)
+
 let backup_file f = f ^ ".save"
 
 let debug_print_model model =
@@ -202,7 +250,10 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
   let int_exitcode = Int64.to_int exitcode in
   let ans =
     try List.assoc int_exitcode res_parser.prp_exitcodes
-    with Not_found -> grep out res_parser.prp_regexps in
+    with Not_found -> grep out (List.map (fun (a, b) -> Str.regexp a, b) res_parser.prp_regexps)
+      (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
+      t, None *)
+  in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in

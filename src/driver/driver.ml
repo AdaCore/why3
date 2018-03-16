@@ -86,14 +86,14 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   let add_to_list r v = (r := v :: !r) in
   let add_global (loc, g) = match g with
     | Prelude s -> add_to_list prelude s
-    | RegexpValid s -> add_to_list regexps (Str.regexp s, Valid)
-    | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
-    | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
-    | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
+    | RegexpValid s -> add_to_list regexps (s, Valid)
+    | RegexpInvalid s -> add_to_list regexps (s, Invalid)
+    | RegexpTimeout s -> add_to_list regexps (s, Timeout)
+    | RegexpOutOfMemory s -> add_to_list regexps (s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
-      add_to_list regexps (Str.regexp s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown (t, None))
-    | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
+      add_to_list regexps (s, StepLimitExceeded)
+    | RegexpUnknown (s,t) -> add_to_list regexps (s, Unknown (t, None))
+    | RegexpFailure (s,t) -> add_to_list regexps (s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
       add_to_list stepregexps (Call_provers.stepregexp r ns)

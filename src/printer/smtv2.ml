@@ -130,7 +130,9 @@ type info = {
   meta_model_projection : Sls.t;
   mutable list_records : ((string * string) list) Stdlib.Mstr.t;
   info_cntexample_need_push : bool;
-  info_cntexample: bool
+  info_cntexample: bool;
+  info_incremental: bool;
+  mutable incr_list: (prsymbol * term) list;
 }
 
 let debug_print_term message t =
@@ -499,11 +501,39 @@ let print_info_model fmt info =
   else
     Stdlib.Mstr.empty
 
+(* TODO factor out print_prop ? *)
+let print_prop info fmt pr f =
+  fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
+    pr.pr_name.id_string (* FIXME? collisions *)
+    (print_fmla info) f
+
+let add_check_sat info fmt =
+  fprintf fmt "@[(check-sat)@]@\n";
+  (* Push if necessary *)
+  if info.info_cntexample && info.info_cntexample_need_push then
+    fprintf fmt "@[(push)@]@\n";
+  if info.info_cntexample then
+    fprintf fmt "@[(get-model)@]@\n"
+
+let print_incremental_axiom info fmt =
+  let l = info.incr_list in
+  let n =
+    List.fold_left (fun n (pr, f) ->
+      print_prop info fmt pr f;
+      if n mod 10 = 0 then (* TODO we dont check-sat and get-model each time we
+                              have a new decl. 10 is random. *)
+        add_check_sat info fmt;
+      n + 1) 0 l
+  in
+  if n mod 10 != 0 then (* TODO 10 is random *)
+    add_check_sat info fmt
+
 let print_prop_decl vc_loc args info fmt k pr f = match k with
   | Paxiom ->
-      fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
-        pr.pr_name.id_string (* FIXME? collisions *)
-        (print_fmla info) f
+      if info.info_incremental then
+        info.incr_list <- (pr, f) :: info.incr_list
+      else
+        print_prop info fmt pr f
   | Pgoal ->
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" (print_ident info) pr.pr_name;
@@ -516,15 +546,19 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
       info.info_in_goal <- false;
       if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
       fprintf fmt "@[(check-sat)@]@\n";
+
+      (* If in incremental mode, we empty the list of axioms we stored *)
+      if info.info_incremental then
+        print_incremental_axiom info fmt;
+
       let model_list = print_info_model fmt info in
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = vc_loc;
-				queried_terms = model_list;
+                                vc_term_loc = vc_loc;
+                                queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 Printer.list_records = info.list_records}
   | Plemma| Pskip -> assert false
-
 
 let print_constructor_decl info fmt (ls,args) =
   let field_names =
@@ -594,12 +628,24 @@ let set_produce_models fmt info =
   if info.info_cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
+let set_incremental fmt info =
+  if info.info_incremental then
+    fprintf fmt "(set-option :incremental true)@\n"
+
 let meta_counterexmp_need_push =
   Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
                             ~desc:"Internal@ use@ only"
 
+let meta_incremental =
+  Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
+                            ~desc:"Internal@ use@ only"
+
 let print_task args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let incremental =
+    let incr_meta = Task.find_meta_tds task meta_incremental in
+    not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)
+  in
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
     not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
@@ -619,10 +665,13 @@ let print_task args ?old:_ fmt task =
     list_records = Stdlib.Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
+    info_incremental = incremental;
+    incr_list = [];
     }
   in
   print_prelude fmt args.prelude;
   set_produce_models fmt info;
+  set_incremental fmt info;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
     | Some t ->
