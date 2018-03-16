@@ -209,7 +209,7 @@ let craft_efficient_re l =
        ~start:(fun fmt () -> Format.fprintf fmt "\\(")
        ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
        ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
-       (fun fmt (a, b) -> Format.fprintf fmt "%s" a)) l
+       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
   in
   Str.regexp s
 
@@ -221,7 +221,10 @@ let analyse_result out list_re =
   let rec analyse saved_model saved_res l =
     match l with
     | [] ->
-        (Opt.get saved_res, saved_model)
+        if saved_res = None then
+          (HighFailure, saved_model)
+        else
+          (Opt.get saved_res, saved_model)
     | Str.Delim res :: Str.Text model :: tl ->
         (* Parse the text of the result *)
         let res = grep res list_re in
@@ -229,6 +232,7 @@ let analyse_result out list_re =
           (Valid, None)
         else
           (* TODO here we could parse the model to know if it is empty or not? *)
+          (* TODO check that there is a "(" at the beginning *)
           analyse (Some model) (Some res) tl
     | Str.Delim res :: tl ->
         let res = grep res list_re in
@@ -236,7 +240,7 @@ let analyse_result out list_re =
           (Valid, None)
         else
           analyse saved_model (Some res) tl
-    | _ -> assert (false) (* TODO *)
+    | Str.Text fail :: tl -> analyse saved_model saved_res tl
   in
 
   analyse None None result_list
