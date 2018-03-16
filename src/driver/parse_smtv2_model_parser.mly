@@ -126,6 +126,12 @@ list_smt_term:
 
 application:
 | LPAREN name list_smt_term RPAREN { Smt2_model_defs.Apply($2, List.rev $3) }
+| LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
+
+binop:
+| LE { "<=" }
+| GE { ">=" }
+
 
 array:
 | LPAREN
@@ -161,8 +167,6 @@ name:
 boolean_expression:
 | LPAREN FORALL LPAREN args_lists RPAREN smt_term RPAREN {  }
 | LPAREN NOT smt_term RPAREN { }
-| LPAREN LE smt_term smt_term RPAREN { }
-| LPAREN GE smt_term smt_term RPAREN { }
 | LPAREN AND list_smt_term RPAREN { }
 
 integer:
