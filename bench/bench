@@ -107,12 +107,12 @@ replay () {
     pgm="bin/why3replay$suffix"
     for f in $1/*/; do
         printf "  $f... "
-        if $pgm $f > /dev/null; then
+        if $pgm $2 $f > /dev/null 2> /dev/null; then
             echo "ok"
         else
             echo "replay test failed!"
-            echo $pgm $f
-            $pgm $f
+            echo $pgm $2 $f
+            $pgm $2 $f
             exit 1
         fi
     done
@@ -236,6 +236,22 @@ echo ""
 
 echo "=== Checking replay (no prover) ==="
 replay bench/replay
+replay examples/bts --merging-only
+replay examples/tests --merging-only
+replay examples/tests-provers --merging-only
+replay examples/check-builtin --merging-only
+replay examples/logic --merging-only
+replay examples --merging-only
+replay examples/foveoos11-cm --merging-only
+replay examples/WP_revisited --merging-only
+replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
+replay examples/bitvectors "-L examples/bitvectors --merging-only"
+replay examples/avl "-L examples/avl --merging-only"
+#replay examples/to_port/verifythis_2016_matrix_multiplication "-L examples/to_port/verifythis_2016_matrix_multiplication --merging-only"
+replay examples/double_wp "-L examples/double_wp --merging-only"
+replay examples/ring_decision "-L examples/ring_decision --merging-only"
+#replay examples/in_progress --merging-only
+#replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
 echo ""
 
 echo "=== Checking valid goals ==="

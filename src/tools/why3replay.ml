@@ -36,6 +36,7 @@ let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_use_steps = ref false
+let opt_merging_only = ref false
 (*
 let opt_bench = ref false
 *)
@@ -78,7 +79,10 @@ let option_list = [
    " replay using recorded number of proof steps (when possible)");
   ("--obsolete-only",
    Arg.Set opt_obsolete_only,
-   " replay only if session is obsolete") ;
+   " replay only if session is obsolete");
+  ("--merging-only",
+   Arg.Set opt_merging_only,
+   " check merging of session");
   ("-P",
    Arg.String (fun s ->
      opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
@@ -376,6 +380,8 @@ let () =
  *)
     if found_obs then eprintf "[Warning] session is obsolete@.";
     if found_detached then eprintf "[Warning] found detached goals or theories or transformations@.";
+    if !opt_merging_only then
+      exit (if found_detached then 1 else 0);
     add_to_check_no_smoke found_detached found_obs cont;
     Debug.dprintf debug "[Replay] starting scheduler@.";
     Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ());
