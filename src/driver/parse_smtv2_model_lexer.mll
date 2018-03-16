@@ -12,6 +12,31 @@
 {
   open Parse_smtv2_model_parser
   exception SyntaxError
+
+  let interp_float b eb sb =
+    try
+      let is_neg = match b with
+        | "#b0" -> false
+        | "#b1" -> true
+        | _ -> raise Exit
+      in
+      if String.sub eb 0 2 = "#b" && String.length eb = 13 &&
+         String.sub sb 0 2 = "#x" && String.length sb = 15 then
+         (* binary 64 *)
+         let exp_base2 = String.sub eb 2 11 in
+         let exp = int_of_string ("0b" ^ exp_base2) - 1023 in
+         let mant_base16 = String.sub sb 2 13 in
+         Model_parser.Float_hexa((if is_neg then "-" else "")^
+         "0x1."^mant_base16^"p"^(string_of_int exp))
+      else
+      if String.sub eb 0 2 = "#x" && String.length eb = 4 &&
+         String.sub sb 0 2 = "#b" && String.length eb = 25 then
+         (* binary 32 *)
+         let exp_base16 = String.sub eb 2 2 in
+         let mant_base2 = String.sub sb 2 23 in
+           raise Exit (* TODO *)
+         else raise Exit
+   with Exit -> Model_parser.Float_value (b, eb, sb)
 }
 
 let atom = [^'('')'' ''\t''\n']
@@ -63,13 +88,13 @@ rule token = parse
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
   | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
 
-  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_zero }
-  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_zero }
-  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_infinity }
-  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_infinity }
-  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Not_a_number }
+  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
+  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }
+  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_infinity }
+  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
+  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (Smt2_model_defs.Float_value (b, eb, sb)) }
+      { FLOAT_VALUE (interp_float b eb sb) }
 
   | num as integer
       { INT_STR (integer) }

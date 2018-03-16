@@ -33,7 +33,7 @@
 %token LET
 %token AND LE GE NOT
 %token DIV
-%token <Smt2_model_defs.float_type> FLOAT_VALUE
+%token <Model_parser.float_type> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
 %token <string> BITVECTOR_EXTRACT

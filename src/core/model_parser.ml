@@ -34,6 +34,7 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string
 
 type model_value =
  | Integer of string
@@ -98,6 +99,10 @@ let convert_float_value f =
       let m = Mstr.add "sign" (Json_base.String b) m in
       let m = Mstr.add "exponent" (Json_base.String eb) m in
       let m = Mstr.add "significand" (Json_base.String sb) m in
+      Json_base.Record m
+  | Float_hexa s ->
+      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Stdlib.Mstr.empty in
+      let m = Mstr.add "value" (Json_base.String s) m in
       Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
@@ -200,7 +205,8 @@ let print_float_human fmt f =
   | Not_a_number ->
       fprintf fmt "NaN"
   | Float_value (b, eb, sb) ->
-      fprintf fmt "float(%s,%s,%s)" b eb sb
+     fprintf fmt "float_bits(%s,%s,%s)" b eb sb
+  | Float_hexa s -> fprintf fmt "%s" s
 
 let rec print_array_human fmt (arr: model_array) =
   fprintf fmt "(";

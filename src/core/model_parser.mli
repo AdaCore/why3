@@ -22,6 +22,7 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string
 
 type model_value =
  | Integer of string

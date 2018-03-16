@@ -1,8 +1,33 @@
-theory T
+theory T32
 
   use import ieee_float.Float32
 
-  goal g1 : forall x:t. not (ge x (4.25:t))
+  goal g1 : forall x:t. eq x (0.0:t)
+
+  goal g2 : forall x:t. eq x (1.25:t)
+
+  goal g3 : forall x:t. not (eq x (0.0:t))
+
+  goal g4 : forall x:t. not (eq x (1.25:t))
+
+  goal g5 : forall x:t. not (ge x (4.25:t))
+
+
+end
+
+theory T64
+
+  use import ieee_float.Float64
+
+  goal g1 : forall x:t. eq x (0.0:t)
+
+  goal g2 : forall x:t. eq x (1.25:t)
+
+  goal g3 : forall x:t. not (eq x (0.0:t))
+
+  goal g4 : forall x:t. not (eq x (1.25:t))
+
+  goal g5 : forall x:t. not (ge x (4.25:t))
 
 
 end

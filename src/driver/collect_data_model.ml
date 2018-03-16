@@ -211,15 +211,6 @@ and refine_variable_value (table: correspondence_table) key v =
     let tv = refine_definition table t in
     Mstr.add key (true, tv) table
 
-let convert_float (f: Smt2_model_defs.float_type) : Model_parser.float_type =
-  match f with
-  | Plus_infinity           -> Model_parser.Plus_infinity
-  | Minus_infinity          -> Model_parser.Minus_infinity
-  | Plus_zero               -> Model_parser.Plus_zero
-  | Minus_zero              -> Model_parser.Minus_zero
-  | Not_a_number            -> Model_parser.Not_a_number
-  | Float_value (b, eb, sb) -> Model_parser.Float_value (b, eb, sb)
-
 (* Conversion to value referenced as defined in model_parser.
    We assume that array indices fit into an integer *)
 let convert_to_indice t =
@@ -249,7 +240,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
-  | Float f -> Model_parser.Float (convert_float f)
+  | Float f -> Model_parser.Float f
   | Bitvector bv -> Model_parser.Bitvector bv
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
