@@ -61,6 +61,7 @@ rule token = parse
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
   | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
+  | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
 
   | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_zero }
   | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_zero }

@@ -36,6 +36,7 @@
 %token <Smt2_model_defs.float_type> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
+%token <string> BITVECTOR_EXTRACT
 %token BITVECTOR_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
@@ -161,6 +162,7 @@ name:
 | ATOM { $1 }
 (* Should not happen in relevant part of the model (ad hoc) *)
 | BITVECTOR_TYPE { "" }
+| BITVECTOR_EXTRACT { $1 }
 
 (* Z3 specific boolean expression. This should maybe be used in the future as
    it may give some information on the counterexample. *)
