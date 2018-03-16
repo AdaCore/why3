@@ -115,9 +115,6 @@ module Static
       invariant { inv g values !next }
       invariant { Fset.subset p.S.contents (vertices g) }
       invariant { Fset.subset (Fset.diff (vertices g) p.S.contents) (defined_sort values) }
-(*
-      invariant { Fset.subset (defined_sort (old values)) (defined_sort values) }
-*)
       variant { S.cardinal p }
       let u = S.choose_and_remove p in
       dfs g u SA.empty values next

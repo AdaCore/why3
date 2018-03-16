@@ -5,9 +5,9 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../topological_sorting.mlw" proved="true">
-<theory name="Graph" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Graph" proved="true">
 </theory>
-<theory name="Static" proved="true" sum="bd5ddf886cb2a5170b31256f1929ab04">
+<theory name="Static" proved="true">
  <goal name="VC dfs" expl="VC for dfs" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC dfs.0" expl="exceptional postcondition" proved="true">
@@ -139,48 +139,42 @@
   <goal name="VC topo_order.2" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC topo_order.3" expl="loop invariant init" proved="true">
+  <goal name="VC topo_order.3" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC topo_order.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC topo_order.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC topo_order.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC topo_order.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC topo_order.8" expl="loop variant decrease" proved="true">
+  <goal name="VC topo_order.7" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="VC topo_order.9" expl="loop invariant preservation" proved="true">
+  <goal name="VC topo_order.8" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC topo_order.10" expl="loop invariant preservation" proved="true">
+  <goal name="VC topo_order.9" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC topo_order.11" expl="loop invariant preservation" proved="true">
+  <goal name="VC topo_order.10" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="VC topo_order.12" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="VC topo_order.13" expl="exceptional postcondition" proved="true">
+  <goal name="VC topo_order.11" expl="exceptional postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC topo_order.14" expl="postcondition" proved="true">
+  <goal name="VC topo_order.12" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Online_graph" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Online_graph" proved="true">
 </theory>
-<theory name="Online_Basic" proved="true" sum="919620d1ed2e5f1374e242d0e300a007">
+<theory name="Online_Basic" proved="true">
  <goal name="VC create" expl="VC for create" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC create.0" expl="postcondition" proved="true">
