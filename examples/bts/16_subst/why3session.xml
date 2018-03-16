@@ -3,14 +3,18 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <file name="../16_subst.mlw">
-<theory name="Issue16" sum="069ffd2e855fd2a770879b5d05edcbe8">
+<theory name="Issue16">
  <goal name="g2">
  <transf name="simplify_trivial_quantification_in_goal" >
   <goal name="g2.0">
   </goal>
  </transf>
- <transf name="subst" arg1="x">
+ <transf name="split_intros_goal_wp" >
   <goal name="g2.0">
+  <transf name="subst" arg1="x">
+   <goal name="g2.0.0">
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -27,10 +31,14 @@
    <goal name="g3.0.1" expl="false case">
    </goal>
   </transf>
-  <transf name="induction" arg1="x" arg2="from" arg3="42">
-   <goal name="g3.0.0" expl="base case">
-   </goal>
-   <goal name="g3.0.1" expl="recursive case">
+  <transf name="split_intros_goal_wp" >
+   <goal name="g3.0.0">
+   <transf name="induction" arg1="x" arg2="from" arg3="42">
+    <goal name="g3.0.0.0" expl="base case">
+    </goal>
+    <goal name="g3.0.0.1" expl="recursive case">
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
