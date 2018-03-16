@@ -307,8 +307,8 @@ let adapt_limits limit on_timelimit =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
       then (2 * limit.limit_time + 1)
-      (* if prover implements time limit, use t + 1 *)
-      else if on_timelimit then succ limit.limit_time
+      (* if prover implements time limit, use 16t + 1 *)
+      else if on_timelimit then 16 * limit.limit_time + 1
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -377,6 +377,11 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
+  Debug.dprintf
+    debug
+    "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
+    limit.limit_time limit.limit_mem
+    (Pp.print_list Pp.comma Pp.string) cmd;
   Prove_client.send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
