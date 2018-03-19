@@ -28,11 +28,11 @@ type for_direction = To | DownTo
 
 type pat =
   | Pwild
-  | Pvar    of vsymbol
-  | Papp    of lsymbol * pat list
-  | Ptuple  of pat list
-  | Por     of pat * pat
-  | Pas     of pat * vsymbol
+  | Pvar   of vsymbol
+  | Papp   of lsymbol * pat list
+  | Ptuple of pat list
+  | Por    of pat * pat
+  | Pas    of pat * vsymbol
 
 type is_rec = bool
 
@@ -62,7 +62,7 @@ and expr_node =
   | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
-  | Etry    of expr * (xsymbol * pvsymbol list * expr) list
+  | Etry    of expr * bool * (xsymbol * pvsymbol list * expr) list
   | Eignore of expr
   | Eabsurd
   | Ehole

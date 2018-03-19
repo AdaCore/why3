@@ -836,7 +836,8 @@ module MLToC = struct
                                    C.Sblock b))))
         end
       end
-    | Etry (b,xl) ->
+    | Etry (b, case, xl) ->
+        assert (not case); (* TODO *)
       if debug then Format.printf "TRY@.";
       let is_while = match b.e_node with Ewhile _ -> true | _-> false in
       let breaks, returns = List.fold_left

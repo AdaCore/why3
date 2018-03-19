@@ -45,7 +45,7 @@ module ML = struct
 
   let rec get_decl_name = function
     | Dtype itdefl ->
-        let add_id = function
+        let add_id = function (* add name of constructors and projections *)
           | Some (Ddata l)   -> List.map (fun (idc,    _) -> idc) l
           | Some (Drecord l) -> List.map (fun (_, idp, _) -> idp) l
           | _ -> [] in
@@ -152,9 +152,9 @@ module ML = struct
     | Eexn (_xs, Some ty, e) -> (* FIXME? How come we never do binding here? *)
         iter_deps_ty f ty;
         iter_deps_expr f e
-    | Etry (e, xbranchl) ->
+    | Etry (e, _, xl) ->
         iter_deps_expr f e;
-        List.iter (iter_deps_xbranch f) xbranchl
+        List.iter (iter_deps_xbranch f) xl
     | Eassign assingl ->
         List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
     | Eignore e -> iter_deps_expr f e
@@ -235,6 +235,11 @@ module ML = struct
 
   let e_match e bl =
     mk_expr (Mltree.Ematch (e, bl))
+
+  let e_match_exn e bl eff_bl lbl_match xl =
+    let ity = match bl with (_, d) :: _ -> d.e_ity | [] -> assert false in
+    let e = e_match e bl ity eff_bl lbl_match in
+    mk_expr (Mltree.Etry (e, true, xl))
 
   let e_assign al ity eff lbl =
     if al = [] then e_unit else mk_expr (Mltree.Eassign al) ity eff lbl
@@ -558,8 +563,8 @@ module Translate = struct
            it must be the case the first branch is irrefutable *)
         (match bl with
          | [] -> assert false | (_, e) :: _ -> expr info svar e.e_mask e)
-    | Ecase (e1, pl) -> let pl = List.map (ebranch info svar mask) pl in
-        ML.e_match (expr info svar e1.e_mask e1) pl (Mltree.I e.e_ity) eff lbl
+    | Ecase (e1, bl) -> let bl = List.map (ebranch info svar mask) bl in
+        ML.e_match (expr info svar e1.e_mask e1) bl (Mltree.I e.e_ity) eff lbl
     | Eassert _ ->
         ML.e_unit
     | Eif (e1, e2, e3) when e_ghost e1 ->
@@ -590,29 +595,32 @@ module Translate = struct
         let dir = for_direction dir in
         let efor = expr info svar efor.e_mask efor in
         ML.e_for pv1 pv2 dir pv3 efor eff lbl
-    | Eghost _ | Epure _ -> assert false
+    | Eghost _ | Epure _ ->
+        assert false
     | Eassign al ->
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
         ML.e_assign al (Mltree.I e.e_ity) eff lbl
-    | Etry (etry, case, pvl_e_map) ->
-        assert (not case); (* TODO *)
+    | Etry ({e_node = Ecase (etry, bl); e_effect; e_label}, true, xl) ->
+        let etry = expr info svar etry.e_mask etry in
+        let bl = List.map (ebranch info svar mask) bl in
+        let mk_xl (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
+        let xl = Mxs.bindings xl in
+        let xl = List.map mk_xl xl in
+        ML.e_match_exn etry bl e_effect e_label xl (Mltree.I e.e_ity) eff lbl
+    | Etry (etry, _, xl) ->
         let etry = expr info svar mask etry in
-        let bl   =
-          let bl_map = Mxs.bindings pvl_e_map in
-          let mk_bl_map (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
-          List.map mk_bl_map bl_map in
-        ML.mk_expr (Mltree.Etry (etry, bl)) (Mltree.I e.e_ity) eff lbl
-    | Eraise (xs, ex) ->
-        (* let ex = exp_of_mask ex xs.xs_mask in *)
-        let ex = expr info svar xs.xs_mask ex in
-        let ex = match ex with
-          | {Mltree.e_node = Mltree.Eblock []} -> None
-          | e -> Some e in
+        let mk_xl (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
+        let xl = Mxs.bindings xl in
+        let xl = List.map mk_xl xl in
+        ML.mk_expr (Mltree.Etry (etry, false, xl)) (Mltree.I e.e_ity) eff lbl
+    | Eraise (xs, ex) -> let ex = match expr info svar xs.xs_mask ex with
+        | {Mltree.e_node = Mltree.Eblock []} -> None
+        | e -> Some e in
         ML.mk_expr (Mltree.Eraise (xs, ex)) (Mltree.I e.e_ity) eff lbl
     | Eexn (xs, e1) ->
         if mask_ghost e1.e_mask then ML.mk_expr
-            (Mltree.Eexn (xs, None, ML.e_unit)) (Mltree.I e.e_ity) eff lbl
+          (Mltree.Eexn (xs, None, ML.e_unit)) (Mltree.I e.e_ity) eff lbl
         else let e1 = expr info svar xs.xs_mask e1 in
           let ty = if ity_equal xs.xs_ity ity_unit then None
             else Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
@@ -838,10 +846,10 @@ module Transform = struct
     | Eraise (exn, Some e) ->
         let e, spv = expr info subst e in
         mk (Eraise (exn, Some e)), spv
-    | Etry (e, bl) ->
+    | Etry (e, case, bl) ->
         let e, spv = expr info subst e in
         let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
-        mk (Etry (e, e_bl)), Spv.union spv spv_bl
+        mk (Etry (e, case, e_bl)), Spv.union spv spv_bl
     | Eassign _al -> (* FIXME : produced superfolous let *)
         (* let assign e (_, _, pv) = mk_let subst pv e in *)
         e, (* List.fold_left assign e al, *) Spv.empty

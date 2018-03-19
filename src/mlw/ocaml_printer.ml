@@ -250,8 +250,8 @@ module Print = struct
             match pjl with
             | []  -> print_papp info ls fmt pl
             | pjl -> fprintf fmt "@[<hov 2>{ %a }@]"
-                       (print_list2 semi equal (print_rs info) (print_pat info))
-                       (pjl, pl)
+                (print_list2 semi equal (print_rs info) (print_pat info))
+                (pjl, pl)
 
   and print_papp info ls fmt = function
     | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
@@ -525,10 +525,14 @@ module Print = struct
           (* then    *) (print_expr info) e (print_lident info) for_id
                         op (print_pv info) pv1
           (* in      *) (print_lident info) for_id (print_pv info) pv2
-    | Etry (e, bl) ->
+    | Etry ({e_node = Ematch (e, bl)}, true, xl) ->
         fprintf fmt
-          "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
-          (print_expr info) e (print_list newline (print_xbranch info)) bl
+          (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@\n%a@]@\nend")
+          (print_expr info) e (print_list newline (print_branch info)) bl
+          (print_list newline (print_xbranch info true)) xl
+    | Etry (e, _, xl) ->
+        fprintf fmt "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
+          (print_expr info) e (print_list newline (print_xbranch info false)) xl
     | Eexn (xs, None, e) ->
         fprintf fmt "@[<hv>let exception %a in@\n%a@]"
           (print_uident info) xs.xs_name (print_expr info) e
@@ -557,22 +561,22 @@ module Print = struct
         fprintf fmt (protect_on paren "raise (%a %a)")
           (print_uident info) xs.xs_name (print_expr ~paren:true info) e
 
-  and print_xbranch info fmt (xs, pvl, e) =
-    let print_var fmt pv =
-      print_lident info fmt (pv_name pv) in
+  and print_xbranch info case fmt (xs, pvl, e) =
+    let print_exn fmt () =
+      if case then fprintf fmt "exception " else fprintf fmt "" in
+    let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
-    | Some s, _ ->
-        fprintf fmt "@[<hov 4>| %a ->@ %a@]"
-          (syntax_arguments s print_var) pvl (print_expr info ~paren:true) e
-    | None, []->
-        fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_uident info) xs.xs_name
-          (print_expr info) e
-    | None, [pv] ->
-        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) xs.xs_name
-          print_var pv (print_expr info) e
-    | None, pvl ->
-        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) xs.xs_name
-          (print_list comma print_var) pvl (print_expr info) e
+    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
+        print_exn () (syntax_arguments s print_var) pvl
+        (print_expr info ~paren:true) e
+    | None, [] -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
+        print_exn () (print_uident info) xs.xs_name (print_expr info) e
+    | None, [pv] -> fprintf fmt "@[<hov 4>| %a%a %a ->@ %a@]"
+        print_exn () (print_uident info) xs.xs_name print_var pv
+        (print_expr info) e
+    | None, pvl -> fprintf fmt "@[<hov 4>| %a%a (%a) ->@ %a@]"
+        print_exn () (print_uident info) xs.xs_name
+        (print_list comma print_var) pvl (print_expr info) e
 
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =

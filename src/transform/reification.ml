@@ -1151,7 +1151,8 @@ let rec interp_expr info (e:Mltree.expr) : value =
                raise CannotReduce
   | Ehole -> Debug.dprintf debug_interp "Ehole@.";
              raise CannotReduce
-  | Etry (e,bl) ->
+  | Etry (e, case, bl) ->
+     assert (not case); (* TODO *)
      try interp_expr info e
      with (Raised (xs, ov, _)  as e) ->
           let rec aux = function
