@@ -560,16 +560,19 @@ module Print = struct
   and print_xbranch info fmt (xs, pvl, e) =
     let print_var fmt pv =
       print_lident info fmt (pv_name pv) in
-    match query_syntax info.info_syn xs.xs_name with
-    | Some s ->
+    match query_syntax info.info_syn xs.xs_name, pvl with
+    | Some s, _ ->
         fprintf fmt "@[<hov 4>| %a ->@ %a@]"
           (syntax_arguments s print_var) pvl (print_expr info ~paren:true) e
-    | None when pvl = []->
-        fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_uident info)
-          (xs.xs_name) (print_expr info) e
-    | None ->
-        fprintf fmt "@[<hov 4>| %a (%a) ->@ %a@]" (print_uident info)
-          (xs.xs_name) (print_list comma print_var) pvl (print_expr info) e
+    | None, []->
+        fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_uident info) xs.xs_name
+          (print_expr info) e
+    | None, [pv] ->
+        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) xs.xs_name
+          print_var pv (print_expr info) e
+    | None, pvl ->
+        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) xs.xs_name
+          (print_list comma print_var) pvl (print_expr info) e
 
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =
