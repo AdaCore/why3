@@ -33,7 +33,7 @@ let string fmt s =
 
 let int fmt d = fprintf fmt "%d" d
 let bool fmt b = fprintf fmt "%b" b
-let float fmt f = fprintf fmt "%f" f
+let float fmt f = fprintf fmt "%g" f
 (* TODO check that you can print a floating point number like this in JSON *)
 
 let print_json_field key value_pr fmt value =

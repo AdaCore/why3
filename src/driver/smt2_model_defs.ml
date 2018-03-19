@@ -52,7 +52,7 @@ let print_float fmt f =
   | Model_parser.Minus_zero -> Format.fprintf fmt "Minus_zero"
   | Model_parser.Not_a_number -> Format.fprintf fmt "NaN"
   | Model_parser.Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
-  | Model_parser.Float_hexa s -> Format.fprintf fmt "%s" s
+  | Model_parser.Float_hexa(s,f) -> Format.fprintf fmt "%s (%g)" s f
 
 let rec print_array fmt a =
   match a with
