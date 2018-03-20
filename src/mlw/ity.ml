@@ -1367,6 +1367,9 @@ let create_cty ?(mask=MaskVisible) ?(defensive=false)
   let effect = { effect with eff_reads = xreads } in
   cty_unsafe args pre post xpost oldies effect result mask freeze
 
+let create_cty_defensive = create_cty ~defensive:true
+let create_cty           = create_cty ~defensive:false
+
 let cty_apply c vl args res =
   let vsb_add vsb {pv_vs = u} v =
     if vs_equal u v.pv_vs then vsb else Mvs.add u v vsb in

@@ -1104,7 +1104,7 @@ let cty_of_spec env bl mask dsp dity =
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  create_cty ~mask ~defensive:true bl p q xq (get_oldies old) eff ity
+  create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity
 
 (** Expressions *)
 

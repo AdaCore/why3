@@ -413,8 +413,8 @@ type cty = private {
   cty_freeze : ity_subst;
 }
 
-val create_cty : ?mask:mask -> ?defensive:bool ->
-  pvsymbol list -> pre list -> post list -> post list Mxs.t ->
+val create_cty : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
 (** [create_cty ?mask ?defensive args pre post xpost oldies effect result]
     creates a new cty. [post] and [mask] must be consistent with [result].
@@ -430,6 +430,13 @@ val create_cty : ?mask:mask -> ?defensive:bool ->
     is [true], then type variables in the result and exceptional results
     are spoiled and fresh regions in the result and exceptional results
     are reset. *)
+
+val create_cty_defensive : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t ->
+  pvsymbol Mpv.t -> effect -> ity -> cty
+(** same as [create_cty], except that type variables in the result
+    and exceptional results are spoiled and fresh regions in the
+    result and exceptional results are reset. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
