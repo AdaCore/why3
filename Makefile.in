@@ -141,7 +141,11 @@ ifeq (@enable_local@,yes)
 all: install_local
 endif
 
-.PHONY: byte opt clean depend all install install_local install_no_local
+.PHONY: byte opt clean depend all install install-lib uninstall
+.PHONY: install-bin install-data uninstall-bin uninstall-data
+.PHONY: install-bash install-emacs install-framac
+.PHONY: uninstall-bash uninstall-emacs uninstall-framac
+.PHONY: install-coq-tactic install-coq install-pvs install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
 CLEANDIRS =
@@ -297,19 +301,10 @@ GENERATED += $(LIBGENERATED)
 # installation
 ###############
 
-clean_old_install::
-	rm -rf $(LIBDIR)/why3
+uninstall-data::
 	rm -rf $(DATADIR)/why3
 
-clean_old_install-lib::
-	if test -d $(OCAMLINSTALLLIB) -a -w $(OCAMLINSTALLLIB); then \
-	  rm -rf $(OCAMLINSTALLLIB)/why3; \
-	fi
-
-install_no_local::
-	$(MKDIR_P) $(BINDIR)
-	$(MKDIR_P) $(LIBDIR)/why3
-	$(MKDIR_P) $(TOOLDIR)
+install-data::
 	$(MKDIR_P) $(DATADIR)/why3
 	$(MKDIR_P) $(DATADIR)/why3/images
 	$(MKDIR_P) $(DATADIR)/why3/vim
@@ -337,32 +332,25 @@ install_no_local::
 	$(INSTALL_DATA) share/vim/syntax/why3.vim $(DATADIR)/why3/vim/syntax/why3.vim
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
-install_no_local_lib::
+ifeq (@enable_local@,yes)
+else
+install:: install-bin install-data
+
+uninstall:: uninstall-bin uninstall-data
+	rm -rf $(LIBDIR)/why3
+endif
+
+uninstall-lib:
+	if test -d $(OCAMLINSTALLLIB) -a -w $(OCAMLINSTALLLIB); then \
+	  rm -rf $(OCAMLINSTALLLIB)/why3; \
+	fi
+
+uninstall:: uninstall-lib
+
+install-lib::
 	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
 	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS))) \
 		lib/why3/META $(OCAMLINSTALLLIB)/why3
-
-ifeq (@enable_local@,yes)
-install install-lib:
-	@echo "Why3 is configured in local installation mode."
-	@echo "To install Why3, run ./configure --disable-local ; make ; make install"
-else
-install: clean_old_install install_no_local
-install-lib: clean_old_install-lib install_no_local_lib
-endif
-
-install-all: install install-lib
-
-##################
-# Uninstallation
-##################
-
-ifeq (@enable_local@,yes)
-uninstall:
-	@echo "Why3 is configured in local installation mode."
-else
-uninstall: clean_old_install clean_old_install-lib
-endif
 
 ##################
 # Why3 emacs mode
@@ -371,16 +359,20 @@ endif
 %.elc: %.el
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
-clean_old_install::
+uninstall-emacs:
 	rm -f $(DATADIR)/emacs/site-lisp/why3.el
 	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
 
-install_no_local::
+uninstall:: uninstall-emacs
+
+install-emacs:
 	$(MKDIR_P) $(DATADIR)/emacs/site-lisp/
 	$(INSTALL_DATA) share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
 ifeq (@enable_emacs_compilation@,yes)
 	$(INSTALL_DATA) share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
 endif
+
+install:: install-emacs
 
 ifeq (@enable_emacs_compilation@,yes)
 all: share/emacs/why3.elc
@@ -441,8 +433,8 @@ $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
-LIBPLUGCMO =  $(addsuffix .cmo,  $(addprefix lib/plugins/, $(PLUGINS)))
-LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+LIBPLUGCMO =  $(PLUGINS:%=lib/plugins/%.cmo)
+LIBPLUGCMXS = $(PLUGINS:%=lib/plugins/%.cmxs)
 
 plugins.byte: $(LIBPLUGCMO)
 plugins.opt : $(LIBPLUGCMXS)
@@ -480,7 +472,11 @@ depend: $(PLUGDEP)
 CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
 
-install_no_local::
+uninstall-bin::
+	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmo)
+	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmxs)
+
+install-bin::
 	$(MKDIR_P) $(LIBDIR)/why3/plugins
 	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
 
@@ -529,12 +525,14 @@ bin/why3replay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/wh
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
-clean_old_install::
-	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
-	rm -f $(BINDIR)/why3bench$(EXE) $(BINDIR)/why3replayer$(EXE)
+uninstall-bin::
+	rm -f $(BINDIR)/why3$(EXE)
+	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(BINDIR)
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
@@ -596,9 +594,9 @@ SERVER_MODULES := logging arraylist options queue readbuf request \
 
 CPULIM_MODULES := cpulimit-unix cpulimit-win
 
-SERVER_O := $(addprefix src/server/, $(addsuffix .o, $(SERVER_MODULES)))
+SERVER_O := $(SERVERMODULES:%=src/server/%.o)
 
-CPULIM_O := $(addprefix src/server/, $(addsuffix .o, $(CPULIM_MODULES)))
+CPULIM_O := $(CPULIM_MODULES:%=src/server/%.o)
 
 TOOLS = lib/why3server$(EXE) lib/why3cpulimit$(EXE)
 
@@ -613,7 +611,11 @@ lib/why3cpulimit$(EXE): $(CPULIM_O)
 %.o: %.c
 	$(CC) -Wall -O -g -o $@ -c $<
 
-install_no_local::
+uninstall-bin::
+	rm -f $(LIBDIR)/why3/why3server$(EXE) $(LIBDIR)/why3/why3cpulimit$(EXE)
+	rm -f $(LIBDIR)/why3/why3-call-pvs
+
+install-bin::
 	$(MKDIR_P) $(LIBDIR)/why3
 	$(INSTALL) lib/why3server$(EXE) $(LIBDIR)/why3/why3server$(EXE)
 	$(INSTALL) lib/why3cpulimit$(EXE) $(LIBDIR)/why3/why3cpulimit$(EXE)
@@ -741,10 +743,11 @@ depend: $(IDEDEP)
 
 CLEANDIRS += src/ide
 
-clean_old_install::
-	rm -f $(BINDIR)/why3ide$(EXE)
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3ide$(EXE)
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
 
 install_local:: bin/why3ide
@@ -790,10 +793,11 @@ depend: $(WEBSERVDEP)
 
 CLEANDIRS += src/ide
 
-clean_old_install::
-	rm -f $(BINDIR)/why3webserver$(EXE)
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3webserver$(EXE)
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3webserver.@OCAMLBEST@ $(TOOLDIR)/why3webserver$(EXE)
 
 install_local:: bin/why3webserver
@@ -836,10 +840,11 @@ depend: $(SESSIONDEP)
 
 CLEANDIRS += src/why3session
 
-clean_old_install::
-	rm -f $(BINDIR)/why3session$(EXE)
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3session$(EXE)
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
 
 install_local:: bin/why3session
@@ -880,10 +885,11 @@ endif
 
 depend: $(SHELLDEP)
 
-clean_old_install::
-	rm -f $(BINDIR)/why3shell$(EXE)
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3shell$(EXE)
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3shell.@OCAMLBEST@ $(TOOLDIR)/why3shell$(EXE)
 
 install_local:: bin/why3shell
@@ -961,9 +967,11 @@ GENERATED += $(COQPGENERATED)
 clean::
 	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
 
-install_no_local::
+install-coq-tactic:
 	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
-	$(INSTALL_DATA) lib/coq-tactic/* $(LIBDIR)/why3/coq-tactic
+	$(INSTALL_DATA) lib/coq-tactic/Why3.vo lib/coq-tactic/why3tac.$(COQTACEXT) $(LIBDIR)/why3/coq-tactic
+
+install:: install-coq-tactic
 
 endif
 
@@ -1109,7 +1117,7 @@ ifeq (@enable_coq_support@,yes)
 
 ifeq (@enable_coq_libs@,yes)
 
-install_no_local::
+install-coq:
 	$(MKDIR_P) $(LIBDIR)/why3/coq
 	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/int
@@ -1138,6 +1146,8 @@ ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
+
+install:: install-coq
 
 endif
 
@@ -1172,7 +1182,7 @@ endif
 
 all: drivers/coq-realizations.aux
 
-install_no_local::
+install-data::
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
 clean::
@@ -1221,7 +1231,7 @@ drivers/pvs-realizations.aux: Makefile
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
-install_no_local::
+install-pvs:
 	$(MKDIR_P) $(LIBDIR)/why3/pvs/int
 	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
 	$(INSTALL_DATA) $(addsuffix .prf, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
@@ -1231,6 +1241,8 @@ install_no_local::
 	$(MKDIR_P) $(LIBDIR)/why3/pvs/floating_point/
 	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
+
+install:: install-pvs
 
 update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
 	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
@@ -1245,7 +1257,7 @@ drivers/pvs-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
-install_no_local::
+install-data::
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 endif
@@ -1406,9 +1418,9 @@ endif
 	    echo "  [$(ISABELLE_TARGET_DIR)]"; \
 	  fi)
 
-install_no_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
+install-isabelle: $(GENERATED_PREFIX_ISABELLE)/last_build
 
-install_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
+install:: install-isabelle
 
 clean::
 	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
@@ -1417,7 +1429,7 @@ endif
 
 all: drivers/isabelle-realizations.aux
 
-install_no_local::
+install-data::
 	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
 clean::
@@ -1458,7 +1470,7 @@ lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX) lib/why3/why3extract.cmo
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) $(CMIHACK) -pack -o $@ $(filter %.cmx, $^)
 
-install_no_local_lib::
+install-lib::
 	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
 	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS))) \
 	  $(OCAMLINSTALLLIB)/why3
@@ -1489,10 +1501,17 @@ jessie.byte: src/jessie/Makefile lib/why3/why3.cma
 jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
 	@$(MAKE) -C src/jessie Jessie3.cmxs
 
-install_no_local::
+uninstall-framac:
+	rm -f $(FRAMAC_LIBDIR)/plugins/Jessie3.*
+
+uninstall:: uninstall-framac
+
+install-framac:
 	$(MKDIR_P) $(FRAMAC_LIBDIR)/plugins/
 	$(INSTALL_DATA) $(wildcard $(addprefix src/jessie/Jessie3., $(INSTALLED_LIB_EXTS))) \
 	  $(FRAMAC_LIBDIR)/plugins/
+
+install:: install-framac
 
 clean::
 	$(MAKE) -C src/jessie clean
@@ -1537,10 +1556,11 @@ depend: $(WHY3DOCDEP)
 CLEANDIRS += src/why3doc
 GENERATED += $(WHY3DOCGENERATED)
 
-clean_old_install::
-	rm -f $(BINDIR)/why3doc$(EXE)
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3doc$(EXE)
 
-install_no_local::
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
 
 install_local:: bin/why3doc
@@ -1797,7 +1817,7 @@ doc: doc/manual.pdf doc/html/index.html
 
 BNF = qualid label constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
+BNFTEX = $(BNF:%=doc/%_bnf.tex)
 
 doc/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
 	doc/bnf$(EXE) $< > $@
@@ -1810,7 +1830,7 @@ DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
       itp pvs coq coq_tactic isabelle
 
-DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
+DOCTEX = $(DOC:%=doc/%.tex)
 
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
@@ -1869,7 +1889,7 @@ MODULESTODOC = \
 	session/itp_communication session/itp_server \
 	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
 
-FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
+FILESTODOC = $(MODULESTODOC:%=src/%.mli)
 
 doc/apidoc:
 	mkdir -p doc/apidoc
@@ -1908,16 +1928,19 @@ clean::
 # Install rules for bash completions
 ##########
 
-clean_old_install::
+uninstall-bash:
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
 	  rm -f /etc/bash_completion.d/why3; \
 	fi
 
-install_no_local::
+uninstall:: uninstall-bash
+
+install-bash::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
-	  $(INSTALL_DATA) share/bash/why3 /etc/bash_completion.d; \
+	  $(INSTALL) share/bash/why3 /etc/bash_completion.d; \
 	fi
 
+install:: install-bash
 
 ##########
 # Stdlib formatted with why3doc
