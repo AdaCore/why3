@@ -1082,19 +1082,6 @@ let rec interp_expr info (e:Mltree.expr) : value =
          | _ -> assert false)
        l;
      Vvoid
-  | Ematch (e, l) ->
-     Debug.dprintf debug_interp "Ematch@.";
-     let v = interp_expr info e in
-     Debug.dprintf debug_interp "value %a@." print_value v;
-     let rec aux = function
-       | [] -> assert false
-       | (p,e)::tl ->
-          try
-            let info' = matching info v p in
-            interp_expr info' e
-          with NoMatch -> aux tl
-     in
-     aux l
   | Eblock l ->
      List.fold_left
        (fun _ e -> interp_expr info e) (*ignore all but last result*)
@@ -1146,10 +1133,23 @@ let rec interp_expr info (e:Mltree.expr) : value =
                raise CannotReduce
   | Ehole -> Debug.dprintf debug_interp "Ehole@.";
              raise CannotReduce
-  | Etry (e, case, bl) ->
-     assert (not case); (* TODO *)
-     try interp_expr info e
-     with (Raised (xs, ov, _)  as e) ->
+  | Ematch (e, l, bl) ->
+     Debug.dprintf debug_interp "Ematch@.";
+     begin match interp_expr info e with
+     | v ->
+          Debug.dprintf debug_interp "value %a@." print_value v;
+          if l = [] then v else
+          let rec aux = function
+            | [] -> assert false
+            | (p,e)::tl ->
+                try
+                  let info' = matching info v p in
+                  interp_expr info' e
+                with NoMatch -> aux tl
+          in
+          aux l
+     | exception (Raised (xs, ov, _) as e) ->
+          if bl = [] then raise e else
           let rec aux = function
             | [] -> Debug.dprintf debug_interp "Etry: uncaught exception@.";
                     raise e
@@ -1168,7 +1168,8 @@ let rec interp_expr info (e:Mltree.expr) : value =
                         aux bl end
                else aux bl
           in
-          aux bl)
+          aux bl
+      end)
 
 let eval_fun decl info = match decl with
   | Dlet (Lsym (_rs, _, _vl, expr)) ->

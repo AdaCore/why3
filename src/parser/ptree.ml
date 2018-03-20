@@ -139,14 +139,13 @@ and expr_desc =
   | Eand of expr * expr
   | Eor of expr * expr
   | Enot of expr
-  | Ematch of expr * (pattern * expr) list
+  | Ematch of expr * reg_branch list * exn_branch list
   | Eabsurd
   | Epure of term
   | Eidpur of qualid
   | Eraise of qualid * expr option
   | Eexn of ident * pty * Ity.mask * expr
   | Eoptexn of ident * Ity.mask * expr
-  | Etry of expr * bool * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of Expr.assertion_kind * term
@@ -155,6 +154,10 @@ and expr_desc =
   | Eghost of expr
   | Enamed of label * expr
   | Escope of qualid * expr
+
+and reg_branch = pattern * expr
+
+and exn_branch = qualid * pattern option * expr
 
 and fundef = ident * ghost * Expr.rs_kind *
   binder list * pty option * Ity.mask * spec * expr

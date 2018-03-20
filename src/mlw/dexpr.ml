@@ -414,11 +414,10 @@ and dexpr_node =
   | DEand of dexpr * dexpr
   | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEcase of dexpr * (dpattern * dexpr) list
+  | DEcase of dexpr * dreg_branch list * dexn_branch list
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * bool * (dxsymbol * dpattern * dexpr) list
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
@@ -435,6 +434,10 @@ and dexpr_node =
   | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
+
+and dreg_branch = dpattern * dexpr
+
+and dexn_branch = dxsymbol * dpattern * dexpr
 
 and dlet_defn = preid * ghost * rs_kind * dexpr
 
@@ -756,15 +759,19 @@ let dexpr ?loc node =
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
         [], res
-    | DEcase (_,[]) ->
+    | DEcase (_,[],[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEcase"
-    | DEcase (de,bl) ->
-        let ety = dity_fresh () in
+    | DEcase (de,bl,xl) ->
         let res = dity_fresh () in
+        let ety = if bl = [] then
+          res else dity_fresh () in
         dexpr_expected_type de ety;
         List.iter (fun (dp,de) ->
           dpat_expected_type dp ety;
           dexpr_expected_type de res) bl;
+        List.iter (fun (xs,dp,de) ->
+          dpat_expected_type dp (specialize_dxs xs);
+          dexpr_expected_type de res) xl;
         [], res
     | DEassign al ->
         List.iter (fun (de1,rs,de2) ->
@@ -784,15 +791,6 @@ let dexpr ?loc node =
         dexpr_expected_type de_to bty;
         dexpr_expected_type de dity_unit;
         dvty_unit
-    | DEtry (_,_,[]) ->
-        invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
-    | DEtry (de,_,bl) ->
-        let res = dity_fresh () in
-        dexpr_expected_type de res;
-        List.iter (fun (xs,dp,de) ->
-          dpat_expected_type dp (specialize_dxs xs);
-          dexpr_expected_type de res) bl;
-        [], res
     | DEraise (xs,de) ->
         dexpr_expected_type de (specialize_dxs xs);
         [], dity_fresh ()
@@ -1313,8 +1311,8 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let env, old = add_label env id.pre_name in
       cexp uloc env de (LD (LL old) :: lpl)
   | DEvar_pure _ | DEpv_pure _ | DEoptexn _
-  | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
-  | DEassign _ | DEwhile _ | DEfor _ | DEtry _ | DEraise _ | DEassert _
+  | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _
+  | DEcase _ | DEassign _ | DEwhile _ | DEfor _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
   | DEcast _ | DEuloc _ | DElabel _ -> assert false (* already stripped *)
 
@@ -1357,25 +1355,6 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_or (expr uloc env de1) (expr uloc env de2)
   | DEif (de1,de2,de3) ->
       e_if (expr uloc env de1) (expr uloc env de2) (expr uloc env de3)
-  | DEcase (de1,bl) ->
-      let e1 = expr uloc env de1 in
-      let mask = if env.ghs then MaskGhost else e1.e_mask in
-      let mk_branch (dp,de) =
-        let vm, pat = create_prog_pattern dp.dp_pat e1.e_ity mask in
-        let e = expr uloc (add_pv_map env vm) de in
-        Mstr.iter (fun _ v -> check_used_pv e v) vm;
-        pat, e in
-      let bl = List.rev_map mk_branch bl in
-      let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
-      let v = create_vsymbol (id_fresh "x") (ty_of_ity e1.e_ity) in
-      (* TODO: this is the right place to show the missing patterns,
-         but we do not have access to the current known_map to do that *)
-      let bl = if Pattern.is_exhaustive [t_var v] pl then bl else begin
-        if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
-          "Non-exhaustive pattern matching, asserting `absurd'";
-        let _,pp = create_prog_pattern PPwild e1.e_ity mask in
-        (pp, e_absurd (ity_of_dity res)) :: bl end in
-      e_case e1 (List.rev bl)
   | DEassign al ->
       let conv (de1,f,de2) =
         let e1 = expr uloc {env with ugh = false} de1 in
@@ -1402,8 +1381,28 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e = expr uloc env de in
       let inv = get_later env dinv in
       e_for v e_from dir e_to i (create_invariant inv) e
-  | DEtry (de1,case,bl) ->
+  | DEcase (de1,bl,xl) ->
       let e1 = expr uloc env de1 in
+      (* regular branches *)
+      let mask = if env.ghs then MaskGhost else e1.e_mask in
+      let mk_branch (dp,de) =
+        let vm, pat = create_prog_pattern dp.dp_pat e1.e_ity mask in
+        let e = expr uloc (add_pv_map env vm) de in
+        Mstr.iter (fun _ v -> check_used_pv e v) vm;
+        pat, e in
+      let bl = List.rev_map mk_branch bl in
+      (* TODO: this is the right place to show the missing patterns,
+         but we do not have access to the current known_map to do that *)
+      let exhaustive = bl = [] ||
+        let v = create_vsymbol (id_fresh "x") (ty_of_ity e1.e_ity) in
+        let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
+        Pattern.is_exhaustive [t_var v] pl in
+      let bl = if exhaustive then bl else begin
+        if List.length bl > 1 then Warning.emit ?loc:de0.de_loc
+          "Non-exhaustive pattern matching, asserting `absurd'";
+        let _,pp = create_prog_pattern PPwild e1.e_ity mask in
+        (pp, e_absurd (ity_of_dity res)) :: bl end in
+      (* exception branches *)
       let add_branch m (xs,dp,de) =
         let xs = get_xs env xs in
         let mask = if env.ghs then MaskGhost else xs.xs_mask in
@@ -1411,7 +1410,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
         let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
         Mxs.add xs ((pat, e) :: Mxs.find_def [] xs m) m in
-      let xsm = List.fold_left add_branch Mxs.empty bl in
+      let xsm = List.fold_left add_branch Mxs.empty xl in
       let is_simple p = match p.pat_node with
         | Papp (fs,[]) -> is_fs_tuple fs
         | Pvar _ | Pwild -> true | _ -> false in
@@ -1445,8 +1444,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
             let bl = if Pattern.is_exhaustive [t] pl then bl else
               let _,pp = create_prog_pattern PPwild xs.xs_ity mask in
               (pp, e_raise xs e (ity_of_dity res)) :: bl in
-            vl, e_case e (List.rev bl) in
-      e_try e1 ~case (Mxs.mapi mk_branch xsm)
+            vl, e_case e (List.rev bl) Mxs.empty in
+      e_case e1 (List.rev bl) (Mxs.mapi mk_branch xsm)
   | DEraise (xs,de) ->
       let {xs_mask = mask} as xs = get_xs env xs in
       let env = {env with ugh = mask = MaskGhost} in
@@ -1474,7 +1473,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       if not (Sxs.mem xs e.e_effect.eff_raises) then e else
       let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
       let branches = Mxs.singleton xs (vl, e_of_vl vl) in
-      e_exn xs (e_try e ~case:false branches)
+      e_exn xs (e_case e [] branches)
   | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       let put _ (ld,_) e = e_let ld e in

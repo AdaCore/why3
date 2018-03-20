@@ -55,17 +55,20 @@ and expr_node =
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
   | Eassign of (pvsymbol * rsymbol * pvsymbol) list
-  | Ematch  of expr * (pat * expr) list
+  | Ematch  of expr * reg_branch list * exn_branch list
   | Eblock  of expr list
   | Ewhile  of expr * expr
   (* For loop for Why3's type int *)
   | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
-  | Etry    of expr * bool * (xsymbol * pvsymbol list * expr) list
   | Eignore of expr
   | Eabsurd
   | Ehole
+
+and reg_branch = pat * expr
+
+and exn_branch = xsymbol * pvsymbol list * expr
 
 and let_def =
   | Lvar of pvsymbol * expr

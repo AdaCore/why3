@@ -817,7 +817,7 @@ single_expr_:
         let id = add_model_trace_label id in
         Elet (id, gh, kind, def, $8)
       | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
-      | _ -> Ematch (def, [pat, $8]) }
+      | _ -> Ematch (def, [pat, $8], []) }
 | LET ghost kind labels(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
 | LET ghost kind labels(lident_nq) mk_expr(fun_defn) IN seq_expr
@@ -835,10 +835,7 @@ single_expr_:
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH ext_match_cases END
-    { let bl, xl = $4 in
-      if xl = [] then Ematch ($2, bl) else
-      if bl = [] then Etry ($2, false, xl) else
-      Etry (mk_expr (Ematch ($2, bl)) $startpos $endpos, true, xl) }
+    { let bl, xl = $4 in Ematch ($2, bl, xl) }
 | EXCEPTION labels(uident) IN seq_expr
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
 | EXCEPTION labels(uident) return IN seq_expr
@@ -898,7 +895,7 @@ single_expr_:
         | None -> mk_id continue_id $startpos($1) $endpos($1) in
       Eraise (Qident id, None) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
-    { Etry ($2, false, $4) }
+    { Ematch ($2, [], $4) }
 | GHOST single_expr
     { Eghost $2 }
 | assertion_kind LEFTBRC term RIGHTBRC

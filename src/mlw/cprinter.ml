@@ -836,8 +836,7 @@ module MLToC = struct
                                    C.Sblock b))))
         end
       end
-    | Etry (b, case, xl) ->
-        assert (not case); (* TODO *)
+    | Ematch (b, [], (_::_ as xl)) ->
       if debug then Format.printf "TRY@.";
       let is_while = match b.e_node with Ewhile _ -> true | _-> false in
       let breaks, returns = List.fold_left
@@ -868,7 +867,7 @@ module MLToC = struct
     | Eraise (_, None) -> assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
-    | Ematch (e1, [Ptuple rets,e2])
+    | Ematch (e1, [Ptuple rets,e2], [])
          when List.for_all
                 (function Pvar _ -> true |_-> false)
                 rets

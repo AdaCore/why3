@@ -458,11 +458,11 @@ module Print = struct
           | _ ->
               fprintf fmt (protect_on paren "%a")
                 (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
-    | Ematch (e1, [p, e2]) ->
+    | Ematch (e1, [p, e2], []) ->
         fprintf fmt
           (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
-    | Ematch (e, pl) ->
+    | Ematch (e, pl, []) ->
         fprintf fmt
           (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
           (print_expr info) e (print_list newline (print_branch info)) pl
@@ -525,14 +525,14 @@ module Print = struct
           (* then    *) (print_expr info) e (print_lident info) for_id
                         op (print_pv info) pv1
           (* in      *) (print_lident info) for_id (print_pv info) pv2
-    | Etry ({e_node = Ematch (e, bl)}, true, xl) ->
+    | Ematch (e, [], xl) ->
+        fprintf fmt "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
+          (print_expr info) e (print_list newline (print_xbranch info false)) xl
+    | Ematch (e, bl, xl) ->
         fprintf fmt
           (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@\n%a@]@\nend")
           (print_expr info) e (print_list newline (print_branch info)) bl
           (print_list newline (print_xbranch info true)) xl
-    | Etry (e, _, xl) ->
-        fprintf fmt "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
-          (print_expr info) e (print_list newline (print_xbranch info false)) xl
     | Eexn (xs, None, e) ->
         fprintf fmt "@[<hv>let exception %a in@\n%a@]"
           (print_uident info) xs.xs_name (print_expr info) e

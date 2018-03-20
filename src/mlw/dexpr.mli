@@ -112,11 +112,10 @@ and dexpr_node =
   | DEand of dexpr * dexpr
   | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEcase of dexpr * (dpattern * dexpr) list
+  | DEcase of dexpr * dreg_branch list * dexn_branch list
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * bool * (dxsymbol * dpattern * dexpr) list
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
@@ -133,6 +132,10 @@ and dexpr_node =
   | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
+
+and dreg_branch = dpattern * dexpr
+
+and dexn_branch = dxsymbol * dpattern * dexpr
 
 and dlet_defn = preid * ghost * rs_kind * dexpr
 

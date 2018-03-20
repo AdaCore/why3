@@ -480,7 +480,7 @@ let inv_of_pure {known_map = kn} loc fl k =
    - [i] is a positive int assigned at the catching site
    - [xres] names the value carried by the exception
    [case_xmap] is used for match-with-exceptions *)
-let rec k_expr env lps e res ?case_xmap xmap =
+let rec k_expr env lps e res xmap =
   let loc = e.e_loc in
   let lab = Slab.diff e.e_label vc_labels in
   let t_lab t = t_label ?loc lab t in
@@ -627,14 +627,6 @@ let rec k_expr env lps e res ?case_xmap xmap =
     | Elet (LDvar (v, e0), e1) ->
         let k = k_expr env lps e1 res xmap in
         Kseq (k_expr env lps e0 v xmap, 0, k)
-    | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
-        let k = k_expr env lps e1 res xmap in
-        let xmap = Opt.get_def xmap case_xmap in
-        Kseq (k_expr env lps e0 (restore_pv v) xmap, 0, k)
-    | Ecase (e0, [pp, e1]) when Svs.is_empty pp.pp_pat.pat_vars ->
-        let k = k_expr env lps e1 res xmap in
-        let xmap = Opt.get_def xmap case_xmap in
-        Kseq (k_expr env lps e0 (proxy_of_expr e0) xmap, 0, k)
     | Elet ((LDsym _| LDrec _) as ld, e1) ->
         let k = k_expr env lps e1 res xmap in
         (* when we havoc the VC of a locally defined function,
@@ -703,7 +695,22 @@ let rec k_expr env lps e res ?case_xmap xmap =
           with Exit -> Ktag (SP, Kif (v, k1, k2))
           else Kif (v, k1, k2) in
         var_or_proxy e0 kk
-    | Ecase (e0, bl) ->
+    | Ecase (e0, bl, xl) ->
+        (* try-with is just another semicolon *)
+        let branch xs (vl,e) (xl,xm) =
+          let i = new_exn env in
+          let xk = k_expr env lps e res xmap in
+          (* a single pv for the carried value *)
+          let v, xk = match vl with
+            | [] -> pv_of_ity "_" ity_unit, xk
+            | [v] -> v, xk
+            | vl ->
+                let v = pv_of_ity "exv" xs.xs_ity in
+                let cs = fs_tuple (List.length vl) in
+                let pl = List.map (fun v -> pat_var v.pv_vs) vl in
+                v, Kcase (v, [pat_app cs pl v.pv_vs.vs_ty, xk]) in
+          (i,xk)::xl, Mxs.add xs (i,v) xm in
+        let xl, cxmap = Mxs.fold branch xl ([], xmap) in
         (* with all branches pure, switch to SP to avoid splitting *)
         let s = List.for_all (fun (_,e) -> eff_pure e.e_effect) bl in
         let branch (pp,e) = pp.pp_pat, k_expr env lps e res xmap in
@@ -722,27 +729,15 @@ let rec k_expr env lps e res ?case_xmap xmap =
             Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f))
           with Exit -> Ktag (SP, Kcase (v, bl))
           else Kcase (v, bl) in
-        let xmap = Opt.get_def xmap case_xmap in
-        var_or_proxy_case xmap e0 kk
-    | Etry (e0, case, bl) ->
-        (* try-with is just another semicolon *)
-        let branch xs (vl,e) (xl,xm) =
-          let i = new_exn env in
-          let xk = k_expr env lps e res xmap in
-          (* a single pv for the carried value *)
-          let v, xk = match vl with
-            | [] -> pv_of_ity "_" ity_unit, xk
-            | [v] -> v, xk
-            | vl ->
-                let v = pv_of_ity "exv" xs.xs_ity in
-                let cs = fs_tuple (List.length vl) in
-                let pl = List.map (fun v -> pat_var v.pv_vs) vl in
-                v, Kcase (v, [pat_app cs pl v.pv_vs.vs_ty, xk]) in
-          (i,xk)::xl, Mxs.add xs (i,v) xm in
-        let xl, cxmap = Mxs.fold branch bl ([], xmap) in
-        let case_xmap, xmap =
-          if case then Some cxmap, xmap else None, cxmap in
-        let k = k_expr env lps e0 res ?case_xmap xmap in
+        let k = match bl with
+          | [] ->
+              k_expr env lps e0 res cxmap
+          | [{pat_node = Pvar v}, k1] ->
+              Kseq (k_expr env lps e0 (restore_pv v) cxmap, 0, k1)
+          | [p, k1] when Svs.is_empty p.pat_vars ->
+              Kseq (k_expr env lps e0 (proxy_of_expr e0) cxmap, 0, k1)
+          | _ ->
+              var_or_proxy_case cxmap e0 kk in
         (* caught xsymbols are converted to unique integers,
            so that we can now serialise the "with" clauses
            and avoid capturing the wrong exceptions *)

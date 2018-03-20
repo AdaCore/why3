@@ -392,7 +392,6 @@ and p_expr fmt e =
     | Eloop (_, _, _) -> fprintf fmt "@[Eloop(_,@ _,@ _)@]"
     | Efor (_, _, _, _) -> fprintf fmt "@[Efor(_,@ _,@ _,@ _)@]"
     | Eraise (_, _) -> fprintf fmt "@[Eraise(_,@ _)@]"
-    | Etry (_, _) -> fprintf fmt "@[Etry(_,@ _)@]"
     | Eabstr (_, _) -> fprintf fmt "@[Eabstr(_,@ _)@]"
     | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
@@ -561,15 +560,6 @@ let rec eval_expr env (e : expr) : result =
           end
         | r -> r
     end
-  | Ecase(e1,ebl) ->
-    begin
-      match eval_expr env e1 with
-        | Normal t ->
-          begin try exec_match env t ebl
-            with Undetermined -> Irred e
-          end
-        | r -> r
-    end
   | Ewhile(cond,_inv,_var,e1) ->
     begin
       match eval_expr env cond with
@@ -617,19 +607,14 @@ let rec eval_expr env (e : expr) : result =
       with
           NotNum -> Irred e
     end
-  | Etry(e1,case,el) ->
+  | Ecase(e0,ebl,el) ->
     begin
-      let e0,ebl =
-        if not case then e1,[]
-        else match e1.e_node with
-        | Ecase(e0,ebl) -> e0,ebl
-        | _ -> assert false
-      in
       let r = eval_expr env e0 in
       match r with
-        | Normal t when case ->
+        | Normal t ->
+          if ebl = [] then r else
           begin try exec_match env t ebl
-            with Undetermined -> Irred e1
+            with Undetermined -> Irred e
           end
         | Excep(ex,t) ->
           begin

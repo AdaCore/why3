@@ -236,19 +236,20 @@ let get_syms node pure =
         syms_tl (syms_eity syms d) invl
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
-    | Ecase (d,bl) ->
+    | Ecase (d,bl,xl) ->
         (* Dexpr handles this, but not Expr, so we set a failsafe *)
-        let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
-        let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
-        if not (Pattern.is_exhaustive [t_var v] pl) then
+        let exhaustive = bl = [] ||
+          let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
+          let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
+          Pattern.is_exhaustive [t_var v] pl in
+        if not exhaustive then
           Loc.errorm ?loc:e.e_loc "Non-exhaustive pattern matching";
-        let add_branch syms (p,e) =
+        let add_rbranch syms (p,e) =
           syms_pat (syms_expr syms e) p.pp_pat in
-        List.fold_left add_branch (syms_eity syms d) bl
-    | Etry (d,_,xl) ->
-        let add_branch xs (vl,e) syms =
+        let add_xbranch xs (vl,e) syms =
           syms_xs xs (syms_pvl (syms_expr syms e) vl) in
-        Mxs.fold add_branch xl (syms_expr syms d)
+        Mxs.fold add_xbranch xl
+          (List.fold_left add_rbranch (syms_eity syms d) bl)
     | Eraise (xs,e) ->
         syms_xs xs (syms_eity syms e)
   and syms_eity syms e =

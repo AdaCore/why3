@@ -830,13 +830,25 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       in
       List.iter add_alias sp.sp_alias;
       DEany (pl, dity, msk, ds)
-  | Ptree.Ematch (e1, bl) ->
+  | Ptree.Ematch (e1, bl, xl) ->
       let e1 = dexpr muc denv e1 in
-      let branch (pp, e) =
+      let rbranch (pp, e) =
         let pp = dpattern muc pp in
         let denv = denv_add_pat denv pp in
         pp, dexpr muc denv e in
-      DEcase (e1, List.map branch bl)
+      let xbranch (q, pp, e) =
+        let xs = find_dxsymbol q in
+        let mb_unit = match xs with
+          | DEgexn xs -> ity_equal xs.xs_ity ity_unit
+          | DElexn _ -> true in
+        let pp = match pp with
+          | Some pp -> dpattern muc pp
+          | None when mb_unit -> Dexpr.dpattern ~loc (DPapp (rs_void, []))
+          | _ -> Loc.errorm ~loc "exception argument expected" in
+        let denv = denv_add_pat denv pp in
+        let e = dexpr muc denv e in
+        xs, pp, e in
+      DEcase (e1, List.map rbranch bl, List.map xbranch xl)
   | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr muc denv e1 in
       let e2 = dexpr muc denv e2 in
@@ -882,21 +894,6 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None when mb_unit -> Dexpr.dexpr ~loc (DEsym (RS rs_void))
         | _ -> Loc.errorm ~loc "exception argument expected" in
       DEraise (xs, e1)
-  | Ptree.Etry (e1, case, cl) ->
-      let e1 = dexpr muc denv e1 in
-      let branch (q, pp, e) =
-        let xs = find_dxsymbol q in
-        let mb_unit = match xs with
-          | DEgexn xs -> ity_equal xs.xs_ity ity_unit
-          | DElexn _ -> true in
-        let pp = match pp with
-          | Some pp -> dpattern muc pp
-          | None when mb_unit -> Dexpr.dpattern ~loc (DPapp (rs_void, []))
-          | _ -> Loc.errorm ~loc "exception argument expected" in
-        let denv = denv_add_pat denv pp in
-        let e = dexpr muc denv e in
-        xs, pp, e in
-      DEtry (e1, case, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
   | Ptree.Eexn (id, pty, mask, e1) ->

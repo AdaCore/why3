@@ -129,16 +129,19 @@ and expr_node =
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * (prog_pattern * expr) list
+  | Ecase   of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
-  | Etry    of expr * bool * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
   | Epure   of term
   | Eabsurd
+
+and reg_branch = prog_pattern * expr
+
+and exn_branch = pvsymbol list * expr
 
 and cexp = private {
   c_node : cexp_node;
@@ -231,9 +234,7 @@ val e_exn : xsymbol -> expr -> expr
 
 val e_raise : xsymbol -> expr -> ity -> expr
 
-val e_try : expr -> case:bool -> (pvsymbol list * expr) Mxs.t -> expr
-
-val e_case : expr -> (prog_pattern * expr) list -> expr
+val e_case : expr -> reg_branch list -> exn_branch Mxs.t -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 
