@@ -426,10 +426,7 @@ val create_cty : ?mask:mask -> pvsymbol list ->
     [post], and [xpost] must come from [cty_reads], [args] or [result].
     [oldies] maps ghost pure snapshots of the parameters and external
     reads to the original pvsymbols: these snapshots are removed from
-    [cty_effect.eff_reads] and replaced with the originals. If [defensive]
-    is [true], then type variables in the result and exceptional results
-    are spoiled and fresh regions in the result and exceptional results
-    are reset. *)
+    [cty_effect.eff_reads] and replaced with the originals. *)
 
 val create_cty_defensive : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t ->
