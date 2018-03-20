@@ -486,7 +486,7 @@ let build_vars_map renv prev =
                   let prev = Task.add_decl prev d in
                   Mvs.add vy y subst, prev)
                 renv.var_maps (renv.subst, prev) in
-  let prev, prs =
+  let prev, mapdecls =
     Mvs.fold
       (fun vy _ (prev,prs) ->
         Debug.dprintf debug_reification "checking %a@." Pretty.print_vs vy;
@@ -508,7 +508,7 @@ let build_vars_map renv prev =
           (List.filter (fun v -> not (Mvs.mem v subst)) renv.lv);
         raise (Exit "vars not matched"));
   Debug.dprintf debug_reification "all vars matched@.";
-  let prev, prs =
+  let prev, defdecls =
     Mterm.fold
       (fun t (vy,i) (prev,prs) ->
         let y = Mvs.find vy subst in
@@ -522,10 +522,10 @@ let build_vars_map renv prev =
         let pr = create_prsymbol (Ident.id_fresh s) in
         let d = create_prop_decl Paxiom pr et in
         Task.add_decl prev d, pr::prs)
-      renv.store (prev,prs) in
-  subst, prev, prs
+      renv.store (prev,[]) in
+  subst, prev, mapdecls, defdecls
 
-let build_goals do_trans prev prs subst env lp g rt =
+let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
   Debug.dprintf debug_refl "building goals@.";
   let inst_rt = t_subst subst rt in
   Debug.dprintf debug_refl "reified goal instantiated@.";
@@ -565,17 +565,12 @@ let build_goals do_trans prev prs subst env lp g rt =
            match t with
            | [t] ->
               let rewrite pr = Apply.rewrite None false pr (Some hr) in
-              let rewrites lt =
-                 List.fold_left
-                   (fun (acc, b) pr ->
-                    try (Lists.apply (Trans.apply (rewrite pr)) acc,true)
-                    with Arg_trans  _ -> acc, b)
-                   (lt,false) prs in
-              let rec rewrite_loop lt =
-                let (lt, b) = rewrites lt in
-                if b then rewrite_loop lt
-                else lt in
-              rewrite_loop [t]
+              let rewrite_once acc pr =
+                try Lists.apply (Trans.apply (rewrite pr)) acc
+                with Arg_trans  _ -> acc in
+              let rewrites lt prs = List.fold_left rewrite_once lt prs in
+              let lt = rewrites [t] mapdecls in
+              rewrites lt defdecls
            | [] -> []
            | _ -> assert false
          else [task_r] in
@@ -601,8 +596,8 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
-  let subst, prev, prs = build_vars_map renv prev in
-  build_goals true prev prs subst env lp g rt)
+  let subst, prev, mds, dds = build_vars_map renv prev in
+  build_goals true prev mds dds subst env lp g rt)
 
 open Mltree
 open Expr
@@ -1315,12 +1310,12 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   try
     let rinfo, lp, _lv, rt = reify_post lpost in
     let lp = (rs.rs_cty.cty_pre)@lp in
-    let subst, prev, prs = build_vars_map rinfo prev in
-    build_goals do_trans prev prs subst env lp g rt
+    let subst, prev, mds, dds = build_vars_map rinfo prev in
+    build_goals do_trans prev mds dds subst env lp g rt
   with
     ReductionFail renv ->
     (* proof failed, show reification context for debugging *)
-    let _, prev, _ = build_vars_map renv prev in
+    let _, prev, _, _ = build_vars_map renv prev in
     let fg = create_prsymbol (id_fresh "Failure") in
     let df = create_prop_decl Pgoal fg t_false in
     [Task.add_decl prev df] )
