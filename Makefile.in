@@ -62,7 +62,11 @@ else
 MENHIR	  = @MENHIR@
 endif
 
-DEPFLAGS  = -slash -I lib/why3
+DEPFLAGS = -slash
+
+ifeq (@enable_why3_lib@,yes)
+DEPFLAGS += -I lib/why3
+endif
 ifeq (@OCAMLBEST@,opt)
 # the semantics of the -native flag changed in ocaml 4.03.0
 #DEPFLAGS += -native
@@ -76,7 +80,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
+INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -98,8 +102,8 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 WARNINGS = A-4-9-41-44-45-50-52@5@48
 
-OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
@@ -114,10 +118,10 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = @MENHIRLIB@
-EXTLIBS = str unix nums dynlink @ZIPLIB@
+EXTLIBS = str unix nums dynlink @ZIPLIB@ @WHY3LIB@
 
-EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
-EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
+EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
+EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
 
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
 COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
@@ -128,11 +132,24 @@ TOTARGET = > "$@" || (RV=$$?; rm -f "$@"; exit $${RV})
 GENERATED_PREFIX_COQ="lib/coq"
 GENERATED_PREFIX_ISABELLE=lib/isabelle
 
+ifeq (@enable_why3_lib@,yes)
+WHY3CMA  = lib/why3/why3.cma
+WHY3CMXA = lib/why3/why3.cmxa
+else
+WHY3CMA  =
+WHY3CMXA =
+endif
+
 ###############
 # main target
 ###############
 
+ifeq (@enable_why3_lib@,yes)
 all: @OCAMLBEST@
+else
+all:
+endif
+
 plugins: plugins.@OCAMLBEST@
 opt: plugins.opt
 byte: plugins.byte
@@ -508,20 +525,20 @@ opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
 bin:
 	mkdir bin
 
-bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
-bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
-bin/why3config.opt: lib/why3/why3.cmxa src/tools/why3config.cmx
-bin/why3config.byte: lib/why3/why3.cma src/tools/why3config.cmo
-bin/why3execute.opt: lib/why3/why3.cmxa src/tools/why3execute.cmx
-bin/why3execute.byte: lib/why3/why3.cma src/tools/why3execute.cmo
-bin/why3extract.opt: lib/why3/why3.cmxa src/tools/why3extract.cmx
-bin/why3extract.byte: lib/why3/why3.cma src/tools/why3extract.cmo
-bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
-bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
-bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
-bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
-bin/why3replay.opt: lib/why3/why3.cmxa src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
-bin/why3replay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
+bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
+bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
+bin/why3config.opt: $(WHY3CMXA) src/tools/why3config.cmx
+bin/why3config.byte: $(WHY3CMA) src/tools/why3config.cmo
+bin/why3execute.opt: $(WHY3CMXA) src/tools/why3execute.cmx
+bin/why3execute.byte: $(WHY3CMA) src/tools/why3execute.cmo
+bin/why3extract.opt: $(WHY3CMXA) src/tools/why3extract.cmx
+bin/why3extract.byte: $(WHY3CMA) src/tools/why3extract.cmo
+bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
+bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
+bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
+bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
+bin/why3replay.opt: $(WHY3CMXA) src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
+bin/why3replay.byte: $(WHY3CMA) src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -726,8 +743,8 @@ bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 bin/why3ide.byte: BLINKFLAGS += -custom
 
-bin/why3ide.opt: lib/why3/why3.cmxa src/ide/resetgc.o $(IDECMX)
-bin/why3ide.byte: lib/why3/why3.cma src/ide/resetgc.o $(IDECMO)
+bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
+bin/why3ide.byte: $(WHY3CMA) src/ide/resetgc.o $(IDECMO)
 
 src/ide/resetgc.o: src/ide/resetgc.c
 	$(SHOW) 'Ocamlc   $<'
@@ -775,11 +792,11 @@ $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
 byte: bin/why3webserver.byte
 opt:  bin/why3webserver.opt
 
-bin/why3webserver.opt: lib/why3/why3.cmxa $(WEBSERVCMX)
+bin/why3webserver.opt: $(WHY3CMXA) $(WEBSERVCMX)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3webserver.byte: lib/why3/why3.cma $(WEBSERVCMO)
+bin/why3webserver.byte: $(WHY3CMA) $(WEBSERVCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
@@ -827,8 +844,8 @@ $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 byte: bin/why3session.byte
 opt:  bin/why3session.opt
 
-bin/why3session.opt: lib/why3/why3.cmxa $(SESSIONCMX)
-bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
+bin/why3session.opt: $(WHY3CMXA) $(SESSIONCMX)
+bin/why3session.byte: $(WHY3CMA) $(SESSIONCMO)
 
 # depend and clean targets
 
@@ -869,11 +886,11 @@ $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 byte: bin/why3shell.byte
 opt:  bin/why3shell.opt
 
-bin/why3shell.opt: lib/why3/why3.cmxa $(SHELLCMX)
+bin/why3shell.opt: $(WHY3CMXA) $(SHELLCMX)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3shell.byte: lib/why3/why3.cma $(SHELLCMO)
+bin/why3shell.byte: $(WHY3CMA) $(SHELLCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -930,8 +947,8 @@ lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
-lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
-lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
+lib/coq-tactic/why3tac.cmxs: $(WHY3CMXA) $(COQPCMX)
+lib/coq-tactic/why3tac.cma: $(WHY3CMA) $(COQPCMO)
 
 src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(SHOW) 'Camlp    $<'
@@ -1495,10 +1512,10 @@ ifeq (@enable_frama_c@,yes)
 nobyte: jessie.byte
 noopt: jessie.opt
 
-jessie.byte: src/jessie/Makefile lib/why3/why3.cma
+jessie.byte: src/jessie/Makefile $(WHY3CMA)
 	@$(MAKE) -C src/jessie Jessie3.cma
 
-jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
+jessie.opt: src/jessie/Makefile $(WHY3CMXA)
 	@$(MAKE) -C src/jessie Jessie3.cmxs
 
 uninstall-framac:
@@ -1542,8 +1559,8 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
-bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
-bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
+bin/why3doc.opt: $(WHY3CMXA) $(WHY3DOCCMX)
+bin/why3doc.byte: $(WHY3CMA) $(WHY3DOCCMO)
 
 # depend and clean targets
 
@@ -1688,8 +1705,8 @@ src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
 src/ide/why3_js.js: src/ide/why3_js.byte
 	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
 
-opt: lib/why3/why3.cma bin/why3webserver.opt src/ide/why3_js.js
-byte: lib/why3/why3.cma bin/why3webserver.byte src/ide/why3_js.js
+opt: bin/why3webserver.opt src/ide/why3_js.js
+byte: bin/why3webserver.byte src/ide/why3_js.js
 
 endif
 
