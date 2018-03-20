@@ -594,7 +594,7 @@ SERVER_MODULES := logging arraylist options queue readbuf request \
 
 CPULIM_MODULES := cpulimit-unix cpulimit-win
 
-SERVER_O := $(SERVERMODULES:%=src/server/%.o)
+SERVER_O := $(SERVER_MODULES:%=src/server/%.o)
 
 CPULIM_O := $(CPULIM_MODULES:%=src/server/%.o)
 
