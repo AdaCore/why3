@@ -307,15 +307,11 @@ else
    LOCALDIR="${PWD}"
 fi
 
-if test "$enable_local" = yes ; then
-   OCAMLINSTALLLIB=$LOCALDIR/lib
+#if ocamlfind is used it gives the install path for ocaml library
+if test "$USEOCAMLFIND" = yes; then
+   OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
 else
-   #if ocamlfind is used it gives the install path for ocaml library
-   if test "$USEOCAMLFIND" = yes; then
-      OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
-   else
-      OCAMLINSTALLLIB=$OCAMLLIB
-   fi
+   OCAMLINSTALLLIB=$OCAMLLIB
 fi
 
 # checking for rubber
@@ -954,11 +950,12 @@ if test "$enable_isabelle_support" = yes ; then
 fi
 if test "$enable_local" = yes ; then
    echo "Installable                 : no"
+   echo "    OCaml library path      : $OCAMLINSTALLLIB/why3"
 else
    echo "Installable                 : yes"
    echo "    Binary path             : $bindir"
-   echo "    Lib path                : $libdir/why3"
+   echo "    Library path            : $libdir/why3"
    echo "    Data path               : $datarootdir/why3"
-   echo "    Ocaml Library           : $OCAMLINSTALLLIB/why3"
+   echo "    OCaml library path      : $OCAMLINSTALLLIB/why3"
    echo "    Relocatable             : $enable_relocation"
 fi
