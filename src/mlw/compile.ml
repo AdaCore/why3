@@ -357,8 +357,7 @@ module Translate = struct
 
   let pvty pv =
     if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
-    else let (vs, vs_ty) = vsty pv.pv_vs in
-      ML.mk_var vs vs_ty false
+    else let (vs, vs_ty) = vsty pv.pv_vs in ML.mk_var vs vs_ty false
 
   let for_direction = function
     | To -> Mltree.To
@@ -449,19 +448,18 @@ module Translate = struct
     | Mltree.Tapp (_, tyl) | Mltree.Ttuple tyl ->
         List.fold_left add_tvar acc tyl
 
-  let pv_list_of_mask pvl mask =
-    let mk_pv_of_mask acc pv = function MaskGhost -> acc | _ -> pv :: acc in
-    match mask with
-    | MaskGhost   -> []
-    | MaskVisible -> pvl
-    | MaskTuple m -> assert (List.length m = List.length pvl);
-        let pvl = List.fold_left2 mk_pv_of_mask [] pvl m in
-        List.rev pvl
-
   (* expressions *)
   let rec expr info svar mask ({e_effect = eff; e_label = lbl} as e) =
     assert (not (e_ghost e));
     assert (not (mask_spill e.e_mask mask));
+    let pv_list_of_mask pvl mask =
+      let mk_pv_of_mask acc pv = function MaskGhost -> acc | _ -> pv :: acc in
+      match mask with
+      | MaskGhost   -> []
+      | MaskVisible -> pvl
+      | MaskTuple m -> assert (List.length m = List.length pvl);
+          let pvl = List.fold_left2 mk_pv_of_mask [] pvl m in
+          List.rev pvl in
     match e.e_node with
     | Econst  _ | Evar _ | Eexec ({c_node = Cfun _}, _) | Eassign _
     | Ewhile  _ | Efor _ | Eraise _ | Eexn _ | Eabsurd when mask = MaskGhost ->
@@ -473,8 +471,6 @@ module Translate = struct
     | Elet (LDvar (_, e1), e2) when e_ghost e1 -> expr info svar mask e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
         (* sequences are transformed into [let o = e1 in e2] by A-normal form *)
-        (* FIXME? this is only the case when [e1] is effectful ? *)
-        (* assert (ity_equal ity_unit e1.e_ity); *)
         expr info svar e1.e_mask e1
     | Elet (LDvar (pv, e1), e2)
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
@@ -534,11 +530,12 @@ module Translate = struct
         ML.e_unit
     | Eexec ({c_node = Capp (rs, pvl)}, _) when is_rs_tuple rs ->
         let pvl = pv_list_of_mask pvl mask in
+        let res_ity = ity_tuple (List.map (fun v -> v.pv_ity) pvl) in
         let pvl = ML.var_list_of_pv_list pvl in
-        ML.e_app rs pvl (Mltree.I e.e_ity) eff lbl (* FIXME : new type *)
+        ML.e_app rs pvl (Mltree.I res_ity) eff lbl
     | Eexec ({c_node = Capp (rs, _)}, _)
-    when is_empty_record info rs || rs_ghost rs ->
-      ML.e_unit
+      when is_empty_record info rs || rs_ghost rs ->
+        ML.e_unit
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
       when isconstructor info rs && cty.cty_args <> [] ->
         (* partial application of constructors *)
@@ -610,7 +607,9 @@ module Translate = struct
         ML.e_match_exn etry bl e_effect e_label xl (Mltree.I e.e_ity) eff lbl
     | Etry (etry, _, xl) ->
         let etry = expr info svar mask etry in
-        let mk_xl (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
+        let mk_xl (xs, (pvl, e)) =
+          let pvl = pv_list_of_mask pvl xs.xs_mask in
+          xs, pvl, expr info svar mask e in
         let xl = Mxs.bindings xl in
         let xl = List.map mk_xl xl in
         ML.mk_expr (Mltree.Etry (etry, false, xl)) (Mltree.I e.e_ity) eff lbl
@@ -684,7 +683,6 @@ module Translate = struct
     | Eexec ({c_node = Cany}, _) -> true
     | _ -> false
 
-  (* pids: identifiers from cloned modules without definitions *)
   let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDvar (_, e)) when e_ghost e ->
@@ -777,8 +775,6 @@ module Transform = struct
       | _ -> true in
     Spv.for_all is_not_write spv
 
-  (* type subst = expr Mpv.t *)
-
   let mk_list_eb ebl f =
     let mk_acc e (e_acc, s_acc) =
       let e, s = f e in e::e_acc, Spv.union s s_acc in
@@ -850,18 +846,12 @@ module Transform = struct
         let e, spv = expr info subst e in
         let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
         mk (Etry (e, case, e_bl)), Spv.union spv spv_bl
-    | Eassign _al -> (* FIXME : produced superfolous let *)
-        (* let assign e (_, _, pv) = mk_let subst pv e in *)
-        e, (* List.fold_left assign e al, *) Spv.empty
+    | Eassign _al ->
+        e, Spv.empty
     | Econst _ | Eabsurd | Ehole -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
         mk (Eignore e), spv
-
-  (* and mk_let subst pv e = *)
-  (*   try let e1 = Mpv.find pv subst in *)
-  (*     { e with e_node = Elet (Lvar (pv, e1), e) } *)
-  (*   with Not_found -> e *)
 
   and branch info subst (pat, e) =
     let e, spv = expr info subst e in (pat, e), spv
