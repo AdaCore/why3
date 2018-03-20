@@ -11,44 +11,8 @@
 
 {
   open Parse_smtv2_model_parser
-  open Model_parser
   exception SyntaxError
 
-  let interp_float b eb sb =
-    try
-      let is_neg = match b with
-        | "#b0" -> false
-        | "#b1" -> true
-        | _ -> raise Exit
-      in
-      if String.length eb = 13 && String.sub eb 0 2 = "#b" &&
-         String.length sb = 15 && String.sub sb 0 2 = "#x" then
-         (* binary 64 *)
-         let exp_base2 = String.sub eb 2 11 in
-         let mant_base16 = String.sub sb 2 13 in
-         let exp = int_of_string ("0b" ^ exp_base2) in
-         if exp = 0 then (* subnormals *)
-           let s = (if is_neg then "-" else "")^
-                   "0x0."^mant_base16^"p-1023"
-            in Float_hexa(s,float_of_string s)
-           else if exp = 2047 then (* infinities and NaN *)
-             if mant_base16="0000000000000" then
-                if is_neg then Minus_infinity else Plus_infinity
-                else Not_a_number
-           else
-           let exp = exp - 1023 in
-           let s = (if is_neg then "-" else "")^
-                   "0x1."^mant_base16^"p"^(string_of_int exp)
-           in Float_hexa(s,float_of_string s)
-      else
-      if String.sub eb 0 2 = "#x" && String.length eb = 4 &&
-         String.sub sb 0 2 = "#b" && String.length eb = 25 then
-         (* binary 32 *)
-         let exp_base16 = String.sub eb 2 2 in
-         let mant_base2 = String.sub sb 2 23 in
-           raise Exit (* TODO *)
-         else raise Exit
-   with Exit -> Float_value (b, eb, sb)
 }
 
 let atom = [^'('')'' ''\t''\n']
@@ -106,7 +70,7 @@ rule token = parse
   | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
   | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (interp_float b eb sb) }
+      { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
 
   | num as integer
       { INT_STR (integer) }
