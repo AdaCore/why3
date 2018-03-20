@@ -55,8 +55,8 @@ type info = {
 let ident_printer () =
   let bls = [
     "abs_int"; "abs_real"; "ac"; "and"; "array"; "as"; "axiom";
-    "bitv"; "bool";
-    "check"; "cut"; "distinct"; "else"; "exists";
+    "bitv"; "bool"; "case_split"; "check"; "cut"; "distinct";
+    "else"; "end"; "exists"; "extends";
     "false"; "float"; "float32"; "float32d"; "float64"; "float64d";
     "forall"; "fpa_rounding_mode"; "function";
     "goal";
@@ -69,7 +69,7 @@ let ident_printer () =
     "prop";
     "real"; "real_of_int"; "rewriting";
     "select"; "sqrt_real"; "sqrt_real_default"; "sqrt_real_excess"; "store";
-    "then"; "true"; "type"; "unit"; "void"; "with";
+    "then"; "theory"; "true"; "type"; "unit"; "void"; "with";
     "Aw"; "Down"; "Od";
     "NearestTiesToAway"; "NearestTiesToEven"; "Nd"; "No"; "Nu"; "Nz";
     "ToZero"; "Up";
