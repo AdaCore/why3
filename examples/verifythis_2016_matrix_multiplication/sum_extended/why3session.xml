@@ -3,44 +3,44 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sum_extended.mlw">
-<theory name="Sum_extended">
- <goal name="WP_parameter sum_mult" expl="VC for sum_mult">
+<file name="../sum_extended.mlw" proved="true">
+<theory name="Sum_extended" proved="true">
+ <goal name="WP_parameter sum_mult" expl="VC for sum_mult" proved="true">
  <proof prover="1"><result status="valid" time="0.05" steps="36"/></proof>
  </goal>
- <goal name="WP_parameter sum_add" expl="VC for sum_add">
+ <goal name="WP_parameter sum_add" expl="VC for sum_add" proved="true">
  <proof prover="1"><result status="valid" time="0.22" steps="260"/></proof>
  </goal>
- <goal name="WP_parameter fubini" expl="VC for fubini">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter fubini.1" expl="1. assertion">
+ <goal name="WP_parameter fubini" expl="VC for fubini" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter fubini.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.2" expl="2. postcondition">
+  <goal name="WP_parameter fubini.1" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.3" expl="3. variant decrease">
+  <goal name="WP_parameter fubini.2" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.4" expl="4. precondition">
+  <goal name="WP_parameter fubini.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.5" expl="5. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter fubini.5.1" expl="1. assertion">
+  <goal name="WP_parameter fubini.4" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter fubini.4.0" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="WP_parameter fubini.5.2" expl="2. assertion">
+   <goal name="WP_parameter fubini.4.1" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fubini.6" expl="6. postcondition">
+  <goal name="WP_parameter fubini.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter sum_ext" expl="VC for sum_ext">
+ <goal name="WP_parameter sum_ext" expl="VC for sum_ext" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
  </goal>
 </theory>

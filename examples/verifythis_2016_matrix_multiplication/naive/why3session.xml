@@ -3,83 +3,83 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../naive.mlw">
-<theory name="MatrixMultiplication">
- <goal name="WP_parameter mult_naive" expl="VC for mult_naive">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mult_naive.1" expl="1. precondition">
+<file name="../naive.mlw" proved="true">
+<theory name="MatrixMultiplication" proved="true">
+ <goal name="WP_parameter mult_naive" expl="VC for mult_naive" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mult_naive.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.2" expl="2. postcondition">
+  <goal name="WP_parameter mult_naive.1" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.3" expl="3. postcondition">
+  <goal name="WP_parameter mult_naive.2" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.4" expl="4. loop invariant init">
+  <goal name="WP_parameter mult_naive.3" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.5" expl="5. loop invariant init">
+  <goal name="WP_parameter mult_naive.4" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.6" expl="6. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.5" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.7" expl="7. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.6" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.8" expl="8. loop invariant init">
+  <goal name="WP_parameter mult_naive.7" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.9" expl="9. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.8" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.10" expl="10. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.9" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.11" expl="11. loop invariant init">
+  <goal name="WP_parameter mult_naive.10" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.12" expl="12. index in array bounds">
+  <goal name="WP_parameter mult_naive.11" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.13" expl="13. index in array bounds">
+  <goal name="WP_parameter mult_naive.12" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.14" expl="14. type invariant">
+  <goal name="WP_parameter mult_naive.13" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.15" expl="15. index in array bounds">
+  <goal name="WP_parameter mult_naive.14" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.16" expl="16. index in array bounds">
+  <goal name="WP_parameter mult_naive.15" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.17" expl="17. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.16" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.18" expl="18. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.17" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="56"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.19" expl="19. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.18" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.20" expl="20. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.19" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.21" expl="21. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.20" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.22" expl="22. loop invariant preservation">
+  <goal name="WP_parameter mult_naive.21" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.23" expl="23. type invariant">
+  <goal name="WP_parameter mult_naive.22" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.24" expl="24. postcondition">
+  <goal name="WP_parameter mult_naive.23" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mult_naive.25" expl="25. postcondition">
+  <goal name="WP_parameter mult_naive.24" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
  </transf>
