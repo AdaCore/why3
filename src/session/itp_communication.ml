@@ -11,7 +11,7 @@
 
 (* Information that the IDE may want to have *)
 type prover = string
-type transformation = string
+type transformation = (string * string)
 type strategy = string
 
 
@@ -30,7 +30,7 @@ type global_information =
     (* hidden_provers       : string list; *)
     (* session_time_limit   : int; *)
     (* session_mem_limit    : int; *)
-     (* session_nb_processes : int; *)
+    (* session_nb_processes : int; *)
     (* session_cntexample   : bool; *)
     (* main_dir             : string *)
   }

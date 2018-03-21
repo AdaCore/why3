@@ -34,7 +34,11 @@ let convert_infos (i: global_information) =
   in
   Record (convert_record
     ["provers", List (List.map convert_prover i.provers);
-     "transformations", List (List.map (fun x -> String x) i.transformations);
+     "transformations",
+     List (List.map
+             (fun (a, b) ->
+               Record (convert_record ["name_t", String a; "desc_t", String b]))
+             i.transformations);
      "strategies", List (List.map convert_strategy i.strategies);
      "commands", List (List.map (fun x -> String x) i.commands)])
 
@@ -567,6 +571,12 @@ let parse_infos j =
   try
     let pr = get_list (get_field j "provers") in
     let tr = get_list (get_field j "transformations") in
+    let tr =
+      List.map (fun j ->
+        try
+          get_string (get_field j "name_t"),
+          get_string (get_field j "desc_t")
+        with | _ -> raise (NotInfos "transformations")) tr in
     let str = get_list (get_field j "strategies") in
     let com = get_list (get_field j "commands") in
     {provers = List.map (fun j -> try
@@ -574,7 +584,7 @@ let parse_infos j =
                                   get_string (get_field j "prover_name"),
                                   get_string (get_field j "prover_parseable_name"))
                                with Not_found -> raise (NotInfos "provers")) pr;
-     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "transformations")) tr;
+     transformations = tr;
      strategies = List.map (fun j -> try
                                  (get_string (get_field j "strategy_shortcut"),
                                   get_string (get_field j "strategy_name"))

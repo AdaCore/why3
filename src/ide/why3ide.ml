@@ -1934,7 +1934,7 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
-  List.iter (fun s -> add_completion_entry (s,"transformation")) transformations;
+  List.iter add_completion_entry transformations;
   (* add the name of the commands *)
   List.iter (fun s -> add_completion_entry (s,"command")) commands;
   (* todo: add queries *)

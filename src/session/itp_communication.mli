@@ -10,7 +10,8 @@
 (********************************************************************)
 
 type prover = string
-type transformation = string
+(* Name and description *)
+type transformation = (string * string)
 type strategy = string
 
 type node_ID = int
