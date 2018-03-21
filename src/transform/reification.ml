@@ -698,6 +698,8 @@ let get_decl env mm rs =
      aux l
   | _ -> Mid.find id tm.mod_known
 
+let get_decl env mm = Wrs.memoize 17 (fun rs -> get_decl env mm rs)
+
 let builtin_progs = Hrs.create 17
 
 let eval_true _ _ = Vbool true
@@ -932,6 +934,7 @@ type info = {
     vars: value Mid.t;
     recs: rsymbol Mrs.t;
     funs: decl Mrs.t;
+    get_decl: rsymbol -> Mltree.decl;
     cs: string list; (* callstack for debugging *)
   }
 
@@ -1004,7 +1007,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
           f rs (List.map (interp_expr info) le))
         else begin
           let decl = try Mrs.find rs info.funs
-                     with Not_found -> get_decl info.env info.mm rs in
+                     with Not_found -> info.get_decl rs in
           Debug.dprintf debug_interp "decl found@.";
           match decl with
           | Dlet (Lsym (rs, _ty, vl, e)) ->
@@ -1256,7 +1259,8 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   (*let mm = Mstr.singleton ms pmod in*)
   Debug.dprintf debug_refl "module map built@.";
   get_builtin_progs env;
-  let decl = get_decl env mm rs in
+  let get_decl = get_decl env mm in
+  let decl = get_decl rs in
   Debug.dprintf debug_refl "initial decl found@.";
   let args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
   let rec reify_post = function
@@ -1294,6 +1298,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
                        funs = Mrs.empty;
                        recs = Mrs.empty;
                        vars = vars;
+                       get_decl = get_decl;
                        cs = [];
                        } in
           Debug.dprintf debug_refl "eval_fun@.";
