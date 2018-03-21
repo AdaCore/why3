@@ -135,6 +135,7 @@ type info = {
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
+  info_set_incremental: bool;
   mutable incr_list: (prsymbol * term) list;
 }
 
@@ -630,7 +631,7 @@ let set_produce_models fmt info =
     fprintf fmt "(set-option :produce-models true)@\n"
 
 let set_incremental fmt info =
-  if info.info_incremental then
+  if info.info_set_incremental then
     fprintf fmt "(set-option :incremental true)@\n"
 
 let meta_counterexmp_need_push =
@@ -668,6 +669,10 @@ let print_task args ?old:_ fmt task =
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;
+    (* info_set_incremental add the incremental option to the header. It is not
+       needed for some provers
+    *)
+    info_set_incremental = not need_push && incremental;
     incr_list = [];
     }
   in
