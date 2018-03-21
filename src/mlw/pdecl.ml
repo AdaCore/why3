@@ -236,7 +236,7 @@ let get_syms node pure =
         syms_tl (syms_eity syms d) invl
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
-    | Ecase (d,bl,xl) ->
+    | Ematch (d,bl,xl) ->
         (* Dexpr handles this, but not Expr, so we set a failsafe *)
         let exhaustive = bl = [] ||
           let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in

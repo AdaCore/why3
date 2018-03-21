@@ -129,7 +129,7 @@ and expr_node =
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * reg_branch list * exn_branch Mxs.t
+  | Ematch  of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
   | Eraise  of xsymbol * expr
@@ -234,7 +234,7 @@ val e_exn : xsymbol -> expr -> expr
 
 val e_raise : xsymbol -> expr -> ity -> expr
 
-val e_case : expr -> reg_branch list -> exn_branch Mxs.t -> expr
+val e_match : expr -> reg_branch list -> exn_branch Mxs.t -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 

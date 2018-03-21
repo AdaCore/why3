@@ -383,7 +383,7 @@ and p_expr fmt e =
       fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
     | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
     | Eif (_, _, _) -> fprintf fmt "@[Eif(_,@ _,@ _)@]"
-    | Ecase (_, _) -> fprintf fmt "@[Ecase(_,@ _)@]"
+    | Ematch (_, _) -> fprintf fmt "@[Ematch(_,@ _)@]"
     | Eassign (pls, e1, reg, pvs) ->
       fprintf fmt "@[Eassign(%a,@ %a,@ %a,@ %a)@]"
         p_pls pls p_expr e1 Ppretty.print_reg reg p_pvs pvs
@@ -607,7 +607,7 @@ let rec eval_expr env (e : expr) : result =
       with
           NotNum -> Irred e
     end
-  | Ecase(e0,ebl,el) ->
+  | Ematch(e0,ebl,el) ->
     begin
       let r = eval_expr env e0 in
       match r with

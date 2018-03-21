@@ -112,7 +112,7 @@ and dexpr_node =
   | DEand of dexpr * dexpr
   | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEcase of dexpr * dreg_branch list * dexn_branch list
+  | DEmatch of dexpr * dreg_branch list * dexn_branch list
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr

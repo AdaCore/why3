@@ -322,7 +322,7 @@ and expr_node =
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * reg_branch list * exn_branch Mxs.t
+  | Ematch  of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
   | Eraise  of xsymbol * expr
@@ -393,7 +393,7 @@ let e_fold fn acc e = match e.e_node with
   | Elet ((LDsym _|LDrec _), e) | Eexn (_,e) -> fn acc e
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
-  | Ecase (d,bl,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl
+  | Ematch (d,bl,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl
       (List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl)
 
 exception FoundExpr of Loc.position option * expr
@@ -565,7 +565,7 @@ let rec raw_of_expr prop e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_void
     (* we do not check e.e_effect here, since we check the
        effects later for the overall expression. The only
-       effect-hiding construction, Ecase(_,_,xl), is forbidden. *)
+       effect-hiding construction, Ematch(_,_,xl), is forbidden. *)
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> t_var v.pv_vs
   | Econst c -> t_const c (ty_of_ity e.e_ity)
@@ -596,11 +596,11 @@ let rec raw_of_expr prop e = match e.e_node with
       t_or (pure_of_expr true e0) (pure_of_expr true e2)
   | Eif (e0,e1,e2) ->
       t_if (pure_of_expr true e0) (pure_of_expr prop e1) (pure_of_expr prop e2)
-  | Ecase (d,bl,xl) when Mxs.is_empty xl ->
+  | Ematch (d,bl,xl) when Mxs.is_empty xl ->
       if bl = [] then pure_of_expr prop d else
       let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
       t_case (pure_of_expr false d) (List.map conv bl)
-  | Ecase _ | Eraise _ | Eabsurd -> raise Exit
+  | Ematch _ | Eraise _ | Eabsurd -> raise Exit
 
 and pure_of_expr prop e = match copy_labels e (raw_of_expr prop e) with
   | {t_ty = Some _} as t when prop -> fmla_of_term t
@@ -653,11 +653,11 @@ let rec post_of_expr res e = match e.e_node with
       post_of_term res (pure_of_expr true e)
   | Eif (e0,e1,e2) ->
       t_if (pure_of_expr true e0) (post_of_expr res e1) (post_of_expr res e2)
-  | Ecase (d,bl,xl) when Mxs.is_empty xl ->
+  | Ematch (d,bl,xl) when Mxs.is_empty xl ->
       if bl = [] then post_of_expr res d else
       let conv (p,e) = t_close_branch p.pp_pat (post_of_expr res e) in
       t_case (pure_of_expr false d) (List.map conv bl)
-  | Ecase _ | Eraise _ -> raise Exit
+  | Ematch _ | Eraise _ -> raise Exit
   | Eabsurd -> copy_labels e t_false
 
 let local_post_of_expr e =
@@ -935,7 +935,7 @@ let e_while d inv vl e =
 
 (* match-with, try-with, raise *)
 
-let e_case e bl xl =
+let e_match e bl xl =
   (* return type *)
   let ity = match bl with
     | (_,d)::_ -> d.e_ity
@@ -987,7 +987,7 @@ let e_case e bl xl =
   let eeff = Mxs.fold (fun xs _ eff -> eff_catch eff xs) xl e.e_effect in
   let eff = try_effect (e::dl) eff_union_seq eeff eff in
   let eff = try_effect (e::dl) eff_ghostify ghost eff in
-  mk_expr (Ecase (e,bl,xl)) ity mask eff
+  mk_expr (Ematch (e,bl,xl)) ity mask eff
 
 let e_raise xs e ity =
   ity_equal_check e.e_ity xs.xs_ity;
@@ -1056,7 +1056,7 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Efor (v,b,i,inv,e) -> e_for_raw v b i inv (e_rs_subst sm e)
   | Ewhile (d,inv,vl,e) -> e_while (e_rs_subst sm d) inv vl (e_rs_subst sm e)
   | Eraise (xs,d) -> e_raise xs (e_rs_subst sm d) e.e_ity
-  | Ecase (d,bl,xl) -> e_case (e_rs_subst sm d)
+  | Ematch (d,bl,xl) -> e_match (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
       (Mxs.map (fun (vl,e) -> vl, e_rs_subst sm e) xl))
 
@@ -1387,14 +1387,14 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "%a <- %a")
         (Pp.print_list Pp.comma print_left) al
         (Pp.print_list Pp.comma print_right) al
-  | Ecase (e,[],xl) ->
+  | Ematch (e,[],xl) ->
       fprintf fmt "try %a with@\n@[<hov>%a@]@\nend" print_expr e
         (Pp.print_list Pp.newline (print_xbranch false)) (Mxs.bindings xl)
-  | Ecase (e0,bl,xl) when Mxs.is_empty xl ->
-      (* Elet and Ecase are ghost-containers *)
+  | Ematch (e0,bl,xl) when Mxs.is_empty xl ->
+      (* Elet and Ematch are ghost-containers *)
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         print_expr e0 (Pp.print_list Pp.newline print_branch) bl
-  | Ecase (e,bl,xl) ->
+  | Ematch (e,bl,xl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@\n%a@]@\nend"
         print_expr e (Pp.print_list Pp.newline print_branch) bl
         (Pp.print_list Pp.newline (print_xbranch true)) (Mxs.bindings xl)

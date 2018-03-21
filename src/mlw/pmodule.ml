@@ -764,7 +764,7 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       e_let ld (clone_expr cl sm e)
   | Eif (e1, e2, e3) ->
       e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
-  | Ecase (d, bl, xl) ->
+  | Ematch (d, bl, xl) ->
       let d = clone_expr cl sm d in
       let conv_rbr (pp, e) =
         let sm, pp = clone_ppat cl sm pp d.e_mask in
@@ -773,7 +773,7 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
         Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
-      e_case d (List.map conv_rbr bl) (Mxs.fold conv_xbr xl Mxs.empty)
+      e_match d (List.map conv_rbr bl) (Mxs.fold conv_xbr xl Mxs.empty)
   | Ewhile (c,invl,varl,e) ->
       e_while (clone_expr cl sm c) (clone_invl cl sm invl)
               (clone_varl cl sm varl) (clone_expr cl sm e)

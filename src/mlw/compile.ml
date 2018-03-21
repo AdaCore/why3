@@ -591,37 +591,21 @@ module Translate = struct
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
         ML.e_assign al (Mltree.I e.e_ity) eff lbl
-    | Ecase (e1, [], xl) when Mxs.is_empty xl ->
+    | Ematch (e1, [], xl) when Mxs.is_empty xl ->
         expr info svar e1.e_mask e1
-    | Ecase (e1, bl, xl) when e_ghost e1 ->
+    | Ematch (e1, bl, xl) when e_ghost e1 ->
         assert (Mxs.is_empty xl); (* Expr ensures this for the time being *)
         (* if [e1] is ghost but the entire [match-with] expression isn't,
            it must be the case the first non-absurd branch is irrefutable *)
         (match bl with (* FIXME: skip absurd branches *)
          | [] -> assert false | (_, e) :: _ -> expr info svar e.e_mask e)
-(*
-    | Ecase (e1, bl) ->
-        let e1 = expr info svar e1.e_mask e1 in
-        let bl = List.map (ebranch info svar mask) bl in
-        ML.e_match e1 bl (Mltree.I e.e_ity) eff lbl
-*)
-    | Ecase (e1, bl, xl) ->
+    | Ematch (e1, bl, xl) ->
         let e1 = expr info svar e1.e_mask e1 in
         let bl = List.map (ebranch info svar mask) bl in
         (* NOTE: why no pv_list_of_mask here? *)
         let mk_xl (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
         let xl = List.map mk_xl (Mxs.bindings xl) in
         ML.e_match e1 bl xl (Mltree.I e.e_ity) eff lbl
-(*
-    | Etry (etry, _, xl) ->
-        let etry = expr info svar mask etry in
-        let mk_xl (xs, (pvl, e)) =
-          let pvl = pv_list_of_mask pvl xs.xs_mask in
-          xs, pvl, expr info svar mask e in
-        let xl = Mxs.bindings xl in
-        let xl = List.map mk_xl xl in
-        ML.mk_expr (Mltree.Etry (etry, false, xl)) (Mltree.I e.e_ity) eff lbl
-*)
     | Eraise (xs, ex) -> let ex = match expr info svar xs.xs_mask ex with
         | {Mltree.e_node = Mltree.Eblock []} -> None
         | e -> Some e in

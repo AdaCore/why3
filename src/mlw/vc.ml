@@ -695,7 +695,7 @@ let rec k_expr env lps e res xmap =
           with Exit -> Ktag (SP, Kif (v, k1, k2))
           else Kif (v, k1, k2) in
         var_or_proxy e0 kk
-    | Ecase (e0, bl, xl) ->
+    | Ematch (e0, bl, xl) ->
         (* try-with is just another semicolon *)
         let branch xs (vl,e) (xl,xm) =
           let i = new_exn env in

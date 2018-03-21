@@ -80,7 +80,7 @@ and term_desc =
   | Tquant of Dterm.dquant * binder list * term list list * term
   | Tnamed of label * term
   | Tlet of ident * term * term
-  | Tmatch of term * (pattern * term) list
+  | Tcase of term * (pattern * term) list
   | Tcast of term * pty
   | Ttuple of term list
   | Trecord of (qualid * term) list

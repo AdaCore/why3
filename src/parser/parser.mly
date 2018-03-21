@@ -573,7 +573,7 @@ single_term_:
       match pat.pat_desc with
       | Pvar (id,false) -> Tlet (id, def, $6)
       | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
-      | _ -> Tmatch (def, [pat, $6]) }
+      | _ -> Tcase (def, [pat, $6]) }
 | LET labels(lident_op_id) EQUAL term IN term
     { Tlet ($2, $4, $6) }
 | LET labels(lident_nq) mk_term(lam_defn) IN term
@@ -581,7 +581,7 @@ single_term_:
 | LET labels(lident_op_id) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
 | MATCH term WITH match_cases(term) END
-    { Tmatch ($2, $4) }
+    { Tcase ($2, $4) }
 | quant comma_list1(quant_vars) triggers DOT term
     { let l = List.map add_model_labels (List.concat $2) in
       Tquant ($1, l, $3, $5) }

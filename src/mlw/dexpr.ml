@@ -414,7 +414,7 @@ and dexpr_node =
   | DEand of dexpr * dexpr
   | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEcase of dexpr * dreg_branch list * dexn_branch list
+  | DEmatch of dexpr * dreg_branch list * dexn_branch list
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
@@ -759,9 +759,9 @@ let dexpr ?loc node =
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
         [], res
-    | DEcase (_,[],[]) ->
-        invalid_arg "Dexpr.dexpr: empty branch list in DEcase"
-    | DEcase (de,bl,xl) ->
+    | DEmatch (_,[],[]) ->
+        invalid_arg "Dexpr.dexpr: empty branch list in DEmatch"
+    | DEmatch (de,bl,xl) ->
         let res = dity_fresh () in
         let ety = if bl = [] then
           res else dity_fresh () in
@@ -1312,7 +1312,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       cexp uloc env de (LD (LL old) :: lpl)
   | DEvar_pure _ | DEpv_pure _ | DEoptexn _
   | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _
-  | DEcase _ | DEassign _ | DEwhile _ | DEfor _ | DEraise _ | DEassert _
+  | DEmatch _ | DEassign _ | DEwhile _ | DEfor _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
   | DEcast _ | DEuloc _ | DElabel _ -> assert false (* already stripped *)
 
@@ -1381,7 +1381,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e = expr uloc env de in
       let inv = get_later env dinv in
       e_for v e_from dir e_to i (create_invariant inv) e
-  | DEcase (de1,bl,xl) ->
+  | DEmatch (de1,bl,xl) ->
       let e1 = expr uloc env de1 in
       (* regular branches *)
       let mask = if env.ghs then MaskGhost else e1.e_mask in
@@ -1444,8 +1444,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
             let bl = if Pattern.is_exhaustive [t] pl then bl else
               let _,pp = create_prog_pattern PPwild xs.xs_ity mask in
               (pp, e_raise xs e (ity_of_dity res)) :: bl in
-            vl, e_case e (List.rev bl) Mxs.empty in
-      e_case e1 (List.rev bl) (Mxs.mapi mk_branch xsm)
+            vl, e_match e (List.rev bl) Mxs.empty in
+      e_match e1 (List.rev bl) (Mxs.mapi mk_branch xsm)
   | DEraise (xs,de) ->
       let {xs_mask = mask} as xs = get_xs env xs in
       let env = {env with ugh = mask = MaskGhost} in
@@ -1473,7 +1473,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       if not (Sxs.mem xs e.e_effect.eff_raises) then e else
       let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
       let branches = Mxs.singleton xs (vl, e_of_vl vl) in
-      e_exn xs (e_case e [] branches)
+      e_exn xs (e_match e [] branches)
   | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       let put _ (ld,_) e = e_let ld e in

@@ -290,7 +290,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let denv = denv_add_let denv e1 id in
       let e2 = dterm ns km crcmap gvars at denv e2 in
       DTlet (e1, id, e2)
-  | Ptree.Tmatch (e1, bl) ->
+  | Ptree.Tcase (e1, bl) ->
       let e1 = dterm ns km crcmap gvars at denv e1 in
       let branch (p, e) =
         let p = dpattern ns km p in
@@ -559,7 +559,7 @@ let dpost muc ql lvm old ity =
         let v = create_pvsymbol (id_fresh "result") ity in
         let i = { id_str = "(null)"; id_loc = loc; id_lab = [] } in
         let t = { term_desc = Tident (Qident i); term_loc = loc } in
-        let f = { term_desc = Tmatch (t, pfl); term_loc = loc } in
+        let f = { term_desc = Ptree.Tcase (t, pfl); term_loc = loc } in
         let lvm = Mstr.add "(null)" v lvm in
         v, Loc.try3 ~loc type_fmla muc lvm old f in
   List.map dpost ql
@@ -690,7 +690,7 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
       DEcast (d1, dity_of_pty muc pty)
   | Ptree.Tat _ -> Loc.errorm ~loc "`at' and `old' cannot be used here"
   | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
-  | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tmatch _ | Ptree.Tif _
+  | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
   | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
   | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
       Loc.errorm ~loc "unsupported effect expression")
@@ -848,7 +848,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         let denv = denv_add_pat denv pp in
         let e = dexpr muc denv e in
         xs, pp, e in
-      DEcase (e1, List.map rbranch bl, List.map xbranch xl)
+      DEmatch (e1, List.map rbranch bl, List.map xbranch xl)
   | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr muc denv e1 in
       let e2 = dexpr muc denv e2 in
