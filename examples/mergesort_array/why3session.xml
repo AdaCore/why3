@@ -6,9 +6,9 @@
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="1.30" timelimit="11" steplimit="0" memlimit="1000"/>
 <file name="../mergesort_array.mlw" proved="true">
-<theory name="Elt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Elt" proved="true">
 </theory>
-<theory name="Merge" proved="true" sum="813126ce9841041d232baba709089035">
+<theory name="Merge" proved="true">
  <goal name="VC merge" expl="VC for merge" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC merge.0" expl="loop invariant init" proved="true">
@@ -167,7 +167,7 @@
   <goal name="VC merge_using.11" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC merge_using.11.0" expl="assertion" proved="true">
-   <proof prover="4" timelimit="11"><result status="valid" time="0.62"/></proof>
+   <proof prover="4" timelimit="11"><result status="valid" time="0.45"/></proof>
    </goal>
   </transf>
   </goal>
@@ -192,7 +192,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="TopDownMergesort" proved="true" sum="0e1da44e6888d41d694e6eab8f1c4adc">
+<theory name="TopDownMergesort" proved="true">
  <goal name="VC mergesort_rec" expl="VC for mergesort_rec" proved="true">
  <proof prover="11"><result status="valid" time="0.33" steps="694"/></proof>
  </goal>
@@ -200,7 +200,7 @@
  <proof prover="11"><result status="valid" time="0.01" steps="36"/></proof>
  </goal>
 </theory>
-<theory name="BottomUpMergesort" proved="true" sum="3a8575d5f117f4c925fe7aa77a6dac60">
+<theory name="BottomUpMergesort" proved="true">
  <goal name="VC bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC bottom_up_mergesort.0" expl="loop invariant init" proved="true">
@@ -325,7 +325,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NaturalMergesort" proved="true" sum="e57520d034e6f5becdbb8f87b610ca27">
+<theory name="NaturalMergesort" proved="true">
  <goal name="VC find_run" expl="VC for find_run" proved="true">
  <proof prover="11"><result status="valid" time="0.02" steps="47"/></proof>
  </goal>

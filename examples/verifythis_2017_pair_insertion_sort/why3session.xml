@@ -6,7 +6,7 @@
 <prover id="2" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2017_pair_insertion_sort.mlw" proved="true">
-<theory name="Challenge1" proved="true" sum="a13de49b27f8b1585b98c4f4666d2f43">
+<theory name="Challenge1" proved="true">
  <goal name="VC pair_insertion_sort" expl="VC for pair_insertion_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC pair_insertion_sort.0" expl="loop invariant init" proved="true">
@@ -135,7 +135,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="114"/></proof>
   </goal>
   <goal name="VC pair_insertion_sort.41" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.54" steps="378"/></proof>
+  <proof prover="0"><result status="valid" time="1.60" steps="1306"/></proof>
   </goal>
   <goal name="VC pair_insertion_sort.42" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
@@ -266,7 +266,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="155"/></proof>
   </goal>
   <goal name="VC pair_insertion_sort.84" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.75" steps="430"/></proof>
+  <proof prover="0"><result status="valid" time="0.57" steps="430"/></proof>
   </goal>
   <goal name="VC pair_insertion_sort.85" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>

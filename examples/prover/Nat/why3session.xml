@@ -3,15 +3,15 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Nat.mlw">
-<theory name="Nat">
- <goal name="WP_parameter nat_to_int_nonnegative" expl="VC for nat_to_int_nonnegative">
- <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+<file name="../Nat.mlw" proved="true">
+<theory name="Nat" proved="true">
+ <goal name="VC nat_to_int_nonnegative" expl="VC for nat_to_int_nonnegative" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
- <goal name="WP_parameter add_nat_simulate_add_int" expl="VC for add_nat_simulate_add_int">
- <proof prover="1"><result status="valid" time="0.03" steps="82"/></proof>
+ <goal name="VC add_nat_simulate_add_int" expl="VC for add_nat_simulate_add_int" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="42"/></proof>
  </goal>
- <goal name="one_nat_value" expl="">
+ <goal name="one_nat_value" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
