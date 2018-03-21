@@ -792,9 +792,19 @@ end
       add_node_to_table node new_id;
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
-      P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
-      get_node_proved new_id node;
+      begin
+        (* Do not send theories that do not contain any goal *)
+        match node with
+        | ATh th when theory_goals th = [] -> ()
+        | _ ->
+            P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+            get_node_proved new_id node
+      end;
       new_id
+
+  (* Same as new_node but do not return the node. *)
+  let create_node ~parent node =
+    let _: node_ID = new_node ~parent node in ()
 
   (****************************)
   (* Iter on the session tree *)
@@ -857,25 +867,19 @@ end
   (* Initialization of session tree *)
   (**********************************)
 
-(*
-  let _init_the_tree (): unit =
-    let f ~parent node_id = ignore (new_node ~parent node_id) in
-    iter_the_files f root_node
-*)
 
   let send_new_subtree_from_trans parent trans_id : unit =
     iter_subtree_from_trans
-      (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
+      create_node parent trans_id
 
   let send_new_subtree_from_file f =
-    iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
-      f
+    iter_subtree_from_file create_node f
 
   let reset_and_send_the_whole_tree (): unit =
     P.notify Reset_whole_tree;
     iter_on_files
       ~on_file:(fun file -> read_and_send (file_name file))
-      ~on_subtree:(fun ~parent id -> ignore (new_node ~parent id))
+      ~on_subtree:create_node
 
   let unfocus () =
     focused_node := Unfocused;
