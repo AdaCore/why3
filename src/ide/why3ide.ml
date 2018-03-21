@@ -1967,9 +1967,13 @@ let init_completion provers transformations strategies commands =
   List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
-  (* does not work: it replaces the previous column as text result
-  command_entry_completion#set_text_column completion_desc;
-   *)
+  (* Adding a column which contains the description of the
+     prover/transformation/strategy. *)
+  let name_renderer = GTree.cell_renderer_text [ ] in
+  name_renderer#set_properties [`BACKGROUND "lightgrey"];
+  command_entry_completion#pack name_renderer;
+  command_entry_completion#add_attribute name_renderer "text" completion_desc;
+
   command_entry_completion#set_match_func match_function;
 
   command_entry#set_completion command_entry_completion
