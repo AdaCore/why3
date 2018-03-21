@@ -251,7 +251,7 @@ LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
 $(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
-$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES) -I +compiler-libs
+$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
@@ -280,14 +280,6 @@ endif
 
 src/util/strings.cmo: WARNINGS:=$(WARNINGS)-3
 src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
-
-# debug optimization
-
-src/utils/debug_optim.cmxs:
-	ocamlopt -I +compiler-libs -for-pack Why3 -shared src/util/debug_optim.ml -o src/util/debug_optim.cmxs
-
-src/transform/reification.cmx: src/utils/debug_optim.cmxs
-src/transform/reification.cmx: OFLAGS += -plugin debug_optim.cmxs
 
 # hide warning 'no cmx file was found in path for module ..., and its interface was not compiled with -opaque' for the coq tactic
 
