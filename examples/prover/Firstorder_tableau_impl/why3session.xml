@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -173,10 +174,10 @@
   <proof prover="8"><result status="valid" time="0.24" steps="146"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.8" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.19" steps="29"/></proof>
+  <proof prover="8"><result status="valid" time="0.20" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.9" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.20" steps="29"/></proof>
+  <proof prover="8"><result status="valid" time="0.19" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.10" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.18" steps="33"/></proof>
@@ -468,7 +469,7 @@
   <goal name="WP_parameter nlsubst_symbol_in_tableau.10" expl="assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.1" expl="assertion">
-   <proof prover="2"><result status="valid" time="1.94"/></proof>
+   <proof prover="0"><result status="valid" time="0.85"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.2" expl="assertion">
    <proof prover="8"><result status="valid" time="0.26" steps="190"/></proof>
