@@ -44,9 +44,10 @@ refer to Section~\ref{sec:ideref} for a more complete description.
   \label{fig:gui1}
 \end{figure}
 
-The GUI is launched on the file above as follows.
+The GUI is launched on the file above as follows
+(here ``\texttt{>}'' is the prompt):
 \begin{verbatim}
-why3 ide hello_proof.why
+> why3 ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
 that looks like the screenshot of Figure~\ref{fig:gui1}.
@@ -151,15 +152,17 @@ explained below.
 
 \subsection{Modifying the input}
 
-% Currently, the GUI does not allow to modify the input file.
-You must
-edit the file external by some editor of your choice. Let us assume we
+You can edit the source file, using the corresponding tab in the
+top-right window of the GUI.
+Let us assume we
 change the goal $G_2$ by replacing the first occurrence of \texttt{true} by
 \texttt{false}, \eg
 \begin{whycode}
   goal G2 : (false -> false) /\ (true \/ false)
 \end{whycode}
-We can reload the modified file in the IDE using menu \textsf{File/Reload}, or the shortcut ``Ctrl-R''. We get the tree view shown on Figure~\ref{fig:gui5}.
+We can refresh the goals using menu \textsf{File/Save all and Refresh
+  session}, or the shortcut ``Ctrl-R''. We get the tree view shown on
+Figure~\ref{fig:gui5}.
 
 %EXECUTE bin/why3 ide --batch "type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
 %EXECUTE sed -i -e 's/true -> false/false -> false/' doc/hello_proof.why
@@ -185,11 +188,13 @@ remains unproved using any of the provers.
 
 Instead of pushing a prover's button to rerun its proofs, you can
 \emph{replay} the existing but obsolete
-proof attempts, by clicking on
-the \textsf{Replay} button. By default, \textsf{Replay} only replays
-proofs that were successful before. If you want to replay all of them,
-you must select the context \textsf{all goals} at the top of the left
-tool bar.
+proof attempts, using menu
+\textsf{Tools/Replay obsolete}. By default, \textsf{Replay} only replays
+proofs that were successful before.
+%% FIXME? ça existe toujours dans le nouvel IDE ?
+% If you want to replay all of them,
+% you must select the context \textsf{all goals} at the top of the left
+% tool bar.
 
 Notice that replaying can be done in batch mode, using the
 \texttt{replay} command (see Section~\ref{sec:why3replayer}) For
@@ -197,19 +202,11 @@ example, running the replayer on the \texttt{hello\_proof} example is
 as follows (assuming $G_2$ still is
 \lstinline|(true -> false) /\ (true \/ false)|).
 \begin{verbatim}
-$ why3 replay hello_proof
-Info: found directory 'hello_proof' for the project
-Opening session...[Xml warning] prolog ignored
-[Reload] file '../hello_proof.why'
-[Reload] theory 'HelloProof'
-[Reload] transformation split_goal for goal G2
- done
-Progress: 9/9
- 2/3
+> why3 replay hello_proof
+ 2/3 (replay OK)
    +--file ../hello_proof.why: 2/3
       +--theory HelloProof: 2/3
          +--goal G2 not proved
-Everything OK.
 \end{verbatim}
 The last line tells us that no differences were detected between the
 current run and the run stored in the XML file. The tree above
@@ -219,14 +216,12 @@ reminds us that $G_2$ is not proved.
 
 You may want to clean some the proof attempts, \eg removing the
 unsuccessful ones when a project is finally fully proved.
-
 A proof or a transformation can be removed by selecting it and
-clicking on button \textsf{Remove}. You must confirm the
-removal. Beware that there is no way to undo such a removal.
-
-The \textsf{Clean} button performs an automatic removal of all proofs
+using menu \textsf{Tools/Remove} or key \texttt{Suppr}.
+It performs an automatic removal of all proofs
 attempts that are unsuccessful, while there exists a successful proof
 attempt for the same goal.
+Beware that there is no way to undo such a removal.
 
 \section{Getting Started with the \why Command}
 \label{sec:batch}
@@ -237,9 +232,9 @@ tool. Refer to Section~\ref{sec:why3ref} for a more complete
 description of this tool and all its command-line options.
 
 The very first time you want to use \why, you should proceed with
-autodetection of external provers. We have already seen how to do
-it in the \why GUI. On the command line, this is done as follows
-(here ``\texttt{>}'' is the prompt):
+autodetection of external provers.
+%% We have already seen how to do it in the \why GUI.
+On the command line, this is done as follows:
 \begin{verbatim}
 > why3 config --detect
 \end{verbatim}
@@ -248,24 +243,25 @@ provers have been successfully detected, you can do as follows.
 \begin{verbatim}
 > why3 --list-provers
 Known provers:
-  alt-ergo (Alt-Ergo)
-  coq (Coq)
-  simplify (Simplify)
+  Alt-Ergo 1.30
+  CVC4 1.5
+  Coq 8.6
 \end{verbatim}
 \index{list-provers@\verb+--list-provers+}
-The first word of each line is a unique identifier for the associated prover. We thus
-have now the three provers Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
-Simplify~\cite{simplify05}.
+The first word of each line
+is a unique identifier for the associated prover. We thus have now the
+three provers Alt-Ergo~\cite{ergo}, CVC4~\cite{cvc4}, and
+Coq~\cite{CoqArt}.
 
-Let us assume that we want to run Simplify on the HelloProof
+Let us assume that we want to run Alt-Ergo on the HelloProof
 example. The command to type and its output are as follows, where the
 \verb|-P| option is followed by the unique prover identifier (as shown
 by \verb|--list-provers| option).
 \begin{verbatim}
-> why3 prove -P simplify hello_proof.why
-hello_proof.why HelloProof G1 : Valid (0.10s)
-hello_proof.why HelloProof G2 : Unknown: Unknown (0.01s)
-hello_proof.why HelloProof G3 : Unknown: Unknown (0.00s)
+> why3 prove -P Alt-Ergo hello_proof.why
+hello_proof.why HelloProof G1: Valid (0.00s, 1 steps)
+hello_proof.why HelloProof G2: Unknown (other) (0.01s)
+hello_proof.why HelloProof G3: Valid (0.00s, 1 steps)
 \end{verbatim}
 Unlike the \why GUI, the command-line tool does not save the proof attempts
 or applied transformations in a database.
@@ -274,7 +270,7 @@ We can also specify which goal or goals to prove. This is done by giving
 first a theory identifier, then goal identifier(s). Here is the way to
 call Alt-Ergo on goals $G_2$ and $G_3$.
 \begin{verbatim}
-> why3 prove -P alt-ergo hello_proof.why -T HelloProof -G G2 -G G3
+> why3 prove -P Alt-Ergo hello_proof.why -T HelloProof -G G2 -G G3
 hello_proof.why HelloProof G2 : Unknown: Unknown (0.01s)
 hello_proof.why HelloProof G3 : Valid (0.01s)
 \end{verbatim}
@@ -289,15 +285,14 @@ Known non-splitting transformations:
 
 Known splitting transformations:
   [...]
-  split_goal
-  split_intro
+  split_goal_right
 \end{verbatim}
 Here is how you can split the goal $G_2$ before calling
 Simplify on the resulting subgoals.
 \begin{verbatim}
-> why3 prove -P simplify hello_proof.why -a split_goal -T HelloProof -G G2
-hello_proof.why HelloProof G2 : Unknown: Unknown (0.00s)
-hello_proof.why HelloProof G2 : Valid (0.00s)
+> why3 prove -P Alt-Ergo hello_proof.why -a split_goal_right -T HelloProof -G G2
+hello_proof.why HelloProof G2: Unknown (other) (0.01s)
+hello_proof.why HelloProof G2: Valid (0.00s, 1 steps)
 \end{verbatim}
 Section~\ref{sec:transformations} gives the description of the various
 transformations available.
