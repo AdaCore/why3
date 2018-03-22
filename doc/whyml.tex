@@ -204,8 +204,8 @@ The second problem is stated as follows:
   subrange from $0$ to $N - 1$, \ie the output array $B$ must be
   such that $B[A[i]] = i$ for $0 \le i < N$.
 \end{quote}
-We may assume that $A$ is surjective and we have to prove
-that the resulting array is also injective.
+% We may assume that $A$ is surjective and we have to prove
+% that the resulting array is also injective.
 The code is immediate, since it is as simple as
 \begin{whycode}
     for i = 0 to n - 1 do b[a[i]] <- i done
@@ -223,16 +223,16 @@ of being injective and surjective. These are purely logical
 declarations:
 \begin{whycode}
   predicate injective (a: array int) (n: int) =
-    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+    forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
   predicate surjective (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
+    forall i. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
 \end{whycode}
 It is also convenient to introduce the predicate ``being in the
 subrange from 0 to $n-1$'':
 \begin{whycode}
   predicate range (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> 0 <= a[i] < n
+    forall i. 0 <= i < n -> 0 <= a[i] < n
 \end{whycode}
 Using these predicates, we can formulate the assumption that any
 injective array of size $n$ within the range $0..n-1$ is also surjective:
@@ -248,11 +248,11 @@ Finally we can give the code a specification, with a loop invariant
 which simply expresses the values assigned to array \texttt{b} so far:
 \begin{whycode}
   let inverting (a: array int) (b: array int) (n: int)
-    requires { 0 <= n = length a = length b }
+    requires { n = length a = length b }
     requires { injective a n /\ range a n }
     ensures  { injective b n }
   = for i = 0 to n - 1 do
-      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      invariant { forall j. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done
 \end{whycode}
@@ -275,24 +275,24 @@ module InvertingAnInjection
   use import array.Array
 
   predicate injective (a: array int) (n: int) =
-    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+    forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
   predicate surjective (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
+    forall i. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
 
   predicate range (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> 0 <= a[i] < n
+    forall i. 0 <= i < n -> 0 <= a[i] < n
 
   lemma injective_surjective:
     forall a: array int, n: int.
       injective a n -> range a n -> surjective a n
 
   let inverting (a: array int) (b: array int) (n: int)
-    requires { 0 <= n = length a = length b }
+    requires { n = length a = length b }
     requires { injective a n /\ range a n }
     ensures  { injective b n }
   = for i = 0 to n - 1 do
-      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      invariant { forall j. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done
 
@@ -338,18 +338,18 @@ It is helpful to introduce two predicates: a first one
 for a successful search,
 \begin{whycode}
   predicate zero_at (l: list int) (i: int) =
-    nth i l = Some 0 /\ forall j:int. 0 <= j < i -> nth j l <> Some 0
+    nth i l = Some 0 /\ forall j. 0 <= j < i -> nth j l <> Some 0
 \end{whycode}
-and another for a non-successful search,
+and a second one for a non-successful search,
 \begin{whycode}
   predicate no_zero (l: list int) =
-    forall j:int. 0 <= j < length l -> nth j l <> Some 0
+    forall j. 0 <= j < length l -> nth j l <> Some 0
 \end{whycode}
 We are now in position to give the code for the search function.
 We write it as a recursive function \texttt{search} that scans a list
 for the first zero value:
 \begin{whycode}
-  let rec search (i: int) (l: list int) =
+  let rec search (i: int) (l: list int) : int =
     match l with
     | Nil      -> i
     | Cons x r -> if x = 0 then i else search (i+1) r
@@ -365,7 +365,7 @@ to give it a \emph{variant}, that is a value that strictly decreases
 at each recursive call with respect to some well-founded ordering.
 Here it is as simple as the list \texttt{l} itself:
 \begin{whycode}
-  let rec search (i: int) (l: list int) variant { l } = ...
+  let rec search (i: int) (l: list int) : int variant { l } = ...
 \end{whycode}
 It is worth pointing out that variants are not limited to values
 of algebraic types. A non-negative integer term (for example,
@@ -405,12 +405,12 @@ module SearchingALinkedList
   use export list.Nth
 
   predicate zero_at (l: list int) (i: int) =
-    nth i l = Some 0 /\ forall j:int. 0 <= j < i -> nth j l <> Some 0
+    nth i l = Some 0 /\ forall j. 0 <= j < i -> nth j l <> Some 0
 
   predicate no_zero (l: list int) =
-    forall j:int. 0 <= j < length l -> nth j l <> Some 0
+    forall j. 0 <= j < length l -> nth j l <> Some 0
 
-  let rec search (i: int) (l: list int) variant { l }
+  let rec search (i: int) (l: list int) : int variant { l }
     ensures { (i <= result < i + length l /\ zero_at l (result - i))
            \/ (result = i + length l /\ no_zero l) }
   = match l with
@@ -418,7 +418,7 @@ module SearchingALinkedList
     | Cons x r -> if x = 0 then i else search (i+1) r
     end
 
-  let search_list (l: list int)
+  let search_list (l: list int) : int
     ensures { (0 <= result < length l /\ zero_at l result)
            \/ (result = length l /\ no_zero l) }
   = search 0 l
@@ -445,7 +445,7 @@ For the purpose of our code, though, it is simpler to have functions
 which do not return options, but have preconditions instead. Such a
 function \texttt{head} is defined as follows:
 \begin{whycode}
-  let head (l: list 'a)
+  let head (l: list 'a) : 'a
     requires { l <> Nil } ensures { hd l = Some result }
   = match l with Nil -> absurd | Cons h _ -> h end
 \end{whycode}
@@ -454,7 +454,7 @@ code. It generates the verification condition \texttt{false}, which is
 here provable using the precondition (the list cannot be \texttt{Nil}).
 Function \texttt{tail} is defined similarly:
 \begin{whycode}
-  let tail (l : list 'a)
+  let tail (l: list 'a) : list 'a
     requires { l <> Nil } ensures { tl l = Some result }
   = match l with Nil -> absurd | Cons _ t -> t end
 \end{whycode}
@@ -465,7 +465,7 @@ local reference \texttt{s} to store the list being scanned.
 As long as \texttt{s} is not empty and its head is not zero, it
 increments \texttt{i} and advances in \texttt{s} using function \texttt{tail}.
 \begin{whycode}
-  let search_loop l =
+  let search_loop (l: list int) : int =
     ensures { ... same postcondition as in search_list ... }
   = let i = ref 0 in
     let s = ref l in

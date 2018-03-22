@@ -15,20 +15,21 @@ module SearchingALinkedList
   use import list.Nth
 
   predicate zero_at (l: list int) (i: int) =
-    nth i l = Some 0 /\ forall j:int. 0 <= j < i -> nth j l <> Some 0
+    nth i l = Some 0 /\ forall j. 0 <= j < i -> nth j l <> Some 0
 
   predicate no_zero (l: list int) =
-    forall j:int. 0 <= j < length l -> nth j l <> Some 0
+    forall j. 0 <= j < length l -> nth j l <> Some 0
 
-  let rec search (i: int) (l: list int) variant {l}
+  let rec search (i: int) (l: list int) : int
+    variant { l }
     ensures { (i <= result < i + length l /\ zero_at l (result - i)) \/
               (result = i + length l /\ no_zero l) }
   = match l with
-    | Nil -> i
+    | Nil      -> i
     | Cons x r -> if x = 0 then i else search (i+1) r
     end
 
-  let search_list (l: list int)
+  let search_list (l: list int) : int
     ensures { (0 <= result < length l /\ zero_at l result) \/
               (result = length l /\ no_zero l) }
   = search 0 l
@@ -39,15 +40,15 @@ module SearchingALinkedList
   use import ref.Ref
   use import list.HdTl
 
-  let head (l : list 'a)
+  let head (l: list 'a) : 'a
     requires { l <> Nil } ensures { hd l = Some result }
   = match l with Nil -> absurd | Cons h _ -> h end
 
-  let tail (l : list 'a)
+  let tail (l: list 'a) : list 'a
     requires { l <> Nil } ensures { tl l = Some result }
   = match l with Nil -> absurd | Cons _ t -> t end
 
-  let search_loop l
+  let search_loop (l: list int) : int
     ensures { (0 <= result < length l /\ zero_at l result) \/
               (result = length l /\ no_zero l) }
   = let i = ref 0 in
@@ -55,8 +56,8 @@ module SearchingALinkedList
     while not (is_nil !s) && head !s <> 0 do
       invariant {
         0 <= !i /\ !i + length !s = length l /\
-        (forall j:int. 0 <= j -> nth j !s = nth (!i + j) l) /\
-        forall j:int. 0 <= j < !i -> nth j l <> Some 0 }
+        (forall j. 0 <= j -> nth j !s = nth (!i + j) l) /\
+         forall j. 0 <= j < !i -> nth j l <> Some 0 }
       variant { !s }
       i := !i + 1;
       s := tail !s
