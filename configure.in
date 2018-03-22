@@ -340,6 +340,33 @@ else
    OCAMLINSTALLLIB=$OCAMLLIB
 fi
 
+# compiler plugins
+
+AX_VERSION_GE([$OCAMLVERSION], 4.03.0,
+  [if test "$USEOCAMLFIND" = yes; then
+     COMPILERLIBS=$(ocamlfind query compiler-libs)
+   fi
+   if test -n "$COMPILERLIBS"; then
+     echo "ocamlfind found compiler-libs in $COMPILERLIBS"
+     enable_compiler_plugins="yes"
+   else
+     COMPILERLIBS="+compiler-libs"
+     AC_CHECK_FILE($OCAMLLIB/compiler-libs/,
+                   enable_compiler_plugins=yes,
+                   enable_compiler_plugins=no)
+     if test "$enable_compiler_plugins" = no; then
+       reason_compiler_plugins=" (compiler-libs not found)"
+     fi
+   fi],
+  [enable_compiler_plugins="no"
+   reason_compiler_plugins=" (Ocaml version 4.03.0 required)"])
+
+if test "$enable_compiler_plugins" = yes; then
+  COMPILERLIBSPKG="compiler-libs"
+else
+  COMPILERLIBSPKG=
+fi
+
 # checking for rubber
 if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(RUBBER,rubber,rubber,no)
@@ -847,6 +874,10 @@ AC_SUBST(HASJSOFOCAML)
 
 AC_SUBST(META_OCAMLGRAPH)
 
+AC_SUBST(enable_compiler_plugins)
+AC_SUBST(COMPILERLIBS)
+AC_SUBST(COMPILERLIBSPKG)
+
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
@@ -938,6 +969,7 @@ echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
+echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"

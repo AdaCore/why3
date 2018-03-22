@@ -281,6 +281,16 @@ endif
 src/util/strings.cmo: WARNINGS:=$(WARNINGS)-3
 src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
 
+# compiler plugins
+
+ifeq (@enable_compiler_plugins@,yes)
+src/utils/debug_optim.cmxs:
+	$(SHOW) 'Linking $@'
+	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o src/util/debug_optim.cmxs
+src/transform/reification.cmx: src/utils/debug_optim.cmxs
+src/transform/reification.cmx: OFLAGS += -plugin debug_optim.cmxs
+endif
+
 # hide warning 'no cmx file was found in path for module ..., and its interface was not compiled with -opaque' for the coq tactic
 
 src/coq-tactic/why3tac.cmx: WARNINGS:=$(WARNINGS)-58
