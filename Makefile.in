@@ -162,7 +162,9 @@ endif
 .PHONY: install-bin install-data uninstall-bin uninstall-data
 .PHONY: install-bash install-emacs install-framac
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
-.PHONY: install-coq-tactic install-coq install-pvs install-isabelle
+.PHONY: coq install-coq-tactic install-coq install-coq-data
+.PHONY: pvs install-pvs install-pvs-data
+.PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
 CLEANDIRS =
@@ -1006,6 +1008,9 @@ endif
 # Coq realizations
 ####################
 
+lib/coq/version: lib/coq/version.in config.status
+	./config.status chmod --file $@
+
 COQVERSIONSPECIFIC=
 
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
@@ -1146,6 +1151,7 @@ ifeq (@enable_coq_libs@,yes)
 
 install-coq:
 	$(MKDIR_P) $(LIBDIR)/why3/coq
+	$(INSTALL_DATA) lib/coq/version $(LIBDIR)/why3/coq/
 	$(INSTALL_DATA) lib/coq/BuiltIn.vo lib/coq/HighOrd.vo $(LIBDIR)/why3/coq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/int
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
@@ -1190,7 +1196,9 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 	$(SHOW) 'Coqdep   $<'
 	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
 
-all: $(COQVO)
+coq: $(COQVO)
+
+all: coq
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
@@ -1209,8 +1217,10 @@ endif
 
 all: drivers/coq-realizations.aux
 
-install-data::
+install-coq-data:
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
+
+install-data:: install-coq-data
 
 clean::
 	rm -f drivers/coq-realizations.aux
@@ -1218,6 +1228,9 @@ clean::
 ####################
 # PVS realizations
 ####################
+
+lib/pvs/version: lib/pvs/version.in config.status
+	./config.status chmod --file $@
 
 ifeq (@enable_pvs_libs@,yes)
 
@@ -1259,6 +1272,8 @@ drivers/pvs-realizations.aux: Makefile
 	) > $@
 
 install-pvs:
+	$(MKDIR_P) $(LIBDIR)/why3/pvs
+	$(INSTALL_DATA) lib/pvs/version $(LIBDIR)/why3/pvs/
 	$(MKDIR_P) $(LIBDIR)/why3/pvs/int
 	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
 	$(INSTALL_DATA) $(addsuffix .prf, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
@@ -1284,10 +1299,12 @@ drivers/pvs-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
 
-install-data::
+endif
+
+install-pvs-data:
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
-endif
+install-data:: install-pvs-data
 
 all: drivers/pvs-realizations.aux
 

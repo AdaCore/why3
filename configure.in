@@ -643,9 +643,7 @@ fi
 if test "$enable_coq_support" = no; then
    enable_coq_tactic=no
    enable_coq_libs=no
-   COMPILETIMECOQ=
-else
-   COMPILETIMECOQ="\\\"Coq\\\", \\\"$COQVERSION\\\"; "
+   COQVERSION=
 fi
 
 if test "$enable_coq_tactic" = yes; then
@@ -720,9 +718,7 @@ fi
 
 if test "$enable_pvs_support" = no; then
    enable_pvs_libs=no
-   COMPILETIMEPVS=
-else
-   COMPILETIMEPVS="\\\"PVS\\\", \\\"$PVSVERSION\\\"; "
+   PVSVERSION=
 fi
 
 # Isabelle
@@ -901,12 +897,11 @@ AC_SUBST(COQC)
 AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQPPLIBS)
-AC_SUBST(COMPILETIMECOQ)
+AC_SUBST(COQVERSION)
 
 AC_SUBST(enable_pvs_libs)
 AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
-AC_SUBST(COMPILETIMEPVS)
 
 AC_SUBST(enable_isabelle_libs)
 AC_SUBST(ISABELLE)
@@ -948,11 +943,13 @@ AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
 AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(.merlin)
 AC_CONFIG_FILES(src/jessie/Makefile)
+AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
 chmod a-w lib/why3/META;
 chmod a-w .merlin;
 chmod a-w src/jessie/Makefile;
+chmod a-w lib/coq/version lib/pvs/version;
 chmod u+x src/config.sh)
 
 AC_OUTPUT

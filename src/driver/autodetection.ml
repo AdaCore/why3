@@ -57,7 +57,7 @@ type prover_autodetection_data =
       prover_id : string;
       prover_name : string;
       prover_altern : string;
-      compile_time_support : bool;
+      support_library : string;
       execs : string list;
       version_switch : string;
       version_regexp : string;
@@ -77,7 +77,7 @@ type prover_autodetection_data =
 let prover_keys =
   let add acc k = Sstr.add k acc in
   List.fold_left add Sstr.empty
-    ["name";"compile_time_support";
+    ["name";"support_library";
      "exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command"; "command_steps";
      "editor";"driver";"in_place";"message";"alternative";"use_at_auto_level"]
@@ -89,8 +89,7 @@ let load_prover kind (id,section) =
     prover_id = id;
     prover_name = get_string section "name";
     prover_altern = get_string section ~default:"" "alternative";
-    compile_time_support =
-      get_bool section ~default:false "compile_time_support";
+    support_library = get_string section ~default:"" "support_library";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
@@ -394,6 +393,30 @@ let generate_auto_strategies config =
        (add_strategy
           (add_strategy config split) auto0) auto1) auto2
 
+let check_support_library data ver =
+  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let replace s = match Str.matched_group 1 s with
+    | "l" -> Config.libdir
+    | "d" -> Config.datadir
+    | c -> c in
+  let sl = Str.global_substitute cmd_regexp replace data.support_library in
+  try
+    let f = open_in sl in
+    let support_ver = input_line f in
+    close_in f;
+    if support_ver = ver then true
+    else begin
+      eprintf
+        "Found prover %s version %s, but Why3 was compiled with support for version %s@."
+        data.prover_name ver support_ver;
+      false
+    end
+  with Sys_error _ | Not_found ->
+    eprintf
+      "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
+      data.prover_name ver;
+    false
+
 let detect_exec env data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
   match s with
@@ -420,25 +443,7 @@ let detect_exec env data acc exec_name =
   else
     (* check if this prover needs compile-time support *)
     let missing_compile_time_support =
-      if data.compile_time_support then
-        try
-          let compile_time_ver =
-            List.assoc data.prover_name Config.compile_time_support
-          in
-          if compile_time_ver <> ver then begin
-            eprintf
-              "Found prover %s version %s, but Why3 was compiled with support for version %s@."
-            data.prover_name ver compile_time_ver;
-            true
-          end
-          else
-            false
-        with Not_found ->
-          eprintf
-            "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
-            data.prover_name ver;
-          true
-      else false
+      data.support_library <> "" && not (check_support_library data ver)
     in
     if missing_compile_time_support then
       (known_version env exec_name; acc)

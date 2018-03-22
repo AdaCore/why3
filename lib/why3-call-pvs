@@ -1,9 +1,9 @@
 #!/bin/sh
 
 if test -z "$PVS_LIBRARY_PATH"; then
-    export PVS_LIBRARY_PATH=$1/pvs
+    export PVS_LIBRARY_PATH=$1
 else
-    export PVS_LIBRARY_PATH=$1/pvs:$PVS_LIBRARY_PATH
+    export PVS_LIBRARY_PATH=$1:$PVS_LIBRARY_PATH
 fi
 shift
 exec "$@"
