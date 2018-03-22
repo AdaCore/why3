@@ -516,7 +516,7 @@ Then it is possible to define the consistency of row \texttt{pos}
 with respect to all previous rows:
 \begin{whycode}
   predicate is_consistent (board: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> consistent_row board pos q
+    forall q. 0 <= q < pos -> consistent_row board pos q
 \end{whycode}
 Implementing a function which decides this predicate is another
 matter. In order for it to be efficient, we want to return
@@ -533,9 +533,9 @@ as one is found, the exception is raised. It is caught immediately
 outside the loop and \texttt{False} is returned. Whenever the end of
 the loop is reached, \texttt{True} is returned.
 \begin{whycode}
-  let check_is_consistent (board: array int) (pos: int)
+  let check_is_consistent (board: array int) (pos: int) : bool
     requires { 0 <= pos < length board }
-    ensures  { result=True <-> is_consistent board pos }
+    ensures  { result <-> is_consistent board pos }
   = try
       for q = 0 to pos - 1 do
         invariant {
@@ -573,13 +573,13 @@ module NQueens
     board[pos] - board[q] <> pos - q
 
   predicate is_consistent (board: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> consistent_row board pos q
+    forall q. 0 <= q < pos -> consistent_row board pos q
 
   exception Inconsistent int
 
   let check_is_consistent (board: array int) (pos: int)
     requires { 0 <= pos < length board }
-    ensures  { result=True <-> is_consistent board pos }
+    ensures  { result <-> is_consistent board pos }
   = try
       for q = 0 to pos - 1 do
         invariant {
@@ -614,11 +614,11 @@ two predicates, one related to legal column values and another to
 consistency of rows:
 \begin{whycode}
   predicate is_board (board: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
+    forall q. 0 <= q < pos -> 0 <= board[q] < length board
 
   predicate solution (board: array int) (pos: int) =
     is_board board pos /\
-    forall q:int. 0 <= q < pos -> is_consistent board q
+    forall q. 0 <= q < pos -> is_consistent board q
 \end{whycode}
 The algorithm will not mutate the partial solution it is given and,
 in case of a search failure, will claim that there is no solution
@@ -626,7 +626,7 @@ extending this prefix. For this reason, we introduce a predicate
 comparing two chess boards for equality up to a given row:
 \begin{whycode}
   predicate eq_board (b1 b2: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> b1[q] = b2[q]
+    forall q. 0 <= q < pos -> b1[q] = b2[q]
 \end{whycode}
 The search itself makes use of an exception to signal a successful search:
 \begin{whycode}
@@ -636,8 +636,8 @@ The backtracking code is a recursive function \verb|bt_queens| which
 takes the chess board, its size, and the starting row for the search.
 The termination is ensured by the obvious variant \texttt{n-pos}.
 \begin{whycode}
-  let rec bt_queens (board: array int) (n: int) (pos: int)
-    variant  { n-pos }
+  let rec bt_queens (board: array int) (n: int) (pos: int) : unit
+    variant  { n - pos }
 \end{whycode}
 The precondition relates \texttt{board}, \texttt{pos}, and \texttt{n}
 and requires \texttt{board} to be a solution up to \texttt{pos}:
@@ -655,11 +655,8 @@ or the function raises \texttt{Solution} and we have a solution in
     ensures  { forall b:array int. length b = n -> is_board b n ->
                  eq_board board b pos -> not (solution b n) }
     raises   { Solution -> solution board n }
-  = 'Init:
+  =
 \end{whycode}
-We place a code mark \texttt{'Init} immediately at the beginning of
-the program body to
-be able to refer to the value of \texttt{board} in the pre-state.
 Whenever we reach the end of the chess board, we have found a solution
 and we signal it using exception \texttt{Solution}:
 \begin{whycode}
@@ -675,7 +672,7 @@ prefix so far, and that we have not found any solution that would
 extend this prefix with a queen on row \texttt{pos} at a column below
 \texttt{i}:
 \begin{whycode}
-      invariant { eq_board board (at board 'Init) pos }
+      invariant { eq_board board (old board) pos }
       invariant { forall b:array int.  length b = n -> is_board b n ->
         eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
 \end{whycode}
@@ -692,8 +689,8 @@ Solving the puzzle is a simple call to \verb|bt_queens|, starting the
 search on row 0. The postcondition is also twofold, as for
 \verb|bt_queens|, yet slightly simpler.
 \begin{whycode}
-  let queens (board: array int) (n: int)
-    requires { 0 <= length board = n }
+  let queens (board: array int) (n: int) : unit
+    requires { length board = n }
     ensures  { forall b:array int.
                  length b = n -> is_board b n -> not (solution b n) }
     raises   { Solution -> solution board n }
@@ -712,18 +709,18 @@ automatically, including the verification of the lemmas themselves.
 %END LATEX
 \begin{whycode}
   predicate is_board (board: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
+    forall q. 0 <= q < pos -> 0 <= board[q] < length board
 
   predicate solution (board: array int) (pos: int) =
     is_board board pos /\
-    forall q:int. 0 <= q < pos -> is_consistent board q
+    forall q. 0 <= q < pos -> is_consistent board q
 
   predicate eq_board (b1 b2: array int) (pos: int) =
-    forall q:int. 0 <= q < pos -> b1[q] = b2[q]
+    forall q. 0 <= q < pos -> b1[q] = b2[q]
 
   exception Solution
 
-  let rec bt_queens (board: array int) (n: int) (pos: int)
+  let rec bt_queens (board: array int) (n: int) (pos: int) : unit
     variant  { n - pos }
     requires { 0 <= pos <= n = length board }
     requires { solution board pos }
@@ -731,18 +728,17 @@ automatically, including the verification of the lemmas themselves.
     ensures  { forall b:array int. length b = n -> is_board b n ->
                  eq_board board b pos -> not (solution b n) }
     raises   { Solution -> solution board n }
-  = 'Init:
-    if pos = n then raise Solution;
+  = if pos = n then raise Solution;
     for i = 0 to n - 1 do
-      invariant { eq_board board (at board 'Init) pos }
+      invariant { eq_board board (old board) pos }
       invariant { forall b:array int. length b = n -> is_board b n ->
         eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
       board[pos] <- i;
       if check_is_consistent board pos then bt_queens board n (pos + 1)
     done
 
-  let queens (board: array int) (n: int)
-    requires { 0 <= length board = n }
+  let queens (board: array int) (n: int) : unit
+    requires { length board = n }
     ensures  { forall b:array int.
                  length b = n -> is_board b n -> not (solution b n) }
     raises   { Solution -> solution board n }
