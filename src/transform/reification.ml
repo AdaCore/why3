@@ -564,13 +564,9 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
            let t = Trans.apply (compute_hyp hr) task_r in
            match t with
            | [t] ->
-              let rewrite pr = Apply.rewrite None false pr (Some hr) in
-              let rewrite_once acc pr =
-                try Lists.apply (Trans.apply (rewrite pr)) acc
-                with Arg_trans  _ -> acc in
-              let rewrites lt prs = List.fold_left rewrite_once lt prs in
-              let lt = rewrites [t] mapdecls in
-              rewrites lt defdecls
+              let rewrite = Apply.rewrite_list None false true
+                              (mapdecls@defdecls) (Some hr) in
+              Trans.apply rewrite t
            | [] -> []
            | _ -> assert false
          else [task_r] in

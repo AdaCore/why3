@@ -291,6 +291,71 @@ let rewrite_in rev with_terms h h1 =
   (* Composing previous functions *)
   Trans.bind (Trans.bind found_eq lp_new) recreate_tasks
 
+let rewrite_list opt rev with_terms hl h1 =
+  let found_decl =
+    fold (fun d (ok,acc) ->
+        if ok then (ok,acc)
+        else
+          match d.d_node with
+          | Dprop (p, pr, t)
+               when (Ident.id_equal pr.pr_name h1.pr_name &&
+                     (p = Paxiom || p = Pgoal)) ->
+             (true,Some (p,pr,t))
+          | _ -> (ok, acc)) (false, None) in
+  let found_term = Trans.bind found_decl
+                     (fun (_, od) -> Trans.store (fun _ ->
+                        match od with
+                        | Some (_,_,t) -> ([],t)
+                        | None -> raise (Arg_error "rewrite"))) in
+  let do_h h (lp, term) =
+    (* Used to find the equality we are rewriting on *)
+    (* TODO here should fold with a boolean stating if we found equality yet to
+       not go through all possible hypotheses *)
+    fold (fun d (acclp,accterm) ->
+      match d.d_node with
+      | Dprop (Paxiom, pr, t) when Ident.id_equal pr.pr_name h.pr_name ->
+          let lp, lv, f = intros t in
+          let t1, t2 = (match f.t_node with
+          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+              (* Support to rewrite from the right *)
+              if rev then (t1, t2) else (t2, t1)
+          | Tbinop (Tiff, t1, t2) ->
+              (* Support to rewrite from the right *)
+              if rev then (t1, t2) else (t2, t1)
+          | _ -> raise (Arg_bad_hypothesis ("rewrite", f))) in
+          let new_lp, new_term =
+            if opt
+            then try replace_subst lp lv t1 t2 with_terms accterm
+                 with Arg_trans _ -> (acclp, accterm)
+            else replace_subst lp lv t1 t2 with_terms accterm in
+       new_lp@acclp, new_term
+      | _ -> (acclp, accterm)) (lp, term) in
+  let do_all = List.fold_left (fun acc h -> Trans.bind acc (do_h h)) found_term hl in
+  (* Pass the premises as new goals. Replace the former toberewritten
+     hypothesis to the new rewritten one *)
+  let recreate_tasks (lp, term) =
+    let trans_rewriting =
+      Trans.decl (fun d -> match d.d_node with
+      | Dprop (p, pr, _t)
+         when (Ident.id_equal pr.pr_name h1.pr_name &&
+               (p = Paxiom || p = Pgoal)) ->
+         [create_prop_decl p pr term]
+      | _ -> [d]) None in
+    let list_par =
+      List.map
+        (fun e ->
+            Trans.decl (fun d -> match d.d_node with
+            | Dprop (p, pr, _t)
+              when (Ident.id_equal pr.pr_name h1.pr_name &&
+                    p = Paxiom) ->
+                [d]
+            | Dprop (Pgoal, _, _) ->
+                [create_prop_decl Pgoal (Decl.create_prsymbol (gen_ident "G")) e]
+            | _ -> [d] )
+          None) lp in
+    Trans.par (trans_rewriting :: list_par) in
+  Trans.bind do_all recreate_tasks
+
 let find_target_prop h : prsymbol trans =
   Trans.store (fun task ->
                match h with
@@ -304,6 +369,14 @@ let rewrite with_terms rev h h1 =
     | Some l -> l
   in
   Trans.bind (find_target_prop h1) (rewrite_in (not rev) with_terms h)
+
+let rewrite_list with_terms rev opt hl h1 =
+  let with_terms =
+    match with_terms with
+    | None -> []
+    | Some l -> l
+  in
+  Trans.bind (find_target_prop h1) (rewrite_list opt (not rev) with_terms hl)
 
 (* This function is used to detect when we found the hypothesis/goal we want
    to replace/unfold into. *)
@@ -519,6 +592,10 @@ let () = wrap_and_register
 let _ = wrap_and_register
     ~desc:"rewrite [<-] <name> [in] <name2> [with] <list term> rewrites equality defined in name into name2 using exactly all terms of the list as instance for what cannot be deduced directly" "rewrite"
     (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol (Topt ("with", Ttermlist Ttrans_l))))))) (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
+
+let _ = wrap_and_register
+    ~desc:"rewrite_list [<-] <list name> [?] [in] <name2> [with] <list term> rewrites equalities defined in <list name> into name2 using exactly all terms of the list as instance for what cannot be deduced directly. If [?] is set, each of the rewrites is optional." "rewrite_list"
+    (Toptbool ("<-", (Tprlist (Toptbool ("?", Topt ("in",  Tprsymbol (Topt ("with", Ttermlist Ttrans_l)))))))) (fun rev hl opt h1opt term_list -> rewrite_list term_list rev opt hl h1opt)
 
 let () = wrap_and_register
     ~desc:"apply <prop> [with] <list term> applies prop to the goal and \
