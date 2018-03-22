@@ -284,7 +284,7 @@ let convert_to_model_element name t =
       let value = convert_to_model_value t in
       Model_parser.create_model_element ~name ~value ()
 
-let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
+let default_apply_to_record (list_records: (string list) Mstr.t) (t: term) =
 
   let rec array_apply_to_record (a: array) =
     match a with
@@ -324,6 +324,16 @@ let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
 
   in
   apply_to_record t
+
+let apply_to_records_ref = ref None
+
+let register_apply_to_records f =
+  apply_to_records_ref := Some f
+
+let apply_to_record list_records t =
+  match !apply_to_records_ref with
+  | None -> default_apply_to_record list_records t
+  | Some f -> f list_records t
 
 let definition_apply_to_record list_records d =
     match d with
