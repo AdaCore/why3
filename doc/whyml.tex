@@ -3,18 +3,21 @@
 %HEVEA\cutname{whyml.html}
 
 This chapter describes the \whyml programming language.
-A \whyml input text contains a list of theories (see
-Chapter~\ref{chap:syntax}) and/or modules.
-Modules extend theories with \emph{programs}.
-Programs can use all types, symbols, and constructs from the logic.
-They also provide extra features:
+A \whyml input text contains a list of modules (as in
+Chapter~\ref{chap:syntax}), where logical declarations are extended
+with \emph{program declarations}.
+%% Programs can use all types, symbols, and constructs from the logic.
+This includes:
 \begin{itemize}
 \item
   In a record type declaration, some fields can be declared
   \texttt{mutable} and/or \texttt{ghost}.
+  Additionally, a record type can be declared \texttt{abstract} (its
+  fields are only visible in ghost code / specification).
 \item
   In an algebraic type declaration (this includes record types), an
   invariant can be specified.
+  %% FIXME vrai aussi dans la logique, non ?
 \item
   There are programming constructs with no counterpart in the logic:
   \begin{itemize}
@@ -27,34 +30,30 @@ They also provide extra features:
   \item annotations: pre- and postconditions, assertions, loop invariants.
   \end{itemize}
 \item
-  A program function can be non-terminating or can be proved
-  to be terminating using a variant (a term together with a well-founded
-  order relation).
-\item
-  An abstract program type $t$ can be introduced with a logical
-  \emph{model} $\tau$: inside programs, $t$ is abstract, and inside
-  annotations, $t$ is an alias for $\tau$.
+  A program function can be non-terminating. (But termination can be
+  proved if we wish.)
 \end{itemize}
 %
-Programs are contained in files with suffix \verb|.mlw|.
-They are handled by \texttt{why3}. For instance
+Command-line tools described in the previous chapters also apply to
+files containing programs. For instance
 \begin{verbatim}
 > why3 prove myfile.mlw
 \end{verbatim}
-will display the verification conditions extracted from modules in
-file \texttt{myfile.mlw}, as a set of corresponding theories, and
+displays the verification conditions for programs contained in
+file \texttt{myfile.mlw}, and
 \begin{verbatim}
 > why3 prove -P alt-ergo myfile.mlw
 \end{verbatim}
-will run the SMT solver Alt-Ergo on these verification conditions.
-Program files are also handled by the GUI tool \texttt{why3ide}.
+runs the SMT solver Alt-Ergo on these verification conditions.
+All this can be performed within the GUI tool \texttt{why3 ide} as well.
 See Chapter~\ref{chap:manpages} for more details regarding command lines.
 
 \medskip
 As an introduction to \whyml, we use the five problems from the VSTTE
 2010 verification competition~\cite{vstte10comp}.
 The source code for all these examples is contained in \why's
-distribution, in sub-directory \texttt{examples/}.
+distribution, in sub-directory \texttt{examples/}. Look for files
+named \texttt{vstte10\_xxx.mlw}.
 
 \section{Problem 1: Sum and Maximum}
 \label{sec:MaxAndSum}
@@ -79,9 +78,8 @@ theory, exactly as we would do within a theory definition:
 \begin{whycode}
   use import int.Int
 \end{whycode}
-We are also going to use references and arrays from \whyml's standard
-library, so we import the corresponding modules, with a similar
-declaration:
+We are also going to use references and arrays from \why\ standard
+library, so we import the corresponding modules:
 \begin{whycode}
   use import ref.Ref
   use import array.Array
@@ -91,39 +89,32 @@ Modules \texttt{Ref} and \texttt{Array} respectively provide a type
 arrays, together with useful
 operations and traditional syntax. They are loaded from the \whyml
 files \texttt{ref.mlw} and \texttt{array.mlw} in the standard library.
-\why reports an error when it finds a theory and a module with
-the same name in the standard library, or when it finds a theory
-declared in a \texttt{.mlw} file and in a \texttt{.why} file with
-the same name.
 
 We are now in position to define a program function
 \verb|max_sum|. A function definition is introduced with the keyword
 \texttt{let}. In our case, it introduces a function with two arguments,
 an array \texttt{a} and its size \texttt{n}:
 \begin{whycode}
-  let max_sum (a: array int) (n: int) = ...
+  let max_sum (a: array int) (n: int) : (int, int) = ...
 \end{whycode}
 (There is a function \texttt{length} to get the size of an array but
 we add this extra parameter \texttt{n} to stay close to the original
 problem statement.) The function body is a Hoare triple, that is a
 precondition, a program expression, and a postcondition.
 \begin{whycode}
-  let max_sum (a: array int) (n: int)
-    requires { 0 <= n = length a }
-    requires { forall i:int. 0 <= i < n -> a[i] >= 0 }
+  let max_sum (a: array int) (n: int) : (int, int)
+    requires { n = length a }
+    requires { forall i. 0 <= i < n -> a[i] >= 0 }
     ensures  { let (sum, max) = result in sum <= n * max }
   = ... expression ...
 \end{whycode}
-The first precondition expresses that \texttt{n} is non-negative and is
+The first precondition expresses that \texttt{n} is
 equal to the length of \texttt{a} (this will be needed for
 verification conditions related to array bound checking).
 The second precondition expresses that all
 elements of \texttt{a} are non-negative.
-The postcondition assumes that the value returned by the function,
-denoted \texttt{result}, is a pair of integers, and decomposes it as
-the pair \texttt{(sum, max)} to express the required property.
-The same postcondition can be written in another form, doing the
-pattern matching immediately:
+The postcondition decomposes the value returned by the function
+as a pair of integers \texttt{(sum, max)} and states the required property.
 \begin{whycode}
     returns { sum, max -> sum <= n * max }
 \end{whycode}
@@ -146,14 +137,14 @@ and \texttt{sum}
 and finally returning the pair of the values contained in \texttt{sum}
 and \texttt{max}:
 \begin{whycode}
-  (!sum, !max)
+  !sum, !max
 \end{whycode}
 This completes the code for function \texttt{max\_sum}.
 As such, it cannot be proved correct, since the loop is still lacking
 a loop invariant. In this case, the loop invariant is as simple as
-\verb|!sum <= i * !max|, since the postcondition only requires to prove
+\verb|!sum <= i * !max|, since the postcondition only requires us to prove
 \verb|sum <= n * max|. The loop invariant is introduced with the
-keyword \texttt{invariant}, immediately after the keyword \texttt{do}.
+keyword \texttt{invariant}, immediately after the keyword \texttt{do}:
 \begin{whycode}
     for i = 0 to n - 1 do
       invariant { !sum <= i * !max }
@@ -176,9 +167,9 @@ module MaxAndSum
   use import ref.Ref
   use import array.Array
 
-  let max_sum (a: array int) (n: int)
-    requires { 0 <= n = length a }
-    requires { forall i:int. 0 <= i < n -> a[i] >= 0 }
+  let max_sum (a: array int) (n: int) : (int, int)
+    requires { n = length a }
+    requires { forall i. 0 <= i < n -> a[i] >= 0 }
     returns  { sum, max -> sum <= n * max }
   = let sum = ref 0 in
     let max = ref 0 in
@@ -187,7 +178,7 @@ module MaxAndSum
       if !max < a[i] then max := a[i];
       sum := !sum + a[i]
     done;
-    (!sum, !max)
+    !sum, !max
 
 end
 \end{whycode}
@@ -198,19 +189,12 @@ end
 \end{figure}
 %END LATEX
 We can now proceed to its verification.
-Running \texttt{why3}, or better \texttt{why3ide}, on file
-\verb|max_sum.mlw| will show a single verification condition with name
-\verb|WP_parameter_max_sum|.
-Discharging this verification condition with an automated theorem
-prover will not succeed, most likely, as it involves non-linear
-arithmetic. Repeated applications of goal splitting and calls to
-SMT solvers (within \texttt{why3ide}) will typically leave a single,
-unsolved goal, which reduces to proving the following sequent:
-\begin{displaymath}
-  s \le i \times max, ~ max < a[i] \vdash s + a[i] \le (i+1) \times a[i].
-\end{displaymath}
-This is easily discharged using an interactive proof assistant such as
-Coq, and thus completes the verification.
+Running \texttt{why3}, or better \texttt{why3 ide}, on file
+\verb|max_sum.mlw| shows a single verification condition with name
+\verb|WP max_sum|.
+Discharging this verification condition requires a little bit of non-linear
+arithmetic. Thus some SMT solvers may fail at proving it, but other
+succeed, \emph{e.g.}, CVC4.
 
 \section{Problem 2: Inverting an Injection}
 
