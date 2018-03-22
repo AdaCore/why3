@@ -284,9 +284,9 @@ src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
 # compiler plugins
 
 ifeq (@enable_compiler_plugins@,yes)
-$(LIBCMO) $(LIBCMX): INCLUDES += -I @COMPILERLIBS@
 src/utils/debug_optim.cmxs:
-	$(OCAMLOPT) -I @COMPILERLIBS@ -for-pack Why3 -shared src/util/debug_optim.ml -o src/util/debug_optim.cmxs
+	$(SHOW) 'Linking $@'
+	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o src/util/debug_optim.cmxs
 src/transform/reification.cmx: src/utils/debug_optim.cmxs
 src/transform/reification.cmx: OFLAGS += -plugin debug_optim.cmxs
 endif
