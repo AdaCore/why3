@@ -284,10 +284,10 @@ src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
 # compiler plugins
 
 ifeq (@enable_compiler_plugins@,yes)
-src/utils/debug_optim.cmxs:
+src/util/debug_optim.cmxs: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
-	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o src/util/debug_optim.cmxs
-src/transform/reification.cmx: src/utils/debug_optim.cmxs
+	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o $@
+src/transform/reification.cmx: src/util/debug_optim.cmxs
 src/transform/reification.cmx: OFLAGS += -plugin debug_optim.cmxs
 endif
 
