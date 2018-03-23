@@ -18,6 +18,9 @@ let debug_interp = Debug.register_info_flag
 let debug_refl = Debug.register_info_flag
                      ~desc:"Reflection transformations"
                      "reflection"
+let debug_flamegraph = Debug.register_info_flag
+                         ~desc:"Print callstacks from the interpreter in Flamegraph input format."
+                         "interp_flamegraph"
 
 let print_id fmt id = Format.fprintf fmt "%s" id.id_string
 
@@ -601,8 +604,6 @@ open Ity
 
 exception CannotReduce
 
-let append l = List.fold_left (fun acc s -> acc^":"^s) "" l
-
 type value =
   | Vconstr of rsymbol * field list
   | Vtuple of value list
@@ -615,7 +616,7 @@ type value =
 
 and field = Fimmutable of value | Fmutable of value ref
 
-exception Raised of xsymbol * value option * string
+exception Raised of xsymbol * value option * rsymbol list
 
 open Format
 
@@ -931,8 +932,35 @@ type info = {
     recs: rsymbol Mrs.t;
     funs: decl Mrs.t;
     get_decl: rsymbol -> Mltree.decl;
-    cs: string list; (* callstack for debugging *)
+    cur_rs: rsymbol; (* current function *)
+    cs: rsymbol list; (* callstack for debugging/profiling *)
   }
+
+let ts = ref 0. (* timestamp for current callstack *)
+
+let print_callstack cs time =
+  Format.eprintf "%a %d@."
+    (Pp.print_list (fun fmt () -> Format.fprintf fmt ";") Expr.print_rs)
+    (List.rev cs)
+    (int_of_float (time *. 100000000.))
+
+let cs_push info rs =
+  let new_cs = rs :: info.cs in
+  if Debug.test_flag debug_flamegraph
+  then begin
+    let ts_end = Unix.gettimeofday () in
+    print_callstack info.cs (ts_end -. !ts);
+    ts := Unix.gettimeofday ();
+    { info with cur_rs = rs; cs = new_cs }
+    end
+  else { info with cur_rs = rs; cs = new_cs }
+
+let cs_pop info =
+  if Debug.test_flag debug_flamegraph
+  then begin
+    let ts_end = Unix.gettimeofday () in
+    print_callstack info.cs (ts_end -. !ts);
+    ts := Unix.gettimeofday () end
 
 let get pv info : value =  Mid.find pv.pv_vs.vs_name info.vars
 
@@ -992,7 +1020,13 @@ let rec interp_expr info (e:Mltree.expr) : value =
                 print_id id print_value v;
               add_id id v info)
             info le vl in
-        interp_expr { info' with cs = rs.rs_name.id_string::(info'.cs) } e in
+        if rs_equal rs info.cur_rs
+        then interp_expr info' e
+        else begin
+          let info' = cs_push info' rs in
+          let v = interp_expr info' e in
+          cs_pop info';
+          v end in
       Debug.dprintf debug_interp "eval call@.";
       let res = try begin
         let rs = if Mrs.mem rs info.recs then Mrs.find rs info.recs else rs in
@@ -1125,7 +1159,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
      let ov = match oe with
        | None -> None
        | Some e -> Some (interp_expr info e) in
-     raise (Raised (xs, ov, append info.cs))
+     raise (Raised (xs, ov, info.cs))
   | Eexn  _ -> Debug.dprintf debug_interp "Eexn@.";
                          raise CannotReduce
   | Eabsurd -> Debug.dprintf debug_interp "Eabsurd@.";
@@ -1295,13 +1329,16 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
                        recs = Mrs.empty;
                        vars = vars;
                        get_decl = get_decl;
+                       cur_rs = rs;
                        cs = [];
                        } in
           Debug.dprintf debug_refl "eval_fun@.";
+          ts := Unix.gettimeofday ();
           let res =
             try term_of_value (eval_fun decl info)
-            with Raised (xs,_,s) ->
-              Format.eprintf "Raised %s %s@." (xs.xs_name.id_string) s;
+            with Raised (xs,_,cs) ->
+              Format.eprintf "Raised %s %a@." (xs.xs_name.id_string)
+                (Pp.print_list Pp.semi Expr.print_rs) cs;
               raise (ReductionFail renv) (*(try eval_fun decl info with Raised _ -> Vbool false)*) in
           Debug.dprintf debug_refl "res %a@." Pretty.print_term res;
           let rinfo = {renv with subst = Mvs.add vres res renv.subst} in

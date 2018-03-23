@@ -920,7 +920,7 @@ let rmul (a b:t)
                   = (from_int n1 *. from_int n2) /. (from_int d1 *. from_int d2)
                   = (from_int n1 /. from_int d1) *. (from_int n2 /. from_int d2)
                   = rinterp a y *. rinterp b y };
-      simp r
+      r
     end
   end
 
@@ -943,6 +943,12 @@ let rinv (a:t)
   raises  { QError -> true }
 = match a with
   | (n,d) -> if n = 0 || d = 0 then raise QError else (d,n)
+  end
+
+let is_zero (a:t)
+  ensures { result <-> req a rzero }
+= match a with
+  | (n,d) -> n = 0 && d <> 0
   end
 
 end
@@ -1251,8 +1257,8 @@ let madd (a b:t)
   raises  { Q.QError -> true }
 = match a, b with
   | (q1, e1), (q2, e2) ->
-    if Q.req q1 Q.rzero then b
-    else if Q.req q2 Q.rzero then a
+    if Q.is_zero q1 then b
+    else if Q.is_zero q2 then a
     else if same_exp e1 e2
     then begin
       let q = Q.radd q1 q2 in
@@ -1273,7 +1279,7 @@ let mmul (a b:t)
 = match a, b with
   | (q1,e1), (q2,e2) ->
     let q = Q.rmul q1 q2 in
-    if Q.req q Q.rzero then mzero
+    if Q.is_zero q then mzero
     else begin
       let e = add_exp e1 e2 in
       assert { forall y. minterp (q,e) y = minterp a y *. minterp b y
@@ -1310,7 +1316,7 @@ let rec predicate pure_same_exp (e1 e2: exp)
 let predicate meq (a b:t)
   ensures { result -> forall y. minterp a y = minterp b y }
 = match (a,b) with
-  | (q1,e1), (q2,e2) -> (Q.req q1 q2 && pure_same_exp e1 e2) || (Q.req q1 Q.rzero && Q.req q2 Q.rzero)
+  | (q1,e1), (q2,e2) -> (Q.req q1 q2 && pure_same_exp e1 e2) || (Q.is_zero q1 && Q.is_zero q2)
   end
 
 let minv (a:t)
