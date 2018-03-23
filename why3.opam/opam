@@ -22,17 +22,45 @@ tags: [
   "interactive theorem prover"
 ]
 available: [ ocaml-version >= "4.02.3" ]
+
+build: [
+  ["./configure"
+   "--prefix" prefix
+   "--disable-frama-c"
+   "--disable-coq-tactic"
+   "--disable-coq-libs"
+   "--disable-js-of-ocaml"
+   "--disable-ide"]
+  [make "-j%{jobs}%" "all" "opt" "byte"]
+]
+
+install: [make "install" "install-lib"]
+
+remove: [
+  ["rm" "%{bin}%/why3"]
+  ["rm" "-r" "%{lib}%/why3"]
+  ["rm" "-r" "%{share}%/why3"]
+]
+
+flags: [ light-uninstall ]
+
+build-doc: [
+  [make "doc" "stdlibdoc" "apidoc"]
+  [make "DOCDIR=%{doc}%/why3" "install-doc"]
+]
+
 depends: [
-  "why3-base" { = "0.88.3" }
-  "lablgtk"
-  "conf-gtksourceview"
+  "ocamlfind" {build}
+  "menhir" {>= 20150629}
+  "num"
+]
+
+depopts: [
   "zarith"
   "camlzip"
   "ocamlgraph"
 ]
-depopts: [
-  "coq"
-]
-messages: [
-  "Coq realizations of Why3 theories are only available if Coq is installed" { !coq:installed }
+
+conflicts: [
+  "ocamlgraph" {< "1.8.2"}
 ]
