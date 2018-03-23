@@ -19,7 +19,11 @@ val int : Format.formatter -> int -> unit
 val bool : Format.formatter -> bool -> unit
 (* print an boolean *)
 val float : Format.formatter -> float -> unit
-(* print an floating point number *)
+(* print a floating point number *)
+val standard_float : Format.formatter -> float -> unit
+(* print a float in a format that cannot be mistaken for an integer (this makes
+   communication with other tools easier).
+*)
 
 val list :
   (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a list -> unit
