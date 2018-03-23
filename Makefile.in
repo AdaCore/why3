@@ -163,8 +163,9 @@ endif
 .PHONY: install-bash install-emacs install-framac
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
 .PHONY: ide install-ide uninstall-ide
-.PHONY: coq install-coq-tactic install-coq install-coq-data
-.PHONY: pvs install-pvs install-pvs-data
+.PHONY: coq install-coq uninstall-coq
+.PHONY: coq-tactic install-coq-tactic uninstall-coq-tactic
+.PHONY: pvs install-pvs uninstall-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
@@ -961,11 +962,11 @@ $(COQPDEP): $(COQPGENERATED)
 byte: lib/coq-tactic/why3tac.cma
 opt:  lib/coq-tactic/why3tac.cmxs
 
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
 lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@ @WHY3LIB@)
 
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@ @WHY3LIB@)
 
 lib/coq-tactic/why3tac.cmxs: $(WHY3CMXA) $(COQPCMX)
 lib/coq-tactic/why3tac.cma: $(WHY3CMA) $(COQPCMO)
@@ -987,7 +988,9 @@ lib/coq-tactic/Why3.vo: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/
 	$(SHOW) 'Coqc     $<'
 	$(HIDE)WHY3CONFIG="" $(COQC) $(COQRTAC) $<
 
-all: lib/coq-tactic/Why3.vo
+coq-tactic: lib/coq-tactic/Why3.vo
+
+all: coq-tactic
 
 # depend and clean targets
 
@@ -1003,6 +1006,9 @@ GENERATED += $(COQPGENERATED)
 
 clean::
 	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
+
+uninstall-coq-tactic:
+	rm -rf $(LIBDIR)/why3/coq-tactic
 
 install-coq-tactic:
 	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
@@ -1083,6 +1089,25 @@ endif
 
 COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
 
+%.vo: %.v
+	$(SHOW) 'Coqc     $<'
+	$(HIDE)$(COQC) -R lib/coq Why3 $<
+
+%.vd: %.v
+	$(SHOW) 'Coqdep   $<'
+	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
+
+COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
+COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
+COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
+
+coq: $(COQVO) drivers/coq-realizations.aux
+
+clean-coq:
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
+
+clean:: clean-coq
+
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)(echo "(* generated automatically at compilation time *)"; \
@@ -1152,10 +1177,10 @@ update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux 
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/floating_point.mlw
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T floating_point.$$f -o $(GENERATED_PREFIX_COQ)/floating_point/; done
 
-
-ifeq (@enable_coq_support@,yes)
-
 ifeq (@enable_coq_libs@,yes)
+
+uninstall-coq:
+	rm -rf $(LIBDIR)/why3/coq
 
 install-coq:
 	$(MKDIR_P) $(LIBDIR)/why3/coq
@@ -1187,24 +1212,10 @@ ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
+	$(MKDIR_P) $(DATADIR)/why3/drivers
+	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
 install:: install-coq
-
-endif
-
-COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
-COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
-COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
-
-%.vo: %.v
-	$(SHOW) 'Coqc     $<'
-	$(HIDE)$(COQC) -R lib/coq Why3 $<
-
-%.vd: %.v
-	$(SHOW) 'Coqdep   $<'
-	$(HIDE)$(COQDEP) -R lib/coq Why3 $< $(TOTARGET)
-
-coq: $(COQVO)
 
 all: coq
 
@@ -1216,19 +1227,13 @@ endif
 
 depend: $(COQVD)
 
-clean-coq:
-	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
-
-clean:: clean-coq
-
 endif
 
-all: drivers/coq-realizations.aux
-
-install-coq-data:
+install-data::
+	$(MKDIR_P) $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
-install-data:: install-coq-data
+all: drivers/coq-realizations.aux
 
 clean::
 	rm -f drivers/coq-realizations.aux
@@ -1279,6 +1284,9 @@ drivers/pvs-realizations.aux: Makefile
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
+uninstall-pvs:
+	rm -rf $(LIBDIR)/why3/pvs
+
 install-pvs:
 	$(MKDIR_P) $(LIBDIR)/why3/pvs
 	$(INSTALL_DATA) lib/pvs/version $(LIBDIR)/why3/pvs/
@@ -1290,6 +1298,7 @@ install-pvs:
 	$(INSTALL_DATA) $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 	$(MKDIR_P) $(LIBDIR)/why3/pvs/floating_point/
 	$(INSTALL_DATA) $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
+	$(MKDIR_P) $(DATADIR)/why3/drivers/
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 install:: install-pvs
@@ -1309,10 +1318,9 @@ drivers/pvs-realizations.aux: Makefile
 
 endif
 
-install-pvs-data:
+install-data::
+	$(MKDIR_P) $(DATADIR)/why3/drivers/
 	$(INSTALL_DATA) drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
-
-install-data:: install-pvs-data
 
 all: drivers/pvs-realizations.aux
 
