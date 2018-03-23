@@ -162,6 +162,7 @@ endif
 .PHONY: install-bin install-data uninstall-bin uninstall-data
 .PHONY: install-bash install-emacs install-framac
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
+.PHONY: ide install-ide uninstall-ide
 .PHONY: coq install-coq-tactic install-coq install-coq-data
 .PHONY: pvs install-pvs install-pvs-data
 .PHONY: install-isabelle
@@ -335,7 +336,6 @@ uninstall-data::
 
 install-data::
 	$(MKDIR_P) $(DATADIR)/why3
-	$(MKDIR_P) $(DATADIR)/why3/images
 	$(MKDIR_P) $(DATADIR)/why3/vim
 	$(MKDIR_P) $(DATADIR)/why3/vim/ftdetect
 	$(MKDIR_P) $(DATADIR)/why3/vim/syntax
@@ -348,13 +348,6 @@ install-data::
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
 	$(INSTALL_DATA) share/provers-detection-data.conf $(DATADIR)/why3/
-	for i in share/images/*.rc; do \
-	     d=`basename $$i .rc`; \
-	     $(INSTALL_DATA) $$i $(DATADIR)/why3/images; \
-	     $(MKDIR_P) $(DATADIR)/why3/images/$$d; \
-	     $(INSTALL_DATA) share/images/$$d/* $(DATADIR)/why3/images/$$d; \
-	done
-	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
 	$(INSTALL_DATA) share/Makefile.config $(DATADIR)/why3
 	$(INSTALL_DATA) share/vim/ftdetect/why3.vim $(DATADIR)/why3/vim/ftdetect/why3.vim
@@ -772,12 +765,27 @@ depend: $(IDEDEP)
 
 CLEANDIRS += src/ide
 
-uninstall-bin::
-	rm -f $(TOOLDIR)/why3ide$(EXE)
+ide: bin/why3ide.@OCAMLBEST@
 
-install-bin::
+uninstall-ide:
+	rm -f $(TOOLDIR)/why3ide$(EXE)
+	rm -rf $(DATADIR)/why3/images
+
+uninstall:: uninstall-ide
+
+install-ide:
 	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL) bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
+	$(MKDIR_P) $(DATADIR)/why3/images
+	for i in share/images/*.rc; do \
+	     d=`basename $$i .rc`; \
+	     $(INSTALL_DATA) $$i $(DATADIR)/why3/images; \
+	     $(MKDIR_P) $(DATADIR)/why3/images/$$d; \
+	     $(INSTALL_DATA) share/images/$$d/* $(DATADIR)/why3/images/$$d; \
+	done
+	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
+
+install:: install-ide
 
 install_local:: bin/why3ide
 
