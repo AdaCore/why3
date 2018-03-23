@@ -315,8 +315,10 @@ module Print = struct
         else fprintf fmt "%a" (print_expr ~paren:true info) expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
+    | expr :: exprl, [] ->
+        fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        print_apply_args info fmt (exprl, [])
     | [], _ -> ()
-    | _, [] -> assert false
 
   and print_apply info rs fmt pvl =
     let isfield =
@@ -360,7 +362,7 @@ module Print = struct
         end
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
-    | _, _, tl -> (* FIXME? when is in driver but is not a local id *)
+    | _, _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]"
           (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)

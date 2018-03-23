@@ -172,6 +172,15 @@ module TestExtraction
     let partial = test_filter_ghost_args 3 in
     42
 
+  let constant test_partial2 : int =
+    let r = ref 0 in
+    let f (x: int) (ghost y) = r := !r + 21 in
+    let g = f 17 in
+    g (0:int); g (1:int); !r
+
+  let test_zero_args () : int =
+    test_partial2 + 0
+
   let test_filter_ghost_args2 (x: int) (ghost y: int) (z: int) : int =
     x + z
 
@@ -199,7 +208,7 @@ module TestExtraction
     let res = yxz - xzy in
     res
 
-  let test_partial2 (x: int) : int =
+  let test_partial3 (x: int) : int =
     let sum : int -> int -> int = fun x y -> x + y in
     let incr_a (a: int) = sum a in
     incr_a x x
