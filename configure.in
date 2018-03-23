@@ -67,13 +67,19 @@ AC_ARG_ENABLE(zarith,
 # camlzip
 
 AC_ARG_ENABLE(zip,
-    AS_HELP_STRING([--enable-zip], [use LZ compression to store session files]),,
+    AS_HELP_STRING([--disable-zip], [do not use LZ compression to store session files]),,
     enable_zip=yes)
+
+# js_of_ocaml
+
+AC_ARG_ENABLE(js_of_ocaml,
+    AS_HELP_STRING([--disable-js-of-ocaml], [do not use js-of-ocaml]),,
+    enable_js_of_ocaml=yes)
 
 # menhirLib
 
 AC_ARG_ENABLE(menhirLib,
-    AS_HELP_STRING([--enable-menhirLib], [use MenhirLib parsing library]),,
+    AS_HELP_STRING([--disable-menhirLib], [do not use MenhirLib parsing library]),,
     enable_menhirLib=yes)
 
 # IDE
@@ -81,6 +87,10 @@ AC_ARG_ENABLE(menhirLib,
 AC_ARG_ENABLE(ide,
     AS_HELP_STRING([--disable-ide], [do not build Why3 IDE]),,
     enable_ide=yes)
+
+AC_ARG_ENABLE(web_ide,
+    AS_HELP_STRING([--disable-web-ide], [do not build Why3 Web IDE]),,
+    enable_web_ide=yes)
 
 # Coq tactic and libraries
 
@@ -499,7 +509,9 @@ else
 fi
 
 # checking for lablgtk2
-if test "$enable_ide" = yes ; then
+if test "$enable_ide" != yes ; then
+   reason_ide=" (disabled by user)"
+else
    if test "$USEOCAMLFIND" = yes; then
       LABLGTK2LIB=$(ocamlfind query lablgtk2)
    fi
@@ -544,23 +556,31 @@ dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
-
 # checking for js_of_ocaml
-HASJSOFOCAML=no
-if test "$USEOCAMLFIND" = yes; then
+if test "$enable_js_of_ocaml" != yes; then
+   reason_js_of_ocaml=" (disabled by user)"
+elif test "$USEOCAMLFIND" != yes; then
+   enable_js_of_ocaml=no
+   reason_js_of_ocaml=" (ocamlfind not available)"
+else
    JSOFOCAML=$(ocamlfind query js_of_ocaml)
    if test -z "$JSOFOCAML"; then
-      reason_jsofocaml=" (js_of_ocaml not found)"
+      enable_js_of_ocaml=no
+      reason_js_of_ocaml=" (js_of_ocaml not found)"
    else
       JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml-ppx)
       if test -z "$JSOFOCAMLPPX"; then
-         reason_jsofocaml=" (js_of_ocaml-ppx not found)"
-      else
-         HASJSOFOCAML=yes
+         enable_js_of_ocaml=no
+         reason_js_of_ocaml=" (js_of_ocaml-ppx not found)"
       fi
    fi
-else
-   reason_jsofocaml=" (ocamlfind not available)"
+fi
+
+if test "$enable_web_ide" != yes; then
+   reason_web_ide=" (disabled by user)"
+elif test "$enable_js_of_ocaml" != yes; then
+   enable_web_ide=no
+   reason_web_ide=" (js_of_ocaml not available)"
 fi
 
 # Coq
@@ -866,7 +886,8 @@ AC_SUBST(enable_ide)
 AC_SUBST(LABLGTK2LIB)
 AC_SUBST(LABLGTK2PKG)
 
-AC_SUBST(HASJSOFOCAML)
+AC_SUBST(enable_web_ide)
+AC_SUBST(enable_js_of_ocaml)
 
 AC_SUBST(META_OCAMLGRAPH)
 
@@ -967,10 +988,11 @@ echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
+echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
-echo "    Web IDE                 : $HASJSOFOCAML$reason_jsofocaml"
+echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    MenhirLib support       : $enable_menhirLib$reason_menhirLib"

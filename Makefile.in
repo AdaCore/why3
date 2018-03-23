@@ -1726,7 +1726,7 @@ CLEANDIRS += src/trywhy3
 # why3webserver and full web/js interface
 #########
 
-ifeq (@HASJSOFOCAML@,yes)
+ifeq (@enable_web_ide@,yes)
 
 JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
         -I src/ide
