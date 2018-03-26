@@ -20,7 +20,7 @@ let log s = ignore (Firebug.console ## log (Js.string s))
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let check_def s o =
-  Js.Optdef.get o (fun () -> log ("Object " ^ s ^ " is undefined or null");
+  Js.Optdef.get o (fun () -> log ("ERROR in check_def(): object " ^ s ^ " is undefined or null");
 			     assert false)
 
 let get_global ident =
@@ -61,7 +61,7 @@ let getElement cast id =
     getElement_exn cast id
   with
     Not_found ->
-    log ("Element " ^ id ^ " does not exist or has invalid type");
+    log ("ERROR in getElement(): element " ^ id ^ " does not exist or has invalid type");
     assert false
 
 (**********)
@@ -82,7 +82,8 @@ module PE = struct
   let log_print_msg = print "why3-msg"
 
   let error_print_msg s =
-    error_container ##. innerHTML := Js.string s
+    error_container ##. innerHTML := Js.string s;
+    log_print_msg s
 
 (* TODO remove this *)
   let printAnswer s = log_print_msg s
@@ -341,9 +342,9 @@ let sendRequest r =
    let onreadystatechange () =
      if xhr ##. readyState == XmlHttpRequest.DONE then
        if xhr ##. status == 200 then
-         PE.printAnswer (readBody xhr)
+         PE.printAnswer ("Http request '" ^ r ^ "' returned " ^ readBody xhr)
        else
-         PE.printAnswer ("Erreur " ^ string_of_int (xhr ##. status)) in
+         PE.printAnswer ("Http request '" ^ r ^ "' failed with status " ^ string_of_int (xhr ##. status)) in
    xhr ## overrideMimeType (Js.string "text/json");
    let _ = xhr ## _open (Js.string "GET")
                 (Js.string ("http://localhost:6789/request?"^r))  Js._true in
@@ -626,10 +627,15 @@ let getNotification2 () =
       if xhr ##. status == 200 then
         let r = readBody xhr in
         let nl =
-          try Json_util.parse_list_notification r with e ->
-            log (Printexc.to_string e ^ " " ^ r); [] in
+          try Json_util.parse_list_notification r
+          with e ->
+            log ("ERROR in getNotification2: Json_util.parse_list_notification raised " ^ Printexc.to_string e ^
+                   " on the following notification: " ^ r); []
+        in
+        (* TODO: make a nicer log *)
         if nl != [] then
           PE.printAnswer ("r = |" ^ r ^ "|");
+        (**)
         interpNotifications nl
       else
         ()

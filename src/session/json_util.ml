@@ -44,14 +44,14 @@ let convert_infos (i: global_information) =
 
 let convert_prover_answer (pa: prover_answer) =
   match pa with
-  | Valid             -> String "Valid"
-  | Invalid           -> String "Invalid"
-  | Timeout           -> String "Timeout"
-  | OutOfMemory       -> String "OutOfMemory"
-  | StepLimitExceeded -> String "StepLimitExceeded"
-  | Unknown _         -> String "Unknown"
-  | Failure _         -> String "Failure"
-  | HighFailure       -> String "HighFailure"
+  | Valid             -> "Valid",""
+  | Invalid           -> "Invalid",""
+  | Timeout           -> "Timeout",""
+  | OutOfMemory       -> "OutOfMemory",""
+  | StepLimitExceeded -> "StepLimitExceeded",""
+  | Unknown(s,_)      -> "Unknown",s
+  | Failure s         -> "Failure",s
+  | HighFailure       -> "HighFailure",""
 
 let convert_limit (l: Call_provers.resource_limit) =
   Record (convert_record
@@ -70,13 +70,16 @@ let convert_model (m: Model_parser.model) =
 
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
-  Record (convert_record
-    ["pr_answer", convert_prover_answer pr.pr_answer;
-     "pr_status", convert_unix_process pr.pr_status;
-     "pr_output", String pr.pr_output;
-     "pr_time", Float pr.pr_time;
-     "pr_steps", Int pr.pr_steps;
-     "pr_model", convert_model pr.pr_model])
+  let (a,s) = convert_prover_answer pr.pr_answer in
+  Record
+    (convert_record
+       ["pr_answer", String a;
+        "pr_answer_arg", String s;
+        "pr_status", convert_unix_process pr.pr_status;
+        "pr_output", String pr.pr_output;
+        "pr_time", Float pr.pr_time;
+        "pr_steps", Int pr.pr_steps;
+        "pr_model", convert_model pr.pr_model])
 
 let convert_proof_attempt (pas: proof_attempt_status) =
   Record (match pas with
@@ -482,47 +485,65 @@ let parse_node_type_from_json j =
   | String "NProofAttempt"   -> NProofAttempt
   | _                        -> raise NotNodeType
 
-exception NotProverAnswer
+let parse_prover_answer a d =
+  match a with
+  | "Valid"             -> Valid
+  | "Invalid"           -> Invalid
+  | "Timeout"           -> Timeout
+  | "OutOfMemory"       -> OutOfMemory
+  | "StepLimitExceeded" -> StepLimitExceeded
+  | "Unknown"           -> Unknown (d,None)
+  | "Failure"           -> Failure d
+  | "HighFailure"       -> HighFailure
+  | _                   -> HighFailure
 
-let parse_prover_answer j =
+let parse_unix_process j arg =
   match j with
-  | String "Valid"             -> Valid
-  | String "Invalid"           -> Invalid
-  | String "Timeout"           -> Timeout
-  | String "OutOfMemory"       -> OutOfMemory
-  | String "StepLimitExceeded" -> StepLimitExceeded
-  | String "Unknown"           -> raise NotProverAnswer (* TODO *)
-  | String "Failure"           -> raise NotProverAnswer (* TODO *)
-  | String "HighFailure"       -> HighFailure
-  | _                          -> raise NotProverAnswer
-
-exception NotUnixProcess
-
-let parse_unix_process j =
-  match j with
-  | String "WEXITED" -> Unix.WEXITED 0 (* TODO dummy value *)
-  | String "WSIGNALED" -> Unix.WSIGNALED 0 (* TODO dummy value *)
-  | String "WSTOPPED" -> Unix.WSTOPPED 0 (* TODO dummy value *)
-  | _ -> raise NotUnixProcess
-
-exception NotProverResult
+  | "WEXITED" -> Unix.WEXITED arg (* TODO dummy value *)
+  | "WSIGNALED" -> Unix.WSIGNALED arg (* TODO dummy value *)
+  | "WSTOPPED" -> Unix.WSTOPPED arg (* TODO dummy value *)
+  | _ -> Unix.WSIGNALED (-1) (* default, should never happen *)
 
 let parse_prover_result j =
-  try
-    let pr_answer = get_field j "pr_answer" in
-    let pr_status_unix = get_field j "pr_status" in
-    let pr_output = get_string (get_field j "pr_output") in
-    let pr_time = get_float (get_field j "pr_time") in
-    let pr_steps = get_int (get_field j "pr_steps") in
-    let pr_model = get_string (get_field j "pr_model") in
-    {pr_answer = parse_prover_answer pr_answer;
-     pr_status = parse_unix_process pr_status_unix;
-     pr_output = pr_output;
-     pr_time = pr_time;
-     pr_steps = pr_steps;
-     pr_model = Obj.magic pr_model} (* TODO pr_model is a string, should be model *)
-  with
-  | _ -> raise NotProverResult
+  let pr_answer =
+    let arg =
+      try get_string (get_field j "pr_answer_arg")
+      with Not_found -> ""
+    in
+    try parse_prover_answer (get_string (get_field j "pr_answer")) arg
+    with Not_found -> HighFailure
+  in
+  let pr_status_unix =
+    let arg =
+      try get_int (get_field j "pr_status_arg")
+      with Not_found -> (-1)
+    in
+    try parse_unix_process (get_string (get_field j "pr_status")) arg
+    with Not_found -> Unix.WSIGNALED (-1)
+  in
+  let pr_output =
+    try get_string (get_field j "pr_output")
+    with Not_found -> ""
+  in
+  let pr_time =
+    try get_float (get_field j "pr_time")
+    with Not_found -> -1.0
+  in
+  let pr_steps =
+    try get_int (get_field j "pr_steps")
+    with Not_found -> -1
+  in
+  let _pr_model =
+    try get_string (get_field j "pr_model")
+    with Not_found -> ""
+  in
+  { pr_answer = pr_answer;
+    pr_status = pr_status_unix;
+    pr_output = pr_output;
+    pr_time = pr_time;
+    pr_steps = pr_steps;
+    pr_model = Model_parser.default_model (* pr_model *)}
+    (* TODO pr_model is a string, should be model *)
 
 exception NotProofAttempt
 
