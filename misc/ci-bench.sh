@@ -1,16 +1,18 @@
 #!/bin/bash
 
-# runner:
-# apt-get install curl opam automake libgmp-dev zlib1g-dev
+# Runner installation
+# -------------------
+# apt-get install curl
 # curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | bash
-# apt-get install gitlab-runner
+# curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+# apt-key fingerprint 0EBFCD88
+# echo "deb https://download.docker.com/linux/debian stretch stable" >> /etc/apt/sources.list
+# apt-get update
+# apt-get install gitlab-runner docker-ce
 # gitlab-runner register
 #   https://gitlab.inria.fr/
 #   shell
-# su gitlab-runner
-# cd
-# opam init
-# opam install menhir alt-ergo
+# usermod -aG docker gitlab-runner
 
 set -e
 eval `opam config env`
