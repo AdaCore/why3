@@ -352,7 +352,7 @@ fi
 
 # compiler plugins
 
-AX_VERSION_GE([$OCAMLVERSION], 4.03.0,
+AX_VERSION_GE([$OCAMLVERSION], 4.05.0,
   [if test "$USEOCAMLFIND" = yes; then
      COMPILERLIBS=$(ocamlfind query compiler-libs)
    fi
@@ -369,7 +369,7 @@ AX_VERSION_GE([$OCAMLVERSION], 4.03.0,
      fi
    fi],
   [enable_compiler_plugins="no"
-   reason_compiler_plugins=" (Ocaml version 4.03.0 required)"])
+   reason_compiler_plugins=" (Ocaml version 4.05.0 required)"])
 
 if test "$enable_compiler_plugins" = yes; then
   COMPILERLIBSPKG="compiler-libs"
