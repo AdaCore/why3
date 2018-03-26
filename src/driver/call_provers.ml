@@ -421,8 +421,12 @@ let query_result_buffer id =
       Hashtbl.remove result_buffer id; r
   with Not_found -> NoUpdates
 
+(* The editor result is returned as Valid but the editor result is also always
+   made obsolete. We put Valid here so that it is possible to replay the proof
+   to get a non obsolete valid proof.
+*)
 let editor_result ret = {
-  pr_answer = Unknown ("", None);
+  pr_answer = Valid;
   pr_status = ret;
   pr_output = "";
   pr_time   = 0.0;

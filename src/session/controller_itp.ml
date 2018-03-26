@@ -432,15 +432,18 @@ let timeout_handler () =
     let q = Queue.create () in
     while not (Queue.is_empty prover_tasks_edited) do
       (* call is an EditorCall *)
-      let (callback,call,ores) as c =
+      let (callback,call,_ores) as c =
         Queue.pop prover_tasks_edited in
       let prover_update = Call_provers.query_call call in
       match prover_update with
       | Call_provers.NoUpdates -> Queue.add c q
-      | Call_provers.ProverFinished _res ->
-          (* res is meaningless for edition, we returned the old result *)
-          (* inform the callback *)
-          callback (match ores with None -> Undone | Some r -> Done r)
+      | Call_provers.ProverFinished res ->
+          (* For editor event, the result is always obsolete and valid which
+             means that the proof need to be replayed to be completely checked.
+             Replay only replays valid goals so there would be no way to make an
+             interactive proof and then check it otherwise.
+          *)
+          callback (Done res)
       | _ -> assert (false) (* An edition can only return Noupdates or finished *)
     done;
     Queue.transfer q prover_tasks_edited;
