@@ -16,7 +16,6 @@ open Stdlib
 open Ide_utils
 open History
 open Itp_communication
-open Itp_server
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 

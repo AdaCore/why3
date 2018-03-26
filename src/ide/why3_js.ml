@@ -540,6 +540,7 @@ let remove_node n =
 end
 
 let interpNotif (n: notification) =
+  Format.kasprintf PE.log_print_msg "interpNotif: %a@\n@." Itp_communication.print_notify n;
   match n with
   | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->
@@ -632,10 +633,6 @@ let getNotification2 () =
             log ("ERROR in getNotification2: Json_util.parse_list_notification raised " ^ Printexc.to_string e ^
                    " on the following notification: " ^ r); []
         in
-        (* TODO: make a nicer log *)
-        if nl != [] then
-          PE.printAnswer ("r = |" ^ r ^ "|");
-        (**)
         interpNotifications nl
       else
         ()

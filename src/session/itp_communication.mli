@@ -141,3 +141,8 @@ type ide_request =
 
 (* Return true if the request modify the session *)
 val modify_session: ide_request -> bool
+
+
+val print_request: Format.formatter -> ide_request -> unit
+val print_msg: Format.formatter -> message_notification -> unit
+val print_notify: Format.formatter -> notification -> unit
