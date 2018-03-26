@@ -1,6 +1,27 @@
-before_script:
-  - . $HOME/.opam/opam-init/variables.sh
+stages:
+- init
+- bench
+- deploy
 
-ci-bench:
+variables:
+  DEPLOY_TAG: registry.gitlab.inria.fr/why3/why3:latest
+
+init:
+  stage: init
   script:
-    - misc/ci-bench.sh
+    - docker build -t bench-image -f misc/Dockerfile.init .
+
+bench:
+  stage: bench
+  script:
+    - docker run -t bench-image misc/ci-bench.sh
+
+deploy:
+  stage: deploy
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.inria.fr
+    - docker build -t deploy-image -f misc/Dockerfile.deploy .
+    - docker tag deploy-image $DEPLOY_TAG
+    - docker push $DEPLOY_TAG
+  only:
+    - master

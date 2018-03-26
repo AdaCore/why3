@@ -13,6 +13,7 @@
 # opam install menhir alt-ergo
 
 set -e
+eval `opam config env`
 
 # configuration
 autoconf

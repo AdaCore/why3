@@ -1,0 +1,18 @@
+FROM bench-image
+
+RUN eval `opam config env` && \
+    autoconf && \
+    (automake --add-missing 2> /dev/null || true) && \
+    ./configure && \
+    make -j2
+
+USER root
+
+RUN make install
+RUN sudo adduser --disabled-password --gecos '' guest
+USER guest
+ENV HOME /home/guest
+WORKDIR /home/guest
+
+RUN why3 config --detect
+
