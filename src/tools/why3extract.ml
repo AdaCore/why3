@@ -146,7 +146,7 @@ let print_preludes =
 let print_mdecls ?fname m mdecls =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let test_decl_not_driver decl =
-    let decl_name = ML.get_decl_name decl in
+    let decl_name = Mltree.get_decl_name decl in
     let test_id_not_driver id =
       Printer.query_syntax pargs.Pdriver.syntax id = None in
     List.exists test_id_not_driver decl_name in
@@ -292,7 +292,7 @@ let rec visit ~recurs mm id =
   if not (Ident.Hid.mem visited id) then begin try
       let d = find_decl mm id in
       Ident.Hid.add visited id ();
-      if recurs then ML.iter_deps (visit ~recurs mm) d;
+      if recurs then Mltree.iter_deps (visit ~recurs mm) d;
       toextract := { info_rec = recurs; info_id = id } :: !toextract
     with Not_found -> ()
   end

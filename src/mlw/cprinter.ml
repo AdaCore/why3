@@ -1008,7 +1008,7 @@ module MLToC = struct
   let translate_decl (info:info) (d:Mltree.decl) : C.definition option
     =
     let decide_print id = query_syntax info.syntax id = None in
-    match Compile.ML.get_decl_name d with
+    match Mltree.get_decl_name d with
     | [id] when decide_print id ->
        if debug then Format.printf "print %s@." id.id_string;
        translate_decl info d

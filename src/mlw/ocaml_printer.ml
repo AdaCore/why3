@@ -41,7 +41,6 @@ type info = {
 module Print = struct
 
   open Mltree
-  open Compile.ML
 
   (* extraction labels *)
   let optional_arg = create_label "ocaml:optional"
