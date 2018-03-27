@@ -6,6 +6,7 @@ stages:
 .build_template: &build_definition
   stage: build
   script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
     - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
     - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh
 
@@ -39,12 +40,14 @@ bench:
   variables:
     COMPILER: system
   script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
     - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
     - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
 
 .bench_template: &bench_definition
   stage: test
   script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
     - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
     - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
   only:
@@ -74,6 +77,7 @@ bench-4.06.0:
 opam:
   stage: build
   script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
     - docker build -t bench-image -f misc/Dockerfile.init .
     - docker build -t opam-image -f misc/Dockerfile.opam .
     - docker run -t --rm opam-image opam pin -v -y add why3-ide .
@@ -81,6 +85,7 @@ opam:
 deploy:
   stage: deploy
   script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
     - docker build -t bench-image -f misc/Dockerfile.init .
     - docker build -t deploy-image -f misc/Dockerfile.deploy .
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY

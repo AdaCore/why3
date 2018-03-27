@@ -2,7 +2,7 @@
 
 # Runner installation
 # -------------------
-# apt-get install curl
+# apt-get install curl autoconf automake
 # curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | bash
 # curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 # apt-key fingerprint 0EBFCD88
@@ -17,20 +17,10 @@
 set -e
 eval `opam config env`
 
-# configuration
-autoconf
-automake --add-missing 2> /dev/null || true
 ./configure --enable-local
-
-# compilation
 make -j2
 
 if test "$1" = bench; then
-
-# detection of provers
 bin/why3config --detect-provers
-
-# run the bench
 make bench
-
 fi

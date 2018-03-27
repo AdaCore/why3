@@ -2,9 +2,9 @@ FROM ocaml/ocaml:debian-stable
 
 # install dependencies
 RUN apt-get update && \
-    apt-get install -y autoconf automake wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam
+    apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam
 
-#create user
+# create user
 RUN sudo adduser --disabled-password --gecos '' why3
 USER why3
 ENV HOME /home/why3

@@ -1,8 +1,6 @@
 FROM bench-image
 
 RUN eval `opam config env` && \
-    autoconf && \
-    (automake --add-missing 2> /dev/null || true) && \
     ./configure && \
     make -j2
 
