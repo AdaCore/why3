@@ -74,8 +74,9 @@ bench-4.06.0:
 deploy:
   stage: deploy
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t bench-image -f misc/Dockerfile.init .
     - docker build -t deploy-image -f misc/Dockerfile.deploy .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker tag deploy-image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   only:
