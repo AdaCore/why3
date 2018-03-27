@@ -22,6 +22,9 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+val interp_float: string -> string -> string -> float_type
 
 type model_value =
  | Integer of string
@@ -32,6 +35,7 @@ type model_value =
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string;
@@ -41,10 +45,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record ={
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 val array_create_constant :
   value : model_value ->
@@ -259,7 +261,6 @@ val interleave_with_source :
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
-  filename:string ->
   rel_filename:string ->
   source_code:string ->
   locations:(Loc.position * 'a) list ->
@@ -274,7 +275,6 @@ val interleave_with_source :
     @param end_comment the string that ends a comment
     @param me_name_trans see print_model
     @param model counter-example model
-    @param filename the file name of the source
     @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
     @param locations the source locations that are found in the code
@@ -315,9 +315,13 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =  Stdlib.Sstr.t -> string -> model_element list
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
 (** Parses the input string into model elements. It contains the list of
-    projections that are collected in the task.
+    projections and a map associating the name of printed projections to the
+    fields (couple of printed field and model_trace name) that are collected in
+    the task.
  *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit

@@ -40,6 +40,7 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
+  gen_new_file : bool ->
   ?inplace     : bool ->
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
@@ -64,6 +65,7 @@ val prove_task :
   ?ce_prover   : string ->
   ?old         : string ->
   ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
@@ -79,6 +81,7 @@ val prove_task_prepared :
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
 (** Traverse all metas from a driver *)

@@ -34,6 +34,60 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+
+                               let interp_float b eb sb =
+    try
+      let is_neg = match b with
+        | "#b0" -> false
+        | "#b1" -> true
+        | _ -> raise Exit
+      in
+      if String.length eb = 13 && String.sub eb 0 2 = "#b" &&
+         String.length sb = 15 && String.sub sb 0 2 = "#x" then
+         (* binary 64 *)
+         let exp_base2 = String.sub eb 2 11 in
+         let mant_base16 = String.sub sb 2 13 in
+         let exp = int_of_string ("0b" ^ exp_base2) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-1023"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 2047 then (* infinities and NaN *)
+             if mant_base16="0000000000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 1023 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else
+      if String.length eb = 4 && String.sub eb 0 2 = "#x" &&
+         String.length sb = 25 && String.sub sb 0 2 = "#b" then
+         (* binary 32 *)
+         let exp_base16 = String.sub eb 2 2 in
+         let mant_base2 = String.sub sb 2 23 in
+         let mant_base16 =
+           Format.asprintf "%06x" (2*int_of_string ("0b" ^ mant_base2))
+         in
+         let exp = int_of_string ("0x" ^ exp_base16) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-127"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 255 then (* infinities and NaN *)
+             if mant_base16="0000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 127 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else raise Exit
+   with Exit -> Float_value (b, eb, sb)
 
 type model_value =
  | Integer of string
@@ -44,6 +98,7 @@ type model_value =
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string; (* Even array indices can exceed MAX_INT with Z3 *)
@@ -53,10 +108,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record = {
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 let array_create_constant ~value =
   {
@@ -100,6 +153,11 @@ let convert_float_value f =
       let m = Mstr.add "exponent" (Json_base.String eb) m in
       let m = Mstr.add "significand" (Json_base.String sb) m in
       Json_base.Record m
+  | Float_hexa(s,f) ->
+      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Stdlib.Mstr.empty in
+      let m = Mstr.add "str_hexa" (Json_base.String s) m in
+      let m = Mstr.add "value" (Json_base.Float f) m in
+      Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
   match value with
@@ -136,6 +194,16 @@ let rec convert_model_value value : Json_base.json =
       let m = Mstr.add "type" (Json_base.String "Array") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json_base.List l) m in
       Json_base.Record m
+  | Apply (s, lt) ->
+      let lt = List.map convert_model_value lt in
+      let slt =
+        let m = Mstr.add "list" (Json_base.List lt) Stdlib.Mstr.empty in
+        let m = Mstr.add "apply" (Json_base.String s) m in
+        Json_base.Record m
+      in
+      let m = Mstr.add "type" (Json_base.String "Apply") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" slt m in
+      Json_base.Record m
   | Record r ->
       convert_record r
 
@@ -154,18 +222,19 @@ and convert_indices indices =
 
 and convert_record r =
   let m = Mstr.add "type" (Json_base.String "Record") Stdlib.Mstr.empty in
-  let fields = convert_fields r.fields in
-  let discrs = convert_discrs r.discrs in
-  let m_field_discr = Mstr.add "Field" fields Stdlib.Mstr.empty in
-  let m_field_discr = Mstr.add "Discr" discrs m_field_discr in
-  let m = Mstr.add "val" (Json_base.Record m_field_discr) m in
+  let fields = convert_fields r in
+  let m_field = Mstr.add "Field" fields Stdlib.Mstr.empty in
+  let m = Mstr.add "val" (Json_base.Record m_field) m in
   Json_base.Record m
 
 and convert_fields fields =
-  Json_base.List (List.map convert_model_value fields)
-
-and convert_discrs discrs =
-  Json_base.List (List.map convert_model_value discrs)
+  Json_base.List
+    (List.map
+       (fun (f, v) ->
+         let m = Mstr.add "field" (Json_base.String f) Stdlib.Mstr.empty in
+         let m = Mstr.add "value" (convert_model_value v) m in
+         Json_base.Record m)
+       fields)
 
 let print_model_value_sanit fmt v =
   let v = convert_model_value v in
@@ -190,7 +259,8 @@ let print_float_human fmt f =
   | Not_a_number ->
       fprintf fmt "NaN"
   | Float_value (b, eb, sb) ->
-      fprintf fmt "float(%s,%s,%s)" b eb sb
+     fprintf fmt "float_bits(%s,%s,%s)" b eb sb
+  | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
   fprintf fmt "(";
@@ -199,11 +269,10 @@ let rec print_array_human fmt (arr: model_array) =
     arr.arr_indices;
   fprintf fmt "others => %a)" print_model_value_human arr.arr_others
 
-(* TODO there should be no record printed that way currently in Why3 *)
 and print_record_human fmt r =
-  fprintf fmt "Record(";
-  List.iter (fun x -> fprintf fmt "%a" print_model_value_human x) r.fields;
-  fprintf fmt ")"
+  fprintf fmt "%a"
+    (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
+    (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
 
 and print_model_value_human fmt (v: model_value) =
   match v with
@@ -212,6 +281,8 @@ and print_model_value_human fmt (v: model_value) =
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
+  | Apply (s, lt) ->
+    fprintf fmt "[%s %a]" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Bitvector s -> fprintf fmt "%s" s
@@ -307,7 +378,9 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser = Stdlib.Sstr.t -> string -> model_element list
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
 
 (*
 ***************************************************************
@@ -452,12 +525,16 @@ let interleave_line
     let model_elements = IntMap.find line_number model_file in
     print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
-      (get_padding line) ^
-        start_comment ^
-        (flush_str_formatter ()) ^
-        end_comment in
+     (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
+    in
 
-    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + 1, remaining_locs, list_loc @ locs)
+    (* We need to know how many lines will be taken by the counterexample. This
+       is ad hoc as we don't really know how the lines are split in IDE. *)
+    let len_cnt =
+      1 + (String.length cntexmp_line) / 80
+    in
+
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + len_cnt, remaining_locs, list_loc @ locs)
   with Not_found ->
     (source_code ^ line, line_number + 1, offset, remaining_locs, list_loc @ locs)
 
@@ -467,7 +544,6 @@ let interleave_with_source
     ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
     model
-    ~filename
     ~rel_filename
     ~source_code
     ~locations =
@@ -476,7 +552,15 @@ let interleave_with_source
       (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)
   in
   try
-    let model_file = StringMap.find filename model.model_files in
+    (* There is no way to compare rel_filename and the locations of filename in
+       the file because they contain extra ".." which cannot be reliably removed
+       (because of potential symbolic link). So, we use the basename.
+    *)
+    let model_files =
+      StringMap.filter (fun k _ -> Filename.basename k = Filename.basename rel_filename)
+        model.model_files
+    in
+    let model_file = snd (StringMap.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
       Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
@@ -706,7 +790,8 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
-    let raw_model = raw_mp list_proj input in
+    let list_records = printer_mapping.list_records in
+    let raw_model = raw_mp list_proj list_records input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -725,4 +810,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ -> [])
+  (fun _ _ _ -> [])

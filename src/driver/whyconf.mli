@@ -83,6 +83,10 @@ val cntexample: main -> bool
 val set_limits: main -> int -> int -> int -> main
 val set_cntexample: main -> bool -> main
 
+val default_editor: main -> string
+(** editor name used when no specific editor known for a prover *)
+val set_default_editor: main -> string -> main
+
 val plugins : main -> string list
 val pluginsdir : main -> string
 val set_plugins : main -> string list -> main

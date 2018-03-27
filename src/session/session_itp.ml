@@ -1864,12 +1864,17 @@ and save_trans s ctxt fmt (tid,t) =
   fprintf fmt "@]@\n</transf>"
 
 let save_theory s ctxt fmt t =
-  fprintf fmt
-    "@\n@[<v 1>@[<h><theory@ %a%a>@]"
-    save_ident t.theory_name
-    (save_bool_def "proved" false) (th_proved s t);
-  List.iter (save_goal s ctxt fmt) t.theory_goals;
-  fprintf fmt "@]@\n</theory>"
+  (* Saving empty theories takes space in session files. Not saving them should
+     be harmless. *)
+  if t.theory_goals <> [] then
+  begin
+    fprintf fmt
+      "@\n@[<v 1>@[<h><theory@ %a%a>@]"
+      save_ident t.theory_name
+      (save_bool_def "proved" false) (th_proved s t);
+    List.iter (save_goal s ctxt fmt) t.theory_goals;
+    fprintf fmt "@]@\n</theory>"
+  end
 
 let save_file s ctxt fmt _ f =
   fprintf fmt

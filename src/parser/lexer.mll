@@ -10,14 +10,7 @@
 (********************************************************************)
 
 {
-  open Format
   open Parser
-
-  exception IllegalCharacter of char
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | _ -> raise e)
 
   let keywords = Hashtbl.create 97
   let () =
@@ -241,7 +234,7 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (IllegalCharacter c) }
+      { Lexlib.illegal_character c lexbuf }
 
 {
 

@@ -18,7 +18,6 @@ open Why3
 open Unix_scheduler
 open Format
 open Itp_communication
-open Itp_server
 
 (*************************)
 (* Protocol of the shell *)

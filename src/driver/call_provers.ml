@@ -16,6 +16,8 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
+
 type reason_unknown =
   | Resourceout
   | Other
@@ -308,8 +310,8 @@ let adapt_limits limit on_timelimit =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
       then (2 * limit.limit_time + 1)
-      (* if prover implements time limit, use t + 1 *)
-      else if on_timelimit then succ limit.limit_time
+      (* if prover implements time limit, use 16t + 1 *)
+      else if on_timelimit then 16 * limit.limit_time + 1
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -342,15 +344,15 @@ let handle_answer answer =
       let id = answer.Prove_client.id in
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
-      if Debug.test_noflag debug then begin
-	Sys.remove save.vc_file;
-	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
+      if Debug.test_noflag debug && Debug.test_noflag keep_vcs then begin
+        Sys.remove save.vc_file;
+        if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let out = read_and_delete_file answer.Prove_client.out_file in
       let ret = answer.Prove_client.exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-	  answer.Prove_client.time out ret save.limit ~printer_mapping in
+          answer.Prove_client.time out ret save.limit ~printer_mapping in
       id, Some ans
   | Prove_client.Started id ->
       id, None
@@ -379,6 +381,11 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
+  Debug.dprintf
+    debug
+    "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
+    limit.limit_time limit.limit_mem
+    (Pp.print_list Pp.comma Pp.string) cmd;
   Prove_client.send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
@@ -418,8 +425,12 @@ let query_result_buffer id =
       Hashtbl.remove result_buffer id; r
   with Not_found -> NoUpdates
 
+(* The editor result is returned as Valid but the editor result is also always
+   made obsolete. We put Valid here so that it is possible to replay the proof
+   to get a non obsolete valid proof.
+*)
 let editor_result ret = {
-  pr_answer = Unknown ("", None);
+  pr_answer = Valid;
   pr_status = ret;
   pr_output = "";
   pr_time   = 0.0;
@@ -440,7 +451,7 @@ let rec wait_on_call = function
   | ServerCall id as pc ->
       begin match query_result_buffer id with
         | ProverFinished r -> r
-	| _ ->
+        | _ ->
             fetch_new_results ~blocking:true;
             wait_on_call pc
       end
@@ -449,14 +460,18 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ?(inplace=false) buffer =
+                   ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
-    if inplace then begin
-      let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
-      Sys.rename filename (backup_file filename);
-      filename, open_out filename
-    end else
-      Filename.open_temp_file "why_" ("_" ^ filename) in
+    if gen_new_file then
+      Filename.open_temp_file "why_" ("_" ^ filename)
+    else
+      begin
+        let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
+        if inplace then
+          Sys.rename filename (backup_file filename);
+        filename, open_out filename
+      end
+  in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
 

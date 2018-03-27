@@ -366,11 +366,12 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
+    let interactive = config_pr.Whyconf.interactive in
     let ce_prover = if cntexample then Some pr.Whyconf.prover_name else None in
     try
       let call =
         Driver.prove_task ?old:proof_script ?ce_prover ~cntexample ~inplace ~command
-                        ~limit driver task
+                        ~limit ~interactive driver task
       in
       let pa = (c.controller_session,id,pr,callback,false,call,ores) in
       Hashtbl.replace prover_tasks_in_progress call pa
@@ -433,14 +434,17 @@ let timeout_handler () =
     let q = Queue.create () in
     while not (Queue.is_empty prover_tasks_edited) do
       (* call is an EditorCall *)
-      let (_ses,_id,_pr,callback,_started,call,ores) as c =
+      let (callback,call,_ores) as c =
         Queue.pop prover_tasks_edited in
       let prover_update = Call_provers.query_call call in
       match prover_update with
       | Call_provers.NoUpdates -> Queue.add c q
       | Call_provers.ProverFinished res ->
-          let res = Opt.fold fuzzy_proof_time res ores in
-          (* inform the callback *)
+          (* For editor event, the result is always obsolete and valid which
+             means that the proof need to be replayed to be completely checked.
+             Replay only replays valid goals so there would be no way to make an
+             interactive proof and then check it otherwise.
+          *)
           callback (Done res)
       | _ -> assert (false) (* An edition can only return Noupdates or finished *)
     done;
@@ -494,7 +498,7 @@ let run_timeout_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr
+let schedule_proof_attempt c id pr ?save_to
                            ~counterexmp ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
@@ -528,12 +532,16 @@ let schedule_proof_attempt c id pr
       let pa = Hprover.find h pr in
       let a = get_proof_attempt_node ses pa in
       let old_res = a.proof_state in
-      let script = Opt.map (fun s ->
+      let script =
+        if save_to = None then
+          Opt.map (fun s ->
                             Debug.dprintf debug_sched "Script file = %s@." s;
                             Filename.concat (get_dir ses) s) a.proof_script
+        else
+          save_to
       in
       old_res, script
-    with Not_found | Session_itp.BadID -> None,None
+    with Not_found | Session_itp.BadID -> None,save_to
   in
   let panid = graft_proof_attempt ~limit ses id pr in
   Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)
@@ -592,6 +600,7 @@ let prepare_edition c ?file pn pr ~notification =
   update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
   let file = Opt.get pa.proof_script in
+  let old_res = pa.proof_state in
   let session_dir = Session_itp.get_dir session in
   let file = Filename.concat session_dir file in
   let old =
@@ -613,7 +622,7 @@ let prepare_edition c ?file pn pr ~notification =
   Driver.print_task ~cntexample:false ?old driver fmt task;
   Opt.iter close_in old;
   close_out ch;
-  panid,file
+  panid,file,old_res
 
 exception Editor_not_found
 
@@ -625,7 +634,7 @@ let schedule_edition c id pr ~callback ~notification =
   (* Make sure editor exists. Fails otherwise *)
   let editor =
     match prover_conf.Whyconf.editor with
-    | "" -> raise Editor_not_found
+    | "" -> Whyconf.(default_editor (get_main config))
     | s ->
        try
          let ed = Whyconf.editor_by_id config s in
@@ -633,7 +642,7 @@ let schedule_edition c id pr ~callback ~notification =
                               ed.Whyconf.editor_options)
        with Not_found -> raise Editor_not_found
   in
-  let panid,file = prepare_edition c id pr ~notification in
+  let panid,file,old_res = prepare_edition c id pr ~notification in
   (* Notification node *)
   let callback panid s =
     begin
@@ -660,8 +669,7 @@ let schedule_edition c id pr ~callback ~notification =
                 editor file;
   let call = Call_provers.call_editor ~command:editor file in
   callback panid Running;
-  Queue.add (c.controller_session,id,pr,callback panid,false,call,None)
-            prover_tasks_edited;
+  Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_timeout_handler ()
 
 exception TransAlreadyExists of string * string
@@ -734,7 +742,7 @@ let run_strategy_on_goal
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ~counterexmp ~limit ~callback ~notification
+         schedule_proof_attempt c g p ?save_to:None ~counterexmp ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -850,7 +858,7 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn ~counterexmp:false
+      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn ~counterexmp:false
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
@@ -946,7 +954,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
+       schedule_proof_attempt ?save_to:None c parid pr' ~counterexmp:false ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1145,7 +1153,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                                    Call_provers.print_prover_result res
                   end
                 in
-                schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
+                schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1225,7 +1233,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
+            schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
          | _ -> assert false
       end
     in

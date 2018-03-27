@@ -20,7 +20,7 @@ let log s = ignore (Firebug.console ## log (Js.string s))
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let check_def s o =
-  Js.Optdef.get o (fun () -> log ("Object " ^ s ^ " is undefined or null");
+  Js.Optdef.get o (fun () -> log ("ERROR in check_def(): object " ^ s ^ " is undefined or null");
 			     assert false)
 
 let get_global ident =
@@ -61,7 +61,7 @@ let getElement cast id =
     getElement_exn cast id
   with
     Not_found ->
-    log ("Element " ^ id ^ " does not exist or has invalid type");
+    log ("ERROR in getElement(): element " ^ id ^ " does not exist or has invalid type");
     assert false
 
 (**********)
@@ -82,7 +82,8 @@ module PE = struct
   let log_print_msg = print "why3-msg"
 
   let error_print_msg s =
-    error_container ##. innerHTML := Js.string s
+    error_container ##. innerHTML := Js.string s;
+    log_print_msg s
 
 (* TODO remove this *)
   let printAnswer s = log_print_msg s
@@ -341,9 +342,9 @@ let sendRequest r =
    let onreadystatechange () =
      if xhr ##. readyState == XmlHttpRequest.DONE then
        if xhr ##. status == 200 then
-         PE.printAnswer (readBody xhr)
+         PE.printAnswer ("Http request '" ^ r ^ "' returned " ^ readBody xhr)
        else
-         PE.printAnswer ("Erreur " ^ string_of_int (xhr ##. status)) in
+         PE.printAnswer ("Http request '" ^ r ^ "' failed with status " ^ string_of_int (xhr ##. status)) in
    xhr ## overrideMimeType (Js.string "text/json");
    let _ = xhr ## _open (Js.string "GET")
                 (Js.string ("http://localhost:6789/request?"^r))  Js._true in
@@ -360,6 +361,7 @@ let sendRequest r =
 module Panel =
   struct
     let main_panel = getElement AsHtml.div "why3-main-panel"
+    let task_list_container = getElement AsHtml.div "why3-task-list-container"
     let tab_container = getElement AsHtml.div "why3-tab-container"
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
     let reset () =
@@ -379,7 +381,7 @@ module Panel =
 			   (e ##. clientX) - (main_panel ##. offsetLeft)
 			 in
 			 let offset = Js.string ((string_of_int offset) ^ "px") in
-			 let edit_style = tab_container ##. style in
+			 let edit_style = task_list_container ##. style in
 			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
 			     JSU.(set edit_style (Js.string "flexBasis") offset);
 			     Js._false
@@ -539,6 +541,7 @@ let remove_node n =
 end
 
 let interpNotif (n: notification) =
+  Format.kasprintf PE.log_print_msg "interpNotif: %a@\n@." Itp_communication.print_notify n;
   match n with
   | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->
@@ -626,10 +629,11 @@ let getNotification2 () =
       if xhr ##. status == 200 then
         let r = readBody xhr in
         let nl =
-          try Json_util.parse_list_notification r with e ->
-            log (Printexc.to_string e ^ " " ^ r); [] in
-        if nl != [] then
-          PE.printAnswer ("r = |" ^ r ^ "|");
+          try Json_util.parse_list_notification r
+          with e ->
+            log ("ERROR in getNotification2: Json_util.parse_list_notification raised " ^ Printexc.to_string e ^
+                   " on the following notification: " ^ r); []
+        in
         interpNotifications nl
       else
         ()

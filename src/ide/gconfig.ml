@@ -37,8 +37,6 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable default_prover : string; (* "" means none *)
-      mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_full_context : bool;
       mutable show_labels : bool;
@@ -88,8 +86,6 @@ type ide = {
   ide_goal_color : string;
   ide_error_color : string;
   ide_iconset : string;
-  ide_default_prover : string;
-  ide_default_editor : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
 }
@@ -115,10 +111,6 @@ let default_ide =
     ide_goal_color = "gold";
     ide_error_color = "orange";
     ide_iconset = "fatcow";
-    ide_default_prover = "";
-    ide_default_editor =
-      (try Sys.getenv "EDITOR" ^ " %f"
-       with Not_found -> "editor %f");
     ide_hidden_provers = [];
   }
 
@@ -172,12 +164,6 @@ let load_ide section =
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
-    ide_default_editor =
-      get_string section ~default:default_ide.ide_default_editor
-        "default_editor";
-    ide_default_prover =
-      get_string section ~default:default_ide.ide_default_prover
-        "default_prover";
     ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
   }
 
@@ -220,8 +206,6 @@ let load_config config original_config =
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
     iconset = ide.ide_iconset;
-    default_prover = ide.ide_default_prover;
-    default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
     hidden_provers = ide.ide_hidden_provers;
@@ -270,9 +254,6 @@ let save_config t =
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "iconset" t.iconset in
-  let ide = set_string ide "default_prover" t.default_prover in
-  let ide = set_string ide "default_editor" t.default_editor in
-  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
@@ -973,6 +954,7 @@ let provers_page c (notebook:GPack.notebook) =
       in ())
     (Whyconf.get_provers c.config);
   (* default prover *)
+(*
   let frame2 =
     GBin.frame ~label:"Default prover" ~packing:hbox_pack () in
   let provers_box =
@@ -981,9 +963,9 @@ let provers_page c (notebook:GPack.notebook) =
   let group =
     let b =
       GButton.radio_button ~label:"(none)" ~packing:provers_box#add
-                           ~active:(c.default_prover = "") () in
+                           ~active:(c.config.default_prover = "") () in
     let (_ : GtkSignal.id) =
-      b#connect#toggled ~callback:(fun () -> c.default_prover <- "") in
+      b#connect#toggled ~callback:(fun () -> c.config.default_prover <- "") in
     b#group in
   Mprover.iter
     (fun _ p ->
@@ -991,12 +973,13 @@ let provers_page c (notebook:GPack.notebook) =
       let label = Pp.string_of_wnl print_prover p.prover in
       let b =
         GButton.radio_button ~label ~group ~packing:provers_box#add
-                             ~active:(name = c.default_prover) () in
+                             ~active:(name = c.config.default_prover) () in
       let (_ : GtkSignal.id) =
-        b#connect#toggled ~callback:(fun () -> c.default_prover <- name)
+        b#connect#toggled ~callback:(fun () -> c.config.default_prover <- name)
       in ())
     (Whyconf.get_provers c.config)
-
+ *)
+  ()
 
 
 (* Page "Uninstalled provers" *)
@@ -1056,12 +1039,16 @@ let editors_page c (notebook:GPack.notebook) =
   let default_editor_frame =
     GBin.frame ~label:"Default editor" ~packing:vbox_pack ()
   in
+  let main = Whyconf.get_main c.config in
   let editor_entry =
-   GEdit.entry ~text:c.default_editor ~packing:default_editor_frame#add ()
+   GEdit.entry ~text:(default_editor main) ~packing:default_editor_frame#add ()
   in
   let (_ : GtkSignal.id) =
-    editor_entry#connect#changed ~callback:
-      (fun () -> c.default_editor <- editor_entry#text)
+    editor_entry#connect#changed
+      ~callback:
+      (fun () ->
+       c.config <- Whyconf.set_main c.config
+	(Whyconf.set_default_editor main editor_entry#text))
   in
   let frame = GBin.frame ~label:"Specific editors" ~packing:vbox_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in

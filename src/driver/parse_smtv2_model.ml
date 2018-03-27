@@ -39,25 +39,27 @@ let do_parsing model =
   | Parse_smtv2_model_lexer.SyntaxError ->
     Warning.emit
       ~loc:(get_position lexbuf)
-      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected character";
+      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
+      (Lexing.lexeme lexbuf);
     Stdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
     begin
       let loc = get_position lexbuf in
-      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model";
+      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
+      (Lexing.lexeme lexbuf);
       Stdlib.Mstr.empty
     end
 
-let do_parsing list_proj model =
+let do_parsing list_proj list_records model =
   let m = do_parsing model in
-  Collect_data_model.create_list list_proj m
+  Collect_data_model.create_list list_proj list_records m
 
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)
 (* For Alt-ergo the output is not the same and we
    match on "I don't know". But we also need to begin
    parsing on a fresh new line ".*" ensures it *)
-let parse : raw_model_parser = fun list_proj input ->
+let parse : raw_model_parser = fun list_proj list_records input ->
   try
     let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
     ignore (Str.search_forward r input 0);
@@ -65,7 +67,7 @@ let parse : raw_model_parser = fun list_proj input ->
     let nr = Str.regexp "^)" in
     let res = Str.search_backward nr input (String.length input) in
     let model_string = String.sub input match_end (res + 1 - match_end) in
-    do_parsing list_proj model_string
+    do_parsing list_proj list_records model_string
   with
   | Not_found -> []
 

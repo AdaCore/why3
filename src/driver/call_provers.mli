@@ -152,6 +152,7 @@ val call_on_buffer :
   res_parser      : prover_result_parser ->
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
+  gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> server_id
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
@@ -166,7 +167,12 @@ val call_on_buffer :
 
     @param inplace : it is used to make a save of the file on which the
     prover was called. It is renamed as %f.save if inplace=true and the command
-    [actualcommand] fails *)
+    [actualcommand] fails
+
+    @param gen_new_file: When set, this generates a new temp file to run the
+    prover on. Otherwise it reuses the filename already given.
+
+*)
 
 type prover_update =
   | NoUpdates

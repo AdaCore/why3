@@ -4,204 +4,204 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../matrices.mlw">
-<theory name="MatrixGen">
+<file name="../matrices.mlw" proved="true">
+<theory name="MatrixGen" proved="true">
 </theory>
-<theory name="Matrix">
- <goal name="set_def1">
+<theory name="Matrix" proved="true">
+ <goal name="set_def1" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
  </goal>
- <goal name="set_def2">
+ <goal name="set_def2" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="set_def3">
+ <goal name="set_def3" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
- <goal name="set_def4">
+ <goal name="set_def4" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
  </goal>
 </theory>
-<theory name="FixedMatrix">
- <goal name="rows_and_cols_nonnegative">
+<theory name="FixedMatrix" proved="true">
+ <goal name="rows_and_cols_nonnegative" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="SquareFixedMatrix">
- <goal name="r_and_c_nonnegative">
+<theory name="SquareFixedMatrix" proved="true">
+ <goal name="r_and_c_nonnegative" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="MatrixArithmetic">
- <goal name="zero_neutral">
- <transf name="split_goal_wp">
-  <goal name="zero_neutral.1" expl="1.">
+<theory name="MatrixArithmetic" proved="true">
+ <goal name="zero_neutral" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="zero_neutral.0" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="zero_neutral.2" expl="2.">
+  <goal name="zero_neutral.1" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="add_commutative">
- <transf name="split_goal_wp">
-  <goal name="add_commutative.1" expl="1.">
+ <goal name="add_commutative" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_commutative.0" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="73"/></proof>
   </goal>
-  <goal name="add_commutative.2" expl="2.">
+  <goal name="add_commutative.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="add_associative">
- <transf name="split_goal_wp">
-  <goal name="add_associative.1" expl="1.">
+ <goal name="add_associative" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_associative.0" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="499"/></proof>
   </goal>
-  <goal name="add_associative.2" expl="2.">
+  <goal name="add_associative.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="add_opposite">
- <transf name="split_goal_wp">
-  <goal name="add_opposite.1" expl="1.">
+ <goal name="add_opposite" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_opposite.0" proved="true">
   <proof prover="2"><result status="valid" time="0.12" steps="217"/></proof>
   </goal>
-  <goal name="add_opposite.2" expl="2.">
+  <goal name="add_opposite.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="opp_involutive">
+ <goal name="opp_involutive" proved="true">
  <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="opposite_add">
- <proof prover="0"><result status="valid" time="0.49"/></proof>
+ <goal name="opposite_add" proved="true">
+ <proof prover="0"><result status="valid" time="0.32"/></proof>
  </goal>
- <goal name="WP_parameter mul_assoc_get" expl="VC for mul_assoc_get">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mul_assoc_get.1" expl="1. precondition">
+ <goal name="WP_parameter mul_assoc_get" expl="VC for mul_assoc_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mul_assoc_get.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter mul_assoc_get.2" expl="2. precondition">
+  <goal name="WP_parameter mul_assoc_get.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter mul_assoc_get.3" expl="3. assertion">
+  <goal name="WP_parameter mul_assoc_get.2" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="52"/></proof>
   </goal>
-  <goal name="WP_parameter mul_assoc_get.4" expl="4. precondition">
+  <goal name="WP_parameter mul_assoc_get.3" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter mul_assoc_get.5" expl="5. assertion">
+  <goal name="WP_parameter mul_assoc_get.4" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter mul_assoc_get.6" expl="6. postcondition">
+  <goal name="WP_parameter mul_assoc_get.5" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mul_assoc">
- <transf name="split_goal_wp">
-  <goal name="mul_assoc.1" expl="1.">
+ <goal name="mul_assoc" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_assoc.0" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="103"/></proof>
   </goal>
-  <goal name="mul_assoc.2" expl="2.">
+  <goal name="mul_assoc.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mul_distr_right_get" expl="VC for mul_distr_right_get">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mul_distr_right_get.1" expl="1. assertion">
+ <goal name="WP_parameter mul_distr_right_get" expl="VC for mul_distr_right_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mul_distr_right_get.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="317"/></proof>
   </goal>
-  <goal name="WP_parameter mul_distr_right_get.2" expl="2. precondition">
+  <goal name="WP_parameter mul_distr_right_get.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.10" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter mul_distr_right_get.3" expl="3. postcondition">
+  <goal name="WP_parameter mul_distr_right_get.2" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="112"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mul_distr_right">
- <transf name="split_goal_wp">
-  <goal name="mul_distr_right.1" expl="1.">
+ <goal name="mul_distr_right" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_distr_right.0" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="295"/></proof>
   </goal>
-  <goal name="mul_distr_right.2" expl="2.">
+  <goal name="mul_distr_right.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mul_distr_left_get" expl="VC for mul_distr_left_get">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mul_distr_left_get.1" expl="1. assertion">
+ <goal name="WP_parameter mul_distr_left_get" expl="VC for mul_distr_left_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mul_distr_left_get.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.19" steps="329"/></proof>
   </goal>
-  <goal name="WP_parameter mul_distr_left_get.2" expl="2. precondition">
+  <goal name="WP_parameter mul_distr_left_get.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter mul_distr_left_get.3" expl="3. postcondition">
+  <goal name="WP_parameter mul_distr_left_get.2" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="45"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mul_distr_left">
- <transf name="split_goal_wp">
-  <goal name="mul_distr_left.1" expl="1.">
+ <goal name="mul_distr_left" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_distr_left.0" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="289"/></proof>
   </goal>
-  <goal name="mul_distr_left.2" expl="2.">
+  <goal name="mul_distr_left.1" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mul_zero_right">
+ <goal name="mul_zero_right" proved="true">
  <proof prover="2"><result status="valid" time="0.15" steps="315"/></proof>
  </goal>
- <goal name="mul_zero_left">
+ <goal name="mul_zero_left" proved="true">
  <proof prover="2"><result status="valid" time="0.16" steps="315"/></proof>
  </goal>
- <goal name="mul_opp">
- <transf name="split_goal_wp">
-  <goal name="mul_opp.1" expl="1.">
+ <goal name="mul_opp" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_opp.0" proved="true">
   <proof prover="2"><result status="valid" time="0.20" steps="502"/></proof>
   </goal>
-  <goal name="mul_opp.2" expl="2.">
+  <goal name="mul_opp.1" proved="true">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="mul_opp.3" expl="3.">
+  <goal name="mul_opp.2" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="mul_opp.4" expl="4.">
+  <goal name="mul_opp.3" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="BlockMul">
- <goal name="WP_parameter block_mul_ij" expl="VC for block_mul_ij">
+<theory name="BlockMul" proved="true">
+ <goal name="WP_parameter block_mul_ij" expl="VC for block_mul_ij" proved="true">
  <proof prover="2"><result status="valid" time="0.47" steps="452"/></proof>
  </goal>
- <goal name="WP_parameter mul_split" expl="VC for mul_split">
- <proof prover="2"><result status="valid" time="0.29" steps="363"/></proof>
+ <goal name="WP_parameter mul_split" expl="VC for mul_split" proved="true">
+ <proof prover="2"><result status="valid" time="0.14" steps="363"/></proof>
  </goal>
- <goal name="WP_parameter mul_block_cell" expl="VC for mul_block_cell">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mul_block_cell.1" expl="1. precondition">
+ <goal name="WP_parameter mul_block_cell" expl="VC for mul_block_cell" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mul_block_cell.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter mul_block_cell.2" expl="2. postcondition">
+  <goal name="WP_parameter mul_block_cell.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.12" steps="136"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mul_block">
- <transf name="split_goal_wp">
-  <goal name="mul_block.1" expl="1.">
+ <goal name="mul_block" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_block.0" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="108"/></proof>
   </goal>
-  <goal name="mul_block.2" expl="2.">
+  <goal name="mul_block.1" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
  </transf>

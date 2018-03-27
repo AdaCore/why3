@@ -64,7 +64,7 @@ type command =
   | Transform    of string * Trans.gentrans * string list
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
-  | Edit         of Whyconf.config_prover
+  | Edit         of Whyconf.prover
   | Bisect
   | Replay       of bool
   | Clean

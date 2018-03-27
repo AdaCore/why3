@@ -49,7 +49,8 @@ type info = {
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
   mutable list_projs: Stdlib.Sstr.t;
-  meta_model_projection: Sls.t
+  meta_model_projection: Sls.t;
+  info_cntexample: bool
   }
 
 let ident_printer () =
@@ -389,10 +390,10 @@ let print_logic_decl info fmt (ls,ld) =
   if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
     then () else (print_logic_decl info fmt ls ld; forget_tvs info)
 
-let print_info_model cntexample info =
+let print_info_model info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if not (S.is_empty info_model) && cntexample then
+  if not (S.is_empty info_model) && info.info_cntexample then
     begin
       let model_map =
 	S.fold (fun f acc ->
@@ -410,7 +411,7 @@ let print_info_model cntexample info =
   else
     Stdlib.Mstr.empty
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -420,20 +421,21 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f =
       | None -> ()
       | Some loc -> fprintf fmt " @[(* %a *)@]@\n"
             Loc.gen_report_position loc);
-      let model_list = print_info_model cntexample info in
+      let model_list = print_info_model info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
-                                list_projections = info.list_projs;};
+                                list_projections = info.list_projs;
+                                list_records = Stdlib.Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma| Pskip -> assert false
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc cntexample args info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc args info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc args info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -445,7 +447,7 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc cntexample args info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc args info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -485,6 +487,7 @@ let print_task args ?old:_ fmt task =
     info_in_goal = false;
     list_projs = Stdlib.Sstr.empty;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
+    info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
@@ -493,7 +496,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample args info fmt d
+            begin try print_decl vc_loc args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

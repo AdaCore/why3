@@ -13,14 +13,6 @@ open Stdlib
 
 type variable = string
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-
 type array =
   | Const of term
   | Store of array * term * term
@@ -29,7 +21,8 @@ and term =
   | Integer of string
   | Decimal of (string * string)
   | Fraction of (string * string)
-  | Float of float_type
+  | Float of Model_parser.float_type
+  | Apply of (string * term list)
   | Other of string
   | Array of array
   | Bitvector of string
@@ -38,8 +31,7 @@ and term =
   | Function_Local_Variable of variable
   | Variable of variable
   | Ite of term * term * term * term
-  | Record of int * (term list)
-  | Discr of int * (term list)
+  | Record of string * ((string * term) list)
   | To_array of term
 
 type definition =
@@ -54,12 +46,13 @@ type correspondence_table = (bool * definition) Mstr.t
 
 let print_float fmt f =
   match f with
-  | Plus_infinity -> Format.fprintf fmt "Plus_infinity"
-  | Minus_infinity -> Format.fprintf fmt "Minus_infinity"
-  | Plus_zero -> Format.fprintf fmt "Plus_zero"
-  | Minus_zero -> Format.fprintf fmt "Minus_zero"
-  | Not_a_number -> Format.fprintf fmt "NaN"
-  | Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
+  | Model_parser.Plus_infinity -> Format.fprintf fmt "Plus_infinity"
+  | Model_parser.Minus_infinity -> Format.fprintf fmt "Minus_infinity"
+  | Model_parser.Plus_zero -> Format.fprintf fmt "Plus_zero"
+  | Model_parser.Minus_zero -> Format.fprintf fmt "Minus_zero"
+  | Model_parser.Not_a_number -> Format.fprintf fmt "NaN"
+  | Model_parser.Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
+  | Model_parser.Float_hexa(s,f) -> Format.fprintf fmt "%s (%g)" s f
 
 let rec print_array fmt a =
   match a with
@@ -75,6 +68,10 @@ and print_term fmt t =
   | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
   | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
   | Float f -> Format.fprintf fmt "Float: %a" print_float f
+  | Apply (s, lt) ->
+      Format.fprintf fmt "Apply: (%s, %a)" s
+        (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma print_term)
+        lt
   | Other s -> Format.fprintf fmt "Other: %s" s
   | Array a -> Format.fprintf fmt "Array: %a" print_array a
   | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv
@@ -83,10 +80,11 @@ and print_term fmt t =
   | Function_Local_Variable v -> Format.fprintf fmt "LOCAL: %s" v
   | Variable v -> Format.fprintf fmt "VAR: %s" v
   | Ite _ -> Format.fprintf fmt "ITE"
-  | Record (n, l) -> Format.fprintf fmt "record_type: %d; list_fields: %a" n
-        (fun fmt -> Pp.print_list (fun fmt () -> Format.fprintf fmt " ") print_term fmt) l
-  | Discr (n, l) -> Format.fprintf fmt "record_type: %d; list_fields: %a" n
-        (fun fmt -> Pp.print_list (fun fmt () -> Format.fprintf fmt " ") print_term fmt) l
+  | Record (n, l) ->
+      Format.fprintf fmt "record_type: %s; list_fields: %a" n
+        (Pp.print_list Pp.semi
+           (fun fmt (x, a) -> Format.fprintf fmt "(%s, %a)" x print_term a))
+        l
   | To_array t -> Format.fprintf fmt "TO_array: %a@." print_term t
 
 let print_def fmt d =
@@ -115,8 +113,8 @@ let rec make_local_array vars_lists a =
     Store (a', t1', t2')
 
 (* For a definition of function f, local variables being in vars_lists and the
-   returned term being t, this function changes the term give an appropriate tag
-   to variables that are actually local. *)
+   returned term being t, this function changes the term to give an appropriate
+   tag to variables that are actually local. *)
 and make_local vars_lists t =
   match t with
   | Variable s ->
@@ -145,38 +143,16 @@ and make_local vars_lists t =
     let t3 = make_local vars_lists t3 in
     let t4 = make_local vars_lists t4 in
     Ite (t1, t2, t3, t4)
+  | Apply (s, lt) ->
+    let lt = List.map (make_local vars_lists) lt in
+    Apply (s, lt)
   | Integer _ | Decimal _ | Fraction _ | Float _ | Other _ -> t
   | Bitvector _ -> t
   | Cvc4_Variable _ -> raise Bad_local_variable
   | Boolean _ -> t
   | Function_Local_Variable _ -> raise Bad_local_variable
-  | Record (n, l) -> Record (n, List.map (fun x -> make_local vars_lists x) l)
-  | Discr (n, l) -> Discr (n, List.map (fun x -> make_local vars_lists x) l)
+  | Record (n, l) -> Record (n, List.map (fun (f, x) -> f, make_local vars_lists x) l)
   | To_array t -> To_array (make_local vars_lists t)
-
-
-let build_record_discr lgen =
-
-  let rec build_records_with_discrs acc (l: term list) =
-    match l,acc with
-    | Record (n, t) :: tl, None ->
-        build_records_with_discrs (Some (Record (n, t))) tl
-    | Record (_n, _t) :: _tl, Some (Record (_n', _t')) ->
-        assert (false)
-    | Record (n, t) :: _tl, Some (Discr (n', t')) ->
-        Record (n, (Discr (n', t')) :: t)
-    | Discr (n, t) :: tl, None ->
-        build_records_with_discrs (Some (Discr (n, t))) tl
-    | Discr (n, t) :: _tl, Some (Record (n', t')) ->
-        Record (n', (Discr (n, t) :: t'))
-    | Discr (_n, _t) :: _tl, Some (Discr (_n', _t')) ->
-        assert (false)
-    | _a :: tl, _ -> build_records_with_discrs acc tl
-    | [], Some b -> b
-    | [], None -> List.hd lgen
-  in
-
-  build_records_with_discrs None lgen
 
 let rec subst var value t =
   match t with
@@ -194,10 +170,10 @@ let rec subst var value t =
     let t4 = subst var value t4 in
     Ite (t1, t2, t3, t4)
  | Record (n, l) ->
-     Record (n, List.map (fun t -> subst var value t) l)
- | Discr (n, l) ->
-     Discr (n, List.map (fun t -> subst var value t) l)
+     Record (n, List.map (fun (f, t) -> f, subst var value t) l)
  | To_array t -> To_array (subst var value t)
+ | Apply (s, lt) ->
+     Apply (s, List.map (subst var value) lt)
 
 
 and subst_array var value a =

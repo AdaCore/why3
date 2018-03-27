@@ -129,6 +129,9 @@ type info = {
   info_printer : ident_printer;
   mutable list_projs : Stdlib.Sstr.t;
   meta_model_projection : Sls.t;
+  mutable list_records : ((string * string) list) Stdlib.Mstr.t;
+  info_cntexample_need_push : bool;
+  info_cntexample: bool
 }
 
 let debug_print_term message t =
@@ -147,7 +150,7 @@ let print_ident info fmt id =
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
   | Tyapp (ts, l) ->
-     begin match query_syntax info.info_syn ts.ts_name, l with
+      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
       | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
       | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
@@ -470,10 +473,10 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model cntexample fmt info =
+let print_info_model fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if not (S.is_empty info_model) && cntexample then
+  if not (S.is_empty info_model) && info.info_cntexample then
     begin
       fprintf fmt "@[(get-model ";
       let model_map =
@@ -493,7 +496,7 @@ let print_info_model cntexample fmt info =
   else
     Stdlib.Mstr.empty
 
-let print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f = match k with
+let print_prop_decl vc_loc args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -508,40 +511,65 @@ let print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      if cntexample && z3_ce then fprintf fmt "@[(push)@]@\n";
+      if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
       fprintf fmt "@[(check-sat)@]@\n";
-      let model_list = print_info_model cntexample fmt info in
+      let model_list = print_info_model fmt info in
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
-                                list_projections = info.list_projs;}
+                                list_projections = info.list_projs;
+                                Printer.list_records = info.list_records}
   | Plemma| Pskip -> assert false
 
 
 let print_constructor_decl info fmt (ls,args) =
-  match args with
-  | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name
-  | _ ->
-     fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
-     let _ =
-       List.fold_left2
-         (fun i ty pr ->
-          begin match pr with
-          | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
-          | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
-          end;
-          fprintf fmt " %a)" (print_type info) ty;
-          succ i) 1 ls.ls_args args
-     in
-     fprintf fmt ")@]"
+  let field_names =
+    (match args with
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
+    | _ ->
+        fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
+        let field_names, _ =
+          List.fold_left2
+          (fun (acc, i) ty pr ->
+            let field_name =
+              match pr with
+              | Some pr ->
+                  let field_name = sprintf "%a" (print_ident info) pr.ls_name in
+                  fprintf fmt "(%s" field_name;
+                  let trace_name =
+                    try
+                      let lab = Slab.choose (Slab.filter (fun x ->
+                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
+                      Strings.remove_prefix "model_trace:" lab.lab_string
+                    with
+                      Not_found -> ""
+                  in
+                  (field_name, trace_name)
+              | None ->
+                  let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
+                  fprintf fmt "(%s" field_name;
+                  (field_name, "")
+            in
+            fprintf fmt " %a)" (print_type info) ty;
+            (field_name :: acc, succ i)) ([], 1) ls.ls_args args
+        in
+        fprintf fmt ")@]";
+        List.rev field_names)
+  in
+
+  if Strings.has_prefix "mk " ls.ls_name.id_string then
+    begin
+      info.list_records <- Stdlib.Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+    end
 
 let print_data_decl info fmt (ts,cl) =
   fprintf fmt "@[(%a@ %a)@]"
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample z3_ce args info fmt d = match d.d_node with
+let print_decl vc_loc args info fmt d =
+  match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
@@ -557,16 +585,22 @@ let print_decl vc_loc cntexample z3_ce args info fmt d = match d.d_node with
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f
+      print_prop_decl vc_loc args info fmt k pr f
 
-let set_produce_models fmt cntexample =
-  if cntexample then
+let set_produce_models fmt info =
+  if info.info_cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
+
+let meta_counterexmp_need_push =
+  Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
+                            ~desc:"Internal@ use@ only"
 
 let print_task args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
-  (* Specific case for z3 prover because printing is not the same *)
-  let z3_ce = cntexample && Prepare_for_counterexmp.get_ce_prover task = "z3_ce" in
+  let need_push =
+    let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
+    not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
+  in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
@@ -579,16 +613,20 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     list_projs = Stdlib.Sstr.empty;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
-  } in
+    list_records = Stdlib.Mstr.empty;
+    info_cntexample_need_push = need_push;
+    info_cntexample = cntexample;
+    }
+  in
   print_prelude fmt args.prelude;
-  set_produce_models fmt cntexample;
+  set_produce_models fmt info;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
     | Some t ->
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample z3_ce args info fmt d
+            begin try print_decl vc_loc args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

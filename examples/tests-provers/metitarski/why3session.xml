@@ -2,49 +2,57 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../metitarski.why">
-<theory name="P">
- <goal name="x_mul_x_pos" expl="">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
+<theory name="P" proved="true">
+ <goal name="x_mul_x_pos" proved="true">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="sqr_pos" expl="">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <goal name="sqr_pos" proved="true">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="P2">
- <goal name="sqr_pos" expl="">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+<theory name="P2" proved="true">
+ <goal name="sqr_pos" proved="true">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="P3">
- <goal name="cos_bound" expl="">
- <proof prover="1"><result status="timeout" time="5.20"/></proof>
+ <goal name="cos_bound" proved="true">
+ <proof prover="1" timelimit="1"><result status="timeout" time="0.69"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="72"/></proof>
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="cos_bound_harder" expl="">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.12"/></proof>
+ <goal name="cos_bound_harder" proved="true">
+ <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="MethodErrorOK" expl="">
- <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
+ <goal name="MethodErrorOK" proved="true">
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="MethodErrorWrong" expl="">
- <proof prover="1"><result status="timeout" time="4.42"/></proof>
+ <goal name="MethodErrorWrong">
+ <proof prover="1" memlimit="4000"><result status="timeout" time="4.42"/></proof>
  </goal>
 </theory>
 <theory name="Power">
- <goal name="G" expl="">
- <proof prover="1"><result status="unknown" time="0.16"/></proof>
+ <goal name="G">
+ <proof prover="1" memlimit="4000"><result status="unknown" time="0.16"/></proof>
  </goal>
- <goal name="G1" expl="">
- <proof prover="1"><result status="unknown" time="0.15"/></proof>
+ <goal name="G1">
+ <proof prover="0"><result status="unknown" time="1.26"/></proof>
+ <proof prover="1" memlimit="4000"><result status="unknown" time="0.15"/></proof>
+ <proof prover="2"><result status="unknown" time="0.02"/></proof>
+ <proof prover="3"><result status="unknown" time="1.01"/></proof>
  </goal>
- <goal name="G2" expl="">
- <proof prover="1"><result status="unknown" time="0.10"/></proof>
+ <goal name="G2">
+ <proof prover="1" memlimit="4000"><result status="unknown" time="0.10"/></proof>
  </goal>
 </theory>
 <theory name="PolyPaverExamples">
- <goal name="g1" expl="">
- <proof prover="1"><result status="unknown" time="0.24"/></proof>
+ <goal name="g1">
+ <proof prover="1" memlimit="4000"><result status="unknown" time="0.24"/></proof>
  </goal>
 </theory>
 </file>

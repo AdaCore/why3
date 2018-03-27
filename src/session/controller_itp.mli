@@ -197,6 +197,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
+  ?save_to:string ->
   counterexmp:bool ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
@@ -206,7 +207,10 @@ val schedule_proof_attempt :
    time limit [timelimit]; the function [callback] will be called each
    time the proof attempt status changes. Typically at Scheduled, then
    Running, then Done. If there is already a proof attempt with [p] it
-   is updated. *)
+   is updated.
+   [save_to] is used to give a location for the file generated for the prover
+   ( *.smt2). With debug flag keep_vcs, the file are saved at this location.
+*)
 
 val schedule_edition :
   controller ->
@@ -223,13 +227,12 @@ val schedule_edition :
 
 val prepare_edition :
   controller -> ?file:string -> proofNodeID -> Whyconf.prover ->
-(*
-  callback:(proofAttemptID -> proof_attempt_status -> unit) ->
- *)
-  notification:notifier -> proofAttemptID * string
-(** [prepare_edition c id pr filename] prepare for editing the proof
-    of node [id] with prover [pr], using the file name given. The
-    editor is not launched. *)
+  notification:notifier -> proofAttemptID * string * Call_provers.prover_result option
+(** [prepare_edition c ?file id pr] prepare for editing the proof of
+    node [id] with prover [pr]. The editor is not launched. The result
+    is [(pid,name,res)] where [pid] is the node id the proof_attempt,
+    [name] is the name of the file to edit, made relative to the
+    session directory, and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
 
