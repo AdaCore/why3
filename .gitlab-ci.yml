@@ -1,51 +1,18 @@
 stages:
-- init
-- build
-- test
-- deploy
-
-variables:
-  DEPLOY_TAG: registry.gitlab.inria.fr/why3/why3:latest
-
-init:
-  stage: init
-  script:
-    - docker build -t bench-image -f misc/Dockerfile.init .
-
-.init_template: &init_definition
-  stage: init
-  script:
-    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
-
-init-4.03.0:
-  variables:
-    COMPILER: 4.03.0
-  <<: *init_definition
-
-init-4.04.0:
-  variables:
-    COMPILER: 4.04.0
-  <<: *init_definition
-
-init-4.05.0:
-  variables:
-    COMPILER: 4.05.0
-  <<: *init_definition
-
-init-4.06.0:
-  variables:
-    COMPILER: 4.06.0
-  <<: *init_definition
-
-build:
-  stage: build
-  script:
-    - docker run -t --rm bench-image misc/build.sh
+  - build
+  - test
+  - deploy
 
 .build_template: &build_definition
   stage: build
   script:
-    - docker run -t --rm bench-image-$COMPILER misc/build.sh
+    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
+    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh
+
+build:
+  variables:
+    COMPILER: system
+  <<: *build_definition
 
 build-4.03.0:
   variables:
@@ -69,13 +36,17 @@ build-4.06.0:
 
 bench:
   stage: test
+  variables:
+    COMPILER: system
   script:
-    - docker run -t --rm bench-image misc/ci-bench.sh
+    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
+    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
 
 .bench_template: &bench_definition
   stage: test
   script:
-    - docker run -t --rm bench-image-$COMPILER misc/ci-bench.sh
+    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
+    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
   only:
     - tags
     - schedules
@@ -103,9 +74,9 @@ bench-4.06.0:
 deploy:
   stage: deploy
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.inria.fr
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build -t deploy-image -f misc/Dockerfile.deploy .
-    - docker tag deploy-image $DEPLOY_TAG
-    - docker push $DEPLOY_TAG
+    - docker tag deploy-image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   only:
     - master

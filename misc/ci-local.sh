@@ -25,8 +25,12 @@ automake --add-missing 2> /dev/null || true
 # compilation
 make -j2
 
+if test "$1" = bench; then
+
 # detection of provers
 bin/why3config --detect-provers
 
 # run the bench
 make bench
+
+fi
