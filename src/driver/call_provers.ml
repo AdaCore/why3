@@ -16,6 +16,8 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
+
 type reason_unknown =
   | Resourceout
   | Other
@@ -343,15 +345,15 @@ let handle_answer answer =
       let id = answer.Prove_client.id in
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
-      if Debug.test_noflag debug then begin
-	Sys.remove save.vc_file;
-	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
+      if Debug.test_noflag debug && Debug.test_noflag keep_vcs then begin
+        Sys.remove save.vc_file;
+        if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let out = read_and_delete_file answer.Prove_client.out_file in
       let ret = answer.Prove_client.exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-	  answer.Prove_client.time out ret save.limit ~printer_mapping in
+          answer.Prove_client.time out ret save.limit ~printer_mapping in
       id, Some ans
   | Prove_client.Started id ->
       id, None
@@ -447,7 +449,7 @@ let rec wait_on_call = function
   | ServerCall id as pc ->
       begin match query_result_buffer id with
         | ProverFinished r -> r
-	| _ ->
+        | _ ->
             fetch_new_results ~blocking:true;
             wait_on_call pc
       end
@@ -456,14 +458,18 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ?(inplace=false) buffer =
+                   ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
-    if inplace then begin
-      let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
-      Sys.rename filename (backup_file filename);
-      filename, open_out filename
-    end else
-      Filename.open_temp_file "why_" ("_" ^ filename) in
+    if gen_new_file then
+      Filename.open_temp_file "why_" ("_" ^ filename)
+    else
+      begin
+        let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
+        if inplace then
+          Sys.rename filename (backup_file filename);
+        filename, open_out filename
+      end
+  in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
 

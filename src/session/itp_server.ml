@@ -1055,7 +1055,7 @@ end
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover ~counterexmp
+    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover ~counterexmp
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 

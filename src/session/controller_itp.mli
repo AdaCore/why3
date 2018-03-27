@@ -197,6 +197,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
+  ?save_to:string ->
   counterexmp:bool ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
@@ -206,7 +207,10 @@ val schedule_proof_attempt :
    time limit [timelimit]; the function [callback] will be called each
    time the proof attempt status changes. Typically at Scheduled, then
    Running, then Done. If there is already a proof attempt with [p] it
-   is updated. *)
+   is updated.
+   [save_to] is used to give a location for the file generated for the prover
+   ( *.smt2). With debug flag keep_vcs, the file are saved at this location.
+*)
 
 val schedule_edition :
   controller ->
