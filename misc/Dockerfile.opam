@@ -1,0 +1,6 @@
+FROM bench-image
+
+RUN autoconf && \
+    (automake --add-missing 2> /dev/null || true)
+
+RUN opam pin -v -y add why3 .

@@ -71,6 +71,13 @@ bench-4.06.0:
     COMPILER: 4.06.0
   <<: *bench_definition
 
+opam:
+  stage: build
+  script:
+    - docker build -t bench-image -f misc/Dockerfile.init .
+    - docker build -t opam-image -f misc/Dockerfile.opam .
+    - docker run -t --rm opam-image opam pin -v -y add why3-ide .
+
 deploy:
   stage: deploy
   script:

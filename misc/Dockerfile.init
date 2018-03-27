@@ -12,7 +12,7 @@ WORKDIR /home/why3
 
 ARG compiler=system
 RUN opam init -a -y -j2 --compiler=$compiler
-RUN opam install -y menhir lablgtk ocamlgraph zarith camlzip
+RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip
 
 # Alt-Ergo
 RUN opam install alt-ergo.1.30
