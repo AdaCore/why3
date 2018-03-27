@@ -124,7 +124,7 @@ let print_prover_stats fmt stat =
   Format.fprintf fmt "{ %a, %a, %a }"
    (print_json_field "count" int) stat.count
    (print_json_field "max_steps" int) stat.max_steps
-   (print_json_field "max_time" float) stat.max_time
+   (print_json_field "max_time" standard_float) stat.max_time
 
 let print_stats fmt stats =
   match stats with
@@ -161,7 +161,7 @@ let print_timing_entry fmt t =
     let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
     let get_name s = s in
     Format.fprintf fmt ", ";
-    print_json_field "timings" (map_bindings get_name float) fmt l
+    print_json_field "timings" (map_bindings get_name standard_float) fmt l
   else ()
 
 let print_messages () =

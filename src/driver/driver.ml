@@ -381,10 +381,14 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
 let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  let gen_new_file, filename =
-    file_name_of_task ?old ?inplace ?interactive drv task in
   let old_channel = Opt.map open_in old in
-  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
+  let gen_new_file, filename = file_name_of_task ?old ?inplace drv task in
+  let printer_mapping =
+    if Opt.get_def false inplace then
+      print_task_prepared ?old:old_channel drv fmt task
+    else
+      print_task_prepared drv fmt task
+  in
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =

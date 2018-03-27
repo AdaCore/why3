@@ -37,7 +37,7 @@ type float_type =
   | Float_hexa of string * float
 
 
-                               let interp_float b eb sb =
+let interp_float b eb sb =
     try
       let is_neg = match b with
         | "#b0" -> false

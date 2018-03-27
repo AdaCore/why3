@@ -601,8 +601,9 @@ clean::
 # GNATWhy3
 ########
 
-GNAT_FILES := gnat_util gnat_loc gnat_expl gnat_config gnat_scheduler \
-	      gnat_manual gnat_report gnat_objectives gnat_main gnat_server
+GNAT_FILES := gnat_counterexamples gnat_util gnat_loc gnat_expl gnat_config \
+	      gnat_scheduler gnat_manual gnat_report gnat_objectives gnat_main \
+	      gnat_server
 
 GNATMODULES := $(addprefix src/gnat/, $(GNAT_FILES))
 

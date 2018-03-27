@@ -618,6 +618,13 @@ let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
 let debug = !opt_debug
 let debug_save_vcs = !opt_debug_save_vcs
+
+let debug_keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
+
+let _ =
+  if debug_save_vcs || debug then
+    Debug.set_flag debug_keep_vcs
+
 let force = !opt_force
 let limit_line = !opt_limit_line
 

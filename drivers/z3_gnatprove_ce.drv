@@ -45,6 +45,11 @@ outofmemory "(error \".*out of memory\")\\|Cannot allocate memory\\|Maximal allo
 timeout "interrupted by timeout"
 steps ":rlimit-count *\\([0-9]+\\)" 1
 
+(** Z3 needs "(push)" to provide models *)
+theory BuiltIn
+  meta "counterexample_need_smtlib_push" ""
+end
+
 (** Extra theories supported by Z3 *)
 
 (* float literals  *)
