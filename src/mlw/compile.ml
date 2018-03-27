@@ -246,8 +246,10 @@ module Translate = struct
           let pvl = List.fold_left2 mk_pv_of_mask [] pvl m in
           List.rev pvl in
     match e.e_node with
-    | Econst _ | Evar _ | Eexec ({c_node = Cfun _}, _) (* FIXME *)
-      when mask = MaskGhost ->
+    | Econst _ | Evar _ when mask = MaskGhost ->
+        ML.e_unit
+    | Eexec ({c_node = Cfun _; c_cty = {cty_args}}, _)
+      when cty_args <> [] && mask = MaskGhost ->
         ML.e_unit
     | Econst c ->
         Debug.dprintf debug_compile "compiling constant@.";
@@ -351,6 +353,7 @@ module Translate = struct
           | _ -> ML.e_app rs pvl (ML.I e.e_ity) mask eff lbl end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
+        Debug.dprintf debug_compile "compiling abstract block@.";
         expr info svar e.e_mask e
     | Eexec ({c_node = Cfun ef; c_cty = cty}, _) ->
         let ef = expr info svar e.e_mask ef in
@@ -375,6 +378,7 @@ module Translate = struct
         let e3 = expr info svar mask e3 in
         ML.e_if e1 ML.e_unit e3 mask eff lbl
     | Eif (e1, e2, e3) ->
+        Debug.dprintf debug_compile "compiling if block@.";
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
         let e3 = expr info svar mask e3 in
@@ -499,6 +503,7 @@ module Translate = struct
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         [ML.Dlet (ML.Lany (rs, res, []))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
+        Debug.dprintf debug_compile "compiling function %a@." Expr.print_rs rs;
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let svar =
