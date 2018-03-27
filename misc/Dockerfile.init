@@ -9,7 +9,9 @@ RUN sudo adduser --disabled-password --gecos '' why3
 USER why3
 ENV HOME /home/why3
 WORKDIR /home/why3
-RUN opam init -a -y -j2
+
+ARG compiler=system
+RUN opam init -a -y -j2 --compiler=$compiler
 RUN opam install -y menhir lablgtk ocamlgraph zarith camlzip
 
 # Alt-Ergo

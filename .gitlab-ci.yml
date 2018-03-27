@@ -1,6 +1,7 @@
 stages:
 - init
-- bench
+- build
+- test
 - deploy
 
 variables:
@@ -11,10 +12,93 @@ init:
   script:
     - docker build -t bench-image -f misc/Dockerfile.init .
 
-bench:
-  stage: bench
+.init_template: &init_definition
+  stage: init
   script:
-    - docker run -t bench-image misc/ci-bench.sh
+    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
+
+init-4.03.0:
+  variables:
+    COMPILER: 4.03.0
+  <<: *init_definition
+
+init-4.04.0:
+  variables:
+    COMPILER: 4.04.0
+  <<: *init_definition
+
+init-4.05.0:
+  variables:
+    COMPILER: 4.05.0
+  <<: *init_definition
+
+init-4.06.0:
+  variables:
+    COMPILER: 4.06.0
+  <<: *init_definition
+
+build:
+  stage: build
+  script:
+    - docker run -t --rm bench-image misc/build.sh
+
+.build_template: &build_definition
+  stage: build
+  script:
+    - docker run -t --rm bench-image-$COMPILER misc/build.sh
+
+build-4.03.0:
+  variables:
+    COMPILER: 4.03.0
+  <<: *build_definition
+
+build-4.04.0:
+  variables:
+    COMPILER: 4.04.0
+  <<: *build_definition
+
+build-4.05.0:
+  variables:
+    COMPILER: 4.05.0
+  <<: *build_definition
+
+build-4.06.0:
+  variables:
+    COMPILER: 4.06.0
+  <<: *build_definition
+
+bench:
+  stage: test
+  script:
+    - docker run -t --rm bench-image misc/ci-bench.sh
+
+.bench_template: &bench_definition
+  stage: test
+  script:
+    - docker run -t --rm bench-image-$COMPILER misc/ci-bench.sh
+  only:
+    - tags
+    - schedules
+
+bench-4.03.0:
+  variables:
+    COMPILER: 4.03.0
+  <<: *bench_definition
+
+bench-4.04.0:
+  variables:
+    COMPILER: 4.04.0
+  <<: *bench_definition
+
+bench-4.05.0:
+  variables:
+    COMPILER: 4.05.0
+  <<: *bench_definition
+
+bench-4.06.0:
+  variables:
+    COMPILER: 4.06.0
+  <<: *bench_definition
 
 deploy:
   stage: deploy
