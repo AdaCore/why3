@@ -361,6 +361,7 @@ let sendRequest r =
 module Panel =
   struct
     let main_panel = getElement AsHtml.div "why3-main-panel"
+    let task_list_container = getElement AsHtml.div "why3-task-list-container"
     let tab_container = getElement AsHtml.div "why3-tab-container"
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
     let reset () =
@@ -380,7 +381,7 @@ module Panel =
 			   (e ##. clientX) - (main_panel ##. offsetLeft)
 			 in
 			 let offset = Js.string ((string_of_int offset) ^ "px") in
-			 let edit_style = tab_container ##. style in
+			 let edit_style = task_list_container ##. style in
 			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
 			     JSU.(set edit_style (Js.string "flexBasis") offset);
 			     Js._false
