@@ -42,13 +42,6 @@ body {
     width:100%;
 }
 
-#why3-main-panel {
-    width:100%;
-    padding:0;
-    margin:0;
-    flex: 1;
-}
-
 .why3-hidden {
     z-index:-10;
     position:absolute;
@@ -104,50 +97,117 @@ body {
 /**** Main view ****/
 
 #why3-main-panel {
+    flex:1;
+    width:100%;
+    padding:0;
+    margin:0;
+    /*  align-items:stretch; */  /* ? */
+    /* elements in that panel are inserted from left to right */
     display:flex;
-    align-items:stretch;
     flex-direction:row;
 }
 
+/*
 #why3-main-panel > * {
     flex-grow: 1;
     width:auto;
     height:auto;
 }
+*/
+
 #why3-resize-bar {
-    flex-basis:3pt;
-    flex-grow:0;
+    flex-basis:10px;
+    flex-grow:0; /* not flex:0, because bar will become totally invisible */
 
 }
 
-#why3-main-panel #why3-resize-bar:hover {
-    cursor: ew-resize;
-    opacity:0.5;
+/* visual changes when mouse cursor is over the vertical resize bar */
+#why3-resize-bar:hover {
+    cursor: ew-resize;  /* mouse cursor becomes like 'leftrightarrow' */
+    opacity:0.5;        /* bar becomes darker */
+    border-style:solid;    /* ? */
+    border-width: 2pt;     /* ? */
+    box-sizing:border-box; /* ? */
+}
+
+/*** LEFT PART: task list ***/
+
+#why3-task-list-container {
+    overflow:visible; /* add a scrollbar if too high to fit in the window */
+    flex:1; /* proportion of horizontal space taken in the main panel */
+    /* position:relative; /* ? */
+    margin:0; /* ? */
+    padding:0; /* ? */ */
+}
+
+#why3-task-list {
+    overflow:visible; /* add a scrollbar if too high to fit in the window */
+    width:100%;
+    height:100%;
+}
+
+/*** RIGHT PART: panel with item added vertically ***/
+
+#why3-right-panel {
+    flex: 2;
+    width:100%;
+    padding:0;
+    margin:0;
+    /*  align-items:stretch; */  /* ? */
+    /* elements in that panel are inserted from top to bottom */
+    display:flex;
+    flex-direction:column;
+}
+
+
+
+#why3-tab-container {
+    flex:1;
+    position:relative;
+    margin:0;
+    padding:0;
+}
+
+#why3-resize-bar2 {
+    flex-basis:10px;
+    flex-grow:0; /* not flex:0 because bar would become totally invisible */
+
+}
+
+#why3-form-cont {
+    flex-grow:0;
+    position:relative;
+    margin:0;
+    padding:0;
+    width:100%;
+}
+
+
+#why3-tab-container2 {
+    flex:1;
+    position:relative;
+    margin:0;
+    padding:0;
+}
+
+
+/* visual changes when mouse cursor is over the horizaontal resize bar */
+#why3-resize-bar2:hover {
+    cursor: ns-resize;   /* mouse cursor becomes like 'updownarrow' */
+    opacity:0.5;         /* becomes darker */
     border-style:solid;
     border-width: 2pt;
     box-sizing:border-box;
 }
 
-/*** MAIN EDITOR ***/
 
-#why3-task-list-container {
-    flex-grow:1;
-    position:relative;
-    margin:0;
-    padding:0;
-}
-#why3-tab-container {
-    flex-grow:1;
-    position:relative;
-    margin:0;
-    padding:0;
-}
 #why3-task-viewer-container {
-    flex-grow:7;    /* suggested by Sylvain */
+    flex:1;
     position:relative;
     margin:0;
     padding:0;
 }
+
 #why3-editor {
     position:absolute;
     top:0;
@@ -207,25 +267,20 @@ body {
     width:100%;
     height:100%;
 }
-#why3-task-list {
-    overflow:auto;
-    width:100%;
-    height:100%;
-}
 #why3-editor {
-    overflow:auto;
+    overflow:visible;
     width:100%;
     height:100%;
 }
 #why3-error-container {
-    overflow:auto;
+    overflow:visible;
     width:100%;
     height:100%;
 }
 #why3-log-container {
-    overflow:auto;
-    width:100%;
-    height:100%;
+    overflow:visible;
+/*    width:100%; */
+/*    height:100%; */
 }
 
 /******* CONTEXT MENU *********/
@@ -272,7 +327,7 @@ body {
 }
 .why3-dialog {
     z-index:102;
-    flex-grow:0;
+    flex:0;
     box-shadow:0pt 0pt 5pt #333;
     padding: 1em;
 }
