@@ -106,13 +106,7 @@ body {
 #why3-main-panel {
     display:flex;
     align-items:stretch;
-}
-
-#why3-main-panel.why3-wide-view {
     flex-direction:row;
-}
-#why3-main-panel.why3-column-view {
-    flex-direction:column;
 }
 
 #why3-main-panel > * {
@@ -126,15 +120,12 @@ body {
 
 }
 
-#why3-main-panel.why3-wide-view #why3-resize-bar:hover {
+#why3-main-panel #why3-resize-bar:hover {
     cursor: ew-resize;
     opacity:0.5;
     border-style:solid;
     border-width: 2pt;
     box-sizing:border-box;
-}
-#why3-main-panel.why3-column-view #why3-resize-bar:hover {
-    cursor: ns-resize;
 }
 
 /*** MAIN EDITOR ***/
