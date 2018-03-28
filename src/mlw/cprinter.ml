@@ -682,7 +682,7 @@ module MLToC = struct
 	     | _ -> assert false
 	   end
        else
-	   let e =
+	   let e' =
              match
                (query_syntax info.syntax rs.rs_name,
                 query_syntax info.converter rs.rs_name) with
@@ -752,10 +752,13 @@ module MLToC = struct
 	   C.([],
               if env.computes_return_value
 	      then
-                if (ity_equal rs.rs_cty.cty_result Ity.ity_unit)
-                then Sseq(Sexpr e, Sreturn Enothing)
-                else Sreturn e
-              else Sexpr e)
+                begin match e.e_ity with
+                | I ity when ity_equal ity Ity.ity_unit ->
+                   Sseq(Sexpr e', Sreturn Enothing)
+                | I _ -> Sreturn e'
+                | _ -> assert false
+                end
+              else Sexpr e')
     | Elet (ld,e) ->
        begin match ld with
        | Lvar (pv,le) -> (* not a block *)
