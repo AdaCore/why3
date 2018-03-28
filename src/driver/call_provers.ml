@@ -454,7 +454,7 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ?(gen_new_file=false) ?(inplace=false) buffer =
+                   ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
       Filename.open_temp_file "why_" ("_" ^ filename)
