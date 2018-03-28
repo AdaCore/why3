@@ -6,9 +6,7 @@ stages:
 .build_template: &build_definition
   stage: build
   script:
-    - autoconf && (automake --add-missing 2> /dev/null || true)
-    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
-    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh
+    - misc/ci-docker.sh misc/ci-local.sh
 
 build:
   variables:
@@ -40,16 +38,12 @@ bench:
   variables:
     COMPILER: system
   script:
-    - autoconf && (automake --add-missing 2> /dev/null || true)
-    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
-    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench
 
 .bench_template: &bench_definition
   stage: test
   script:
-    - autoconf && (automake --add-missing 2> /dev/null || true)
-    - docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .
-    - docker run -t --rm bench-image-$COMPILER misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench
   only:
     - tags
     - schedules
@@ -76,11 +70,10 @@ bench-4.06.0:
 
 opam:
   stage: build
+  variables:
+    COMPILER: system
   script:
-    - autoconf && (automake --add-missing 2> /dev/null || true)
-    - docker build -t bench-image -f misc/Dockerfile.init .
-    - docker build -t opam-image -f misc/Dockerfile.opam .
-    - docker run -t --rm opam-image opam pin -v -y add why3-ide .
+    - misc/ci-docker.sh misc/ci-opam.sh
 
 deploy:
   stage: deploy
@@ -91,5 +84,6 @@ deploy:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker tag deploy-image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker image prune
   only:
     - master
