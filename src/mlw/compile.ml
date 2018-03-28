@@ -251,11 +251,14 @@ module Translate = struct
     | Eexec ({c_node = Cfun _; c_cty = {cty_args}}, _)
       when cty_args <> [] && mask = MaskGhost ->
         ML.e_unit
-    | Econst c ->
-        Debug.dprintf debug_compile "compiling constant@.";
+    | Eexec ({c_node = Capp (rs, _)}, _)
+      when isconstructor info rs && mask = MaskGhost ->
+        ML.e_unit
+    | Econst c -> Debug.dprintf debug_compile "compiling constant@.";
         let c = match c with Number.ConstInt c -> c | _ -> assert false in
         ML.mk_expr (ML.Econst c) (ML.I e.e_ity) mask eff lbl
     | Evar pv ->
+        Debug.dprintf debug_compile "compiling variable %a@." print_pv pv;
         ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) mask eff lbl
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
         expr info svar mask e2
@@ -338,15 +341,12 @@ module Translate = struct
       when isconstructor info rs && cty.cty_args <> [] ->
         (* partial application of constructors *)
         mk_eta_expansion rs pvl cty
-    | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
+    | Eexec ({c_node = Capp (rs, pvl)}, _) ->
         Debug.dprintf debug_compile "compiling total application of %s@."
           rs.rs_name.id_string;
         let add_unit = function [] -> [ML.e_unit] | args -> args in
-        let is_pvl_ghost = List.for_all (fun {pv_ghost} -> pv_ghost) pvl in
-        let f_zero =
-          if isconstructor info rs || pvl = [] || not is_pvl_ghost then
-            fun x -> x
-          else add_unit in
+        let id_f = fun x -> x in
+        let f_zero = match rs.rs_logic with RLnone -> add_unit | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
@@ -354,7 +354,7 @@ module Translate = struct
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
         Debug.dprintf debug_compile "compiling abstract block@.";
-        expr info svar e.e_mask e
+        expr info svar mask e
     | Eexec ({c_node = Cfun ef; c_cty = cty}, _) ->
         let ef = expr info svar e.e_mask ef in
         ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff lbl
@@ -384,10 +384,12 @@ module Translate = struct
         let e3 = expr info svar mask e3 in
         ML.e_if e1 e2 e3 mask eff lbl
     | Ewhile (e1, _, _, e2) ->
+        Debug.dprintf debug_compile "compiling while block@.";
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar e2.e_mask e2 in
         ML.e_while e1 e2 mask eff lbl
     | Efor (pv1, (pv2, dir, pv3), _, _, efor) ->
+        Debug.dprintf debug_compile "compiling for block@.";
         let dir = for_direction dir in
         let efor = expr info svar efor.e_mask efor in
         ML.e_for pv1 pv2 dir pv3 efor mask eff lbl
@@ -408,8 +410,8 @@ module Translate = struct
     | Ematch (e1, bl, xl) ->
         let e1 = expr info svar e1.e_mask e1 in
         let bl = List.map (ebranch info svar mask) bl in
-        (* NOTE: why no pv_list_of_mask here? *)
-        let mk_xl (xs, (pvl, e)) = xs, pvl, expr info svar mask e in
+        let mk_xl (xs, (pvl, e)) = let pvl = pv_list_of_mask pvl xs.xs_mask in
+          (xs, pvl, expr info svar mask e) in
         let xl = List.map mk_xl (Mxs.bindings xl) in
         ML.e_match e1 bl xl (ML.I e.e_ity) mask eff lbl
     | Eraise (xs, ex) -> let ex = match expr info svar xs.xs_mask ex with
@@ -487,12 +489,18 @@ module Translate = struct
     | PDlet (LDvar (_, e)) when e_ghost e ->
         []
     | PDlet (LDvar (pv, e)) when pv.pv_ghost ->
+        Debug.dprintf debug_compile "compiling top-level ghost symbol %a@."
+          print_pv pv;
         if eff_pure e.e_effect then []
-        else let unit_ = create_pvsymbol (id_fresh "()") ity_unit in
-          [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty e.e_mask e))]
+        else let unit_ = pv (* create_pvsymbol (id_fresh "_") ity_unit *) in
+          [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty MaskGhost e))]
     | PDlet (LDvar (pv, e)) ->
+        Debug.dprintf debug_compile "compiling top-level symbol %a@."
+          print_pv pv;
         [ML.Dlet (ML.Lvar (pv, expr info Stv.empty e.e_mask e))]
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
+        Debug.dprintf debug_compile "compiling top-level ghost function %a@."
+          Expr.print_rs rs;
         []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cany})) ->
         let args = params cty.cty_args in
@@ -502,6 +510,21 @@ module Translate = struct
       when is_val e.e_node -> (* zero argument functions *)
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         [ML.Dlet (ML.Lany (rs, res, []))]
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e; c_cty}))
+      when c_cty.cty_args = [] ->
+        Debug.dprintf debug_compile "compiling zero-arguments function %a@."
+          Expr.print_rs rs;
+        Debug.dprintf debug_compile "rs_cty_eff:%b@. c_cty_eff:%b@."
+          (cty_pure cty) (cty_pure c_cty);
+        Debug.dprintf debug_compile "e_eff:%b@." (eff_pure e.e_effect);
+        let args = params cty.cty_args in
+        let res = mlty_of_ity cty.cty_mask cty.cty_result in
+        let svar =
+          let args' = List.map (fun (_, ty, _) -> ty) args in
+          let svar  = List.fold_left add_tvar Stv.empty args' in
+          add_tvar svar res in
+        let e = expr info svar cty.cty_mask e in
+        [ML.Dlet (ML.Lsym (rs, res, args, e))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
         Debug.dprintf debug_compile "compiling function %a@." Expr.print_rs rs;
         let args = params cty.cty_args in
