@@ -149,7 +149,7 @@ val call_on_buffer :
   res_parser      : prover_result_parser ->
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
-  gen_new_file    : bool ->
+  ?gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
