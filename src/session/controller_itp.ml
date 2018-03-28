@@ -438,10 +438,10 @@ let timeout_handler () =
       let prover_update = Call_provers.query_call call in
       match prover_update with
       | Call_provers.NoUpdates -> Queue.add c q
-      | Call_provers.ProverFinished _res ->
+      | Call_provers.ProverFinished res ->
           (* res is meaningless for edition, we returned the old result *)
           (* inform the callback *)
-          callback (match ores with None -> Undone | Some r -> Done r)
+          callback (match ores with None -> Done res | Some r -> Done r)
       | _ -> assert (false) (* An edition can only return Noupdates or finished *)
     done;
     Queue.transfer q prover_tasks_edited;
@@ -911,6 +911,7 @@ let copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
 (***************** {2 replay} ****************)
 
 
+let debug_replay = Debug.register_flag "replay" ~desc:"Debug@ info@ for@ replay"
 
 let find_prover notification c goal_id pr =
   if Hprover.mem c.controller_provers pr then Some pr else
@@ -1026,10 +1027,13 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
     | Detached -> decr count
   in
 
-  let need_replay pa =
+  let need_replay id pa =
     filter pa &&
       (pa.proof_obsolete || not obsolete_only) &&
-        (not valid_only ||
+        (* When on a single proofattempt node, we want to always replay even non
+           valid proofattempts.
+        *)
+        (any = Some (APa id) || not valid_only ||
            match pa.Session_itp.proof_state with
            | None -> false
            | Some pr -> Call_provers.(pr.pr_answer = Valid))
@@ -1041,14 +1045,17 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
   (match any with
   | None ->
       Session_itp.session_iter_proof_attempt
-        (fun _ pa -> if need_replay pa then incr count) session
+        (fun paid pa -> if need_replay paid pa then incr count) session
   | Some nid ->
       Session_itp.any_iter_proof_attempt session
-        (fun _ pa -> if need_replay pa then incr count) nid);
+        (fun paid pa -> if need_replay paid pa then incr count) nid);
 
   (* Replaying function *)
   let replay_pa id pa =
-    if need_replay pa then
+    let is_need_replay = need_replay id pa in
+    Debug.dprintf debug_replay "Need_replay is set to %b for prover %a@."
+      is_need_replay Whyconf.print_prover pa.prover;
+    if is_need_replay then
       begin
         let parid = pa.parent in
         let pr = pa.prover in
