@@ -607,7 +607,8 @@ exception CannotReduce
 type value =
   | Vconstr of rsymbol * field list
   | Vtuple of value list
-  | Vint of BigInt.t
+  | Vbigint of BigInt.t
+  | Vint of int
   | Vbool of bool
   | Vvoid
   | Varray of value array
@@ -618,12 +619,31 @@ and field = Fimmutable of value | Fmutable of value ref
 
 exception Raised of xsymbol * value option * rsymbol list
 
+open Number
+
+let big_min_int = BigInt.of_int min_int
+let big_max_int = BigInt.of_int max_int
+
+let is_range_small_int ir =
+  BigInt.le big_min_int ir.ir_lower && BigInt.le ir.ir_upper big_max_int
+
+(* a value with a range type included in [min_int, max_int]
+   can be interpreted as an int *)
+let value_of_const ic ty =
+  let bc = Number.compute_int_constant ic in
+  match ty with
+  | Some { ty_node = Tyapp ({ ts_def = Range ir }, [])}
+       when is_range_small_int ir
+    -> Vint (BigInt.to_int bc)
+  | _ -> Vbigint bc
+
 open Format
 
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
-  | Vint i -> fprintf fmt "%a" Number.print_constant (Number.const_of_big_int i)
+  | Vbigint i -> fprintf fmt "%a" Number.print_constant (Number.const_of_big_int i)
+  | Vint i -> fprintf fmt "%d" i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
                         (Pp.print_list Pp.comma print_value) l
   | Vconstr (rs, lf) -> fprintf fmt "@[<hov 2>(%a@ %a)@]"
@@ -702,6 +722,23 @@ let builtin_progs = Hrs.create 17
 let eval_true _ _ = Vbool true
 let eval_false _ _ = Vbool false
 
+let eval_big_int_op op _ l =
+  match l with
+  | [Vbigint i1; Vbigint i2] ->
+     (try Vbigint (op i1 i2) with Division_by_zero -> raise CannotReduce)
+  | _ -> raise CannotReduce
+
+let eval_big_int_uop uop _ l =
+  match l with
+  | [Vbigint i] -> Vbigint (uop i)
+  | _ -> raise CannotReduce
+
+let eval_big_int_rel r _ l =
+  match l with
+  | [Vbigint i1; Vbigint i2] ->
+     Vbool (r i1 i2)
+  | _ -> raise CannotReduce
+
 let eval_int_op op _ l =
   match l with
   | [Vint i1; Vint i2] ->
@@ -719,58 +756,88 @@ let eval_int_rel r _ l =
      Vbool (r i1 i2)
   | _ -> raise CannotReduce
 
-let builtin_array_type _kn _its = ()
+let eval_of_big_int _ l =
+  match l with
+  | [Vbigint i] ->
+     begin try Vint (BigInt.to_int i)
+     with Failure _ -> raise CannotReduce end
+  | _ -> raise CannotReduce
+
+let exec_bigarray_make _ args =
+  match args with
+  | [Vbigint n;def] ->
+     begin
+       try
+         let n = BigInt.to_int n in
+         let v = Varray(Array.make n def) in
+         v
+       with _ -> raise CannotReduce
+     end
+  | _ ->
+     raise CannotReduce
+
+let exec_bigarray_copy _ args =
+  match args with
+  | [Varray a] -> Varray(Array.copy a)
+  | _ ->
+     raise CannotReduce
+
+let exec_bigarray_get _ args =
+  match args with
+  | [Varray a;Vbigint i] ->
+     begin
+       try
+         a.(BigInt.to_int i)
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_bigarray_length _ args =
+  match args with
+  | [Varray a] -> Vbigint (BigInt.of_int (Array.length a))
+  | _ -> raise CannotReduce
+
+let exec_bigarray_set _ args =
+  match args with
+  | [Varray a;Vbigint i;v] ->
+     begin
+       try
+         a.(BigInt.to_int i) <- v;
+         Vvoid
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
 
 let exec_array_make _ args =
   match args with
-    | [Vint n;def] ->
-      begin
-        try
-          let n = BigInt.to_int n in
-          let v = Varray(Array.make n def) in
-          v
-        with _ -> raise CannotReduce
-      end
-    | _ ->
-      raise CannotReduce
+  | [Vint n;def] -> Varray(Array.make n def)
+  | _ -> raise CannotReduce
 
 let exec_array_copy _ args =
   match args with
-    | [Varray a] -> Varray(Array.copy a)
-    | _ ->
-      raise CannotReduce
+  | [Varray a] -> Varray(Array.copy a)
+  | _ -> raise CannotReduce
 
 let exec_array_get _ args =
   match args with
-    | [Varray a;Vint i] ->
-      begin
-        try
-          a.(BigInt.to_int i)
-        with _ -> raise CannotReduce
-      end
-    | _ -> raise CannotReduce
+  | [Varray a;Vint i] -> a.(i)
+  | _ -> raise CannotReduce
 
 let exec_array_length _ args =
   match args with
-    | [Varray a] -> Vint (BigInt.of_int (Array.length a))
-    | _ -> raise CannotReduce
+  | [Varray a] -> Vint (Array.length a)
+  | _ -> raise CannotReduce
 
 let exec_array_set _ args =
   match args with
-    | [Varray a;Vint i;v] ->
-      begin
-        try
-          a.(BigInt.to_int i) <- v;
-          Vvoid
-        with _ -> raise CannotReduce
-      end
-    | _ -> raise CannotReduce
+  | [Varray a;Vint i;v] ->
+     a.(i) <- v;
+     Vvoid
+  | _ -> raise CannotReduce
 
-let builtin_matrix_type _kn _its = ()
-
-let exec_matrix_make _ args =
+let exec_bigmatrix_make _ args =
   match args with
-  | [Vint r; Vint c; def] ->
+  | [Vbigint r; Vbigint c; def] ->
      begin
        try
          let r = BigInt.to_int r in
@@ -780,9 +847,9 @@ let exec_matrix_make _ args =
      end
   | _ -> raise CannotReduce
 
-let exec_matrix_get _ args =
+let exec_bigmatrix_get _ args =
   match args with
-  | [Vmatrix m; Vint i; Vint j] ->
+  | [Vmatrix m; Vbigint i; Vbigint j] ->
      begin
        try
          m.(BigInt.to_int i).(BigInt.to_int j)
@@ -790,9 +857,9 @@ let exec_matrix_get _ args =
      end
   | _ -> raise CannotReduce
 
-let exec_matrix_set _ args =
+let exec_bigmatrix_set _ args =
   match args with
-  | [Vmatrix m; Vint i; Vint j; v] ->
+  | [Vmatrix m; Vbigint i; Vbigint j; v] ->
      begin
        try
          m.(BigInt.to_int i).(BigInt.to_int j) <- v;
@@ -801,19 +868,63 @@ let exec_matrix_set _ args =
      end
   | _ -> raise CannotReduce
 
+let exec_bigmatrix_rows _ args =
+  match args with
+  | [Vmatrix m] -> Vbigint (BigInt.of_int (Array.length m))
+  | _ -> raise CannotReduce
+
+(* FIXME fails if rows=0 *)
+let exec_bigmatrix_cols _ args =
+  match args with
+  | [Vmatrix m] ->
+     begin
+       try Vbigint (BigInt.of_int (Array.length m.(0)))
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_bigmatrix_copy _ args =
+  match args with
+  | [Vmatrix m] ->
+     let a = Array.copy m in
+     for i = 0 to (Array.length m - 1) do
+       a.(i) <- Array.copy m.(i)
+     done;
+     Vmatrix a
+  | _ -> raise CannotReduce
+
+let exec_matrix_make _ args =
+  match args with
+  | [Vint r; Vint c; def] ->
+     begin
+       try
+         Vmatrix(Array.make_matrix r c def)
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_matrix_get _ args =
+  match args with
+  | [Vmatrix m; Vint i; Vint j] -> m.(i).(j)
+  | _ -> raise CannotReduce
+
+let exec_matrix_set _ args =
+  match args with
+  | [Vmatrix m; Vint i; Vint j; v] ->
+     m.(i).(j) <- v;
+     Vvoid
+  | _ -> raise CannotReduce
+
 let exec_matrix_rows _ args =
   match args with
-  | [Vmatrix m] -> Vint (BigInt.of_int (Array.length m))
+  | [Vmatrix m] -> Vint (Array.length m)
   | _ -> raise CannotReduce
 
 (* FIXME fails if rows=0 *)
 let exec_matrix_cols _ args =
   match args with
   | [Vmatrix m] ->
-     begin
-       try Vint (BigInt.of_int (Array.length m.(0)))
-       with _ -> raise CannotReduce
-     end
+     Vint (Array.length m.(0))
   | _ -> raise CannotReduce
 
 let exec_matrix_copy _ args =
@@ -856,39 +967,108 @@ let built_in_modules =
       "False", eval_false ;
     ] ;
     ["int"],"Int", [],
-    [ "infix +", eval_int_op BigInt.add;
+    [ "infix +", eval_big_int_op BigInt.add;
       (* defined as x+(-y)
-         "infix -", eval_int_op BigInt.sub; *)
-      "infix *", eval_int_op BigInt.mul;
-      "prefix -", eval_int_uop BigInt.minus;
-      "infix =", eval_int_rel BigInt.eq;
-      "infix <", eval_int_rel BigInt.lt;
-      "infix <=", eval_int_rel BigInt.le;
-      "infix >", eval_int_rel BigInt.gt;
-      "infix >=", eval_int_rel BigInt.ge;
+         "infix -", eval_big_int_op BigInt.sub; *)
+      "infix *", eval_big_int_op BigInt.mul;
+      "prefix -", eval_big_int_uop BigInt.minus;
+      "infix =", eval_big_int_rel BigInt.eq;
+      "infix <", eval_big_int_rel BigInt.lt;
+      "infix <=", eval_big_int_rel BigInt.le;
+      "infix >", eval_big_int_rel BigInt.gt;
+      "infix >=", eval_big_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
-    [ "min", eval_int_op BigInt.min;
-      "max", eval_int_op BigInt.max;
+    [ "min", eval_big_int_op BigInt.min;
+      "max", eval_big_int_op BigInt.max;
     ] ;
     ["int"],"ComputerDivision", [],
-    [ "div", eval_int_op BigInt.computer_div;
-      "mod", eval_int_op BigInt.computer_mod;
+    [ "div", eval_big_int_op BigInt.computer_div;
+      "mod", eval_big_int_op BigInt.computer_mod;
     ] ;
     ["int"],"EuclideanDivision", [],
-    [ "div", eval_int_op BigInt.euclidean_div;
-      "mod", eval_int_op BigInt.euclidean_mod;
+    [ "div", eval_big_int_op BigInt.euclidean_div;
+      "mod", eval_big_int_op BigInt.euclidean_mod;
     ] ;
-    ["array"],"Array",
-    ["array", builtin_array_type],
+    ["mach";"int"],"Int31",[],
+    [ "infix +", eval_int_op (+);
+      "infix -", eval_int_op (-);
+      "infix *", eval_int_op ( * );
+      "infix /", eval_int_op (/);
+      "infix %", eval_int_op (mod);
+      "prefix -", eval_int_uop (~-);
+      "infix =", eval_int_rel (=);
+      "infix <", eval_int_rel (<);
+      "infix <=", eval_int_rel (<=);
+      "infix >", eval_int_rel (>);
+      "infix >=", eval_int_rel (>=);
+      "of_int", eval_of_big_int;
+    ] ;
+    ["mach";"int"],"Int32",[],
+    [ "infix +", eval_int_op (+);
+      "infix -", eval_int_op (-);
+      "infix *", eval_int_op ( * );
+      "infix /", eval_int_op (/);
+      "infix %", eval_int_op (mod);
+      "prefix -", eval_int_uop (~-);
+      "infix =", eval_int_rel (=);
+      "infix <", eval_int_rel (<);
+      "infix <=", eval_int_rel (<=);
+      "infix >", eval_int_rel (>);
+      "infix >=", eval_int_rel (>=);
+      "of_int", eval_of_big_int;
+    ] ;
+    ["mach";"int"],"Int63",[],
+    [ "infix +", eval_int_op (+);
+      "infix -", eval_int_op (-);
+      "infix *", eval_int_op ( * );
+      "infix /", eval_int_op (/);
+      "infix %", eval_int_op (mod);
+      "prefix -", eval_int_uop (~-);
+      "infix =", eval_int_rel (=);
+      "infix <", eval_int_rel (<);
+      "infix <=", eval_int_rel (<=);
+      "infix >", eval_int_rel (>);
+      "infix >=", eval_int_rel (>=);
+      "of_int", eval_of_big_int;
+    ] ;
+    ["array"],"Array", [],
+    ["make", exec_bigarray_make ;
+     "mixfix []", exec_bigarray_get ;
+     "length", exec_bigarray_length ;
+     "mixfix []<-", exec_bigarray_set ;
+     "copy", exec_bigarray_copy ;
+    ] ;
+    ["mach"; "array"],"Array31", [],
     ["make", exec_array_make ;
      "mixfix []", exec_array_get ;
      "length", exec_array_length ;
      "mixfix []<-", exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
-    ["matrix"],"Matrix",
-    ["matrix", builtin_matrix_type],
+    ["mach"; "array"],"Array32", [],
+    ["make", exec_array_make ;
+     "mixfix []", exec_array_get ;
+     "length", exec_array_length ;
+     "mixfix []<-", exec_array_set ;
+     "copy", exec_array_copy ;
+    ] ;
+    ["mach"; "array"],"Array63", [],
+    ["make", exec_array_make ;
+     "mixfix []", exec_array_get ;
+     "length", exec_array_length ;
+     "mixfix []<-", exec_array_set ;
+     "copy", exec_array_copy ;
+    ] ;
+    ["matrix"],"Matrix", [],
+    ["make", exec_bigmatrix_make ;
+     "get", exec_bigmatrix_get ;
+     "rows", exec_bigmatrix_rows ;
+     "columns", exec_bigmatrix_cols ;
+     "set", exec_bigmatrix_set ;
+     "copy", exec_bigmatrix_copy ;
+    ] ;
+    ["mach"; "matrix"],"Matrix63", [],
     ["make", exec_matrix_make ;
      "get", exec_matrix_get ;
      "rows", exec_matrix_rows ;
@@ -1001,7 +1181,11 @@ let rec matching info v pat =
 
 let rec interp_expr info (e:Mltree.expr) : value =
   Mltree.(match e.e_node with
-  | Econst nc -> Vint (Number.compute_int_constant nc)
+  | Econst nc ->
+     begin match e.e_ity with
+     | I i -> value_of_const nc (Some (ty_of_ity i))
+     | _ -> assert false
+     end
   | Evar pv ->
      (try get pv info
       with Not_found ->
@@ -1131,15 +1315,26 @@ let rec interp_expr info (e:Mltree.expr) : value =
   | Efor (x, pv1, dir, pv2, e) ->
      Debug.dprintf debug_interp "for@.";
      begin match (get pv1 info, get pv2 info) with
-     | (Vint i1, Vint i2) ->
+     | (Vbigint i1, Vbigint i2) ->
         if dir = To
         then
           for i = BigInt.to_int i1 to BigInt.to_int i2 do
-            ignore (interp_expr (add_pv x (Vint (BigInt.of_int i)) info) e)
+            ignore (interp_expr (add_pv x (Vbigint (BigInt.of_int i)) info) e)
           done
         else
           for i = BigInt.to_int i1 downto BigInt.to_int i2 do
-            ignore (interp_expr (add_pv x (Vint (BigInt.of_int i)) info) e)
+            ignore (interp_expr (add_pv x (Vbigint (BigInt.of_int i)) info) e)
+          done;
+        Vvoid
+     | (Vint i1, Vint i2) ->
+        if dir = To
+        then
+          for i = i1 to i2 do
+            ignore (interp_expr (add_pv x (Vint i) info) e)
+          done
+        else
+          for i = i1 downto i2 do
+            ignore (interp_expr (add_pv x (Vint i) info) e)
           done;
         Vvoid
      | _ -> Debug.dprintf debug_interp "Non-integer for bounds@.";
@@ -1210,6 +1405,7 @@ let eval_fun decl info = match decl with
   | _ -> raise CannotReduce
 
 let rec value_of_term kn t =
+  Debug.dprintf debug_interp "value of term %a@." Pretty.print_term t;
   match t.t_node with
   | Ttrue -> Vbool true
   | Tfalse -> Vbool false
@@ -1223,7 +1419,7 @@ let rec value_of_term kn t =
               | Vbool b -> Vbool (not b)
               | _ -> raise CannotReduce end
   (* TODO Tbinop maybe *)
-  | Tconst (Number.ConstInt ic) -> Vint (Number.compute_int_constant ic)
+  | Tconst (Number.ConstInt ic) -> value_of_const ic t.t_ty
   | Term.Tapp (ls,[]) ->
      begin match find_logic_definition kn ls with
      | None -> raise CannotReduce
@@ -1236,7 +1432,8 @@ let rec value_of_term kn t =
 let rec term_of_value = function
   | Vbool true -> t_bool_true
   | Vbool false -> t_bool_false
-  | Vint i -> t_bigint_const i
+  | Vbigint i -> t_bigint_const i
+  | Vint _ -> raise CannotReduce
   | Vtuple l -> t_tuple (List.map term_of_value l)
   | Vconstr (rs, lf) ->
      t_app (ls_of_rs rs) (List.map (fun f -> term_of_value (field_get f)) lf)
