@@ -10,7 +10,7 @@
       f(i,c) = max{j in c} m[i][j] + f(i+1, C\{j})
 
    As such, it would still be a brute force approach (of complexity n!)
-   but we can memoize f and then the search space decreases to 2^n-1.
+   but we can memoize f and then the search space decreases to n*2^n.
 
    The following code implements such a solution. Sets of integers are
    provided in theory Bitset. Hash tables for memoization are provided
