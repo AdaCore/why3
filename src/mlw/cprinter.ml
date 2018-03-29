@@ -37,9 +37,10 @@ module C = struct
   (* return type, parameter list. Variadic functions not handled. *)
   and proto = ty * (ty * ident) list
 
-  and binop = Band | Bor | Beq | Bne | Bassign (* += and co. maybe to add *)
+  and binop = Band | Bor | Beq | Bne | Bassign | Blt | Ble | Bgt | Bge
+  (* += and co. maybe to add *)
 
-  and unop = Unot | Ustar | Uaddr (* (pre|post)(incr|decr) maybe to add *)
+  and unop = Unot | Ustar | Uaddr | Upreincr | Upostincr | Upredecr | Upostdecr
 
   and expr =
     | Enothing
@@ -416,6 +417,12 @@ module Print = struct
     | Unot -> fprintf fmt "!"
     | Ustar -> fprintf fmt "*"
     | Uaddr -> fprintf fmt "&"
+    | Upreincr | Upostincr -> fprintf fmt "++"
+    | Upredecr | Upostdecr -> fprintf fmt "--"
+
+  and unop_postfix = function
+    | Upostincr | Upostdecr -> true
+    | _ -> false
 
   and print_binop fmt = function
     | Band -> fprintf fmt "&&"
@@ -423,11 +430,19 @@ module Print = struct
     | Beq -> fprintf fmt "=="
     | Bne -> fprintf fmt "!="
     | Bassign -> fprintf fmt "="
+    | Blt -> fprintf fmt "<"
+    | Ble -> fprintf fmt "<="
+    | Bgt -> fprintf fmt ">"
+    | Bge -> fprintf fmt ">="
 
   and print_expr ~paren fmt = function
     | Enothing -> if debug then Format.printf "enothing"; ()
-    | Eunop(u,e) -> fprintf fmt (protect_on paren "%a %a")
-      print_unop u (print_expr ~paren:true) e
+    | Eunop(u,e) ->
+       if unop_postfix u
+       then fprintf fmt (protect_on paren "%a%a")
+              (print_expr ~paren:true) e print_unop u
+       else fprintf fmt (protect_on paren "%a%a")
+              print_unop u (print_expr ~paren:true) e
     | Ebinop(b,e1,e2) ->
       fprintf fmt (protect_on paren "%a %a %a")
         (print_expr ~paren:true) e1 print_binop b (print_expr ~paren:true) e2
@@ -488,7 +503,12 @@ module Print = struct
       (print_stmt ~braces:true) (Sblock([],e))
     | Swhile (e,b) -> fprintf fmt "while (%a)@;<1 2>%a"
       (print_expr ~paren:false) e (print_stmt ~braces:true) (Sblock([],b))
-    | Sfor _ -> raise (Unprinted "for loops")
+    | Sfor (einit, etest, eincr, s) ->
+       fprintf fmt "for (%a; %a; %a)@;<1 2>%a"
+         (print_expr ~paren:false) einit
+         (print_expr ~paren:false) etest
+         (print_expr ~paren:false) eincr
+         (print_stmt ~braces:true) (Sblock([],s))
     | Sbreak -> fprintf fmt "break;"
     | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" (print_expr ~paren:true) e
@@ -904,7 +924,26 @@ module MLToC = struct
       expr info {env with computes_return_value = true} r
     | Eraise (_, None) -> assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
-    | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
+    | Efor (i, sb, dir, eb, body) ->
+       begin match i.pv_vs.vs_ty.ty_node with
+       | Tyapp ({ ts_def = Range _ },_) ->
+          let ty = ty_of_ty info i.pv_vs.vs_ty in
+          let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
+          let ei = C.Evar (i.pv_vs.vs_name) in
+          let init_e = C.Ebinop (Bassign, ei, C.Evar (sb.pv_vs.vs_name)) in
+          let incr_op = match dir with To -> C.Upostincr | DownTo -> C.Upostdecr in
+          let incr_e = C.Eunop (incr_op, ei) in
+          let test_op = match dir with To -> C.Ble | DownTo -> C.Bge in
+          let test_e = C.Ebinop (test_op, ei, C.Evar (eb.pv_vs.vs_name)) in
+          let env' = { env with computes_return_value = false;
+                                in_unguarded_loop = true;
+                                breaks =
+                                  if env.in_unguarded_loop
+                                  then Sid.empty else env.breaks } in
+          let bd, bs = expr info env' body in
+          [di], C.Sfor(init_e, test_e, incr_e, C.Sblock (bd,bs))
+       |  _ -> raise (Unsupported "for loops")
+       end
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
