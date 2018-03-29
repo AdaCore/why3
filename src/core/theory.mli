@@ -82,6 +82,7 @@ val list_metas  : unit -> meta list
 
 val meta_range : meta
 val meta_float : meta
+val meta_projection: meta
 
 (** {2 Theories} *)
 

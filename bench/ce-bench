@@ -8,7 +8,13 @@ files=""
 while test $# != 0; do
 case "$1" in
   "-update-oracle")
-        updateoracle=true;;
+      updateoracle=true;;
+  "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: ce-bench [-update-oracle] <files>\n"
+      printf "  <files> must be given without the '.mlw' suffix\n"
+      printf "  if <files> empty, use all files from directory 'ce'\n"
+      exit 2;;
   *)
        files="$files $1"
 esac
@@ -16,20 +22,19 @@ shift
 done
 
 if test "$files" = "" ; then
-    files="ce/*.mlw"
+    files="$dir/ce/*.mlw"
 fi
 
-cd $dir
 
 # $1 = prover, $2 = file
 run () {
     printf "  $2 ($1)... "
     f="$2_$1"
-    ../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
+    $dir/../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' > "$f.out"
-    ../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
+    $dir/../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
         sed 's/ ([0-9]\+\.[0-9]\+s)//' >> "$f.out"
     if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
      echo "ok"
@@ -48,8 +53,10 @@ run () {
 
 
 for file in $files; do
+    filedir=`dirname $file`
     filebase=`basename $file .mlw`
-    run CVC4,1.5 ce/$filebase
-    run Z3,4.5.0 ce/$filebase
-    run Z3,4.6.0 ce/$filebase
+    printf "Running provers on $filedir/$filebase.mlw\n";
+    run CVC4,1.5 $filedir/$filebase
+    run Z3,4.5.0 $filedir/$filebase
+    run Z3,4.6.0 $filedir/$filebase
 done

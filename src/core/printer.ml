@@ -33,6 +33,7 @@ type printer_mapping = {
   vc_term_loc   : Loc.position option;
   queried_terms : Term.term Stdlib.Mstr.t;
   list_projections: Stdlib.Sstr.t;
+  list_records: ((string * string) list) Stdlib.Mstr.t;
 }
 
 type printer_args = {
@@ -57,6 +58,7 @@ let get_default_printer_mapping = {
   vc_term_loc = None;
   queried_terms = Stdlib.Mstr.empty;
   list_projections = Stdlib.Sstr.empty;
+  list_records = Stdlib.Mstr.empty;
 }
 
 let register_printer ~desc s p =

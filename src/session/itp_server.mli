@@ -11,10 +11,6 @@
 
 open Itp_communication
 
-val print_request: Format.formatter -> ide_request -> unit
-val print_msg: Format.formatter -> message_notification -> unit
-val print_notify: Format.formatter -> notification -> unit
-
 (* The server part of the protocol *)
 module type Protocol = sig
 

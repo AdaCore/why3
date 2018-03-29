@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -e
 
 autoconf && (automake --add-missing 2> /dev/null || true)
 docker build -t bench-image-$COMPILER -f misc/Dockerfile.init --build-arg compiler=$COMPILER .

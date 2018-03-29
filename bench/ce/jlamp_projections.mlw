@@ -32,8 +32,10 @@ use import Abstract
 
 type r = {mutable f : byte; mutable g : bool}
 
-function get_f [@model_projection] (x:r) : byte = x.f
-function get_g [@model_projection] (x:r) : bool = x.g
+function get_f (x:r) : byte = x.f
+function get_g (x:r) : bool = x.g
+meta model_projection function get_f
+meta model_projection function get_g
 
 let p4 (b [@model_projected] : r) =
   if b.g then b.f <- add b.f (of_int 1)

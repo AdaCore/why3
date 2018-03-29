@@ -22,6 +22,9 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+val interp_float: string -> string -> string -> float_type
 
 type model_value =
  | Integer of string
@@ -32,6 +35,7 @@ type model_value =
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string;
@@ -41,10 +45,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record ={
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 val array_create_constant :
   value : model_value ->
@@ -313,9 +315,13 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =  Stdlib.Sstr.t -> string -> model_element list
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
 (** Parses the input string into model elements. It contains the list of
-    projections that are collected in the task.
+    projections and a map associating the name of printed projections to the
+    fields (couple of printed field and model_trace name) that are collected in
+    the task.
  *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit

@@ -16,7 +16,6 @@ open Stdlib
 open Ide_utils
 open History
 open Itp_communication
-open Itp_server
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -1941,7 +1940,7 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
-  List.iter (fun s -> add_completion_entry (s,"transformation")) transformations;
+  List.iter add_completion_entry transformations;
   (* add the name of the commands *)
   List.iter (fun s -> add_completion_entry (s,"command")) commands;
   (* todo: add queries *)
@@ -1974,9 +1973,13 @@ let init_completion provers transformations strategies commands =
   List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
-  (* does not work: it replaces the previous column as text result
-  command_entry_completion#set_text_column completion_desc;
-   *)
+  (* Adding a column which contains the description of the
+     prover/transformation/strategy. *)
+  let name_renderer = GTree.cell_renderer_text [ ] in
+  name_renderer#set_properties [`BACKGROUND "lightgrey"];
+  command_entry_completion#pack name_renderer;
+  command_entry_completion#add_attribute name_renderer "text" completion_desc;
+
   command_entry_completion#set_match_func match_function;
 
   command_entry#set_completion command_entry_completion
