@@ -1,6 +1,84 @@
-before_script:
-  - . $HOME/.opam/opam-init/variables.sh
+stages:
+  - build
+  - test
+  - deploy
 
-ci-bench:
+.build_template: &build_definition
+  stage: build
   script:
-    - misc/ci-bench.sh
+    - misc/ci-docker.sh misc/ci-local.sh
+
+build:
+  variables:
+    COMPILER: system
+  <<: *build_definition
+
+build-4.03.0:
+  variables:
+    COMPILER: 4.03.0
+  <<: *build_definition
+
+build-4.04.0:
+  variables:
+    COMPILER: 4.04.0
+  <<: *build_definition
+
+build-4.05.0:
+  variables:
+    COMPILER: 4.05.0
+  <<: *build_definition
+
+build-4.06.0:
+  variables:
+    COMPILER: 4.06.0
+  <<: *build_definition
+
+bench:
+  stage: test
+  variables:
+    COMPILER: system
+  script:
+    - misc/ci-docker.sh misc/ci-local.sh bench
+
+.bench_template: &bench_definition
+  stage: test
+  script:
+    - misc/ci-docker.sh misc/ci-local.sh bench
+  only:
+    - tags
+    - schedules
+
+bench-4.03.0:
+  variables:
+    COMPILER: 4.03.0
+  <<: *bench_definition
+
+bench-4.04.0:
+  variables:
+    COMPILER: 4.04.0
+  <<: *bench_definition
+
+bench-4.05.0:
+  variables:
+    COMPILER: 4.05.0
+  <<: *bench_definition
+
+bench-4.06.0:
+  variables:
+    COMPILER: 4.06.0
+  <<: *bench_definition
+
+deploy:
+  stage: deploy
+  script:
+    - autoconf && (automake --add-missing 2> /dev/null || true)
+    - docker build -t bench-image -f misc/Dockerfile.init .
+    - docker build -t deploy-image -f misc/Dockerfile.deploy .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker tag deploy-image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker image prune -f
+  only:
+    - master
+    - /^bugfix[/]v[0-9.]*$/
+    - tags
