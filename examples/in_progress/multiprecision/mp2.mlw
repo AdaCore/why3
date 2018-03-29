@@ -1442,7 +1442,6 @@ module N
     writes   { x.data.elts }
   =
     let ghost ox = { x } in
-    let r : ref limb = ref 0 in
     let ghost b : ref limb = ref 1 in
     let lx : ref limb = ref 0 in
     let i : ref int32 = ref 0 in
@@ -1462,7 +1461,6 @@ module N
       lx := get_ofs x !i;
       assert { !lx = (pelts ox)[ox.offset + !i] };
       let res = sub_mod !lx 1 in
-      r := res;
       ghost (if Limb.(=) !lx 0 then b := 1 else b := 0);
       assert { res - radix * !b = !lx - 1 };
       value_sub_update_no_change (pelts x) (x.offset + p2i !i)
@@ -2528,7 +2526,7 @@ module N
     assert { 1 <= k <= d };
     let l,h = mul_double v uh in
     let sl,c = add_with_carry l ul zero in
-    let sh,c' = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
+    let (sh,ghost c') = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
     assert { sl + radix * sh + radix * radix * c'
              = l + radix * h + ul + radix * uh };
     assert { c' = 0
@@ -3041,7 +3039,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let r1 = ref zero in
     let l,h = mul_double v uh in
     let sl, c = add_with_carry um l zero in
-    let sh, c' = add_with_carry uh h c in
+    let sh, ghost c' = add_with_carry uh h c in
     assert { sl + radix * sh + radix * radix * c'
              = um + radix * uh + v * uh };
     assert { c' = 0
@@ -3072,11 +3070,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
              by !r1 = mod (um - dh * sh) radix  };*)
     let tl, th = mul_double sh dl in
     let il, b = sub_with_borrow ul tl zero in
-    let (ih, b') = sub_with_borrow !r1 th b in
+    let (ih, ghost b') = sub_with_borrow !r1 th b in
     assert { il + radix * ih - radix * radix * b'
              = ul + radix * !r1 - sh * dl };
     let bl,b2 = sub_with_borrow il dl zero in
-    let bh, b2' = sub_with_borrow ih dh b2 in
+    let bh, ghost b2' = sub_with_borrow ih dh b2 in
     assert { bl + radix * bh - radix * radix * b2'
              = il + radix * ih - dl - radix * dh };
     mod_mult (radix * radix) (l2i b')
@@ -3448,7 +3446,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  so !q1 = mod (cq - 1) radix = cq - 1
                  };
       let rl, c = add_with_carry !r0 dl zero in
-      let rh, c' = add_with_carry !r1 dh c in
+      let rh, ghost c' = add_with_carry !r1 dh c in
       assert { rl + radix * rh = mod (r' + d) (radix * radix)
                by radix * radix * c' + rl + radix * rh
                   = r' + d
@@ -3505,7 +3503,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin
       let bl, b = sub_with_borrow !r0 dl zero in
-      let bh, b'= sub_with_borrow !r1 dh b in
+      let bh, ghost b'= sub_with_borrow !r1 dh b in
       assert { b' = 0 };
       assert { bl + radix * bh = !r0 + radix * !r1 - d };
       assert { !q1 < radix - 1
@@ -3871,7 +3869,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     if (not (Limb.(=) qh limb_zero))
     then begin
          assert { qh = 1 };
-         let b = sub_in_place xd y sy sy in
+         let ghost b = sub_in_place xd y sy sy in
          begin
              ensures { value (x at PreAdjust) sx =
                   (value !qp (sx - sy - !i)
@@ -4136,7 +4134,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         label SubMax in
         let ghost xc = Array.copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-        let b = submul_limb xd y !ql sy in
+        let ghost b = submul_limb xd y !ql sy in
         begin
           ensures { value x !i
                  = value (x at SubMax) !i }
@@ -5965,7 +5963,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ensures { !rl + radix * !rh < dl + radix * dh }
         ensures { !qh = 1 }
         let (r0, b) = sub_with_borrow !rl dl uzero in
-        let (r1, b') = sub_with_borrow !rh dh b in
+        let (r1, ghost b') = sub_with_borrow !rh dh b in
         assert { b' = 0 };
         assert { r0 + radix * r1 = !rl + radix * !rh - (dl + radix * dh) };
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);

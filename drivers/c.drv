@@ -221,8 +221,8 @@ struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
 
 uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 {
-  uint64_t q,r;
-  udiv_qrnnd(q,r,uh,ul,d);
+  uint64_t q,_dummy;
+  udiv_qrnnd(q,_dummy,uh,ul,d);
   return q;
 }
 

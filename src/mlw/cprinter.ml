@@ -907,7 +907,7 @@ module MLToC = struct
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
          when List.for_all
-                (function Pvar _ -> true |_-> false)
+                (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
                 rets
       ->
        let id_struct = id_register (id_fresh "struct_res") in
@@ -920,6 +920,7 @@ module MLToC = struct
              match p with
              | Pvar vs -> C.Ddecl(ty_of_ty info vs.vs_ty,
                                   [vs.vs_name, C.Enothing])::acc
+             | Pwild -> acc
              | _ -> assert false )
         rets [d_struct] in
        let d,s = expr info {env with computes_return_value = false} e1 in
@@ -930,6 +931,7 @@ module MLToC = struct
          match rets with
          | [] -> C.Snop
          | Pvar vs :: t -> C.Sseq ((assign vs.vs_name i), (assigns t (i+1)))
+         | Pwild :: t -> assigns t (i+1) (* ghost variable, skip *)
          | _ -> assert false in
        let assigns = assigns rets 0 in
        let b = expr info env e2 in

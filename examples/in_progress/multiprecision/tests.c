@@ -58,8 +58,10 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
   mp_size_t max_n, an, bn, rn;
+#ifdef BENCH
   struct timeval begin, end;
   double elapsed;
+#endif
   uint64_t c, refc;
   //gmp_randstate_t rands;
   //TMP_DECL;
