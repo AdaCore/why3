@@ -1,0 +1,18 @@
+FROM ocaml/ocaml:debian-stable
+
+# install dependencies
+RUN apt-get update && \
+    apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam
+
+# create user
+RUN sudo adduser --disabled-password --gecos '' why3
+USER why3
+ENV HOME /home/why3
+WORKDIR /home/why3
+
+ARG compiler=system
+RUN opam init -a -y -j2 --compiler=$compiler
+RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip
+
+# Alt-Ergo
+RUN opam install alt-ergo.1.30
