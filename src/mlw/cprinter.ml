@@ -593,6 +593,7 @@ module MLToC = struct
         | Some s -> C.Tsyntax (s, List.map (ty_of_mlty info) tl)
         | None -> C.Tnosyntax
        end
+    | Ttuple [] -> C.Tvoid
     | Ttuple _ -> raise (Unsupported "tuple parameters")
 
   let rec ty_of_ty info ty = (*FIXME try to use only ML tys*)
@@ -1019,7 +1020,8 @@ module MLToC = struct
          begin try
            let params =
              List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
-                      (List.filter (fun (_,_, gh) -> not gh) vl) in
+               (List.filter (fun (_,_, gh) -> not gh) vl) in
+           let params = List.filter (fun (ty, _) -> ty <> C.Tvoid) params in
 	   let env = { computes_return_value = true;
 		       in_unguarded_loop = false;
                        current_function = rs;
