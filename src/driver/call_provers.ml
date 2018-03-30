@@ -215,18 +215,19 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
        Unknown (s, Some reason_unknown)
     | _ -> ans
   in
-  (* Highfailures close to time limit are assumed to be timeouts *)
+  (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
   let tlimit = float limit.limit_time in
   let ans, time =
+    if tlimit > 0.0 && time >= 0.9 *. tlimit then
     match ans with
-    | HighFailure when tlimit > 0.0 && time >= 0.9 *. tlimit ->
-       Debug.dprintf
-	 debug
-	 "[Call_provers.parse_prover_run] highfailure after %f >= 0.9 timelimit -> set to Timeout@." time;
+    | HighFailure | Unknown _ | Timeout ->
+       Debug.dprintf debug
+         "[Call_provers.parse_prover_run] answer after %f >= 0.9 timelimit -> Timeout@." time;
        Timeout, tlimit
     | _ -> ans,time
+    else ans, time
   in
-  (* attempt to fix early timeouts / resp. unknown answers after timelimit *)
+  (* attempt to fix early timeouts *)
   (* does not work well. Let's give the answer and time without change instead, and let
      Session_scheduler.fuzzy_proof_time do the job instead
   Debug.dprintf
@@ -235,11 +236,6 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
     time tlimit;
   let ans,time =
     match ans with
-    | Unknown _ when tlimit > 0.0 && time >= 0.99 *. tlimit ->
-       Debug.dprintf
-	 debug
-	 "[Call_provers.parse_prover_run] unknown answer after %f >= 0.99 timelimit -> set to Timeout@." time;
-       Timeout, tlimit
     | Timeout when time < tlimit ->
        Debug.dprintf
 	 debug
