@@ -608,7 +608,9 @@ module MLToC = struct
        begin match query_syntax info.syntax ts.ts_name
         with
         | Some s -> C.Tsyntax (s, List.map (ty_of_ty info) tl)
-        | None -> C.Tnosyntax
+        | None -> if is_ts_tuple ts && tl = []
+                  then C.Tvoid
+                  else C.Tnosyntax
        end
 
   let ity_of_expr e = match e.e_ity with
@@ -1045,10 +1047,7 @@ module MLToC = struct
                      acc && arity_zero ity.ity_node) true ity)
 	   in
 	   (* FIXME is it necessary to have arity 0 in regions ?*)
-	   let rtype =
-	     if ity_equal rity Ity.ity_unit
-	     then C.Tvoid
-	     else ty_of_ty info (ty_of_ity rity) in
+	   let rtype = ty_of_ty info (ty_of_ity rity) in
            let rtype,sdecls =
              if rtype=C.Tnosyntax && is_simple_tuple rity
              then
