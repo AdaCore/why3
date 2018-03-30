@@ -936,15 +936,21 @@ module MLToC = struct
           let init_e = C.Ebinop (Bassign, ei, C.Evar (sb.pv_vs.vs_name)) in
           let incr_op = match dir with To -> C.Upostincr | DownTo -> C.Upostdecr in
           let incr_e = C.Eunop (incr_op, ei) in
-          let test_op = match dir with To -> C.Ble | DownTo -> C.Bge in
-          let test_e = C.Ebinop (test_op, ei, C.Evar (eb.pv_vs.vs_name)) in
+          let init_test_op = match dir with | To -> C.Blt | DownTo -> C.Bgt in
+          let init_test = C.Sif (C.Ebinop(init_test_op,
+                                          C.Evar (eb.pv_vs.vs_name),
+                                          C.Evar (sb.pv_vs.vs_name)),
+                                 Sbreak, Snop) in
+          let end_test = C.Sif (C.Ebinop (C.Beq, ei, C.Evar eb.pv_vs.vs_name),
+                                Sbreak, Snop) in
           let env' = { env with computes_return_value = false;
                                 in_unguarded_loop = true;
                                 breaks =
                                   if env.in_unguarded_loop
                                   then Sid.empty else env.breaks } in
           let bd, bs = expr info env' body in
-          [di], C.Sfor(init_e, test_e, incr_e, C.Sblock (bd,bs))
+          let bs = C.Sseq(init_test, C.Sseq (bs, end_test)) in
+          [di], C.Sfor(init_e, Enothing, incr_e, C.Sblock (bd,bs))
        |  _ -> raise (Unsupported "for loops")
        end
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
