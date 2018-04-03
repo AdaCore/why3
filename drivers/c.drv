@@ -1,12 +1,8 @@
 printer "c"
 
-module BuiltIn
-
-  prelude "#include <stdlib.h>"
-  prelude "#include <stdint.h>"
-  prelude "#include <stdio.h>"
-
-end
+prelude "#include <stdlib.h>"
+prelude "#include <stdint.h>"
+prelude "#include <stdio.h>"
 
 module ref.Ref
 
@@ -221,7 +217,8 @@ struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
 
 uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 {
-  uint64_t q,_dummy;
+  uint64_t q;
+  uint64_t _dummy __attribute__((unused));
   udiv_qrnnd(q,_dummy,uh,ul,d);
   return q;
 }

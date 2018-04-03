@@ -327,20 +327,28 @@ let () =
     match opt_modu_flat with
     | Modular -> Queue.iter do_modular opt_queue
     | Flat -> let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
-      let visit_m _ m =
-        let tm = translate_module m in
-        let visit_id id _ = visit ~recurs:true mm id in
-        Ident.Mid.iter visit_id tm.Mltree.mod_known in
-      Mstr.iter visit_m mm;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let cout = match opt_output with
         | None -> stdout
         | Some file -> open_out file in
       let fmt = formatter_of_out_channel cout in
-      (* print driver prelude *)
+      let thprelude = pargs.Pdriver.thprelude in
       let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
+      let rec do_preludes id =
+        (try
+          let m = find_module_id mm id in
+          Ident.Sid.iter do_preludes m.mod_used
+        with Not_found -> ());
+        print_preludes id fmt thprelude
+      in
       print_prelude pargs.Pdriver.prelude;
-      Ident.Mid.iter (fun _ p -> print_prelude p) pargs.Pdriver.thprelude;
+      let visit_m _ m =
+        do_preludes m.mod_theory.Theory.th_name;
+        let tm = translate_module m in
+        let visit_id id _ = visit ~recurs:true mm id in
+        Ident.Mid.iter visit_id tm.Mltree.mod_known;
+      in
+      Mstr.iter visit_m mm;
       let extract fmt { info_id = id } =
         let pm = find_module_id mm id in
         let m = translate_module pm in
