@@ -350,7 +350,7 @@ let fuzzy_proof_time nres ores =
   let told = ores.Call_provers.pr_time in
   let ansnew = nres.Call_provers.pr_answer in
   let tnew = nres.Call_provers.pr_time in
-  if group_answer ansold = group_answer ansnew &&
+  if ansnew <> Call_provers.Timeout && group_answer ansold = group_answer ansnew &&
        tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1
   then { nres with Call_provers.pr_time = told }
   else nres
