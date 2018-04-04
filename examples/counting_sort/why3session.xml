@@ -6,7 +6,7 @@
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../counting_sort.mlw" proved="true">
-<theory name="Spec" proved="true" sum="7321666aec9fecd30a161f3c27f5da95">
+<theory name="Spec" proved="true">
  <goal name="VC k" expl="VC for k" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -14,7 +14,7 @@
  <proof prover="2"><result status="valid" time="0.76" steps="828"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" proved="true" sum="7dc4b56b2b85019a89435b491922cc31">
+<theory name="CountingSort" proved="true">
  <goal name="VC counting_sort" expl="VC for counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC counting_sort.0" expl="array creation size" proved="true">
@@ -113,7 +113,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" proved="true" sum="5228d909430fe25c78cff001a951e966">
+<theory name="InPlaceCountingSort" proved="true">
  <goal name="VC in_place_counting_sort" expl="VC for in_place_counting_sort" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC in_place_counting_sort.0" expl="array creation size" proved="true">
@@ -215,7 +215,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" proved="true" sum="28e8abfc409b018965296c7ff809f176">
+<theory name="Harness" proved="true">
  <goal name="VC harness" expl="VC for harness" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC harness.0" expl="array creation size" proved="true">

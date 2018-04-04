@@ -8,46 +8,46 @@
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lagrange_inequality.why" expanded="true">
-<theory name="LagrangeInequality" sum="8a00795ba64779f7cb70136d97cee367" expanded="true">
- <goal name="norm2_pos" expl="">
+<file name="../lagrange_inequality.why" proved="true">
+<theory name="LagrangeInequality" proved="true">
+ <goal name="norm2_pos" proved="true">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Lagrange" expl="">
+ <goal name="Lagrange" proved="true">
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="CauchySchwarzInequality" sum="6e848922a66a6cca6a4bceda7cb78455" expanded="true">
- <goal name="CauchySchwarz_aux" expl="">
+<theory name="CauchySchwarzInequality" proved="true">
+ <goal name="CauchySchwarz_aux" proved="true">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="norm_pos" expl="">
+ <goal name="norm_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="sqr_le_sqrt" expl="">
+ <goal name="sqr_le_sqrt" proved="true">
  <proof prover="0" edited="lagrange_inequality_CauchySchwarzInequality_sqr_le_sqrt_1.v"><result status="valid" time="0.97"/></proof>
  <proof prover="6"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="CauchySchwarz" expl="">
+ <goal name="CauchySchwarz" proved="true">
  <proof prover="0" edited="lagrange_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="0.59"/></proof>
  </goal>
 </theory>
-<theory name="TriangleInequality" sum="194a101f983bb8dbabab492d87078475" expanded="true">
- <goal name="triangle_aux" expl="">
+<theory name="TriangleInequality" proved="true">
+ <goal name="triangle_aux" proved="true">
  <proof prover="11"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="sqr_sqrt_le" expl="">
+ <goal name="sqr_sqrt_le" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="triangle" expl="">
+ <goal name="triangle" proved="true">
  <proof prover="0" memlimit="1000" edited="lagrange_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.33"/></proof>
  </goal>
 </theory>
