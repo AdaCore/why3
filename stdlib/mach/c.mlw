@@ -2,7 +2,7 @@ module C
 
   use import mach.int.Unsigned
   use import mach.int.Int32
-  use import mach.int.UInt32
+  use import mach.int.UInt32GMP as UInt32
   use import array.Array
   use import map.Map
   use import int.Int
@@ -155,7 +155,7 @@ module C
     ensures  { pelts result = old pelts p }
     ensures  { plength result = old plength p }
     (* NOT alias result.data old p.data *)
-                   
+
   val join_r (p1 p2: ptr 'a) : unit
     requires { p1.zone = p2.zone }
     requires { p1.max = p2.min }

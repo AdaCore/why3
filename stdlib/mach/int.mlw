@@ -110,7 +110,6 @@ end
 module Unsigned
 
   use import int.Int
-  use import int.EuclideanDivision
 
   let constant min_unsigned : int = 0
 
@@ -124,6 +123,16 @@ module Unsigned
   constant radix : int
 
   axiom radix_def : radix = max+1
+
+end
+
+module UnsignedGMP
+
+  (** Additional GMP-inspired arithmetic primitives *)
+
+  use import int.Int
+  clone export Unsigned
+  use import int.EuclideanDivision
 
   val add_mod (x y:t) : t
     ensures { to_int result = mod (to_int x + to_int y) (max+1) }
@@ -228,12 +237,9 @@ module Int32BV
 
 end
 
-module UInt32
+module UInt32Gen
 
   use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
 
   type uint32 = < range 0 0xffff_ffff >
 
@@ -242,7 +248,33 @@ module UInt32
   let constant radix : int = max_uint32 + 1
   function to_int (x : uint32) : int = uint32'int x
 
+end
+
+module UInt32
+
+  use export UInt32Gen
+
   clone export Unsigned with
+    type t = uint32,
+    constant max = uint32'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint32'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
+module UInt32GMP
+
+  use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+  use import Int32
+  use export UInt32Gen
+
+  clone export UnsignedGMP with
     type t = uint32,
     constant max = uint32'maxInt,
     constant radix = radix,
@@ -460,12 +492,9 @@ module Int64
 *)
 end
 
-module UInt64
+module UInt64Gen
 
   use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
 
   type uint64 = < range 0 0xffff_ffff_ffff_ffff >
 
@@ -475,7 +504,40 @@ module UInt64
 
   function to_int (x : uint64) : int = uint64'int x
 
+end
+
+module UInt64
+
+  use export UInt64Gen
+
   clone export Unsigned with
+    type t = uint64,
+    constant max = uint64'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint64'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+(*  use bv.BV64
+
+  val to_bv (x: uint64) : BV64.t
+    ensures { BV64.to_uint result = to_int x }
+  val of_bv (x: BV64.t) : uint64
+    ensures { to_int result = BV64.to_uint x }
+*)
+end
+
+module UInt64GMP
+
+  use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+  use import Int32
+  use export UInt64Gen
+
+  clone export UnsignedGMP with
     type t = uint64,
     constant max = uint64'maxInt,
     constant radix = radix,
@@ -526,11 +588,4 @@ module UInt64
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
 
-(*  use bv.BV64
-
-  val to_bv (x: uint64) : BV64.t
-    ensures { BV64.to_uint result = to_int x }
-  val of_bv (x: BV64.t) : uint64
-    ensures { to_int result = BV64.to_uint x }
-*)
 end
