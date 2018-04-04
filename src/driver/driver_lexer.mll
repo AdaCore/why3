@@ -59,7 +59,6 @@
         "converter", CONVERTER;
         "literal", LITERAL;
         "use", USE;
-        "export", EXPORT;
       ]
 
 }
