@@ -289,9 +289,12 @@ let update_task =
     let update task0 =
       (** add requested theories *)
       let task0 = Mid.fold (fun _ (th,th') task ->
-          Task.on_theory th (fun task _sm ->
-              (** could we do some clone_export? *)
-              Task.use_export task th'
+          Task.on_theory th (fun task sm ->
+              if Theory.is_empty_sm sm then
+                Task.use_export task th'
+              else
+                (** We do nothing in case of clone *)
+                task
             ) task task0
         ) drv.drv_thuse task0
       in
