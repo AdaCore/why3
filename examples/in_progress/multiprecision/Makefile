@@ -1,3 +1,15 @@
+BENCH ?= no
+
+ifeq ($(BENCH),yes)
+  WHY3=../../../bin/why3.opt
+else
+  ifeq ($(BINDIR),)
+    WHY3=why3
+  else
+    WHY3=$(BINDIR)/why3
+  endif
+endif
+
 all: why3 extract
 
 clean:
@@ -8,7 +20,7 @@ why3:
 
 extract: why3
 	mkdir -p build
-	why3 extract -D c -o build/N.c -L . mp2.N
+	$(WHY3) extract -D c -o build/N.c -L . mp2.N
 
 tests: extract check-gmp
 	gcc -O2 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o build/tests
