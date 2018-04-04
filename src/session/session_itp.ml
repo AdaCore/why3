@@ -1594,7 +1594,6 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
         make_theory_section ~detached:false ~merge:(old_ses,old_th,env,use_shapes) s fn th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
-        found_detached := true;
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
         make_theory_section ~detached:false s fn th
     in
