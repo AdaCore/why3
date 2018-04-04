@@ -208,7 +208,7 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		parse_smtv2_model
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr \
-          pinterp mltree compile pdriver cprinter ocaml_printer
+          pinterp mltree compile mlinterp pdriver cprinter ocaml_printer
 
 LIB_PARSER = ptree glob typing parser lexer
 
@@ -227,7 +227,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		prop_curry eliminate_literal \
 		generic_arg_trans_utils case apply \
 		ind_itp destruct cut \
-		induction induction_pr matching reification
+		induction induction_pr matching reflection
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -291,8 +291,10 @@ ifeq (@enable_compiler_plugins@,yes)
 src/util/debug_optim.cmxs: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o $@
-src/transform/reification.cmx: src/util/debug_optim.cmxs
-src/transform/reification.cmx: OFLAGS += -plugin debug_optim.cmxs
+src/transform/reflection.cmx: src/util/debug_optim.cmxs
+src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
+src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
+src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
 endif
 
 # hide warning 'no cmx file was found in path for module ..., and its interface was not compiled with -opaque' for the coq tactic
