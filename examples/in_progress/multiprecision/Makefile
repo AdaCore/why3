@@ -1,5 +1,8 @@
 all: why3 extract
 
+clean:
+	rm -rf build
+
 why3:
 	make -C ../../..
 
@@ -12,6 +15,9 @@ tests: extract check-gmp
 	gcc -O2 -Wall -g -std=gnu99 -DCOMPARE_MINI tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o build/minitests
 	./build/tests
 	./build/minitests
+
+bench-tests: extract
+	gcc -O2 -Wall -g -std=gnu99 tests.c build/N.c -Iinclude -fomit-frame-pointer -fno-tree-vectorize -lgmp -o build/bench-tests
 
 build/why3%bench: extract check-gmp
 	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o $@

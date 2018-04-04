@@ -181,6 +181,45 @@ extract_and_run () {
     fi
 }
 
+extract_and_test_wmp () {
+    dir="examples/in_progress/multiprecision"
+    shift
+    printf "  $dir... "
+    printf "clean... "
+    if BENCH=yes make -C $dir clean > /dev/null; then
+        printf "extract... "
+        if BENCH=yes make -C $dir extract > /dev/null; then
+            printf "compile... "
+            if BENCH=yes make -C $dir bench-tests > /dev/null; then
+                printf "execute... "
+                if $dir/build/bench-tests > /dev/null; then
+                    echo "ok"
+                else
+                    echo "execution failed!"
+                    echo $dir/main.opt
+                    $dir/main.opt
+                    exit 1
+                fi
+            else
+                echo "compilation failed!"
+                echo BENCH=yes make -C $dir
+                BENCH=yes make -C $dir
+                exit 1
+            fi
+        else
+            echo "extract failed!"
+            echo BENCH=yes make -C $dir extract
+            BENCH=yes make -C $dir extract
+            exit 1
+        fi
+    else
+        echo "clean failed!"
+        echo BENCH=yes make -C $dir clean
+        BENCH=yes make -C $dir clean
+        exit 1
+    fi
+}
+
 list_stuff () {
     pgm="bin/why3$suffix"
     printf '  %s ' "$1"
@@ -303,6 +342,10 @@ extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
 # extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml
 extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+echo ""
+
+echo "=== Checking extraction to C ==="
+extract_and_test_wmp
 echo ""
 
 echo "=== Checking --list-* ==="
