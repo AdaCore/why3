@@ -39,6 +39,32 @@ module mach.int.Int32
   syntax val (>)     "%1 > %2"
 end
 
+module mach.int.UInt32Gen
+
+  syntax type uint32 "uint32_t"
+
+  syntax converter max_uint32 "0xffffffff"
+  syntax converter length "32"
+
+end
+
+module mach.int.UInt32
+
+  syntax converter of_int "%1U"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+end
+
 module mach.int.UInt32GMP
 
   prelude
@@ -119,17 +145,6 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
 
   syntax converter of_int "%1U"
 
-  syntax type uint32 "uint32_t"
-
-  syntax converter max_uint32 "0xffffffff"
-  syntax converter length "32"
-
-  syntax val add_with_carry "add32_with_carry"
-  syntax val sub_with_borrow "sub32_with_borrow"
-  syntax val mul_double "mul32_double"
-  syntax val add3 "add32_3"
-  syntax val lsld "lsld32"
-
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (*)     "%1 * %2"
@@ -140,6 +155,12 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
   syntax val (<)     "%1 < %2"
   syntax val (>=)    "%1 >= %2"
   syntax val (>)     "%1 > %2"
+
+  syntax val add_with_carry "add32_with_carry"
+  syntax val sub_with_borrow "sub32_with_borrow"
+  syntax val mul_double "mul32_double"
+  syntax val add3 "add32_3"
+  syntax val lsld "lsld32"
 
   syntax val add_mod "%1 + %2"
   syntax val sub_mod "%1 - %2"
@@ -156,6 +177,33 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
   syntax val count_leading_zeros "__builtin_clz(%1)"
 
   syntax val of_int32 "(uint32_t)%1"
+
+
+end
+
+module mach.int.UInt64Gen
+
+  syntax type uint64 "uint64_t"
+
+  syntax converter max_uint64 "0xffffffffffffffff"
+  syntax converter length "64"
+
+end
+
+module mach.int.UInt64
+
+  syntax converter of_int "%1ULL"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 
 
 end
@@ -257,18 +305,6 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 
   syntax converter of_int "%1ULL"
 
-  syntax type uint64 "uint64_t"
-
-  syntax converter max_uint64 "0xffffffffffffffff"
-  syntax converter length "64"
-
-  syntax val add_with_carry "add64_with_carry"
-  syntax val sub_with_borrow "sub64_with_borrow"
-  syntax val mul_double "mul64_double"
-  syntax val div2by1 "div64_2by1"
-  syntax val add3 "add64_3"
-  syntax val lsld "lsld64"
-
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (*)     "%1 * %2"
@@ -279,6 +315,13 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val (<)     "%1 < %2"
   syntax val (>=)    "%1 >= %2"
   syntax val (>)     "%1 > %2"
+
+  syntax val add_with_carry "add64_with_carry"
+  syntax val sub_with_borrow "sub64_with_borrow"
+  syntax val mul_double "mul64_double"
+  syntax val div2by1 "div64_2by1"
+  syntax val add3 "add64_3"
+  syntax val lsld "lsld64"
 
   syntax val add_mod "%1 + %2"
   syntax val sub_mod "%1 - %2"
@@ -292,7 +335,6 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val count_leading_zeros "__builtin_clzll(%1)"
 
   syntax val of_int32 "(uint64_t)%1"
-
 
 end
 
