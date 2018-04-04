@@ -1068,9 +1068,6 @@ COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
 COQLIBS_OPTION_FILES = Option
 COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 
-COQLIBS_SEQ_FILES = Seq
-COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
-
 ifeq (@coq_compat_version@,COQ84)
 COQLIBS_BV_FILES = Pow2int
 else
@@ -1087,7 +1084,7 @@ COQLIBS_IEEEFLOAT_FILES = RoundingMode GenericFloat Float32 Float64
 COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
@@ -1129,8 +1126,6 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_OPTION_FILES); do \
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
-	for f in $(COQLIBS_SEQ_FILES); do \
-	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BV_FILES); do \
 	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_IEEEFLOAT_FILES); do \
@@ -1164,9 +1159,6 @@ update-coq-list: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib
 
 update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/option.mlw
 	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T option.$$f -o $(GENERATED_PREFIX_COQ)/option/; done
-
-update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/seq.mlw
-	for f in $(COQLIBS_SEQ_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T seq.$$f -o $(GENERATED_PREFIX_COQ)/seq/; done
 
 update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/bv.mlw
 	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T bv.$$f -o $(GENERATED_PREFIX_COQ)/bv/; done
@@ -1202,8 +1194,6 @@ install-coq:
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_LIST)) $(LIBDIR)/why3/coq/list/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/option
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
-	$(MKDIR_P) $(LIBDIR)/why3/coq/seq
-	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/bv
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
 ifeq (@enable_coq_fp_libs@,yes)
