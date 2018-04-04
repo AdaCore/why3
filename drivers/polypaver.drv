@@ -34,7 +34,7 @@ transformation "discriminate"
 transformation "encoding_tptp"
 
 theory BuiltIn
-  meta "encoding : base" type real
+  meta "encoding:base" type real
   syntax predicate (=)  "(%1 = %2)"
   meta "eliminate_algebraic" "no_index"
 end
@@ -58,9 +58,9 @@ theory real.Real
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove allprops
 end

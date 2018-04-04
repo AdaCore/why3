@@ -135,6 +135,8 @@ type int_range = {
   ir_upper : BigInt.t;
 }
 
+val create_range : BigInt.t -> BigInt.t -> int_range
+
 exception OutOfRange of integer_constant
 
 val check_range : integer_constant -> int_range -> unit

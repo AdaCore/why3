@@ -45,7 +45,6 @@ type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_opaque : Stv.t;
   ls_constr : int;
 }
 
@@ -63,29 +62,22 @@ let ls_equal : lsymbol -> lsymbol -> bool = (==)
 let ls_hash ls = id_hash ls.ls_name
 let ls_compare ls1 ls2 = id_compare ls1.ls_name ls2.ls_name
 
-let check_opaque opaque args value =
-  if Stv.is_empty opaque then opaque else
-  let diff s ty = ty_v_fold (fun s tv -> Stv.remove tv s) s ty in
-  let s = List.fold_left diff (Opt.fold diff opaque value) args in
-  if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
-
 let check_constr constr _args value =
   if constr = 0 || (constr > 0 && value <> None)
   then constr else invalid_arg "Term.create_lsymbol"
 
-let create_lsymbol ?(opaque=Stv.empty) ?(constr=0) name args value = {
+let create_lsymbol ?(constr=0) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
-  ls_opaque = check_opaque opaque args value;
   ls_constr = check_constr constr args value;
 }
 
-let create_fsymbol ?opaque ?constr nm al vl =
-  create_lsymbol ?opaque ?constr nm al (Some vl)
+let create_fsymbol ?constr nm al vl =
+  create_lsymbol ?constr nm al (Some vl)
 
-let create_psymbol ?opaque nm al =
-  create_lsymbol ?opaque ~constr:0 nm al None
+let create_psymbol nm al =
+  create_lsymbol ~constr:0 nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -100,11 +92,12 @@ type pattern = {
 }
 
 and pattern_node =
-  | Pwild
-  | Pvar of vsymbol
-  | Papp of lsymbol * pattern list
-  | Por  of pattern * pattern
+  | Pwild (* _ *)
+  | Pvar of vsymbol (* newly introduced variables *)
+  | Papp of lsymbol * pattern list (* application *)
+  | Por  of pattern * pattern (* | *)
   | Pas  of pattern * vsymbol
+  (* naming a term recognized by pattern as a variable *)
 
 (* h-consing constructors for patterns *)
 
@@ -282,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare t1 t2 =
+let t_compare trigger label t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -327,7 +320,7 @@ let t_compare t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      comp_raise (Slab.compare t1.t_label t2.t_label);
+      if label then comp_raise (Slab.compare t1.t_label t2.t_label) else ();
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -383,7 +376,7 @@ let t_compare t1 t2 =
               let vml1 = (bv1, b1.bv_subst) :: vml1 in
               let vml2 = (bv2, b2.bv_subst) :: vml2 in
               let tr_cmp t1 t2 = t_compare bnd vml1 vml2 t1 t2; 0 in
-              comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2);
+              if trigger then comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2) else ();
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
@@ -409,7 +402,11 @@ let t_compare t1 t2 =
   try t_compare 0 [] [] t1 t2; 0
   with CompLT -> -1 | CompGT -> 1
 
-let t_equal t1 t2 = (t_compare t1 t2 = 0)
+let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
+
+let t_equal_nt_nl t1 t2 = (t_compare false false t1 t2 = 0)
+
+let t_compare = t_compare true true
 
 let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
@@ -770,6 +767,11 @@ let t_open_bound (v,b,t) =
   let m,v = vs_rename b.bv_subst v in
   v, t_subst_unsafe m t
 
+let t_open_bound_with e (v,b,t) =
+  vs_check v e;
+  let m = Mvs.add v e b.bv_subst in
+  t_subst_unsafe m t
+
 let t_open_branch (p,b,t) =
   let m,p = pat_rename b.bv_subst p in
   p, t_subst_unsafe m t
@@ -778,6 +780,8 @@ let t_open_quant (vl,b,tl,f) =
   let m,vl = vl_rename b.bv_subst vl in
   let tl = tr_map (t_subst_unsafe m) tl in
   vl, tl, t_subst_unsafe m f
+
+let t_clone_bound_id (v,_,_) = id_clone v.vs_name
 
 (** open bindings with optimized closing callbacks *)
 
@@ -838,29 +842,28 @@ let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
 
-let t_const c ty =
+let check_literal c ty =
   let ts = match ty.ty_node with
     | Tyapp (ts,[]) -> ts
-    | _ ->
-       match c with
-             | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
-             | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
+    | _ -> match c with
+           | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
+           | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
   in
   match c with
-  | Number.ConstInt _ when ts_equal ts ts_int ->
-     t_const c ty
+  | Number.ConstInt _ when ts_equal ts ts_int -> ()
   | Number.ConstInt n ->
      begin match ts.ts_def with
-           | Range ir -> Number.check_range n ir; t_const c ty
+           | Range ir -> Number.(check_range n ir)
            | _ -> raise (InvalidIntegerLiteralType ty)
      end
-  | Number.ConstReal _ when ts_equal ts ts_real ->
-     t_const c ty
-  | Number.ConstReal r ->
+  | Number.ConstReal _ when ts_equal ts ts_real -> ()
+  | Number.ConstReal x ->
      begin match ts.ts_def with
-           | Float fp -> Number.(check_float r.rc_abs) fp; t_const c ty
+           | Float fp -> Number.(check_float x.Number.rc_abs fp)
            | _ -> raise (InvalidRealLiteralType ty)
      end
+
+let t_const c ty = check_literal c ty; t_const c ty
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
@@ -902,10 +905,31 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
-let asym_label = create_label "asym_split"
+let rec t_and_l = function
+  | [] -> t_true
+  | [f] -> f
+  | f::fl -> t_and f (t_and_l fl)
 
-let t_and_asym t1 t2 = t_and (t_label_add asym_label t1) t2
-let t_or_asym  t1 t2 = t_or  (t_label_add asym_label t1) t2
+let rec t_or_l = function
+  | [] -> t_false
+  | [f] -> f
+  | f::fl -> t_or f (t_or_l fl)
+
+let asym_split = create_label "asym_split"
+let stop_split = create_label "stop_split"
+
+let t_and_asym t1 t2 = t_and (t_label_add asym_split t1) t2
+let t_or_asym  t1 t2 = t_or  (t_label_add asym_split t1) t2
+
+let rec t_and_asym_l = function
+  | [] -> t_true
+  | [f] -> f
+  | f::fl -> t_and_asym f (t_and_asym_l fl)
+
+let rec t_or_asym_l = function
+  | [] -> t_false
+  | [f] -> f
+  | f::fl -> t_or_asym f (t_or_asym_l fl)
 
 (* closing constructors *)
 
@@ -938,15 +962,15 @@ let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
-  let opaque = Stv.of_list ts.ts_args in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
   let id = id_fresh ("Tuple" ^ string_of_int n) in
-  let fs = create_fsymbol ~opaque ~constr:1 id tl ty in
+  let fs = create_fsymbol ~constr:1 id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 
-let is_fs_tuple fs = ls_equal fs (fs_tuple (List.length fs.ls_args))
+let is_fs_tuple fs =
+  fs.ls_constr = 1 && Hid.mem fs_tuple_ids fs.ls_name
 
 let is_fs_tuple_id id =
   try Some (Hid.find fs_tuple_ids id) with Not_found -> None
@@ -1162,6 +1186,8 @@ let t_fold fn acc t = match t.t_node with
   | Tquant (_, b) ->
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
+
+let t_iter fn t = t_fold (fun () t -> fn t) () t
 
 let t_all pr t = Util.all t_fold pr t
 let t_any pr t = Util.any t_fold pr t
@@ -1450,10 +1476,6 @@ let t_pred_app_beta lam t = t_pred_app_beta_l lam [t]
 
 (* constructors with propositional simplification *)
 
-let keep_on_simp_label = create_label "keep_on_simp"
-let can_simp t = not (Slab.mem keep_on_simp_label t.t_label)
-let can_simp_left t = can_simp t && not (Slab.mem asym_label t.t_label)
-
 let t_not_simp f = match f.t_node with
   | Ttrue  -> t_label_copy f t_false
   | Tfalse -> t_label_copy f t_true
@@ -1461,59 +1483,59 @@ let t_not_simp f = match f.t_node with
   | _      -> t_not f
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
-  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
-  | _, Tfalse when can_simp_left f1 -> f2
-  | _, _ when t_equal f1 f2    -> f1
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> t_label_remove asym_split f1
+  | Tfalse, _ -> t_label_remove asym_split f1
+  | _, Tfalse -> f2
+  | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_and f1 f2
 
 let t_and_simp_l l = List.fold_right t_and_simp l t_true
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
-  | _, Ttrue  when can_simp_left f1 -> f2
-  | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
-  | _, _ when t_equal f1 f2    -> f1
+  | Ttrue, _  -> t_label_remove asym_split f1
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> f2
+  | _, Tfalse -> t_label_remove asym_split f1
+  | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_or f1 f2
 
 let t_or_simp_l l = List.fold_right t_or_simp l t_false
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
-  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
-(*| _, Tfalse when can_simp f1 -> f2*)
-  | _, _ when t_equal f1 f2    -> f1
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> t_label_remove asym_split f1
+  | Tfalse, _ -> t_label_remove asym_split f1
+  | _, Tfalse -> f2
+  | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_and_asym f1 f2
 
 let t_and_asym_simp_l l = List.fold_right t_and_asym_simp l t_true
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
-(*| _, Ttrue  when can_simp f1 -> f2*)
-  | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
-  | _, _ when t_equal f1 f2    -> f1
+  | Ttrue, _  -> t_label_remove asym_split f1
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> f2
+  | _, Tfalse -> t_label_remove asym_split f1
+  | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_or_asym f1 f2
 
 let t_or_asym_simp_l l = List.fold_right t_or_asym_simp l t_false
 
 let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f1 -> f2
-  | Tfalse, _ when can_simp f2 -> t_label_copy f1 t_true
-  | _, Tfalse when can_simp f2 -> t_not_simp f1
-  | _, _ when t_equal f1 f2    -> t_label_copy f1 t_true
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> t_label_copy f1 t_true
+  | _, Tfalse -> t_not_simp f1
+  | _, _ when t_equal f1 f2 -> t_label_copy f1 t_true
   | _, _ -> t_implies f1 f2
 
 let t_iff_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> f1
-  | Tfalse, _ when can_simp f1 -> t_not_simp f2
-  | _, Tfalse when can_simp f2 -> t_not_simp f1
-  | _, _ when t_equal f1 f2    -> t_label_copy f1 t_true
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f1
+  | Tfalse, _ -> t_not_simp f2
+  | _, Tfalse -> t_not_simp f1
+  | _, _ when t_equal f1 f2 -> t_label_copy f1 t_true
   | _, _ -> t_iff f1 f2
 
 let t_binary_simp op = match op with
@@ -1523,22 +1545,25 @@ let t_binary_simp op = match op with
   | Tiff     -> t_iff_simp
 
 let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
-  | Ttrue, _, _  when can_simp f1 && can_simp f3 -> f2
-  | Tfalse, _, _ when can_simp f1 && can_simp f2 -> f3
-  | _, Ttrue, _  when can_simp f2 -> t_implies_simp (t_not_simp f1) f3
-  | _, Tfalse, _ when can_simp f2 -> t_and_asym_simp (t_not_simp f1) f3
-  | _, _, Ttrue  when can_simp f3 -> t_implies_simp f1 f2
-  | _, _, Tfalse when can_simp f3 -> t_and_asym_simp f1 f2
-  | _, _, _ when t_equal f2 f3 && can_simp f1 -> f2
+  | Ttrue, _, _  -> f2
+  | Tfalse, _, _ -> f3
+  | _, Ttrue, _  -> t_implies_simp (t_not_simp f1) f3
+  | _, Tfalse, _ -> t_and_asym_simp (t_not_simp f1) f3
+  | _, _, Ttrue  -> t_implies_simp f1 f2
+  | _, _, Tfalse -> t_and_asym_simp f1 f2
+  | _, _, _ when t_equal f2 f3 -> f2
   | _, _, _ -> t_if f1 f2 f3
 
 let small t = match t.t_node with
   | Tvar _ | Tconst _ -> true
+(* NOTE: shouldn't we allow this?
+  | Tapp (_,[]) -> true
+*)
   | _ -> false
 
 let t_let_simp e ((v,b,t) as bt) =
   let n = t_v_occurs v t in
-  if n = 0 && can_simp e then
+  if n = 0 then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
     vs_check v e;
@@ -1548,7 +1573,7 @@ let t_let_simp e ((v,b,t) as bt) =
 
 let t_let_close_simp v e t =
   let n = t_v_occurs v t in
-  if n = 0 && can_simp e then t else
+  if n = 0 then t else
   if n = 1 || small e then
     t_subst_single v e t
   else
@@ -1563,10 +1588,10 @@ let t_case_simp t bl =
   let e0_false = match e0.t_node with
     | Tfalse -> true | _ -> false in
   let is_e0 (_,_,e) = match e.t_node with
-    | Ttrue when can_simp e -> e0_true
-    | Tfalse when can_simp e -> e0_false
+    | Ttrue -> e0_true
+    | Tfalse -> e0_false
     | _ -> t_equal e e0 in
-  if can_simp t && t_closed e0 && List.for_all is_e0 tl then e0
+  if t_closed e0 && List.for_all is_e0 tl then e0
   else t_case t bl
 
 let t_case_close_simp t bl =
@@ -1578,10 +1603,10 @@ let t_case_close_simp t bl =
   let e0_false = match e0.t_node with
     | Tfalse -> true | _ -> false in
   let is_e0 (_,e) = match e.t_node with
-    | Ttrue when can_simp e -> e0_true
-    | Tfalse when can_simp e -> e0_false
+    | Ttrue -> e0_true
+    | Tfalse -> e0_false
     | _ -> t_equal e e0 in
-  if can_simp t && t_closed e0 && List.for_all is_e0 tl then e0
+  if t_closed e0 && List.for_all is_e0 tl then e0
   else t_case_close t bl
 
 let t_quant_simp q ((vl,_,_,f) as qf) =
@@ -1598,6 +1623,7 @@ let t_quant_simp q ((vl,_,_,f) as qf) =
     else t_quant_close q vl (List.filter (List.for_all (t_v_all check)) tl) f
 
 let t_quant_close_simp q vl tl f =
+  if vl = [] then f else
   let fvs = t_vars f in
   let check v = Mvs.mem v fvs in
   if List.for_all check vl then
@@ -1614,10 +1640,10 @@ let t_forall_close_simp = t_quant_close_simp Tforall
 let t_exists_close_simp = t_quant_close_simp Texists
 
 let t_equ_simp t1 t2 =
-  if t_equal t1 t2 && can_simp t1 then t_true  else t_equ t1 t2
+  if t_equal t1 t2 then t_true  else t_equ t1 t2
 
 let t_neq_simp t1 t2 =
-  if t_equal t1 t2 && can_simp t1 then t_false else t_neq t1 t2
+  if t_equal t1 t2 then t_false else t_neq t1 t2
 
 let t_forall_close_merge vs f = match f.t_node with
   | Tquant (Tforall, fq) ->
@@ -1631,41 +1657,22 @@ let t_exists_close_merge vs f = match f.t_node with
       t_exists_close (vs@vs') trs f
   | _ -> t_exists_close vs [] f
 
-let t_map_simp fn f =
-    if can_simp f then
-    t_label_copy f (match f.t_node with
-    | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
-	t_equ_simp (fn t1) (fn t2)
-    | Tif (f1, f2, f3) ->
-	t_if_simp (fn f1) (fn f2) (fn f3)
-    | Tlet (t, b) ->
-	let u,t2,close = t_open_bound_cb b in
-	t_let_simp (fn t) (close u (fn t2))
-    | Tquant (q, b) ->
-	let vl,tl,f1,close = t_open_quant_cb b in
-	t_quant_simp q (close vl (tr_map fn tl) (fn f1))
-    | Tbinop (op, f1, f2) ->
-	t_binary_simp op (fn f1) (fn f2)
-    | Tnot f1 ->
-	t_not_simp (fn f1)
-    | _ -> t_map fn f)
-    else
-    t_label_copy f (match f.t_node with
-    | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
-	t_equ (fn t1) (fn t2)
-    | Tif (f1, f2, f3) ->
-	t_if (fn f1) (fn f2) (fn f3)
-    | Tlet (t, b) ->
-	let u,t2,close = t_open_bound_cb b in
-	t_let (fn t) (close u (fn t2))
-    | Tquant (q, b) ->
-	let vl,tl,f1,close = t_open_quant_cb b in
-	t_quant q (close vl (tr_map fn tl) (fn f1))
-    | Tbinop (op, f1, f2) ->
-	t_binary op (fn f1) (fn f2)
-    | Tnot f1 ->
-	t_not (fn f1)
-    | _ -> t_map fn f)
+let t_map_simp fn f = t_label_copy f (match f.t_node with
+  | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
+      t_equ_simp (fn t1) (fn t2)
+  | Tif (f1, f2, f3) ->
+      t_if_simp (fn f1) (fn f2) (fn f3)
+  | Tlet (t, b) ->
+      let u,t2,close = t_open_bound_cb b in
+      t_let_simp (fn t) (close u (fn t2))
+  | Tquant (q, b) ->
+      let vl,tl,f1,close = t_open_quant_cb b in
+      t_quant_simp q (close vl (tr_map fn tl) (fn f1))
+  | Tbinop (op, f1, f2) ->
+      t_binary_simp op (fn f1) (fn f2)
+  | Tnot f1 ->
+      t_not_simp (fn f1)
+  | _ -> t_map fn f)
 
 let t_map_simp fn = t_map_simp (fun t ->
   let res = fn t in t_ty_check res t.t_ty; res)

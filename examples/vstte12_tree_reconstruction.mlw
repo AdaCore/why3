@@ -18,10 +18,11 @@ module Tree
   type tree = Leaf | Node tree tree
 
   (* the list of leaf depths for tree t, if root is at depth d *)
-  function depths (d: int) (t: tree) : list int = match t with
+  let rec function depths (d: int) (t: tree) : list int =
+    match t with
     | Leaf -> Cons d Nil
     | Node l r -> depths (d+1) l ++ depths (d+1) r
-  end
+    end
 
   (* lemmas on depths *)
 
@@ -92,7 +93,7 @@ module TreeReconstruction
 
   let rec build_rec (d: int) (s: list int) : (tree, list int)
     variant { (s, d) with lex }
-    ensures { let t, s' = result in s = depths d t ++ s' }
+    returns { t, s' -> s = depths d t ++ s' }
     raises  { Failure -> forall t: tree, s' : list int. depths d t ++ s' <> s }
   = match s with
     | Nil ->
@@ -100,11 +101,11 @@ module TreeReconstruction
     | Cons h t ->
         if h < d then raise Failure;
         if h = d then
-          (Leaf, t)
+          Leaf, t
         else
           let l, s = build_rec (d+1) s in
           let r, s = build_rec (d+1) s in
-          (Node l r, s)
+          Node l r, s
     end
 
   let build (s: list int) : tree
@@ -289,10 +290,11 @@ module ZipperBased
      [(x1, Leaf); (x2, Leaf); ...; (xn, Leaf)].
      Function [map_leaf] below does this. *)
 
-  function map_leaf (l: list int) : list (int, tree) = match l with
-  | Nil -> Nil
-  | Cons d r -> Cons (d, Leaf) (map_leaf r)
-  end
+  let rec function map_leaf (l: list int) : list (int, tree) =
+    match l with
+    | Nil -> Nil
+    | Cons d r -> Cons (d, Leaf) (map_leaf r)
+    end
 
   (* two lemmas on [map_leaf] *)
 

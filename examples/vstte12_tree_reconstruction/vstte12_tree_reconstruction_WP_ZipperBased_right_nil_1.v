@@ -10,9 +10,6 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-(* Why3 assumption *)
 Inductive tree :=
   | Leaf : tree
   | Node : tree -> tree -> tree.
@@ -85,8 +82,8 @@ Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
   tree)%type)), (g (Init.Datatypes.app l1 l2)) -> (g l1).
 
 Require Import Why3. 
-Ltac z := why3 "Z3,4.4.0," timelimit 5; admit.
-Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
+Ltac z := why3 "Z3,4.5.0," timelimit 5; admit.
+Ltac ae := why3 "Alt-Ergo,1.30,"; admit.
 
 Lemma depths_length: forall t d, (Length.length (depths d t) >= 1)%Z.
   induction t; simpl.

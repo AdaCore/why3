@@ -2,31 +2,23 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../add_list.mlw" expanded="true">
-<theory name="SumList" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="AddListRec" sum="ddf9071b1a9688fe9218a8b95f77634f" expanded="true">
- <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.02" steps="49"/></proof>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../add_list.mlw" proved="true">
+<theory name="AddListRec" proved="true">
+ <goal name="VC sum" expl="VC for sum" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="93"/></proof>
  </goal>
- <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <goal name="VC main" expl="VC for main" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="AddListImp" sum="b8d9e3c0e71fb300ad846cc5060783ef" expanded="true">
- <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+<theory name="AddListImp" proved="true">
+ <goal name="VC sum" expl="VC for sum" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <goal name="VC main" expl="VC for main" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

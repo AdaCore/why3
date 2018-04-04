@@ -11,188 +11,91 @@
 
 (*s Parse trees. *)
 
-type loc = Loc.position
-
-(*s Logical terms and formulas *)
-
-type integer_constant = Number.integer_constant
-type real_constant = Number.real_constant
-type constant = Number.constant
-
 type label =
   | Lstr of Ident.label
   | Lpos of Loc.position
 
-type quant =
-  | Tforall | Texists | Tlambda
-
-type binop =
-  | Tand | Tand_asym | Tor | Tor_asym | Timplies | Tiff | Tby | Tso
-
-type unop =
-  | Tnot
-
 type ident = {
   id_str : string;
   id_lab : label list;
-  id_loc : loc;
+  id_loc : Loc.position;
 }
+
+(*s Types *)
 
 type qualid =
   | Qident of ident
   | Qdot of qualid * ident
 
-type opacity = bool
-
 type pty =
-  | PTtyvar of ident * opacity
+  | PTtyvar of ident
   | PTtyapp of qualid * pty list
   | PTtuple of pty list
   | PTarrow of pty * pty
   | PTparen of pty
+  | PTpure  of pty
+
+(*s Patterns *)
 
 type ghost = bool
 
-type binder = loc * ident option * ghost * pty option
-type param  = loc * ident option * ghost * pty
-
 type pattern = {
   pat_desc : pat_desc;
-  pat_loc  : loc;
+  pat_loc  : Loc.position;
 }
 
 and pat_desc =
   | Pwild
-  | Pvar of ident
+  | Pvar of ident * ghost
   | Papp of qualid * pattern list
   | Prec of (qualid * pattern) list
   | Ptuple of pattern list
+  | Pas of pattern * ident * ghost
   | Por of pattern * pattern
-  | Pas of pattern * ident
   | Pcast of pattern * pty
+
+(*s Logical terms and formulas *)
+
+type binder = Loc.position * ident option * ghost * pty option
+type param  = Loc.position * ident option * ghost * pty
 
 type term = {
   term_desc : term_desc;
-  term_loc  : loc;
+  term_loc  : Loc.position;
 }
 
 and term_desc =
   | Ttrue
   | Tfalse
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tident of qualid
   | Tidapp of qualid * term list
   | Tapply of term * term
   | Tinfix of term * ident * term
   | Tinnfix of term * ident * term
-  | Tbinop of term * binop * term
-  | Tunop of unop * term
+  | Tbinop of term * Dterm.dbinop * term
+  | Tbinnop of term * Dterm.dbinop * term
+  | Tnot of term
   | Tif of term * term * term
-  | Tquant of quant * binder list * term list list * term
+  | Tquant of Dterm.dquant * binder list * term list list * term
   | Tnamed of label * term
   | Tlet of ident * term * term
-  | Tmatch of term * (pattern * term) list
+  | Tcase of term * (pattern * term) list
   | Tcast of term * pty
   | Ttuple of term list
   | Trecord of (qualid * term) list
   | Tupdate of term * (qualid * term) list
+  | Tscope of qualid * term
+  | Tat of term * ident
 
-(*s Declarations. *)
-
-type use = {
-  use_theory : qualid;
-  use_import : (bool (* import *) * string (* as *)) option;
-}
-
-type clone_subst =
-  | CSns    of loc * qualid option * qualid option
-  | CStsym  of loc * qualid * ident list * pty
-  | CSfsym  of loc * qualid * qualid
-  | CSpsym  of loc * qualid * qualid
-  | CSvsym  of loc * qualid * qualid
-  | CSlemma of loc * qualid
-  | CSgoal  of loc * qualid
-
-type field = {
-  f_loc     : loc;
-  f_ident   : ident;
-  f_pty     : pty;
-  f_mutable : bool;
-  f_ghost   : bool
-}
-
-type type_def =
-  | TDabstract
-  | TDalias     of pty
-  | TDalgebraic of (loc * ident * param list) list
-  | TDrecord    of field list
-  | TDrange     of BigInt.t * BigInt.t
-  | TDfloat     of int * int
-
-type visibility = Public | Private | Abstract
+(*s Program expressions *)
 
 type invariant = term list
-
-type type_decl = {
-  td_loc    : loc;
-  td_ident  : ident;
-  td_params : ident list;
-  td_model  : bool;
-  td_vis    : visibility;
-  td_def    : type_def;
-  td_inv    : invariant;
-}
-
-type logic_decl = {
-  ld_loc    : loc;
-  ld_ident  : ident;
-  ld_params : param list;
-  ld_type   : pty option;
-  ld_def    : term option;
-}
-
-type ind_decl = {
-  in_loc    : loc;
-  in_ident  : ident;
-  in_params : param list;
-  in_def    : (loc * ident * term) list;
-}
-
-type metarg =
-  | Mty  of pty
-  | Mfs  of qualid
-  | Mps  of qualid
-  | Mpr  of qualid
-  | Mstr of string
-  | Mint of int
-
-type use_clone = use * clone_subst list option
-
-type decl =
-  | Dtype of type_decl list
-  | Dlogic of logic_decl list
-  | Dind of Decl.ind_sign * ind_decl list
-  | Dprop of Decl.prop_kind * ident * term
-  | Dmeta of ident * metarg list
-
-(* program files *)
-
-type assertion_kind = Aassert | Aassume | Acheck
-
-type lazy_op = LazyAnd | LazyOr
-
-type variant = term * qualid option
-
-type loop_annotation = {
-  loop_invariant : invariant;
-  loop_variant   : variant list;
-}
-
-type for_direction = To | Downto
+type variant = (term * qualid option) list
 
 type pre = term
-type post = loc * (pattern * term) list
-type xpost = loc * (qualid * pattern * term) list
+type post = Loc.position * (pattern * term) list
+type xpost = Loc.position * (qualid * (pattern * term) option) list
 
 type spec = {
   sp_pre     : pre list;
@@ -200,84 +103,138 @@ type spec = {
   sp_xpost   : xpost list;
   sp_reads   : qualid list;
   sp_writes  : term list;
-  sp_variant : variant list;
+  sp_alias   : (term * term) list;
+  sp_variant : variant;
   sp_checkrw : bool;
   sp_diverge : bool;
 }
 
-type type_v =
-  | PTpure of pty
-  | PTfunc of param list * type_c
-
-and type_c = type_v * spec
-
-type top_ghost = Gnone | Gghost | Glemma
-
 type expr = {
   expr_desc : expr_desc;
-  expr_loc  : loc;
+  expr_loc  : Loc.position;
 }
 
 and expr_desc =
   | Etrue
   | Efalse
-  | Econst of constant
+  | Econst of Number.constant
   (* lambda-calculus *)
   | Eident of qualid
   | Eidapp of qualid * expr list
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr
-  | Elet of ident * top_ghost * expr * expr
-  | Efun of ident * top_ghost * lambda * expr
+  | Elet of ident * ghost * Expr.rs_kind * expr * expr
   | Erec of fundef list * expr
-  | Elam of lambda
+  | Efun of binder list * pty option * Ity.mask * spec * expr
+  | Eany of param list * Expr.rs_kind * pty option * Ity.mask * spec
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
-  | Eassign of expr * qualid * expr
+  | Eassign of (expr * qualid * expr) list
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
-  | Eloop of loop_annotation * expr
-  | Ewhile of expr * loop_annotation * expr
-  | Elazy of expr * lazy_op * expr
+  | Ewhile of expr * invariant * variant * expr
+  | Eand of expr * expr
+  | Eor of expr * expr
   | Enot of expr
-  | Ematch of expr * (pattern * expr) list
+  | Ematch of expr * reg_branch list * exn_branch list
   | Eabsurd
+  | Epure of term
+  | Eidpur of qualid
   | Eraise of qualid * expr option
-  | Etry of expr * (qualid * pattern option * expr) list
-  | Efor of ident * expr * for_direction * expr * invariant * expr
+  | Eexn of ident * pty * Ity.mask * expr
+  | Eoptexn of ident * Ity.mask * expr
+  | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
-  | Eassert of assertion_kind * term
+  | Eassert of Expr.assertion_kind * term
   | Emark of ident * expr
   | Ecast of expr * pty
-  | Eany of type_c
   | Eghost of expr
-  | Eabstract of expr * spec
   | Enamed of label * expr
+  | Escope of qualid * expr
 
-and fundef = ident * top_ghost * lambda
+and reg_branch = pattern * expr
 
-and lambda = binder list * pty option * expr * spec
+and exn_branch = qualid * pattern option * expr
 
-type pdecl =
-  | Dval of ident * top_ghost * type_v
-  | Dlet of ident * top_ghost * expr
-  | Dfun of ident * top_ghost * lambda
-  | Drec of fundef list
-  | Dexn of ident * pty
+and fundef = ident * ghost * Expr.rs_kind *
+  binder list * pty option * Ity.mask * spec * expr
 
-(* incremental parsing *)
+(*s Declarations *)
 
-type incremental = {
-  open_theory     : ident -> unit;
-  close_theory    : unit -> unit;
-  open_module     : ident -> unit;
-  close_module    : unit -> unit;
-  open_namespace  : string -> unit;
-  close_namespace : loc -> bool (*import:*) -> unit;
-  new_decl        : loc -> decl -> unit;
-  new_pdecl       : loc -> pdecl -> unit;
-  use_clone       : loc -> use_clone -> unit;
+type field = {
+  f_loc     : Loc.position;
+  f_ident   : ident;
+  f_pty     : pty;
+  f_mutable : bool;
+  f_ghost   : bool
 }
+
+type type_def =
+  | TDalias     of pty
+  | TDalgebraic of (Loc.position * ident * param list) list
+  | TDrecord    of field list
+  | TDrange     of BigInt.t * BigInt.t
+  | TDfloat     of int * int
+
+type visibility = Public | Private | Abstract (* = Private + ghost fields *)
+
+type type_decl = {
+  td_loc    : Loc.position;
+  td_ident  : ident;
+  td_params : ident list;
+  td_vis    : visibility; (* records only *)
+  td_mut    : bool;       (* records or abstract types *)
+  td_inv    : invariant;  (* records only *)
+  td_wit    : (qualid * expr) list;
+  td_def    : type_def;
+}
+
+type logic_decl = {
+  ld_loc    : Loc.position;
+  ld_ident  : ident;
+  ld_params : param list;
+  ld_type   : pty option;
+  ld_def    : term option;
+}
+
+type ind_decl = {
+  in_loc    : Loc.position;
+  in_ident  : ident;
+  in_params : param list;
+  in_def    : (Loc.position * ident * term) list;
+}
+
+type metarg =
+  | Mty  of pty
+  | Mfs  of qualid
+  | Mps  of qualid
+  | Max  of qualid
+  | Mlm  of qualid
+  | Mgl  of qualid
+  | Mstr of string
+  | Mint of int
+
+type clone_subst =
+  | CStsym  of qualid * ident list * pty
+  | CSfsym  of qualid * qualid
+  | CSpsym  of qualid * qualid
+  | CSvsym  of qualid * qualid
+  | CSxsym  of qualid * qualid
+  | CSaxiom of qualid
+  | CSlemma of qualid
+  | CSgoal  of qualid
+
+type decl =
+  | Dtype of type_decl list
+  | Dlogic of logic_decl list
+  | Dind of Decl.ind_sign * ind_decl list
+  | Dprop of Decl.prop_kind * ident * term
+  | Dlet of ident * ghost * Expr.rs_kind * expr
+  | Drec of fundef list
+  | Dexn of ident * pty * Ity.mask
+  | Dmeta of ident * metarg list
+  | Dclone of qualid * clone_subst list
+  | Duse of qualid

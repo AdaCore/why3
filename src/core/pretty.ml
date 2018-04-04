@@ -19,35 +19,45 @@ open Decl
 open Theory
 open Task
 
-let debug_print_labels = Debug.register_info_flag "print_labels"
-  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let why3_keywords =
+  ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
+   "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
+   "scope"; "import"; "export"; "end";
+   "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
+   "let"; "in"; "match"; "with"; "as"; "epsilon" ]
+
+let label_coercion = create_label "coercion"
+
+let debug_print_labels =
+  Debug.register_info_flag
+    "print_labels"
+    ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let iprinter,aprinter,tprinter,pprinter =
-  let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
-            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-            "namespace"; "import"; "export"; "end";
-            "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
-            "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:isanitize
+let debug_print_coercions = Debug.register_info_flag "print_coercions"
+  ~desc:"Print@ coercions@ in@ logical@ formulas."
+
+let meta_introduced_hypotheses =
+  register_meta
+    ~desc:"marks beginning of hypotheses introduced by introduce_premises"
+    "introduced_premises" []
+
+let create iprinter aprinter tprinter pprinter do_forget_all =
+  (module (struct
 
 let forget_tvs () =
-  forget_all aprinter
+  (* we always forget type variables between each declaration *)
+  (* if do_forget_all then *) forget_all aprinter
 
 let forget_all () =
-  forget_all iprinter;
-  forget_all aprinter;
-  forget_all tprinter;
-  forget_all pprinter
+  if do_forget_all then forget_all iprinter;
+  if do_forget_all then forget_all aprinter;
+  if do_forget_all then forget_all tprinter;
+  if do_forget_all then forget_all pprinter
 
-let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_label fmt l = fprintf fmt "[@%s]" l.lab_string
 let print_labels = print_iter1 Slab.iter space print_label
 
 let print_loc fmt l =
@@ -74,20 +84,19 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 (* pretty-print infix and prefix logic symbols *)
 
-let extract_op ls =
-  let s = ls.ls_name.id_string in
+let extract_op s =
+  (*let s = ls.ls_name.id_string in*)
   match Ident.kind_of_fix s with
   | `None | `Mixfix _ -> None
   | `Prefix s | `Infix s -> Some s
 
-let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
+let tight_op s =
+  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
 let escape_op s =
-  let len = String.length s in
-  if len = 0 then s else
-    let s = if String.get s (len - 1) = '*' then s ^ " " else s in
-    let s = if String.get s 0 = '*' then " " ^ s else s in
-   s
+  let s = if Strings.has_prefix "*" s then " " ^ s else s in
+  let s = if Strings.has_suffix "*" s then s ^ " " else s in
+  s
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
@@ -97,12 +106,16 @@ let print_th fmt th =
 let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
 
-let print_ls fmt ls =
-  if ls.ls_name.id_string = "mixfix []" then fprintf fmt "([])" else
-  if ls.ls_name.id_string = "mixfix [<-]" then fprintf fmt "([<-])" else
-  match extract_op ls with
+let print_ls fmt ({ls_name = {id_string = nm}} as ls) =
+  if nm = "mixfix []" then pp_print_string fmt "([])" else
+  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
+  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
+  if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
+  let s = id_unique iprinter ls.ls_name in
+  match extract_op s with
   | Some s -> fprintf fmt "(%s)" (escape_op s)
-  | None   -> fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  | None   -> fprintf fmt "%s" s
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
@@ -120,6 +133,8 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
   | Tyapp (ts, [t1;t2]) when ts_equal ts Ty.ts_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_ty_node 1) t1 (print_ty_node 0) t2
+  | Tyapp (ts, []) when is_ts_tuple ts ->
+      fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list comma (print_ty_node 0)) tl
   | Tyapp (ts, []) -> print_ts fmt ts
@@ -127,6 +142,14 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
       print_ts ts (print_list space (print_ty_node 2)) tl
 
 let print_ty fmt ty = print_ty_node 0 fmt ty
+
+let print_vsty fmt v =
+  fprintf fmt "%a%a:@,%a" print_vs v
+    print_id_labels v.vs_name print_ty v.vs_ty
+
+let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
+let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -165,10 +188,6 @@ let rec print_pat_node pri fmt p = match p.pat_node with
 
 let print_pat = print_pat_node 0
 
-let print_vsty fmt v =
-  fprintf fmt "%a%a:@,%a" print_vs v
-    print_id_labels v.vs_name print_ty v.vs_ty
-
 let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
   | Texists -> fprintf fmt "exists"
@@ -203,46 +222,69 @@ and print_lterm pri fmt t =
     else print_tlab pri fmt t in
   print_tloc pri fmt t
 
-and print_app pri ls fmt tl = match extract_op ls, tl with
+and print_app pri ls fmt tl =
+  let s = id_unique iprinter ls.ls_name in
+  match extract_op s, tl with
   | _, [] ->
       print_ls fmt ls
   | Some s, [t1] when tight_op s ->
-      fprintf fmt (protect_on (pri > 8) "%s%a")
+      fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Some s, [t1] ->
-      fprintf fmt (protect_on (pri > 5) "%s %a")
+      fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
         s (print_lterm 6) t1
   | Some s, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %s@ %a@]")
+      fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
         (print_lterm 7) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a <- %a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
+  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [_..]" ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..]")
+        (print_lterm 7) t1 print_term t2
+  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [.._]" ->
+      fprintf fmt (protect_on (pri > 7) "%a[..%a]")
+        (print_lterm 7) t1 print_term t2
+  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [_.._]" ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..%a]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, tl ->
-      fprintf fmt (protect_on (pri > 6) "@[<hov 1>%a@ %a@]")
+      fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
         print_ls ls (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
+     begin
+       match t.t_ty with
+       | Some {ty_node = Tyapp (ts,[])}
+            when ts_equal ts ts_int || ts_equal ts ts_real ->
+          Number.print_constant fmt c
+       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+                            print_ty ty
+       | None -> assert false
+     end
+  | Tapp (_, [t1]) when Slab.mem label_coercion t.t_label &&
+                        Debug.test_noflag debug_print_coercions ->
+      print_lterm pri fmt (t_label t1.t_label t1)
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "%a:%a")
+      fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
         (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
         print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a%a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0)
+                              "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
         print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
@@ -256,8 +298,8 @@ and print_tnode pri fmt t = match t.t_node with
           print_vsty v print_term f;
         forget_var v
       end else begin
-        fprintf fmt (protect_on (pri > 0) "@[<hov 1>\\ %a%a.@ %a@]")
-          (print_list comma print_vsty) vl print_tl tl print_term e;
+        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun%a%a ->@ %a@]")
+          (print_list nothing print_vs_arg) vl print_tl tl print_term e;
         List.iter forget_var vl
       end
   | Tquant (q,fq) ->
@@ -270,17 +312,17 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when Slab.mem Term.asym_label f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a so@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+    when Slab.mem Term.asym_split f2.t_label ->
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
-    when Slab.mem Term.asym_label f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a by@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+    when Slab.mem Term.asym_split f2.t_label ->
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label f1.t_label in
+      let asym = Slab.mem Term.asym_split f1.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
+      fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
@@ -295,10 +337,6 @@ and print_tl fmt tl =
     (print_list alt (print_list comma print_term)) tl
 
 (** Declarations *)
-
-let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
-let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 let print_constr fmt (cs,pjl) =
   let add_pj pj ty pjl = (pj,ty)::pjl in
@@ -376,7 +414,6 @@ let sprint_pkind = function
   | Paxiom -> "axiom"
   | Plemma -> "lemma"
   | Pgoal  -> "goal"
-  | Pskip  -> "skip"
 
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
@@ -405,6 +442,11 @@ let print_next_logic_decl = print_logic_decl false
 let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl Ind false
 let print_ind_decl fmt s  = print_ind_decl s true fmt
+
+let print_inst_ty fmt (ts1,ty2) =
+  fprintf fmt "type %a%a = %a" print_ts ts1
+    (print_list_pre space print_tv) ts1.ts_args
+    print_ty ty2; forget_tvs ()
 
 let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
@@ -442,16 +484,16 @@ let print_tdecl fmt td = match td.td_node with
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
-  | Clone (th,sm) when is_empty_sm sm ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
+      let ym = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ty [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]"
-        print_qt th (print_list comma print_inst_ts) tm
-                    (print_list comma print_inst_ls) lm
-                    (print_list comma print_inst_pr) pm
+      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]"
+        print_qt th (print_list_suf comma print_inst_ts) tm
+                    (print_list_suf comma print_inst_ty) ym
+                    (print_list_suf comma print_inst_ls) lm
+                    (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
         m.meta_name (print_list comma print_meta_arg) al
@@ -499,6 +541,74 @@ let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
   fprintf fmt "@[<hov>%a@]@." P.print
     (NsTree.Namespace (name, th.th_export, th.th_known))
+
+
+(* print task under the form of a sequent, with only local context, for the IDE *)
+
+(*
+let print_goal fmt d =
+   match d.d_node with
+   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]@\n" print_term f
+   | _ -> assert false
+*)
+
+let local_decls task symbmap =
+  let rec skip t = function
+    | { td_node = Use th } :: rest
+      when id_equal t.th_name th.th_name -> rest
+    | _ :: rest -> skip t rest
+    | [] -> []
+  in
+  let rec filter ((b,acc1,acc2) as acc) = function
+    | { td_node = Meta (m,_) } :: rest
+         when meta_equal m meta_introduced_hypotheses ->
+       filter (true, acc2 @ acc1, []) rest
+    | { td_node = Decl d } :: rest ->
+        let id = Sid.choose d.d_news in
+        (try filter acc (skip (Mid.find id symbmap) rest)
+         with Not_found ->
+              filter (b,acc1,d::acc2) rest)
+    | _ :: rest -> filter acc rest
+    | [] -> if b then List.rev acc1, List.rev acc2
+            else match acc1,acc2 with
+            | [], g::r -> List.rev r, [g]
+            | _ -> assert false
+  in
+  filter (false,[],[]) (task_tdecls task)
+
+let print_sequent fmt task =
+  let ut = Task.used_symbols (Task.used_theories task) in
+  let (ld1,ld2) = local_decls task ut in
+  let rec aux fmt l =
+    match l with
+      | [] -> ()
+      | d :: r ->
+         fprintf fmt "@[%a@]@\n@\n" print_decl d;
+         aux fmt r
+  in
+  fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld1;
+  fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld2;
+
+
+
+            end) : Pretty_sig.Printer) (* end of the first class module *)
+
+
+
+module LegacyPrinter =
+  (val (let iprinter,aprinter,tprinter,pprinter =
+    let same = fun x -> x in
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same
+  in
+  create iprinter aprinter tprinter pprinter true))
+
+include LegacyPrinter
+
 
 (* Exception reporting *)
 
@@ -565,9 +675,9 @@ let () = Exn_printer.register
       fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
-  | Decl.RecordFieldMissing (_cs,ls) ->
+  | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" print_ls ls
-  | Decl.DuplicateRecordField (_cs,ls) ->
+  | Decl.DuplicateRecordField ls ->
       fprintf fmt "Field %a is used twice in the same constructor" print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt

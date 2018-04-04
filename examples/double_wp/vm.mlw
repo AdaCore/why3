@@ -31,7 +31,7 @@ end
     - an evaluation stack, containing integers.
 *)
 
-theory Vm "Virtual Machine for IMP language"
+theory Vm
 
   use import state.State
   use import int.Int
@@ -76,19 +76,19 @@ theory Vm "Virtual Machine for IMP language"
   lemma codeseq_at_app_left: forall c c1 c2 p.
     codeseq_at c p (c1 ++ c2) -> codeseq_at c p c1
 
-  function push (n:int) (s:stack) : stack = Cons n s
-  function iconst (n:int) : code = Cons (Iconst n) Nil
-  function ivar (x:id) : code  = Cons (Ivar x) Nil
-  function isetvar (x:id) : code = Cons (Isetvar x) Nil
-  constant iadd : code = Cons Iadd Nil
-  constant isub : code = Cons Isub Nil
-  constant imul : code = Cons Imul Nil
-  function ibeq (ofs:ofs) : code = Cons (Ibeq ofs) Nil
-  function ible (ofs:ofs) : code = Cons (Ible ofs) Nil
-  function ibne (ofs:ofs) : code = Cons (Ibne ofs) Nil
-  function ibgt (ofs:ofs) : code = Cons (Ibgt ofs) Nil
-  function ibranch (ofs:ofs) : code = Cons (Ibranch ofs) Nil
-  constant ihalt : code = (Cons Ihalt Nil)
+  let function push (n:int) (s:stack) : stack = Cons n s
+  let function iconst (n:int) : code = Cons (Iconst n) Nil
+  let function ivar (x:id) : code  = Cons (Ivar x) Nil
+  let function isetvar (x:id) : code = Cons (Isetvar x) Nil
+  let constant iadd : code = Cons Iadd Nil
+  let constant isub : code = Cons Isub Nil
+  let constant imul : code = Cons Imul Nil
+  let function ibeq (ofs:ofs) : code = Cons (Ibeq ofs) Nil
+  let function ible (ofs:ofs) : code = Cons (Ible ofs) Nil
+  let function ibne (ofs:ofs) : code = Cons (Ibne ofs) Nil
+  let function ibgt (ofs:ofs) : code = Cons (Ibgt ofs) Nil
+  let function ibranch (ofs:ofs) : code = Cons (Ibranch ofs) Nil
+  let constant ihalt : code = (Cons Ihalt Nil)
 
   (* The semantics of the virtual machine is given in small-step style,
      as a transition relation between machine states: triples (program

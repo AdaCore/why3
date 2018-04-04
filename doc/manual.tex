@@ -63,9 +63,18 @@
 %\let\bf\bfseries
 
 \usepackage{ifthen}
+
+% avoid double spacing after '.' and ':' in texttt
+%BEGIN LATEX
+\makeatletter
+\let\ttfamily\relax
+\DeclareRobustCommand\ttfamily
+   {\not@math@alphabet\ttfamily\mathtt\fontfamily\ttdefault\selectfont\frenchspacing}
+\makeatother
+%END LATEX
+
 \input{./macros.tex}
 \input{./replayer_macros.tex}
-
 \input{./version.tex}
 
 \makeindex
@@ -265,6 +274,69 @@ Thi-Minh-Tuyen Nguyen, M\'ario Pereira, Asma Tafat, Piotr Trojanek.
 \chapter{Release Notes}
 %HEVEA\cutname{changes.html}
 
+\section{Release Notes for version 0.90}
+
+TO DISCUSS:
+
+comment mettre a jour l'example bag ? Parametrer par une egalit'e sur
+les elements ?
+
+
+Attention, ne pas introduire 1 variable par champ complique le boulot des prouveurs
+
+``inline'' ne doit pas inliner Map.set
+
+egalite sur les type algebriques ? engendrees automatiquement ?
+
+\subsection{Syntax Changes}
+
+\begin{center}
+\begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{version 0.87} & \textbf{version 0.90} \\
+\hline
+\texttt{'L:} & \texttt{label L in} \\
+\hline
+\texttt{at x 'L} & \texttt{x at L} \\
+\hline
+\texttt{assert \{ ... (old x) ... \}} & \texttt{assert \{ ... (x at Init) ... \}} \\
+\hline
+\texttt{\char`\\ x. e} & \texttt{fun x -> e} \\
+\hline
+\texttt{use HighOrd} & nothing, not needed anymore \\
+\hline
+\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
+\hline
+\texttt{type t model ...} & \texttt{type t = abstract ...} \\
+\hline
+\texttt{abstract e ensures \{ Q \}} & \texttt{begin ensures \{ Q \} e end} \\
+\hline
+\texttt{namespace N} & \texttt{scope N} \\
+\hline
+\texttt{"attribute"} & \texttt{[@attribute]} \\
+\hline
+\texttt{meta M prop P} & \texttt{meta M lemma P} or \texttt{meta M axiom P} or \texttt{meta M goal P} \\
+\hline
+\texttt{loop ... end} & \texttt{while true do ... done} \\
+\hline
+\texttt{type ... invariant \{ ... self.foo ... \}} & \texttt{type ... invariant \{ ... foo ... \}}\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Model types, abstract types}
+
+explain \texttt{private} and ghost fields, \texttt{abstract mutable},
+\texttt{private mutable}
+
+\subsection{Polymorphic Equality}
+
+No polymorphic equality in programs. Consequence : no List.mem in
+programs, need for List.mem, List.filter, parameterized with a
+predicate.
+
+No default equality on algebraic datatypes
+
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
 The syntax of \whyml programs changed in release 0.80.
@@ -422,7 +494,7 @@ are the following.
 % %   the future. Examples are available in \texttt{examples/programs}. *)
 % \end{itemize}
 
-\bibliographystyle{abbrvurl}
+\bibliographystyle{plain}
 \bibliography{manual}
 %\bibliography{abbrevs,demons,demons2,demons3,team,crossrefs}
 

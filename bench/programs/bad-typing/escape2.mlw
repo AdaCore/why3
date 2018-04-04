@@ -1,0 +1,11 @@
+module M
+
+  use import ref.Ref
+
+  (* reference would escape its scope *)
+
+  let test () =
+    let x = ref 0 in
+    fun y -> !x
+
+end

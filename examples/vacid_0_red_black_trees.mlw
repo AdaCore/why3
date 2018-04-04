@@ -292,7 +292,7 @@ module Vacid0
   predicate inv (r : rbt) =
     let (_, t) = r in bst t /\ exists n : int. rbtree n t
 
-  function default (r : rbt) : value =
+  let function default (r : rbt) : value =
     let (d, _) = r in d
 
   predicate mem (r : rbt) (k : key) (v : value) =

@@ -7,7 +7,7 @@
 theory Graph
 
   use export list.List
-  use import list.Append
+  use export list.Append
   use export list.Length
   use list.Mem
   use export int.Int
@@ -26,11 +26,14 @@ theory Graph
     mem (x, y) edges -> mem x vertices /\ mem y vertices
 
   (* a single source vertex s is given *)
-  constant s: vertex
-  axiom s_in_graph: mem s vertices
+  val constant s: vertex
+    ensures { mem result vertices }
 
   (* hence vertices is non empty *)
   lemma vertices_cardinal_pos: cardinal vertices > 0
+
+  val constant nb_vertices: int
+    ensures { result = cardinal vertices }
 
   (* paths *)
   clone export graph.IntPathWeight
@@ -60,36 +63,35 @@ theory Graph
 
   clone pigeon.Pigeonhole with type t = vertex
 
-  lemma long_path_decomposition_pigeon1:
-    forall l: list vertex, v: vertex.
-    path s l v -> l <> Nil ->
-    (forall v1: vertex. Mem.mem v1 (Cons v l) -> mem v1 vertices)
-
-  lemma long_path_decomposition_pigeon2:
-    forall l: list vertex, v: vertex.
-    (forall v1: vertex. Mem.mem v1 (Cons v l) -> mem v1 vertices) ->
-    length (Cons v l) > cardinal vertices ->
-    (exists e: vertex, l1 l2 l3: list vertex.
-    (Cons v l) = l1 ++ (Cons e (l2 ++ (Cons e l3))))
-
-  lemma long_path_decomposition_pigeon3:
-    forall l: list vertex, v: vertex.
-    (exists e: vertex, l1 l2 l3: list vertex.
-    (Cons v l) = l1 ++ (Cons e (l2 ++ (Cons e l3)))) ->
-       (exists l1 l2: list vertex. l = l1 ++ Cons v l2)
-    \/ (exists n: vertex, l1 l2 l3: list vertex.
-          l = l1 ++ Cons n (l2 ++ Cons n l3))
+  predicate cyc_decomp (v: vertex) (l: list vertex)
+                       (vi: vertex) (l1 l2 l3: list vertex) =
+    l = l1 ++ l2 ++ l3 /\ length l2 > 0 /\
+    path s l1 vi /\ path vi l2 vi /\ path vi l3 v
 
   lemma long_path_decomposition:
-    forall l: list vertex, v: vertex.
-    path s l v -> length l >= cardinal vertices ->
-       (exists l1 l2: list vertex. l = l1 ++ Cons v l2)
-    \/ (exists n: vertex, l1 l2 l3: list vertex.
-          l = l1 ++ Cons n (l2 ++ Cons n l3))
+    forall l v. path s l v /\ length l >= cardinal vertices ->
+      (exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3)
+      by exists n l1 l2 l3. Cons v l = l1 ++ Cons n (l2 ++ Cons n l3)
+      so match l1 with
+        | Nil -> cyc_decomp v l v l2 (Cons n l3) Nil
+        | Cons v l1 -> cyc_decomp v l n l1 (Cons n l2) (Cons n l3)
+        end
 
-  lemma simple_path:
-    forall v: vertex, l: list vertex. path s l v ->
-    exists l': list vertex. path s l' v /\ length l' < cardinal vertices
+  lemma long_path_reduction:
+    forall l v. path s l v /\ length l >= cardinal vertices ->
+      exists l'. path s l' v /\ length l' < length l
+      by exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3 /\ l' = l1 ++ l3
+
+  let lemma simple_path (v: vertex) (l: list vertex) : unit
+    requires { path s l v }
+    ensures  { exists l'. path s l' v /\ length l' < cardinal vertices }
+  = let rec aux (n: int) : unit
+      ensures { forall l. length l <= n /\ path s l v ->
+          exists l'. path s l' v /\ length l' < cardinal vertices }
+      variant { n }
+    = if n > 0 then aux (n-1)
+    in
+    aux (length l)
 
   (* negative cycle [v] -> [v] reachable from [s] *)
   predicate negative_cycle (v: vertex) =
@@ -108,32 +110,52 @@ theory Graph
        an even shorter path, with a stricltly shorter (list) length,
        thus we can apply the induction hypothesis.                     Qed.
    *)
-  lemma key_lemma_1:
-    forall v: vertex, n: int.
+  predicate all_path_gt (v: vertex) (n: int) =
+    forall l. path s l v /\ length l < cardinal vertices -> path_weight l v >= n
+
+  let lemma key_lemma_1 (v: vertex) (l: list vertex) (n: int) : unit
     (* if any simple path has weight at least n *)
-    (forall l: list vertex.
-       path s l v -> length l < cardinal vertices -> path_weight l v >= n) ->
+    requires { all_path_gt v n }
     (* and if there exists a shorter path *)
-    (exists l: list vertex. path s l v /\ path_weight l v < n) ->
-    (* then there exists a nagtive cycle *)
-    exists u: vertex. negative_cycle u
+    requires { path s l v /\ path_weight l v < n }
+    (* then there exists a negative cycle. *)
+    ensures  { exists u. negative_cycle u }
+  = let rec aux (m: int) : 'a
+      requires { forall u. not negative_cycle u }
+      requires { exists l. path s l v /\ path_weight l v < n /\ length l <= m }
+      ensures  { false }
+      variant  { m }
+    = assert { (exists l'. path s l' v /\ path_weight l' v < n /\ length l' < m)
+        by exists l. path s l v /\ path_weight l v < n /\ length l <= m
+        so exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3
+        so let res = l1 ++ l3 in
+          path s res v /\ length res < length l /\ path_weight res v < n
+          by path_weight l v =
+            path_weight l1 vi + path_weight l2 vi + path_weight l3 v
+          so path_weight l2 vi >= 0 by not negative_cycle vi
+      };
+      aux (m-1)
+    in
+    if pure { forall u. not negative_cycle u } then aux (length l)
 
 end
 
 module BellmanFord
 
-  use import map.Map
-  use map.Const
   use import Graph
   use int.IntInf as D
-
   use import ref.Ref
-  use impset.Impset as S
+  clone impset.Impset as S with type elt = (vertex, vertex)
+  clone import impmap.ImpmapNoDom with type key = vertex
 
-  type distmap = map vertex D.t
+  type distmap = ImpmapNoDom.t D.t
 
-  function initialize_single_source (s: vertex) : distmap =
-    (Const.const D.Infinite)[s <- D.Finite 0]
+  let initialize_single_source (s: vertex): distmap
+    ensures { result = (create D.Infinite)[s <- D.Finite 0] }
+  =
+    let m = create D.Infinite in
+    m[s] <- D.Finite 0;
+    m
 
   (* [inv1 m pass via] means that we already performed [pass-1] steps
      of the main loop, and, in step [pass], we already processed edges
@@ -163,6 +185,25 @@ module BellmanFord
     forall u v: vertex. mem (u, v) via ->
     D.le m[v] (D.add m[u] (D.Finite (weight u v)))
 
+
+  let rec lemma inv2_path (m: distmap) (y z: vertex) (l:list vertex) : unit
+    requires { inv2 m edges }
+    requires { path y l z }
+    ensures  { D.le m[z] (D.add m[y] (D.Finite (path_weight l z))) }
+    variant  { length l }
+  = match l with
+    | Nil -> ()
+    | Cons _ q ->
+      let hd = match q with
+        | Nil -> z
+        | Cons h _ ->
+          assert { path_weight l z = weight y h + path_weight q z };
+          assert { D.le m[h] (D.add m[y] (D.Finite (weight y h))) };
+          h
+        end in
+      inv2_path m hd z q
+    end
+
   (* key lemma for non-existence of a negative cycle
 
      Proof: let us assume a negative cycle reachable from s, that is
@@ -175,15 +216,58 @@ module BellmanFord
        hence a contradiction.                                  Qed. *)
   lemma key_lemma_2:
      forall m: distmap. inv1 m (cardinal vertices) empty -> inv2 m edges ->
-     forall v: vertex. not (negative_cycle v)
+     forall v: vertex. not (negative_cycle v
+       so exists l1. path s l1 v
+       so exists l2. path v l2 v /\ path_weight l2 v < 0
+       so D.le m[v] (D.add m[v] (D.Finite (path_weight l2 v)))
+     )
 
-  let relax (m: ref distmap) (u v: vertex) (pass: int)
+  let relax (m: distmap) (u v: vertex) (pass: int)
             (ghost via: set (vertex, vertex))
     requires { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) }
-    requires { inv1 !m pass via }
-    ensures  { inv1 !m pass (add (u, v) via) }
-  = let n = D.add !m[u] (D.Finite (weight u v)) in
-    if D.lt n !m[v] then m := !m[v <- n]
+    requires { inv1 m pass via }
+    ensures  { inv1 m pass (add (u, v) via) }
+  = label I in
+    let n = D.add m[u] (D.Finite (weight u v)) in
+    if D.lt n m[v]
+    then begin
+      m[v] <- n;
+      assert { match (m at I)[u] with
+        | D.Infinite -> false
+        | D.Finite w0 ->
+          let w1 = w0 + weight u v in
+          n = D.Finite w1
+          && (exists l. path s l v /\ path_weight l v = w1
+            by exists l2.
+              path s l2 u /\ path_weight l2 u = w0 /\ l = l2 ++ Cons u Nil
+          ) && (forall l. path s l v /\ length l < pass -> path_weight l v >= w1
+            by match (m at I)[v] with
+            | D.Infinite -> false
+            | D.Finite w2 -> path_weight l v >= w2
+            end
+          ) && (forall z l. path s l z /\ length l < pass ->
+            mem (z,v) (add (u,v) via) ->
+            path_weight l z + weight z v >= w1
+            by if z = u then path_weight l z >= w0
+            else match (m at I)[v] with
+              | D.Infinite -> false
+              | D.Finite w2 -> path_weight l z + weight z v >= w2
+              end
+          )
+        end
+      }
+    end else begin
+      assert { forall l w1. path s l u /\ length l < pass /\ m[v] = D.Finite w1 ->
+        path_weight l u + weight u v >= w1
+        by match m[u] with
+        | D.Infinite -> false
+        | D.Finite w0 -> path_weight l u >= w0
+        end
+      }
+    end
+
+  val get_edges (): S.t
+    ensures { result.S.contents = edges }
 
   exception NegativeCycle
 
@@ -192,35 +276,52 @@ module BellmanFord
       match result[v] with
         | D.Finite n ->
             (exists l: list vertex. path s l v /\ path_weight l v = n) /\
-            (forall l: list vertex. path s l v -> path_weight l v >= n)
+            (forall l: list vertex. path s l v -> path_weight l v >= n
+             by all_path_gt v n)
         | D.Infinite ->
             (forall l: list vertex. not (path s l v))
       end }
     raises { NegativeCycle -> exists v: vertex. negative_cycle v }
-  = let m = ref (initialize_single_source s) in
-    for i = 1 to cardinal vertices - 1 do
-      invariant { inv1 !m i empty }
-      let es = S.create edges in
+  = let m = initialize_single_source s in
+    for i = 1 to nb_vertices - 1 do
+      invariant { inv1 m i empty }
+      let es = get_edges () in
       while not (S.is_empty es) do
-        invariant { subset !es edges /\ inv1 !m i (diff edges !es) }
-        variant   { cardinal !es }
-        let ghost via = diff edges !es in
-        let (u, v) = S.pop es in
+        invariant { subset es.S.contents edges /\ inv1 m i (diff edges es.S.contents) }
+        variant   { S.cardinal es }
+        let ghost via = diff edges es.S.contents in
+        let (u, v) = S.choose_and_remove es in
         relax m u v i via
       done;
-      assert { inv1 !m i edges }
+      assert { inv1 m i edges }
     done;
-    assert { inv1 !m (cardinal vertices) empty };
-    let es = S.create edges in
+    assert { inv1 m (cardinal vertices) empty };
+    let es = get_edges () in
     while not (S.is_empty es) do
-      invariant { subset !es edges /\ inv2 !m (diff edges !es) }
-      variant { cardinal !es }
-      let (u, v) = S.pop es in
-      if D.lt (D.add !m[u] (D.Finite (weight u v))) !m[v] then begin
+      invariant { subset es.S.contents edges /\ inv2 m (diff edges es.S.contents) }
+      variant { S.cardinal es }
+      let (u, v) = S.choose_and_remove es in
+      if D.lt (D.add m[u] (D.Finite (weight u v))) m[v] then begin
+        assert { match m[u], m[v] with
+          | D.Infinite, _ -> false
+          | D.Finite _, D.Infinite -> false
+            by exists l2. path s l2 u
+            so let l = l2 ++ Cons u Nil in path s l v
+            so exists l. path s l v /\ length l < cardinal vertices
+          | D.Finite wu, D.Finite wv ->
+            (exists w. negative_cycle w)
+            by
+            all_path_gt v wv
+            so exists l2. path s l2 u /\ path_weight l2 u = wu
+            so let l = l2 ++ Cons u Nil in
+              path s l v /\ path_weight l v < wv
+          end
+        };
         raise NegativeCycle
       end
     done;
-    assert { inv2 !m edges };
-    !m
+    assert { inv2 m edges };
+    assert { forall u. not (negative_cycle u) };
+    m
 
 end

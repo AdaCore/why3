@@ -1,0 +1,9 @@
+
+
+type t 'a
+
+function f int : t int
+
+meta coercion function f
+
+goal G: forall x: t bool. 42 = x

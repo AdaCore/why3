@@ -2,17 +2,43 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="3124401c83f9fccd5387bad3a9f2247a" expanded="true">
- <goal name="WP_parameter f91" expl="VC for f91">
- <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../mccarthy.mlw" proved="true">
+<theory name="McCarthy91" proved="true">
+ <goal name="VC f91" expl="VC for f91" proved="true">
+ <proof prover="1" timelimit="10"><result status="valid" time="0.00" steps="31"/></proof>
  </goal>
- <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec">
- <proof prover="0"><result status="valid" time="0.11" steps="171"/></proof>
+ <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <proof prover="1" timelimit="10"><result status="valid" time="0.29" steps="517"/></proof>
  </goal>
- <goal name="WP_parameter f91_pseudorec" expl="VC for f91_pseudorec">
- <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
+ <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1" timelimit="10"><result status="valid" time="0.01" steps="49"/></proof>
+ </goal>
+</theory>
+<theory name="McCarthyWithCoroutines" proved="true">
+ <goal name="VC aux1" expl="VC for aux1" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC mccarthy1" expl="VC for mccarthy1" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC aux2" expl="VC for aux2" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC mccarthy2" expl="VC for mccarthy2" proved="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="McCarthy91Mach" proved="true">
+ <goal name="VC f91" expl="VC for f91" proved="true">
+ <proof prover="1"><result status="valid" time="0.07" steps="1067"/></proof>
+ </goal>
+ <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <proof prover="1"><result status="valid" time="6.06" steps="12891"/></proof>
+ </goal>
+ <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1"><result status="valid" time="0.08" steps="432"/></proof>
  </goal>
 </theory>
 </file>

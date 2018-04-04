@@ -14,6 +14,13 @@ module KodaRuskey_Spec
 
   type color = White | Black
 
+  let eq_color (c1 c2:color) : bool
+    ensures { result <-> c1 = c2 }
+  = match c1,c2 with
+    | White,White | Black,Black -> True
+    | _ -> False
+    end
+
   type forest =
     | E
     | N int forest forest
@@ -96,7 +103,7 @@ module Lemmas
     | Cons f tl -> mem_forest n f || mem_stack n tl
     end
 
-  lemma mem_app: forall n st1 "induction" st2.
+  lemma mem_app: forall n st1 [@induction] st2.
     mem_stack n (st1 ++ st2) -> mem_stack n st1 || mem_stack n st2
 
   function size_stack (st: stack) : int = match st with
@@ -405,7 +412,7 @@ module KodaRuskey
   use import int.Int
   use import ref.Ref
 
-  val map_of_array (a: array 'a) : M.map int 'a
+  val ghost map_of_array (a: array 'a) : M.map int 'a
     ensures { result = a.elts }
 
   val ghost visited: ref visited
@@ -440,43 +447,48 @@ module KodaRuskey
         assert { disjoint_stack f1 st' };
         assert { not (mem_stack i st') };
         let ghost visited1 = !visited in
-        if bits[i] = White then begin
-    'A:   enum bits f0 (Cons f2 st');
+        if eq_color bits[i] White then begin
+          label A in
+          enum bits f0 (Cons f2 st');
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
-    'B:   bits[i] <- Black;
+          label B in
+          bits[i] <- Black;
           assert { sub st f0 bits.elts };
           assert { white_forest f1 bits.elts };
-          assert { unchanged (Cons f2 st') (at bits 'B).elts bits.elts};
-          assert { inverse (Cons f2 st') (at bits 'A).elts bits.elts };
-    'C:   enum bits f0 (Cons f1 (Cons f2 st'));
+          assert { unchanged (Cons f2 st') (bits at B).elts bits.elts};
+          assert { inverse (Cons f2 st') (bits at A).elts bits.elts };
+          label C in
+          enum bits f0 (Cons f1 (Cons f2 st'));
           assert { bits[i] = Black };
           assert { final_forest f1 bits.elts };
           assert { if not (even_forest f1)
-                   then inverse (Cons f2 st') (at bits 'C).elts bits.elts &&
+                   then inverse (Cons f2 st') (bits at C).elts bits.elts &&
                         white_forest f2 bits.elts
-                   else unchanged (Cons f2 st') (at bits 'C).elts bits.elts &&
+                   else unchanged (Cons f2 st') (bits at C).elts bits.elts &&
                         final_forest f2 bits.elts };
           ghost stored_trans1 f0 bits1 (map_of_array bits)
     i f1 f2 st' visited1 visited2 !visited
         end else begin
           assert { if not (even_forest f1) then white_forest f2 bits.elts
                    else final_forest f2 bits.elts };
-    'A:   enum bits f0 (Cons f1 (Cons f2 st'));
+          label A in
+          enum bits f0 (Cons f1 (Cons f2 st'));
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
-    'B:   bits[i] <- White;
+          label B in
+          bits[i] <- White;
           assert { unchanged (Cons f1 (Cons f2 st'))
-                     (at bits 'B).elts bits.elts };
+                     (bits at B).elts bits.elts };
           assert { inverse (Cons f1 (Cons f2 st'))
-                     (at bits 'A).elts bits.elts };
+                     (bits at A).elts bits.elts };
           assert { sub st f0 bits.elts };
           assert { if even_forest f1 || even_forest f2
-                   then unchanged st' (at bits 'A).elts bits.elts
-                   else inverse st' (at bits 'A).elts bits.elts };
-    'C:   enum bits f0 (Cons f2 st');
+                   then unchanged st' (bits at A).elts bits.elts
+                   else inverse st' (bits at A).elts bits.elts };
+          enum bits f0 (Cons f2 st');
           assert { bits[i] = White };
           assert { white_forest f  bits.elts };
           ghost stored_trans2 f0 bits1 (map_of_array bits)

@@ -4,14 +4,17 @@ module M
 
   use import int.Int
 
-  let x () : int = 13 * 3 + 7 - 4
+  let x0 () : int = 13 * 3 + 7 - 4
+
+  let x1 () : bool = 2 + 2 = 4
 
   use import ref.Ref
 
-  let x0 () : int =
+  let x2 () : int =
     let x = ref 13 in
     if !x <> 3 then 7 else 4
 
+  use import list.List
   use import list.Append
 
   let y () : list int =
@@ -23,6 +26,7 @@ module Map
 
   use import int.Int
   use import map.Map
+  use import map.Const
 
   exception Found int
 
@@ -37,10 +41,10 @@ module Map
 
   constant t : map int int = (const 0)[0 <- 12][1 <- 42][2 <- 67]
 
-  let test12 () = search t 3 12
-  let test42 () = search t 3 42
-  let test67 () = search t 3 67
-  let test0 () = search t 3 0
+  let ghost test12 () = search t 3 12
+  let ghost test42 () = search t 3 42
+  let ghost test67 () = search t 3 67
+  let ghost test0 () = search t 3 0
 
 end
 
@@ -62,7 +66,7 @@ module Mut
 
   let t0 () =
     let y = { a = 1; c = 43; b = 2 } in
-    y.a + y.c (* should be 3 *)
+    y.a + y.b (* should be 3 *)
 
   let t1 () =
     let y = { a = 1; c = 43; b = 2 } in
@@ -96,7 +100,7 @@ module Mut
       s.i <- s.i + x.i;
       x.i <- x.i + 1
     done;
-    s.i
+    s.i (* should be 55 *)
 
 
   let f m : int
@@ -288,4 +292,3 @@ module Array
   let j () = g[0] <- 42
 
 end
-

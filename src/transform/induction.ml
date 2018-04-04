@@ -15,7 +15,7 @@ open Term
 open Decl
 open Theory
 open Task
-
+open Args_wrapper
 
 
 
@@ -99,8 +99,8 @@ let print_vset vset =
     Format.printf "] "
   in
   Format.printf "************** t_candidates_lex *****************\n";
-  Format.printf "Candidates found : %d @." (Svsl.cardinal vset);
-  Format.printf "Candidates : [ ";
+  Format.printf "Candidates found: %d @." (Svsl.cardinal vset);
+  Format.printf "Candidates: [ ";
   Svsl.iter (fun vl -> aux vl) vset;
   Format.printf "]\n@.";
   Pretty.forget_all ()
@@ -112,7 +112,7 @@ let print_heuristic_lex vl =
   Format.printf "Induction variables (in lexicographic order): [ ";
   List.iter (Format.printf "%a " Pretty.print_vs) vl;
   Format.printf "]@.";
-  Format.printf "Lex. order map : [ ";
+  Format.printf "Lex. order map: [ ";
   Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
   Format.printf "]\n@.";
   Pretty.forget_all ()
@@ -352,6 +352,15 @@ let induction_ty_lex task =
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
+
+let induction_on_hyp ls =
+  Trans.compose (Ind_itp.revert_tr_symbol [Tslsymbol ls])
+    (Trans.store induction_ty_lex)
+
+let () = wrap_and_register
+    ~desc:"induction_arg_ty_lex <ls> performs induction_ty_lex on ls."
+    "induction_arg_ty_lex"
+    (Tlsymbol Ttrans_l) induction_on_hyp
 
 
 (***************************************************************************)

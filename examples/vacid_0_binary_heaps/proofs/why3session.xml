@@ -2,596 +2,695 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../heapsort.mlw">
-<theory name="HeapSort" sum="ae3a1756696edab5e79bfec9096552d9">
- <goal name="Min_of_sorted" expl="">
- <proof prover="0" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="0.52"/></proof>
+<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../heapsort.mlw" proved="true">
+<theory name="HeapSort" proved="true" sum="b24b0ba972d2009dd0e19718fd0706ed">
+ <goal name="VC min_of_sorted" expl="VC for min_of_sorted" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC min_of_sorted.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC min_of_sorted.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC min_of_sorted.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC min_of_sorted.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="WP_parameter heapSort" expl="VC for heapSort">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter heapSort.1" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
+ <goal name="VC heapSort" expl="VC for heapSort" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC heapSort.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.2" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="VC heapSort.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.3" expl="loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter heapSort.3.1" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC heapSort.2" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC heapSort.3" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC heapSort.3.0" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.3.2" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+   <goal name="VC heapSort.3.1" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.3.3" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+   <goal name="VC heapSort.3.2" expl="VC for heapSort" proved="true">
+   <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.3.4" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.3.5" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.3.6" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+   <goal name="VC heapSort.3.3" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter heapSort.4" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC heapSort.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.5" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC heapSort.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.6" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC heapSort.6" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.7" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC heapSort.7" expl="assertion" proved="true">
+  <proof prover="2" timelimit="1"><result status="valid" time="0.03" steps="110"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.8" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.9" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.10" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.11" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.12" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.13" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter heapSort.13.1" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC heapSort.8" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC heapSort.8.0" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.13.2" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+   <goal name="VC heapSort.8.1" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.13.3" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
+   <goal name="VC heapSort.8.2" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter heapSort.13.4" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
+   <goal name="VC heapSort.8.3" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC heapSort.8.4" expl="VC for heapSort" proved="true">
+   <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="104"/></proof>
+   </goal>
+   <goal name="VC heapSort.8.5" expl="VC for heapSort" proved="true">
+   <proof prover="2" timelimit="1"><result status="valid" time="0.03" steps="92"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter heapSort.14" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC heapSort.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.15" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="25"/></proof>
+  <goal name="VC heapSort.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapSort.16" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.17" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.18" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.19" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="95"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.20" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter heapSort.20.1" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.20.2" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.20.3" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.20.4" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.16" steps="186"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.20.5" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.06" steps="44"/></proof>
-   </goal>
-   <goal name="WP_parameter heapSort.20.6" expl="VC for heapSort">
-   <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter heapSort.21" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter heapSort.22" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="33"/></proof>
+  <goal name="VC heapSort.11" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../heap.why">
-<theory name="Heap" sum="e8b2994e775196c00b326d2d3a20ddd6">
- <goal name="Parent_inf" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+<file name="../heap.why" proved="true">
+<theory name="Heap" proved="true" sum="c43e894ad02fc7ade4ed176da0bfc752">
+ <goal name="Parent_inf" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="Left_sup" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
+ <goal name="Left_sup" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="Right_sup" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
+ <goal name="Right_sup" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="Parent_right" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
+ <goal name="Parent_right" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="Parent_left" expl="">
- <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="Parent_left" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="Inf_parent" expl="">
- <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="Inf_parent" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
- <goal name="Child_parent" expl="">
- <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+ <goal name="Child_parent" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
  </goal>
- <goal name="Parent_pos" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="Parent_pos" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="Is_heap_when_no_element" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+ <goal name="Is_heap_when_no_element" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="Is_heap_sub" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
+ <goal name="Is_heap_sub" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
- <goal name="Is_heap_sub2" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+ <goal name="Is_heap_sub2" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="Is_heap_when_node_modified" expl="">
- <proof prover="3"><result status="valid" time="0.12" steps="91"/></proof>
+ <goal name="Is_heap_when_node_modified" proved="true">
+ <proof prover="2"><result status="valid" time="0.15" steps="227"/></proof>
  </goal>
- <goal name="Is_heap_add_last" expl="">
- <proof prover="3"><result status="valid" time="0.06" steps="63"/></proof>
+ <goal name="Is_heap_add_last" proved="true">
+ <proof prover="2"><result status="valid" time="0.05" steps="94"/></proof>
  </goal>
- <goal name="Parent_inf_el" expl="">
- <proof prover="5"><result status="valid" time="0.03"/></proof>
+ <goal name="Parent_inf_el" proved="true">
+ <proof prover="5" timelimit="1"><result status="valid" time="0.14"/></proof>
  </goal>
- <goal name="Left_sup_el" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="Left_sup_el" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
- <goal name="Right_sup_el" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="Right_sup_el" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
- <goal name="Is_heap_relation" expl="">
- <proof prover="0" edited="heap_Heap_Is_heap_relation_1.v"><result status="valid" time="0.32"/></proof>
+ <goal name="VC is_heap_relation" expl="VC for is_heap_relation" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC is_heap_relation.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC is_heap_relation.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="VC is_heap_relation.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="VC is_heap_relation.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC is_heap_relation.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>
-<file name="../bag_of_integers.why">
-<theory name="Bag_integers" sum="a2a29f00b101eeda1c37dd7adf678511">
- <goal name="Min_bag_union1" expl="">
- <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+<file name="../bag_of_integers.why" proved="true">
+<theory name="Bag_integers" proved="true" sum="11f798688fe35fe2155a1e298c24360f">
+ <goal name="Min_bag_union1" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="Min_bag_union2" expl="">
- <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
+ <goal name="Min_bag_union2" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
  </goal>
 </theory>
 </file>
-<file name="../test_harness.mlw">
-<theory name="TestHarness" sum="b765a9d9e932554247e401446c74a720">
- <goal name="WP_parameter testHarness" expl="VC for testHarness">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter testHarness.1" expl="array creation size">
+<file name="../test_harness.mlw" proved="true">
+<theory name="TestHarness" proved="true" sum="45070028561c41a332fde761f12fd18d">
+ <goal name="VC testHarness" expl="VC for testHarness" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC testHarness.0" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.2" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC testHarness.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.3" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC testHarness.2" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.4" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC testHarness.3" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.5" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="VC testHarness.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.6" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC testHarness.5" expl="assertion" proved="true">
+  <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="80"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.7" expl="assertion">
-  <proof prover="5"><result status="valid" time="2.96"/></proof>
+  <goal name="VC testHarness.6" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.8" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC testHarness.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.9" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="65"/></proof>
+  <goal name="VC testHarness.8" expl="assertion" proved="true">
+  <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="103"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.10" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC testHarness.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.11" expl="assertion">
-  <proof prover="5"><result status="valid" time="0.15"/></proof>
+  <goal name="VC testHarness.10" expl="assertion" proved="true">
+  <proof prover="5" timelimit="1"><result status="valid" time="0.23"/></proof>
   </goal>
-  <goal name="WP_parameter testHarness.12" expl="assertion">
-  <proof prover="5"><result status="valid" time="0.14"/></proof>
+  <goal name="VC testHarness.11" expl="assertion" proved="true">
+  <proof prover="5" timelimit="1"><result status="valid" time="0.18"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../elements.why">
-<theory name="Elements" sum="2b23547de6496576565e4bdc4d344338">
- <goal name="Elements_singleton" expl="">
+<file name="../elements.why" proved="true">
+<theory name="Elements" proved="true" sum="568d7e84d95d740156de701aaf50fd41">
+ <goal name="Elements_singleton" proved="true">
  <proof prover="5"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="Elements_union" expl="">
- <proof prover="0" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.40"/></proof>
+ <goal name="Elements_union" proved="true">
+ <proof prover="6" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
- <goal name="Elements_add1" expl="">
- <proof prover="0" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.37"/></proof>
+ <goal name="Elements_add1" proved="true">
+ <proof prover="6" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.37"/></proof>
  </goal>
- <goal name="Elements_remove_last" expl="">
+ <goal name="Elements_remove_last" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="Occ_elements" expl="">
- <proof prover="0" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.41"/></proof>
+ <goal name="Occ_elements" proved="true">
+ <proof prover="6" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.38"/></proof>
  </goal>
- <goal name="Elements_set_outside" expl="">
- <proof prover="0" edited="elements_Elements_Elements_set_outside_1.v"><result status="valid" time="0.50"/></proof>
+ <goal name="VC elements_set_outside" expl="VC for elements_set_outside" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC elements_set_outside.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC elements_set_outside.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC elements_set_outside.2" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="Elements_set_inside" expl="">
- <proof prover="0" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="0.38"/></proof>
+ <goal name="Elements_set_inside" proved="true">
+ <proof prover="6" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="0.41"/></proof>
  </goal>
- <goal name="Elements_set_inside2" expl="">
+ <goal name="Elements_set_inside2" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
  <proof prover="3"><result status="valid" time="0.01" steps="33"/></proof>
  </goal>
 </theory>
 </file>
-<file name="../heap_implem.mlw">
-<theory name="Implementation" sum="cc4f3d6641601c1e50a7ae22972d1b81">
- <goal name="Is_heap_min" expl="">
- <proof prover="0" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="0.41"/></proof>
+<file name="../heap_implem.mlw" proved="true">
+<theory name="Implementation" proved="true" sum="0eae515d4d680526289e3239fb2beb41">
+ <goal name="VC is_heap_min" expl="VC for is_heap_min" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC is_heap_min.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC is_heap_min.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC is_heap_min.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC is_heap_min.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="2.00" steps="1761"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="WP_parameter create" expl="VC for create">
- <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter insert.1" expl="loop invariant init">
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC insert.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter insert.2" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.30" steps="195"/></proof>
+  <goal name="VC insert.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter insert.3" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  <goal name="VC insert.2" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.26" steps="358"/></proof>
+  <proof prover="3"><result status="valid" time="0.36" steps="254"/></proof>
   </goal>
-  <goal name="WP_parameter insert.4" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.4.1" expl="VC for insert">
+  <goal name="VC insert.3" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="75"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="79"/></proof>
+  </goal>
+  <goal name="VC insert.4" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC insert.4.0" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="32"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="31"/></proof>
+   </goal>
+   <goal name="VC insert.4.1" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.16" steps="229"/></proof>
+   <proof prover="3"><result status="valid" time="0.82" steps="189"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC insert.5" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="43"/></proof>
+  </goal>
+  <goal name="VC insert.6" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC insert.6.0" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
-   <goal name="WP_parameter insert.4.2" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="2.15" steps="797"/></proof>
+   <goal name="VC insert.6.1" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter insert.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.5.1" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
+   <goal name="VC insert.6.2" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="48"/></proof>
+   <proof prover="3"><result status="valid" time="0.07" steps="90"/></proof>
    </goal>
-   <goal name="WP_parameter insert.5.2" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.5.3" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.05" steps="61"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.5.4" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.03" steps="47"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.5.5" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.46" steps="258"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.5.6" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.5.7" expl="VC for insert">
+   <goal name="VC insert.6.3" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.04" steps="58"/></proof>
    <proof prover="5"><result status="valid" time="0.04"/></proof>
    </goal>
+   <goal name="VC insert.6.4" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="1.09" steps="693"/></proof>
+   <proof prover="3"><result status="valid" time="0.60" steps="262"/></proof>
+   </goal>
+   <goal name="VC insert.6.5" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+   </goal>
+   <goal name="VC insert.6.6" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.32" steps="481"/></proof>
+   <proof prover="3"><result status="valid" time="0.64" steps="261"/></proof>
+   </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter insert.6" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.02" steps="31"/></proof>
+  <goal name="VC insert.7" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter insert.7" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC insert.8" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="64"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="116"/></proof>
   </goal>
-  <goal name="WP_parameter insert.8" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.9" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.9.1" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.02" steps="47"/></proof>
+  <goal name="VC insert.9" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC insert.9.0" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.05" steps="175"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="118"/></proof>
    </goal>
-   <goal name="WP_parameter insert.9.2" expl="VC for insert">
-   <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+   <goal name="VC insert.9.1" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="27"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter extractMin" expl="VC for extractMin">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter extractMin.1" expl="assertion">
+ <goal name="VC extractMin" expl="VC for extractMin" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC extractMin.0" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.2" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.16" steps="163"/></proof>
+  <goal name="VC extractMin.1" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.17" steps="418"/></proof>
+  <proof prover="3"><result status="valid" time="0.16" steps="286"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.3" expl="loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.3.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC extractMin.2" expl="loop invariant init" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.2.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+   <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.3.2" expl="VC for extractMin">
+   <goal name="VC extractMin.2.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
    <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.3.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.04" steps="86"/></proof>
+   <goal name="VC extractMin.2.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="60"/></proof>
+   <proof prover="3"><result status="valid" time="0.04" steps="94"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.3.4" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="40"/></proof>
+   <goal name="VC extractMin.2.3" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.15" steps="315"/></proof>
+   <proof prover="3"><result status="valid" time="0.12" steps="219"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.3.5" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.4" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.5" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.6" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.84" steps="444"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.7" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.7.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.7.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.53" steps="436"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.7.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.07" steps="77"/></proof>
+   <goal name="VC extractMin.2.4" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter extractMin.8" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC extractMin.3" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="64"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.9" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="31"/></proof>
+  <goal name="VC extractMin.4" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.10" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="30"/></proof>
+  <goal name="VC extractMin.5" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="1.16" steps="1037"/></proof>
+  <proof prover="3"><result status="valid" time="1.64" steps="717"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.11" expl="assertion">
-  <proof prover="3"><result status="valid" time="1.11" steps="476"/></proof>
+  <goal name="VC extractMin.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="1.02" steps="1083"/></proof>
+  <proof prover="3"><result status="valid" time="0.48" steps="359"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.12" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.12.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.12.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.64" steps="454"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.12.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.07" steps="81"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.13" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.13.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.13.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.13.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.14" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.14.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.14.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.14.3" expl="VC for extractMin">
-   <proof prover="5"><result status="valid" time="0.09"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.14.4" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.14.5" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.14.6" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.06" steps="68"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.15" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.16" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.17" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.18" expl="assertion">
-  <proof prover="3"><result status="valid" time="1.13" steps="520"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.19" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.19.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.19.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.85" steps="514"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.19.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.10" steps="78"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.20" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.21" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.21.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.21.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.21.3" expl="VC for extractMin">
-   <proof prover="5"><result status="valid" time="0.08"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.21.4" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.21.5" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.21.6" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.04" steps="43"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.22" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.23" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.24" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.25" expl="assertion">
-  <proof prover="3"><result status="valid" time="1.03" steps="469"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.26" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.26.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.26.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.96" steps="585"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.26.3" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.06" steps="78"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.27" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.27.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.27.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.27.3" expl="VC for extractMin">
+  <goal name="VC extractMin.7" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.7.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter extractMin.28" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.28.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
+   <goal name="VC extractMin.7.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.28.2" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.28.3" expl="VC for extractMin">
-   <proof prover="5"><result status="valid" time="0.10"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.28.4" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.28.5" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.02" steps="22"/></proof>
-   </goal>
-   <goal name="WP_parameter extractMin.28.6" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.04" steps="43"/></proof>
+   <goal name="VC extractMin.7.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+   <proof prover="3"><result status="valid" time="0.07" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter extractMin.29" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
+  <goal name="VC extractMin.8" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="74"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.30" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC extractMin.9" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="76"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.31" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC extractMin.10" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="2.48" steps="1513"/></proof>
+  <proof prover="3"><result status="valid" time="3.26" steps="766"/></proof>
   </goal>
-  <goal name="WP_parameter extractMin.32" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.33" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.34" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter extractMin.35" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter extractMin.35.1" expl="VC for extractMin">
-   <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC extractMin.11" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.11.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.35.2" expl="VC for extractMin">
+   <goal name="VC extractMin.11.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="57"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="34"/></proof>
+   </goal>
+   <goal name="VC extractMin.11.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="1.54" steps="1029"/></proof>
+   <proof prover="3"><result status="valid" time="0.98" steps="378"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.12" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.12.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
    <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter extractMin.35.3" expl="VC for extractMin">
+   <goal name="VC extractMin.12.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+   </goal>
+   <goal name="VC extractMin.12.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.13" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="VC extractMin.14" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.14.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
+   </goal>
+   <goal name="VC extractMin.14.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+   </goal>
+   <goal name="VC extractMin.14.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="4.16" steps="2409"/></proof>
+   <proof prover="5"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC extractMin.14.3" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
+   </goal>
+   <goal name="VC extractMin.14.4" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
+   </goal>
+   <goal name="VC extractMin.14.5" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.05" steps="64"/></proof>
+   <proof prover="3"><result status="valid" time="0.04" steps="97"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.15" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="71"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="VC extractMin.16" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="72"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="36"/></proof>
+  </goal>
+  <goal name="VC extractMin.17" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="2.28" steps="1502"/></proof>
+  <proof prover="3"><result status="valid" time="2.77" steps="761"/></proof>
+  </goal>
+  <goal name="VC extractMin.18" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.18.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="24"/></proof>
+   </goal>
+   <goal name="VC extractMin.18.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="32"/></proof>
+   </goal>
+   <goal name="VC extractMin.18.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="1.46" steps="1025"/></proof>
+   <proof prover="3"><result status="valid" time="0.96" steps="373"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.19" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC extractMin.20" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="VC extractMin.21" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.21.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+   </goal>
+   <goal name="VC extractMin.21.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+   </goal>
+   <goal name="VC extractMin.21.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="4.41" steps="2760"/></proof>
+   <proof prover="5"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC extractMin.21.3" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+   </goal>
+   <goal name="VC extractMin.21.4" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="74"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="36"/></proof>
+   </goal>
+   <goal name="VC extractMin.21.5" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.04" steps="59"/></proof>
+   <proof prover="3"><result status="valid" time="0.04" steps="58"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.22" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="68"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="35"/></proof>
+  </goal>
+  <goal name="VC extractMin.23" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="25"/></proof>
+  </goal>
+  <goal name="VC extractMin.24" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="1.63" steps="1299"/></proof>
+  <proof prover="3"><result status="valid" time="2.42" steps="801"/></proof>
+  </goal>
+  <goal name="VC extractMin.25" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.25.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+   </goal>
+   <goal name="VC extractMin.25.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="51"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
+   </goal>
+   <goal name="VC extractMin.25.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="1.60" steps="1001"/></proof>
+   <proof prover="3"><result status="valid" time="0.91" steps="366"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.26" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC extractMin.27" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC extractMin.28" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.28.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+   </goal>
+   <goal name="VC extractMin.28.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="VC extractMin.28.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="3.69" steps="2469"/></proof>
+   <proof prover="5"><result status="valid" time="0.09"/></proof>
+   </goal>
+   <goal name="VC extractMin.28.3" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
+   </goal>
+   <goal name="VC extractMin.28.4" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="70"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="33"/></proof>
+   </goal>
+   <goal name="VC extractMin.28.5" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.04" steps="56"/></proof>
+   <proof prover="3"><result status="valid" time="0.06" steps="55"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.29" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC extractMin.30" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC extractMin.31" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="VC extractMin.32" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="VC extractMin.33" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.33.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+   </goal>
+   <goal name="VC extractMin.33.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
+   </goal>
+   <goal name="VC extractMin.33.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC extractMin.34" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC extractMin.34.0" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
+   </goal>
+   <goal name="VC extractMin.34.1" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
+   </goal>
+   <goal name="VC extractMin.34.2" expl="VC for extractMin" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
+   <proof prover="3"><result status="valid" time="0.10" steps="22"/></proof>
    </goal>
   </transf>
   </goal>
@@ -599,22 +698,25 @@
  </goal>
 </theory>
 </file>
-<file name="../abstract_heap.mlw">
-<theory name="AbstractHeap" sum="d41d8cd98f00b204e9800998ecf8427e">
+<file name="../abstract_heap.mlw" proved="true">
+<theory name="AbstractHeap" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 </file>
-<file name="../heap_model.why">
-<theory name="Model" sum="7a1ddeb8b12fc43a06d7cc61835e4a23">
- <goal name="Model_empty" expl="">
+<file name="../heap_model.why" proved="true">
+<theory name="Model" proved="true" sum="4e26e6b01738e8834e2a10ad47b287a9">
+ <goal name="Model_empty" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="Model_singleton" expl="">
- <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="Model_singleton" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="Model_set" expl="">
- <proof prover="3"><result status="valid" time="0.14" steps="186"/></proof>
+ <goal name="Model_set" proved="true">
+ <proof prover="2"><result status="valid" time="0.15" steps="306"/></proof>
+ <proof prover="3"><result status="valid" time="0.30" steps="304"/></proof>
  </goal>
- <goal name="Model_add_last" expl="">
+ <goal name="Model_add_last" proved="true">
  <proof prover="5"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>

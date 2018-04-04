@@ -12,7 +12,7 @@ module Heap
   use import int.Int
 
   type elt
-  predicate le elt elt
+  val predicate le elt elt
 
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
 
@@ -161,7 +161,7 @@ module PairingHeap
   use import list.List
   use import list.Length
 
-  predicate le elt elt
+  val predicate le elt elt
   clone import relations.TotalPreOrder with type t = elt, predicate rel = le
 
   (* [e] is no greater than the root of [h], if any *)
@@ -245,7 +245,7 @@ module PairingHeap
 
   let is_empty (h: heap) : bool
     ensures { result <-> size h = 0 }
-  = h = E
+  = match h with E -> true | _ -> false end
 
   let merge (h1 h2: heap) : heap
     requires { inv h1 && inv h2 }

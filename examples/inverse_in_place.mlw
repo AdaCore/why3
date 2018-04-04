@@ -22,10 +22,10 @@ module InverseInPlace
   use import ref.Ref
   use import array.Array
 
-  function (~_) (x: int) : int = -x-1
+  let function (~_) (x: int) : int = -x-1
 
   function numof (m: M.map int int) (l r: int) : int =
-    NumOf.numof (\ n. M.([]) m n >= 0) l r
+    NumOf.numof (fun n -> M.([]) m n >= 0) l r
 
   predicate is_permutation (a: array int) =
     forall i: int. 0 <= i < length a ->
@@ -39,23 +39,22 @@ module InverseInPlace
     (forall i: int. 0 <= i < length b -> a[b[i]] = i) ->
     is_permutation b
 
-  predicate loopinvariant (old a: array int) (m m' n: int) =
+  predicate loopinvariant (olda a: array int) (m m' n: int) =
       (forall e: int. 0 <= e < n -> -n <= a[e] < n)
    /\ (forall e: int. m < e < n -> 0 <= a[e])
-   /\ (forall e: int. m < e < n -> old[a[e]] = e)
-   /\ (forall e: int. 0 <= e <= m' -> a[e] >= 0 -> old[e] = a[e])
+   /\ (forall e: int. m < e < n -> olda[a[e]] = e)
+   /\ (forall e: int. 0 <= e <= m' -> a[e] >= 0 -> olda[e] = a[e])
    /\ (forall e: int. 0 <= e <= m -> a[e] <= m)
    /\ (forall e: int. 0 <= e <= m' -> a[e] < 0 ->
-        old[~ a[e]] = e /\ (~a[e] <= m -> a[~a[e]] < 0))
+        olda[~ a[e]] = e /\ (~a[e] <= m -> a[~a[e]] < 0))
 
   let inverse_in_place (a: array int)
     requires { is_permutation a }
     ensures  { is_permutation a }
     ensures  { forall i: int. 0 <= i < length a -> (old a)[a[i]] = i }
-  =
- 'L:let n = length a in
+  = let n = length a in
     for m = n-1 downto 0 do
-      invariant { loopinvariant (at a 'L) a m m n }
+      invariant { loopinvariant (old a) a m m n }
       let i = ref a[m] in
       if !i >= 0 then begin
         (* unrolled loop once *)
@@ -65,9 +64,9 @@ module InverseInPlace
         i := a[!i];
         while !i >= 0 do
           invariant { a[!k] = !i <= m /\ 0 <= !k <= m /\ ~m <= !j < 0 /\
-                      (at a 'L)[~ !j] = !k /\ a[~ !j] < 0 /\ a[m] < 0 }
+                      (old a)[~ !j] = !k /\ a[~ !j] < 0 /\ a[m] < 0 }
           invariant { forall e: int. 0 <= e < m -> a[e] < 0 -> a[e] <> !j }
-          invariant { loopinvariant (at a 'L) a m (m-1) n }
+          invariant { loopinvariant (old a) a m (m-1) n }
           variant   { numof a.elts 0 n }
           a[!k] <- !j;
           j := ~ !k;
@@ -77,7 +76,7 @@ module InverseInPlace
         assert { !k = m };
         i := !j
       end;
-      assert { (at a 'L)[~ !i] = m };
+      assert { (old a)[~ !i] = m };
       a[m] <- ~ !i
     done
 

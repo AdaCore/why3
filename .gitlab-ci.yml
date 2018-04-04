@@ -68,6 +68,13 @@ bench-4.06.0:
     COMPILER: 4.06.0
   <<: *bench_definition
 
+opam:
+  stage: build
+  variables:
+    COMPILER: system
+  script:
+    - misc/ci-docker.sh misc/ci-opam.sh
+
 deploy:
   stage: deploy
   script:

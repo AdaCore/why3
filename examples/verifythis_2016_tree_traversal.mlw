@@ -64,11 +64,12 @@ module Memory
   use import map.Map
   (** [loc] is the type of memory locations (e.g pointers) *)
   type loc
+  val predicate eq (x y:loc) ensures { result <-> x = y }
   (** Kinds of pointer fields. *)
   type kind = Parent | Left | Right
   (** Convenience alias for a pointer field table. *)
   type pmem = map kind (map loc loc)
-  type memory model {
+  type memory = abstract {
     mutable accessor : pmem;
     mutable mark : map loc bool;
   }
@@ -109,7 +110,7 @@ module Memory
   (** Non-deterministic initialization. In the original alorithm,
       the variable y starts uninitialized. *)
   type non_det_magic
-  type non_det model { mutable non_det_field : non_det_magic }
+  type non_det = abstract { mutable non_det_field : non_det_magic }
   val non_det : non_det
   val anyloc () : loc writes { non_det }
 
@@ -214,7 +215,7 @@ module TreeShape
     = match t with
       | Empty -> ()
       | Node l _ r ->
-        if c2 = c then (unicity memo t t0 c p2 p;absurd);
+        if eq c2 c then (unicity memo t t0 c p2 p;absurd);
         aux l (memo[Left][c2]) c2; aux r (memo[Right][c2]) c2
       end in
     aux lf (memo[Left][c]) c; aux rg (memo[Right][c]) c
@@ -374,13 +375,13 @@ module Recursive
       let ghost _c = !x in
       let _lf = get_acc Left !x in
       let _rg = get_acc Right !x in
-      let ghost (lf, rg) = match t with
+      let lf, rg = ghost match t with
         | Empty -> absurd
-        | Node l _ r -> (l, r)
+        | Node l _ r -> l, r
         end in
       (ghost not_below mem0 lf rg _c !z);
       bloc mem0 GoLeft;
-      let b = abstract ensures { result <-> _lf = null /\ _rg = null }
+      let b = begin ensures { result <-> _lf = null /\ _rg = null }
         ensures { result -> lf = Empty /\ rg = Empty }
         is_null _lf && is_null _rg end in
       if not b then begin
@@ -394,13 +395,13 @@ module Recursive
     in
     let ghost mem0 = get_all_accs () in
     try aux t;
-      'I:
-      loop
-        invariant { memo = at memo 'I }
+      label I in
+      while true do
+        invariant { memo = (memo at I) }
         invariant { rotated mem0 memo.accessor Finish !x /\ !entered }
         variant { 0 }
         bloc mem0 Finish
-      end
+      done
     with Stop -> (ghost ext_cur mem0 t root (null ())); () end
 
 end
@@ -596,7 +597,8 @@ module Iterative
         if is_null f.pleft && is_null f.pright
         then begin
           st := s;
-          assert { f.tleft = Empty /\ f.tright = Empty };
+          assert { match f.tleft, f.tright with
+            Empty, Empty  -> true | _ -> false end };
           closing t f.tree stop f.memo0 scur st
         end else begin
           let f = { f with memo1 = scur } in
@@ -645,7 +647,7 @@ module Iterative
     let ghost st = ref Bottom in
     ghost opening t t stop stop st;
     let entered = ref false in (* encode do-while loop. *)
-    while not(abstract ensures { result <-> !x = null }
+    while not (begin ensures { result <-> !x = null }
         !entered && is_null !x end)
     do (* ==> do { BODY } while(x != null); *)
       invariant { !x = null -> !entered }

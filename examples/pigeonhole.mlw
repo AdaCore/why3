@@ -5,12 +5,9 @@
 
 module Pigeonhole
 
-  use import HighOrd
   use import int.Int
   use import set.Fset
   use import ref.Ref
-
-  exception Exit
 
   let rec below (n: int) : set int
     requires { 0 <= n }
@@ -25,15 +22,13 @@ module Pigeonhole
     ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }
   =
     let s = ref empty in
-    try
     for i = 0 to n-1 do
       invariant { cardinal !s = i }
       invariant { forall x. mem x !s <-> (exists j. 0 <= j < i /\ x = f j) }
-      if mem (f i) !s then raise Exit;
+      if mem (f i) !s then return;
       s := add (f i) !s
     done;
     let b = below m in assert { subset !s b };
     absurd
-    with Exit -> () end
 
 end

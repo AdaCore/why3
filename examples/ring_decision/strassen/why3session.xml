@@ -1,0 +1,1523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<file name="../strassen.mlw">
+<theory name="InfMatrixGen" proved="true">
+ <goal name="VC ext_by_bounds" expl="VC for ext_by_bounds" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="oob_zero" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="size_to_bounds" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+ </goal>
+ <goal name="iso_size" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="iso_size.0" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="iso_size.0.0" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="iso_size.0.0.0" proved="true">
+    <proof prover="1"><result status="valid" time="0.05"/></proof>
+    </goal>
+    <goal name="iso_size.0.0.1" proved="true">
+    <proof prover="1"><result status="valid" time="0.07"/></proof>
+    </goal>
+    <goal name="iso_size.0.0.2" proved="true">
+    <proof prover="1"><result status="valid" time="0.10"/></proof>
+    </goal>
+    <goal name="iso_size.0.0.3" proved="true">
+    <proof prover="1"><result status="valid" time="0.03"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="size_rows_ib" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="size_iso" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="size_iso.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.23"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="InfMatrix" proved="true">
+ <goal name="VC set" expl="VC for set" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="set_def_changed" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="84"/></proof>
+ </goal>
+ <goal name="set_def_unchanged" proved="true">
+ <proof prover="0"><result status="valid" time="0.49" steps="675"/></proof>
+ </goal>
+ <goal name="set_def_rowz_changed" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="38"/></proof>
+ <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="set_def_colz_changed" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+ </goal>
+ <goal name="set_def_rowz_unchanged" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
+ </goal>
+ <goal name="set_def_colz_unchanged" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
+ </goal>
+ <goal name="set_def_other_rowz" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
+ </goal>
+ <goal name="set_def_other_colz" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+ </goal>
+ <goal name="VC fcreate" expl="VC for fcreate" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="fcreate_get_ib" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="106"/></proof>
+ </goal>
+ <goal name="fcreate_get_oob" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="46"/></proof>
+ </goal>
+ <goal name="fcreate_size" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="fcreate_size.0" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="fcreate_size.0.0" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="fcreate_size.0.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+    </goal>
+    <goal name="fcreate_size.0.0.1" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Sum_extended" proved="true">
+ <goal name="VC sum_mult" expl="VC for sum_mult" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC sum_mult.0" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="2"/></proof>
+  </goal>
+  <goal name="VC sum_mult.1" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="4"><result status="timeout" time="1.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC sum_add" expl="VC for sum_add" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC sum_add.0" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC sum_add.1" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC fubini" expl="VC for fubini" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC fubini.0" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC fubini.1" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC fubini.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC fubini.3" expl="assertion" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.74"/></proof>
+  <proof prover="4"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC fubini.4" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="79"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC sum_ext" expl="VC for sum_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC sum_ext.0" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="MaxFun" proved="true">
+ <goal name="VC maxf" expl="VC for maxf" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="VC maxf_nonneg" expl="VC for maxf_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="20"/></proof>
+ </goal>
+ <goal name="VC maxf_larger" expl="VC for maxf_larger" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC maxf_larger.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC maxf_larger.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC maxf_larger.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="20"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_left" expl="VC for max_left" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_left.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC max_left.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC max_left.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.19" steps="245"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_ext" expl="VC for max_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_ext.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC max_ext.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="VC max_ext.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="VC max_ext.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_decomp" expl="VC for max_decomp" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_decomp.0" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC max_decomp.0.0" expl="VC for max_decomp" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+   </goal>
+   <goal name="VC max_decomp.0.1" expl="VC for max_decomp" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+   <goal name="VC max_decomp.0.2" expl="VC for max_decomp" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC max_decomp.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC max_decomp.2" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC max_decomp.2.0" expl="VC for max_decomp" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+   </goal>
+   <goal name="VC max_decomp.2.1" expl="VC for max_decomp" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC max_decomp.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="140"/></proof>
+  </goal>
+  <goal name="VC max_decomp.4" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC max_decomp.4.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+   </goal>
+   <goal name="VC max_decomp.4.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC max_constant" expl="VC for max_constant" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC max_constant.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC max_constant.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC max_constant.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC max_constant.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC max_constant.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="20"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="InfIntMatrix" proved="true">
+ <goal name="VC zerof" expl="VC for zerof" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="VC mzero" expl="VC for mzero" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ </goal>
+ <goal name="VC zerorc" expl="VC for zerorc" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="VC idf" expl="VC for idf" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="VC id" expl="VC for id" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="id_def" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="39"/></proof>
+ <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.05"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="id_def.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="39"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC add2f" expl="VC for add2f" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="add_get" proved="true">
+ <proof prover="0"><result status="valid" time="0.54" steps="751"/></proof>
+ <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.03"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="add_iso" proved="true">
+ <proof prover="0"><result status="valid" time="0.14" steps="470"/></proof>
+ </goal>
+ <goal name="add_size" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_size.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="226"/></proof>
+  </goal>
+  <goal name="add_size.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="98"/></proof>
+  </goal>
+  <goal name="add_size.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="add_assoc" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_assoc.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
+  </goal>
+  <goal name="add_assoc.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="add_commutative" proved="true">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.03"/></proof>
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="add_commutative.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="add_commutative.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="zero_neutral" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="zero_neutral.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="zero_neutral.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC sub" expl="VC for sub" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="sub_size" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="sub_size.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.59" steps="1121"/></proof>
+  </goal>
+  <goal name="sub_size.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="656"/></proof>
+  </goal>
+  <goal name="sub_size.2" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="opp_involutive" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="opp_involutive.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="413"/></proof>
+  </goal>
+  <goal name="opp_involutive.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="atom_oob" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="atom_oob.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="atom_oob.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="atom_oob.2" proved="true">
+  <proof prover="0"><result status="unknown" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="atom_oob.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cell_oob_r" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="cell_oob_r.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="cell_oob_r.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="cell_oob_r.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="cell_oob_r.3" proved="true">
+  <proof prover="1"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="cell_oob_r.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="cell_oob_r.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cell_oob_c" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="cell_oob_c.0" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="cell_oob_c.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="cell_oob_c.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="cell_oob_c.3" proved="true">
+  <proof prover="0"><result status="unknown" time="0.22"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="cell_oob_c.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="cell_oob_c.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC mul_sizes" expl="VC for mul_sizes" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC mul_sizes.0" expl="precondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC mul_sizes.0.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC mul_sizes.0.0.0" expl="precondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC mul_sizes.0.0.0.0" expl="precondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_sizes.1" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_sizes.1.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_sizes.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="54"/></proof>
+  </goal>
+  <goal name="VC mul_sizes.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="id_neutral_r" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="id_neutral_r.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="111"/></proof>
+  </goal>
+  <goal name="id_neutral_r.1" proved="true">
+  <proof prover="4"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="id_neutral_r.2" proved="true">
+  <proof prover="0"><result status="unknown" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="id_neutral_r.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.29" steps="461"/></proof>
+  </goal>
+  <goal name="id_neutral_r.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="id_neutral_l" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="id_neutral_l.0" proved="true">
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="4.10" steps="515"/></proof>
+  </goal>
+  <goal name="id_neutral_l.1" proved="true">
+  <proof prover="0"><result status="unknown" time="0.50"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="id_neutral_l.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+  </goal>
+  <goal name="id_neutral_l.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="id_neutral_l.4" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="id_neutral_l.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="id_neutral_l.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="id_neutral_l.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="12"/></proof>
+  </goal>
+  <goal name="id_neutral_l.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="id_neutral_l.9" proved="true">
+  <proof prover="4"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="id_neutral_l.10" proved="true">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="id_neutral_l.11" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="id_neutral_l.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC mul_assoc_get" expl="VC for mul_assoc_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC mul_assoc_get.0" expl="precondition" proved="true">
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="VC mul_assoc_get.1" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.1.0" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="28"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.1" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="65"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.2" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.3" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.4" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="120"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.5" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="67"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.6" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.1.7" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="106"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.2" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.2.0" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.1" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.2" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.3" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="2"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.4" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.5" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.2.6" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.3" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.3.0" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.77" steps="782"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.1" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.2" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.3" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.4" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.5" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="33"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.6" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.3.7" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.4" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC mul_assoc_get.5" expl="assertion" proved="true">
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="9.41" steps="769"/></proof>
+  <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.60"/></proof>
+  <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mul_assoc_get.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="3.49" steps="176"/></proof>
+  </goal>
+  <goal name="VC mul_assoc_get.7" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.7.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.1" expl="assertion" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="0.98"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.2" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.3" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="2"><result status="valid" time="0.30"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.4" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.5" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.7.6" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.8" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.8.0" expl="assertion" proved="true">
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="1.64" steps="1066"/></proof>
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="6.48"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.1" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
+   <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.2" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.3" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.02" steps="16"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.05"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.4" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.02" steps="16"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.5" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.01" steps="36"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.6" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="VC mul_assoc_get.8.7" expl="VC for mul_assoc_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.9" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.9.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.10" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.10.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.51"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_assoc_get.11" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_assoc_get.11.0" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="mul_assoc" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="mul_assoc.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="mul_assoc.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC mul_distr_right_get" expl="VC for mul_distr_right_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC mul_distr_right_get.0" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC mul_distr_right_get.0.0" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.1" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.2" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.3" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.4" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.5" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.6" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.7" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.8" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.9" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.10" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.11" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.12" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.13" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC mul_distr_right_get.0.14" expl="VC for mul_distr_right_get" proved="true">
+   <proof prover="2"><result status="valid" time="0.91"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_distr_right_get.1" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_distr_right_get.1.0" expl="precondition" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="33"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_distr_right_get.2" expl="assertion" proved="true">
+  <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC mul_distr_right_get.3" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.93"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ext_iso" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+ </goal>
+ <goal name="ext_get" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="ext_get.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="ext_get.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="151"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ext_dist_sum_mat" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="ext_dist_sum_mat.0" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="ext_dist_sum_mat.0.0" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="ext_dist_sum_mat.0.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="50"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="ext_dist_sum_mat.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ext_dist_sum_r" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="ext_dist_sum_r.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="47"/></proof>
+  </goal>
+  <goal name="ext_dist_sum_r.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="assoc_mul_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="assoc_mul_ext.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="70"/></proof>
+  </goal>
+  <goal name="assoc_mul_ext.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="unit_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="unit_ext.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="unit_ext.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC comm_mul_ext_ij" expl="VC for comm_mul_ext_ij" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC comm_mul_ext_ij.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="175"/></proof>
+  </goal>
+  <goal name="VC comm_mul_ext_ij.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  </goal>
+  <goal name="VC comm_mul_ext_ij.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="VC comm_mul_ext_ij.3" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC comm_mul_ext_ij.3.0" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="4"><result status="valid" time="0.19"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.1" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="23"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.2" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="23"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.3" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="4"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.4" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="1"><result status="valid" time="0.71"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.5" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC comm_mul_ext_ij.3.6" expl="VC for comm_mul_ext_ij" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC comm_mul_ext_ij.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="VC comm_mul_ext_ij.5" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC comm_mul_ext_ij.5.0" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.08"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="comm_mul_ext" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="comm_mul_ext.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="comm_mul_ext.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="comm_mul_ext.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="comm_mul_ext.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="InfIntMatrixDecision">
+ <goal name="VC eq0_int" expl="VC for eq0_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="VC rzero" expl="VC for rzero" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC rone" expl="VC for rone" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC aone" expl="VC for aone" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC azero" expl="VC for azero" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="VC rplus" expl="VC for rplus" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC rtimes" expl="VC for rtimes" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC ropp" expl="VC for ropp" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC aplus" expl="VC for aplus" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC atimes" expl="VC for atimes" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC aopp" expl="VC for aopp" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="A.Assoc" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="A.Unit_def_l" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="A.Unit_def_r" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="A.Inv_def_l">
+ </goal>
+ <goal name="A.Inv_def_r">
+ </goal>
+ <goal name="A.Comm" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+ </goal>
+ <goal name="A.MulAssoc.Assoc" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="A.Mul_distr_l">
+ </goal>
+ <goal name="A.Mul_distr_r">
+ </goal>
+ <goal name="AUnitary" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+ </goal>
+ <goal name="ANonTrivial" proved="true">
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC infix $" expl="VC for infix $" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="ExtDistSumA" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="ExtDistSumR" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="AssocMulExt" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="UnitExt" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+ </goal>
+ <goal name="CommMulExt" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+ </goal>
+ <goal name="VC eq0" expl="VC for eq0" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="VC asub" expl="VC for asub" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="asub_def" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+ </goal>
+</theory>
+<theory name="MatrixTests">
+ <goal name="VC block_mul_ij" expl="VC for block_mul_ij" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC block_mul_ij.0" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC block_mul_ij.0.0" expl="VC for block_mul_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.12" steps="116"/></proof>
+   </goal>
+   <goal name="VC block_mul_ij.0.1" expl="VC for block_mul_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="156"/></proof>
+   </goal>
+   <goal name="VC block_mul_ij.0.2" expl="VC for block_mul_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.17" steps="285"/></proof>
+   </goal>
+   <goal name="VC block_mul_ij.0.3" expl="VC for block_mul_ij" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="31"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC block_mul_ij.1" expl="variant decrease" proved="true">
+  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC block_mul_ij.2" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC block_mul_ij.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="VC block_mul_ij.4" expl="precondition" proved="true">
+  <transf name="eliminate_if" proved="true" >
+   <goal name="VC block_mul_ij.4.0" expl="precondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC block_mul_ij.4.0.0" expl="VC for block_mul_ij" proved="true">
+    <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="16"/></proof>
+    </goal>
+    <goal name="VC block_mul_ij.4.0.1" expl="VC for block_mul_ij" proved="true">
+    <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.07" steps="16"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC block_mul_ij.5" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.80" steps="155"/></proof>
+  </goal>
+  <goal name="VC block_mul_ij.6" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC mul_split" expl="VC for mul_split" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC mul_split.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
+  </goal>
+  <goal name="VC mul_split.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="VC mul_split.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="21"/></proof>
+  </goal>
+  <goal name="VC mul_split.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="VC mul_split.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="21"/></proof>
+  </goal>
+  <goal name="VC mul_split.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="136"/></proof>
+  </goal>
+  <goal name="VC mul_split.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="22"/></proof>
+  </goal>
+  <goal name="VC mul_split.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="143"/></proof>
+  </goal>
+  <goal name="VC mul_split.8" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="56"/></proof>
+  </goal>
+  <goal name="VC mul_split.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.34" steps="618"/></proof>
+  </goal>
+  <goal name="VC mul_split.10" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC mul_split.10.0" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.1" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.13"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.2" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.3" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.27"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.4" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.5" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.6" expl="VC for mul_split" proved="true">
+   <proof prover="2"><result status="valid" time="0.60"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.7" expl="VC for mul_split" proved="true">
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC mul_split.10.8" expl="VC for mul_split" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="32"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_split.11" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_split.11.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_split.12" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC mul_split.12.0" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mul_split.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="54"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC mul_block_cell" expl="VC for mul_block_cell">
+ </goal>
+ <goal name="VC mul_block" expl="VC for mul_block">
+ </goal>
+ <goal name="VC naive_blocks" expl="VC for naive_blocks">
+ </goal>
+ <goal name="VC cut_quarters" expl="VC for cut_quarters">
+ </goal>
+ <goal name="VC paste_quarters" expl="VC for paste_quarters">
+ </goal>
+ <goal name="VC strassen_pow2" expl="VC for strassen_pow2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC strassen_pow2.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="32"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="32"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.3" expl="precondition" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="66"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="81"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.5" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.5.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="81"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.6" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.6.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="116"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.7" expl="assertion" proved="true">
+  <transf name="split_intros_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.7.0" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC strassen_pow2.7.1" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC strassen_pow2.7.2" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC strassen_pow2.7.3" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.8" expl="assertion" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.50" steps="941"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="1.00" steps="1783"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="40"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.11" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="40"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.12" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.13" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.58" steps="591"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="3.46" steps="3379"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.15" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.30" steps="411"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.16" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="49"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.17" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.17.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="49"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.18" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.18.0" expl="precondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.10" steps="105"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.20" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="50"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.21" expl="precondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.21.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.21.0.0" expl="precondition" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.21.0.0.0" expl="precondition" proved="true">
+     <proof prover="4"><result status="valid" time="0.07"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.22" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="106"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.23" expl="precondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.23.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.23.0.0" expl="precondition" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.23.0.0.0" expl="precondition" proved="true">
+     <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.52" steps="361"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.24" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="50"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.25" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="50"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.26" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="51"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.27" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="107"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.28" expl="variant decrease" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.28.0" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC strassen_pow2.28.1" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.29" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="50"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.30" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="51"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.31" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.32" expl="variant decrease" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC strassen_pow2.32.0" expl="VC for strassen_pow2" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="51"/></proof>
+   </goal>
+   <goal name="VC strassen_pow2.32.1" expl="VC for strassen_pow2" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.33" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="51"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.34" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="107"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.35" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="53"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.36" expl="variant decrease" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.36.0" expl="variant decrease" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.36.0.0" expl="variant decrease" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.36.0.0.0" expl="variant decrease" proved="true">
+     <proof prover="4"><result status="valid" time="0.06"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.37" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="52"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.38" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="109"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.39" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="109"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.40" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="53"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.41" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="53"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.42" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="110"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.43" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.44" expl="assertion" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.44.0" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.44.0.0" expl="assertion" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.44.0.0.0" expl="assertion" proved="true">
+     <transf name="reflection_f" proved="true" arg1="norm_f">
+      <goal name="VC strassen_pow2.44.0.0.0.0" expl="assertion" proved="true">
+      <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="64"/></proof>
+      </goal>
+      <goal name="VC strassen_pow2.44.0.0.0.1" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC strassen_pow2.44.0.0.0.1.0" proved="true">
+       <proof prover="4"><result status="valid" time="0.05"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.45" expl="assertion" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.45.0" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.45.0.0" expl="assertion" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.45.0.0.0" expl="assertion" proved="true">
+     <transf name="reflection_f" proved="true" arg1="norm_f">
+      <goal name="VC strassen_pow2.45.0.0.0.0" expl="assertion" proved="true">
+      <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="63"/></proof>
+      </goal>
+      <goal name="VC strassen_pow2.45.0.0.0.1" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC strassen_pow2.45.0.0.0.1.0" proved="true">
+       <proof prover="4"><result status="valid" time="0.08"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.46" expl="assertion" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.46.0" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.46.0.0" expl="assertion" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.46.0.0.0" expl="assertion" proved="true">
+     <transf name="reflection_f" proved="true" arg1="norm_f">
+      <goal name="VC strassen_pow2.46.0.0.0.0" expl="assertion" proved="true">
+      <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.11" steps="64"/></proof>
+      </goal>
+      <goal name="VC strassen_pow2.46.0.0.0.1" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC strassen_pow2.46.0.0.0.1.0" proved="true">
+       <proof prover="4"><result status="valid" time="0.06"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.47" expl="assertion" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.47.0" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.47.0.0" expl="assertion" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.47.0.0.0" expl="assertion" proved="true">
+     <transf name="reflection_f" proved="true" arg1="norm_f">
+      <goal name="VC strassen_pow2.47.0.0.0.0" expl="assertion" proved="true">
+      <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.13" steps="67"/></proof>
+      </goal>
+      <goal name="VC strassen_pow2.47.0.0.0.1" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC strassen_pow2.47.0.0.0.1.0" proved="true">
+       <proof prover="4"><result status="valid" time="0.09"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.48" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.39" steps="121"/></proof>
+  </goal>
+  <goal name="VC strassen_pow2.49" expl="precondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC strassen_pow2.49.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC strassen_pow2.49.0.0" expl="precondition" proved="true">
+    <transf name="inline_trivial" proved="true" >
+     <goal name="VC strassen_pow2.49.0.0.0" expl="precondition" proved="true">
+     <proof prover="4"><result status="valid" time="0.10"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC strassen_pow2.50" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

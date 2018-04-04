@@ -33,12 +33,12 @@ let rec sum (l: list or_integer_float) : (int, real) =
     variant { l }
     returns { si, sf -> si = add_int l /\ sf = add_real l }
   match l with
-  | Nil -> (0, 0.0)
+  | Nil -> 0, 0.0
   | Cons h t ->
-      let (a,b) = sum t in
+      let a,b = sum t in
       match h with
-      | Integer n -> (n + a,b)
-      | Real x -> (a,x +. b)
+      | Integer n -> n + a, b
+      | Real x -> a, x +. b
       end
   end
 
@@ -47,7 +47,7 @@ let main () =
     Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
       (Cons (Real 1.4) (Cons (Integer 9) Nil))))
   in
-  let (s,f) = sum l in
+  let s,f = sum l in
   assert { s = 22 };
   assert { f = 4.7 }
 
@@ -59,30 +59,24 @@ module AddListImp
 use import SumList
 use import ref.Ref
 
-exception Break
-
 let sum (l: list or_integer_float) : (int, real) =
     returns { si, sf -> si = add_int l /\ sf = add_real l }
   let si = ref 0 in
   let sf = ref 0.0 in
   let ll = ref l in
-  try
-    while True do
+  while True do
     invariant { !si + add_int !ll = add_int l /\
-                !sf +. add_real !ll = add_real l
-              }
+                !sf +. add_real !ll = add_real l }
     variant { !ll }
      match !ll with
-     | Nil -> raise Break
+     | Nil -> return !si, !sf
      | Cons (Integer n) t ->
          si := !si + n; ll := t
      | Cons (Real x) t ->
          sf := !sf +. x; ll := t
      end
-   done;
-   absurd
-  with Break -> (!si, !sf)
-  end
+  done;
+  absurd
 
 
 let main () =
@@ -90,7 +84,7 @@ let main () =
     Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
       (Cons (Real 1.4) (Cons (Integer 9) Nil))))
   in
-  let (s,f) = sum l in
+  let s,f = sum l in
   assert { s = 22 };
   assert { f = 4.7 }
 

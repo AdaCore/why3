@@ -1,0 +1,375 @@
+printer "c"
+
+prelude "#include <stdlib.h>"
+prelude "#include <stdint.h>"
+prelude "#include <stdio.h>"
+
+module ref.Ref
+
+  syntax type ref "%1"
+  syntax val ref "%1"
+  syntax val (!_) "%1"
+  syntax converter (!_) "%1"
+  syntax val (:=) "%1 = %2"
+  syntax converter contents "%1"
+end
+
+module mach.int.Unsigned
+
+  syntax constant zero_unsigned "0"
+
+end
+
+module mach.int.Int32
+  syntax val of_int "%1"
+  syntax converter of_int "%1"
+
+  syntax type int32  "int32_t"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (-_)    "-(%1)"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+end
+
+module mach.int.UInt32Gen
+
+  syntax type uint32 "uint32_t"
+
+  syntax converter max_uint32 "0xffffffff"
+  syntax converter length "32"
+
+end
+
+module mach.int.UInt32
+
+  syntax converter of_int "%1U"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+end
+
+module mach.int.UInt32GMP
+
+  prelude
+
+"
+#define LOW_MASK 0x00000000FFFFFFFFULL
+
+struct __add32_with_carry_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c)
+{
+  struct __add32_with_carry_result result;
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;
+  result.__field_0 = (uint32_t)(r & LOW_MASK);
+  result.__field_1 = (uint32_t)(r >> 32);
+  return result;
+}
+
+struct __sub32_with_borrow_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b)
+{
+  struct __sub32_with_borrow_result result;
+  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;
+  result.__field_0 = (uint32_t)(r & LOW_MASK);
+  result.__field_1 = (uint32_t)(r >> 63);
+  return result;
+}
+
+struct __mul32_double_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+struct __mul32_double_result mul32_double(uint32_t x, uint32_t y)
+{
+  struct __mul32_double_result result;
+  uint64_t r = (uint64_t)x * (uint64_t)y;
+  result.__field_0 = (uint32_t)(r & LOW_MASK);
+  result.__field_1 = (uint32_t)(r >> 32);
+  return result;
+}
+
+struct __add32_3_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z)
+{
+  struct __add32_3_result result;
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;
+  result.__field_0 = (uint32_t)(r & LOW_MASK);
+  result.__field_1 = (uint32_t)(r >> 32);
+  return result;
+}
+
+struct __lsld32_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
+{
+  struct __lsld32_result result;
+  uint64_t r = (uint64_t)x << cnt;
+  result.__field_0 = (uint32_t)(r & LOW_MASK);
+  result.__field_1 = (uint32_t)(r >> 32);
+  return result;
+}
+"
+
+  syntax converter of_int "%1U"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+  syntax val add_with_carry "add32_with_carry"
+  syntax val sub_with_borrow "sub32_with_borrow"
+  syntax val mul_double "mul32_double"
+  syntax val add3 "add32_3"
+  syntax val lsld "lsld32"
+
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
+
+  syntax val div2by1
+         "(uint32_t)(((uint64_t)%1 | ((uint64_t)%2 << 32))/(uint64_t)%3)"
+
+  syntax val lsl "%1 << %2"
+  syntax val lsr "%1 >> %2"
+
+  syntax val is_msb_set "%1 & 0x80000000U"
+
+  syntax val count_leading_zeros "__builtin_clz(%1)"
+
+  syntax val of_int32 "(uint32_t)%1"
+
+
+end
+
+module mach.int.UInt64Gen
+
+  syntax type uint64 "uint64_t"
+
+  syntax converter max_uint64 "0xffffffffffffffff"
+  syntax converter length "64"
+
+end
+
+module mach.int.UInt64
+
+  syntax converter of_int "%1ULL"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+
+end
+
+module mach.int.UInt64GMP
+
+  prelude
+
+"
+#include \"config.h\"
+#include \"gmp.h\"
+#include \"gmp-impl.h\"
+#include \"longlong.h\"
+
+#undef invert_limb
+
+struct __add64_with_carry_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __add64_with_carry_result add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
+{
+  struct __add64_with_carry_result result;
+  uint64_t r = x + y + c;
+  result.__field_0 = r;
+  if (r == x) result.__field_1 = c;
+  else result.__field_1 = (r < x);
+  return result;
+}
+
+struct __sub64_with_borrow_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __sub64_with_borrow_result sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
+{
+  struct __sub64_with_borrow_result result;
+  uint64_t r = x - y - b;
+  result.__field_0 = r;
+  if (r > x) result.__field_1 = 1;
+  else if (r == x) result.__field_1 = b;
+  else result.__field_1 = 0;
+  return result;
+}
+
+struct __mul64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+{
+  struct __mul64_double_result result;
+  umul_ppmm(result.__field_1,result.__field_0,x,y);
+  return result;
+}
+
+uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  uint64_t q;
+  uint64_t _dummy __attribute__((unused));
+  udiv_qrnnd(q,_dummy,uh,ul,d);
+  return q;
+}
+
+struct __add64_3_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
+{
+  struct __add64_3_result result;
+  uint64_t r, c1, c2;
+  r = x + y;
+  c1 = r < y;
+  r += z;
+  c2 = r < z;
+  result.__field_1 = c1 + c2;
+  result.__field_0 = r;
+  return result;
+}
+
+struct __lsld64_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
+{
+  struct __lsld64_result result;
+  result.__field_1 = x >> (64 - cnt);
+  result.__field_0 = x << cnt;
+  return result;
+}
+"
+
+  syntax converter of_int "%1ULL"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+  syntax val add_with_carry "add64_with_carry"
+  syntax val sub_with_borrow "sub64_with_borrow"
+  syntax val mul_double "mul64_double"
+  syntax val div2by1 "div64_2by1"
+  syntax val add3 "add64_3"
+  syntax val lsld "lsld64"
+
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
+
+  syntax val lsl "%1 << %2"
+  syntax val lsr "%1 >> %2"
+
+  syntax val is_msb_set "%1 & 0x8000000000000000ULL"
+
+  syntax val count_leading_zeros "__builtin_clzll(%1)"
+
+  syntax val of_int32 "(uint64_t)%1"
+
+end
+
+
+
+module mach.c.C
+
+  prelude "#include <assert.h>"
+
+  syntax type ptr "%1 *"
+  syntax type bool "int" (* ? *)
+
+  syntax val malloc "malloc((%1) * sizeof(%v0))"
+  syntax val free   "free(%1)"
+  syntax val realloc "realloc(%1, (%2) * sizeof(%v0))"
+
+  (* syntax val is_null "(%1) == NULL" *)
+  syntax val is_not_null "(%1) != NULL"
+  syntax val null "NULL"
+
+  syntax val incr "%1+(%2)"
+
+  syntax val get "*(%1)"
+  syntax val get_ofs "*(%1+(%2))"
+
+  syntax val set "*(%1) = %2"
+  syntax val set_ofs "*(%1+(%2)) = %3"
+
+  syntax val incr_split "%1+(%2)"
+  syntax val join "(void)0"
+
+  syntax val c_assert "assert ( %1 )"
+
+  syntax val print_space "printf(\" \")"
+  syntax val print_newline "printf(\"\\n\")"
+  syntax val print_uint32 "printf(\"%#010x\",%1)"
+
+end

@@ -2,31 +2,77 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vm.mlw" expanded="true">
-<theory name="ReflTransClosure" sum="f262a809b2b34d0ef483b05c11f8827b">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../vm.mlw">
+<theory name="ReflTransClosure" sum="8ac8ed5760e8555c2bce4ced0d223f8b">
  <goal name="transition_star_one" expl="">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="transition_star_transitive" expl="">
  <transf name="induction_pr">
   <goal name="transition_star_transitive.1" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="transition_star_transitive.1.1" expl="">
+   <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="transition_star_transitive.2" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="transition_star_transitive.2.1" expl="">
+   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Vm" sum="ca3f01c85f614bd0a405676a54d223d8">
+<theory name="Vm" sum="a97f807b42b411f5965ea9e0aaaa483b">
  <goal name="codeseq_at_app_right" expl="">
- <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
  <goal name="codeseq_at_app_left" expl="">
- <proof prover="2"><result status="valid" time="0.07" steps="60"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
+ </goal>
+ <goal name="VC push" expl="VC for push">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC iconst" expl="VC for iconst">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ivar" expl="VC for ivar">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC isetvar" expl="VC for isetvar">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC iadd" expl="VC for iadd">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC isub" expl="VC for isub">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC imul" expl="VC for imul">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibeq" expl="VC for ibeq">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ible" expl="VC for ible">
+ <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibne" expl="VC for ibne">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibgt" expl="VC for ibgt">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibranch" expl="VC for ibranch">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ihalt" expl="VC for ihalt">
+ <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
 </file>

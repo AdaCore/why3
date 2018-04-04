@@ -2,146 +2,118 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.7.1" timelimit="30" steplimit="0" memlimit="4000"/>
+<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="20" steplimit="0" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="30" steplimit="0" memlimit="1000"/>
-<file name="../vstte10_inverting.mlw" expanded="true">
-<theory name="InvertingAnInjection" sum="1664f1e7a4f28a1873adb4b1c23da4de" expanded="true">
- <goal name="WP_parameter inverting" expl="VC for inverting">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter inverting.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+<file name="../vstte10_inverting.mlw" proved="true">
+<theory name="InvertingAnInjection" proved="true">
+ <goal name="VC inverting" expl="VC for inverting" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC inverting.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter inverting.2" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC inverting.1" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter inverting.3" expl="index in array bounds">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC inverting.2" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter inverting.4" expl="type invariant">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting.5" expl="index in array bounds">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting.6" expl="loop invariant preservation">
+  <goal name="VC inverting.3" expl="loop invariant preservation" proved="true">
   <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter inverting.7" expl="type invariant">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC inverting.4" expl="postcondition" proved="true">
+  <proof prover="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
   </goal>
-  <goal name="WP_parameter inverting.8" expl="postcondition">
-  <proof prover="0" timelimit="5" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
+  <goal name="VC inverting.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter inverting2" expl="VC for inverting2">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter inverting2.1" expl="array creation size">
-  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="VC inverting2" expl="VC for inverting2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC inverting2.0" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter inverting2.2" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter inverting2.2.1" expl="VC for inverting2">
+  <goal name="VC inverting2.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC inverting2.2" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC inverting2.3" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="VC inverting2.4" expl="loop invariant preservation" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC inverting2.5" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC inverting2.5.0" expl="VC for inverting2" proved="true">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.00" steps="7"/></proof>
+   </goal>
+   <goal name="VC inverting2.5.1" expl="VC for inverting2" proved="true">
+   <proof prover="0" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="0.39"/></proof>
+   </goal>
+   <goal name="VC inverting2.5.2" expl="VC for inverting2" proved="true">
    <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
+   <proof prover="2" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="WP_parameter inverting2.2.2" expl="VC for inverting2">
-   <transf name="inline_goal">
-    <goal name="WP_parameter inverting2.2.2.1" expl="VC for inverting2">
-    <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
-    <proof prover="4"><result status="valid" time="0.01"/></proof>
-    <proof prover="5"><result status="valid" time="0.01"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="WP_parameter inverting2.2.3" expl="VC for inverting2">
-   <proof prover="3" timelimit="10"><result status="valid" time="0.00" steps="9"/></proof>
-   </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverting2.3" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.4" expl="index in array bounds">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.5" expl="type invariant">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.6" expl="index in array bounds">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.7" expl="loop invariant preservation">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.8" expl="type invariant">
-  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter inverting2.9" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter inverting2.9.1" expl="VC for inverting2">
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
-   </goal>
-   <goal name="WP_parameter inverting2.9.2" expl="VC for inverting2">
-   <proof prover="0" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_WP_parameter_inverting2_1.v"><result status="valid" time="0.32"/></proof>
-   </goal>
-   <goal name="WP_parameter inverting2.9.3" expl="VC for inverting2">
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
-   </goal>
-  </transf>
+  <goal name="VC inverting2.6" expl="postcondition" proved="true">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Test" sum="fdd8fa218fe9feedf8633a4d84de5248" expanded="true">
- <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter test.1" expl="array creation size">
-  <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
+<theory name="Test" proved="true">
+ <goal name="VC test" expl="VC for test" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC test.0" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter test.2" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="VC test.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter test.3" expl="index in array bounds">
-  <proof prover="3" timelimit="10"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC test.2" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter test.4" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC test.3" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter test.5" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC test.4" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter test.6" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC test.5" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter test.7" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+  <goal name="VC test.6" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter test.8" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC test.7" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter test.9" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC test.8" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter test.10" expl="index in array bounds">
-  <proof prover="3" timelimit="3"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC test.9" expl="index in array bounds" proved="true">
+  <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter test.11" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
+  <goal name="VC test.10" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter test.12" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.08" steps="33"/></proof>
+  <goal name="VC test.11" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter test.13" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.22" steps="53"/></proof>
+  <goal name="VC test.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.13" steps="157"/></proof>
   </goal>
-  <goal name="WP_parameter test.14" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.18" steps="80"/></proof>
+  <goal name="VC test.13" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.39" steps="1898"/></proof>
   </goal>
  </transf>
  </goal>

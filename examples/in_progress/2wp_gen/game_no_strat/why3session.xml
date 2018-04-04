@@ -1,0 +1,864 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../game_no_strat.mlw" proved="true">
+<theory name="StratLessDef" proved="true" sum="2803034f827335a32519f99b56d56e9f">
+ <goal name="u_acc_step_is_tr_succ" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_step_is_tr_succ.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="100"/></proof>
+  </goal>
+  <goal name="u_acc_step_is_tr_succ.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="377"/></proof>
+  </goal>
+  <goal name="u_acc_step_is_tr_succ.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Uacc" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="WinAlt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="InvExtraDef" proved="true" sum="082be763ed723dcbceb7619e095d0938">
+ <goal name="VC span_game" expl="VC for span_game" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
+ </goal>
+</theory>
+<theory name="InvExtra" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="UaccProof" proved="true" sum="bce0e4631411a2a2ed8a2ceccb258a1b">
+ <goal name="u_acc_base" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_base.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="1"/></proof>
+  </goal>
+  <goal name="u_acc_base.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="2"/></proof>
+  </goal>
+  <goal name="u_acc_base.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="dmn_witness_criterion" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="dmn_witness_criterion.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="25"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="169"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.3" proved="true">
+  <proof prover="0" timelimit="20"><result status="valid" time="7.57" steps="27117"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="844"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.27" steps="777"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="220"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="591"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="55"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.9" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.53" steps="1765"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.10" proved="true">
+  <proof prover="5"><result status="valid" time="0.68"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.29" steps="594"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.12" proved="true">
+  <proof prover="1"><result status="valid" time="2.86"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="34"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="369"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="66"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="82"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="68"/></proof>
+  </goal>
+  <goal name="dmn_witness_criterion.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="137"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_rebuild" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_rebuild.0" proved="true">
+  <proof prover="2"><result status="valid" time="1.52"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="627"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="259"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="623"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="467"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.54" steps="1099"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.7" proved="true">
+  <proof prover="5"><result status="valid" time="1.16"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.8" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="178"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.9" proved="true">
+  <proof prover="1"><result status="valid" time="1.88"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.10" proved="true">
+  <proof prover="1"><result status="valid" time="1.37"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.48" steps="1078"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="16"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.14" proved="true">
+  <proof prover="1"><result status="valid" time="1.04"/></proof>
+  </goal>
+  <goal name="u_acc_rebuild.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_next" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_next.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="565"/></proof>
+  </goal>
+  <goal name="u_acc_next.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.41" steps="1200"/></proof>
+  </goal>
+  <goal name="u_acc_next.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_sup" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_sup.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="58"/></proof>
+  </goal>
+  <goal name="u_acc_sup.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="2.36" steps="3448"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_lim" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_lim.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+  </goal>
+  <goal name="u_acc_lim.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="462"/></proof>
+  </goal>
+  <goal name="u_acc_lim.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="301"/></proof>
+  </goal>
+  <goal name="u_acc_lim.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="220"/></proof>
+  </goal>
+  <goal name="u_acc_lim.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="u_acc_lim.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="u_acc_lim.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="859"/></proof>
+  </goal>
+  <goal name="u_acc_lim.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="157"/></proof>
+  </goal>
+  <goal name="u_acc_lim.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="325"/></proof>
+  </goal>
+  <goal name="u_acc_lim.9" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="u_acc_lim.9.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="101"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="u_acc_lim.10" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.71" steps="3260"/></proof>
+  </goal>
+  <goal name="u_acc_lim.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="97"/></proof>
+  </goal>
+  <goal name="u_acc_lim.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="87"/></proof>
+  </goal>
+  <goal name="u_acc_lim.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="29"/></proof>
+  </goal>
+  <goal name="u_acc_lim.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="90"/></proof>
+  </goal>
+  <goal name="u_acc_lim.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="68"/></proof>
+  </goal>
+  <goal name="u_acc_lim.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="26"/></proof>
+  </goal>
+  <goal name="u_acc_lim.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="473"/></proof>
+  </goal>
+  <goal name="u_acc_lim.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="121"/></proof>
+  </goal>
+  <goal name="u_acc_lim.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="37"/></proof>
+  </goal>
+  <goal name="u_acc_lim.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="496"/></proof>
+  </goal>
+  <goal name="u_acc_lim.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="38"/></proof>
+  </goal>
+  <goal name="u_acc_lim.22" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="3.00" steps="8988"/></proof>
+  </goal>
+  <goal name="u_acc_lim.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
+  </goal>
+  <goal name="u_acc_lim.24" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="90"/></proof>
+  </goal>
+  <goal name="u_acc_lim.25" proved="true">
+  <proof prover="0"><result status="valid" time="1.10" steps="3016"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_by_step" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="u_acc_by_step.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="u_acc_by_step.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="2"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="u_acc_by_step.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="u_acc_by_step.1.0" proved="true">
+   <proof prover="0" timelimit="20"><result status="valid" time="11.72" steps="5690"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="u_acc_by_step.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="u_acc_by_step.2.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="42"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Uacc.u_acc_base" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+ </goal>
+ <goal name="Uacc.u_acc_next" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+ </goal>
+ <goal name="Uacc.u_acc_lim" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="24"/></proof>
+ </goal>
+ <goal name="Uacc.u_acc_sup" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+ </goal>
+ <goal name="Uacc.u_acc_by_step" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="4"/></proof>
+ </goal>
+ <goal name="Uacc.u_acc_rebuild" proved="true">
+ <proof prover="0"><result status="valid" time="0.22" steps="580"/></proof>
+ </goal>
+</theory>
+<theory name="WinAltProof" proved="true" sum="7396f32827bea3b6fd26c4693d77bc37">
+ <goal name="u_acc_losing_1" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_losing_1.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.27" steps="4072"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="199"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.26" steps="674"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
+  </goal>
+  <goal name="u_acc_losing_1.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.30" steps="574"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_losing_2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_losing_2.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="937"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="703"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.23" steps="663"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="188"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="35"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="19"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="79"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="79"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="290"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="37"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.57" steps="1184"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="58"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.78" steps="1738"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="281"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="149"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.26" steps="618"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.42" steps="1428"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="169"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.22" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="59"/></proof>
+  </goal>
+  <goal name="u_acc_losing_2.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="u_acc_losing_3" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="u_acc_losing_3.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="27"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="124"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="8"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.89" steps="1858"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="235"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="40"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.33" steps="1366"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="132"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="119"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="148"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="103"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="30"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.12" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.15" steps="534"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.19" steps="441"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.14" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.92" steps="2735"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="63"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="94"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="430"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
+  </goal>
+  <goal name="u_acc_losing_3.22" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="win_strat_from_victory_invariant" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="win_strat_from_victory_invariant.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="58"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="630"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="3.93" steps="5575"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="12"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.6" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="win_strat_from_victory_invariant.6.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="win_strat_from_victory_invariant.6.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="win_strat_from_victory_invariant.6.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="win_strat_from_victory_invariant.6.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="win_strat_from_victory_invariant.6.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="win_strat_from_victory_invariant.6.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.04" steps="73"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="win_strat_from_victory_invariant.6.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="win_strat_from_victory_invariant.6.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="win_strat_from_victory_invariant.6.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.09" steps="369"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.38" steps="1319"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
+  </goal>
+  <goal name="win_strat_from_victory_invariant.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="victory_invariant_from_win_strat_both" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="victory_invariant_from_win_strat_both.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="259"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="65"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.3" proved="true">
+  <proof prover="0" timelimit="20"><result status="valid" time="2.88" steps="5714"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.19" steps="358"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.5" proved="true">
+  <proof prover="2"><result status="valid" time="1.29"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="279"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.7" proved="true">
+  <proof prover="1"><result status="valid" time="0.67"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="87"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.34" steps="1117"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="403"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.13" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.13" steps="576"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="32"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.27" steps="660"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.16" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.86" steps="2113"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="364"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.18" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.39" steps="3597"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.19" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.38" steps="3597"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="764"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.22" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.32" steps="2493"/></proof>
+  </goal>
+  <goal name="victory_invariant_from_win_strat_both.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="627"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="victory_invariant_ok_1" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="victory_invariant_ok_1.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="47"/></proof>
+  </goal>
+  <goal name="victory_invariant_ok_1.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="66"/></proof>
+  </goal>
+  <goal name="victory_invariant_ok_1.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="victory_invariant_ok_1.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="85"/></proof>
+  </goal>
+  <goal name="victory_invariant_ok_1.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="victory_invariant_ok_2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="victory_invariant_ok_2.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="victory_invariant_ok_2.1" proved="true">
+  <proof prover="2"><result status="valid" time="1.31"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WinAlt.u_acc_losing" proved="true">
+ <proof prover="0"><result status="valid" time="0.07" steps="40"/></proof>
+ </goal>
+ <goal name="WinAlt.strong_u_acc_losing" proved="true">
+ <proof prover="0"><result status="valid" time="0.11" steps="204"/></proof>
+ </goal>
+ <goal name="WinAlt.victory_invariant_ok" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="7"/></proof>
+ </goal>
+ <goal name="WinAlt.win_strat_from_victory_invariant" proved="true">
+ <proof prover="0"><result status="valid" time="0.08" steps="42"/></proof>
+ </goal>
+ <goal name="WinAlt.victory_invariant_from_win_strat_1" proved="true">
+ <proof prover="2"><result status="valid" time="1.34"/></proof>
+ </goal>
+ <goal name="WinAlt.victory_invariant_from_win_strat_2" proved="true">
+ <proof prover="2"><result status="valid" time="1.40"/></proof>
+ </goal>
+</theory>
+<theory name="InvExtraProof" proved="true" sum="73261a0eb10caf7ea86a2c28b1ec70e2">
+ <goal name="victory_inv_span" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="victory_inv_span.0" proved="true">
+  <proof prover="5"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="victory_inv_span.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="victory_inv_span.2" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="victory_inv_span.2.0" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="victory_inv_span.2.0.0" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="victory_inv_span.2.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+     </goal>
+     <goal name="victory_inv_span.2.0.0.1" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="57"/></proof>
+     </goal>
+     <goal name="victory_inv_span.2.0.0.2" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+     </goal>
+     <goal name="victory_inv_span.2.0.0.3" proved="true">
+     <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="victory_inv_span.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.32" steps="513"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cropping_access" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="cropping_access.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+  </goal>
+  <goal name="cropping_access.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="436"/></proof>
+  </goal>
+  <goal name="cropping_access.2" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="cropping_access.2.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="cropping_access.2.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="cropping_access.2.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="cropping_access.2.1.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.26" steps="474"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="cropping_access.2.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="cropping_access.2.2.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.04" steps="42"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="cropping_access.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="24"/></proof>
+  </goal>
+  <goal name="cropping_access.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="cropping_access.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="cropping_access.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="246"/></proof>
+  </goal>
+  <goal name="cropping_access.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="55"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cropping" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="cropping.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="27"/></proof>
+  </goal>
+  <goal name="cropping.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="108"/></proof>
+  </goal>
+  <goal name="cropping.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="59"/></proof>
+  </goal>
+  <goal name="cropping.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="83"/></proof>
+  </goal>
+  <goal name="cropping.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="cropping.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="77"/></proof>
+  </goal>
+  <goal name="cropping.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.31" steps="538"/></proof>
+  </goal>
+  <goal name="cropping.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="45"/></proof>
+  </goal>
+  <goal name="cropping.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="79"/></proof>
+  </goal>
+  <goal name="cropping.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+  <goal name="cropping.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+  <goal name="cropping.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="24"/></proof>
+  </goal>
+  <goal name="cropping.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="51"/></proof>
+  </goal>
+  <goal name="cropping.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="cropping.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="cropping.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="72"/></proof>
+  </goal>
+  <goal name="cropping.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="256"/></proof>
+  </goal>
+  <goal name="cropping.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="cropping.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="24"/></proof>
+  </goal>
+  <goal name="cropping.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="46"/></proof>
+  </goal>
+  <goal name="cropping.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="172"/></proof>
+  </goal>
+  <goal name="cropping.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="142"/></proof>
+  </goal>
+  <goal name="cropping.22" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="38"/></proof>
+  </goal>
+  <goal name="cropping.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="100"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="InvExtra.cropping" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="11"/></proof>
+ </goal>
+ <goal name="InvExtra.cropping_access" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

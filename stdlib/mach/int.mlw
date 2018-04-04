@@ -1,0 +1,591 @@
+
+(** {1 Arithmetic for programs} *)
+
+(** {2 Integer Division}
+
+It is checked that divisor is not null.
+
+*)
+
+module Int
+
+  use export int.Int
+  use export int.ComputerDivision
+
+  let (/) (x: int) (y: int)
+    requires { [@expl:check division by zero] y <> 0 }
+    ensures  { result = div x y }
+  = div x y
+
+  let (%) (x: int) (y: int)
+    requires { [@expl:check modulo by zero] y <> 0 }
+    ensures  { result = mod x y }
+  = mod x y
+
+end
+
+(** {2 Machine integers}
+
+  Bounded integers, typically n-bit signed and unsigned integers, go
+  here. We first introduce a generic theory [Bounded_int] of bounded
+  integers, with minimal and maximal values (resp. [min] and [max]).
+  Then we instantiate it to get 32-bit and 64-bit signed and unsigned integers
+  ([Int32], [UInt32], [Int64], and [UInt64]) as well as 31-bit and 63-bit signed
+  integers ([Int31] and [Int63]) to be used in OCaml programs.
+
+*)
+
+module Bounded_int
+
+  use import int.Int
+
+  type t
+
+  constant min : int
+  constant max : int
+
+  function to_int (n:t) : int
+  meta coercion function to_int
+  meta "model_projection" function to_int
+
+  val to_int (n:t) : int
+    ensures { result = n }
+
+  predicate in_bounds (n:int) = min <= n <= max
+
+  axiom to_int_in_bounds: forall n:t. in_bounds n
+
+  val of_int (n:int) : t
+    requires { [@expl:integer overflow] in_bounds n }
+    ensures  { result = n }
+
+  val (+) (a:t) (b:t) : t
+    requires { [@expl:integer overflow] in_bounds (a + b) }
+    ensures   { result = a + b }
+
+  val (-) (a:t) (b:t) : t
+    requires { [@expl:integer overflow] in_bounds (a - b) }
+    ensures  { result = a - b }
+
+  val ( * ) (a:t) (b:t) : t
+    requires { [@expl:integer overflow] in_bounds (a * b) }
+    ensures  { result = a * b }
+
+  val (-_) (a:t) : t
+    requires { [@expl:integer overflow] in_bounds (- a) }
+    ensures  { result = - a }
+
+  axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
+
+  val (=) (a:t) (b:t) : bool
+    ensures { to_int a = to_int b -> result }
+    ensures { result -> a = b }
+
+  val (<=) (a:t) (b:t) : bool
+    ensures  { result <-> to_int a <= to_int b }
+
+  val (<) (a:t) (b:t) : bool
+    ensures  { result <-> to_int a < to_int b }
+
+  val (>=) (a:t) (b:t) : bool
+    ensures  { result <-> to_int a >= to_int b }
+
+  val (>) (a:t) (b:t) : bool
+    ensures  { result <-> to_int a > to_int b }
+
+  use import int.ComputerDivision
+
+  val (/) (a:t) (b:t) : t
+    requires { [@expl:division by zero] b <> 0 }
+    requires { [@expl:integer overflow] in_bounds (div a b) }
+    ensures  { result = div a b }
+
+  val (%) (a:t) (b:t) : t
+    requires { [@expl:division by zero] b <> 0 }
+    requires { [@expl:integer overflow] in_bounds (mod a b) }
+    ensures  { result = mod a b }
+
+end
+
+module Unsigned
+
+  use import int.Int
+
+  let constant min_unsigned : int = 0
+
+  clone export Bounded_int with
+    constant min = min_unsigned
+
+  constant zero_unsigned : t
+
+  axiom zero_unsigned_is_zero : to_int zero_unsigned = 0
+
+  constant radix : int
+
+  axiom radix_def : radix = max+1
+
+end
+
+module UnsignedGMP
+
+  (** Additional GMP-inspired arithmetic primitives *)
+
+  use import int.Int
+  clone export Unsigned
+  use import int.EuclideanDivision
+
+  val add_mod (x y:t) : t
+    ensures { to_int result = mod (to_int x + to_int y) (max+1) }
+
+  val add_with_carry (x y:t) (c:t) : (t,t)
+    requires { 0 <= to_int c <= 1 }
+    returns { (r,d) ->
+      to_int r + radix * to_int d =
+      to_int x + to_int y + to_int c
+      /\ 0 <= to_int d <= 1 }
+
+  val sub_mod (x y:t) : t
+    ensures { to_int result = mod (to_int x - to_int y) radix }
+
+  val sub_with_borrow (x y:t) (b:t) : (t,t)
+    requires { 0 <= to_int b <= 1 }
+    returns { (r, d) ->
+      to_int r - radix * to_int d  =
+      to_int x - to_int y - to_int b
+      /\ 0 <= to_int d <= 1 }
+
+  val add3 (x y z:t) : (t,t)
+    returns { (r,d) ->
+      to_int r + radix * to_int d =
+      to_int x + to_int y + to_int z
+      /\ 0 <= to_int d <= 2 }
+
+  val mul_mod (x y:t) : t
+    ensures { to_int result = mod (to_int x * to_int y) radix }
+
+  val mul_double (x y:t) : (t,t)
+    returns { (r,d) ->
+      to_int r + radix * to_int d =
+      to_int x * to_int y }
+
+end
+
+module Int31
+
+  use import int.Int
+
+  type int31 = < range -0x4000_0000 0x3fff_ffff >
+
+  let constant min_int31 : int = - 0x4000_0000
+  let constant max_int31 : int =   0x3fff_ffff
+  function to_int (x : int31) : int = int31'int x
+
+  clone export Bounded_int with
+    type t = int31,
+    constant min = int31'minInt,
+    constant max = int31'maxInt,
+    function to_int = int31'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+(*  use bv.BV31
+
+  val to_bv (x: int31) : BV31.t
+    ensures { BV31.to_int result = to_int x }
+  val of_bv (x: BV31.t) : int31
+    ensures { to_int result = BV31.to_int x }
+*)
+end
+
+module Int32
+
+  use import int.Int
+
+  type int32 = < range -0x8000_0000 0x7fff_ffff >
+
+  let constant min_int32 : int = - 0x8000_0000
+  let constant max_int32 : int =   0x7fff_ffff
+  function to_int (x : int32) : int = int32'int x
+
+  clone export Bounded_int with
+    type t = int32,
+    constant min = int32'minInt,
+    constant max = int32'maxInt,
+    function to_int = int32'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+(*
+  use bv.BV32
+
+  val to_bv (x: int32) : BV32.t
+    ensures { BV32.to_int result = to_int x }
+  val of_bv (x: BV32.t) : int32
+    ensures { to_int result = BV32.to_int x }
+*)
+end
+
+module Int32BV
+
+  use export Int32
+
+  use bv.BV32
+
+  val to_bv (x: int32) : BV32.t
+    ensures { BV32.to_int result = to_int x }
+  val of_bv (x: BV32.t) : int32
+    ensures { to_int result = BV32.to_int x }
+
+end
+
+module UInt32Gen
+
+  use import int.Int
+
+  type uint32 = < range 0 0xffff_ffff >
+
+  let constant max_uint32 : int = 0xffff_ffff
+  let constant length : int = 32
+  let constant radix : int = max_uint32 + 1
+  function to_int (x : uint32) : int = uint32'int x
+
+end
+
+module UInt32
+
+  use export UInt32Gen
+
+  clone export Unsigned with
+    type t = uint32,
+    constant max = uint32'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint32'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
+module UInt32GMP
+
+  use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+  use import Int32
+  use export UInt32Gen
+
+  clone export UnsignedGMP with
+    type t = uint32,
+    constant max = uint32'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint32'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  val lsld (x cnt:uint32) : (uint32,uint32)
+    requires { 0 < to_int cnt < 32 }
+    returns { (r,d) -> to_int r + (max_uint32+1) * to_int d =
+              (power 2 (to_int cnt)) * to_int x }
+
+  val lsl (x cnt:uint32) : uint32
+    requires { 0 <= to_int cnt < 32 }
+    requires { (power 2 (to_int cnt)) * to_int x <= max_uint32 }
+    ensures { to_int result = (power 2 (to_int cnt)) * to_int x }
+
+  val lsr (x cnt:uint32) : uint32
+    requires { 0 <= to_int cnt < 32 }
+    requires { mod (to_int x) (power 2 (to_int cnt)) = 0 }
+    ensures { to_int x = (power 2 (to_int cnt)) * to_int result }
+
+  val div2by1 (l h d:uint32) : uint32
+    requires { to_int h < to_int d }
+    (* this pre implies d > 0 and also
+       l + (max+1)*h < (max+1)+(max+1)*h
+                     = (max+1)*(h+1)
+       thus
+       (l + (max+1)*h)/d < (max+1)*(h+1)/d
+                         <= max+1   (since h < d)
+       thus the result is <= max, no overflow
+    *)
+    ensures { to_int result
+            = div (to_int l + (max_uint32+1) * to_int h) (to_int d) }
+
+  val predicate is_msb_set (x:uint32) : bool
+    ensures { result <-> 2 * to_int x > max_uint32 }
+
+  val count_leading_zeros (x:uint32) : int32
+    requires { to_int x > 0 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint32 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint32 }
+    ensures { 0 <= Int32.to_int result < 32 }
+
+  val of_int32(x:int32) : uint32
+    requires { Int32.to_int x >= 0 }
+    ensures { to_int result = Int32.to_int x }
+
+(*  use bv.BV32
+
+  val to_bv (x: uint32) : BV32.t
+    ensures { BV32.to_uint result = to_int x }
+  val of_bv (x: BV32.t) : uint32
+    ensures { to_int result = BV32.to_uint x }
+*)
+end
+
+module Int63
+
+  use import int.Int
+
+  type int63 = < range -0x4000_0000_0000_0000 0x3fff_ffff_ffff_ffff >
+
+  let constant min_int63 : int = - 0x4000_0000_0000_0000
+  let constant max_int63 : int =   0x3fff_ffff_ffff_ffff
+  function to_int (x : int63) : int = int63'int x
+
+  clone export Bounded_int with
+    type t = int63,
+    constant min = int63'minInt,
+    constant max = int63'maxInt,
+    function to_int = int63'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  let constant zero = of_int 0
+  let constant one = of_int 1
+  let constant max_int = of_int max_int63
+  let constant min_int = of_int min_int63
+
+(*  use bv.BV63
+
+  val to_bv (x: int63) : BV63.t
+    ensures { BV63.to_int result = to_int x }
+  val of_bv (x: BV63.t) : int63
+    ensures { to_int result = BV63.to_int x }
+*)
+end
+
+module Refint63
+
+  use import int.Int
+  use import Int63
+  use export ref.Ref
+
+  let incr (r: ref int63) : unit
+    requires { [@expl:integer overflow] to_int !r < max_int63 }
+    ensures  { to_int !r = to_int (old !r) + 1 }
+  = r := !r + of_int 1
+  let decr (r: ref int63) : unit
+    requires { [@expl:integer overflow] min_int63 < to_int !r }
+    ensures  { to_int !r = to_int (old !r) - 1 }
+  = r := !r - of_int 1
+
+  let (+=) (r: ref int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int !r + to_int v) }
+    ensures { to_int !r = to_int (old !r) + to_int v }
+  = r := !r + v
+
+  let (-=) (r: ref int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int !r - to_int v) }
+    ensures  { to_int !r = to_int (old !r) - to_int v }
+  = r := !r - v
+
+  let ( *= ) (r: ref int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int !r * to_int v) }
+    ensures { to_int !r = to_int (old !r) * to_int v }
+  = r := !r * v
+
+end
+
+module MinMax63
+
+  use import int.Int
+  use import Int63
+
+  let min (x y: int63) : int63
+    ensures { result = if to_int x <= to_int y then x else y }
+  = if x <= y then x else y
+
+  let max (x y: int63) : int63
+    ensures { result = if to_int x >= to_int y then x else y }
+  = if x >= y then x else y
+
+end
+
+
+(** {2 Mutable states of pseudo-random generators}
+
+  Basically a reference containing a pure generator. *)
+
+module State63
+
+  use import int.Int
+  use import Int63
+
+  type state = private mutable { }
+
+  val create (seed: int63) : state
+
+  val init (s: state) (seed: int63) : unit writes {s}
+
+  val self_init (s: state) : unit writes {s}
+
+  val random_bool (s: state) : bool writes {s}
+
+  val random_int63 (s: state) (n: int63) : int63 writes {s}
+    requires { 0 < n }
+    ensures  { 0 <= result < n }
+
+end
+
+(** {2 A global pseudo-random generator} *)
+
+module Random63
+
+  use import int.Int
+  use import Int63
+  use import State63
+
+  val s: state
+
+  let init (seed: int63) = init s seed
+
+  let self_init () = self_init s
+
+  let random_bool ()
+    writes { s }
+  = random_bool s
+
+  let random_int63 (n: int63) : int63
+    requires { 0 < n } (* FIXME: n should be less than 2^30 *)
+    writes   { s }
+    ensures  { 0 <= result < n }
+  = random_int63 s n
+
+end
+
+module Int64
+
+  use import int.Int
+
+  type int64 = < range -0x8000_0000_0000_0000 0x7fff_ffff_ffff_ffff >
+
+  let constant min_int64 : int = - 0x8000_0000_0000_0000
+  let constant max_int64 : int =   0x7fff_ffff_ffff_ffff
+  function to_int (x : int64) : int = int64'int x
+
+  clone export Bounded_int with
+    type t = int64,
+    constant min = int64'minInt,
+    constant max = int64'maxInt,
+    function to_int = int64'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+(*  use bv.BV64
+
+  val to_bv (x: int64) : BV64.t
+    ensures { BV64.to_int result = to_int x }
+  val of_bv (x: BV64.t) : int64
+    ensures { to_int result = BV64.to_int x }
+*)
+end
+
+module UInt64Gen
+
+  use import int.Int
+
+  type uint64 = < range 0 0xffff_ffff_ffff_ffff >
+
+  let constant max_uint64 : int = 0xffff_ffff_ffff_ffff
+  let constant length : int = 64
+  let constant radix : int = max_uint64 + 1
+
+  function to_int (x : uint64) : int = uint64'int x
+
+end
+
+module UInt64
+
+  use export UInt64Gen
+
+  clone export Unsigned with
+    type t = uint64,
+    constant max = uint64'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint64'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+(*  use bv.BV64
+
+  val to_bv (x: uint64) : BV64.t
+    ensures { BV64.to_uint result = to_int x }
+  val of_bv (x: BV64.t) : uint64
+    ensures { to_int result = BV64.to_uint x }
+*)
+end
+
+module UInt64GMP
+
+  use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+  use import Int32
+  use export UInt64Gen
+
+  clone export UnsignedGMP with
+    type t = uint64,
+    constant max = uint64'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uint64'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  val lsld (x cnt:uint64) : (uint64,uint64)
+    requires { 0 < to_int cnt < 64 }
+    returns { (r,d) -> to_int r + (max_uint64+1) * to_int d =
+              (power 2 (to_int cnt)) * to_int x }
+
+  val lsl (x cnt:uint64) : uint64
+    requires { 0 <= to_int cnt < 64 }
+    requires { (power 2 (to_int cnt)) * to_int x <= max_uint64 }
+    ensures { to_int result = (power 2 (to_int cnt)) * to_int x }
+
+  val lsr (x cnt:uint64) : uint64
+    requires { 0 <= to_int cnt < 64 }
+    requires { mod (to_int x) (power 2 (to_int cnt)) = 0 }
+    ensures { to_int x = (power 2 (to_int cnt)) * to_int result }
+
+  val div2by1 (l h d:uint64) : uint64
+    requires { to_int h < to_int d }
+    (* this pre implies d > 0 and also
+       l + (max+1)*h < (max+1)+(max+1)*h
+                     = (max+1)*(h+1)
+       thus
+       (l + (max+1)*h)/d < (max+1)*(h+1)/d
+                         <= max+1   (since h < d)
+       thus the result is <= max, no overflow
+    *)
+    ensures { to_int result
+            = div (to_int l + (max_uint64+1) * to_int h) (to_int d) }
+
+  val predicate is_msb_set (x:uint64) : bool
+    ensures { result <-> 2 * to_int x > max_uint64 }
+
+  val count_leading_zeros (x:uint64) : int32
+    requires { to_int x > 0 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint64 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint64 }
+    ensures { 0 <= Int32.to_int result < 64 }
+
+  val of_int32(x:int32) : uint64
+    requires { Int32.to_int x >= 0 }
+    ensures { to_int result = Int32.to_int x }
+
+end

@@ -22,11 +22,7 @@ endif
 
 
 MAIN = main
-OBJ = defunctionalization__Expr \
-	defunctionalization__DirectSem \
-	defunctionalization__CPS \
-	defunctionalization__Defunctionalization \
-
+OBJ = defunctionalization
 ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
 CMX = $(addsuffix .cmx, $(OBJ))
@@ -51,7 +47,10 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../defunctionalization.mlw
-	$(WHY3) extract -D ocaml64 ../defunctionalization.mlw -o .
+	$(WHY3) extract -D ocaml64 --recursive -L .. -o $@ \
+		defunctionalization.DirectSem \
+		defunctionalization.CPS \
+		defunctionalization.Defunctionalization
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

@@ -19,11 +19,11 @@ let debug = Debug.register_info_flag "encoding"
   ~desc:"Print@ debugging@ messages@ about@ polymorphism@ encoding."
 
 (* meta to tag the protected types *)
-let meta_kept = register_meta "encoding : kept" [MTty]
+let meta_kept = register_meta "encoding:kept" [MTty]
   ~desc:"Specify@ a@ type@ to@ keep@ during@ polymorphism@ encoding."
 
 (* meta to tag the custom base type *)
-let meta_base = register_meta_excl "encoding : base" [MTty]
+let meta_base = register_meta_excl "encoding:base" [MTty]
   ~desc:"Specify@ the@ base@ type@ for@ monomorphic@ \
     polymorphism@ encoding@ (`int'@ or@ `real'@ only)."
 
@@ -110,8 +110,8 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label = Ident.create_label "encoding : unprotected"
-let unprotecting_label = Ident.create_label "encoding : unprotecting"
+let unprotected_label = Ident.create_label "encoding:unprotected"
+let unprotecting_label = Ident.create_label "encoding:unprotecting"
 
 let id_unprotected n = id_fresh ~label:(Slab.singleton unprotected_label) n
 let id_unprotecting n = id_fresh ~label:(Slab.singleton unprotecting_label) n
@@ -248,7 +248,7 @@ let monomorphise_task =
       when ts_equal ts ts_int || ts_equal ts ts_real ->
         ty, create_ty_decl ts
     | Some [MAty _] -> Loc.errorm
-        "the \"enconding : base\" meta can only apply to `int' or `real'"
+        "the \"encoding:base\" meta can only apply to `int' or `real'"
     | Some _ -> assert false
     | None -> ty_base, d_ts_base in
   Trans.on_tagged_ty meta_kept (fun kept ->

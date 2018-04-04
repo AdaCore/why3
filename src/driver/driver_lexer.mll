@@ -10,15 +10,8 @@
 (********************************************************************)
 
 {
-  open Format
   open Lexing
   open Driver_parser
-
-  exception IllegalCharacter of char
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | _ -> raise e)
 
   let keywords = Hashtbl.create 97
   let () =
@@ -73,7 +66,7 @@ let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
 
 rule token = parse
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | "(*)"
@@ -111,7 +104,7 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (IllegalCharacter c) }
+      { Lexlib.illegal_character c lexbuf }
 
 {
   let parse_file_gen parse input_lexbuf lexbuf =

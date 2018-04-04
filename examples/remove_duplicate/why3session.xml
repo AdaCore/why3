@@ -2,122 +2,100 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../remove_duplicate.mlw" expanded="true">
-<theory name="Spec" sum="d41d8cd98f00b204e9800998ecf8427e">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../remove_duplicate.mlw" proved="true">
+<theory name="Spec" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="RemoveDuplicateQuadratic" sum="1f3579322cb22f971ff1e44dfbc4b8e2" expanded="true">
- <goal name="WP_parameter test_appears" expl="VC for test_appears">
- <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
+<theory name="RemoveDuplicateQuadratic" proved="true">
+ <goal name="VC test_appears" expl="VC for test_appears" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="65"/></proof>
  </goal>
- <goal name="WP_parameter remove_duplicate" expl="VC for remove_duplicate">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter remove_duplicate.1" expl="array creation size">
-  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="VC remove_duplicate" expl="VC for remove_duplicate" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC remove_duplicate.0" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.2" expl="array creation size">
-  <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
+  <goal name="VC remove_duplicate.1" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC remove_duplicate.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC remove_duplicate.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.5" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.10"/></proof>
+  <goal name="VC remove_duplicate.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.6" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC remove_duplicate.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.7" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC remove_duplicate.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.8" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC remove_duplicate.7" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.9" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC remove_duplicate.8" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.10" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC remove_duplicate.9" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.11" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC remove_duplicate.10" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.12" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC remove_duplicate.11" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.13" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
+  <goal name="VC remove_duplicate.12" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.14" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  <goal name="VC remove_duplicate.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.15" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC remove_duplicate.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="75"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.16" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC remove_duplicate.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="215"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.17" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
+  <goal name="VC remove_duplicate.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="213"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.18" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC remove_duplicate.17" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="71"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.19" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
+  <goal name="VC remove_duplicate.18" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.20" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.46" steps="243"/></proof>
+  <goal name="VC remove_duplicate.19" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.21" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.18" steps="74"/></proof>
+  <goal name="VC remove_duplicate.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.22" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.12" steps="90"/></proof>
+  <goal name="VC remove_duplicate.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.23" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.05" steps="25"/></proof>
+  <goal name="VC remove_duplicate.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="122"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.24" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC remove_duplicate.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.25" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="VC remove_duplicate.24" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.26" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC remove_duplicate.25" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.27" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC remove_duplicate.26" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter remove_duplicate.28" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.29" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.05" steps="84"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.30" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.31" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.32" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.33" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_duplicate.34" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <goal name="VC remove_duplicate.27" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>

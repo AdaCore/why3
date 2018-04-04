@@ -643,7 +643,6 @@ and tr_global_ts dep env evd (r : global_reference) =
             let j = ith_mutual_inductive i j in
             let ts = lookup_table global_ts (IndRef j) in
             let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in
-            let opaque = Ty.Stv.of_list ts.Ty.ts_args in
             let constr = Array.length oib.mind_nf_lc in
             let mk_constructor k _tyk = (* k-th constructor *)
               let r = ConstructRef (j, k+1) in
@@ -683,7 +682,7 @@ and tr_global_ts dep env evd (r : global_reference) =
               in
               let l = List.map (tr_type dep' tvm env evd) l in
               let id = preid_of_id (Nametab.basename_of_global r) in
-              let ls = Term.create_fsymbol ~opaque ~constr id l tyj in
+              let ls = Term.create_fsymbol ~constr id l tyj in
               add_table global_ls r (Some ls);
               add_poly_arity ls vars;
               ls, List.map (fun _ -> None) ls.ls_args
@@ -1324,7 +1323,8 @@ let why3tac ?(timelimit=timelimit) s gl =
     let cp, drv = get_prover s in
     let command = String.concat " " (cp.command :: cp.extra_options) in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
-    if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
+    if debug then Format.printf "@[%a@]@\n---@."
+      (fun fmt -> Driver.print_task drv fmt) !task;
     let limit =
     { Call_provers.empty_limit with Call_provers.limit_time = timelimit } in
     let call = Driver.prove_task ~command ~limit drv !task in
@@ -1356,7 +1356,7 @@ let why3tac ?(timelimit=timelimit) s gl =
         errorlabstrm "Whyconf.ProverAmbiguity" msg
     | Whyconf.ParseFilterProver s ->
       let msg = pr_str "Syntax error prover identification '" ++
-        pr_str s ++ pr_str "' :  name[,version[,alternative]|,,alternative]" in
+        pr_str s ++ pr_str "':  name[,version[,alternative]|,,alternative]" in
       errorlabstrm "Whyconf.ParseFilterProver" msg
 (*
     | e ->

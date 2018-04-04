@@ -1,0 +1,19 @@
+
+use import int.Int
+use import ref.Ref
+
+exception Exit
+
+let funny () =
+  exception FixRegion (ref int) in
+  let fixed_ref (i : int) : unit
+    ensures { false }
+    raises  { FixRegion r -> !r = i }
+  = raise FixRegion (ref i) in
+  let r1 = try fixed_ref 42; absurd with FixRegion r -> r end in
+  try begin ensures { false }
+    let r2 = try fixed_ref 17; absurd with FixRegion r -> r end in
+    r2 := !r2 + 1;
+    raise Exit
+  end with Exit -> () end;
+  assert { !r1 = 18 }

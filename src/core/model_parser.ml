@@ -34,15 +34,71 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+
+                               let interp_float b eb sb =
+    try
+      let is_neg = match b with
+        | "#b0" -> false
+        | "#b1" -> true
+        | _ -> raise Exit
+      in
+      if String.length eb = 13 && String.sub eb 0 2 = "#b" &&
+         String.length sb = 15 && String.sub sb 0 2 = "#x" then
+         (* binary 64 *)
+         let exp_base2 = String.sub eb 2 11 in
+         let mant_base16 = String.sub sb 2 13 in
+         let exp = int_of_string ("0b" ^ exp_base2) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-1023"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 2047 then (* infinities and NaN *)
+             if mant_base16="0000000000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 1023 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else
+      if String.length eb = 4 && String.sub eb 0 2 = "#x" &&
+         String.length sb = 25 && String.sub sb 0 2 = "#b" then
+         (* binary 32 *)
+         let exp_base16 = String.sub eb 2 2 in
+         let mant_base2 = String.sub sb 2 23 in
+         let mant_base16 =
+           Format.asprintf "%06x" (2*int_of_string ("0b" ^ mant_base2))
+         in
+         let exp = int_of_string ("0x" ^ exp_base16) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-127"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 255 then (* infinities and NaN *)
+             if mant_base16="0000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 127 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else raise Exit
+   with Exit -> Float_value (b, eb, sb)
 
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string; (* Even array indices can exceed MAX_INT with Z3 *)
@@ -52,10 +108,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record = {
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 let array_create_constant ~value =
   {
@@ -79,94 +133,160 @@ let array_add_element ~array ~index ~value =
 let convert_float_value f =
   match f with
   | Plus_infinity ->
-      let m = Mstr.add "cons" (Json.String "Plus_infinity") Stdlib.Mstr.empty in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Stdlib.Mstr.empty in
+      Json_base.Record m
   | Minus_infinity ->
-      let m = Mstr.add "cons" (Json.String "Minus_infinity") Stdlib.Mstr.empty in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Minus_infinity") Stdlib.Mstr.empty in
+      Json_base.Record m
   | Plus_zero ->
-      let m = Mstr.add "cons" (Json.String "Plus_zero") Stdlib.Mstr.empty in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Plus_zero") Stdlib.Mstr.empty in
+      Json_base.Record m
   | Minus_zero ->
-      let m = Mstr.add "cons" (Json.String "Minus_zero") Stdlib.Mstr.empty in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Minus_zero") Stdlib.Mstr.empty in
+      Json_base.Record m
   | Not_a_number ->
-      let m = Mstr.add "cons" (Json.String "Not_a_number") Stdlib.Mstr.empty in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Not_a_number") Stdlib.Mstr.empty in
+      Json_base.Record m
   | Float_value (b, eb, sb) ->
-      let m = Mstr.add "cons" (Json.String "Float_value") Stdlib.Mstr.empty in
-      let m = Mstr.add "sign" (Json.String b) m in
-      let m = Mstr.add "exponent" (Json.String eb) m in
-      let m = Mstr.add "significand" (Json.String sb) m in
-      Json.Record m
+      let m = Mstr.add "cons" (Json_base.String "Float_value") Stdlib.Mstr.empty in
+      let m = Mstr.add "sign" (Json_base.String b) m in
+      let m = Mstr.add "exponent" (Json_base.String eb) m in
+      let m = Mstr.add "significand" (Json_base.String sb) m in
+      Json_base.Record m
+  | Float_hexa(s,f) ->
+      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Stdlib.Mstr.empty in
+      let m = Mstr.add "str_hexa" (Json_base.String s) m in
+      let m = Mstr.add "value" (Json_base.Float f) m in
+      Json_base.Record m
 
-let rec convert_model_value value : Json.json =
+let rec convert_model_value value : Json_base.json =
   match value with
   | Integer s ->
-      let m = Mstr.add "type" (Json.String "Integer") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.String s) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Integer") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
   | Float f ->
-      let m = Mstr.add "type" (Json.String "Float") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Float") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (convert_float_value f) m in
-      Json.Record m
+      Json_base.Record m
   | Decimal (int_part, fract_part) ->
-      let m = Mstr.add "type" (Json.String "Decimal") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.String (int_part^"."^fract_part)) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Decimal") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (int_part^"."^fract_part)) m in
+      Json_base.Record m
+  | Fraction (num, den) ->
+      let m = Mstr.add "type" (Json_base.String "Fraction") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (num^"/"^den)) m in
+      Json_base.Record m
   | Unparsed s ->
-      let m = Mstr.add "type" (Json.String "Unparsed") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.String s) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Unparsed") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
   | Bitvector v ->
-      let m = Mstr.add "type" (Json.String "Bv") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.String v) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Bv") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String v) m in
+      Json_base.Record m
   | Boolean b ->
-      let m = Mstr.add "type" (Json.String "Boolean") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.Bool b) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Boolean") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.Bool b) m in
+      Json_base.Record m
   | Array a ->
       let l = convert_array a in
-      let m = Mstr.add "type" (Json.String "Array") Stdlib.Mstr.empty in
-      let m = Mstr.add "val" (Json.List l) m in
-      Json.Record m
+      let m = Mstr.add "type" (Json_base.String "Array") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.List l) m in
+      Json_base.Record m
+  | Apply (s, lt) ->
+      let lt = List.map convert_model_value lt in
+      let slt =
+        let m = Mstr.add "list" (Json_base.List lt) Stdlib.Mstr.empty in
+        let m = Mstr.add "apply" (Json_base.String s) m in
+        Json_base.Record m
+      in
+      let m = Mstr.add "type" (Json_base.String "Apply") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" slt m in
+      Json_base.Record m
   | Record r ->
       convert_record r
 
 and convert_array a =
   let m_others =
     Mstr.add "others" (convert_model_value a.arr_others)  Stdlib.Mstr.empty in
-  convert_indices a.arr_indices @ [Json.Record m_others]
+  convert_indices a.arr_indices @ [Json_base.Record m_others]
 
 and convert_indices indices =
   match indices with
   | [] -> []
   | index :: tail ->
-    let m = Mstr.add "indice" (Json.String index.arr_index_key) Stdlib.Mstr.empty in
+    let m = Mstr.add "indice" (Json_base.String index.arr_index_key) Stdlib.Mstr.empty in
     let m = Mstr.add "value" (convert_model_value index.arr_index_value) m in
-    Json.Record m :: convert_indices tail
+    Json_base.Record m :: convert_indices tail
 
 and convert_record r =
-  let m = Mstr.add "type" (Json.String "Record") Stdlib.Mstr.empty in
-  let fields = convert_fields r.fields in
-  let discrs = convert_discrs r.discrs in
-  let m_field_discr = Mstr.add "Field" fields Stdlib.Mstr.empty in
-  let m_field_discr = Mstr.add "Discr" discrs m_field_discr in
-  let m = Mstr.add "val" (Json.Record m_field_discr) m in
-  Json.Record m
+  let m = Mstr.add "type" (Json_base.String "Record") Stdlib.Mstr.empty in
+  let fields = convert_fields r in
+  let m_field = Mstr.add "Field" fields Stdlib.Mstr.empty in
+  let m = Mstr.add "val" (Json_base.Record m_field) m in
+  Json_base.Record m
 
 and convert_fields fields =
-  Json.List (List.map convert_model_value fields)
-
-and convert_discrs discrs =
-  Json.List (List.map convert_model_value discrs)
+  Json_base.List
+    (List.map
+       (fun (f, v) ->
+         let m = Mstr.add "field" (Json_base.String f) Stdlib.Mstr.empty in
+         let m = Mstr.add "value" (convert_model_value v) m in
+         Json_base.Record m)
+       fields)
 
 let print_model_value_sanit fmt v =
   let v = convert_model_value v in
-  Json.print_json fmt v
+  Json_base.print_json fmt v
 
 let print_model_value = print_model_value_sanit
+
+
+(******************************************)
+(* Print values for humans                *)
+(******************************************)
+let print_float_human fmt f =
+  match f with
+  | Plus_infinity ->
+      fprintf fmt "+∞"
+  | Minus_infinity ->
+      fprintf fmt "-∞"
+  | Plus_zero ->
+      fprintf fmt "+0"
+  | Minus_zero ->
+      fprintf fmt "-0"
+  | Not_a_number ->
+      fprintf fmt "NaN"
+  | Float_value (b, eb, sb) ->
+     fprintf fmt "float_bits(%s,%s,%s)" b eb sb
+  | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
+
+let rec print_array_human fmt (arr: model_array) =
+  fprintf fmt "(";
+  List.iter (fun e ->
+    fprintf fmt "%s => %a," e.arr_index_key print_model_value_human e.arr_index_value)
+    arr.arr_indices;
+  fprintf fmt "others => %a)" print_model_value_human arr.arr_others
+
+and print_record_human fmt r =
+  fprintf fmt "%a"
+    (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
+    (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
+
+and print_model_value_human fmt (v: model_value) =
+  match v with
+  | Integer s -> fprintf fmt "%s" s
+  | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
+  | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
+  | Float f -> print_float_human fmt f
+  | Boolean b -> fprintf fmt "%b"  b
+  | Apply (s, lt) ->
+    fprintf fmt "[%s %a]" s (Pp.print_list Pp.space print_model_value_human) lt
+  | Array arr -> print_array_human fmt arr
+  | Record r -> print_record_human fmt r
+  | Bitvector s -> fprintf fmt "%s" s
+  | Unparsed s -> fprintf fmt "%s" s
 
 (*
 ***************************************************************
@@ -258,14 +378,16 @@ let default_model = {
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser =  string -> model_element list
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
 
 (*
 ***************************************************************
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element me_name_trans fmt m_element =
+let print_model_element print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
@@ -274,10 +396,10 @@ let print_model_element me_name_trans fmt m_element =
     fprintf fmt  "%s = %a"
       me_name print_model_value m_element.me_value
 
-let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
+let print_model_elements ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element print_model_value me_name_trans) fmt m_elements
 
-let print_model_file fmt me_name_trans filename model_file =
+let print_model_file ~print_model_value fmt me_name_trans filename model_file =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -285,7 +407,7 @@ let print_model_file fmt me_name_trans filename model_file =
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements me_name_trans fmt m_elements)
+      print_model_elements print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -297,13 +419,24 @@ let why_name_trans me_name =
 
 let print_model
     ?(me_name_trans = why_name_trans)
+    ~print_model_value
     fmt
     model =
   (* Simple and easy way to print file sorted alphabetically
    FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
    *)
   let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file fmt me_name_trans k e) l
+  List.iter (fun (k, e) -> print_model_file ~print_model_value fmt me_name_trans k e) l
+
+let print_model_human
+    ?(me_name_trans = why_name_trans)
+    fmt
+    model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+
+
+let print_model ?(me_name_trans = why_name_trans)
+    fmt
+    model = print_model ~me_name_trans ~print_model_value fmt model
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
@@ -335,7 +468,7 @@ let print_model_vc_term
       let (filename, line_number, _, _) = Loc.get pos in
       let model_file = get_model_file model.model_files filename in
       let model_elements = get_elements model_file line_number in
-      print_model_elements ~sep me_name_trans fmt model_elements
+      print_model_elements ~sep print_model_value me_name_trans fmt model_elements
 
 let model_vc_term_to_string
     ?(me_name_trans = why_name_trans)
@@ -351,25 +484,59 @@ let get_padding line =
     Str.matched_string line
   with Not_found -> ""
 
+(* This assumes that l is sorted and split the list of locations in two:
+   those that are applied on this line and the others. For those that are on
+   this line, we split the locations that appear on several lines. *)
+let rec partition_loc line lc l =
+  match l with
+  | (hd,a) :: tl ->
+      let (hdf, hdl, hdfc, hdlc) = Loc.get hd in
+      if hdl = line then
+        if hdlc > lc then
+          let old_sloc = Loc.user_position hdf hdl hdfc lc in
+          let newlc = hdlc - lc in
+          let new_sloc = Loc.user_position hdf (hdl + 1) 1 newlc in
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          ((new_sloc,a) :: rem_loc, (old_sloc,a) :: new_loc)
+        else
+          let (rem_loc, new_loc) = partition_loc line lc tl in
+          (rem_loc, (hd,a) :: new_loc)
+      else
+        (l, [])
+  | _ -> (l, [])
+
+(* Change a locations so that it points to a different line number *)
+let add_offset off (loc, a) =
+  let (f, l, fc, lc) = Loc.get loc in
+  (Loc.user_position f (l + off) fc lc, a)
+
 let interleave_line
     start_comment
     end_comment
     me_name_trans
     model_file
-    (source_code, line_number)
+    (source_code, line_number, offset, remaining_locs, locs)
     line =
+  let remaining_locs, list_loc =
+    partition_loc line_number (String.length line) remaining_locs
+  in
+  let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
-    print_model_elements me_name_trans str_formatter model_elements ~sep:"; ";
+    print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
-      (get_padding line) ^
-	start_comment ^
-	(flush_str_formatter ()) ^
-	end_comment in
+     (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
+    in
 
-    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1)
+    (* We need to know how many lines will be taken by the counterexample. This
+       is ad hoc as we don't really know how the lines are split in IDE. *)
+    let len_cnt =
+      1 + (String.length cntexmp_line) / 80
+    in
+
+    (source_code ^ line ^ cntexmp_line ^ "\n", line_number + 1, offset + len_cnt, remaining_locs, list_loc @ locs)
   with Not_found ->
-    (source_code ^ line, line_number + 1)
+    (source_code ^ line, line_number + 1, offset, remaining_locs, list_loc @ locs)
 
 
 let interleave_with_source
@@ -377,28 +544,37 @@ let interleave_with_source
     ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
     model
-    ~filename
-    ~source_code =
+    ~rel_filename
+    ~source_code
+    ~locations =
+  let locations =
+    List.sort (fun x y -> compare (fst x) (fst y))
+      (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)
+  in
   try
-    let model_file = StringMap.find filename model.model_files in
+    (* There is no way to compare rel_filename and the locations of filename in
+       the file because they contain extra ".." which cannot be reliably removed
+       (because of potential symbolic link). So, we use the basename.
+    *)
+    let model_files =
+      StringMap.filter (fun k _ -> Filename.basename k = Filename.basename rel_filename)
+        model.model_files
+    in
+    let model_file = snd (StringMap.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      let lines = Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1) in
-      let remove_last_element list =
-	let list_rev = List.rev list in
-	match list_rev with
-	| _ :: tail -> List.rev tail
-	| _ -> List.rev list_rev
-      in
-      remove_last_element lines in
-    let (source_code, _) = List.fold_left
-      (interleave_line
-	 start_comment end_comment me_name_trans model_file)
-      ("", 1)
-      (src_lines_up_to_last_cntexmp_el source_code model_file) in
-    source_code
+      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+    in
+    let (source_code, _, _, _, gen_loc) =
+      List.fold_left
+        (interleave_line
+           start_comment end_comment me_name_trans model_file)
+        ("", 1, 0, locations, [])
+        (src_lines_up_to_last_cntexmp_el source_code model_file)
+    in
+    source_code, gen_loc
   with Not_found ->
-    source_code
+    source_code, locations
 
 
 (*
@@ -409,15 +585,15 @@ let print_model_element_json me_name_to_str fmt me =
     fprintf fmt "%a" print_model_value_sanit me.me_value in
   let print_kind fmt =
     match me.me_name.men_kind with
-    | Result -> fprintf fmt "%a" Json.string "result"
-    | Old -> fprintf fmt "%a" Json.string "old"
-    | Error_message -> fprintf fmt "%a" Json.string "error_message"
-    | Other -> fprintf fmt "%a" Json.string "other" in
+    | Result -> fprintf fmt "%a" Json_base.string "result"
+    | Old -> fprintf fmt "%a" Json_base.string "old"
+    | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
+    | Other -> fprintf fmt "%a" Json_base.string "other" in
   let print_name fmt =
-    Json.string fmt (me_name_to_str me) in
+    Json_base.string fmt (me_name_to_str me) in
   let print_value_or_kind_or_name fmt printer =
     printer fmt in
-  Json.map_bindings
+  Json_base.map_bindings
     (fun s -> s)
     print_value_or_kind_or_name
     fmt
@@ -426,14 +602,14 @@ let print_model_element_json me_name_to_str fmt me =
      ("kind", print_kind)]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
-  Json.list
+  Json_base.list
     (print_model_element_json me_name_to_str)
     fmt
     model_elements
 
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
     (file_name, model_file) =
-  Json.map_bindings
+  Json_base.map_bindings
     (fun i ->
       match model.vc_term_loc with
       | None ->
@@ -461,7 +637,7 @@ let print_model_json
       List.append bindings [(file_name, (file_name, model_file))])
     []
     (StringMap.bindings model.model_files) in
-  Json.map_bindings
+  Json_base.map_bindings
     (fun s -> s)
     (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
     fmt
@@ -613,18 +789,20 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
-    let raw_model = raw_mp input in
+    let list_proj = printer_mapping.list_projections in
+    let list_records = printer_mapping.list_records in
+    let raw_model = raw_mp list_proj list_records input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s);
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_raw_model_parser s =
+let lookup_raw_model_parser s : raw_model_parser =
   try snd (Hstr.find model_parsers s)
   with Not_found -> raise (UnknownModelParser s)
 
-let lookup_model_parser s =
+let lookup_model_parser s : model_parser =
   make_mp_from_raw (lookup_raw_model_parser s)
 
 let list_model_parsers () =
@@ -632,4 +810,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ -> [])
+  (fun _ _ _ -> [])

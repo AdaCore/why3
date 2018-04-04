@@ -1,4 +1,3 @@
-
 (* Why driver for Gappa *)
 
 prelude "# this is a prelude for Gappa"
@@ -57,9 +56,9 @@ theory int.Int
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop NonTrivialRing
   remove prop ZeroLessOne
@@ -103,9 +102,9 @@ theory real.Real
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
   remove prop NonTrivialRing
   remove prop ZeroLessOne
@@ -154,14 +153,14 @@ end
 theory floating_point.Single
 
   syntax function round "float<ieee_32,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 
 theory floating_point.Double
 
   syntax function round "float<ieee_64,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 
@@ -177,15 +176,15 @@ end
 
 theory ieee_float.GenericFloat
 
-  meta "instantiate : auto" prop zero_to_real
-  meta "instantiate : auto" prop is_finite
-  meta "instantiate : auto" prop lt_finite
-  meta "instantiate : auto" prop le_finite
-  meta "instantiate : auto" prop neg_finite
-  meta "instantiate : auto" prop add_finite
-  meta "instantiate : auto" prop sub_finite
-  meta "instantiate : auto" prop mul_finite
-  meta "instantiate : auto" prop div_finite
+  meta "instantiate:auto" prop zero_to_real
+  meta "instantiate:auto" prop is_finite
+  meta "instantiate:auto" prop lt_finite
+  meta "instantiate:auto" prop le_finite
+  meta "instantiate:auto" prop neg_finite
+  meta "instantiate:auto" prop add_finite
+  meta "instantiate:auto" prop sub_finite
+  meta "instantiate:auto" prop mul_finite
+  meta "instantiate:auto" prop div_finite
 
 end
 
@@ -205,7 +204,7 @@ end
 theory floating_point.SingleMultiRounding
 
   syntax function round "float<ieee_32,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
 *)
@@ -213,14 +212,6 @@ end
 theory floating_point.DoubleMultiRounding
 
   syntax function round "float<ieee_64,%1>(%2)"
-  meta "instantiate : auto" prop Bounded_value
+  meta "instantiate:auto" prop Bounded_value
 
 end
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "make -C .. bench"
-End:
-*)

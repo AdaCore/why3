@@ -56,8 +56,7 @@ let alt_ergo_driver : Driver.driver =
 
 let () = log_time ("Initialising why3 worker: end ")
 
-let split_trans = Trans.lookup_transform_l "split_goal_wp" env
-let intro_trans = Trans.lookup_transform "introduce_premises" env
+let split_trans = Trans.lookup_transform_l "split_intros_goal_wp" env
 
 (* CF gmain.ml ligne 568 et suivante *)
 module W =
@@ -106,7 +105,7 @@ module Task =
     let clear_warnings () = warnings := []
     let () =
       Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
-                        let _, a,b,_c = Loc.get loc in
+                        let _, a,b,_ = Loc.get loc in
                         warnings := ((a-1,b), msg) :: !warnings)
 
 
@@ -175,7 +174,7 @@ module Task =
 	  subtasks = [];
 	  loc = id_loc @  (collect_locs task);
 	  expl = expl;
-          pretty = task_text (Trans.apply intro_trans task);
+          pretty = task_text task;
         }
       in
       Hashtbl.add task_table id task_info;

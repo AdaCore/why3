@@ -50,7 +50,7 @@ val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
 
     Note that in order this work, projection functions cannot be inlined.
     If inlining transformation is performed, projection functions must
-    be marked with meta "inline : no".
+    be marked with meta "inline:no".
 
     This transformation is needed in situations when we want to display not
     value of a variable, but value of a projection function applied to a variable.

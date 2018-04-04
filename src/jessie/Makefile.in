@@ -29,6 +29,9 @@ Jessie3.cmx: $(addsuffix .cmx, $(MODULES))
 Jessie3.cmxs: Jessie3.cmx
 	ocamlopt.opt -shared $(FLAGS) $(INCLUDE) -o $@ $(addsuffix .cmx, @MENHIRLIB@) $(addsuffix .cmxa, @ZIPLIB@) $(WHYLIB)/why3.cmxa $^
 
+%.cmi: %.mli
+	ocamlc.opt $(FLAGS) $(INCLUDE) -c $^
+
 %.cmo: %.ml
 	ocamlc.opt $(FLAGS) $(INCLUDE) -c $^
 
@@ -61,8 +64,11 @@ tests/ptests_config: Makefile
 	chmod a-w tests/ptests_config
 
 clean:
+	rm -f $(addsuffix .cmi, $(MODULES))
 	rm -f $(addsuffix .cmo, $(MODULES))
 	rm -f $(addsuffix .cmx, $(MODULES))
 	rm -f Jessie3.cma Jessie3.cmxs
 
 register.cmx: ACSLtoWhy3.cmx
+
+register.cmo: ACSLtoWhy3.cmo

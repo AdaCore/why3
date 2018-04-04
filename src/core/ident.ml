@@ -38,66 +38,14 @@ let create_label s = Hslab.hashcons {
   lab_tag    = -1
 }
 
+let list_label () =
+  let acc = ref [] in
+  Hslab.iter (fun label -> acc := label.lab_string :: !acc);
+  !acc
+
 let lab_equal : label -> label -> bool = (==)
 let lab_hash lab = lab.lab_tag
 let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
-
-(* functions for working with counterexample model labels *)
-
-let model_proj_label = create_label "model_projected"
-let model_label = create_label "model"
-
-let remove_model_labels ~labels =
-  Slab.filter (fun l -> (l <> model_label) && (l <> model_proj_label) ) labels
-
-let is_model_trace_label label =
-  Strings.has_prefix "model_trace:" label.lab_string
-
-let get_model_trace_label ~labels =
-  Slab.choose (Slab.filter is_model_trace_label labels)
-
-let transform_model_trace_label labels trans_fun =
-  try
-    let trace_label = get_model_trace_label ~labels in
-    let labels_without_trace = Slab.remove trace_label labels in
-    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
-    Slab.add new_trace_label labels_without_trace
-  with Not_found -> labels
-
-let append_to_model_element_name ~labels ~to_append =
-  let trans lab_str =
-    let splitted = Strings.bounded_split '@' lab_str 2 in
-    match splitted with
-    | [before; after] -> before ^ to_append ^ "@" ^ after
-    | _ -> lab_str^to_append in
-  transform_model_trace_label labels trans
-
-let append_to_model_trace_label ~labels ~to_append =
-    let trans lab_str = lab_str ^ to_append in
-    transform_model_trace_label labels trans
-
-let get_model_element_name ~labels =
-  let trace_label = get_model_trace_label ~labels in
-  let splitted1 = Strings.bounded_split ':' trace_label.lab_string 2 in
-  match splitted1 with
-  | [_; content] ->
-    begin
-      let splitted2 = Strings.bounded_split '@' content 2 in
-      match splitted2 with
-      | [el_name; _] -> el_name
-      | [el_name] -> el_name
-      | _ -> raise Not_found
-    end;
-  | [_] -> ""
-  | _ -> assert false
-
-let get_model_trace_string ~labels =
-  let tl = get_model_trace_label ~labels in
-  let splitted = Strings.bounded_split ':' tl.lab_string 2 in
-  match splitted with
-  | [_; t_str] -> t_str
-  | _ -> ""
-
 
 (** Naming convention *)
 
@@ -189,8 +137,26 @@ type ident_printer = {
   blacklist : string list;
 }
 
+(* name is already sanitized *)
 let find_unique indices name =
-  let specname ind = name ^ string_of_int ind in
+  let specname ind =
+    let rec repeat n s =
+      if n <= 0 then s else repeat (n-1) (s ^ "^")
+    in
+    (* In the case, the symbol is infix/prefix *and* the name has not been
+       sanitized for provers (the space " " is still there), we don't want to
+       disambiguate with a number but with a symbol: "+" becomes "+." "+.." etc.
+       It allows to parse the ident again (for transformations).
+    *)
+    if Strings.has_prefix "infix " name ||
+       Strings.has_prefix "prefix " name then
+      (repeat ind name)
+    else
+      if ind < 0 then
+        name
+      else
+        name ^ string_of_int ind
+  in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in
@@ -217,6 +183,12 @@ let create_ident_printer ?(sanitizer = same) sl =
     values    = Hid.create 1997;
     sanitizer = sanitizer;
     blacklist = sl }
+
+let known_id printer id =
+  try
+    (let _ = Hid.find printer.values id in true)
+  with Not_found ->
+    false
 
 let id_unique printer ?(sanitizer = same) id =
   try
@@ -287,3 +259,107 @@ let sanitizer' head rest last n =
   String.concat "" (List.rev !lst)
 
 let sanitizer head rest n = sanitizer' head rest rest n
+
+
+
+(** {2 functions for working with counterexample model labels} *)
+
+let model_label = create_label "model"
+let model_projected_label = create_label "model_projected"
+let model_vc_label = create_label "model_vc"
+let model_vc_post_label = create_label "model_vc_post"
+
+let create_model_trace_label s = create_label ("model_trace:" ^ s)
+
+let is_counterexample_label l =
+  l = model_label || l = model_projected_label
+
+let has_a_model_label id =
+  Slab.exists is_counterexample_label id.id_label
+
+let remove_model_labels ~labels =
+  Slab.filter (fun l -> not (is_counterexample_label l)) labels
+
+let is_model_trace_label label =
+  Strings.has_prefix "model_trace:" label.lab_string
+
+let get_model_trace_label ~labels =
+  Slab.choose (Slab.filter is_model_trace_label labels)
+
+let transform_model_trace_label labels trans_fun =
+  try
+    let trace_label = get_model_trace_label ~labels in
+    let labels_without_trace = Slab.remove trace_label labels in
+    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
+    Slab.add new_trace_label labels_without_trace
+  with Not_found -> labels
+
+let append_to_model_element_name ~labels ~to_append =
+  let trans lab_str =
+    let splitted = Strings.bounded_split '@' lab_str 2 in
+    match splitted with
+    | [before; after] -> before ^ to_append ^ "@" ^ after
+    | _ -> lab_str^to_append in
+  transform_model_trace_label labels trans
+
+let append_to_model_trace_label ~labels ~to_append =
+    let trans lab_str = lab_str ^ to_append in
+    transform_model_trace_label labels trans
+
+let get_model_element_name ~labels =
+  let trace_label = get_model_trace_label ~labels in
+  let splitted1 = Strings.bounded_split ':' trace_label.lab_string 2 in
+  match splitted1 with
+  | [_; content] ->
+    begin
+      let splitted2 = Strings.bounded_split '@' content 2 in
+      match splitted2 with
+      | [el_name; _] -> el_name
+      | [el_name] -> el_name
+      | _ -> raise Not_found
+    end;
+  | [_] -> ""
+  | _ -> assert false
+
+let get_model_trace_string ~labels =
+  let tl = get_model_trace_label ~labels in
+  let splitted = Strings.bounded_split ':' tl.lab_string 2 in
+  match splitted with
+  | [_; t_str] -> t_str
+  | _ -> ""
+
+
+(* Functions for working with ITP labels *)
+
+let is_name_label label =
+  Strings.has_prefix "name:" label.lab_string
+
+let get_name_label ~labels =
+  try Some (Slab.choose (Slab.filter is_name_label labels))
+  with Not_found -> None
+
+let get_element_name ~labels =
+  match get_name_label ~labels with
+  | None -> None
+  | Some name_label ->
+    let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+    let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
+    match splitted1 with
+    | ["name"; content] when Str.string_match correct_word content 0 ->
+        Some content
+    | _ -> None
+
+let id_unique_label printer ?(sanitizer = same) id =
+  try
+    Hid.find printer.values id
+  with Not_found ->
+    let labels = id.id_label in
+    let name =
+      match (get_element_name ~labels) with
+      | Some x -> x
+      | None -> printer.sanitizer id.id_string
+    in
+    let name = sanitizer name in
+    let name = find_unique printer.indices name in
+    Hid.replace printer.values id name;
+    name

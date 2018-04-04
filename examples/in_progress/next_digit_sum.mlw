@@ -46,7 +46,7 @@ module M
   use int.Sum
 
   function sum (m: M.map int int) (i j: int) : int =
-    Sum.sum i (j - 1) (\ k: int. M.get m k)
+    Sum.sum (fun k -> M.get m k) i (j - 1)
 
   lemma Sum_is_sum_digits_interp:
     forall x : M.map int int, i j : int.
@@ -69,14 +69,14 @@ module M
   val x : array int
 
   (* the number of digits of X *)
-  constant n : int
+  val constant n : int
+    ensures { 0 <= result }
 
   (* the target digit sum *)
-  constant y : int
+  val constant y : int
+    ensures { 0 < result }
 
-  axiom Hypotheses: n >= 0 /\ y > 0
-
-  constant m : int = 1 + max n (div y 9)
+  let constant m : int = 1 + max n (div y 9)
 
 exception Success
 
@@ -87,8 +87,7 @@ let search_safety ()
   requires { length x = m }
   ensures  { true }
   raises   { Success -> true }
-= 'Init:
-  let s = ref 0 in
+= let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     s := !s + x[i]
   done;
@@ -112,7 +111,7 @@ let search_safety ()
     s := !s - x[d]
   done
 
-(* 2. Correctness, part 1: when Sucess is raised, x contains an integer
+(* 2. Correctness, part 1: when Success is raised, x contains an integer
       with digit sum y *)
 
   (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
@@ -123,8 +122,7 @@ let search ()
   requires { length x = m /\ is_integer x.elts }
   ensures  { true }
   raises   { Success -> is_integer x.elts /\ sum x.elts 0 m = y }
-= 'Init:
-  let s = ref 0 in
+= let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { !s = sum x.elts 0 i }
     s := !s + x[i]
@@ -132,11 +130,11 @@ let search ()
   assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
-      x = at x 'Init /\
+      x = old x /\
       !s = sum x.elts d m
     }
     for c = x[d] + 1 to 9 do
-      invariant { x = at x 'Init }
+      invariant { x = old x }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         x[d] <- c;
@@ -249,8 +247,7 @@ let search_smallest ()
     interp x.elts 0 m > interp (old x.elts) 0 m /\
     forall u : int. interp (old x.elts) 0 m < u < interp x.elts 0 m ->
       sum_digits u <> y }
-= 'Init:
-  let s = ref 0 in
+= let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { !s = sum x.elts 0 i }
     s := !s + x[i]
@@ -258,24 +255,24 @@ let search_smallest ()
   assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
-      x = at x 'Init /\
+      x = old x /\
       !s = sum x.elts d m /\
       forall u : int.
-         interp (at x.elts 'Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
+         interp (old x.elts) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
     }
     for c = x[d] + 1 to 9 do
       invariant {
-        x = at x 'Init /\
+        x = old x /\
         forall c' : int. x[d] < c' < c ->
           forall u : int.
-          interp (at x.elts 'Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
+          interp (old x.elts) 0 m < u <= interp9 (M.set x.elts d c') d m ->
             sum_digits u <> y }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
         x[d] <- c;
         assert { sum x.elts d m = y - delta };
-        assert { gt_digit x.elts (at x.elts 'Init) d };
+        assert { gt_digit x.elts (old x.elts) d };
         let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
@@ -286,7 +283,7 @@ let search_smallest ()
              (forall j : int. 0 <= j < i ->
                 (j <  smallest_size delta -> x[j] = M.get (smallest delta) j) /\
                 (j >= smallest_size delta -> x[j] = 0)) /\
-             gt_digit x.elts (at x.elts 'Init) d }
+             gt_digit x.elts (old x.elts) d }
           if i < k then x[i] <- 9
           else if i = k then x[i] <- mod delta 9
           else x[i] <- 0;

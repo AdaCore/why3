@@ -53,7 +53,7 @@ end
 module NewtonMethod
 
   use import int.Int
-  use import int.ComputerDivision
+  use import mach.int.Int
   use import ref.Ref
   use import Square
 
@@ -63,7 +63,7 @@ module NewtonMethod
   = if x = 0 then 0 else
     if x <= 3 then 1 else
     let y = ref x in
-    let z = ref (div (1 + x) 2) in
+    let z = ref ((1 + x) / 2) in
     while !z < !y do
       variant { !y }
       invariant { !z > 0 }
@@ -72,7 +72,7 @@ module NewtonMethod
       invariant { x < sqr (!y + 1) }
       invariant { x < sqr (!z + 1) }
       y := !z;
-      z := div (div x !z + !z) 2;
+      z := (x / !z + !z) / 2;
       (* A few hints to prove preservation of the last invariant *)
       assert { x < sqr (!z + 1)
         by let a = div x !y in

@@ -2,20 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../swap.mlw" expanded="true">
-<theory name="Swap" sum="1b197572b7291569bed618b6de44cf80" expanded="true">
- <goal name="WP_parameter swap" expl="VC for swap" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../swap.mlw" proved="true">
+<theory name="Swap" proved="true">
+ <goal name="VC swap" expl="VC for swap" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
 </theory>
-<theory name="SwapInt32" sum="3c47c12a369be70231259182eede9267" expanded="true">
- <goal name="WP_parameter swap" expl="VC for swap" expanded="true">
- <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
+<theory name="SwapInt32" proved="true">
+ <goal name="VC swap" expl="VC for swap" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
  </goal>
- <goal name="WP_parameter swap_ref" expl="VC for swap_ref" expanded="true">
- <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
+ <goal name="VC swap_ref" expl="VC for swap_ref" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="46"/></proof>
  </goal>
 </theory>
 </file>

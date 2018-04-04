@@ -2,101 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../conjugate.mlw" expanded="true">
-<theory name="Conjugate" sum="7b5a646dd5c9610cfa9cac93d0ed2e65" expanded="true">
- <goal name="WP_parameter conjugate" expl="VC for conjugate" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter conjugate.1" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.2" expl="array creation size">
-  <proof prover="2"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.3" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.4" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.5" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.6" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.7" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.8" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.9" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.10" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.11" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.12" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.13" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.14" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.15" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.16" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.17" expl="loop invariant init">
-  <proof prover="2" timelimit="10"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.18" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.19" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.20" expl="loop invariant preservation">
-  <proof prover="2" timelimit="10"><result status="valid" time="0.03" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.21" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.22" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.23" expl="loop invariant preservation">
-  <proof prover="2" timelimit="10"><result status="valid" time="0.25" steps="150"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.24" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.25" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.26" expl="type invariant">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter conjugate.27" expl="postcondition">
-  <proof prover="2" timelimit="10"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
- </transf>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../conjugate.mlw" proved="true">
+<theory name="Conjugate" proved="true">
+ <goal name="VC conjugate" expl="VC for conjugate" proved="true">
+ <proof prover="0"><result status="valid" time="0.13" steps="291"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="590b77e6d4ceb99348eca8a5a1516b63" expanded="true">
- <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <proof prover="2"><result status="valid" time="0.09" steps="36"/></proof>
+<theory name="Test" proved="true">
+ <goal name="VC test" expl="VC for test" proved="true">
+ <proof prover="0"><result status="valid" time="0.11" steps="99"/></proof>
  </goal>
- <goal name="WP_parameter bench" expl="VC for bench" expanded="true">
- <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+ <goal name="VC bench" expl="VC for bench" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
 </theory>
 </file>

@@ -168,7 +168,7 @@ theory BV_Check
       eq_sub    a b (t'int i) (t'int n)
   <-> eq_sub_bv a b i n
 
-  goal Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+  goal Extensionality: forall x y : t [x == y]. x == y -> x = y
 
 end
 

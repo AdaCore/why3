@@ -10,9 +10,9 @@ theory Utils
 
   use import bv.BV32
 
-  constant one : t = 1
-  constant two : t = 2
-  constant lastbit : t = sub size_bv one
+  let constant one : t = (1:t)
+  let constant two : t = (2:t)
+  let constant lastbit : t = (31:t)
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
@@ -20,7 +20,7 @@ theory Utils
   (** We start by introducing a function that returns the number of
       1-bit in a bitvector (p.82) *)
 
-  function count (bv : t) : t =
+  let function count (bv : t) : t =
     let x = sub bv (bw_and (lsr_bv bv one) (0x55555555:t)) in
     let x = add (bw_and x (0x33333333:t))
                 (bw_and (lsr_bv x two) (0x33333333:t)) in
@@ -55,7 +55,7 @@ module Utils_Spec
 
   lemma countZero: count zeros = zeros
 
-  lemma numOfZero: NumOf.numof (\i. nth zeros i) 0 32 = 0
+  lemma numOfZero: NumOf.numof (fun i -> nth zeros i) 0 32 = 0
 
   (** Now, for b a bitvector with n 1-bits, we check that if its
       first bit is 0 then shifting b by one on the right doesn't
@@ -78,20 +78,19 @@ module Utils_Spec
   variant {bv with ult}
   ensures {t'int (count bv) = NumOf.numof (nth bv) 0 32}
   =
-    if bv = zeros then ()
-    else
+    if pure { bv <> zeros } then
     begin
       countSpec_Aux (lsr_bv bv one);
       assert {
                  let x = (if nth_bv bv zeros then 1 else 0) in
                   let f = nth bv in
                   let g = nth (lsr_bv bv one) in
-                  let h = \i. nth bv (i+1) in
+                  let h = fun i -> nth bv (i+1) in
                   (forall i. 0 <= i < 31 -> g i = h i) &&
                   NumOf.numof f 0 32 - x = NumOf.numof f (0+1) 32 &&
                   NumOf.numof f (0+1) (31+1) = NumOf.numof h 0 31 &&
                   NumOf.numof g 0 (32-1) = NumOf.numof g 0 32
-           }
+      }
     end
 
   (** With these lemmas, we can now prove the correctness property of
@@ -101,8 +100,6 @@ module Utils_Spec
         (nth b) 0 32
 
   (** {6 hammingD correctness } *)
-
-  use HighOrd as HO
 
   predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
@@ -119,7 +116,7 @@ module Utils_Spec
 
   lemma separation: forall a b. hammingD a b = zeros <-> a = b
 
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     variant {b - a}
@@ -147,11 +144,11 @@ module Hackers_delight
   use import bv.BV32
   use import Utils
 
-  (** {2 ASCII cheksum }
+  (** {2 ASCII checksum }
     In the beginning the encoding of an ascii character was done on 8
     bits: the first 7 bits were used for the carracter itself while
-    the 8th bit was used as a cheksum: a mean to detect errors. The
-    cheksum value was the binary sum of the 7 other bits, allowing the
+    the 8th bit was used as a checksum: a mean to detect errors. The
+    checksum value was the binary sum of the 7 other bits, allowing the
     detections of any change of an odd number of bits in the initial
     value. Let's prove it! *)
 

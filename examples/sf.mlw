@@ -13,12 +13,11 @@ module HoareLogic
 
   (* Example: Slow Subtraction *)
 
-  let slow_subtraction (x: ref int) (z: ref int) =
+  let slow_subtraction (x: ref int) (z: ref int)
     requires { !x >= 0 }
     ensures { !z = old !z - old !x }
-'Init:
-    while !x <> 0 do
-      invariant { 0 <= !x /\ !z - !x = at !z 'Init - at !x 'Init } variant { !x }
+  = while !x <> 0 do
+      invariant { 0 <= !x /\ !z - !x = old (!z - !x) } variant { !x }
       z := !z - 1;
       x := !x - 1
     done
@@ -31,11 +30,10 @@ module HoareLogic
 
   (* Exercise: Slow Addition *)
 
-  let slow_addition (x: ref int) (z: ref int) =
+  let slow_addition (x: ref int) (z: ref int)
     requires { !x >= 0 } ensures { !z = old !z + old !x }
-'Init:
-    while !x <> 0 do
-      invariant { 0 <= !x /\ !z + !x = at !z 'Init + at !x 'Init } variant { !x }
+  = while !x <> 0 do
+      invariant { 0 <= !x /\ !z + !x = old (!z + !x) } variant { !x }
       z := !z + 1;
       x := !x - 1
     done
@@ -53,10 +51,9 @@ module HoareLogic
   let parity (x: ref int) (y: ref int)
     requires { !x >= 0 } ensures { !y=0 <-> even (old !x) }
   = y := 0;
-'Init:
     while !x <> 0 do
-      invariant { 0 <= !x /\ (!y=0 /\ even (at !x 'Init - !x) \/
-                               !y=1 /\ even (at !x 'Init - !x + 1)) }
+      invariant { 0 <= !x /\ (!y=0 /\ even ((old !x) - !x) \/
+                              !y=1 /\ even ((old !x) - !x + 1)) }
       variant { !x }
       y := 1 - !y;
       x := !x - 1
@@ -114,10 +111,9 @@ module MoreHoareLogic
   let list_sum (l: ref (list int)) (y: ref int)
     ensures { !y = sum (old !l) }
   = y := 0;
-'Init:
-    while !l <> Nil do
-      invariant { length !l <= length (at !l 'Init) /\
-                  !y + sum !l = sum (at !l 'Init) }
+    while not (is_nil !l) do
+      invariant { length !l <= length (old !l) /\
+                  !y + sum !l = sum (old !l) }
       variant { !l }
       y := !y + head !l;
       l := tail !l
@@ -126,18 +122,21 @@ module MoreHoareLogic
   use import list.Mem
   use import list.Append
 
+  type elt
+  val predicate eq (x y: elt)
+    ensures { result <-> x = y }
+
   (* note: we avoid the use of an existential quantifier in the invariant *)
-  let list_member (x : ref (list 'a)) (y: 'a) (z: ref int)
+  let list_member (x : ref (list elt)) (y: elt) (z: ref int)
     ensures { !z=1 <-> mem y (old !x) }
   = z := 0;
-'Init:
-    while !x <> Nil do
-      invariant { length !x <= length (at !x 'Init) /\
-                  (mem y !x -> mem y (at !x 'Init)) /\
-                  (!z=1 /\ mem y (at !x 'Init) \/
-                   !z=0 /\ (mem y (at !x 'Init) -> mem y !x)) }
+    while not (is_nil !x) do
+      invariant { length !x <= length (old !x) /\
+                  (mem y !x -> mem y (old !x)) /\
+                  (!z=1 /\ mem y (old !x) \/
+                   !z=0 /\ (mem y (old !x) -> mem y !x)) }
       variant { !x }
-      if y = head !x then z := 1;
+      if eq y (head !x) then z := 1;
       x := tail !x
     done
 

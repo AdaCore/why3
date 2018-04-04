@@ -7,7 +7,6 @@
 
 module Spec
 
-  use import HighOrd
   use import int.Int
 
   type addr
@@ -38,7 +37,7 @@ module Spec
   type registers = register -> int
 
   function update (reg: registers) (r: register) (v: int) : registers =
-    \r'. if r' = r then v else reg r'
+    fun r' -> if r' = r then v else reg r'
 
   use import list.List
 
@@ -86,7 +85,7 @@ module Spec
       - all registers smaller than are preserved
       - memory and stack are preserved *)
   function expr_post (e: expr) (r: register) : state -> state -> bool =
-    \s s'. s'.mem = s.mem /\ s'.reg r = eval s.mem e /\ s'.st = s.st /\
+    fun s s' -> s'.mem = s.mem /\ s'.reg r = eval s.mem e /\ s'.st = s.st /\
       forall r'. r' < r -> s'.reg r' = s.reg r'
   meta rewrite_def function expr_post
 
@@ -108,7 +107,7 @@ module DWP
 
   meta compute_max_steps 0x10000
 
-  predicate (-->) (x y: 'a) = "rewrite" x = y
+  predicate (-->) (x y: 'a) = [@rewrite] x = y
   meta rewrite_def predicate (-->)
 
   type post = state -> state -> bool
@@ -126,14 +125,14 @@ module DWP
   predicate wcode_ok (wc: wcode) = forall q s.
     wc.trans q s -> q (exec_list wc.wcode s)
 
-  function to_wp (pst: post) : trans = \q s1. forall s2. pst s1 s2 -> q s2
+  function to_wp (pst: post) : trans = fun q s1 -> forall s2. pst s1 s2 -> q s2
   meta rewrite_def function to_wp
 
-  function rcompose : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c = \f g x. g (f x)
+  function rcompose : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c = fun f g x -> g (f x)
   meta rewrite_def function rcompose
 
-  function exec_closure (i: instr) : state -> state = \s. exec i s
-  function id : 'a -> 'a = \x.x
+  function exec_closure (i: instr) : state -> state = fun s -> exec i s
+  function id : 'a -> 'a = fun x -> x
 
   let ($_) (hc: hcode) : wcode
     requires { hcode_ok hc }
@@ -163,14 +162,13 @@ module DWP
 
   let nil () : wcode
     ensures { wcode_ok result }
-    ensures { result.trans --> \q.q }
+    ensures { result.trans --> fun q -> q }
   = { wcode = Nil; trans = id }
 
 end
 
 module InfinityOfRegisters
 
-  use import HighOrd
   use import int.Int
   use import list.List
   use import list.Append
@@ -206,18 +204,16 @@ end
 
 module FiniteNumberOfRegisters
 
-  use import HighOrd
   use import int.Int
   use import list.List
   use import list.Append
   use import Spec
   use import DWP
 
-  (** we have k registers, namely 0,1,...,k-1 *)
-  constant k: int
-
-  (** we assume having at least two registers, otherwise we can't add *)
-  axiom at_least_two_registers: k >= 2
+  (** we have k registers, namely 0,1,...,k-1,
+      and there are at least two of them, otherwise we can't add *)
+  val constant k: int
+    ensures { 2 <= result }
 
   (** [compile e r] returns a list of instructions that stores the value
       of [e] in register [r], without modifying any register [r' < r]. *)
@@ -246,7 +242,6 @@ end
 
 module OptimalNumberOfRegisters
 
-  use import HighOrd
   use import int.Int
   use import int.MinMax
   use import list.List
@@ -254,15 +249,15 @@ module OptimalNumberOfRegisters
   use import Spec
   use import DWP
 
-  (** we have k registers, namely 0,1,...,k-1 *)
-  constant k: int
-
-  (** we assume having at least two registers, otherwise we can't add *)
-  axiom at_least_two_registers: k >= 2
+  (** we have k registers, namely 0,1,...,k-1,
+      and there are at least two of them, otherwise we can't add *)
+  val constant k: int
+    ensures { 2 <= result }
 
   (** the minimal number of registers needed to evaluate e *)
-  function n (e: expr) : int =
-    match e with
+  let rec function n (e: expr) : int
+  variant { e }
+  = match e with
     | Evar _     -> 1
     | Eneg e     -> n e
     | Eadd e1 e2 -> let n1 = n e1 in let n2 = n e2 in

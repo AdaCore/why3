@@ -2,186 +2,86 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../matrices_ring_simp.mlw">
-<theory name="Symb" sum="aa56815b148e133d02ca363f67192b13">
- <goal name="LOCAL.WP_parameter l_mdl_ok" expl="VC for l_mdl_ok">
- <proof prover="2"><result status="valid" time="0.03" steps="109"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../matrices_ring_simp.mlw" proved="true">
+<theory name="Symb" proved="true">
+ <goal name="LOCAL.VC l_mdl_ok" expl="VC for l_mdl_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="112"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter m_mdl_ok" expl="VC for m_mdl_ok">
- <proof prover="2"><result status="valid" time="0.03" steps="47"/></proof>
+ <goal name="LOCAL.VC m_mdl_ok" expl="VC for m_mdl_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_mdl_ok" expl="VC for lm_mdl_ok">
- <proof prover="2"><result status="valid" time="0.04" steps="120"/></proof>
+ <goal name="LOCAL.VC lm_mdl_ok" expl="VC for lm_mdl_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="122"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_mdl_same" expl="VC for lm_mdl_same">
- <proof prover="2"><result status="valid" time="0.08" steps="185"/></proof>
+ <goal name="LOCAL.VC lm_mdl_same" expl="VC for lm_mdl_same" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="179"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter l_compare_zero" expl="VC for l_compare_zero">
- <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
+ <goal name="LOCAL.VC l_compare_zero" expl="VC for l_compare_zero" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="83"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter m_collapse_ok" expl="VC for m_collapse_ok">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter m_collapse_ok.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.2" expl="2. postcondition">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.4" expl="4. assertion">
-  <proof prover="2"><result status="valid" time="0.16" steps="376"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.22" steps="395"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.7" expl="7. postcondition">
-  <proof prover="2"><result status="valid" time="0.31" steps="424"/></proof>
-  </goal>
-  <goal name="WP_parameter m_collapse_ok.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  </goal>
- </transf>
+ <goal name="LOCAL.VC m_collapse_ok" expl="VC for m_collapse_ok" proved="true">
+ <proof prover="3"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_collapse_ok" expl="VC for lm_collapse_ok">
- <proof prover="2"><result status="valid" time="0.09" steps="520"/></proof>
+ <goal name="LOCAL.VC lm_collapse_ok" expl="VC for lm_collapse_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.13" steps="382"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter cat_rev_ok" expl="VC for cat_rev_ok">
- <proof prover="2"><result status="valid" time="0.09" steps="436"/></proof>
+ <goal name="LOCAL.VC cat_rev_ok" expl="VC for cat_rev_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="295"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_dump_ok" expl="VC for lm_dump_ok">
- <proof prover="2"><result status="valid" time="0.16" steps="608"/></proof>
+ <goal name="LOCAL.VC lm_dump_ok" expl="VC for lm_dump_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.21" steps="581"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_merge_ok" expl="VC for lm_merge_ok">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter lm_merge_ok.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.28" steps="329"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.7" expl="7. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.8" expl="8. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.10" expl="10. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.11" expl="11. variant decrease">
-  <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.12" expl="12. precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.13" expl="13. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.14" expl="14. postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_merge_ok.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="3.07"/></proof>
-  </goal>
- </transf>
+ <goal name="LOCAL.VC lm_merge_ok" expl="VC for lm_merge_ok" proved="true">
+ <proof prover="1" timelimit="5"><result status="valid" time="2.65" steps="4960"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter cat_ok" expl="VC for cat_ok">
- <proof prover="2"><result status="valid" time="0.12" steps="563"/></proof>
+ <goal name="LOCAL.VC cat_ok" expl="VC for cat_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.16" steps="490"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter m_mul_ok" expl="VC for m_mul_ok">
- <proof prover="2"><result status="valid" time="0.11" steps="369"/></proof>
+ <goal name="LOCAL.VC m_mul_ok" expl="VC for m_mul_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.09" steps="267"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter m_distribute_ok" expl="VC for m_distribute_ok">
- <proof prover="2"><result status="valid" time="0.08" steps="467"/></proof>
+ <goal name="LOCAL.VC m_distribute_ok" expl="VC for m_distribute_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="364"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_distribute_ok" expl="VC for lm_distribute_ok">
- <proof prover="2"><result status="valid" time="0.19" steps="479"/></proof>
+ <goal name="LOCAL.VC lm_distribute_ok" expl="VC for lm_distribute_ok" proved="true">
+ <proof prover="1"><result status="valid" time="0.34" steps="772"/></proof>
  </goal>
- <goal name="LOCAL.WP_parameter lm_opp_ok" expl="VC for lm_opp_ok">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter lm_opp_ok.1" expl="1. postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.3" expl="3. variant decrease">
-  <proof prover="2"><result status="valid" time="0.03" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.5" expl="5. precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.6" expl="6. precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="97"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.7" expl="7. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter lm_opp_ok.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.13"/></proof>
-  </goal>
- </transf>
+ <goal name="LOCAL.VC lm_opp_ok" expl="VC for lm_opp_ok" proved="true">
+ <proof prover="1" timelimit="5" edited="matrices_ring_simp-Symb-VC_lm_opp_ok_1.why"><result status="valid" time="1.51" steps="3322"/></proof>
  </goal>
- <goal name="extends_rw">
- <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="extends_rw" proved="true">
+ <proof prover="1" edited="matrices_ring_simp-Symb-extends_rw_1.why"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter symb_env" expl="VC for symb_env">
- <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="VC symb_env" expl="VC for symb_env" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter symb_reg" expl="VC for symb_reg">
- <proof prover="2"><result status="valid" time="0.07" steps="61"/></proof>
+ <goal name="VC symb_reg" expl="VC for symb_reg" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
  </goal>
- <goal name="WP_parameter symb_opp" expl="VC for symb_opp">
- <proof prover="2"><result status="valid" time="0.03" steps="19"/></proof>
+ <goal name="VC symb_opp" expl="VC for symb_opp" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
  </goal>
- <goal name="WP_parameter symb_add" expl="VC for symb_add">
- <proof prover="2"><result status="valid" time="0.10" steps="97"/></proof>
+ <goal name="VC symb_add" expl="VC for symb_add" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="171"/></proof>
  </goal>
- <goal name="WP_parameter symb_sub" expl="VC for symb_sub">
- <proof prover="2"><result status="valid" time="0.04" steps="36"/></proof>
+ <goal name="VC symb_sub" expl="VC for symb_sub" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="52"/></proof>
  </goal>
- <goal name="WP_parameter symb_mul" expl="VC for symb_mul">
- <proof prover="2"><result status="valid" time="0.03" steps="28"/></proof>
+ <goal name="VC symb_mul" expl="VC for symb_mul" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
  </goal>
- <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter harness.1" expl="1. precondition">
-  <transf name="compute_specified">
-   <goal name="WP_parameter harness.1.1" expl="1. precondition">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter harness.1.1.1" expl="1. precondition">
-    <transf name="compute_specified">
-     <goal name="WP_parameter harness.1.1.1.1" expl="1. precondition">
-     <transf name="introduce_premises">
-      <goal name="WP_parameter harness.1.1.1.1.1" expl="1. precondition">
-      <proof prover="2"><result status="valid" time="0.03" steps="32"/></proof>
-      </goal>
-     </transf>
+ <goal name="VC harness" expl="VC for harness" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC harness.0" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.0.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.0.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.0.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.02" steps="61"/></proof>
      </goal>
     </transf>
     </goal>
@@ -189,21 +89,17 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter harness.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="98"/></proof>
+  <goal name="VC harness.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="141"/></proof>
   </goal>
-  <goal name="WP_parameter harness.3" expl="3. precondition">
-  <transf name="compute_specified">
-   <goal name="WP_parameter harness.3.1" expl="1. precondition">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter harness.3.1.1" expl="1. precondition">
-    <transf name="compute_specified">
-     <goal name="WP_parameter harness.3.1.1.1" expl="1. precondition">
-     <transf name="introduce_premises">
-      <goal name="WP_parameter harness.3.1.1.1.1" expl="1. precondition">
-      <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
-      </goal>
-     </transf>
+  <goal name="VC harness.2" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.2.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.2.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.2.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.03" steps="65"/></proof>
      </goal>
     </transf>
     </goal>
@@ -211,27 +107,23 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter harness.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="115"/></proof>
+  <goal name="VC harness.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="166"/></proof>
   </goal>
-  <goal name="WP_parameter harness.5" expl="5. precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="64"/></proof>
+  <goal name="VC harness.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter harness.6" expl="6. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="102"/></proof>
+  <goal name="VC harness.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="114"/></proof>
   </goal>
-  <goal name="WP_parameter harness.7" expl="7. precondition">
-  <transf name="compute_specified">
-   <goal name="WP_parameter harness.7.1" expl="1. precondition">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter harness.7.1.1" expl="1. precondition">
-    <transf name="compute_specified">
-     <goal name="WP_parameter harness.7.1.1.1" expl="1. precondition">
-     <transf name="introduce_premises">
-      <goal name="WP_parameter harness.7.1.1.1.1" expl="1. precondition">
-      <proof prover="2"><result status="valid" time="0.02" steps="43"/></proof>
-      </goal>
-     </transf>
+  <goal name="VC harness.6" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.6.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.6.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.6.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.04" steps="73"/></proof>
      </goal>
     </transf>
     </goal>
@@ -239,27 +131,17 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter harness.8" expl="8. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="146"/></proof>
+  <goal name="VC harness.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="192"/></proof>
   </goal>
-  <goal name="WP_parameter harness.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="78"/></proof>
-  </goal>
-  <goal name="WP_parameter harness.10" expl="10. precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="78"/></proof>
-  </goal>
-  <goal name="WP_parameter harness.11" expl="11. precondition">
-  <transf name="compute_specified">
-   <goal name="WP_parameter harness.11.1" expl="1. precondition">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter harness.11.1.1" expl="1. precondition">
-    <transf name="compute_specified">
-     <goal name="WP_parameter harness.11.1.1.1" expl="1. precondition">
-     <transf name="introduce_premises">
-      <goal name="WP_parameter harness.11.1.1.1.1" expl="1. precondition">
-      <proof prover="2"><result status="valid" time="0.02" steps="46"/></proof>
-      </goal>
-     </transf>
+  <goal name="VC harness.8" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.8.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.8.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.8.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.04" steps="76"/></proof>
      </goal>
     </transf>
     </goal>
@@ -267,75 +149,141 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter harness.12" expl="12. precondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="173"/></proof>
+  <goal name="VC harness.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="200"/></proof>
   </goal>
-  <goal name="WP_parameter harness.13" expl="13. precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="92"/></proof>
+  <goal name="VC harness.10" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.10.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.10.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.10.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.04" steps="80"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter harness.14" expl="14. precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="92"/></proof>
+  <goal name="VC harness.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="217"/></proof>
   </goal>
-  <goal name="WP_parameter harness.15" expl="15. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="98"/></proof>
+  <goal name="VC harness.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter harness.16" expl="16. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="98"/></proof>
+  <goal name="VC harness.13" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="150"/></proof>
   </goal>
-  <goal name="WP_parameter harness.17" expl="17. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="105"/></proof>
+  <goal name="VC harness.14" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.14.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.14.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.14.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.06" steps="88"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter harness.18" expl="18. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="105"/></proof>
+  <goal name="VC harness.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="231"/></proof>
   </goal>
-  <goal name="WP_parameter harness.19" expl="19. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="112"/></proof>
+  <goal name="VC harness.16" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.16.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.16.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.16.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.06" steps="92"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter harness.20" expl="20. precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="112"/></proof>
+  <goal name="VC harness.17" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="254"/></proof>
   </goal>
-  <goal name="WP_parameter harness.21" expl="21. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="118"/></proof>
+  <goal name="VC harness.18" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter harness.22" expl="22. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="118"/></proof>
+  <goal name="VC harness.19" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="268"/></proof>
   </goal>
-  <goal name="WP_parameter harness.23" expl="23. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="125"/></proof>
+  <goal name="VC harness.20" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
   </goal>
-  <goal name="WP_parameter harness.24" expl="24. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="125"/></proof>
+  <goal name="VC harness.21" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="352"/></proof>
   </goal>
-  <goal name="WP_parameter harness.25" expl="25. precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="132"/></proof>
+  <goal name="VC harness.22" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
-  <goal name="WP_parameter harness.26" expl="26. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="132"/></proof>
+  <goal name="VC harness.23" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="268"/></proof>
   </goal>
-  <goal name="WP_parameter harness.27" expl="27. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="139"/></proof>
+  <goal name="VC harness.24" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
-  <goal name="WP_parameter harness.28" expl="28. precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="139"/></proof>
+  <goal name="VC harness.25" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.47" steps="686"/></proof>
   </goal>
-  <goal name="WP_parameter harness.29" expl="29. precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="145"/></proof>
+  <goal name="VC harness.26" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.26.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.26.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.26.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.08" steps="110"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter harness.30" expl="30. precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="145"/></proof>
+  <goal name="VC harness.27" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="223"/></proof>
   </goal>
-  <goal name="WP_parameter harness.31" expl="31. precondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="151"/></proof>
+  <goal name="VC harness.28" expl="precondition" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.28.0" expl="precondition" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.28.0.0" expl="precondition" proved="true">
+    <transf name="compute_specified" proved="true" >
+     <goal name="VC harness.28.0.0.0" expl="precondition" proved="true">
+     <proof prover="1"><result status="valid" time="0.11" steps="114"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter harness.32" expl="32. precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="151"/></proof>
+  <goal name="VC harness.29" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="232"/></proof>
   </goal>
-  <goal name="WP_parameter harness.33" expl="33. assertion">
-  <transf name="compute_specified">
-   <goal name="WP_parameter harness.33.1" expl="1. assertion">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter harness.33.1.1" expl="1. assertion">
-    <transf name="compute_specified">
+  <goal name="VC harness.30" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="80"/></proof>
+  </goal>
+  <goal name="VC harness.31" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="316"/></proof>
+  </goal>
+  <goal name="VC harness.32" expl="assertion" proved="true">
+  <transf name="compute_specified" proved="true" >
+   <goal name="VC harness.32.0" expl="assertion" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC harness.32.0.0" expl="assertion" proved="true">
+    <transf name="compute_specified" proved="true" >
     </transf>
     </goal>
    </transf>

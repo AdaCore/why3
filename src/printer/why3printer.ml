@@ -23,7 +23,7 @@ open Theory
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-            "namespace"; "import"; "export"; "end";
+            "scope"; "import"; "export"; "end";
             "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
             "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
@@ -198,7 +198,7 @@ and print_tnode pri fmt t = match t.t_node with
           print_vsty v print_term f;
         forget_var v
       end else begin
-        fprintf fmt (protect_on (pri > 0) "\\ %a%a.@ %a")
+        fprintf fmt (protect_on (pri > 0) "fun %a%a ->@ %a")
           (print_list comma print_vsty) vl print_tl tl print_term e;
         List.iter forget_var vl
       end
@@ -212,7 +212,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label f1.t_label in
+      let asym = Slab.mem Term.asym_split f1.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -349,6 +349,11 @@ let print_decl fmt d = match d.d_node with
   | Dind (s, il) -> print_list_next nothing (print_ind_decl s) fmt il
   | Dprop p   -> print_prop_decl fmt p
 
+let print_inst_ty fmt (ts1,ty2) =
+  fprintf fmt "type %a%a = %a" print_ts ts1
+    (print_list_pre space print_tv) ts1.ts_args
+    print_ty ty2; forget_tvs ()
+
 let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
 
@@ -377,16 +382,16 @@ let print_tdecl fmt td = match td.td_node with
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_qt th
-  | Clone (th,sm) when is_empty_sm sm ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]@\n@\n" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
+      let ym = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ty [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]@\n@\n"
-        print_qt th (print_list comma print_inst_ts) tm
-                    (print_list comma print_inst_ls) lm
-                    (print_list comma print_inst_pr) pm
+      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]"
+        print_qt th (print_list_suf comma print_inst_ts) tm
+                    (print_list_suf comma print_inst_ty) ym
+                    (print_list_suf comma print_inst_ls) lm
+                    (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al

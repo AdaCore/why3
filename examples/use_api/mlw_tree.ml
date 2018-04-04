@@ -46,22 +46,6 @@ let t : Ptree.incremental = Mlw_typing.open_file env pathname
 
 open Ptree
 
-(*
-type incremental = {
-  open_theory     : ident -> unit;
-  close_theory    : unit -> unit;
-  open_module     : ident -> unit;
-  close_module    : unit -> unit;
-  open_namespace  : string -> unit;
-  close_namespace : loc -> bool (*import:*) -> unit;
-  new_decl        : loc -> decl -> unit;
-  new_pdecl       : loc -> pdecl -> unit;
-  use_clone       : loc -> use_clone -> unit;
-}
-*)
-
-
-
 (* start a module *)
 
 let mk_ident ?(label=[]) ?(loc=Loc.dummy_position) s = {

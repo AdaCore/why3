@@ -57,9 +57,9 @@ module SimpleQueue
     mutable n: int;
     ghost mutable contents: list 'a; (* data[m..n[ *)
   }
-  invariant { 0 < length self.data }
-  invariant { 0 <= self.m <= self.n <= length self.data }
-  invariant { self.contents = to_list self.data self.m self.n }
+  invariant { 0 < length data }
+  invariant { 0 <= m <= n <= length data }
+  invariant { contents = to_list data m n }
 
   let create (x: 'a) : t 'a
     ensures { result.contents = Nil }
@@ -102,6 +102,6 @@ module SimpleQueue
 *)
     q.data[q.n] <- x;
     q.n <- q.n + 1;
-    ghost q.contents <- q.contents ++ Cons x Nil
+    ghost (q.contents <- q.contents ++ Cons x Nil)
 
 end

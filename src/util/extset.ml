@@ -47,6 +47,10 @@ module type S = sig
   val add_new : exn -> elt -> t -> t
   val is_num_elt : int -> t -> bool
   val of_list : elt list -> t
+  val contains: t -> elt -> bool
+  val add_left: t -> elt -> t
+  val remove_left: t -> elt -> t
+  val print: (Format.formatter -> elt -> unit) -> Format.formatter -> t -> unit
 end
 
 module MakeOfMap (M: Extmap.S) = struct
@@ -91,6 +95,15 @@ module MakeOfMap (M: Extmap.S) = struct
   let add_new e x s = M.add_new e x () s
   let is_num_elt n m = M.is_num_elt n m
   let of_list l = List.fold_left (fun acc a -> add a acc) empty l
+  let contains = M.contains
+  let add_left s e = M.add e () s
+  let remove_left s e = M.remove e s
+  let print print_elt fmt s =
+    if is_empty s then Format.fprintf fmt "{}" else begin
+      Format.fprintf fmt "@[<hov 2>{ ";
+      Pp.print_iter1 iter Pp.comma print_elt fmt s;
+      Format.fprintf fmt "}@]"
+    end
 end
 
 module type OrderedType = Set.OrderedType

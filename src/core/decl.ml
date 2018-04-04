@@ -288,7 +288,6 @@ type prop_kind =
   | Plemma    (* prove, use as a premise *)
   | Paxiom    (* do not prove, use as a premise *)
   | Pgoal     (* prove, do not use as a premise *)
-  | Pskip     (* do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * term
 
@@ -352,7 +351,7 @@ module Hsdecl = Hashcons.Make (struct
   let hs_ind (ps,al) = Hashcons.combine_list hs_prop (ls_hash ps) al
 
   let hs_kind = function
-    | Plemma -> 11 | Paxiom -> 13 | Pgoal  -> 17 | Pskip  -> 19
+    | Plemma -> 11 | Paxiom -> 13 | Pgoal -> 17
 
   let hash d = match d.d_node with
     | Dtype  s -> ts_hash s
@@ -395,8 +394,8 @@ exception BadLogicDecl of lsymbol * lsymbol
 exception BadConstructor of lsymbol
 
 exception BadRecordField of lsymbol
-exception RecordFieldMissing of lsymbol * lsymbol
-exception DuplicateRecordField of lsymbol * lsymbol
+exception RecordFieldMissing of lsymbol
+exception DuplicateRecordField of lsymbol
 
 exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
@@ -421,21 +420,21 @@ let create_data_decl tdl =
   if tdl = [] then raise EmptyDecl;
   let add s (ts,_) = Sts.add ts s in
   let tss = List.fold_left add Sts.empty tdl in
-  let check_proj cs tyv s tya ls = match ls with
+  let check_proj tyv s tya ls = match ls with
     | None -> s
     | Some ({ls_args = [ptyv]; ls_value = Some ptya; ls_constr = 0} as ls) ->
         ty_equal_check tyv ptyv;
         ty_equal_check tya ptya;
-        Sls.add_new (DuplicateRecordField (cs,ls)) ls s
+        Sls.add_new (DuplicateRecordField ls) ls s
     | Some ls -> raise (BadRecordField ls)
   in
   let check_constr tys ty cll pjs (syms,news) (fs,pl) =
     ty_equal_check ty (Opt.get_exn (BadConstructor fs) fs.ls_value);
     let fs_pjs =
-      try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
+      try List.fold_left2 (check_proj ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
     if not (Sls.equal pjs fs_pjs) then
-      raise (RecordFieldMissing (fs, Sls.choose (Sls.diff pjs fs_pjs)));
+      raise (RecordFieldMissing (Sls.choose (Sls.diff pjs fs_pjs)));
     if fs.ls_constr <> cll then raise (BadConstructor fs);
     let vs = ty_freevars Stv.empty ty in
     let rec check seen ty = match ty.ty_node with
@@ -456,8 +455,8 @@ let create_data_decl tdl =
     if cl = [] then raise (EmptyAlgDecl ts);
     if ts.ts_def <> NoDef then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
-    let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
-      (Opt.fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+    let pjs = List.fold_left (fun s (_,pl) ->
+      List.fold_left (Opt.fold Sls.add_left) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     List.fold_left (check_constr ts ty cll pjs) (syms,news) cl
@@ -718,7 +717,6 @@ let check_foundness kn d =
 let rec ts_extract_pos kn sts ts =
   assert (not (is_alias_type_def ts.ts_def));
   if ts_equal ts ts_func then [false;true] else
-  if ts_equal ts ts_pred then [false] else
   if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
   match find_constructors kn ts with
     | [] ->
@@ -746,9 +744,8 @@ let check_positivity kn d = match d.d_node with
           | Tyapp (ts,tl) ->
               let check pos ty =
                 if pos then check_ty ty else
-                if ty_s_any (fun ts -> Sts.mem ts tss) ty
-                then raise (NonPositiveTypeDecl (tys,cs,ty))
-              in
+                if ty_s_any (Sts.contains tss) ty then
+                  raise (NonPositiveTypeDecl (tys,cs,ty)) in
               List.iter2 check (ts_extract_pos kn Sts.empty ts) tl
         in
         List.iter check_ty cs.ls_args
@@ -778,15 +775,15 @@ let parse_record kn fll =
   let cs, pjl = match find_constructors kn ts with
     | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
     | _ -> raise (BadRecordField fs) in
-  let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
+  let pjs = Sls.of_list pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else
-    Mls.add_new (DuplicateRecordField (cs,pj)) pj v m) Mls.empty fll in
+    Mls.add_new (DuplicateRecordField pj) pj v m) Mls.empty fll in
   cs,pjl,flm
 
 let make_record kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let get_arg pj = Mls.find_exn (RecordFieldMissing (cs,pj)) pj flm in
+  let get_arg pj = Mls.find_exn (RecordFieldMissing pj) pj flm in
   fs_app cs (List.map get_arg pjl) ty
 
 let make_record_update kn t fll ty =

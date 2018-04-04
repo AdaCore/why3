@@ -26,46 +26,43 @@ module SwapInt32
   (* a simple model of 32-bit integers with addition, subtraction,
      and possible overflows *)
 
-  type int32
+  type int32 = < range -0x8000_0000 0x7fff_ffff >
 
-  constant min_int32 : int = - 0x80000000
-  constant max_int32 : int =   0x7fffffff
-  constant width     : int = max_int32 - min_int32 + 1
+  meta coercion function int32'int
 
-  function to_int (n: int32) : int
+  constant width : int = int32'maxInt - int32'minInt + 1
 
   val (+) (a: int32) (b: int32) : int32
-    ensures   { to_int result =
-         if to_int a + to_int b < min_int32 then to_int a + to_int b + width
-    else if to_int a + to_int b > max_int32 then to_int a + to_int b - width
-    else    to_int a + to_int b }
+    ensures { result =
+         if a + b < int32'minInt then a + b + width
+    else if a + b > int32'maxInt then a + b - width
+    else    a + b }
 
   val (-) (a: int32) (b: int32) : int32
-    ensures   { to_int result =
-         if to_int a - to_int b < min_int32 then to_int a - to_int b + width
-    else if to_int a - to_int b > max_int32 then to_int a - to_int b - width
-    else    to_int a - to_int b }
+    ensures { result =
+         if a - b < int32'minInt then a - b + width
+    else if a - b > int32'maxInt then a - b - width
+    else    a - b }
 
-  predicate in_bounds (n: int32) = min_int32 <= to_int n <= max_int32
+  predicate in_bounds (n: int32) = int32'minInt <= n <= int32'maxInt
 
   (* purely applicative version first *)
 
   let swap (a b: int32) : (int32, int32)
     requires { in_bounds a /\ in_bounds b }
-    ensures  { let (x,y) = result in
-               to_int x = to_int b /\ to_int y = to_int a }
+    returns  { x,y -> int32'int x = b /\ int32'int y = a }
   =
     let a = a + b in
     let b = a - b in
     let a = a - b in
-    (a, b)
+    a, b
 
   (* then rephrased with mutable variables *)
 
   let swap_ref (a b: ref int32) : unit
     requires { in_bounds !a /\ in_bounds !b }
     writes   { a, b }
-    ensures  { to_int !a = old (to_int !b) /\ to_int !b = old (to_int !a) }
+    ensures  { int32'int !a = old !b /\ int32'int !b = old !a }
   =
     a := !a + !b;
     b := !a - !b;

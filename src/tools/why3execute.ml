@@ -44,29 +44,31 @@ let () =
 
 let do_input f =
   let format = !opt_parser in
-  let mm, _thm = match f with
+  let mm = match f with
     | "-" ->
-        Env.read_channel Mlw_module.mlw_language ?format env "stdin" stdin
+        Env.read_channel Pmodule.mlw_language ?format env "stdin" stdin
     | file ->
-        Env.read_file Mlw_module.mlw_language ?format env file
+        Env.read_file Pmodule.mlw_language ?format env file
   in
   let do_exec (mid,name) =
     let m = try Mstr.find mid mm with Not_found ->
       eprintf "Module '%s' not found.@." mid;
       exit 1 in
-    let ps =
-      try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name]
+    let rs =
+      try Pmodule.ns_find_rs m.Pmodule.mod_export [name]
       with Not_found ->
         eprintf "Function '%s' not found in module '%s'.@." name mid;
         exit 1 in
-    match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+(*
+    match Pdecl.find_definition m.Pmodule.mod_known rs with
     | None ->
       eprintf "Function '%s.%s' has no definition.@." mid name;
       exit 1
     | Some d ->
+*)
       try
         printf "@[<hov 2>Execution of %s.%s ():@\n%a" mid name
-          (Mlw_interp.eval_global_symbol env m) d
+          (Pinterp.eval_global_symbol env m) rs
       with e when Debug.test_noflag Debug.stack_trace ->
         printf "@\n@]@.";
         raise e in

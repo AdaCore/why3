@@ -1,0 +1,49 @@
+
+(* Various programs computing the factorial. *)
+
+module FactRecursive
+
+  use import int.Int
+  use import int.Fact
+
+  let rec fact_rec (x:int) : int
+    requires { x >= 0 }
+    variant  { x }
+    ensures  { result = fact x }
+  = [@vc:sp]
+    if x = 0 then 1 else x * fact_rec (x-1)
+
+  let test0 () = fact_rec 0
+  let test1 () = fact_rec 1
+  let test7 () = fact_rec 7
+  let test42 () = fact_rec 42
+
+end
+
+module FactImperative
+
+  use import int.Int
+  use import int.Fact
+  use import ref.Ref
+
+  let fact_imp (x:int) : int
+    requires { x >= 0 }
+    ensures { result = fact x }
+  = [@vc:sp]
+    let y = ref 0 in
+    let r = ref 1 in
+    while !y < x do
+      invariant { 0 <= !y <= x }
+      invariant { !r = fact !y }
+      variant { x - !y }
+      y := !y + 1;
+      r := !r * !y
+    done;
+    !r
+
+  let test0 () = fact_imp 0
+  let test1 () = fact_imp 1
+  let test7 () = fact_imp 7
+  let test42 () = fact_imp 42
+
+end

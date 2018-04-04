@@ -1,6 +1,6 @@
 theory Records
   type t = { a:int; b:int }
-  goal g1 : 
+  goal g1 :
     let t = { a = 1; b = 2 } in
     let t = { t with a = () } in
     true

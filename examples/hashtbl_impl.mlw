@@ -17,11 +17,16 @@ module HashtblImpl
 
   type key
 
-  function hash key : int
+  val eq (x y : key) : bool
+    ensures { result <-> x = y }
 
-  axiom hash_nonneg: forall k: key. 0 <= hash k
+  val function hash key : int
+    ensures { 0 <= result }
 
-  function bucket (k: key) (n: int) : int = mod (hash k) n
+  let function bucket (k: key) (n: int) : int
+    requires { 0 < n }
+    ensures { 0 <= result < n }
+  = mod (hash k) n
 
   lemma bucket_bounds:
     forall n: int. 0 < n ->
@@ -41,10 +46,11 @@ module HashtblImpl
                 mutable data: array (list (key, 'a)); (* buckets *)
           ghost mutable view: map key (option 'a); (* pure model *) }
 
-    invariant { 0 < length self.data }
+    invariant { 0 < length data }
     invariant {
-      forall i: int. 0 <= i < length self.data -> good_hash self.data i }
-    invariant { forall k: key, v: 'a. good_data k v self.view self.data }
+      forall i: int. 0 <= i < length data -> good_hash data i }
+    invariant { forall k: key, v: 'a. good_data k v view data }
+    by { size = 0; data = make 1 Nil; view = Const.const None }
 
   let create (n: int) : t 'a
     requires { 1 <= n }
@@ -104,7 +110,7 @@ module HashtblImpl
               end }
   = match l with
     | Nil -> None
-    | Cons (k', v) r -> if k = k' then Some v else list_find k r
+    | Cons (k', v) r -> if eq k k' then Some v else list_find k r
     end
 
   let find (h: t 'a) (k: key) : option 'a
@@ -120,7 +126,7 @@ module HashtblImpl
   = match l with
     | Nil -> Nil
     | Cons ((k', _) as p) r ->
-        if k = k' then list_remove k r else Cons p (list_remove k r)
+        if eq k k' then list_remove k r else Cons p (list_remove k r)
     end
 
   let remove (h: t 'a) (k: key) : unit
@@ -145,7 +151,7 @@ module HashtblImpl
     ensures { forall k': key. k' <> k ->
                 Map.get h.view k' = Map.get (old h.view) k' }
   =
-    abstract if h.size = length h.data then resize h end;
+    if h.size = length h.data then resize h;
     remove h k;
     let i = bucket k (length h.data) in
     h.data[i] <- Cons (k, v) h.data[i];

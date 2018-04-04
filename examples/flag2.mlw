@@ -12,94 +12,103 @@ module Flag
 
   type color = Blue | White | Red
 
-  predicate monochrome (a:map int color) (i:int) (j:int) (c:color) =
-    forall k:int. i <= k < j -> a[k]=c
+  let eq_color (c1 c2 :color) : bool
+    ensures { result <-> c1 = c2 }
+  = match c1,c2 with
+    | Blue,Blue | Red,Red | White,White -> True
+    | _,_ -> False
+    end
 
-  function nb_occ (a:map int color) (i:int) (j:int) (c:color) : int
+  predicate monochrome (a: map int color) (i: int) (j: int) (c: color) =
+    forall k: int. i <= k < j -> a[k]=c
 
-  axiom nb_occ_null:
-    forall a:map int color, i j:int, c:color.
-       i >= j -> nb_occ a i j c = 0
+  let rec function nb_occ (a: map int color) (i: int) (j: int) (c: color) : int
+    variant { j - i }
+  = if i >= j then 0 else
+    if eq_color a[j-1] c then 1 + nb_occ a i (j-1) c else nb_occ a i (j-1) c
 
-  axiom nb_occ_add_eq:
-    forall a:map int color, i j:int, c:color.
-       i < j /\ get a (j-1) = c -> nb_occ a i j c = nb_occ a i (j-1) c + 1
+  let rec lemma nb_occ_split (a: map int color) (i j k: int) (c: color)
+    requires { i <= j <= k }
+    variant { k - j }
+    ensures { nb_occ a i k c = nb_occ a i j c + nb_occ a j k c }
+  = if k = j then () else nb_occ_split a i j (k-1) c
 
-  axiom nb_occ_add_neq:
-    forall a:map int color, i j:int, c:color.
-       i < j /\ get a (j-1) <> c -> nb_occ a i j c = nb_occ a i (j-1) c
-
-  lemma nb_occ_split:
-    forall a:map int color, i j k:int, c:color.
-       i <= j <= k ->
-         nb_occ a i k c = nb_occ a i j c + nb_occ a j k c
-
-  lemma nb_occ_ext:
-    forall a1 a2:map int color, i j:int, c:color.
-       (forall k:int. i <= k < j -> get a1 k = get a2 k) ->
-         nb_occ a1 i j c = nb_occ a2 i j c
+  let rec lemma nb_occ_ext (a1 a2: map int color) (i j: int) (c: color)
+    requires { forall k: int. i <= k < j -> a1[k] = a2[k] }
+    variant { j - i }
+    ensures { nb_occ a1 i j c = nb_occ a2 i j c }
+  = if i >= j then () else nb_occ_ext a1 a2 i (j-1) c
 
   lemma nb_occ_store_outside_up:
-    forall a:map int color, i j k:int, c:color.
+    forall a: map int color, i j k: int, c: color.
       i <= j <= k -> nb_occ (set a k c) i j c = nb_occ a i j c
 
   lemma nb_occ_store_outside_down:
-    forall a:map int color, i j k:int, c:color.
+    forall a: map int color, i j k: int, c: color.
       k < i <= j -> nb_occ (set a k c) i j c = nb_occ a i j c
 
   lemma nb_occ_store_eq_eq:
-    forall a:map int color, i j k:int, c:color.
-      i <= k < j -> get a k = c ->
+    forall a: map int color, i j k: int, c: color.
+      i <= k < j -> a[k] = c ->
        nb_occ (set a k c) i j c = nb_occ a i j c
 
-  lemma nb_occ_store_eq_neq:
-    forall a:map int color, i j k:int, c:color.
-      i <= k < j -> get a k <> c ->
-       nb_occ (set a k c) i j c = nb_occ a i j c + 1
+  let rec lemma nb_occ_store_eq_neq (a: map int color) (i j k: int) (c: color)
+    requires { i <= k < j }
+    requires { a[k] <> c }
+    variant  { j - k }
+    ensures  { nb_occ (set a k c) i j c = nb_occ a i j c + 1 }
+  = if k = j - 1 then () else nb_occ_store_eq_neq a i (j-1) k c
 
-  lemma nb_occ_store_neq_eq:
-    forall a:map int color, i j k:int, c c':color.
-      i <= k < j -> c <> c' -> get a k = c ->
-       nb_occ (set a k c') i j c = nb_occ a i j c - 1
+  let lemma nb_occ_store_neq_eq
+    (a: map int color) (i j k: int) (c c': color)
+    requires { i <= k < j } requires { c <> c' } requires { a[k] = c }
+    ensures  { nb_occ (set a k c') i j c = nb_occ a i j c - 1 }
+  = nb_occ_split a i k j c; nb_occ_split (set a k c') i k j c;
+    nb_occ_split a k (k + 1) j c; nb_occ_split (set a k c') k (k+1) j c
 
-  lemma nb_occ_store_neq_neq:
-    forall a:map int color, i j k:int, c c':color.
-      i <= k < j -> c <> c' -> get a k <> c ->
-       nb_occ (set a k c') i j c = nb_occ a i j c
+  let lemma nb_occ_store_neq_neq
+    (a: map int color) (i j k: int) (c c': color)
+    requires { i <= k < j } requires { c <> c' } requires { a[k] <> c }
+    ensures  { nb_occ (set a k c') i j c = nb_occ a i j c }
+  = nb_occ_split a i k j c; nb_occ_split (set a k c') i k j c;
+    nb_occ_split a k (k + 1) j c; nb_occ_split (set a k c') k (k+1) j c
+
+  use import array.Array
+
+ let swap (a:array color) (i: int) (j: int) : unit
+   requires { 0 <= i < a.length }
+   requires { 0 <= j < a.length }
+   ensures { a[i] = old a[j] }
+   ensures { a[j] = old a[i] }
+   ensures { forall k: int. k <> i /\ k <> j -> a[k] = old a[k] }
+   ensures { forall k1 k2: int, c: color. k1 <= i < k2 /\ k1 <= j < k2 ->
+        nb_occ a.elts k1 k2 c = nb_occ (old a.elts) k1 k2 c }
+ = let ai = a[i] in
+   let aj = a[j] in
+   a[i] <- aj;
+   a[j] <- ai
 
 
- let swap (a:ref (map int color)) (i:int) (j:int) : unit
-   ensures { get !a i = get (old !a) j }
-   ensures { get !a j = get (old !a) i }
-   ensures { forall k:int. k <> i /\ k <> j -> get !a k = get (old !a) k }
-   ensures { forall k1 k2:int, c:color. k1 <= i < k2 /\ k1 <= j < k2 ->
-        nb_occ !a k1 k2 c = nb_occ (old !a) k1 k2 c }
- = let ai = get !a i in
-   let aj = get !a j in
-   a := set !a i aj;
-   a := set !a j ai
-
-
- let dutch_flag (a:ref (map int color)) (n:int) =
-    requires { 0 <= n }
-    ensures { (exists b:int. exists r:int.
-        monochrome !a 0 b Blue /\
-        monochrome !a b r White /\
-        monochrome !a r n Red) }
-    ensures { forall c:color. nb_occ !a 0 n c = nb_occ (old !a) 0 n c }
-  let b = ref 0 in
+ let dutch_flag (a:array color)
+    ensures { (exists b: int. exists r: int.
+        monochrome a.elts 0 b Blue /\
+        monochrome a.elts b r White /\
+        monochrome a.elts r a.length Red) }
+    ensures { forall c: color.
+        nb_occ a.elts 0 a.length c = nb_occ (old a.elts) 0 a.length c }
+= let b = ref 0 in
   let i = ref 0 in
-  let r = ref n in
-  'Init:
+  let r = ref a.length in
   while !i < !r do
-    invariant { 0 <= !b <= !i <= !r <= n }
-    invariant { monochrome !a 0 !b Blue }
-    invariant { monochrome !a !b !i White }
-    invariant { monochrome !a !r n  Red }
+    invariant { 0 <= !b <= !i <= !r <= a.length }
+    invariant { monochrome a.elts 0 !b Blue }
+    invariant { monochrome a.elts !b !i White }
+    invariant { monochrome a.elts !r a.length  Red }
     invariant {
-      forall c:color. nb_occ !a 0 n c = nb_occ (at !a 'Init) 0 n c }
+      forall c: color.
+        nb_occ a.elts 0 a.length c = nb_occ (old a.elts) 0 a.length c }
     variant { !r - !i }
-    match get !a !i with
+    match a[!i] with
     | Blue -> swap a !b !i; b := !b + 1; i := !i + 1
     | White -> i := !i + 1
     | Red -> r := !r - 1; swap a !r !i

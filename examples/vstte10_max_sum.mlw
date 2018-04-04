@@ -12,9 +12,10 @@ module MaxAndSum
   use import ref.Ref
   use import array.Array
 
-  let max_sum (a: array int) (n: int)
-    requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    ensures { let (sum, max) = result in sum <= n * max }
+  let max_sum (a: array int) (n: int) : (int, int)
+    requires { n = length a }
+    requires { forall i. 0 <= i < n -> a[i] >= 0 }
+    returns  { sum, max -> sum <= n * max }
   = let sum = ref 0 in
     let max = ref 0 in
     for i = 0 to n - 1 do
@@ -22,7 +23,7 @@ module MaxAndSum
       if !max < a[i] then max := a[i];
       sum := !sum + a[i]
     done;
-    (!sum, !max)
+    !sum, !max
 
 end
 
@@ -40,7 +41,7 @@ module MaxAndSum2
 
   let max_sum (a: array int) (n: int)
     requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    ensures  { let (s, m) = result in
+    ensures  { let s, m = result in
                s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
   = let s = ref 0 in
     let m = ref 0 in
@@ -49,12 +50,13 @@ module MaxAndSum2
       if !m < a[i] then m := a[i];
       s := !s + a[i]
     done;
-    (!s, !m)
+    !s, !m
 
 end
 
 module TestCase
 
+  use import int.Int
   use import MaxAndSum2
   use import array.Array
   use import array.ArraySum
@@ -74,16 +76,16 @@ module TestCase
     a[7] <- 1;
     a[8] <- 10;
     a[9] <- 6;
-    let (s, m) = max_sum a n in
+    let s, m = max_sum a n in
     assert { s = 45 };
     assert { m = 10 };
-    (s, m)
+    s, m
 
   let test_case () raises { BenchFailure -> true } =
-    let (s, m) = test () in
+    let s, m = test () in
     (* bench of --exec *)
     if s <> 45  then raise BenchFailure;
     if m <> 10  then raise BenchFailure;
-    (s,m)
+    s,m
 
 end

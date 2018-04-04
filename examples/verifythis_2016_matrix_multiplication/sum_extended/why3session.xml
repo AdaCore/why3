@@ -2,46 +2,36 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sum_extended.mlw">
-<theory name="Sum_extended" sum="cfab2f022b7b9478b4cc84f0f10fa2ed">
- <goal name="WP_parameter sum_mult" expl="VC for sum_mult">
- <proof prover="1"><result status="valid" time="0.05" steps="36"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../sum_extended.mlw" proved="true">
+<theory name="Sum_extended" proved="true">
+ <goal name="VC sum_mult" expl="VC for sum_mult" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="42"/></proof>
  </goal>
- <goal name="WP_parameter sum_add" expl="VC for sum_add">
- <proof prover="1"><result status="valid" time="0.22" steps="260"/></proof>
+ <goal name="VC sum_add" expl="VC for sum_add" proved="true">
+ <proof prover="0"><result status="valid" time="0.13" steps="147"/></proof>
  </goal>
- <goal name="WP_parameter fubini" expl="VC for fubini">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter fubini.1" expl="1. assertion">
-  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="VC fubini" expl="VC for fubini" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC fubini.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.2" expl="2. postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC fubini.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.3" expl="3. variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+  <goal name="VC fubini.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.4" expl="4. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC fubini.3" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.56" steps="734"/></proof>
   </goal>
-  <goal name="WP_parameter fubini.5" expl="5. assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter fubini.5.1" expl="1. assertion">
-   <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-   </goal>
-   <goal name="WP_parameter fubini.5.2" expl="2. assertion">
-   <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter fubini.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC fubini.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="79"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter sum_ext" expl="VC for sum_ext">
- <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+ <goal name="VC sum_ext" expl="VC for sum_ext" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
 </file>

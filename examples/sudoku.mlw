@@ -215,8 +215,8 @@ module TheClassicalSudokuGrid
     ss[76]<-57; ss[77]<-57; ss[78]<-60; ss[79]<-60; ss[80]<-60;
     (* square offset *)
     let sqo = Array.make 9 0 in
-    sqo[ 0]<-0; sqo[ 1]<-1; sqo[ 2]<-2; sqo[ 3]<-9; sqo[ 4]<-10;
-    sqo[ 5]<-11; sqo[ 6]<-18; sqo[ 7]<-19; sqo[ 8]<-20;
+    sqo[0]<-0; sqo[1]<-1; sqo[2]<-2; sqo[3]<-9; sqo[4]<-10;
+    sqo[5]<-11; sqo[6]<-18; sqo[7]<-19; sqo[8]<-20;
     { column_start = cs; column_offsets = co;
       row_start    = rs; row_offsets    = ro;
       square_start = ss; square_offsets = sqo; }
@@ -273,7 +273,7 @@ module Solver
       let v = g[s + offsets[off]] in
       if 1 <= v && v <= 9 then
          begin
-           if b[v] = True then raise Invalid;
+           if b[v] then raise Invalid;
             b[v] <- True
          end
     done
@@ -330,6 +330,30 @@ module Solver
     ensures  { full_up_to g2 i }
   = assert { grid_eq_sub g1 g2 0 i }
 
+  let lemma valid_chunk_frame (start:array int) (offsets:array int) (g1 g2:grid) (i:int)
+    requires { chunk_valid_indexes start offsets }
+    requires { 0 <= i < 81 }
+    requires { grid_eq g1 g2 }
+    requires { valid_chunk g1 i start offsets }
+    ensures  { valid_chunk g2 i start offsets }
+  = ()
+
+  let rec lemma valid_up_to_frame (s:sudoku_chunks) (g1 g2:grid) (i:int)
+    requires { well_formed_sudoku s }
+    requires { 0 <= i <= 81 }
+    requires { grid_eq g1 g2 }
+    requires { valid_up_to s g1 i }
+    variant  { i }
+    ensures  { valid_up_to s g2 i }
+  = if i > 0 then
+      begin
+        assert { valid_up_to s g1 (i-1) };
+        valid_up_to_frame s g1 g2 (i-1);
+	valid_chunk_frame s.column_start s.column_offsets g1 g2 (i-1);
+	valid_chunk_frame s.row_start s.row_offsets g1 g2 (i-1);
+	valid_chunk_frame s.square_start s.square_offsets g1 g2 (i-1);
+      end
+
 
 
 (** how to prove the "hard" property : if
@@ -384,14 +408,16 @@ this is true but with 2 different possible reasons:
       valid_chunk h i2 start offsets
 
 
-  lemma valid_up_to_change :
-    forall s:sudoku_chunks, g:grid, i x : int.
-      well_formed_sudoku s /\
-      is_index i /\ valid_up_to s g i /\ 1 <= x <= 9 /\
-      valid_column s (Map.set g i x) i /\
-      valid_row s (Map.set g i x) i /\
-      valid_square s (Map.set g i x) i
-      -> valid_up_to s (Map.set g i x) (i+1)
+  let ghost valid_up_to_change (s:sudoku_chunks) (g:grid) (i x : int)
+    requires {  well_formed_sudoku s }
+    requires { is_index i }
+    requires { valid_up_to s g i }
+    requires { 1 <= x <= 9 }
+    requires { valid_column s (Map.set g i x) i }
+    requires { valid_row s (Map.set g i x) i }
+    requires { valid_square s (Map.set g i x) i }
+    ensures  { valid_up_to s (Map.set g i x) (i+1) }
+  = ()
 
 
   (** {3 The main solver loop} *)
@@ -422,41 +448,42 @@ this is true but with 2 different possible reasons:
       end
     else
       begin
-      'L:
+      let ghost old_g = g.elts in
       for k = 1 to 9 do
-        invariant { grid_eq (at g 'L).elts (Map.set g.elts i 0) }
+        invariant { grid_eq old_g (Map.set g.elts i 0) }
         invariant { full_up_to g.elts i }
         invariant { (* for completeness *)
           forall k'. 1 <= k' < k ->
-          let g' = Map.set (at g 'L).elts i k' in
+          let g' = Map.set old_g i k' in
           forall h : grid. included g' h /\ full h -> not (valid s h) }
         g[i] <- k;
+	valid_up_to_frame s old_g (Map.set g.elts i 0) i;
         try
           check_valid_chunk g i s.column_start s.column_offsets;
           check_valid_chunk g i s.row_start s.row_offsets;
           check_valid_chunk g i s.square_start s.square_offsets;
             (* the hard part: see lemma valid_up_to_change *)
-          assert { let grid' = Map.set (at g 'L).elts i k in
+          assert { let grid' = Map.set old_g i k in
             grid_eq grid' g.elts &&
             valid_chunk grid' i s.column_start s.column_offsets &&
             valid_chunk grid' i s.row_start s.row_offsets &&
             valid_chunk grid' i s.square_start s.square_offsets &&
             valid_up_to s grid' (i+1) };
-          assert { valid_up_to s g.elts (i+1) };
+          valid_up_to_change s old_g i k;
           solve_aux s g (i + 1)
         with Invalid ->
           assert { (* for completeness *)
-            not (valid s (Map.set (at g 'L).elts i k)) };
+            not (valid s (Map.set old_g i k)) };
           assert { (* for completeness *)
-            let g' = Map.set (at g 'L).elts i k in
+            let g' = Map.set old_g i k in
             forall h : grid. included g' h /\ full h -> not (valid s h) }
         end
       done;
       g[i] <- 0;
       assert { (* for completeness *)
-        forall h:grid. included (at g 'L).elts h /\ full h ->
+        forall h:grid. included old_g h /\ full h ->
           let k' = Map.get h i in
-          let g' = Map.set (at g 'L).elts i k' in
+          let g' = Map.set old_g i k' in
           included g' h }
       end
 
@@ -491,7 +518,7 @@ this is true but with 2 different possible reasons:
 
 end
 
-(*
+(* Proof in progress
 module RandomSolver
 
   (* a variant: solve using a random order of cells *)
@@ -532,13 +559,13 @@ module RandomSolver
       end
     else
       begin
-      'L:
+      label L in
       for k = 1 to 9 do
-        invariant { grid_eq (at g 'L).elts (Map.set g.elts j 0) }
+        invariant { grid_eq (g at L).elts (Map.set g.elts j 0) }
         invariant { full_up_to g.elts i } (* TODO i -> j *)
         invariant { (* for completeness *)
           forall k'. 1 <= k' < k ->
-          let g' = Map.set (at g 'L).elts i k' in (* TODO i -> j *)
+          let g' = Map.set (g at L).elts i k' in (* TODO i -> j *)
           forall h : grid. included g' h /\ full h -> not (valid s h) }
         g[j] <- k;
         try
@@ -547,7 +574,7 @@ module RandomSolver
           check_valid_chunk g j s.square_start s.square_offsets;
             (* the hard part: see lemma valid_up_to_change *)
             (* TODO i -> j *)
-          assert { let grid' = Map.set (at g 'L).elts i k in
+          assert { let grid' = Map.set (g at L).elts i k in
             grid_eq grid' g.elts &&
             valid_chunk grid' i s.column_start s.column_offsets &&
             valid_chunk grid' i s.row_start s.row_offsets &&
@@ -557,17 +584,17 @@ module RandomSolver
           solve_aux s randoffset g (i + 1)
         with Invalid ->
           assert { (* for completeness *)
-            not (valid s (Map.set (at g 'L).elts i k)) };
+            not (valid s (Map.set (g at L).elts i k)) };
           assert { (* for completeness *)
-            let g' = Map.set (at g 'L).elts i k in
+            let g' = Map.set (g at L).elts i k in
             forall h : grid. included g' h /\ full h -> not (valid s h) }
         end
       done;
       g[j] <- 0;
       assert { (* for completeness *)
-        forall h:grid. included (at g 'L).elts h /\ full h ->
+        forall h:grid. included (g at L).elts h /\ full h ->
           let k' = Map.get h i in
-          let g' = Map.set (at g 'L).elts i k' in
+          let g' = Map.set (g at L).elts i k' in
           included g' h }
       end
 
@@ -614,9 +641,8 @@ module Test
   use import TheClassicalSudokuGrid
 
   use import Solver
-  use array.Array
   use import map.Map
-  use map.Const
+  use import array.Array
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()
@@ -647,28 +673,39 @@ module Test
 8 0 0 0 0 1 0 0 5
 0 0 0 0 0 0 0 7 6
 *)
-  constant solvable : grid =
-    (Const.const 0)
-    [0<-2][2<-9][7<-1]
-    [13<-6]
-    [19<-5][20<-3][21<-8][23<-2][24<-7]
-    [27<-3]
-    [40<-7][41<-5][44<-3]
-    [46<-4][47<-1][48<-2][50<-8][51<-9]
-    [56<-4][58<-9][61<-2]
-    [63<-8][68<-1][71<-5]
-    [79<-7][80<-6]
-
-  lemma valid_values_solvable: valid_values solvable
 
   let test1 ()
     raises { NoSolution -> true }
   = let a = Array.make 81 0 in
-    for i = 0 to 80 do
-      invariant { valid_values a.Array.elts }
-      Array.([]<-) a i (Map.get solvable i)
-    done;
+    a[0] <- 2;
+    a[2] <- 9;
+    a[7] <- 1;
+    a[13] <- 6;
+    a[19] <- 5;
+    a[20] <- 3;
+    a[21] <- 8;
+    a[23] <- 2;
+    a[24] <- 7;
+    a[27] <- 3;
+    a[40] <- 7;
+    a[41] <- 5;
+    a[44] <- 3;
+    a[46] <- 4;
+    a[47] <- 1;
+    a[48] <- 2;
+    a[50] <- 8;
+    a[51] <- 9;
+    a[56] <- 4;
+    a[58] <- 9;
+    a[61] <- 2;
+    a[63] <- 8;
+    a[68] <- 1;
+    a[71] <- 5;
+    a[79] <- 7;
+    a[80] <- 6;
+    assert { valid_values a.Array.elts };
     solve (classical_sudoku()) a
+
 (* the solution:
 
   2, 6, 9, 3, 5, 7, 8, 1, 4,
@@ -693,6 +730,6 @@ end
 
 (***
 Local Variables:
-compile-command: "why3ide sudoku.mlw"
+compile-command: "why3 ide --extra-config ../share/strategies.conf sudoku.mlw"
 End:
 *)

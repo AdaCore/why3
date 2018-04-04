@@ -12,54 +12,52 @@ one</a>}: it does not use any Coq proofs, but lemma functions instead.
 *)
 
 
-module Disjoint
 
-  use export int.Int
-  use export list.List
-  use export list.Mem
-  use export list.Append
-  use export list.Length
+module InPlaceRev
+
+  use import map.Map
+  use import ref.Ref
+  use import int.Int
+  use import list.List
+  use list.Quant
+  use import list.Append
+  use import list.Mem
+  use import list.Length
   use export list.Reverse
 
-  predicate disjoint (l1:list 'a) (l2:list 'a) =
-    forall x:'a. not (mem x l1 /\ mem x l2)
+  type loc
 
-  predicate no_repet (l:list 'a) =
+  val function eq_loc (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  val constant null : loc
+
+  predicate disjoint (l1:list loc) (l2:list loc) =
+    forall x:loc. not (mem x l1 /\ mem x l2)
+
+  predicate no_repet (l:list loc) =
     match l with
     | Nil -> true
     | Cons x r -> not (mem x r) /\ no_repet r
     end
 
-  let rec ghost mem_decomp (x: 'a) (l: list 'a) : (list 'a, list 'a)
+  let rec ghost mem_decomp (x: loc) (l: list loc)
+    : (list loc, list loc)
     requires { mem x l }
     variant  { l }
     returns { (l1,l2) -> l = l1 ++ Cons x l2 }
   = match l with
     | Nil -> absurd
-    | Cons h t -> if h = x then (Nil,t) else
+    | Cons h t -> if eq_loc h x then (Nil,t) else
        let (r1,r2) = mem_decomp x t in (Cons h r1,r2)
     end
 
-end
-
-
-
-module InPlaceRev
-
-  use import Disjoint
-  use import map.Map
-  use import ref.Ref
-
-  type loc
-
-  function null:loc
-
-  val acc(field: ref (map loc 'a)) (l:loc) : 'a
+  val acc (field: ref (map loc 'a)) (l:loc) : 'a
     requires { l <> null }
     reads { field }
     ensures { result = get !field l }
 
-  val upd(field: ref (map loc 'a)) (l:loc) (v:'a):unit
+  val upd (field: ref (map loc 'a)) (l:loc) (v:'a):unit
     requires { l <> null }
     writes { field }
     ensures { !field = set (old !field) l v }
@@ -141,11 +139,11 @@ module InPlaceRev
     requires { disjoint l1M l2M }
     ensures { list_seg result !next (l1M ++ l2M) null }
   =
-    if l1 = null then l2 else
+    if eq_loc l1 null then l2 else
     let p = ref l1 in
     let ghost pM = ref l1M in
     let ghost l1pM = ref (Nil : list loc) in
-    while acc next !p <> null do
+    while not (eq_loc (acc next !p) null) do
       invariant { !p <> null }
       invariant { list_seg l1 !next !l1pM !p }
       invariant { list_seg !p !next !pM null }
@@ -154,9 +152,11 @@ module InPlaceRev
       variant   { !pM }
         match !pM with
         | Nil -> absurd
-        | Cons _ t ->
-          l1pM := !l1pM ++ Cons !p Nil;
-          pM := t
+        | Cons h t ->
+          pM := t;
+          assert { disjoint !l1pM !pM };
+          assert { not (mem h !pM) };
+          l1pM := !l1pM ++ Cons h Nil;
         end;
         p := acc next !p
     done;
@@ -171,19 +171,18 @@ module InPlaceRev
   let in_place_reverse (l:loc) (ghost lM:list loc) : loc
     requires { list_seg l !next lM null }
     ensures  { list_seg result !next (reverse lM) null }
-  = 'Init:
-    let p = ref l in
+  = let p = ref l in
     let ghost pM = ref lM in
     let r = ref null in
     let ghost rM = ref (Nil : list loc) in
-    while !p <> null do
+    while not (eq_loc !p null) do
       invariant { list_seg !p !next !pM null }
       invariant { list_seg !r !next !rM null }
       invariant { disjoint !pM !rM }
       invariant { (reverse !pM) ++ !rM = reverse lM }
       variant   { !pM }
       let n = get !next !p in
-      next := set !next !p !r;
+      upd next !p !r;
       assert { list_seg !r !next !rM null };
       r := !p;
       p := n;
@@ -203,11 +202,15 @@ module InPlaceRevSeq
   use import int.Int
   use map.Map
   use import seq.Seq
+  use import seq.Mem
   use import seq.Reverse
-  use import ref.Ref
 
-  predicate mem (x: 'a) (s: seq 'a) =
-    exists i. 0 <= i < length s /\ s[i] = x
+  type loc
+
+  val function null: loc
+
+  val function eq_loc (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
 
   predicate disjoint (s1: seq 'a) (s2: seq 'a) =
     (* forall x:'a. not (mem x s1 /\ mem x s2) *)
@@ -215,27 +218,25 @@ module InPlaceRevSeq
     forall i2. 0 <= i2 < length s2 ->
     s1[i1] <> s2[i2]
 
-  predicate no_repet (s: seq 'a) =
+  predicate no_repet (s: seq loc) =
     forall i. 0 <= i < length s -> not (mem s[i] s[i+1 ..])
 
   lemma non_empty_seq:
     forall s: seq 'a. length s > 0 ->
     s == cons s[0] s[1 .. ]
 
-  let rec ghost mem_decomp (x: 'a) (s: seq 'a) : (seq 'a, seq 'a)
+  let rec ghost mem_decomp (x: loc) (s: seq loc) : (seq loc, seq loc)
     requires { mem x s }
     variant  { length s }
     returns  { (s1,s2) -> s == s1 ++ cons x s2 }
   =
-    if s[0] = x then (empty, s[1 ..])
+    if eq_loc s[0] x then (empty, s[1 ..])
     else begin
       assert { s == cons s[0] s[1 .. ] };
       let (s1, s2) = mem_decomp x s[1 .. ] in (cons s[0] s1, s2)
     end
 
-  type loc
-
-  function null: loc
+  use import ref.Ref
 
   type memory 'a = ref (Map.map loc 'a)
 
@@ -347,12 +348,12 @@ module InPlaceRevSeq
     requires { disjoint l1M l2M }
     ensures  { list_seg !next result (l1M ++ l2M) null }
   =
-    if l1 = null then l2 else
+    if eq_loc l1 null then l2 else
     let p = ref l1 in
     let ghost pM = ref l1M in
     let ghost l1pM = ref (empty : seq loc) in
     ghost list_seg_no_repet !next l1 l1M;
-    while acc next !p <> null do
+    while not (eq_loc (acc next !p) null) do
       invariant { !p <> null }
       invariant { list_seg !next l1 !l1pM !p }
       invariant { list_seg !next !p !pM null }
@@ -361,9 +362,9 @@ module InPlaceRevSeq
       variant   { length !pM }
       assert { length !pM > 0 };
       assert { not (mem !p !l1pM) };
-      let t = !pM[ 1 .. ] in
-      l1pM := !l1pM ++ cons !p empty;
-      pM := t;
+      let ghost t = !pM[ 1 .. ] in
+      ghost l1pM := !l1pM ++ cons !p empty;
+      ghost pM := t;
       p := acc next !p
     done;
     upd next !p l2;
@@ -375,12 +376,11 @@ module InPlaceRevSeq
   let in_place_reverse (l:loc) (ghost lM: seq loc) : loc
     requires { list_seg !next l lM null }
     ensures  { list_seg !next result (reverse lM) null }
-  = 'Init:
-    let p = ref l in
+  = let p = ref l in
     let ghost pM = ref lM in
     let r = ref null in
     let ghost rM = ref (empty: seq loc) in
-    while !p <> null do
+    while not (eq_loc !p null) do
       invariant { list_seg !next !p !pM null }
       invariant { list_seg !next !r !rM null }
       invariant { disjoint !pM !rM }

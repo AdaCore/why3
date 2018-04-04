@@ -7,8 +7,9 @@ n = int(input("entrez n : "))
 s = 0
 k = 0
 while k <= n:
-    #@ invariant 0 <= k <= n+1
+    #@ invariant k <= n+1
     #@ invariant s == (k - 1) * k // 2
+    #@ variant n - k
     s = s + k
     k = k + 1
 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../gnome_sort.mlw" proved="true">
+<theory name="GnomeSort" proved="true">
+ <goal name="VC gnome_sort" expl="VC for gnome_sort" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC gnome_sort.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.3" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.4" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.5" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.7" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.10" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="71"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="89"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.14" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC gnome_sort.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

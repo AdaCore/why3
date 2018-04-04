@@ -415,7 +415,7 @@ let prepare info defs ((params,funs,preds,eqs,hyps,goal,types) as acc) d =
     | Dind _ ->
         unsupportedDecl d
           "please remove inductive definitions before calling Mathematica printer"
-    | Dprop ((Plemma|Pskip), _, _) ->
+    | Dprop (Plemma, _, _) ->
         unsupportedDecl d
           "math: lemmas are not supported"
 

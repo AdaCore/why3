@@ -212,7 +212,7 @@ let rec print_term info defs fmt t =
   | Tcase _ -> unsupportedTerm t
       "gappa: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "gappa : you must eliminate epsilon"
+      "gappa: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 
@@ -415,7 +415,7 @@ let prepare defs ints truths acc d =
       split_hyp defs truths pr acc (simpl_fmla defs truths f)
   | Dprop (Pgoal, pr, f) ->
       split_hyp defs truths pr acc (simpl_fmla defs truths (t_not f))
-  | Dprop ((Plemma|Pskip), _, _) ->
+  | Dprop (Plemma, _, _) ->
       unsupportedDecl d "gappa: lemmas are not supported"
 
 let filter_hyp defs (eqs, hyps) ((pr, f) as hyp) =

@@ -6,6 +6,7 @@
 [kernel] Parsing tests/demo/array_max.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
 [jessie3] processing function max
 [jessie3] created program function max (67)
 [jessie3] found 0 logic decl(s)
@@ -20,118 +21,116 @@
             
             (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude.Prelude *)
-            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use ref.Ref *)
             
             (* use mach.bv.BVCheck32 *)
             
-            goal WP_parameter_max :
-              forall a:map int t, len:t.
-               to_uint len > 0 ->
-                (0 <= 0 /\ 0 < two_power_size) &&
-                 (to_uint (of_int 0) = 0 ->
-                   (0 <= 0 /\ 0 < two_power_size) &&
-                    (to_uint (of_int 0) = 0 ->
-                      (0 <= 0 /\ 0 < two_power_size) && (let o = of_int 0 in
-                       to_uint o = 0 ->
-                        (forall x:t.
-                          x = o ->
-                           (0 <= 1 /\ 1 < two_power_size) && (let o1 = of_int 1 in
-                            to_uint o1 = 1 ->
-                             (0 <= (to_uint len - to_uint o1) /\
-                               (to_uint len - to_uint o1) < two_power_size) &&
-                              (let o2 = sub len o1 in
-                              to_uint o2 = (to_uint len - to_uint o1) ->
-                               (forall y:t.
-                                 y = o2 ->
-                                  ((0 <= to_uint x /\ to_uint x <= to_uint y) /\
-                                    to_uint y < to_uint len) /\
-                                   (forall y1:t, x1:t.
-                                     (0 <= to_uint x1 /\ to_uint x1 <= to_uint y1) /\
-                                      to_uint y1 < to_uint len ->
-                                      (forall result:bool.
-                                        match result with
-                                         | True -> not to_uint x1 = to_uint y1
-                                         | False -> to_uint x1 = to_uint y1
-                                         end /\
-                                         match result with
-                                         | True -> not eq x1 y1
-                                         | False -> eq x1 y1
-                                         end ->
-                                         (if result = True then let o3 = get a
-                                                                          (to_uint y1) in
-                                         let o4 = get a (to_uint x1) in
-                                         forall result1:bool.
-                                          match result1 with
-                                           | True -> to_uint o4 <= to_uint o3
-                                           | False -> to_uint o4 > to_uint o3
-                                           end /\
-                                           match result1 with
-                                           | True -> ule o4 o3
-                                           | False -> not ule o4 o3
-                                           end ->
-                                           (if result1 = True then (0 <= 1 /\
-                                                                     1 < two_power_size) &&
-                                                                    (let o5 = of_int 1 in
-                                                                    to_uint o5 = 1 ->
-                                                                     (0 <=
-                                                                       (to_uint x1 +
-                                                                         to_uint o5) /\
-                                                                       (to_uint x1 +
-                                                                         to_uint o5) <
-                                                                        two_power_size) &&
-                                                                      (let o6 = 
-                                                                      add x1 o5 in
-                                                                      to_uint o6 =
-                                                                       (to_uint x1 +
-                                                                         to_uint o5) ->
-                                                                       (forall x2:t.
-                                                                         x2 = o6 ->
-                                                                          ((0 <=
-                                                                             to_uint x2 /\
-                                                                             to_uint x2 <=
-                                                                              to_uint
-                                                                              y1) /\
-                                                                            to_uint y1 <
-                                                                             to_uint
-                                                                              len) /\
-                                                                           0 <=
-                                                                            (to_uint y1 -
-                                                                              to_uint
-                                                                              x1) /\
-                                                                            (to_uint y1 -
-                                                                              to_uint
-                                                                              x2) <
-                                                                             (to_uint
-                                                                              y1 -
-                                                                              to_uint
-                                                                              x1))))
-                                           else (0 <= 1 /\ 1 < two_power_size) &&
-                                                 (let o5 = of_int 1 in
-                                                 to_uint o5 = 1 ->
-                                                  (0 <= (to_uint y1 - to_uint o5) /\
-                                                    (to_uint y1 - to_uint o5) <
-                                                     two_power_size) &&
-                                                   (let o6 = sub y1 o5 in
-                                                   to_uint o6 =
-                                                    (to_uint y1 - to_uint o5) ->
-                                                    (forall y2:t.
-                                                      y2 = o6 ->
-                                                       ((0 <= to_uint x1 /\
-                                                          to_uint x1 <= to_uint y2) /\
-                                                         to_uint y2 < to_uint len) /\
-                                                        0 <= (to_uint y1 - to_uint x1) /\
-                                                         (to_uint y2 - to_uint x1) <
-                                                          (to_uint y1 - to_uint x1)))))
-                                         else 0 <= to_uint x1 /\
-                                               to_uint x1 < to_uint len))))))))))
+            (* use mach.int.Int64 *)
+            
+            goal VC_max :
+              forall a:array t, len:t.
+               (0 <= 0 /\ (to_uint len - 1) < length a) /\ to_uint len > 0 ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 0 /\ 0 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 0 /\ o1 = of_int 0 ->
+                        (0 <= 0 /\ 0 < two_power_size) /\
+                         (forall o2:t.
+                           to_uint o2 = 0 /\ o2 = of_int 0 ->
+                            (forall x:t.
+                              x = o2 ->
+                               (0 <= 1 /\ 1 < two_power_size) /\
+                                (forall o3:t.
+                                  to_uint o3 = 1 /\ o3 = of_int 1 ->
+                                   (0 <= (to_uint len - to_uint o3) /\
+                                     (to_uint len - to_uint o3) < two_power_size) /\
+                                    (let o4 = sub len o3 in
+                                    to_uint o4 = (to_uint len - to_uint o3) ->
+                                     (forall y:t.
+                                       y = o4 ->
+                                        ((0 <= to_uint x /\ to_uint x <= to_uint y) /\
+                                          to_uint y < to_uint len) /\
+                                         (forall y1:t, x1:t.
+                                           (0 <= to_uint x1 /\ to_uint x1 <= to_uint y1) /\
+                                            to_uint y1 < to_uint len ->
+                                            (if true then if not x1 = y1 then let o5 = 
+                                            to_uint y1 in
+                                            (0 <= o5 /\ o5 < length a) /\
+                                             (let o6 = a[o5] in let o7 = to_uint x1 in
+                                             (0 <= o7 /\ o7 < length a) /\
+                                              (let o8 = a[o7] in
+                                              (to_uint o8 <= to_uint o6 <-> ule o8 o6) ->
+                                               (if to_uint o8 <= to_uint o6 then 
+                                               (0 <= 1 /\ 1 < two_power_size) /\
+                                                (forall o9:t.
+                                                  to_uint o9 = 1 /\ o9 = of_int 1 ->
+                                                   (0 <= (to_uint x1 + to_uint o9) /\
+                                                     (to_uint x1 + to_uint o9) <
+                                                      two_power_size) /\
+                                                    (forall o10:t.
+                                                      to_uint o10 =
+                                                       (to_uint x1 + to_uint o9) /\
+                                                       o10 = add x1 o9 ->
+                                                       (forall x2:t.
+                                                         x2 = o10 ->
+                                                          ((0 <= to_uint x2 /\
+                                                             to_uint x2 <= to_uint y1) /\
+                                                            to_uint y1 < to_uint len) /\
+                                                           0 <=
+                                                            (to_uint y1 - to_uint x1) /\
+                                                            (to_uint y1 - to_uint x2) <
+                                                             (to_uint y1 - to_uint x1))))
+                                               else (0 <= 1 /\ 1 < two_power_size) /\
+                                                     (forall o9:t.
+                                                       to_uint o9 = 1 /\ o9 = of_int 1 ->
+                                                        (0 <= (to_uint y1 - to_uint o9) /\
+                                                          (to_uint y1 - to_uint o9) <
+                                                           two_power_size) /\
+                                                         (let o10 = sub y1 o9 in
+                                                         to_uint o10 =
+                                                          (to_uint y1 - to_uint o9) ->
+                                                          (forall y2:t.
+                                                            y2 = o10 ->
+                                                             ((0 <= to_uint x1 /\
+                                                                to_uint x1 <=
+                                                                 to_uint y2) /\
+                                                               to_uint y2 < to_uint len) /\
+                                                              0 <=
+                                                               (to_uint y1 - to_uint x1) /\
+                                                               (to_uint y2 - to_uint x1) <
+                                                                (to_uint y1 -
+                                                                  to_uint x1)))))))
+                                            else 0 <= to_uint x1 /\
+                                                  to_uint x1 < to_uint len
+                                            else 0 <= to_uint x1 /\
+                                                  to_uint x1 < to_uint len)))))))))
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (WP_parameter max): Valid, Timeout, Valid, Timeout, Timeout
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC max) (precondition): Valid, Valid, Timeout
+[jessie3] Task 6 (VC max) (loop invariant init): Valid, Valid, Valid
+[jessie3] Task 7 (VC max) (index in array bounds): Valid, Timeout, Valid
+[jessie3] Task 8 (VC max) (index in array bounds): Valid, Valid, Valid
+[jessie3] Task 9 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 10 (VC max) (precondition): Valid, Valid, Timeout
+[jessie3] Task 11 (VC max) (loop invariant preservation): Valid, Timeout, Timeout
+[jessie3] Task 12 (VC max) (loop variant decrease): Valid, Valid, Valid
+[jessie3] Task 13 (VC max) (precondition): Valid, Valid, Valid
+[jessie3] Task 14 (VC max) (precondition): Valid, Timeout, Timeout
+[jessie3] Task 15 (VC max) (loop invariant preservation): Valid, Timeout, Valid
+[jessie3] Task 16 (VC max) (loop variant decrease): Valid, Valid, Valid
+[jessie3] Task 17 (VC max) (postcondition): Valid, Valid, Valid
+[jessie3] Task 18 (VC max) (postcondition): Valid, Valid, Valid

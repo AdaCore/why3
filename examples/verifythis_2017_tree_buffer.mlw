@@ -1,0 +1,178 @@
+(**
+
+{1 VerifyThis @ ETAPS 2017 competition
+   Challenge 4: Tree Buffer}
+
+See https://formal.iti.kit.edu/ulbrich/verifythis2017/
+
+Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(* default implementation *)
+module Spec
+
+  use export int.Int
+  use export list.List
+
+  type buf 'a = { h: int; xs: list 'a }
+
+  let rec function take (n: int) (l: list 'a) : list 'a =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> if n = 0 then Nil
+                   else Cons x (take (n-1) xs) end
+
+  let function empty (h: int) : buf 'a =
+    { h = h; xs = Nil }
+
+  let function add (x: 'a) (b: buf 'a) : buf 'a =
+    { b with xs = Cons x b.xs }
+
+  let function get (b: buf 'a) : list 'a =
+    take b.h b.xs
+
+  (* the following lemma is useful to verify both Caterpillar and
+     RealTime implementations below *)
+
+  use import list.Append
+  use import list.Length
+
+  let rec lemma take_lemma (l1 l2 l3: list 'a) (n: int)
+    requires { 0 <= n <= length l1 }
+    ensures  { take n (l1 ++ l2) = take n (l1 ++ l3) }
+    variant  { l1 }
+  = match l1 with Nil -> ()
+    | Cons _ ll1 -> if n > 0 then take_lemma ll1 l2 l3 (n-1) end
+
+end
+
+(* task 1 *)
+module Caterpillar
+
+  use import Spec
+  use import list.Append
+  use import list.Length
+
+  type cat 'a = {
+    ch: int;
+    xs: list 'a;
+    xs_len: int;
+    ys: list 'a;
+    ghost b: buf 'a; (* the model is the default implementation *)
+  } invariant {
+    b.h = ch /\
+    xs_len = length xs < ch /\
+    forall len. 0 <= len <= ch -> take len (xs ++ ys) = take len b.xs
+  } by {
+    ch = 1; xs = Nil; xs_len = 0; ys = Nil; b = empty 1
+  }
+
+  (* for the three operations, the postcondition uses the default
+  implementation *)
+
+  let cat_empty (h: int) : cat 'a
+    requires { 0 < h }
+    ensures  { result.b = empty h }
+  = { ch = h; xs = Nil; xs_len = 0; ys = Nil;
+      b = empty h }
+
+  let cat_add (x: 'a) (c: cat 'a) : cat 'a
+    ensures { result.b = add x c.b }
+  = if c.xs_len = c.ch - 1 then
+      { c with xs = Nil; xs_len = 0; ys = Cons x c.xs;
+        b = add x c.b }
+    else
+      { c with xs = Cons x c.xs; xs_len = 1 + c.xs_len;
+        b = add x c.b }
+
+  let cat_get (c: cat 'a) : list 'a
+    ensures { result = get c.b }
+  = take c.ch (c.xs ++ c.ys)
+
+end
+
+(* task 2 *)
+
+(* important note: Why3 assumes a garbage collector and so it makes
+   little sense to implement the real time solution in Why3.
+
+   Yet I stayed close to the C++ code, with a queue to_delete where
+   lists are added when discarded and then destroyed progressively
+   (at most two conses at a time) in process_queue.
+
+   The C++ code seems to be missing the insertion into to_delete,
+   which I added to rt_add; see my comment below.
+*)
+
+module RealTime
+
+  use import Spec
+  use import list.Append
+  use import list.Length
+
+  (* For technical reasons, the global queue cannot contain
+     polymorphic values, to we assume values to be of some
+     abstract type "elt". Anyway, the C++ code assumes integer
+     elements. *)
+  type elt
+
+  (* not different from the Caterpillar implementation
+     replacing 'a with elt everywhere *)
+  type rt = {
+    ch: int;
+    xs: list elt;
+    xs_len: int;
+    ys: list elt;
+    ghost b: buf elt; (* the model is the default implementation *)
+  } invariant {
+    b.h = ch /\
+    xs_len = length xs < ch /\
+    forall len. 0 <= len <= ch -> take len (xs ++ ys) = take len b.xs
+  } by {
+    ch = 1; xs = Nil; xs_len = 0; ys = Nil; b = empty 1
+  }
+
+  (* garbage collection *)
+  use queue.Queue as Q
+    (* note: when translating Why3 to OCaml, this module is mapped
+       to OCaml's Queue module, where push and pop are O(1) *)
+
+  val to_delete: Q.t (list elt)
+
+  let de_allocate (l: list elt)
+  = match l with Nil -> () | Cons _ xs -> Q.push xs to_delete end
+
+  let process_queue ()
+  = try
+      if not (Q.is_empty to_delete) then de_allocate (Q.pop to_delete);
+      if not (Q.is_empty to_delete) then de_allocate (Q.pop to_delete)
+    with Q.Empty -> absurd end
+
+  (* no difference wrt Caterpillar *)
+  let rt_empty (h: int) : rt
+    requires { 0 < h }
+    ensures  { result.b = empty h }
+  = { ch = h; xs = Nil; xs_len = 0; ys = Nil;
+      b = empty h }
+
+  (* no difference wrt Caterpillar *)
+  let rt_get (c: rt) : list elt
+    ensures { result = get c.b }
+  = take c.ch (c.xs ++ c.ys)
+
+  (* this is where we introduce explicit garbage collection
+     1. process_queue is called first (as in the C++ code)
+     2. when ys is discarded, it is added to the queue (which
+        seems to be missing in the C++ code) *)
+  let rt_add (x: elt) (c: rt) : rt
+    ensures { result.b = add x c.b }
+  = process_queue ();
+    if c.xs_len = c.ch - 1 then begin
+      Q.push c.ys to_delete;
+      { c with xs = Nil; xs_len = 0; ys = Cons x c.xs;
+        b = add x c.b }
+    end else
+      { c with xs = Cons x c.xs; xs_len = 1 + c.xs_len;
+        b = add x c.b }
+
+end

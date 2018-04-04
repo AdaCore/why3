@@ -10,24 +10,23 @@ module InsertionSort
   use import array.ArrayPermut
   use import array.ArrayEq
 
-  let insertion_sort (a: array int) =
+  let insertion_sort (a: array int)
     ensures { sorted a /\ permut_all (old a) a }
-'L:
-    for i = 1 to length a - 1 do
+  = for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (old a) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && a[!j - 1] > v do
         invariant { 0 <= !j <= i }
-        invariant { permut_all (at a 'L) a[!j <- v] }
+        invariant { permut_all (old a) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> v < a[k] }
         variant { !j }
-'L1:
+        label L in
         a[!j] <- a[!j - 1];
-        assert { exchange (at a 'L1)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
+        assert { exchange (a at L)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
         j := !j - 1
       done;
       assert { forall k: int. 0 <= k < !j -> a[k] <= v };
@@ -71,7 +70,11 @@ module InsertionSortGen
   use import array.ArrayPermut
   use import array.ArrayEq
 
-  clone import map.MapSorted as M
+  type elt
+
+  val predicate le elt elt
+
+  clone import map.MapSorted as M with type elt = elt, predicate le = le
 
   axiom le_refl: forall x:elt. le x x
 
@@ -85,24 +88,23 @@ module InsertionSortGen
   predicate sorted (a : array elt) =
     M.sorted_sub a.elts 0 a.length
 
-  let insertion_sort (a: array elt) =
+  let insertion_sort (a: array elt)
     ensures { sorted a /\ permut_all (old a) a }
-'L:
-    for i = 1 to length a - 1 do
+  = for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (old a) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && not (le a[!j - 1] v) do
         invariant { 0 <= !j <= i }
-        invariant { permut_all (at a 'L) a[!j <- v] }
+        invariant { permut_all (old a) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> le a[k1] a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> le v a[k] }
         variant { !j }
-'L1:
+        label L in
         a[!j] <- a[!j - 1];
-        assert { exchange (at a 'L1)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
+        assert { exchange (a at L)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
         j := !j - 1
       done;
       assert { forall k: int. 0 <= k < !j -> le a[k] v };

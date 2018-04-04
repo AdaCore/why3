@@ -35,9 +35,9 @@ let print_grid fmt a =
   fprintf fmt "@]"
 
 let () =
-  let sudoku = Sudoku__TheClassicalSudokuGrid.classical_sudoku () in
+  let sudoku = Sudoku.classical_sudoku () in
   printf "Problem: %a@." print_grid input_grid;
-  let a = Sudoku__Solver.solve sudoku input_grid
+  let a = Sudoku.solve sudoku input_grid
   in
   printf "Solution: %a@." print_grid a
 

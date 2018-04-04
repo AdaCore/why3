@@ -397,12 +397,12 @@ combination of an ``export'' and the creation of a namespace. We
 provide a helper function for that:
 \begin{ocamlcode}
 (* [use th1 th2] insert the equivalent of a "use import th2" in
-  theory th1 under construction *)
+   theory th1 under construction *)
 let use th1 th2 =
   let name = th2.Theory.th_name in
-  Theory.close_namespace
+  Theory.close_scope
     (Theory.use_export
-      (Theory.open_namespace th1 name.Ident.id_string) th2) true
+      (Theory.open_scope th1 name.Ident.id_string) th2) true
 \end{ocamlcode}
 Addition of formula 3 is then
 \begin{ocamlcode}

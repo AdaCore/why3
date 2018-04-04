@@ -1,0 +1,65 @@
+[jessie3] Loading Why3 configuration...
+[jessie3] Why3 environment loaded.
+[jessie3] Loading Why3 theories...
+[jessie3] Loading Why3 modules...
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing tests/basic/global.c (with preprocessing)
+[jessie3] Loading prover drivers...
+[jessie3] Translating to Why3...
+[jessie3] Starting translation
+[jessie3] global var x done
+[jessie3] denv contains [x]
+[jessie3] processing function test0
+[jessie3] created program function test0 (68)
+[jessie3] processing function test1
+[jessie3] created program function test1 (70)
+[jessie3] global var y done
+[jessie3] denv contains [y; x; test1; test0]
+[jessie3] processing function f
+[jessie3] created program function f (73)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 0 theory(ies)
+[jessie3] made 5 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.bv.BVCheck32 *)
+            
+            (* use mach.int.Int64 *)
+            
+            goal VC_test0 : true
+            
+            goal VC_test1 : 0 <= 3 /\ 3 < two_power_size
+            
+            goal VC_f :
+              forall x:t, y:t.
+               (6 * to_uint y) = 42 &&
+                (to_uint x * 7) = 42 &&
+                 (0 <= 1 /\ 1 < two_power_size) /\
+                  (forall o:t.
+                    to_uint o = 1 /\ o = of_int 1 ->
+                     0 <= (to_uint x + to_uint o) /\
+                      (to_uint x + to_uint o) < two_power_size)
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC test1) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC f) (assertion): Timeout, Unknown, Timeout
+[jessie3] Task 3 (VC f) (assertion): Timeout, Timeout, Timeout
+[jessie3] Task 4 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC f) (precondition): Valid, Valid, Valid

@@ -2,77 +2,38 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
 Definition unit := unit.
 
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
-(* Why3 assumption *)
-Inductive matrix
-  (a:Type) :=
-  | mk_matrix : Z -> Z -> (map.Map.map Z (map.Map.map Z a)) -> matrix a.
-Axiom matrix_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (matrix a).
+Axiom matrix : forall (a:Type), Type.
+Parameter matrix_WhyType : forall (a:Type) {a_WT:WhyType a},
+  WhyType (matrix a).
 Existing Instance matrix_WhyType.
-Implicit Arguments mk_matrix [[a]].
+
+Parameter elts: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> (Z -> (Z ->
+  a)).
+
+Parameter rows: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> Z.
+
+Parameter columns: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> Z.
+
+Axiom matrix'invariant : forall {a:Type} {a_WT:WhyType a},
+  forall (self:(matrix a)), (0%Z <= (rows self))%Z /\
+  (0%Z <= (columns self))%Z.
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(matrix a)): (map.Map.map Z
-  (map.Map.map Z a)) := match v with
-  | (mk_matrix x x1 x2) => x2
-  end.
-
-(* Why3 assumption *)
-Definition columns {a:Type} {a_WT:WhyType a} (v:(matrix a)): Z :=
-  match v with
-  | (mk_matrix x x1 x2) => x1
-  end.
-
-(* Why3 assumption *)
-Definition rows {a:Type} {a_WT:WhyType a} (v:(matrix a)): Z :=
-  match v with
-  | (mk_matrix x x1 x2) => x
-  end.
-
-(* Why3 assumption *)
-Definition index := (Z* Z)%type.
-
-(* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z*
-  Z)%type): a :=
-  match i with
-  | (r, c) => (map.Map.get (map.Map.get (elts a1) r) c)
-  end.
-
-(* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z* Z)%type)
-  (v:a): (matrix a) :=
-  match i with
-  | (r, c) => (mk_matrix (rows a1) (columns a1) (map.Map.set (elts a1) r
-      (map.Map.set (map.Map.get (elts a1) r) c v)))
-  end.
-
-(* Why3 assumption *)
-Definition valid_index {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (i:(Z*
-  Z)%type): Prop :=
-  match i with
-  | (r, c) => ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ ((0%Z <= c)%Z /\
-      (c < (columns a1))%Z)
-  end.
-
-(* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a} (r:Z) (c:Z) (v:a): (matrix a) :=
-  (mk_matrix r c (map.Map.const (map.Map.const v: (map.Map.map Z
-  a)): (map.Map.map Z (map.Map.map Z a)))).
+Definition valid_index {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (r:Z)
+  (c:Z): Prop := ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ ((0%Z <= c)%Z /\
+  (c < (columns a1))%Z).
 
 (* Why3 assumption *)
 Inductive path: (matrix bool) -> Z -> Z -> Z -> Prop :=
-  | Path_empty : forall (m:(matrix bool)) (i:Z) (j:Z) (k:Z), ((get m (i,
-      j)) = true) -> (path m i j k)
+  | Path_empty : forall (m:(matrix bool)) (i:Z) (j:Z) (k:Z), ((((elts m) i)
+      j) = true) -> (path m i j k)
   | Path_cons : forall (m:(matrix bool)) (i:Z) (x:Z) (j:Z) (k:Z),
       ((0%Z <= x)%Z /\ (x < k)%Z) -> ((path m i x k) -> ((path m x j k) ->
       (path m i j k))).

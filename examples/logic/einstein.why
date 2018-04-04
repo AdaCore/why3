@@ -18,8 +18,12 @@ theory Bijection
   axiom Of_to : forall y : u. of (to_ y) = y
 end
 
-theory Einstein "Einstein's problem"
+(** {2 Einstein's problem} *)
+
+theory Einstein
+
   (** Types *)
+
   type house  = H1 | H2 | H3 | H4 | H5
   type color  = Blue | Green | Red | White | Yellow
   type person = Dane | Englishman | German | Norwegian | Swede
@@ -28,15 +32,18 @@ theory Einstein "Einstein's problem"
   type pet    = Birds | Cats | Dogs | Fish | Horse
 
   (** Each house is associated bijectively to a color and a person *)
+
   clone Bijection as Color with type t = house, type u = color
   clone Bijection as Owner with type t = house, type u = person
 
   (** Each drink, cigar brand and pet are associated bijectively to a person *)
+
   clone Bijection as Drink with type t = person, type u = drink
   clone Bijection as Cigar with type t = person, type u = cigar
   clone Bijection as Pet   with type t = person, type u = pet
 
   (** Relative positions of the houses *)
+
   predicate leftof (h1 h2 : house) =
     match h1, h2 with
     | H1, H2
@@ -105,7 +112,9 @@ theory Einstein "Einstein's problem"
 
 end
 
-theory Goals "Goals about Einstein's problem"
+(** {2 Goals about Einstein's problem} *)
+
+theory Goals
   use import Einstein
 
 (*

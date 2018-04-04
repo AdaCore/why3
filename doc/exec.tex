@@ -51,62 +51,124 @@ We get the expected output, namely the pair \texttt{(45, 10)}.
 An alternative to interpretation is to compile \whyml to OCaml.
 We do so using the \texttt{extract} command, as follows:
 \begin{verbatim}
-> mkdir dir
-> why3 extract -D ocaml64 maxsum.mlw -o dir
+> why3 extract -D ocaml64 maxsum.mlw -o max_sum.ml
 \end{verbatim}
 The \texttt{extract} command requires the name of a driver, which indicates
 how theories/modules from the \why standard library are translated to
 OCaml. Here we assume a 64-bit architecture and thus we pass
-\texttt{ocaml64}. On a 32-bit architecture, we would use
-\texttt{ocaml32} instead. Extraction also requires a target directory
-to be specified using option \verb+-o+. Here we pass a freshly created
-directory \texttt{dir}.
-
-Directory \texttt{dir} is now populated with a bunch of OCaml files,
-among which we find a file \texttt{maxsum\_\_MaxAndSum.ml} containing
-the OCaml code for functions \texttt{max\_sum} and \texttt{test}.
-
+\texttt{ocaml64}. We also specify an output file using option
+\verb+-o+, namely \texttt{max\_sum.ml}.
+After this command, the file \texttt{max\_sum.ml} contains an OCaml
+code for function \texttt{max\_sum}.
 To compile it, we create a file \texttt{main.ml}
-containing a call to \texttt{test}, that is, for example,
+containing a call to \texttt{max\_sum}, \emph{e.g.},
 \begin{whycode}
-  let (s,m) = test () in
-  Format.printf "sum=%s, max=%s@."
-    (Why3__BigInt.to_string s) (Why3__BigInt.to_string m)
+let a = Array.map Z.of_int [| 9; 5; 0; 2; 7; 3; 2; 1; 10; 6 |]
+let m, s = Max_sum.max_sum a (Z.of_int 10)
+let () = Format.printf "sum=%s, max=%s@." (Z.to_string s) (Z.to_string m)
 \end{whycode}
-and we pass both files \texttt{maxsum\_\_MaxAndSum.ml} and
-\texttt{main.ml} to the OCaml compiler:
+It is convenient to use \texttt{ocamlbuild} to compile and link both
+files \texttt{max\_sum.ml} and \texttt{main.ml}:
 \begin{verbatim}
-> cd dir
-> ocamlopt zarith.cmxa why3extract.cmxa maxsum__MaxAndSum.ml main.ml
+> ocamlbuild -pkg zarith main.native
 \end{verbatim}
-OCaml code extracted from \why must be linked with the library
-\texttt{why3extract.cmxa} that is shipped with \why. It is typically
-stored in subdirectory \texttt{why3} of the OCaml standard library.
-Depending on the way \why was installed, it depends either on library
-\texttt{nums.cmxa} or \texttt{zarith.cmxa} for big integers. Above we
-assumed the latter. It is likely that additional options \texttt{-I}
-must be passed to the OCaml compiler for libraries
-\texttt{zarith.cmxa} and \texttt{why3extract.cmxa} to be found.
-For instance, it could be
+Since \why's type
+\texttt{int} is translated to OCaml arbitrary precision integers using
+the \texttt{ZArith} library, we have to pass option \texttt{-pkg
+  zarith} to \texttt{ocamlbuild}. In order to get extracted code that
+uses OCaml's native integers instead, one has to use \why's types for
+63-bit integers from libraries \texttt{mach.int.Int63} and
+\texttt{mach.array.Array63}.
+
+\paragraph{Extraction starting point} The \texttt{extract} command accepts three
+different targets for extraction: a \whyml file, a module, or a symbol
+(function, type, exception). To extract all the symbols from every module of a
+file named \texttt{f.mlw}, one should write
 \begin{verbatim}
-> ocamlopt -I `ocamlfind query zarith` zarith.cmxa \
-           -I `why3 --print-libdir`/why3 why3extract.cmxa \
-           ...
+> why3 extract -D <driver> f.mlw
 \end{verbatim}
-To make the compilation process easier, one can write a
-\texttt{Makefile} which can include informations about Why3
-configuration as follows.
+To extract only the symbols from module \texttt{M} of file \texttt{f.mlw}, one
+should write
+\begin{verbatim}
+> why3 extract -D <driver> -L <dir> f.M
+\end{verbatim}
+To extract only the symbol \texttt{s} (a function, a type, or an exception) from
+module \texttt{M} of file \texttt{f.mlw}, one should write
+\begin{verbatim}
+> why3 extract -D <driver> -L <dir> f.M.s
+\end{verbatim}
+Note the use of~\texttt{-L <dir>}, for both extraction of a module and a symbol,
+in order to state the location of file \texttt{f.mlw}.
+
+\paragraph{Options}
+\begin{description}
+\item[\texttt{-{}-flat}] performs a flat extraction, \emph{i.e.}, everything is
+  extracted into a single file. This is the default behavior. The \texttt{-o}
+  option should be given the name of a file or, if omitted, the result of
+  extraction is printed to the standard output.
+\item[\texttt{-{}-modular}] each module is extracted in its own, separated
+  file. The \texttt{-o} option cannot be omitted, and it should be given the
+  name of an existing directory. This directory will be populated with the
+  resulting OCaml files.
+\item[\texttt{-{}-recursive}] recursively extracts all the dependencies of the
+  chosen entry point. This option is valid for both \texttt{modular} and
+  \texttt{flat} options.
+\end{description}
+
+\paragraph{Examples}
+We illustrate different ways of using the \texttt{extract} command though some
+examples. Consider the program in Figure~\ref{fig:AQueue} on
+page~\pageref{fig:AQueue}. If we are only interested in extracting function
+\texttt{aenqueue}, we can proceed as follows:
+\begin{verbatim}
+> why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
+\end{verbatim}
+Here we assume that file \texttt{aqueue.mlw} contains this program, and that
+we invoke \texttt{extract} from the directory where this file is stored. File
+\texttt{aqueue.ml} now contains the following OCaml code:
 \begin{whycode}
-WHY3SHARE=$(shell why3 --print-datadir)
-
-include $(WHY3SHARE)/Makefile.config
-
-maxsum:
-        ocamlopt $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa \
-                -o maxsum maxsum__MaxAndSum.ml main.ml
+let enqueue (x: 'a) (q: 'a queue) : 'a queue =
+  create (q.front) (q.lenf) (x :: (q.rear))
+    (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
+Choosing a function symbol as the entry point of extraction allows us to focus
+only on specific parts of the program. However, the generated code cannot be
+type-checked by the OCaml compiler, as it depends on function \texttt{create}
+and on type \texttt{'a queue}, whose definitions are not given. In order to
+obtain a \emph{complete} OCaml implementation, we can perform a recursive
+extraction:
+\begin{verbatim}
+> why3 extraction --recursive -D ocaml64 -L . \
+    aqueue.AmortizedQueue.enqueue -o aqueue.ml
+\end{verbatim}
+This updates the contents of file \texttt{aqueue.ml} as follows:
+%\begin{figure}
+\begin{whycode}
+type 'a queue = {
+  front: 'a list;
+  lenf: Z.t;
+  rear: 'a list;
+  lenr: Z.t;
+  }
 
+let create (f: 'a list) (lf: Z.t) (r: 'a list) (lr: Z.t) : 'a queue =
+  if Z.geq lf lr
+  then
+    { front = f; lenf = lf; rear = r; lenr = lr }
+  else
+    let f1 = List.append f (List.rev r) in
+    { front = f1; lenf = Z.add lf lr; rear = []; lenr = (Z.of_string "0") }
 
+let enqueue (x: 'a) (q: 'a queue) : 'a queue =
+  create (q.front) (q.lenf) (x :: (q.rear))
+    (Z.add (q.lenr) (Z.of_string "1"))
+\end{whycode}
+This new version of the code is now accepted by the OCaml compiler.
+
+Let us now consider the
+% \label{fig:extract-queens}
+% \caption{Recursive extraction of \texttt{queens} function.}
+% \end{figure}
 
 %%% Local Variables:
 %%% mode: latex

@@ -314,3 +314,23 @@ theory CheckBV8
   goal smoke7    : rotate_right_bv one one                   = zeros
   goal smoke8    : rotate_left_bv lastb one                  = zeros
 end
+
+
+
+
+
+theory Extras
+
+  use import bv.BV64
+
+  lemma mod_mult: forall x [@model] a [@model] b [@model].
+      ule zeros x ->
+      ult zeros a ->
+      ult zeros b ->
+      ule a (0xffff_ffff:t) ->
+      ule b (0xffff_ffff:t) ->
+      urem (urem x (mul a b)) a = urem x a
+
+
+
+end

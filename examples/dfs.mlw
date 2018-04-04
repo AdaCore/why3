@@ -32,15 +32,24 @@ module DFS
   use import ref.Ref
 
   type loc
-  constant null: loc
-  constant root: loc
+  val constant null: loc
+  val constant root: loc
 
-  function left  loc: loc
-  function right loc: loc
+  val (==) (x y: loc) : bool
+    ensures { result <-> x = y }
+
+  val function left  loc: loc
+  val function right loc: loc
 
   type marks = map loc bool
   val marked: ref marks
   val ghost busy: ref marks
+
+  let set (m: ref marks) (l: loc) (b: bool) : unit
+    writes  { m }
+    ensures { !m = (old !m)[l <- b] }
+  = let f = !m in
+    m := fun x -> if x == l then b else f x
 
   predicate edge (x y: loc) = x <> null && (left x = y || right x = y)
 
@@ -66,18 +75,19 @@ module DFS
     ensures  { forall x: loc. !busy[x] = True -> (old !busy)[x] = True }
     ensures  { only_descendants_are_marked !marked }
   =
-    if c <> null && not !marked[c] then begin
-      ghost busy := !busy[c <- True];
-      marked := !marked[c <- True];
+    if not (c == null) && not !marked[c] then begin
+      ghost set busy c True;
+      set marked c True;
       dfs (left c);
       dfs (right c);
-      busy := !busy[c <- False]
+      set busy c False
     end
 
   predicate all_descendants_are_marked (marked: marks) =
     root <> null ->
     marked[root] = True &&
-    forall x y: loc. edge x y -> marked[x] = True -> y <> null -> marked[y] = True
+    forall x y: loc.
+      edge x y -> marked[x] = True -> y <> null -> marked[y] = True
 
   lemma reformulation:
     forall marked: marks.

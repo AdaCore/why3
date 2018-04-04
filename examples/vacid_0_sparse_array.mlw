@@ -31,11 +31,17 @@ back   +-+-+-+-------------------+
                    mutable card   : int;
                            def    : 'a; }
   invariant {
-    0 <= self.card <= A.length self.values <= maxlen /\
-    A.length self.values = A.length self.index = A.length self.back /\
+    0 <= card <= A.length values <= maxlen /\
+    A.length values = A.length index = A.length back /\
     forall i : int.
-      0 <= i < self.card ->
-      0 <= self.back[i] < A.length self.values /\ self.index[self.back[i]] = i
+      0 <= i < card ->
+      0 <= back[i] < A.length values /\ index[back[i]] = i
+  } by {
+    values = A.make 0 (any 'a);
+    index  = A.make 0 0;
+    back   = A.make 0 0;
+    card   = 0;
+    def    = any 'a
   }
 
   predicate is_elt (a: sparse_array 'a) (i: int) =
@@ -92,6 +98,9 @@ back   +-+-+-+-------------------+
     (* sparse_array invariant *)
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
+      by MI.surjective a.back.elts a.card
+      so exists j. 0 <= j < a.card /\ a.back[j] = i
+
 
   let set (a: sparse_array 'a) i v
     requires { 0 <= i < length a }
@@ -112,10 +121,10 @@ module Harness
   use import SparseArray
 
   type elt
-  constant default : elt
+  val constant default : elt
 
-  constant c1 : elt
-  constant c2 : elt
+  val constant c1 : elt
+  val constant c2 : elt
 
   let harness () =
     let a = create 10 default in
@@ -132,20 +141,23 @@ module Harness
     let get_b_0 = get b 0 in assert { get_b_0 = default };
     ()
 
+  val predicate (!=) (x y : elt)
+    ensures { result <-> x <> y }
+
   exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =
     let a = create 10 default in
     let b = create 20 default in
-    if get a 5 <> default then raise BenchFailure;
-    if get b 7 <> default then raise BenchFailure;
+    if get a 5 != default then raise BenchFailure;
+    if get b 7 != default then raise BenchFailure;
     set a 5 c1;
     set b 7 c2;
-    if get a 5 <> c1 then raise BenchFailure;
-    if get b 7 <> c2 then raise BenchFailure;
-    if get a 7 <> default then raise BenchFailure;
-    if get b 5 <> default then raise BenchFailure;
-    if get a 0 <> default then raise BenchFailure;
-    if get b 0 <> default then raise BenchFailure
+    if get a 5 != c1 then raise BenchFailure;
+    if get b 7 != c2 then raise BenchFailure;
+    if get a 7 != default then raise BenchFailure;
+    if get b 5 != default then raise BenchFailure;
+    if get a 0 != default then raise BenchFailure;
+    if get b 0 != default then raise BenchFailure
 
 end

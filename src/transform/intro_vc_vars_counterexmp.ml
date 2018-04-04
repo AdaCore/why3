@@ -22,14 +22,8 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_label = Ident.create_label "model"
-  (* Identifies terms that should be in counterexample and should not be projected. *)
-let model_projected_label = Ident.create_label "model_projected"
-  (* Identifies terms that should be in counterexample and should be projected. *)
-let model_vc_label = Ident.create_label "model_vc"
-  (* Identifies the term that triggers the VC. *)
-let model_vc_post_label = Ident.create_label "model_vc_post"
-(* Identifies the postcondition that triggers the VC. *)
+let model_trace_prefix = "model_trace:"
+  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
 
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
@@ -41,7 +35,12 @@ type vc_term_info = {
   (* true if VC was generated for precondition or postcondition *)
 }
 
-let is_model_vc_label l = l = model_vc_label || l = model_vc_post_label
+let get_label labels prefix =
+  let check l = Strings.has_prefix prefix l.lab_string in
+  Slab.choose (Slab.filter check labels)
+
+let is_model_vc_label l =
+  lab_equal l model_vc_label || lab_equal l model_vc_post_label
 
 let check_enter_vc_term t info vc_loc =
   (* Check whether the term that triggers VC is entered.
@@ -59,6 +58,7 @@ let check_enter_vc_term t info vc_loc =
   else
     info
 
+(* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
 let add_old lab_str =
   try
     let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
@@ -77,7 +77,7 @@ let model_trace_for_postcondition ~labels =
      exist model_trace label in labels, labels otherwise.
   *)
   try
-    let trace_label = get_label labels model_trace_regexp in
+    let trace_label = get_label labels model_trace_prefix in
     let lab_str = add_old trace_label.lab_string in
     if lab_str = trace_label.lab_string then
       labels
@@ -88,10 +88,6 @@ let model_trace_for_postcondition ~labels =
 	other_labels
   with Not_found ->
     labels
-
-let is_counterexample_label l =
-  l = model_label || l = model_projected_label
-
 
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
@@ -129,7 +125,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
 	     should be in counterexample, introduce new constant in location
 	     loc with all labels necessary for collecting it for counterexample
 	     and make it equal to the variable *)
-          if Slab.exists is_counterexample_label ls.id_label then
+          if Ident.has_a_model_label ls then
 	    let const_label = if info.vc_pre_or_post then
 	      model_trace_for_postcondition ~labels:ls.id_label
 	    else
@@ -324,7 +320,7 @@ let intro_vc_vars_counterexmp2 task =
     | None -> ""
     | Some loc ->
       let (file, line, col1, col2) = Loc.get loc in
-      file ^ ":" ^ (string_of_int line) ^ ":" ^ (string_of_int col1) ^ ":" ^ (string_of_int col2)
+      Printf.sprintf "%s:%d:%d:%d" file line col1 col2
   in
   let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
   Task.add_tdecl task g

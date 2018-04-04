@@ -31,6 +31,10 @@ let meta_invalid_trigger =
   Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
   ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
 
+(* Meta to tag projection functions *)
+let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
@@ -44,13 +48,16 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
+  mutable list_projs: Stdlib.Sstr.t;
+  meta_model_projection: Sls.t;
+  info_cntexample: bool
   }
 
 let ident_printer () =
   let bls = [
     "abs_int"; "abs_real"; "ac"; "and"; "array"; "as"; "axiom";
-    "bitv"; "bool";
-    "check"; "cut"; "distinct"; "else"; "exists";
+    "bitv"; "bool"; "case_split"; "check"; "cut"; "distinct";
+    "else"; "end"; "exists"; "extends";
     "false"; "float"; "float32"; "float32d"; "float64"; "float64d";
     "forall"; "fpa_rounding_mode"; "function";
     "goal";
@@ -63,7 +70,7 @@ let ident_printer () =
     "prop";
     "real"; "real_of_int"; "rewriting";
     "select"; "sqrt_real"; "sqrt_real_default"; "sqrt_real_excess"; "store";
-    "then"; "true"; "type"; "unit"; "void"; "with";
+    "then"; "theory"; "true"; "type"; "unit"; "void"; "with";
     "Aw"; "Down"; "Od";
     "NearestTiesToAway"; "NearestTiesToEven"; "Nd"; "No"; "Nu"; "Nz";
     "ToZero"; "Up";
@@ -74,6 +81,8 @@ let ident_printer () =
 
 let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
+
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
 
 let print_ident_label info fmt id =
   if info.info_show_labels then
@@ -86,6 +95,8 @@ let print_ident_label info fmt id =
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
+  if Sls.mem ls info.meta_model_projection then
+    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -212,13 +223,13 @@ let rec print_term info fmt t =
 	    end
       ) end
   | Tlet _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate let in term"
+      "alt-ergo: you must eliminate let in term"
   | Tif _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate if_then_else"
+      "alt-ergo: you must eliminate if_then_else"
   | Tcase _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate match"
+      "alt-ergo: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "alt-ergo : you must eliminate epsilon"
+      "alt-ergo: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
   check_exit_vc_term t info.info_in_goal info.info_vc_term;
@@ -338,7 +349,7 @@ let print_data_decl info fmt = function
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" (print_type_decl info) ts
         (print_list semi print_field) pjl
   | _, _ -> unsupported
-      "alt-ergo : algebraic datatype are not supported"
+      "alt-ergo: algebraic datatype are not supported"
 
 let print_data_decl info fmt ((ts, _csl) as p) =
   if Mid.mem ts.ts_name info.info_syn then () else
@@ -379,10 +390,10 @@ let print_logic_decl info fmt (ls,ld) =
   if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
     then () else (print_logic_decl info fmt ls ld; forget_tvs info)
 
-let print_info_model cntexample info =
+let print_info_model info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if not (S.is_empty info_model) && cntexample then
+  if not (S.is_empty info_model) && info.info_cntexample then
     begin
       let model_map =
 	S.fold (fun f acc ->
@@ -400,25 +411,27 @@ let print_info_model cntexample info =
   else
     Stdlib.Mstr.empty
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Pgoal ->
-      let model_list = print_info_model cntexample info in
+      let model_list = print_info_model info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; };
+				queried_terms = model_list;
+                                list_projections = info.list_projs;
+                                list_records = Stdlib.Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
-  | Plemma| Pskip -> assert false
+  | Plemma -> assert false
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc cntexample args info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc args info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc args info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -430,7 +443,7 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc cntexample args info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc args info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -467,7 +480,11 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     info_model = S.empty;
     info_vc_term = vc_info;
-    info_in_goal = false;} in
+    info_in_goal = false;
+    list_projs = Stdlib.Sstr.empty;
+    meta_model_projection = Task.on_tagged_ls meta_projection task;
+    info_cntexample = cntexample;
+  } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
@@ -475,7 +492,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample args info fmt d
+            begin try print_decl vc_loc args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

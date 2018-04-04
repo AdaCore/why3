@@ -263,7 +263,7 @@ let print_decl info fmt d = match d.d_node with
       let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, conjecture,@ %a).@]@\n"
         head print_pr pr (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) -> assert false
+  | Dprop (Plemma, _, _) -> assert false
 
 let print_decls fm nm =
 (*

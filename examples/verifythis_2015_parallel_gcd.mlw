@@ -225,6 +225,10 @@ module Interleaving
         ()
     end
 
+  let can_progress (s : state)
+    ensures { result = True <-> s <> Halt }
+  = match s with Halt -> False | _ -> True end
+
   let parallel_gcd (a0 b0: int) : int
     requires { 0 < a0 /\ 0 < b0 }
     ensures  { result = gcd a0 b0 }
@@ -236,25 +240,25 @@ module Interleaving
     (* two threads *)
     let th1 = create_thread () in
     let th2 = create_thread () in
-    while th1.state <> Halt || th2.state <> Halt do
+    while can_progress th1.state || can_progress th2.state do
       invariant { inv th1 d !a !b /\ inv th2 d !b !a }
       variant { (* global progress in the algorithm *)
                 !a + !b
                 ,
                 (* progress in one of the two threads *)
-                if !a = !b
+                begin if !a = !b
                 then prog_index th2 !a + prog_index th1 !b
                 else if !a < !b
                 then prog_index th2 !a
-                else prog_index th1 !b
+                else prog_index th1 !b end
                 ,
                 (* no progress in both threads, but the scheduler
                    switches to the non-progressing thread *)
-                if progress_thread th1 !a !b
+                begin if progress_thread th1 !a !b
                 then if !scheduled then 1 else 0
                 else if progress_thread th2 !b !a
                 then if !scheduled then 0 else 1
-                else 0
+                else 0 end
                 ,
                 (* the scheduler is still running the non-progressing thread *)
                 !timer }

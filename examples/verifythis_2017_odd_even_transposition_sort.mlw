@@ -1,0 +1,98 @@
+(**
+
+{1 VerifyThis @ ETAPS 2017 competition
+   Challenge 3: Odd-Even Transposition Sort}
+
+See https://formal.iti.kit.edu/ulbrich/verifythis2017/
+
+Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(* note: this is only a solution for the sequential (single processor) version
+   of the challenge *)
+
+module Challenge3
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Refint
+  use import array.Array
+  use import array.IntArraySorted
+  use import array.ArraySwap
+  use import array.ArrayPermut
+  use import array.Inversions
+
+  (* odd-sorted up to n exclusive *)
+  predicate odd_sorted (a: array int) (n: int) =
+    forall i. 0 <= i -> 2*i + 2 < n -> a[2*i+1] <= a[2*i+2]
+
+  (* even-sorted up to n exclusive *)
+  predicate even_sorted (a: array int) (n: int) =
+    forall i. 0 <= i -> 2*i + 1 < n -> a[2*i] <= a[2*i+1]
+
+  let lemma odd_even_sorted (a: array int) (n: int)
+    requires { 0 <= n <= length a }
+    requires { odd_sorted a n }
+    requires { even_sorted a n }
+    ensures  { sorted_sub a 0 n }
+  = if n > 0 && length a > 0 then
+    for i = 1 to n - 1 do
+      invariant { sorted_sub a 0 i }
+      assert { forall j. 0 <= j < i -> a[j] <= a[i]
+                  by a[i-1] <= a[i]
+                  by i-1 = 2 * div (i-1) 2 \/
+                     i-1 = 2 * div (i-1) 2 + 1 }
+    done
+
+  (* note: program variable "sorted" renamed into "is_sorted"
+     (clash with library predicate "sorted" on arrays) *)
+  let odd_even_transposition_sort (a: array int)
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  = let is_sorted = ref false in
+    while not !is_sorted do
+      invariant { permut_all (old a) a }
+      invariant { !is_sorted -> sorted a }
+      variant   { (if !is_sorted then 0 else 1), inversions a }
+      is_sorted := true;
+      let i = ref 1 in
+      let ghost half_i = ref 0 in
+      label L in
+      while !i < length a - 1 do
+        invariant { 0 <= !half_i /\ 0 <= !i = 2 * !half_i + 1 }
+        invariant { permut_all (old a) a }
+        invariant { odd_sorted a !i }
+        invariant { if !is_sorted then inversions a = inversions (a at L)
+                                  else inversions a < inversions (a at L) }
+        variant   { length a - !i }
+        if a[!i] > a[!i+1] then begin
+          swap a !i (!i+1);
+          is_sorted := false;
+        end;
+        i := !i + 2;
+        ghost half_i := !half_i + 1
+      done;
+      assert { odd_sorted a (length a) };
+      i := 0;
+      ghost half_i := 0;
+      while !i < length a - 1 do
+        invariant { 0 <= !half_i /\ 0 <= !i = 2 * !half_i }
+        invariant { 0 <= !i }
+        invariant { permut_all (old a) a }
+        invariant { !is_sorted -> odd_sorted a (length a) }
+        invariant { even_sorted a !i }
+        invariant { if !is_sorted then inversions a = inversions (a at L)
+                                  else inversions a < inversions (a at L) }
+        invariant { !is_sorted \/ inversions a < inversions (a at L) }
+        variant   { length a - !i }
+        if a[!i] > a[!i+1] then begin
+          swap a !i (!i+1);
+          is_sorted := false;
+        end;
+        i := !i + 2;
+        ghost half_i := !half_i + 1
+      done;
+      assert { !is_sorted -> even_sorted a (length a) }
+    done
+
+end

@@ -80,7 +80,7 @@ predicate eval_fmla (sigma:env) (pi:env) (f:fmla) =
 (** substitution of a reference [r] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is fresh *)
 
-function subst_term (e:term) (r:ident) (v:ident) : term =
+let rec function subst_term (e:term) (r:ident) (v:ident) : term =
   match e with
   | Tconst _ -> e
   | Tvar _ -> e
@@ -117,7 +117,7 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
   | Fforall y _ f -> id <> y /\ fresh_in_fmla id f
   end
 
-function subst (f:fmla) (x:ident) (v:ident) : fmla =
+let rec function subst (f:fmla) (x:ident) (v:ident) : fmla =
   match f with
   | Fterm e -> Fterm (subst_term e x v)
   | Fand f1 f2 -> Fand (subst f1 x v) (subst f2 x v)
@@ -362,7 +362,7 @@ module WP
 
 use import Imp
 
-use set.Set
+use set.Fset as Set
 
 predicate assigns (sigma:env) (a:Set.set ident) (sigma':env) =
   forall i:ident. not (Set.mem i a) ->

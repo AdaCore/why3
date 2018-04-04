@@ -105,11 +105,22 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : limit:int -> engine -> Term.term -> Term.term
+val normalize : ?step_limit:int -> limit:int -> engine -> Term.term -> Term.term
 (** [normalize e t] normalizes the term [t] with respect to the engine
     [e]
 
     parameter [limit] provides a maximum number of steps for execution.
     When limit is reached, the partially reduced term is returned.
+    parameter [step_limit] provides a maximum number of steps on reductions
+    that would change the term even after reconstruction.
 *)
 
+
+open Term
+
+exception NoMatch of (term * term) option
+exception NoMatchpat of (pattern * pattern) option
+
+type substitution = term Mvs.t
+
+val first_order_matching: Svs.t -> term list -> term list -> Ty.ty Ty.Mtv.t * substitution

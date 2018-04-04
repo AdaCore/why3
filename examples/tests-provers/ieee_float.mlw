@@ -25,7 +25,7 @@ module M603_018
     requires { roundToIntegral RTN z = x }
     requires { roundToIntegral RTP z = y }
   =
-    let t = (x .+ y) ./ (2.0:t) in
+    let ghost t = (x .+ y) ./ (2.0:t) in
     assert { roundToIntegral RTN x .= x };
     assert { roundToIntegral RTN y .= y };
     assert { roundToIntegral RTN z .= x };
@@ -69,7 +69,7 @@ module M121_039_nonlinear
   predicate axiom_mult (a b y : t) =
      if a .<= b /\ y .<= zeroF then a .* y .>= b .* y else false
 
-  let test (a x y:t)
+  let ghost test (a x y:t)
     requires { zeroF .<= a .<= one }
     requires { .- one .<= x .<= one }
     requires { .- one .<= y .<= one }
@@ -77,7 +77,6 @@ module M121_039_nonlinear
     ensures  { result .>= zeroF /\ result .<= (2.0:t) }
   =
     assert { axiom_mult a one y };
-
     assert { a .>= zeroF };
     assert { a .<= one };
     assert { x .> zeroF };
@@ -87,7 +86,6 @@ module M121_039_nonlinear
     assert { x .+ y .* a .>= x .+ y };
     assert { x .+ y .>= zeroF };
     assert { x .+ y .* a .>= zeroF };
-
     x .+ y .* a
 
 end
@@ -97,7 +95,7 @@ module LB09_025_conversion
   use import ieee_float.Float32
   use import int.Int
 
-  let fti x
+  let ghost fti x
     requires { x .>= of_int RNE (-2147483648) /\ x .+ (of_int RNE 1) .<= of_int RNE 2147483647 }
     ensures  { of_int RNE result .>= x .- (of_int RNE 1) }
     ensures  { of_int RNE result .<= x .+ (of_int RNE 1) }

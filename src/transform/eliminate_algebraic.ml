@@ -173,7 +173,7 @@ and rewriteF kn state av sign f = match f.t_node with
       let vl, tr, f1, close = t_open_quant_cb bf in
       let tr = TermTF.tr_map (rewriteT kn state)
                       (rewriteF kn state Svs.empty sign) tr in
-      let av = List.fold_left (fun s v -> Svs.add v s) av vl in
+      let av = List.fold_right Svs.add vl av in
       let f1 = rewriteF kn state av sign f1 in
       (* Preserve labels and location of f *)
       t_label_copy f (t_quant_simp q (close vl tr f1))
@@ -336,7 +336,7 @@ let add_tags mts (state,task) (ts,csl) =
     let sts = Sts.add ts sts in
     let add s (ls,_) = List.fold_left (mat_ty sts) s ls.ls_args in
     let stv = List.fold_left add Stv.empty csl in
-    List.map (fun v -> Stv.mem v stv) ts.ts_args
+    List.map (Stv.contains stv) ts.ts_args
   and mat_ty sts stv ty = match ty.ty_node with
     | Tyvar tv -> Stv.add tv stv
     | Tyapp (ts,tl) ->
@@ -435,13 +435,12 @@ let eliminate_match =
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
-    \"keep_types\" : @[keep algebraic type definitions@]@\n\
-    \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
-    \"keep_recs\"  : @[keep non-recursive records@]@\n\
-    \"no_index\"   : @[do not generate indexing functions@]@\n\
-    \"no_inversion\" : @[do not generate inversion axioms@]@\n\
-    \"no_selector\"  : @[do not generate selector@]@]"
-
+    - keep_types:   @[keep algebraic type definitions@]@\n\
+    - keep_enums:   @[keep monomorphic enumeration types@]@\n\
+    - keep_recs:    @[keep non-recursive records@]@\n\
+    - no_index:     @[do not generate indexing functions@]@\n\
+    - no_inversion: @[do not generate inversion axioms@]@\n\
+    - no_selector:  @[do not generate selector@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
@@ -453,7 +452,15 @@ let eliminate_algebraic = Trans.compose compile_match
       | [MAstr "no_index"]   -> { st with no_ind = true }
       | [MAstr "no_inversion"] -> { st with no_inv = true }
       | [MAstr "no_selector"]  -> { st with no_sel = true }
-      | _ -> raise (Invalid_argument "meta eliminate_algebraic")
+      | [MAstr s] ->
+         raise (
+             Invalid_argument (
+                 "meta eliminate_algebraic, arg = \"" ^ s ^ "\""))
+      | l ->
+         raise (
+             Invalid_argument (
+                 "meta eliminate_algebraic, nb arg = " ^
+                   string_of_int (List.length l) ^ ""))
     in
     let st = List.fold_left check st ml in
     Trans.fold_map comp st init_task))

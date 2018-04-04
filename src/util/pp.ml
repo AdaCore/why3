@@ -15,6 +15,8 @@
 
 open Format
 
+type 'a pp = formatter -> 'a -> unit
+
 let print_option f fmt = function
   | None -> ()
   | Some x -> f fmt x
@@ -47,6 +49,12 @@ let print_list_delim ~start ~stop ~sep pr fmt = function
   | [] -> ()
   | l -> fprintf fmt "%a%a%a" start () (print_list sep pr) l stop ()
 
+let print_list_next sep print fmt = function
+  | [] -> ()
+  | [x] -> print true fmt x
+  | x :: r ->
+      print true fmt x; sep fmt ();
+      print_list sep (print false) fmt r
 
 let print_iter1 iter sep print fmt l =
   let first = ref true in
@@ -86,6 +94,7 @@ let comma fmt () = fprintf fmt ",@ "
 let star fmt () = fprintf fmt "*@ "
 let simple_comma fmt () = fprintf fmt ", "
 let underscore fmt () = fprintf fmt "_"
+let slash fmt () = fprintf fmt "/"
 let semi fmt () = fprintf fmt ";@ "
 let colon fmt () = fprintf fmt ":@ "
 let space fmt () = fprintf fmt "@ "
@@ -195,6 +204,7 @@ let string_of_wnl p x =
   Buffer.contents b
 
 let sprintf p =
+  (* useless: this is the same as Format.asprintf *)
   let b = Buffer.create 100 in
   let fmt = formatter_of_buffer b in
   kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p

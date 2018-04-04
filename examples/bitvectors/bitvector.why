@@ -356,7 +356,7 @@ theory BV32
 
   function size : int = 32
 
-  clone export BitVector with function size = size
+  clone export BitVector with function size, lemma size_positive
 
 end
 
@@ -365,7 +365,7 @@ theory BV64
 
   function size : int = 64
 
-  clone export BitVector with function size = size
+  clone export BitVector with function size, lemma size_positive
 
 end
 

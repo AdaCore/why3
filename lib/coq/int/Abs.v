@@ -19,9 +19,10 @@ Require int.Int.
 (* abs is replaced with (ZArith.BinInt.Z.abs x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma abs_def : forall (x:Z), ((0%Z <= x)%Z ->
-  ((ZArith.BinInt.Z.abs x) = x)) /\ ((~ (0%Z <= x)%Z) ->
-  ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
+Lemma abs_def :
+  forall (x:Z),
+  ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x)) /\
+  (~ (0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
 intros x.
 split ; intros H.
 now apply Zabs_eq.
@@ -33,8 +34,9 @@ now apply Zgt_lt.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_le : forall (x:Z) (y:Z), ((ZArith.BinInt.Z.abs x) <= y)%Z <->
-  (((-y)%Z <= x)%Z /\ (x <= y)%Z).
+Lemma Abs_le :
+  forall (x:Z) (y:Z),
+  ((ZArith.BinInt.Z.abs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\ (x <= y)%Z).
 intros x y.
 zify.
 omega.

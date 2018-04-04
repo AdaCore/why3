@@ -42,8 +42,7 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Config.datadir "theories";
-    Filename.concat Config.datadir "modules"; ]
+  [ Filename.concat Config.datadir "stdlib" ]
 
 let default_conf_file =
   match Config.localdir with
@@ -58,14 +57,20 @@ type prover =
       prover_altern : string;
     }
 
+let print_altern fmt s =
+  if s <> "" then Format.fprintf fmt " (%s)" s
+
 let print_prover fmt p =
-  Format.fprintf fmt "%s (%s%s%s)"
-    p.prover_name p.prover_version
-    (if p.prover_altern = "" then "" else " ") p.prover_altern
+  Format.fprintf fmt "%s %s%a"
+    p.prover_name p.prover_version print_altern p.prover_altern
 
 let prover_parseable_format p =
-  Format.sprintf "%s,%s,%s"
-    p.prover_name p.prover_version p.prover_altern
+  if p.prover_altern = "" then
+    Format.sprintf "%s,%s"
+                   p.prover_name p.prover_version
+  else
+    Format.sprintf "%s,%s,%s"
+                   p.prover_name p.prover_version p.prover_altern
 
 let print_prover_parseable_format fmt p =
   Format.pp_print_string fmt (prover_parseable_format p)
@@ -138,24 +143,6 @@ type config_strategy = {
   strategy_shortcut : string;
 }
 
-(* a default set of strategies *)
-let default_strategies =
-  List.map
-    (fun (name,desc,shortcut,code) ->
-      let s = ref Rc.empty_section in
-      s := Rc.set_string !s "name" name;
-      s := Rc.set_string !s "desc" desc;
-      s := Rc.set_string !s "shortcut" shortcut;
-      s := Rc.set_string !s "code" code;
-      !s)
-    [ "Split", "Split@ conjunctions@ in@ goal", "s",
-      "t split_goal_wp exit";
-      "Inline", "Inline@ function@ symbols@ once", "i",
-      "t inline_goal exit";
-      "Compute", "Compute@ in@ goal", "c",
-      "t compute_in_goal exit";
-    ]
-
 let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
     | [] -> default
@@ -178,7 +165,7 @@ let set_strategies rc strategies =
 type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
   datadir  : string;      (* "/usr/local/share/why/" *)
-  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
+  loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
@@ -189,6 +176,8 @@ type main = {
   (* plugins to load, without extension, relative to [libdir]/plugins *)
   cntexample : bool;
   (* true provers should be asked for counter-example model *)
+  default_editor : string;
+  (* editor name used when no specific editor known for a prover *)
 }
 
 let libdir m =
@@ -220,6 +209,7 @@ let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
 let cntexample m = m.cntexample
+let default_editor m = m.default_editor
 
 exception StepsCommandNotSpecified of string
 
@@ -239,6 +229,8 @@ let set_limits m time mem running =
 let set_cntexample m cntexample =
   { m with cntexample = cntexample }
 
+let set_default_editor m e = { m with default_editor = e }
+
 let plugins m = m.plugins
 let set_plugins m pl =
   (* TODO : sanitize? *)
@@ -254,7 +246,7 @@ let load_plugins m =
   let load x =
     try Plugin.load x
     with exn ->
-      Format.eprintf "%s can't be loaded : %a@." x
+      Format.eprintf "%s can't be loaded: %a@." x
         Exn_printer.exn_printer exn in
   List.iter load m.plugins
 
@@ -279,6 +271,8 @@ let empty_main =
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
     cntexample = false;  (* no counter-examples by default *)
+    default_editor = (try Sys.getenv "EDITOR" ^ " %f"
+                      with Not_found -> "editor %f");
   }
 
 let default_main =
@@ -298,6 +292,7 @@ let set_main rc main =
     set_int section "running_provers_max" main.running_provers_max in
   let section = set_stringl section "plugin" main.plugins in
   let section = set_bool section "cntexample" main.cntexample in
+  let section = set_string section "default_editor" main.default_editor in
   set_section rc "main" section
 
 exception NonUniqueId
@@ -500,24 +495,28 @@ let load_policy provers acc (_,section) =
 let load_strategy strategies section =
   try
     let name = get_string section "name" in
+    let name =
+      try
+        let (_:int) = String.index name ' ' in
+        Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+        String.map (function ' ' -> '_' | c -> c) name
+      with Not_found -> name
+    in
     let desc = get_string section "desc" in
-(*
-    let desc = Scanf.format_from_string desc "" in
- *)
     let shortcut = get_string ~default:"" section "shortcut" in
     let code = get_string section "code" in
     Mstr.add
       name
-        { strategy_name = name;
-          strategy_desc = desc;
-          strategy_code = code;
-          strategy_shortcut = shortcut;
-        }
-        strategies
+      { strategy_name = name;
+        strategy_desc = desc;
+        strategy_code = code;
+        strategy_shortcut = shortcut;
+      }
+      strategies
   with
-      MissingField s ->
-        Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
-        strategies
+    MissingField s ->
+    Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
+    strategies
 
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
@@ -525,13 +524,14 @@ let load_main dirname section =
   { libdir    = get_string ~default:default_main.libdir section "libdir";
     datadir   = get_string ~default:default_main.datadir section "datadir";
     loadpath  = List.map (Sysutil.absolutize_filename dirname)
-      (get_stringl ~default:[] section "loadpath");
+                         (get_stringl ~default:[] section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
     memlimit  = get_int ~default:default_main.memlimit section "memlimit";
     running_provers_max = get_int ~default:default_main.running_provers_max
-      section "running_provers_max";
+                                  section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
-    cntexample = get_bool ~default:default_main.cntexample section "cntexample"
+    cntexample = get_bool ~default:default_main.cntexample section "cntexample";
+    default_editor = get_string ~default:default_main.default_editor section "default_editor";
   }
 
 let read_config_rc conf_file =
@@ -568,7 +568,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies ~default:default_strategies rc in
+  let strategies = get_strategies ~default:[] rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
@@ -638,7 +638,7 @@ let parse_filter_prover s =
   (* reverse order *)
   match sl with
   | [name] -> mk_filter_prover name
-  | [version;name] -> mk_filter_prover ~version name
+  | [version;name] -> mk_filter_prover ~altern:"" ~version name
   | [altern;"";name] -> mk_filter_prover ~altern name
   | [altern;version;name] -> mk_filter_prover ~version ~altern name
   | _ -> raise (ParseFilterProver s)
@@ -749,6 +749,8 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_prover_config config prover =
+  Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
 let get_policies config = config.provers_upgrade_policy
 let get_prover_upgrade_policy config p =
@@ -842,7 +844,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun 'why3 config'"
   | NonUniqueId ->
-    Format.fprintf fmt "InternalError : two provers share the same id"
+    Format.fprintf fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp
@@ -853,11 +855,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
       provers
   | ParseFilterProver s ->
     fprintf fmt
-      "Syntax error prover identification '%s' : \
+      "Syntax error prover identification '%s': \
        name[,version[,alternative]|,,alternative]" s
   | DuplicateShortcut s ->
     fprintf fmt
-      "Shortcut %s appears two times in the configuration file" s
+      "Shortcut %s appears twice in the configuration file" s
   | _ -> raise e)
 
 
@@ -927,3 +929,15 @@ let load_driver main env file extras =
     eprintf "Fatal error while loading driver file '%s': %a@."
             file Exn_printer.exn_printer e;
     exit 1
+
+
+let unknown_to_known_provers provers pu =
+  Mprover.fold (fun pk _ (others,name,version) ->
+    match
+      pk.prover_name = pu.prover_name,
+      pk.prover_version = pu.prover_version,
+      pk.prover_altern = pu.prover_altern with
+        | false, _, _ -> pk::others, name, version
+        | _, false, _ -> others, pk::name, version
+        | _           -> others, name, pk::version
+  ) provers ([],[],[])

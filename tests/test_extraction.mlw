@@ -2,6 +2,8 @@
 (* test of the OCaml extraction
    run "make test-ocaml-extraction" from the top directory *)
 
+(* TODO : add a test for match .. with .. exception expressions *)
+
 module TestExtraction
 
   use import int.Int
@@ -9,41 +11,10 @@ module TestExtraction
   let f (x: int) : int = x+1
   let test_int () = f 31 + (div 33 3 + 2 - 4) - -1
 
-  use import mach.int.Int31
-  let f31 (x: int31) : int31 = x + of_int 1
-  let test_int31 () =
-    to_int (f31 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
-
-  use import mach.int.Int32
-  let f32 (x: int32) : int32 = x + of_int 1
-  let test_int32 () =
-    to_int (f32 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
-
-  use import mach.int.UInt32
-  let fu32 (x: uint32) : uint32 = x + of_int 1
-  let test_uint32 () =
-    to_int (fu32 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
-
   use import mach.int.Int63
-  let f63 (x: int63) : int63 = x + of_int 1
+  let f63 (x: int63) : int63 = x + 1
   let test_int63 () =
-    to_int (f63 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
-
-  use import mach.int.Int64
-  let f64 (x: int64) : int64 = x + of_int 1
-  let test_int64 () =
-    to_int (f64 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
-
-  use import mach.int.UInt64
-  let fu64 (x: uint64) : uint64 = x + of_int 1
-  let test_uint64 () =
-    to_int (fu64 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+    to_int (f63 31 + (33 / 3 + 2 - 4) - (-1))
 
   use import int.Int
   use import ref.Ref
@@ -59,21 +30,305 @@ module TestExtraction
   use import array.Array
 
   let test_array () =
-    let a = Array.make 43 0 in
+    let a = Array.make 43 (0:int63) in
     for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
     a[42]
 
-  use import mach.array.Array31
+  use import mach.array.Array63
 
-  let test_array31 () : int =
-    let a = Array31.make (Int31.of_int 43) 0 in
-    for i = 1 to 42 do a[Int31.of_int i] <- a[Int31.of_int (i - 1)] + 1 done;
-    a[Int31.of_int 42]
+  let test_array63 () : int =
+    let a = Array63.make 43 0 in
+    for i = 1 to 42 do a[Int63.of_int i] <- a[Int63.of_int (i - 1)] + 1 done;
+    a[42]
+
+  use import seq.Seq
+  use import int.Int
+  use import mach.int.Int
+
+  (* FIXME: this function is never used.
+            Use it somewhere and supply a driver? *)
+  (* val test_val (x: int) : int *)
+  (*   ensures { result > x } *)
+
+  let function f_function (y: int) (x: int) : int
+    requires { x >= 0 }
+    ensures  { result >= 0 }
+  = x
+
+  let g (ghost z: int) (x: int) : int
+    requires { x > 0 }
+    ensures  { result > 0 }
+  = let y = x in
+    y
+
+  type t 'a 'b 'c 'd
+
+  type list 'a = Nil | Cons 'a (list 'a)
+
+  type btree 'a = E | N (btree 'a) 'a (btree 'a)
+
+  type ntree 'a = Empty | Node 'a (list 'a)
+
+  type list_int = list int
+
+  type cursor 'a = {
+    collection : list 'a;
+    index      : int;
+    mutable index2     : int;
+    ghost mutable v : seq 'a;
+  }
+
+  type r 'a = {
+    aa: 'a;
+    ghost i: int;
+  }
+
+  (* let create_cursor (l: list int) (i i2: int) : cursor int = *)
+  (*   { collection = l; index = i; index2 = i2; v = empty } *)
+
+  let create_r (x: int) (y: int) : r int =
+    { aa = x; i = y }
+
+  use import ref.Ref
+
+  let update (c: cursor int) : int
+  = c.index
+
+  exception Empty (list int, int)
+  exception Out_of_bounds int
+
+  (* exception are unary constructors *)
+(*
+  let raise1 () =
+    raises { Empty -> true }
+    raise (Empty (Nil, 0))
+  let raise2 () =
+    raises { Empty -> true }
+    let p = (Nil, 0) in
+    raise (Empty p)
+*)
+
+  let rec length (l: list 'a) : int
+    variant  { l }
+  = match l with
+    | Nil -> 0
+    | Cons _ r -> 1 + length r
+    end
+
+  let t (x:int) : int
+    requires { false }
+  = absurd
+
+  let a () : unit
+  = assert { true }
+
+  let singleton (x: int) (l: list int) : list int =
+    let x = Nil in x
+
+(* FIXME constructors in Why3 can be partially applied
+         => an eta-expansion is needed
+         be careful with side-effects
+         "let c = Cons e in" should be translated to
+         "let c = let o = e in fun x -> Cons (o, x) in ..." in OCaml
+
+   Mário: I think A-normal form takes care of the side-effects problem
+*)
+  let constructor1 () =
+    let x = Cons in
+    x (42:int63)
+
+  let foofoo (x: int) : int =
+    let ghost y = x + 1 in
+    x
+
+  let test (x: int) : int =
+    let y =
+      let z = x in
+      (ghost z) + 1
+    in 42
+
+  type list_ghost = Nil2 | Cons2 int list_ghost (ghost int)
+
+  let add_list_ghost (x: int) (l: list_ghost) : list_ghost =
+    match l with
+    | Cons2 _ Nil2 _ | Nil2 -> Cons2 x Nil2 (1+2)
+    | Cons2 _ _ n -> Cons2 x l (n+1)
+    end
+
+  let ggg () : int = 42
+
+  let call (x:int) : int =
+    ggg () + 42
+
+  (* functions with ghost arguments *)
+
+  let test_filter_ghost_args (x: int) (ghost y: int) =
+    (1:int) / 0
+
+  let test_call (x: int) : int =
+    test_filter_ghost_args x 0 + 1
+
+  let constant test_partial : int =
+    let partial = test_filter_ghost_args 3 in
+    42
+
+  let constant test_partial2 : int =
+    let r = ref 0 in
+    let f (x: int) (ghost y) = r := !r + 21 in
+    let g = f 17 in
+    g (0:int); g (1:int); !r
+
+  let test_zero_args () : int =
+    test_partial2 + 0
+
+  let test_filter_ghost_args2 (x: int) (ghost y: int) (z: int) : int =
+    x + z
+
+  let test_filter_ghost_args3 (ghost y: int) : int =
+    1 / 0
+
+  let many_args (a b c d e f g h i j k l m: int) : int = 42
+
+  let foo (x: int) : int =
+    let _ = (42:int63) in (* FIXME? print _ in OCaml *)
+    x
+
+  let test_fun (x: int) : int -> int =
+    fun (y: int) -> x + y
+
+  let test_local (x: int) : int =
+    let fact (x: int) (y: int): int = x + y in
+    fact x 42
+
+  let test_lets (x: int) : int =
+    let y = x in
+    let z = y + 1 in
+    let yxz = y * x * z in
+    let xzy = x + z + y in
+    let res = yxz - xzy in
+    res
+
+  let test_partial3 (x: int) : int =
+    let sum : int -> int -> int = fun x y -> x + y in
+    let incr_a (a: int) = sum a in
+    incr_a x x
+
+  let constr_partial (x: int) : list int =
+    let x = Cons 42 in
+    x Nil
+
+  let filter_record (c: cursor 'a) : int =
+    match c with
+    | { collection = l; index = i; index2 = i2; v = v} -> i
+    end
+
+  (** for loops *)
+
+  let for_loop1 () =
+    let r = ref (0: int63) in
+    for i = 0 to 10 do r := !r + i done;
+    !r
+
+  (** optional and named arguments *)
+
+  use import option.Option
+
+  let opt_f (x [@ocaml:named]: int) (y [@ocaml:named]) = x+y
+  let constant opt_a = opt_f 40 2
+  let opt_g (x [@ocaml:optional]) (y [@ocaml:named]: int) =
+     match x with None -> y | Some x -> x + y end
+  let constant opt_c = opt_g (Some 40) 2
+
+  (* FIXME: partial application with named arguments not yet supported *)
+  let constant opt_b = fun y -> opt_g y 42
+  let opt_h () = fun y -> opt_f 40 y
+  let opt_i () = opt_h () 2
+
+  (** test the execution of the extracted code *)
+
+  use import ocaml.Pervasives
+
+  let test1 () raises { AssertFailure } =
+    ocaml_assert ((1:int) + 1 = 2)
+
+  (** parallel assignement *)
+
+  type record1 = { mutable field: int }
+
+  let test_parallel_assign () raises { AssertFailure } =
+    let a = { field = 0 } in
+    let b = { field = 1 } in
+    (a.field, b.field) <- (b.field, a.field);
+    ocaml_assert (a.field = 1)
+
+  (** machine arithmetic *)
+
+  use import mach.int.Int63
+
+  let get_min_int63 (x: int63) : int
+  = min_int63
+
+  let test2 () raises { AssertFailure }
+  = ocaml_assert ((1:int63) + 1 = 2)
+
+  (* testing proxy-variables inlining mechanism inside a lambda *)
+  let test3 () raises { AssertFailure }
+  = let i = ref (42:int63) in
+    let c = Cons !i in
+    i := 0;
+    let c = c Nil in
+    ocaml_assert (match c with Cons x _ -> x = 42 | _ -> true end)
+
+  (* testing proxy-variables inlining with conflicting effects *)
+  let test4 () raises { AssertFailure }
+  = let f (x y: int63) raises { AssertFailure }
+    = ocaml_assert (y = 42);
+      x + y in
+    let i = ref 42 in
+    let res = f (i := 0; !i) !i in
+    ocaml_assert (!i = 0);
+    ocaml_assert (res = 42)
+
+  let main () raises { AssertFailure } =
+    test1 ();
+    test2 ();
+    test3 ();
+    test4 ();
+    test_parallel_assign ()
+
+  (* scopes *)
+
+  type ty = A | B | C
+
+  scope S
+    type ty = A | B | C
+    (* locally hides toplevel function foo: int -> int *)
+    let foo (x: bool) : bool = x
+    let test_foo () = foo true
+  end
+
+  let test_foo () = foo 42
+
+  (* range types *)
+
+  type small_range = <range 1 10>
+
+  let test_small_range () =
+    for x = 1: small_range to 3 do
+      ()
+    done
+
+  type big_range = <range 1 0x4000_0000>
+
+  let test_big_range () =
+    for x = 1: big_range to 3 do
+      ()
+    done
 
 end
 
 (*
 Local Variables:
-compile-command: "why3 --type-only test_extraction.mlw && make -C .. test-ocaml-extraction"
+compile-command: "make -C .. test-ocaml-extraction"
 End:
 *)

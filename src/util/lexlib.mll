@@ -17,16 +17,13 @@
 
   exception UnterminatedComment
   exception UnterminatedString
+  exception IllegalCharacter of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
+    | IllegalCharacter s -> fprintf fmt "illegal character %s" s
     | _ -> raise e)
-
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
   let string_start_loc = ref Loc.dummy_position
   let string_buf = Buffer.create 1024
@@ -40,9 +37,17 @@
 
 }
 
-let newline = '\n'
+let newline = '\r'* '\n'
 
-rule comment = parse
+rule utf8_tail b n = parse
+  | eof
+      { false }
+  | ['\128'-'\191'] as c
+      { Buffer.add_char b c;
+        n == 1 || utf8_tail b (n - 1) lexbuf }
+  | _ { false }
+
+and comment = parse
   | "(*)"
       { comment lexbuf }
   | "*)"
@@ -50,7 +55,7 @@ rule comment = parse
   | "(*"
       { comment lexbuf; comment lexbuf }
   | newline
-      { newline lexbuf; comment lexbuf }
+      { new_line lexbuf; comment lexbuf }
   | eof
       { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
   | _
@@ -61,15 +66,20 @@ and string = parse
       { let s = Buffer.contents string_buf in
         Buffer.clear string_buf;
         s }
+  | "\\" newline
+      { new_line lexbuf; string_skip_spaces lexbuf }
   | "\\" (_ as c)
-      { if c = '\n' then newline lexbuf;
-        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
-      { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
+      { new_line lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
       { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
+
+and string_skip_spaces = parse
+  | [' ' '\t']*
+      { string lexbuf }
 
 {
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
@@ -104,4 +114,24 @@ and string = parse
       Bytes.unsafe_to_string t
     end else s
 
+  let illegal_character c lexbuf =
+    let loc = loc lexbuf in
+    let b = Buffer.create 2 in
+    Buffer.add_char b c;
+    let n =
+      match c with
+      | '\000'..'\127' -> 0
+      | '\192'..'\223' -> 1
+      | '\224'..'\239' -> 2
+      | '\240'..'\247' -> 3
+      | _ -> -1 in
+    if n <> 0 && (n == -1 || not (utf8_tail b n lexbuf)) then begin
+      (* invalid encoding, convert the first character to a utf8 one *)
+      Buffer.reset b;
+      let c = Char.code c in
+      Buffer.add_char b (Char.chr (0xC0 lor (c lsr 6)));
+      Buffer.add_char b (Char.chr (c land 0xBF));
+    end;
+    (* TODO: check that the buffer does not hold a utf8 character in one of the invalid ranges *)
+    raise (Loc.Located (loc, IllegalCharacter (Buffer.contents b)))
 }

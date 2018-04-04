@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Task transformations *)
+
 open Ty
 open Term
 open Decl
@@ -16,7 +18,7 @@ open Theory
 open Task
 open Stdlib
 
-(** Task transformation *)
+(** {2 Transformations} *)
 
 type 'a trans
 type 'a tlist = 'a list trans
@@ -30,17 +32,24 @@ val identity_l : task tlist
 val singleton : 'a trans -> 'a tlist
 val return    : 'a -> 'a trans
 val bind      : 'a trans -> ('a -> 'b trans) -> 'b trans
+val bind_comp : ('a * task) trans -> ('a -> 'b trans) -> 'b trans
 
 val trace_goal : string -> task trans -> task trans
 
-(** Compose transformation *)
+(** {2 Compose transformations} *)
+
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist
 
 val seq   : task trans list -> task trans
 val seq_l : task tlist list -> task tlist
 
-(** Create Transformation *)
+val par : task trans list -> task tlist
+(** parallelize transformations: [par l] will duplicate the current
+    task in [n] new tasks, with [n] the length of [l], and apply to each of
+    this new task the corresponding transformation in [l] *)
+
+(** {2 Iterating transformations} *)
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
@@ -48,7 +57,18 @@ val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
 val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist
 
 val decl   : (decl -> decl list     ) -> task -> task trans
+(** [decl f t1 t2] adds to task [t1] the declarations [f d] for each
+    declaration [d] of task [t2]. (similar to a "flat_map"
+    operation) *)
+
 val decl_l : (decl -> decl list list) -> task -> task tlist
+(** [decl_l f t1 t2]: on each declaration d of task [t2]
+    (with [f d] = [ld_1; ld_2; ... ld_n]), create n duplicates (newt_i)
+    of t1 with the declaration d_i replaced by ld_i.
+
+    Note for example that this 'decl_l (fun d -> [[d]; [d]])' will
+    duplicate the task on each declaration and probably run forever.
+*)
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
@@ -64,21 +84,30 @@ val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans
+(** [add_decls ld t1] adds decls ld at the end of the task t1 (before the goal) *)
 
-(* Dependent Transformations *)
+(** {2 Dependent Transformations} *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans
-val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
-
 val on_meta_excl : meta -> (meta_arg list option -> 'a trans) -> 'a trans
-val on_used_theory : theory -> (bool -> 'a trans) -> 'a trans
 
+val on_used_theory : theory -> (bool -> 'a trans) -> 'a trans
+val on_cloned_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
+
+(** [on_tagged_* m f] allow to do a transformation having all the tagged declarations
+    in a set as argument of f.
+    If used to modify the existing task, be careful to not make references to
+    declarations found in the set before they are actually declared in the new task.
+
+    For example, this will likely fail:
+      Trans.on_tagged_ls some_meta (fun s -> Trans.decl (fun d -> [d; s.choose]))
+*)
 val on_tagged_ty : meta -> (Sty.t -> 'a trans) -> 'a trans
 val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
 val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans
 val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 
-(* Flag-dependent Transformations *)
+(** {2 Flag-dependent Transformations} *)
 
 exception UnknownFlagTrans of meta * string * string list
 exception IllegalFlagTrans of meta
@@ -96,7 +125,7 @@ val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
 
 val on_flag_t : meta -> ('a,'b) flag_trans -> ('a -> 'b trans) -> 'a -> 'b trans
 
-(** Debug Transformations *)
+(** {2 Debug Transformations} *)
 
 val print_meta : Debug.flag -> meta -> task trans
 (** [print_meta f m] is an identity transformation that
@@ -131,5 +160,62 @@ val list_transforms_l : unit -> (string * Pp.formatted) list
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)
 
+(** {2 Transformations with arguments}
+
+  These transformations take strings as arguments. For a more "typed" version,
+  see file [src/transform/args_wrapper.ml]
+
+*)
+
+type naming_table = {
+    namespace : namespace;
+    known_map : known_map;
+    coercion : Coercion.t;
+    printer : Ident.ident_printer;
+    aprinter : Ident.ident_printer;
+ }
+(** In order to interpret, that is type, string arguments as symbols or
+   terms, a transformation may need a [naming_table]. Typing arguments
+   requires looking up identifiers into the [namespace] and also
+   looking up declarations into the [known_map]. Since the identifiers
+   given as arguments come from the task as it is displayed to the
+   user, we need to ensure that the names in the [namespace] are
+   coherent with the names that are printed, this why we also record
+   the [printer].
+
+   See module [Args_wrapper] for the functions that builds objects of
+   type [naming_table] from given tasks, and types the arguments of
+   transformations.  *)
+
+exception Bad_name_table of string
+
+type trans_with_args = string list -> Env.env -> naming_table -> task trans
+type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
+
+val list_transforms_with_args   : unit -> (string * Pp.formatted) list
+val list_transforms_with_args_l : unit -> (string * Pp.formatted) list
+
+val register_transform_with_args   : desc:Pp.formatted -> string -> trans_with_args -> unit
+val register_transform_with_args_l : desc:Pp.formatted -> string -> trans_with_args_l -> unit
+
+(** {2 handling of all forms of transformations} *)
+
+type gentrans =
+  | Trans_one of Task.task trans
+  | Trans_list of Task.task tlist
+  | Trans_with_args of trans_with_args
+  | Trans_with_args_l of trans_with_args_l
+
+val lookup_trans : Env.env -> string -> gentrans
+
+val lookup_trans_desc: string -> Pp.formatted
+(* Takes the name of a transformation (with args or not) and returns its
+   description. *)
+
+val list_trans : unit -> string list
+
 val apply_transform : string -> Env.env -> task -> task list
-(** apply a registered 1-to-1 or a 1-to-n function directly *)
+(** apply a registered 1-to-1 or a 1-to-n, directly.*)
+
+val apply_transform_args : string -> Env.env -> string list -> naming_table -> task -> task list
+(** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)

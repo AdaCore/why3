@@ -1,0 +1,61 @@
+(**********************************************************************
+ ***                       gnat2why theories                        ***
+ **********************************************************************)
+
+theory _gnatprove_standard_th.Floating_Func
+   syntax predicate neq "(not (fp.eq %1 %2))"
+   syntax function bool_lt  "(fp.lt %1 %2)"
+   syntax function bool_le  "(fp.leq %1 %2)"
+   syntax function bool_gt  "(fp.gt %1 %2)"
+   syntax function bool_ge  "(fp.geq %1 %2)"
+   syntax function bool_eq  "(fp.eq %1 %2)"
+   syntax function bool_neq "(not (fp.eq %1 %2))"
+   remove allprops
+end
+
+(*************************************************************************)
+
+theory "_gnatprove_standard".Floating
+  syntax function rem "(fp.rem %1 %2)"
+  syntax function div_rne "(fp.div RNE %1 %2)"
+  remove allprops
+end
+
+theory "_gnatprove_standard".Float32_next_prev
+  syntax function max_value "(fp #b0 #b11111110 #b11111111111111111111111)"
+end
+
+theory "_gnatprove_standard".Float64_next_prev
+  syntax function max_value "(fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)"
+end
+
+theory "_gnatprove_standard".Float32
+  syntax function one "(fb #b0 #b01111111 #b00000000000000000000000)"
+  remove allprops
+end
+
+theory "_gnatprove_standard".Float64
+  syntax function one "(fb #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000)"
+  remove allprops
+end
+
+(*************************************************************************)
+
+theory ada__model.Floating_Point_Base
+   syntax function bool_eq "(fp.eq %1 %2)"
+   remove allprops
+end
+
+(*************************************************************************)
+
+theory ieee_float.Float64
+ (* function to_int *)
+end
+
+theory ieee_float.Float32
+ (* function to_int *)
+end
+
+theory real.Square
+ remove allprops
+end

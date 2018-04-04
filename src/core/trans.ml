@@ -42,6 +42,8 @@ let compose_l f g x = Lists.apply g (f x)
 let seq l x   = List.fold_left (fun x f -> f x) x l
 let seq_l l x = List.fold_left (fun x f -> Lists.apply f x) [x] l
 
+let par (l:task trans list) x = List.map (fun f -> f x) l
+
 module Wtask = Weakhtbl.Make (struct
   type t = task_hd
   let tag t = t.task_tag
@@ -52,6 +54,9 @@ let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
   | _ -> tr t
 
 let bind f g = store (fun task -> g (f task) task)
+
+let bind_comp f g =
+  store (fun task -> let (ret, new_task) = f task in g ret new_task)
 
 let trace_goal msg tr =
   fun task ->
@@ -170,8 +175,9 @@ let on_meta_tds t fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_meta_tds task t) task
 
-let on_theory th fn =
+let on_cloned_theory th fn =
   let add td acc = match td.td_node with
+    | Use _ -> acc
     | Clone (_,sm) -> sm::acc
     | _ -> assert false
   in
@@ -185,8 +191,12 @@ let on_meta t fn =
   on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set []))
 
 let on_used_theory th fn =
-  let td = create_null_clone th in
-  on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
+  let check td = match td.td_node with
+    | Use _ -> true
+    | Clone _ -> false
+    | _ -> assert false
+  in
+  on_theory_tds th (fun tds -> fn (Stdecl.exists check tds.tds_set))
 
 let on_meta_excl t fn =
   if not t.meta_excl then raise (NotExclusiveMeta t);
@@ -274,7 +284,6 @@ let create_debugging_trans trans_name (tran : Task.task trans) =
     print_task_goal t2;
     Debug.dprintf debug "@.@.";
     t2;
-    
   end in
   store new_trans
 
@@ -331,23 +340,112 @@ let list_transforms () =
 let list_transforms_l () =
   Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_l []
 
-(** fast transform *)
+
+
+
+(** transformations with arguments *)
+
+type naming_table = {
+    namespace : namespace;
+    known_map : known_map;
+    coercion : Coercion.t;
+    printer : Ident.ident_printer;
+    aprinter : Ident.ident_printer;
+  }
+
+exception Bad_name_table of string
+
+type trans_with_args = string list -> Env.env -> naming_table -> task trans
+type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
+
+let transforms_with_args = Hstr.create 17
+let transforms_with_args_l = Hstr.create 17
+
+let lookup_transform_with_args s =
+ try snd (Hstr.find transforms_with_args s)
+ with Not_found -> raise (UnknownTrans s)
+
+let lookup_transform_with_args_l s =
+ try snd (Hstr.find transforms_with_args_l s)
+ with Not_found -> raise (UnknownTrans s)
+
+let list_transforms_with_args () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_with_args []
+
+let list_transforms_with_args_l () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_with_args_l []
+
+let register_transform_with_args ~desc s p =
+  if Hstr.mem transforms_with_args s then raise (KnownTrans s);
+  Hstr.replace transforms_with_args s (desc, fun _ -> p)
+
+let register_transform_with_args_l ~desc s p =
+  if Hstr.mem transforms_with_args_l s then raise (KnownTrans s);
+  Hstr.replace transforms_with_args_l s (desc, fun _ -> p)
+
 type gentrans =
   | Trans_one of Task.task trans
   | Trans_list of Task.task tlist
+  | Trans_with_args of trans_with_args
+  | Trans_with_args_l of trans_with_args_l
 
 let lookup_trans env name =
   try
     let t = lookup_transform name env in
     Trans_one t
   with UnknownTrans _ ->
-    let t = lookup_transform_l name env in
-    Trans_list t
+    try
+      let t = lookup_transform_l name env in
+      Trans_list t
+    with UnknownTrans _ ->
+      try
+        let t = lookup_transform_with_args name env in
+        Trans_with_args t
+      with UnknownTrans _ ->
+        let t = lookup_transform_with_args_l name env in
+        Trans_with_args_l t
+
+let lookup_trans_desc name =
+  try
+    let desc, _ = Hstr.find transforms name in
+    desc
+  with Not_found ->
+    try
+      let desc, _ = Hstr.find transforms_l name in
+      desc
+    with Not_found ->
+      try
+        let desc, _ = Hstr.find transforms_with_args name in
+        desc
+      with Not_found ->
+        let desc, _ = Hstr.find transforms_with_args_l name in
+        desc
+
+let list_trans () =
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms_l []
+  in
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms l
+  in
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms_with_args l
+  in
+    Hstr.fold (fun k _ acc -> k::acc) transforms_with_args_l l
 
 let apply_transform tr_name env task =
    match lookup_trans env tr_name with
     | Trans_one t -> [apply t task]
     | Trans_list t -> apply t task
+    | Trans_with_args _ (* [apply (t []) task] *)
+    | Trans_with_args_l _ -> assert false (* apply (t []) task *)
+
+let apply_transform_args tr_name env args tables task =
+   match lookup_trans env tr_name with
+    | Trans_one t -> [apply t task]
+    | Trans_list t -> apply t task
+    | Trans_with_args t -> [apply (t args) env tables task]
+    | Trans_with_args_l t -> apply (t args) env tables task
 
 (** Flag-dependent transformations *)
 
@@ -363,18 +461,18 @@ let on_flag_find m ft s = try Hstr.find ft s with
 let on_flag_gen m ft def_name def arg =
   on_meta_excl m (fun alo ->
     let t, tr_name = match alo with
-      | None -> def, Printf.sprintf "%s %s" m.meta_name def_name
+      | None -> def, Printf.sprintf "%s%s" m.meta_name def_name
       | Some [MAstr s] ->
-          on_flag_find m ft s, Printf.sprintf "%s : %s" m.meta_name s
+          on_flag_find m ft s, Printf.sprintf "%s:%s" m.meta_name s
       | _ -> raise (IllegalFlagTrans m)
     in
     named tr_name (t arg))
 
-let on_flag m ft def arg =
-  let tdef x = on_flag_find m ft def x in
-  on_flag_gen m ft (Printf.sprintf ": %s" def) tdef arg
+let on_flag m ft def_name arg =
+  let def x = on_flag_find m ft def_name x in
+  on_flag_gen m ft (Printf.sprintf ":%s" def_name) def arg
 
-let on_flag_t m ft def arg = on_flag_gen m ft "(default)" def arg
+let on_flag_t m ft def arg = on_flag_gen m ft " (default)" def arg
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->
@@ -390,4 +488,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | TransFailure (s,e) ->
       Format.fprintf fmt "Failure in transformation %s@\n%a" s
         Exn_printer.exn_printer e
+  | Bad_name_table s ->
+      Format.fprintf fmt "Names table associated to task was not generated in %s" s
   | e -> raise e)

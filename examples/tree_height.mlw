@@ -8,24 +8,21 @@ module HeightCPS
   use import int.MinMax
   use import bintree.Tree
   use import bintree.Height
-  use HighOrd
 
-  function height_cps (t: tree 'a) (k: int -> 'b) : 'b =
-    match t with
+  let rec height_cps (t: tree 'a) (k: int -> 'b) : 'b
+    variant { t }
+    ensures { result = k (height t) }
+  = match t with
     | Empty -> k 0
     | Node l _ r ->
-        height_cps l (\ hl.
-        height_cps r (\ hr.
+        height_cps l (fun hl ->
+        height_cps r (fun hr ->
         k (1 + max hl hr)))
     end
 
-  function height1 (t: tree 'a) : int = height_cps t (\ h. h)
-
-  lemma height_cps_correct:
-    forall t: tree 'a, k: int -> 'b. height_cps t k = k (height t)
-
-  lemma height1_correct:
-    forall t: tree 'a. height1 t = height t
+  let height (t: tree 'a) : int
+    ensures { result = height t }
+  = height_cps t (fun h -> h)
 
 end
 
@@ -45,10 +42,10 @@ module Iteration
 
   type what 'a = Argument (tree 'a) | Result int
 
-  predicate is_id (k: cont 'a) =
+  let predicate is_id (k: cont 'a) =
     match k with Id -> true | _ -> false end
 
-  predicate is_result (w: what 'a) =
+  let predicate is_result (w: what 'a) =
     match w with Result _ -> true | _ -> false end
 
   function evalk (k: cont 'a) (r: int) : int =
@@ -146,3 +143,96 @@ module HeightStack
 
 end
 
+(** Computing the height of a tree with a small amount of memory:
+    Stack size is only proportional to the logarithm of the tree size.
+    (author: Martin Clochard) *)
+
+module HeightSmallSpace
+
+  use import int.Int
+  use import int.MinMax
+  use import int.ComputerDivision
+  use import option.Option
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Height
+
+  (** Count number of leaves in a tree. *)
+  function leaves (t: tree 'a) : int = 1 + size t
+
+  (** [height_limited acc depth lim t]:
+       Compute the [height t] if the number of leaves in [t] is at most [lim],
+         fails otherwise. [acc] and [depth] are accumulators.
+         For maintaining the limit within the recursion, this routine
+         also send back the difference between the number of leaves and
+         the limit in case of success.
+       Method: find out one child with number of leaves at most [lim/2] using
+         recursive calls. If no such child is found, the tree has at
+         least [lim+1] leaves, hence fails. Otherwise, accumulate the result
+         of the recursive call for that child and make a recursive tail-call
+         for the other child, using the computed difference in order to
+         update [lim]. Since non-tail-recursive calls halve the limit,
+         the space complexity is logarithmic in [lim].
+       Note that as is, this has a degenerate case:
+         if the small child is extremely small, we may waste a lot
+         of computing time on the large child to notice it is large,
+         while in the end processing only the small child until the
+         tail-recursive call. Analysis shows that this results in
+         super-polynomial time behavior (recursion T(N) = T(N/2)+T(N-1))
+       To mitigate this, we perform recursive calls on all [lim/2^k] limits
+         in increasing order (see process_small_child subroutine), until
+         one succeed or maximal limits both fails. This way,
+         the time spent by a single phase of the algorithm is representative
+         of the size of the processed set of nodes.
+         Time complexity: open
+   *)
+  let rec height_limited (acc depth lim: int) (t:tree 'a) : option (int,int)
+    requires { 0 < lim /\ 0 <= acc }
+    returns  { None -> leaves t > lim
+      | Some (res,dl) -> res = max acc (depth + height t)
+                         /\ lim = leaves t + dl /\ 0 <= dl }
+    variant { lim }
+  = match t with
+    | Empty -> Some (max acc depth,lim-1)
+    | Node l _ r ->
+      let rec process_small_child (limc: int) : option (int,int,tree 'a)
+        requires { 0 <= limc < lim }
+        returns  { None -> leaves l > limc /\ leaves r > limc
+          | Some (h,sz,rm) -> height t = 1 + max h (height rm)
+                              /\ leaves t = leaves rm + sz
+                              /\ 0 < sz <= limc }
+        variant { limc }
+      = if limc = 0 then None else
+        match process_small_child (div limc 2) with
+        | (Some _) as s -> s
+        | None -> match height_limited 0 0 limc l with
+        | Some (h,dl) -> Some (h,limc-dl,r)
+        | None -> match height_limited 0 0 limc r with
+        | Some (h,dl) -> Some (h,limc-dl,l)
+        | None -> None
+        end end end
+      in
+      let limc = div lim 2 in
+      match process_small_child limc with
+      | None -> None
+      | Some (h,sz,rm) ->
+        height_limited (max acc (depth + h + 1)) (depth+1) (lim-sz) rm
+      end
+    end
+
+  use import ref.Ref
+
+  let height (t: tree 'a) : int
+    ensures { result = height t }
+  = let lim = ref 1 in
+    while true do
+      invariant { !lim > 0 }
+      variant { leaves t - !lim }
+      match height_limited 0 0 !lim t with
+      | None -> lim := !lim * 2
+      | Some (h,_) -> return h
+      end
+    done; absurd
+
+
+end

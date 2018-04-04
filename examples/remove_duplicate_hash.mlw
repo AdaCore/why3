@@ -73,7 +73,7 @@ module RemoveDuplicate
       invariant { forall x: elt. appears x a i <-> mem x s.s }
       MutableSet.add s a[i]
     done;
-    'L:
+    label L in
     let r = Array.make (MutableSet.size s) a[0] in
     MutableSet.clear s;
     let j = ref 0 in
@@ -82,7 +82,7 @@ module RemoveDuplicate
       invariant { forall x: elt. mem x s.s <-> appears x r !j }
       invariant { nodup r !j }
       invariant { 0 <= !j = cardinal s.s <= length r }
-      invariant { subset s.s (at s.s 'L) }
+      invariant { subset s.s (s.s at L) }
       if not (MutableSet.contains s a[i]) then begin
         MutableSet.add s a[i];
         r[!j] <- a[i];

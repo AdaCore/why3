@@ -12,6 +12,7 @@
 {
   open Parse_smtv2_model_parser
   exception SyntaxError
+
 }
 
 let atom = [^'('')'' ''\t''\n']
@@ -28,8 +29,8 @@ let float_num = '#'('b' | 'x') hexa_num
 rule token = parse
   | '\n'
     { token lexbuf }
-  | space+ as space_str
-      { SPACE (space_str) }
+  | space+
+      { token lexbuf }
   | "store" { STORE }
   | "const" { CONST }
   | "model" {MODEL}
@@ -42,6 +43,7 @@ rule token = parse
   | ";;" { read_string (Buffer.create 17) lexbuf }
   | '=' { EQUAL }
   | '_' { UNDERSCORE }
+  | '/' { DIV }
   | "as-array" { AS_ARRAY }
   | "ite" { ITE }
   | "define-fun" { DEFINE_FUN }
@@ -58,33 +60,17 @@ rule token = parse
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "mk___split_fields"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_FIELD ("mk___split_fields",0)
-    | n -> MK_SPLIT_FIELD ("mk___split_fields"^n, int_of_string n) }
-  | "mk___rep"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_REP ("mk___rep", 0)
-    | n -> MK_REP ("mk___rep"^n, int_of_string n) }
-  | "mk___t"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_T ("mk___t", 0)
-    | n -> MK_T ("mk___t"^n, int_of_string n) }
-  | "mk___split_discrs"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
-    | n -> MK_SPLIT_DISCRS ("mk___split_discrs"^n, int_of_string n) }
-  | "mk" name dummy { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
   | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
+  | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
 
-  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_zero }
-  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_zero }
-  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_infinity }
-  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_infinity }
-  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Not_a_number }
+  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
+  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }
+  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_infinity }
+  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
+  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (Smt2_model_defs.Float_value (b, eb, sb)) }
+      { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
 
   | num as integer
       { INT_STR (integer) }
@@ -97,7 +83,7 @@ rule token = parse
   | eof
       { EOF }
   | _
-	{ raise SyntaxError }
+      { raise SyntaxError }
 
 and read_string buf =
   parse

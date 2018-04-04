@@ -46,8 +46,10 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s : forall (x:R) (n:Z), (0%Z <= n)%Z ->
-  ((Reals.Rfunctions.powerRZ x (n + 1%Z)%Z) = (x * (Reals.Rfunctions.powerRZ x n))%R).
+Lemma Power_s :
+  forall (x:R) (n:Z), (0%Z <= n)%Z ->
+  ((Reals.Rfunctions.powerRZ x (n + 1%Z)%Z) =
+   (x * (Reals.Rfunctions.powerRZ x n))%R).
 Proof.
 intros x n h1.
 rewrite 2!power_is_exponentiation by auto with zarith.
@@ -55,8 +57,10 @@ now apply Power_s.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s_alt : forall (x:R) (n:Z), (0%Z < n)%Z ->
-  ((Reals.Rfunctions.powerRZ x n) = (x * (Reals.Rfunctions.powerRZ x (n - 1%Z)%Z))%R).
+Lemma Power_s_alt :
+  forall (x:R) (n:Z), (0%Z < n)%Z ->
+  ((Reals.Rfunctions.powerRZ x n) =
+   (x * (Reals.Rfunctions.powerRZ x (n - 1%Z)%Z))%R).
 intros x n h1.
 rewrite <- Power_s.
 f_equal; omega.
@@ -70,8 +74,10 @@ exact Rmult_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_sum : forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((Reals.Rfunctions.powerRZ x (n + m)%Z) = ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ x m))%R)).
+Lemma Power_sum :
+  forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
+  ((Reals.Rfunctions.powerRZ x (n + m)%Z) =
+   ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ x m))%R).
 Proof.
 intros x n m h1 h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -79,8 +85,10 @@ apply Power_sum ; auto with real.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_mult : forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((Reals.Rfunctions.powerRZ x (n * m)%Z) = (Reals.Rfunctions.powerRZ (Reals.Rfunctions.powerRZ x n) m))).
+Lemma Power_mult :
+  forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
+  ((Reals.Rfunctions.powerRZ x (n * m)%Z) =
+   (Reals.Rfunctions.powerRZ (Reals.Rfunctions.powerRZ x n) m)).
 Proof.
 intros x n m h1 h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -88,17 +96,21 @@ apply Power_mult ; auto with real.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R) ->
-  forall (n:Z), (0%Z <= n)%Z ->
-  (((Reals.Rfunctions.powerRZ x n) * y)%R = (y * (Reals.Rfunctions.powerRZ x n))%R).
+Lemma Power_comm1 :
+  forall (x:R) (y:R), ((x * y)%R = (y * x)%R) -> forall (n:Z),
+  (0%Z <= n)%Z ->
+  (((Reals.Rfunctions.powerRZ x n) * y)%R =
+   (y * (Reals.Rfunctions.powerRZ x n))%R).
 intros x y h1 n h2.
 apply Rmult_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_comm2 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R) ->
-  forall (n:Z), (0%Z <= n)%Z ->
-  ((Reals.Rfunctions.powerRZ (x * y)%R n) = ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ y n))%R).
+Lemma Power_comm2 :
+  forall (x:R) (y:R), ((x * y)%R = (y * x)%R) -> forall (n:Z),
+  (0%Z <= n)%Z ->
+  ((Reals.Rfunctions.powerRZ (x * y)%R n) =
+   ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ y n))%R).
 Proof.
 intros x y h1 n h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -106,7 +118,8 @@ apply Power_comm2 ; auto with real.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_ge_one : forall (x:R) (n:Z), ((0%Z <= n)%Z /\ (1%R <= x)%R) ->
+Lemma Pow_ge_one :
+  forall (x:R) (n:Z), ((0%Z <= n)%Z /\ (1%R <= x)%R) ->
   (1%R <= (Reals.Rfunctions.powerRZ x n))%R.
 intros x n (h1,h2).
 generalize h1.

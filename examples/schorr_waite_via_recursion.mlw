@@ -42,7 +42,7 @@ module Memory
   (** Memory blocks have two parts: a marking part containing in particular
       Schorr-Waite internal management data, and a sequence of pointers
       to other memory blocks. *)
-  type memory model {
+  type memory = abstract {
     (** Associate block size to location. *)
     block_size : map loc int;
     (** Pointers to other memory blocks. *)
@@ -170,7 +170,7 @@ module SchorrWaite
     ensures { forall x. not path (old memo) root x /\ x <> null ->
       memo.colors[x] = (old memo).colors[x] }
   =
-    'I:
+    label I in
     let t = ref root in
     let p = ref (null ()) in
     (** Schorr-Waite loop body. *)
@@ -247,62 +247,62 @@ module SchorrWaite
     in
     let rec aux (ghost gray:set loc) : unit
       (* DFS invariant *)
-      requires { well_colored_on graph gray (at memo 'I) memo.colors }
+      requires { well_colored_on graph gray (memo at I) memo.colors }
       requires { mem !t graph }
       (* Non-marked nodes have unchanged structure with
           respect to the initial one. *)
       requires { forall x n.
         x <> null /\ not black memo.colors[x] /\ 0 <= n < memo.block_size[x] ->
-        memo.accessor[x][n] = (at memo.accessor 'I)[x][n] }
+        memo.accessor[x][n] = (memo.accessor at I)[x][n] }
       (* 'stack frames' are maintained correctly *)
       ensures { !t = old !t /\ !p = old !p }
       (* Pointer buffer is left unchanged *)
       ensures { unchanged (old memo) memo }
       (* Maintain DFS invariant *)
-      ensures { well_colored_on graph gray (at memo 'I) memo.colors }
+      ensures { well_colored_on graph gray (memo at I) memo.colors }
       (* The top node get marked *)
       ensures { black memo.colors[!t] \/ !t = null }
       (* May not mark unreachable node, neither change marked node. *)
       ensures { forall x.
-        x <> null -> not path (at memo 'I) !t x \/ black (old memo.colors)[x] ->
+        x <> null -> not path (memo at I) !t x \/ black (old memo.colors)[x] ->
         memo.colors[x] = (old memo.colors)[x] }
       (* Never 'exit' the loop during the recursive calls *)
       raises { Stop -> false }
       (* Terminates because there is a limited number of 'grayable' nodes. *)
       variant { cardinal graph - cardinal gray }
-    = 'J:
+    = label J in
       if is_null !t || black !t then () else begin
         let s = get_block_size !t in
         let ghost g2 = add !t gray in
-        assert { path (at memo 'I) !t !t };
+        assert { path (memo at I) !t !t };
         body (); (* Either push or mark & continue. *)
         if s <> 0 then begin
           for i = 0 to s - 2 do (* Over all sub-blocs... *)
             (* DFS invariant. *)
-            invariant { well_colored_on graph g2 (at memo 'I) memo.colors }
+            invariant { well_colored_on graph g2 (memo at I) memo.colors }
             (* Current stack frame invariants *)
-            invariant { !p = at !t 'J }
-            invariant { !t = (at memo.accessor 'I)[!p][i] }
+            invariant { !p = !t at J }
+            invariant { !t = (memo.accessor at I)[!p][i] }
             invariant { memo.colors[!p] = Black (Some i) }
             invariant { forall j. 0 <= j < s /\ j <> i ->
-              memo.accessor[!p][j] = (at memo.accessor 'J)[!p][j] }
-            invariant { memo.accessor[!p][i] = at !p 'J }
+              memo.accessor[!p][j] = (memo.accessor at J)[!p][j] }
+            invariant { memo.accessor[!p][i] = !p at J }
             (* Outside structure is unchanged. *)
             invariant { forall l n.
               l <> null /\ l <> !p /\ 0 <= n < memo.block_size[l] ->
-              memo.accessor[l][n] = (at memo.accessor 'J)[l][n] }
+              memo.accessor[l][n] = (memo.accessor at J)[l][n] }
             (* All nodes under !p & before i are either null or marked black. *)
             invariant { forall j. 0 <= j < i ->
               let l = memo.accessor[!p][j] in l = null \/ black memo.colors[l] }
             (* Unreachable/pre-marked blocks do not change. *)
             invariant { forall l. l <> null ->
-              not path (at memo 'I) !p l \/ black (at memo.colors 'J)[l] ->
-                memo.colors[l] = (at memo.colors 'J)[l] }
-            'K:
+              not path (memo at I) !p l \/ black (memo.colors at J)[l] ->
+                memo.colors[l] = (memo.colors at J)[l] }
+            label K in
             aux g2; (* Explore sub-bloc. *)
             body (); (* Swing to next sub-bloc. *)
-            assert { !t = (at memo.accessor 'K)[!p][i+1]
-              = (at memo.accessor 'J)[!p][i+1] }
+            assert { !t = (memo.accessor at K)[!p][i+1]
+              = (memo.accessor at J)[!p][i+1] }
           done;
           aux g2; (* Explore last sub-bloc. *)
           body (); (* Pop. *)
@@ -313,9 +313,9 @@ module SchorrWaite
         absurd; (* Done. *)
     with Stop ->
       (* Need induction to recover path-based specification. *)
-      assert { forall x y m. m = at memo 'I /\ x <> null /\ y <> null /\
+      assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
         mem x graph /\ black memo.colors[x] ->
-        ("induction" path m x y) -> black memo.colors[y] }
+        ([@induction] path m x y) -> black memo.colors[y] }
     end
 
 end

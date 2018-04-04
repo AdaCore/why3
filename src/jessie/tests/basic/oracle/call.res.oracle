@@ -6,30 +6,79 @@
 [kernel] Parsing tests/basic/call.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
 [jessie3] processing function f
 [jessie3] created program function f (67)
 [jessie3] processing function g
+[jessie3] lookup program function f (67)
 [jessie3] created program function g (72)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
-[jessie3] failure: Exception raised during translation to Why3:
-                   Ident f is not yet declared
-[jessie3] failure: Exception raised when loading prover drivers:
-                   anomaly: Log.AbortFatal("jessie3")
-[kernel] Current source was: tests/basic/call.c:16
-         The full backtrace is:
-         Raised at file "src/kernel/log.ml", line 524, characters 30-31
-         Called from file "src/kernel/log.ml", line 518, characters 9-16
-         Re-raised at file "src/kernel/log.ml", line 521, characters 15-16
-         Called from file "register.ml", line 87, characters 6-113
-         Called from file "queue.ml", line 134, characters 6-20
-         Called from file "src/kernel/boot.ml", line 37, characters 4-20
-         Called from file "src/kernel/cmdline.ml", line 763, characters 2-9
-         Called from file "src/kernel/cmdline.ml", line 216, characters 4-8
-         
-         Plug-in jessie3 aborted: internal error.
-         Please report as 'crash' at http://bts.frama-c.com/.
-         Your Frama-C version is Sodium-20150201.
-         Note that a version and a backtrace alone often do not contain enough
-         information to understand the bug. Guidelines for reporting bugs are at:
-         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines
+[jessie3] made 2 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.bv.BVCheck32 *)
+            
+            (* use mach.int.Int64 *)
+            
+            goal VC_f :
+              forall x:t.
+               0 <= to_uint x /\ to_uint x <= 1000 ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 1 /\ 1 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 1 /\ o1 = of_int 1 ->
+                        (0 <= (to_uint x + to_uint o1) /\
+                          (to_uint x + to_uint o1) < two_power_size) /\
+                         (forall o2:t.
+                           to_uint o2 = (to_uint x + to_uint o1) /\ o2 = add x o1 ->
+                            (forall us_retres:t.
+                              us_retres = o2 -> (to_uint us_retres - to_uint x) > 0))))
+            
+            goal VC_g :
+              forall x:t.
+               10 <= to_uint x /\ to_uint x <= 100 ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 1 /\ 1 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 1 /\ o1 = of_int 1 ->
+                        (0 <= (to_uint x - to_uint o1) /\
+                          (to_uint x - to_uint o1) < two_power_size) /\
+                         (let o2 = sub x o1 in
+                         to_uint o2 = (to_uint x - to_uint o1) ->
+                          (0 <= to_uint o2 /\ to_uint o2 <= 1000) /\
+                           (forall o3:t.
+                             (to_uint o3 - to_uint o2) > 0 ->
+                              (forall y:t. y = o3 -> (to_uint y - to_uint x) >= 0)))))
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC f) (postcondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 6 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 7 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 8 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 9 (VC g) (assertion): Valid, Valid, Valid

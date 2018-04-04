@@ -32,7 +32,7 @@ theory BuiltIn
   syntax type real  "real"
   syntax predicate (=)  "(= %1 %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 
   (* could we do this? *)
   (* meta "eliminate_algebraic" "keep_enums" *)
@@ -55,16 +55,16 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -98,16 +98,16 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -118,43 +118,40 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
-
+  meta "encoding:kept" type real
 end
 
 theory Bool
-   syntax type     bool  "bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding : kept" type bool
-end
-theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function notb  "(not %1)"
+  syntax type     bool  "bool"
+  syntax function True  "true"
+  syntax function False "false"
+
+  meta "encoding:kept" type bool
 end
 
+theory bool.Bool
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function notb  "(not %1)"
+end
+
+theory HighOrd
+  syntax type (->) "(-> %1 %2)"
+  syntax function (@) "(%1 %2)"
+
+  meta "encoding:lskept" function (@)
+end
 
 theory map.Map
-  syntax type map "(-> %1 %2)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
-
   syntax function get    "(%1 %2)"
   syntax function ([])   "(%1 %2)"
   syntax function set    "(update %1 (%2) %3)"
   syntax function ([<-]) "(update %1 (%2) %3)"
 
-
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 end
 
 theory map.Const
-  meta "encoding : lskept" function const
+  meta "encoding:lskept" function const
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)

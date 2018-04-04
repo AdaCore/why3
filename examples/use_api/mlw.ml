@@ -39,8 +39,165 @@ let mul_int : Term.lsymbol =
 let unit_type = Ty.ty_tuple []
 
 (* start a module named "Program" *)
+let m = Pmodule.create_module env (Ident.id_fresh "Program")
+
+
+(* declaration of
+     let f (_dummy:unit) : unit
+        requires { true }
+        ensures { true }
+      =
+        assert { 6*7 = 42 }
+ *)
+let d =
+  let id = Ident.id_fresh "f" in
+  let args =
+    [None,false,Dexpr.dity_of_ity Ity.ity_unit]
+  in
+  let body denv =
+    let spec_later _lvm _old _ret_type =
+      {
+        Dexpr.ds_pre = [];
+        Dexpr.ds_post = [];
+        Dexpr.ds_xpost = Ity.Mexn.empty;
+        Dexpr.ds_reads = [];
+        Dexpr.ds_writes = [];
+        Dexpr.ds_diverge = false;
+        Dexpr.ds_checkrw = false;
+      }
+    in
+    let variants _lvm _old = [Term.t_nat_const 0,None] in
+    let body =
+      let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
+      let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
+      let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
+      let p =
+        Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
+      in
+      Dexpr.dexpr (Dexpr.DEassert(Expr.Assert,(fun _lvm _old -> p)))
+    in
+    (spec_later,variants,body)
+  in
+  let predef = (id, false (* function is not ghost *),
+                Expr.RKnone (* function is not intended to be used in the specifications *),
+                args,
+                Dexpr.dity_of_ity Ity.ity_unit,
+                Ity.MaskVisible,
+                body)
+  in
+  let denv,def = Dexpr.drec_defn Dexpr.denv_empty [predef] in
+  let def = Dexpr.rec_defn def in
+  Format.eprintf "It works!@.";
+  def
+
+
+(*
+
+declaration of
+     let f (_dummy:unit) : unit
+        requires { true }
+        ensures { result = 0 }
+      =
+        let x = ref 0 in
+        !x
+
+*)
+
+(***
+
+(* import the ref.Ref module *)
+
+let ref_module : Mlw_module.modul =
+  Mlw_module.read_module env ["ref"] "Ref"
+
+let ref_type : Mlw_ty.T.itysymbol =
+  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
+
+(* the "ref" function *)
+let ref_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+
+(* the "!" function *)
+let get_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
+
+let d2 =
+  let args =
+    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
+  in
+  let result = Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int in
+  let spec = {
+    Mlw_ty.c_pre = Term.t_true;
+    c_post = Mlw_ty.create_post result Term.t_true;
+    c_xpost = Mlw_ty.Mexn.empty;
+    c_effect = Mlw_ty.eff_empty;
+    c_variant = [];
+    c_letrec  = 0;
+  }
+  in
+  let body =
+    (* building expression "ref 0" *)
+    let e =
+      (* recall that "ref" has polymorphic type "(v:'a) -> ref 'a".
+         We need to build an instance of it *)
+      (* we build "ref int" with a *fresh* region *)
+      let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
+      (* e1 : the appropriate instance of "ref" *)
+      let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
+      (* we apply it to 0 *)
+      let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      Mlw_expr.e_app e1 [c0]
+    in
+    (* building the first part of the let x = ref 0 *)
+    let letdef, var_x = Mlw_expr.create_let_pv_defn (Ident.id_fresh "x") e in
+    (* building expression "!x" *)
+    let bang_x =
+      (* recall that "!" as type "ref 'a -> 'a" *)
+      let e1 = Mlw_expr.e_arrow get_fun [var_x.Mlw_ty.pv_ity] Mlw_ty.ity_int in
+      Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
+    in
+    (* the complete body *)
+    Mlw_expr.e_let letdef bang_x
+  in
+  let lambda = {
+    Mlw_expr.l_args = args;
+    l_expr = body;
+    l_spec = spec;
+  }
+  in
+  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
+  Mlw_decl.create_rec_decl [def]
+
+
+ **)
+
+
+
+(* TODO: continue *)
+
+(*
+let () = Printexc.record_backtrace true
+
+let () =
+  try
+    let _buggy : Mlw_module.module_uc = Mlw_module.add_pdecl ~wp:true m d in
+    ()
+  with Not_found ->
+    Printexc.print_backtrace stderr;
+    flush stderr
+*)
+
+
+(* old stuff from logic.ml:
+(* build a whyml program *)
+
+(* start a module named "Program" *)
 let m = Mlw_module.create_module env (Ident.id_fresh "Program")
 
+let mul_int : Term.lsymbol =
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+
+let unit_type = Ty.ty_tuple []
 
 (* declaration of
      let f (_dummy:unit) : unit
@@ -92,7 +249,6 @@ declaration of
         !x
 
 *)
-
 
 (* import the ref.Ref module *)
 
@@ -176,10 +332,10 @@ let () =
     flush stderr
 *)
 
-
+ *)
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma mlw.ml"
+compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma -I `ocamlfind query menhirLib` menhirLib.cmo -I `ocamlfind query camlzip` zip.cma ../../lib/why3/why3.cma mlw.ml"
 End:
 *)

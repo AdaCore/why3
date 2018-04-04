@@ -236,3 +236,49 @@ module Algo5
     !maxsum
 
 end
+
+(* Kadane's algorithm with 63-bit integers
+
+   Interestingly, we only have to require all sums to be no greater
+   than max_int.  There is no need to require the sums to be no
+   smaller than min_int, since whenever the sum becomes negative it is
+   replaced by the next element. *)
+
+module BoundedIntegers
+
+  use import int.Int
+  use import mach.int.Int63
+  use import mach.int.Refint63
+  use import mach.array.Array63
+  use int.Sum
+
+  function sum (a: array int63) (lo hi: int) : int =
+    Sum.sum (fun i -> (a[i] : int)) lo hi
+
+  let maximum_subarray (a: array int63) (ghost lo hi: ref int): int63
+    requires { [@no overflow] forall l h. 0 <= l <= h <= length a ->
+               sum a l h <= max_int }
+    ensures { 0 <= !lo <= !hi <= length a && result  = sum a !lo !hi }
+    ensures { forall l h. 0 <= l <= h <= length a -> result >= sum a !lo !hi }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref zero in
+    let ghost l = ref 0 in
+    let s = ref zero in
+    let i = ref zero in
+    while !i < n do
+      invariant { 0 <= !lo <= !hi <= !i <= n && 0 <= !ms = sum a !lo !hi }
+      invariant { forall l' h': int. 0 <= l' <= h' <= !i -> sum a l' h' <= !ms }
+      invariant { 0 <= !l <= !i && !s = sum a !l !i }
+      invariant { forall l': int. 0 <= l' < !i -> sum a l' !i <= !s }
+      variant   { n - !i }
+      if !s < zero then begin s := a[!i]; l := to_int !i end
+      else begin assert { sum a !l (!i + 1) <= max_int }; s += a[!i] end;
+      if !s > !ms then begin
+        ms := !s; lo := !l; hi := to_int !i + 1 end;
+      incr i
+    done;
+    !ms
+
+end

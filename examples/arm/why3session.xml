@@ -2,69 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../arm.mlw" expanded="true">
-<theory name="M" sum="a8ed8ac125c36f5df5d21cfb0c45379b" expanded="true">
- <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter insertion_sort.1" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.2" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.3" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.4" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.5" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.6" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.7" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.03" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.8" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.9" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.10" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="1.17" steps="75"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.11" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.02" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.12" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.13" expl="loop variant decrease">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.14" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.15" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
- </transf>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../arm.mlw" proved="true">
+<theory name="M" proved="true">
+ <goal name="VC insertion_sort" expl="VC for insertion_sort" proved="true">
+ <proof prover="0"><result status="valid" time="0.11" steps="135"/></proof>
  </goal>
 </theory>
-<theory name="ARM" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
-</theory>
-<theory name="InsertionSortExample" sum="bb2596f60660accb63622e86fa9bb854" expanded="true">
- <goal name="WP_parameter path_init_l2" expl="VC for path_init_l2">
- <proof prover="1"><result status="valid" time="0.14"/></proof>
- <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+<theory name="InsertionSortExample" proved="true">
+ <goal name="VC path_init_l2" expl="VC for path_init_l2" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
  </goal>
- <goal name="WP_parameter path_l2_exit" expl="VC for path_l2_exit">
- <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="10"/></proof>
+ <goal name="VC path_l2_exit" expl="VC for path_l2_exit" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
 </theory>
 </file>

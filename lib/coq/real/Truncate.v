@@ -32,9 +32,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Truncate_down_pos : forall (x:R), (0%R <= x)%R ->
-  (((BuiltIn.IZR (truncate x)) <= x)%R /\
-  (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R).
+Lemma Truncate_down_pos :
+  forall (x:R), (0%R <= x)%R ->
+  ((BuiltIn.IZR (truncate x)) <= x)%R /\
+  (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R.
 Proof.
   intros x h.
   rewrite (Ztrunc_floor x h), <-Z2R_IZR, <-Z2R_IZR.
@@ -45,9 +46,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Truncate_up_neg : forall (x:R), (x <= 0%R)%R ->
-  (((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
-  (x <= (BuiltIn.IZR (truncate x)))%R).
+Lemma Truncate_up_neg :
+  forall (x:R), (x <= 0%R)%R ->
+  ((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
+  (x <= (BuiltIn.IZR (truncate x)))%R.
 Proof.
   intros x h.
   rewrite (Ztrunc_ceil x h), <-Z2R_IZR, <-Z2R_IZR.
@@ -63,7 +65,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Real_of_truncate : forall (x:R),
+Lemma Real_of_truncate :
+  forall (x:R),
   ((x - 1%R)%R <= (BuiltIn.IZR (truncate x)))%R /\
   ((BuiltIn.IZR (truncate x)) <= (x + 1%R)%R)%R.
 Proof.
@@ -84,15 +87,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Truncate_monotonic : forall (x:R) (y:R), (x <= y)%R ->
-  ((truncate x) <= (truncate y))%Z.
+Lemma Truncate_monotonic :
+  forall (x:R) (y:R), (x <= y)%R -> ((truncate x) <= (truncate y))%Z.
 Proof.
   apply Ztrunc_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Truncate_monotonic_int1 : forall (x:R) (i:Z),
-  (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
+Lemma Truncate_monotonic_int1 :
+  forall (x:R) (i:Z), (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
 Proof.
   intros x i h.
   rewrite <-Z2R_IZR in h.
@@ -105,8 +108,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Truncate_monotonic_int2 : forall (x:R) (i:Z),
-  ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
+Lemma Truncate_monotonic_int2 :
+  forall (x:R) (i:Z), ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
 Proof.
   intros x i h.
   rewrite <-Z2R_IZR in h.
@@ -139,7 +142,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Floor_down : forall (x:R), ((BuiltIn.IZR (floor x)) <= x)%R /\
+Lemma Floor_down :
+  forall (x:R),
+  ((BuiltIn.IZR (floor x)) <= x)%R /\
   (x < (BuiltIn.IZR ((floor x) + 1%Z)%Z))%R.
 Proof.
   intro x.
@@ -162,8 +167,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Ceil_up : forall (x:R), ((BuiltIn.IZR ((ceil x) - 1%Z)%Z) < x)%R /\
-  (x <= (BuiltIn.IZR (ceil x)))%R.
+Lemma Ceil_up :
+  forall (x:R),
+  ((BuiltIn.IZR ((ceil x) - 1%Z)%Z) < x)%R /\ (x <= (BuiltIn.IZR (ceil x)))%R.
 Proof.
 intro x.
 rewrite <-Z2R_IZR, <-Z2R_IZR; split; [|apply Zceil_ub].
@@ -172,15 +178,15 @@ apply ceil_lb.
 Qed.
 
 (* Why3 goal *)
-Lemma Floor_monotonic : forall (x:R) (y:R), (x <= y)%R ->
-  ((floor x) <= (floor y))%Z.
+Lemma Floor_monotonic :
+  forall (x:R) (y:R), (x <= y)%R -> ((floor x) <= (floor y))%Z.
 Proof.
   apply Zfloor_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Ceil_monotonic : forall (x:R) (y:R), (x <= y)%R ->
-  ((ceil x) <= (ceil y))%Z.
+Lemma Ceil_monotonic :
+  forall (x:R) (y:R), (x <= y)%R -> ((ceil x) <= (ceil y))%Z.
 Proof.
   apply Zceil_le.
 Qed.

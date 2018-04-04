@@ -5,9 +5,9 @@ module M
 
   (* preliminaries *)
 
-  use import map.Map as M
+  clone import appmap.Appmap as M with type key = int
 
-  type array 'a = M.map int 'a
+  type array 'a = t 'a
 
   predicate injective (n:int) (m:int) (a:array 'a) =
     forall i j:int. n <= i <= m -> n <= j <= m ->
@@ -19,7 +19,7 @@ module M
 
   type pointer = int
 
-  type region 'a = M.map pointer 'a
+  type region 'a = t 'a
 
   type first_free_addr = int
 
@@ -125,7 +125,7 @@ fun CreateCourse(R:[Course]): [R]
 let createCourse (r: (ref (region course))) : pointer
   ensures { valid !alloc result }
   = let c = new_pointer () in
-    let (rStud,student,count,sum) = !r[c] in
+    let (rStud,student,_count,_sum) = !r[c] in
     let newc = (rStud,student,0,0) in
     r := !r[c <- newc];
     assert { invCourse !alloc newc };

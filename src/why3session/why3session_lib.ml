@@ -11,7 +11,7 @@
 
 open Why3
 
-module S = Session
+module S = Session_itp
 module C = Whyconf
 
 let verbose = Debug.register_info_flag "verbose"
@@ -71,15 +71,35 @@ let read_env_spec () =
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 
+let read_session fname =
+  let q = Queue.create () in
+  Queue.push fname q;
+  let project_dir = Server_utils.get_session_dir ~allow_mkdir:false q in
+  S.load_session project_dir
+
 let read_update_session ~allow_obsolete env config fname =
-  let project_dir = S.get_project_dir fname in
-  let session,use_shapes = S.read_session project_dir in
+  let session,use_shapes = read_session fname in
+(*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
     ~use_shapes_for_pairing_sub_goals:use_shapes
     (fun ?parent:_ () -> ())
   in
   S.update_session ~ctxt session env config
+ *)
+  let cont = Controller_itp.create_controller config env session in
+  let errors, found_obs, some_merge_miss =
+    Controller_itp.reload_files cont ~use_shapes
+  in
+  begin
+    match errors with
+    | [] -> ()
+    | l ->
+       List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
+       exit 1
+  end;
+  if (found_obs || some_merge_miss) && not allow_obsolete then raise Exit;
+  cont, found_obs, some_merge_miss
 
 (** filter *)
 type filter_prover =
@@ -194,10 +214,10 @@ let read_filter_spec whyconf : filters * bool =
    status = !opt_status;
   },!should_exit
 
-let iter_proof_attempt_by_filter iter filters f session =
+let iter_proof_attempt_by_filter ses iter filters f =
   (* provers *)
   let iter_provers a =
-    if C.Sprover.mem a.S.proof_prover filters.provers then f a in
+    if C.Sprover.mem a.S.prover filters.provers then f a in
   let f = if C.Sprover.is_empty filters.provers then f else iter_provers in
   (* three value *)
   let three_value f v p =
@@ -210,24 +230,36 @@ let iter_proof_attempt_by_filter iter filters f session =
   (* obsolete *)
   let f = three_value f filters.obsolete (fun a -> a.S.proof_obsolete) in
   (* archived *)
+(*
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
+ *)
   (* verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> Opt.inhabited (S.goal_verified a.S.proof_parent)) in
+    (fun a -> S.pn_proved ses a.S.parent) in
   (* verified *)
   let f = three_value f filters.verified
-    (fun p -> Opt.inhabited (S.proof_verified p)) in
+    (fun p -> match p.S.proof_state with Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
+                                      true | _ -> false) in
   (* status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with
-      | S.Done pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
+      | Some pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
       | _ -> ()) in
-  iter f session
+  iter f ses
 
-let theory_iter_proof_attempt_by_filter filters f th =
-  iter_proof_attempt_by_filter S.theory_iter_proof_attempt filters f th
-let session_iter_proof_attempt_by_filter filters f s =
-  iter_proof_attempt_by_filter S.session_iter_proof_attempt filters f s
+let theory_iter_proof_attempt_by_filter s filters f th =
+  iter_proof_attempt_by_filter
+    s
+    (fun f s -> S.theory_iter_proof_attempt s (fun _ -> f))
+    filters f th
+
+let session_iter_proof_attempt_by_filter s filters f =
+  iter_proof_attempt_by_filter
+    s
+    (fun f _s ->
+     S.session_iter_proof_attempt (fun _ x -> f x))
+    filters f s
+
 
 let set_filter_verified_goal t = opt_filter_verified_goal := t
 
@@ -270,3 +302,49 @@ let ask_yn_nonblock ~callback =
             Buffer.clear b;
             true
       end
+
+
+let get_used_provers_goal session g =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.goal_iter_proof_attempt session
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    g;
+  !sprover
+
+let get_used_provers_theory session th =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.theory_iter_proof_attempt session
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    th;
+  !sprover
+
+let get_used_provers_file session f =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.file_iter_proof_attempt session
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    f;
+  !sprover
+
+let get_used_provers session =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.session_iter_proof_attempt
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+     session;
+  !sprover
+
+
+let rec transf_depth s tr =
+  List.fold_left
+    (fun depth g -> max depth (goal_depth s g)) 0 (Session_itp.get_sub_tasks s tr)
+and goal_depth s g =
+  List.fold_left
+    (fun depth tr -> max depth (1 + transf_depth s tr))
+    1 (Session_itp.get_transformations s g)
+
+let theory_depth s t =
+  List.fold_left
+    (fun depth g -> max depth (goal_depth s g)) 0 (Session_itp.theory_goals t)
+
+let file_depth s f =
+  List.fold_left (fun depth t -> max depth (theory_depth s t)) 0
+    (Session_itp.file_theories f)

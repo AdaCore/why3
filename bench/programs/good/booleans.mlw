@@ -1,4 +1,3 @@
-module M
 
 use import int.Int
 use import ref.Ref
@@ -44,7 +43,7 @@ let test_all_1 ()
 
 (* from Cesar Munoz's CD3D *)
 
-function d : int
+val constant d : int
 
 val vx : ref int
 val vy : ref int
@@ -54,12 +53,4 @@ val sq (x:int) : int ensures { result = x*x }
 let test_cd3d ()
   ensures { result=1 -> !vx=0 /\ !vy=0 }
   = if !vx=0 && !vy=0 && sq !vx + sq !vy < sq d then 1 else 2
-
-end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/booleans"
-End:
-*)
 

@@ -16,9 +16,8 @@
 
 module GmpModel
 
-  use export int.Int
-  use export int.ComputerDivision
-  use export array.Array
+  use import int.Int
+  use import array.Array
 
   constant beta' : int
   axiom one_lt_beta' : 1 < beta'
@@ -75,8 +74,11 @@ end
 module GmpAuxiliaryfunctions
 
   use export GmpModel
-  use export ref.Ref
-  use export int.Power
+  use import int.Int
+  use import int.ComputerDivision
+  use import int.Power
+  use import ref.Ref
+  use import array.Array
 
   val rb: ref bool
 

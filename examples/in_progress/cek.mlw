@@ -45,35 +45,33 @@ p2 = (\x.\f.f x) (\y.y) (\x.x)
 </pre></blockquote>}
 *)
 
-constant f : identifier = 6
-constant x : identifier = 24
-constant y : identifier = 25
+let constant f : identifier = 6
+let constant x : identifier = 24
+let constant y : identifier = 25
 
-constant p0 : term = Lambda x (Var x)
+let constant p0 : term = Lambda x (Var x)
 
-constant p1 : term = App p0 p0
+let constant p1 : term = App p0 p0
 
-constant p2 : term =
+let constant p2 : term =
   App (App (Lambda x (Lambda f (App (Var f)  (Var x))))
            (Lambda y (Var y)))
       (Lambda x (Var x))
 
-use HighOrd as H
-
-predicate ground_rec (t:term) (bound: H.pred identifier) =
+predicate ground_rec (t:term) (bound: identifier -> bool) =
   match t with
   | Var v -> bound v
   | App t1 t2 -> ground_rec t1 bound /\ ground_rec t2 bound
-  | Lambda x t -> ground_rec t (\v. v=x \/ bound v)
+  | Lambda x t -> ground_rec t (fun v -> v=x \/ bound v)
   end
 
-let lemma ground_rec_app (t1 t2 : term) (bound: H.pred identifier)
+let lemma ground_rec_app (t1 t2 : term) (bound: identifier -> bool)
   requires { ground_rec (App t1 t2) bound }
   ensures  { ground_rec t1 bound }
   ensures  { ground_rec t2 bound }
 = ()
 
-function no_bound : H.pred identifier = (\x. false)
+function no_bound : identifier -> bool = fun _ -> false
 
 predicate ground (t:term) = ground_rec t no_bound
 
@@ -123,7 +121,7 @@ let rec lemma weak_nf_complete (t:term)
 = match t with
   | Var _ -> ()
   | Lambda _ _ -> ()
-  | App t1 t2 -> 
+  | App t1 t2 ->
     weak_nf_complete t1; weak_nf_complete t2
   end
 
@@ -132,7 +130,7 @@ let rec lemma weak_nf_complete (t:term)
 inductive weak_n_reduce int term term =
   | Zero : forall t. weak_n_reduce 0 t t
   | Succ : forall t1 t2 t3 n.
-     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 -> 
+     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 ->
      weak_n_reduce (n+1) t1 t3
 
 predicate weak_normalize (t1 t2:term) =
@@ -167,9 +165,9 @@ lookup : identifier -> environment -> value
 </pre></blockquote>}
 *)
 
-constant dummy_value : value = Closure (-1) (Var (-1)) Nil
+let constant dummy_value : value = Closure (-1) (Var (-1)) Nil
 
-function lookup (i:identifier) (e:environment) : value =
+let rec function lookup (i:identifier) (e:environment) : value =
   match e with
   | Nil -> dummy_value
   | Cons (j,v) r -> if i=j then v else lookup i r
@@ -186,11 +184,11 @@ type context =
   | Left context term environment
   | Right value context
 
-function recompose (c:context) (t:term) (e:environment) : term =
+let rec function recompose (c:context) (t:term) (e:environment) : term =
   match c with
   | Empty -> t
-  | Left c t1 e1 -> App (recompose c t e) t1
-  | Right (Closure x t1 e1) c -> App (Lambda x t1) (recompose c t e)
+  | Left c t1 _e1 -> App (recompose c t e) t1
+  | Right (Closure x t1 _e1) c -> App (Lambda x t1) (recompose c t e)
   end
 
 (*
@@ -218,9 +216,9 @@ let rec lemma recompose_values (c:context) (t1 t2:expr) (e:environment) : unit
 </pre></blockquote>}
 *)
 
-let rec eval (t:term) (e:environment) (c:context) : value 
+let rec eval (t:term) (e:environment) (c:context) : value
   diverges
-  returns { Closure x t1 e1 -> 
+  returns { Closure x t1 _e1 ->
     weak_normalize (recompose c t e) (Lambda x t1) }
 = match t with
   | Var x -> cont c (lookup x e)
@@ -228,7 +226,7 @@ let rec eval (t:term) (e:environment) (c:context) : value
   | App t0 t1 -> eval t0 e (Left c t1 e)
   end
 
-with cont (c:context) (v:value) : value 
+with cont (c:context) (v:value) : value
   diverges
 = match c with
   | Empty -> v
@@ -244,13 +242,8 @@ let compute p : value
     e = Nil /\ weak_normalize p (Lambda x t) }
 = eval p Nil Empty
 
-let test () 
-  diverges 
+let test ()
+  diverges
 = (compute p0,compute p1,compute p2)
 
-
 end
-
-
-
-

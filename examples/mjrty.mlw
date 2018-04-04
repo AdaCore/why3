@@ -16,8 +16,7 @@
    - arrays are 0-based
    - we assume the input array to have at least one element
    - we use 2x <= y instead of x <= floor(y/2), which is equivalent
-   - we do not consider arithmetic overflows (easy, but requires the
-     extra hypothesis length a <= max_int)
+
 *)
 
 module Mjrty
@@ -28,22 +27,23 @@ module Mjrty
   use import array.NumOfEq
 
   exception Not_found
-  exception Found
 
   type candidate
+
+  val (=) (x y: candidate) : bool
+    ensures { result <-> x = y }
 
   let mjrty (a: array candidate) : candidate
     requires { 1 <= length a }
     ensures  { 2 * numof a result 0 (length a) > length a }
-    raises   { Not_found ->
-      forall c: candidate. 2 * numof a c 0 (length a) <= length a }
+    raises   { Not_found -> forall c. 2 * numof a c 0 (length a) <= length a }
   = let n = length a in
     let cand = ref a[0] in
     let k = ref 0 in
-    for i = 0 to n-1 do (* could start at 1 with k initialized to 1 *)
+    for i = 0 to n - 1 do (* could start at 1 with k initialized to 1 *)
       invariant { 0 <= !k <= numof a !cand 0 i }
-      invariant {2 * (numof a !cand 0 i - !k) <= i - !k }
-      invariant {forall c:candidate. c <> !cand -> 2 * numof a c 0 i <= i - !k }
+      invariant { 2 * (numof a !cand 0 i - !k) <= i - !k }
+      invariant { forall c. c <> !cand -> 2 * numof a c 0 i <= i - !k }
       if !k = 0 then begin
         cand := a[i];
         k := 1
@@ -53,19 +53,15 @@ module Mjrty
         decr k
     done;
     if !k = 0 then raise Not_found;
-    try
-      if 2 * !k > n then raise Found;
-      k := 0;
-      for i = 0 to n-1 do
-        invariant { !k = numof a !cand 0 i /\ 2 * !k <= n }
-        if a[i] = !cand then begin
-          incr k;
-          if 2 * !k > n then raise Found
-        end
-      done;
-      raise Not_found
-    with Found ->
-      !cand
-    end
+    if 2 * !k > n then return !cand;
+    k := 0;
+    for i = 0 to n - 1 do
+      invariant { !k = numof a !cand 0 i /\ 2 * !k <= n }
+      if a[i] = !cand then begin
+        incr k;
+        if 2 * !k > n then return !cand
+      end
+    done;
+    raise Not_found
 
 end

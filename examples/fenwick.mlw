@@ -40,7 +40,7 @@ module Fenwick
   (* Get the i-th elements of the model. *)
   function get (f:fenwick) (i:int) : int = f.t[i+f.leaves-1]
   (* Get the sum of elements over range [a;b[ *)
-  function rget (f:fenwick) (a b:int) : int = sum a b (get f)
+  function rget (f:fenwick) (a b:int) : int = sum (get f) a b
 
   (* Create a Fenwick tree initialized at 0 *)
   let make (lv:int) : fenwick
@@ -62,14 +62,14 @@ module Fenwick
     f.t[!lc] <- f.t[!lc] + x;
     (* Update node summaries for all elements on the path
        from the updated leaf to the root. *)
-    'I:
+    label I in
     while !lc <> 0 do
       invariant { 0 <= !lc < f.t.length }
       invariant { forall i. 0 <= i /\ i < f.leaves - 1 ->
         f.t[i] = f.t[2*i+1] + f.t[2*i+2] -
           if 2*i+1 <= !lc <= 2*i+2 then x else 0 }
       invariant { forall i. f.leaves - 1 <= i < f.t.length ->
-        f.t[i] = (at f 'I).t[i] }
+        f.t[i] = (f at I).t[i] }
       variant { !lc }
       lc := div (!lc - 1) 2;
       f.t[!lc] <- f.t[!lc] + x
@@ -79,7 +79,7 @@ module Fenwick
   let rec ghost sum_dec (a b c:int) : unit
     requires { a <= b }
     ensures { forall f g. (forall i. a <= i < b -> f i = g (i+c)) ->
-      sum a b f = sum (a+c) (b+c) g }
+      sum f a b = sum g (a+c) (b+c) }
     variant { b - a }
   = if a < b then sum_dec (a+1) b c
 
@@ -89,7 +89,7 @@ module Fenwick
      are exactly the childs of elements of range [a;b[. *)
   let rec ghost fen_compact (f:fenwick) (a b:int) : unit
     requires { 0 <= a <= b /\ 2 * b < f.t.length /\ valid f }
-    ensures { sum a b (A.get f.t) = sum (2*a+1) (2*b+1) (A.get f.t) }
+    ensures { sum (A.([]) f.t) a b  = sum  (A.([]) f.t) (2*a+1) (2*b+1) }
     variant { b - a }
   = if a < b then fen_compact f (a+1) b
 
@@ -106,7 +106,7 @@ module Fenwick
        and use compaction lemma to halve interval size. *)
     while !ra <> !rb do
       invariant { 0 <= !ra <= !rb <= f.t.length }
-      invariant { !acc + sum !ra !rb (A.get f.t) = rget f a b }
+      invariant { !acc + sum (A.([]) f.t) !ra !rb = rget f a b }
       variant { !rb - !ra }
       if mod !ra 2 = 0 then acc := !acc + f.t[!ra];
       ra := div !ra 2;

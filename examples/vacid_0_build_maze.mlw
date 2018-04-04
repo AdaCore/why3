@@ -40,7 +40,7 @@ module UnionFind_sig
   use import int.Int
   use export UnionFind_pure
 
-  type uf model { mutable state : uf_pure }
+  type uf = private { ghost mutable state : uf_pure }
 
   val create (n:int) : uf
     requires { 0 <= n }

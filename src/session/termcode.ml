@@ -42,11 +42,10 @@ let concat_expls = function
   | [l] -> Some l
   | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-
 let search_labels callback =
   let rec aux acc f =
     if f.t_ty <> None then acc
-    else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
+    else if Ident.Slab.mem Term.stop_split f.Term.t_label then acc
     else
       let res = callback f.Term.t_label in
       if res = [] then match f.t_node with
@@ -298,9 +297,29 @@ let id_string_shape id = push id
 let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
+open Number
+
+let integer_const_shape = function
+  | IConstRaw i -> push (BigInt.to_string i)
+  | IConstDec s -> push s
+  | IConstHex s -> push "0x"; push s
+  | IConstOct s -> push "0o"; push s
+  | IConstBin s -> push "0b"; push s
+
+let real_const_shape = function
+  | RConstDec (i,f,None)   -> push i; push "."; push f
+  | RConstDec (i,f,Some e) -> push i; push "."; push f; push "e"; push e
+  | RConstHex (i,f,Some e) -> push "0x"; push i; push "."; push f; push "p"; push e
+  | RConstHex (i,f,None)   -> push "0x"; push i; push "."; push f
+
+let sign_shape is_negative =
+  if is_negative then pushc '-'
+
 let const_shape c =
-  Format.fprintf Format.str_formatter "%a" Number.print_constant c;
-  push (Format.flush_str_formatter ())
+  match c with
+  | ConstInt c -> sign_shape c.ic_negative; integer_const_shape c.ic_abs
+  | ConstReal c -> sign_shape c.rc_negative; real_const_shape c.rc_abs
+
 
 let rec pat_shape c m p : 'a =
   match p.pat_node with
@@ -480,16 +499,31 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-(*
-  let _integer_constant b c =
-    Number.print_integer_constant Format.str_formatter c;
-    let s = Format.flush_str_formatter () in
-    string b s
-*)
+  let integer_const b = function
+    | IConstRaw i -> raw_string b (BigInt.to_string i)
+    | IConstDec s -> raw_string b s
+    | IConstHex s -> raw_string b "0x"; raw_string b s
+    | IConstOct s -> raw_string b "0o"; raw_string b s
+    | IConstBin s -> raw_string b "0b"; raw_string b s
+
+  let real_const b = function
+    | RConstDec (i,f,None)   ->
+       raw_string b i; raw_string b "."; raw_string b f
+    | RConstDec (i,f,Some e) ->
+       raw_string b i; raw_string b "."; raw_string b f; raw_string b "e"; raw_string b e
+    | RConstHex (i,f,Some e) ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f;
+       raw_string b "p"; raw_string b e
+    | RConstHex (i,f,None)   ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f
+
+  let sign b is_negative =
+    if is_negative then raw_string b "-"
 
   let const b c =
-    Format.fprintf Format.str_formatter "%a" Number.print_constant c;
-    raw_string b (Format.flush_str_formatter ())
+    match c with
+    | ConstInt c -> sign b c.ic_negative; integer_const b c.ic_abs
+    | ConstReal c -> sign b c.rc_negative; real_const b c.rc_abs
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -559,7 +593,6 @@ module Checksum = struct
     ident b ls.ls_name;
     list ty b ls.ls_args;
     option ty b ls.ls_value;
-    list tvsymbol b (Ty.Stv.elements ls.ls_opaque);
     int b ls.ls_constr
 
   (* start: T G F D R L I P (C M) *)
@@ -591,7 +624,6 @@ module Checksum = struct
           | Decl.Plemma -> "PL"
           | Decl.Paxiom -> "PA"
           | Decl.Pgoal  -> "PG"
-          | Decl.Pskip  -> "PS"
         in
         string b tag;
         ident b n.Decl.pr_name;
@@ -617,6 +649,19 @@ module Checksum = struct
     | Theory.MApr pr -> char b 'p'; ident b pr.Decl.pr_name
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
+
+  let tdecl b d = match d.Theory.td_node with
+    | Theory.Decl d -> decl b d
+    | Theory.Use th
+    | Theory.Clone (th, _) ->
+        char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
+    | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+(* not used anymore
+
+  NOTE: if we come back to checksumming theories, use the separate recursive
+        [tdecl] function for it. [Use] in a theory requires a recursive call
+        (as below), [Use] in a task is just a witness declaration.
 
   let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
@@ -644,7 +689,6 @@ module Checksum = struct
         Ident.Wid.set table t.Theory.th_name v;
         v
 
-(* not used anymore
   let theory ~version t = match version with
     | CV1 -> assert false
     | CV2 -> theory_v2 t

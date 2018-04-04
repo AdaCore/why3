@@ -28,33 +28,32 @@ let print_footer fmt () =
 let style_css fname =
   let c = open_out fname in
   output_string c
-"\
-.why3doc a:visited {color : #416DFF; text-decoration : none; }\
-.why3doc a:link {color : #416DFF; text-decoration : none;}\
-.why3doc a:hover {color : Red; text-decoration : none; background-color: #5FFF88}\
-.why3doc a:active {color : Red; text-decoration : underline; }\
-.why3doc .comment { color : #990000 }\
-.why3doc .keyword1 { color : purple; font-weight : bold }\
-.why3doc .keyword2 { color : blue; font-weight : bold }\
-.why3doc .superscript { font-size : 4 }\
-.why3doc .subscript { font-size : 4 }\
-.why3doc .warning { color : Red ; font-weight : bold }\
-.why3doc .info { margin-left : 3em; margin-right : 3em }\
-.why3doc .code { color : #465F91 ; }\
-.why3doc h1 { font-size : 20pt ; border: 1px solid #000000; margin-top: 10px; margin-bottom: 10px;text-align: center; background-color: #90BDFF ;padding: 10px; }\
-.why3doc h2 { font-size : 18pt ; border: 1px solid #000000; margin-top: 8px; margin-bottom: 8px;text-align: left; background-color: #90DDFF ;padding: 8px; }\
-.why3doc h3 { font-size : 16pt ; border: 1px solid #000000; margin-top: 6px; margin-bottom: 6px;text-align: left; background-color: #90EDFF ;padding: 6px; }\
-.why3doc h4 { font-size : 14pt ; border: 1px solid #000000; margin-top: 4px; margin-bottom: 4px;text-align: left; background-color: #90FDFF ;padding: 4px; }\
-.why3doc h5 { font-size : 12pt ; border: 1px solid #000000; margin-top: 2px; margin-bottom: 2px;text-align: left; background-color: #90BDFF ; padding: 2px; }\
-.why3doc h6 { font-size : 10pt ; border: 1px solid #000000; margin-top: 0px; margin-bottom: 0px;text-align: left; background-color: #90BDFF ; padding: 0px; }\
-.why3doc .typetable { border-style : hidden }\
-.why3doc .indextable { border-style : hidden }\
-.why3doc .paramstable { border-style : hidden ; padding: 5pt 5pt}\
-.why3doc body { background-color : White }\
-.why3doc tr { background-color : White }\
-.why3doc td.typefieldcomment { background-color : #FFFFFF }\
-.why3doc pre { margin-top: 1px ; margin-bottom: 2px; }\
-.why3doc div.sig_block {margin-left: 2em}\
-";
+ ".why3doc a:visited { color: #416DFF; text-decoration: none }\
+\n.why3doc a:link { color: #416DFF; text-decoration: none }\
+\n.why3doc a:hover { color: red; text-decoration: none; background-color: #5FFF88 }\
+\n.why3doc a:active { color: red; text-decoration: underline }\
+\n.why3doc .comment { color: #990000 }\
+\n.why3doc .keyword1 { color: purple; font-weight: bold }\
+\n.why3doc .keyword2 { color: blue; font-weight: bold }\
+\n.why3doc .superscript { font-size: smaller }\
+\n.why3doc .subscript { font-size: smaller }\
+\n.why3doc .warning { color: red; font-weight: bold }\
+\n.why3doc .info { margin-left: 3em; margin-right: 3em }\
+\n.why3doc .info > p:first-child { margin-top: 0 }\
+\n.why3doc code { color: #465F91 }\
+\n.why3doc h1 { font-size: 20pt; border: 1px solid #000000; margin: 10pt 0; text-align: center; background-color: #90BDFF; padding: 10pt }\
+\n.why3doc h2 { font-size: 18pt; border: 1px solid #000000; margin: 8pt 0; text-align: left; background-color: #90DDFF; padding: 8pt }\
+\n.why3doc h3 { font-size: 15pt; border: 1px solid #000000; margin: 6pt 0; text-align: left; background-color: #90EDFF; padding: 6pt }\
+\n.why3doc h4 { font-size: 12pt; border: 1px solid #000000; margin: 4pt 0; text-align: left; background-color: #90FDFF; padding: 4pt }\
+\n.why3doc h5 { font-size: 11pt; border: 1px solid #000000; margin: 2pt 0; text-align: left; background-color: #90FEFF; padding: 2pt }\
+\n.why3doc h6 { font-size: 10pt; border: 1px solid #000000; margin: 0pt 0; text-align: left; background-color: #90FFFF; padding: 0pt }\
+\n.why3doc .typetable { border-style: hidden }\
+\n.why3doc .indextable { border-style: hidden }\
+\n.why3doc .paramstable { border-style: hidden; padding: 5pt 5pt }\
+\n.why3doc body { background-color: white }\
+\n.why3doc tr { background-color: white }\
+\n.why3doc td.typefieldcomment { background-color: #FFFFFF }\
+\n.why3doc pre { margin-top: 0; margin-bottom: 0.5ex }\
+\n.why3doc div.sig_block { margin-left: 2em }\
+\n";
   close_out c
-

@@ -22,13 +22,13 @@ unknown "^\\(unknown\\|sat\\|Fail\\)$" ""
 time "why3cpulimit time : %s s"
 valid "^unsat$"
 
-
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
+
+  meta "encoding:kept" type int
   meta "encoding:ignore_polymorphism_ls" predicate (=)
-  meta "encoding : kept" type int
 end
 
 theory int.Int
@@ -40,7 +40,7 @@ theory int.Int
 
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
-  syntax function ( * )  "(* %1 %2)"
+  syntax function (*)  "(* %1 %2)"
   syntax function (-_) "(- %1)"
 
   syntax predicate (<=) "(<= %1 %2)"
@@ -48,16 +48,16 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -78,7 +78,7 @@ theory real.Real
 
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
-  syntax function ( * )  "(* %1 %2)"
+  syntax function (*)  "(* %1 %2)"
   syntax function (/)  "(/ %1 %2)"
   syntax function (-_) "(- %1)"
   syntax function inv  "(/ 1.0 %1)"
@@ -88,16 +88,16 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -108,28 +108,29 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
 theory Bool
-   syntax type     bool  "Bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding : kept" type bool
+  syntax type     bool  "Bool"
+  syntax function True  "true"
+  syntax function False "false"
+
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
-   syntax function notb  "(not %1)"
-   syntax function implb "(=> %1 %2)"
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function xorb  "(xor %1 %2)"
+  syntax function notb  "(not %1)"
+  syntax function implb "(=> %1 %2)"
 end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
-  meta "encoding : lskept" function ite
+  meta "encoding:lskept" function ite
   meta "encoding:ignore_polymorphism_ls" function ite
 end
 
@@ -141,26 +142,28 @@ theory real.Truncate
 end
 *)
 
-theory map.Map
-  syntax type map "(Array %1 %2)"
-  meta "encoding:ignore_polymorphism_ts" type map
+theory HighOrd
+  syntax type     (->) "(Array %1 %2)"
+  syntax function (@)  "(select %1 %2)"
 
-  syntax function get   "(select %1 %2)"
-  syntax function set   "(store %1 %2 %3)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+  meta "encoding:lskept" function (@)
+  meta "encoding:ignore_polymorphism_ts" type (->)
+  meta "encoding:ignore_polymorphism_ls" function (@)
+end
+
+theory map.Map
+  syntax function get "(select %1 %2)"
+  syntax function set "(store %1 %2 %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
   meta "encoding:ignore_polymorphism_ls" function get
   meta "encoding:ignore_polymorphism_ls" function ([])
   meta "encoding:ignore_polymorphism_ls" function set
   meta "encoding:ignore_polymorphism_ls" function ([<-])
-
-  meta "encoding:ignore_polymorphism_pr" prop Select_eq
-  meta "encoding:ignore_polymorphism_pr" prop Select_neq
-  remove prop Select_eq
-  remove prop Select_neq
 end
 
 theory map.Const
-  meta "encoding : lskept" function const
+  meta "encoding:lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
 end

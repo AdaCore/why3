@@ -62,15 +62,6 @@ let debug_decl decl =
   Debug.dprintf debug "Declaration %s @." s
 *)
 
-(* Label for terms that should be in counterexample *)
-let model_label = Ident.create_label "model"
-(* Label for terms that should be projected in counterexample *)
-let model_proj_label = Ident.create_label "model_projected"
-
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
 let intro_const_equal_to_term
     ~term
     ~id_new
@@ -193,7 +184,7 @@ let intro_proj_for_ls env map_projs ls_projected =
      @param map_projs maps types to projection function for these types
      @param ls_projected the label symbol that should be projected
   *)
-  if not (Slab.mem model_proj_label ls_projected.ls_name.id_label)
+  if not (Slab.mem Ident.model_projected_label ls_projected.ls_name.id_label)
   then
     (* ls_projected has not a label "model_projected" *)
     []
@@ -257,7 +248,7 @@ let encapsulate env projs : Task.task Trans.trans =
   meta_transform2 (fun d -> introduce_projs env map_projs d.Task.task_decl.td_node)
 
 let intro_projections_counterexmp env =
-  Trans.on_tagged_ls meta_projection (encapsulate env)
+  Trans.on_tagged_ls Theory.meta_projection (encapsulate env)
 
 
 let () = Trans.register_env_transform "intro_projections_counterexmp" intro_projections_counterexmp

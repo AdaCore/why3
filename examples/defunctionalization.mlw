@@ -41,11 +41,15 @@ p4 = 10 - (2 - 3)
 </pre></blockquote>}
 *)
 
-constant p0 : prog = Cte 0
-constant p1 : prog = Sub (Cte 10) (Cte 6)
-constant p2 : prog = Sub (Sub (Cte 10) (Cte 6)) (Sub (Cte 7) (Cte 2))
-constant p3 : prog = Sub (Sub (Cte 7) (Cte 2)) (Sub (Cte 10) (Cte 6))
-constant p4 : prog = Sub (Cte 10) (Sub (Cte 2) (Cte 3))
+let constant p0 : prog = Cte 0
+
+let constant p1 : prog = Sub (Cte 10) (Cte 6)
+
+let constant p2 : prog = Sub (Sub (Cte 10) (Cte 6)) (Sub (Cte 7) (Cte 2))
+
+let constant p3 : prog = Sub (Sub (Cte 7) (Cte 2)) (Sub (Cte 10) (Cte 6))
+
+let constant p4 : prog = Sub (Cte 10) (Sub (Cte 2) (Cte 3))
 
 end
 
@@ -94,13 +98,13 @@ holds.
 (* Note: Why3 definitions introduced by "function" belong to the logic
    part of Why3 language *)
 
-function eval_0 (e:expr) : int =
+let rec function eval_0 (e:expr) : int =
   match e with
   | Cte n -> n
   | Sub e1 e2 -> eval_0 e1 - eval_0 e2
   end
 
-function interpret_0 (p:prog) : int = eval_0 p
+let function interpret_0 (p:prog) : int = eval_0 p
 
 (** Tests, can be replayed using
 {h <blockquote><pre>
@@ -111,11 +115,11 @@ function interpret_0 (p:prog) : int = eval_0 p
 *)
 
 let test () =
-  (interpret_0 p0,
+   interpret_0 p0,
    interpret_0 p1,
    interpret_0 p2,
    interpret_0 p3,
-   interpret_0 p4)
+   interpret_0 p4
 
 
 constant v3 : int = eval_0 p3
@@ -143,25 +147,20 @@ use import Expr
 
 *)
 
-use HighOrd
-
-function eval_1 (e:expr) (k: int->'a) : 'a =
-  match e with
-    | Cte n -> k n
-    | Sub e1 e2 ->
-      eval_1 e1 (\ v1. eval_1 e2 (\ v2. k (v1 - v2)))
-  end
-
-function interpret_1 (p : prog) : int = eval_1 p (\ n. n)
-
-
-(** Soundness *)
-
 use import DirectSem
 
-lemma cps_correct_expr: forall e:expr, k: int->'a. eval_1 e k = k (eval_0 e)
+let rec eval_1 (e:expr) (k: int->'a) : 'a
+  variant { e }
+  ensures { result = k (eval_0 e) }
+= match e with
+    | Cte n -> k n
+    | Sub e1 e2 ->
+      eval_1 e1 (fun v1 -> eval_1 e2 (fun v2 -> k (v1 - v2)))
+  end
 
-lemma cps_correct: forall p. interpret_1 p = interpret_0 p
+let interpret_1 (p : prog) : int
+  ensures { result = eval_0 p }
+= eval_1 p (fun n -> n)
 
 end
 
@@ -270,11 +269,11 @@ let interpret_2 (p:prog) : int
   = eval_2 p I
 
 let test () =
-  (interpret_2 p0,
+   interpret_2 p0,
    interpret_2 p1,
    interpret_2 p2,
    interpret_2 p3,
-   interpret_2 p4)
+   interpret_2 p4
 
 end
 
@@ -380,11 +379,11 @@ let interpret_2 (p:prog) : int
   = eval_2 p I
 
 let test () =
-  (interpret_2 p0,
+   interpret_2 p0,
    interpret_2 p1,
    interpret_2 p2,
    interpret_2 p3,
-   interpret_2 p4)
+   interpret_2 p4
 
 end
 
@@ -480,17 +479,15 @@ function interpret_0 (p:prog) : value = eval_0 p
 *)
 
 
-use HighOrd
-
 function eval_1 (e:expr) (k:value -> 'a) : 'a =
   match e with
     | Cte n -> k (if n >= 0 then Vnum n else Underflow)
     | Sub e1 e2 ->
-      eval_1 e1 (\ v1.
+      eval_1 e1 (fun v1 ->
        match v1 with
        | Underflow -> k Underflow
        | Vnum v1 ->
-         eval_1 e2 (\ v2.
+         eval_1 e2 (fun v2 ->
          match v2 with
          | Underflow -> k Underflow
          | Vnum v2 -> k (if v1 >= v2 then Vnum (v1 - v2) else Underflow)
@@ -498,7 +495,7 @@ function eval_1 (e:expr) (k:value -> 'a) : 'a =
        end)
   end
 
-function interpret_1 (p : prog) : value = eval_1 p (\ n. n)
+function interpret_1 (p : prog) : value = eval_1 p (fun n ->  n)
 
 
 lemma cps_correct_expr:
@@ -530,8 +527,8 @@ function eval_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
   match e with
     | Cte n -> if n >= 0 then k n else kerr ()
     | Sub e1 e2 ->
-      eval_2 e1 (\ v1.
-         eval_2 e2 (\ v2.
+      eval_2 e1 (fun v1 ->
+         eval_2 e2 (fun v2 ->
            if v1 >= v2 then k (v1 - v2) else kerr ())
            kerr) kerr
   end
@@ -545,15 +542,15 @@ function eval_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
   end
 
 with eval_2a (e2:expr) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
-  (\ v1. eval_2 e2 (eval_2b v1 k kerr) kerr)
+  (fun v1 ->  eval_2 e2 (eval_2b v1 k kerr) kerr)
 
 with eval_2b (v1:int) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
-  (\ v2. if v1 >= v2 then k (v1 - v2) else kerr ())
+  (fun v2 ->  if v1 >= v2 then k (v1 - v2) else kerr ())
 
 
 
 function interpret_2 (p : prog) : value =
-  eval_2 p (\ n. Vnum n) (\ _. Underflow)
+  eval_2 p (fun n ->  Vnum n) (fun _ ->  Underflow)
 
 
 lemma cps2_correct_expr_aux:
@@ -589,13 +586,13 @@ function eval_3 (e:expr) (k:int -> value) : value =
   end
 
 with eval_3a (e2:expr) (k:int -> value) : int -> value =
-  (\ v1. eval_3 e2 (eval_3b v1 k))
+  (fun v1 ->  eval_3 e2 (eval_3b v1 k))
 
 with eval_3b (v1:int) (k:int -> value) : int -> value =
-  (\ v2. if v1 >= v2 then k (v1 - v2) else Underflow)
+  (fun v2 ->  if v1 >= v2 then k (v1 - v2) else Underflow)
 
 
-function interpret_3 (p : prog) : value = eval_3 p (\ n. Vnum n)
+function interpret_3 (p : prog) : value = eval_3 p (fun n ->  Vnum n)
 
 let rec lemma cps3_correct_expr (e:expr) : unit
   variant { e }
@@ -718,11 +715,11 @@ let interpret_4 (p:prog) : value
 
 
 let test () =
-  (interpret_4 p0,
+   interpret_4 p0,
    interpret_4 p1,
    interpret_4 p2,
    interpret_4 p3,
-   interpret_4 p4)
+   interpret_4 p4
 
 end
 
@@ -821,7 +818,7 @@ recompose ([n1 C], e2) = recompose (C, n1 - e2)
 </pre></blockquote>}
 *)
 
-function recompose (c:context) (e:expr) : expr =
+let rec function recompose (c:context) (e:expr) : expr =
   match c with
   | Empty -> e
   | Left c e2 -> recompose c (Sub e e2)
@@ -905,7 +902,7 @@ lemma size_c_pos: forall c: context. size_c c >= 0
 
 let rec decompose_term (e:expr) (c:context) : (context, expr)
   variant { size_e e + size_c c }
-  ensures { let (c1,e1) = result in
+  ensures { let c1,e1 = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
   raises { Stuck -> is_empty_context c /\ is_a_value e }
@@ -918,7 +915,7 @@ let rec decompose_term (e:expr) (c:context) : (context, expr)
 
 with decompose_cont (c:context) (n:int) : (context, expr)
   variant { size_c c }
-  ensures { let (c1,e1) = result in
+  ensures { let c1,e1 = result in
             recompose c1 e1 = recompose c (Cte n)  /\
             is_a_redex e1 }
   raises { Stuck -> is_empty_context c }
@@ -927,11 +924,11 @@ with decompose_cont (c:context) (n:int) : (context, expr)
   match c with
   | Empty -> raise Stuck
   | Left c e -> decompose_term e (Right n c)
-  | Right n1 c -> (c, Sub (Cte n1) (Cte n))
+  | Right n1 c -> c, Sub (Cte n1) (Cte n)
   end
 
 let decompose (e:expr) : (context, expr)
-  ensures { let (c1,e1) = result in recompose c1 e1 = e  /\
+  ensures { let c1,e1 = result in recompose c1 e1 = e  /\
             is_a_redex e1 }
   raises { Stuck -> is_a_value e }
   =
@@ -964,7 +961,7 @@ let reduce (e:expr) : expr
   ensures { eval_0 result = eval_0 e }
   raises { Stuck -> is_a_value e }
   =
-  let (c,r) = decompose e in
+  let c,r = decompose e in
   recompose c (contract r)
 
 (**
@@ -987,10 +984,9 @@ let rec itere (e:expr) : int
   diverges (* termination could be proved but that's not the point *)
   ensures { eval_0 e = result }
   =
-  try
-    let e' = reduce e in
-    itere e'
-  with Stuck ->
+  match reduce e with
+  | e' -> itere e'
+  | exception Stuck ->
      match e with
      | Cte n -> n
      | _ -> absurd
@@ -1004,7 +1000,7 @@ let rec itere (e:expr) : int
 
 
 let refocus c e
-  ensures { let (c1,e1) = result in
+  ensures { let c1,e1 = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
   raises { Stuck -> is_empty_context c /\ is_a_value e }
@@ -1013,10 +1009,9 @@ let refocus c e
 let rec itere_opt (c:context) (e:expr) : int
   diverges
   ensures { result = eval_0 (recompose c e) }
-= try
-    let (c,r) = refocus c e in
-    itere_opt c (contract r)
-  with Stuck ->
+= match refocus c e with
+  | c, r -> itere_opt c (contract r)
+  | exception Stuck ->
      assert { is_empty_context c };
      match e with
      | Cte n -> n
@@ -1068,11 +1063,11 @@ let interpret p
 = eval_1 Empty p
 
 let test () =
-  (interpret p0,
+   interpret p0,
    interpret p1,
    interpret p2,
    interpret p3,
-   interpret p4)
+   interpret p4
 
 end
 
@@ -1169,11 +1164,11 @@ let interpret p
 = eval_1 Empty p
 
 let test () =
-  (interpret p0,
+   interpret p0,
    interpret p1,
    interpret p2,
    interpret p3,
-   interpret p4)
+   interpret p4
 
 
 end

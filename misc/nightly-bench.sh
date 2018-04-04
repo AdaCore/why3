@@ -11,7 +11,6 @@ case "$1" in
         exit 2
 esac
 
-
 GITBRANCH=`git rev-parse --abbrev-ref HEAD`
 REPORTDIR=$PWD/../why3-reports-$GITBRANCH
 
@@ -82,7 +81,8 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
 # add uninstalled prover substitution policies
 
-COQVER=`bin/why3 --list-provers | sed -n -e 's/  Coq (\(.*\))/\1/p'`
+COQVER=$(bin/why3 --list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
+echo "Coq version detected: $COQVER" >> $REPORT
 if test "$COQVER" != "" ; then
 cat >> why3.conf <<EOF
 
@@ -120,9 +120,10 @@ fi
 make bench &> $OUT
 if test "$?" != "0" ; then
     echo "Make bench FAILED" >> $REPORT
-    cat $OUT >> $REPORT
-    SUBJECT="$SUBJECT make bench failed"
-    notify
+    tail -20 $OUT >> $REPORT
+    SUBJECT="$SUBJECT make bench failed,"
+    # we do not notify yet, we try the examples also
+    # notify
 else
     echo "Make bench succeeded. " >> $REPORT
 fi

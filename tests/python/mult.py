@@ -15,12 +15,14 @@ if q < 0:
 
 r = 0
 while q > 0:
-    #@ invariant 0 <= q and r + p * q == a * b
+    #@ invariant 0 <= q
+    #@ invariant r + p * q == a * b
     #@ variant   q
+    print(p, q, r)
     if q % 2 == 1:
         r = r + p
     p = p + p
     q = q // 2
-
+print(p, q, r)
 print("a * b =", r)
 #@ assert r == a * b

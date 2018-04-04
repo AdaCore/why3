@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<file name="../16_subst.mlw">
+<theory name="Issue16">
+ <goal name="g2">
+ <transf name="simplify_trivial_quantification_in_goal" >
+  <goal name="g2.0">
+  </goal>
+ </transf>
+ <transf name="split_intros_goal_wp" >
+  <goal name="g2.0">
+  <transf name="subst" arg1="x">
+   <goal name="g2.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g1">
+ </goal>
+ <goal name="g">
+ </goal>
+ <goal name="g3">
+ <transf name="remove" arg1="h1,h2">
+  <goal name="g3.0">
+  <transf name="case" arg1="x=0">
+   <goal name="g3.0.0" expl="true case">
+   </goal>
+   <goal name="g3.0.1" expl="false case">
+   </goal>
+  </transf>
+  <transf name="split_intros_goal_wp" >
+   <goal name="g3.0.0">
+   <transf name="induction" arg1="x" arg2="from" arg3="42">
+    <goal name="g3.0.0.0" expl="base case">
+    </goal>
+    <goal name="g3.0.0.1" expl="recursive case">
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

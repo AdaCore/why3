@@ -71,6 +71,12 @@ val add_builtin : 'a language -> (pathname -> 'a) -> unit
     [convert]'ed into exactly the same singleton [theory Mstr.t] maps
     as stored for the base language. *)
 
+val base_language_builtin : pathname -> Theory.theory Mstr.t
+(** [base_language_builtin path] returns the builtin theories defined
+    by the base language. Any offspring language that provides extended
+    definitions of builtin theories must use these as the result of
+    the conversion function. *)
+
 type 'a format_parser = env -> pathname -> filename -> in_channel -> 'a
 (** [(fn : 'a format_parser) env path file ch] parses the in_channel [ch]
     and returns the language-specific contents of type ['a]. References

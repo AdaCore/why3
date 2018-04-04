@@ -29,8 +29,8 @@ val tds_empty : tdecl_set
 
 val mk_tds : Stdecl.t -> tdecl_set
 
-type clone_map = tdecl_set Mid.t
-type meta_map = tdecl_set Mmeta.t
+type clone_map = tdecl_set Mid.t    (* Use and Clone *)
+type meta_map = tdecl_set Mmeta.t   (* Meta *)
 
 (** Task *)
 
@@ -40,7 +40,7 @@ and task_hd = private {
   task_decl  : tdecl;        (** last declaration *)
   task_prev  : task;         (** context *)
   task_known : known_map;    (** known identifiers *)
-  task_clone : clone_map;    (** cloning history *)
+  task_clone : clone_map;    (** use/clone history *)
   task_meta  : meta_map;     (** meta properties *)
   task_tag   : Weakhtbl.tag; (** unique magical tag *)
 }
@@ -79,9 +79,13 @@ val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task
 (** {2 Utilities} *)
 
 val split_theory : theory -> Spr.t option -> task -> task list
-  (** [split_theory th s t] returns the tasks of [th] added to [t]
-      that end by one of [s]. They are in the opposite order than
-      in the theory *)
+  (** [split_theory th s t] returns the list of proof tasks that
+      correspond to goals in [th], in the order of appearance.
+      If set [s] is not empty, then only the goals in [s] are
+      proved. The goals which are instances of already proved
+      propositions (introduced by cloning) are not proved.
+      Task [t] is the task prefix that can be used to add
+      some metas to every generated proof task. *)
 
 (** {2 Realization utilities} *)
 
@@ -116,7 +120,7 @@ val task_separate_goal : task -> tdecl * task
 (** {2 Selectors} *)
 
 val on_meta : meta -> ('a -> meta_arg list -> 'a) -> 'a -> task -> 'a
-val on_theory : theory -> ('a -> symbol_map -> 'a) -> 'a -> task -> 'a
+val on_cloned_theory : theory -> ('a -> symbol_map -> 'a) -> 'a -> task -> 'a
 
 val on_meta_excl : meta -> task -> meta_arg list option
 val on_used_theory : theory -> task -> bool
@@ -133,5 +137,4 @@ exception NotExclusiveMeta of meta
 
 exception GoalNotFound
 exception GoalFound
-exception SkipFound
 exception LemmaFound

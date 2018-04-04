@@ -1,7 +1,8 @@
 
 module TestInt32
 
-  use import mach.int.Int32
+  use import int.Int
+  use import mach.int.Int32BV
 
   let mask_111 (x: int32) : int32
     ensures { 0 <= to_int result < 8 }

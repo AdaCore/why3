@@ -22,15 +22,20 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+val interp_float: string -> string -> string -> float_type
 
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
   arr_index_key : string;
@@ -40,10 +45,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record ={
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_record = (field_name * model_value) list
+and field_name = string
 
 val array_create_constant :
   value : model_value ->
@@ -149,6 +152,16 @@ val print_model :
     @param model the counter-example model to print
 *)
 
+val print_model_human :
+  ?me_name_trans:(model_element_name -> string) ->
+  Format.formatter ->
+  model ->
+  unit
+(** Same as print_model but is intended to be human readable.
+
+*)
+
+
 val model_to_string :
   ?me_name_trans:(model_element_name -> string) ->
   model ->
@@ -248,9 +261,10 @@ val interleave_with_source :
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
-  filename:string ->
+  rel_filename:string ->
   source_code:string ->
-  string
+  locations:(Loc.position * 'a) list ->
+  string * (Loc.position * 'a) list
 (** Given a source code and a counter-example model interleaves
     the source code with information in about the counter-example.
     That is, for each location in counter-example trace creates
@@ -261,11 +275,14 @@ val interleave_with_source :
     @param end_comment the string that ends a comment
     @param me_name_trans see print_model
     @param model counter-example model
-    @param filename the file name of the source
+    @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
+    @param locations the source locations that are found in the code
 
     @return the source code with added comments with information
-    about counter-example model
+    about counter-example model. The second part of the pair are
+    locations modified so that it takes into account that counterexamples
+    were added.
 *)
 
 (*
@@ -298,8 +315,14 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =  string -> model_element list
-(** Parses the input string into model elements. *)
+type raw_model_parser =
+  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+    string -> model_element list
+(** Parses the input string into model elements. It contains the list of
+    projections and a map associating the name of printed projections to the
+    fields (couple of printed field and model_trace name) that are collected in
+    the task.
+ *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

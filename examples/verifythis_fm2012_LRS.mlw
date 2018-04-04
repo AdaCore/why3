@@ -259,27 +259,26 @@ let sort (a:array int) (data : array int)
   ensures { sorted a data }
   ensures { ArrayPermut.permut_all (old data) data }
   =
-   'Init:
    for i = 0 to data.length - 1 do
-     invariant { ArrayPermut.permut_all (at data 'Init) data   }
+     invariant { ArrayPermut.permut_all (old data) data   }
      invariant { sorted_sub a data.elts 0 i  }
      invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { range data }
-       invariant { ArrayPermut.permut_all (at data 'Init) data   }
+       invariant { ArrayPermut.permut_all (old data) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                      le a data[k1] data[k2] }
        variant { !j }
-       'L:
+       label L in
        let b = !j - 1 in
        let t = data[!j] in
        data[!j] <- data[b];
        data[b] <- t;
-       assert { ArrayPermut.exchange (at data 'L) data (!j-1) !j };
+       assert { ArrayPermut.exchange (data at L) data (!j-1) !j };
        decr j
      done;
      (* needed to prove the invariant [sorted_sub a data.elts 0 i] *)
@@ -340,9 +339,10 @@ type suffixArray = {
     values : array int;
     suffixes : array int;
 }
-invariant { self.values.length = self.suffixes.length /\
-  permutation self.suffixes.elts self.suffixes.length /\
-  SuffixSort.sorted self.values self.suffixes }
+invariant { values.length = suffixes.length /\
+  permutation suffixes.elts suffixes.length /\
+  SuffixSort.sorted values suffixes }
+by { values = make 0 0; suffixes = make 0 0 }
 
 let select (s:suffixArray) (i:int) : int
   requires { 0 <= i < s.values.length }
@@ -380,6 +380,7 @@ end
 
 module SuffixArray_test
 
+use import int.Int
 use import array.Array
 use import SuffixArray
 
@@ -525,6 +526,7 @@ end
 
 module LRS_test
 
+  use import int.Int
   use import array.Array
   use import ref.Ref
   use import LRS
@@ -538,6 +540,6 @@ module LRS_test
     lrs arr;
     if !solStart <> 1 then raise BenchFailure;
     if !solLength <> 1 then raise BenchFailure;
-    (!solStart, !solLength)
+    !solStart, !solLength
 
 end

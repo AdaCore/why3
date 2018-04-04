@@ -8,22 +8,22 @@ use import elements.Elements
 use import heap.Heap
 
 function model (h:logic_heap): (bag int) =
-   let (a,n) = h in elements a 0 n
+   let (a,n) = h in elements a.A.contents 0 n
 
 lemma Model_empty :
-   forall a: array int. model (a,0) = empty_bag
+   forall a: map. model (a,0) = empty_bag
 
-lemma Model_singleton : forall a: array int. model (a,1) = singleton(a[0])
+lemma Model_singleton : forall a: map. model (a,1) = singleton(A.([]) a 0)
 
 lemma Model_set :
-  forall a: array int,v: int, i n : int.
+  forall a: map, v: int, i n: int.
     0 <= i < n ->
-        add (a[i]) (model (a[i <- v],n)) =
+        add (A.([]) a i) (model (A.([<-]) a i v, n)) =
         add v (model (a, n))
 
 lemma Model_add_last:
- forall a: array int, n : int. n >= 0 ->
-   model (a, n+1) = add (a[n]) (model (a, n))
+ forall a: map, n: int. n >= 0 ->
+   model (a, n+1) = add (A.([]) a n) (model (a, n))
 
 end
 

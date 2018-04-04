@@ -1,0 +1,146 @@
+
+
+module Binary
+
+  use import int.Int
+  use import mach.int.Int63
+
+  goal G: forall x: int63, y: int. x = y /\ y = x
+
+end
+
+
+
+module Simple
+
+  type t
+
+  function f t : int
+  meta coercion function f
+
+  goal G: forall x: t. x = 42
+
+end
+
+module SameOne
+
+  use import Simple
+
+end
+
+module Same
+
+  use import Simple
+  use import SameOne
+
+  goal G: forall x: t. x = 42
+
+end
+
+module SimplePolymorphic
+
+  type t 'a
+
+  function f (t 'a) : int
+  meta coercion function f
+
+  goal G: forall x: t (bool,bool). x = 42
+
+end
+
+module Transitivity
+
+  type a
+  type b
+  type c
+
+  function b_to_c b : c
+  meta coercion function b_to_c
+
+  function a_to_b a : b
+  meta coercion function a_to_b
+
+  predicate is_c c
+  goal G2: forall x: a. is_c x
+
+end
+
+module SameTransitivity
+
+  use import Transitivity
+
+end
+
+module SameTransitivityCheck
+
+  use import Transitivity
+  use import SameTransitivity
+
+  goal G2: forall x: a. is_c x
+
+end
+
+
+module CoercionIf
+
+  function is_zero int : bool
+  meta coercion function is_zero
+
+  goal G3: if 42 then 1=2 else 3=4
+
+end
+
+
+module TrickyPolymorphicAlpha
+
+  use import list.List
+
+  type t 'a
+  type t1 'a
+  type t2 'a
+
+  function f (t 'a) : t1 (list 'a)
+  meta coercion function f
+
+  function g (t1 'a) : t2 (list 'a)
+  meta coercion function g
+
+  goal a : forall x:t int, y:t2 (list (list int)). x = y
+
+end
+
+module TrickyPolymorphicBeta
+
+  use import list.List
+
+  type t 'a
+  type t1 'a
+  type t2 'a
+
+  function f (t 'a) : t1 (list 'b)
+  meta coercion function f
+
+  function g (t1 'a) : t2 (list 'a)
+  meta coercion function g
+
+  goal a : forall x:t int, y:t2 (list (list int)). x = y
+
+end
+
+module InTypeArgs
+
+  type t1 'a
+  type t2 'a
+  type t3 'a
+
+  function t2_of_t1 (t1 'a) : t2 'a
+  meta coercion function t2_of_t1
+
+  function bool_of_int bool : int
+  meta coercion function bool_of_int
+
+  function h (x: t1 'a) (b: int) : t1 int
+
+  goal G: forall x: t1 'a, y: t2 int. h x true = y
+
+end

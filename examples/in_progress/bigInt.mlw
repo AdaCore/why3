@@ -136,7 +136,7 @@ module N
     ensures { value result = to_int n }
   = let zero = of_int 0 in
     let a =
-      if Int31.eq n zero then
+      if n = zero then
         Array31.make zero zero
       else
         Array31.make (of_int 1) n
@@ -231,7 +231,7 @@ module N
   let eq (x y:t) : bool
     requires { ok x /\ ok y }
     ensures  { if result then value x = value y else value x <> value y }
-  = Int31.eq (compare_array x.digits y.digits) (of_int 0)
+  = compare_array x.digits y.digits = of_int 0
 
 (** {2 arithmetic operations} *)
 
@@ -272,16 +272,16 @@ module N
         value_sub x.elts 0 (to_int !i) (to_int l)
         + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int l - to_int !i }
-      'L:
+      label L in
       let sum = Int31.(+) (Int31.(+) x[!i] y[!i]) !carry in
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
-      if Int31.ne arr[!i] zero then non_null_idx := !i;
+      if arr[!i] <> zero then non_null_idx := !i;
       assert {
-        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+        MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+         value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
       i := Int31.(+) !i one;
     done;
     while Int31.(<) !i h do
@@ -300,31 +300,31 @@ module N
         value_sub x.elts 0 (to_int l) (to_int l)
         + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int h - to_int !i }
-      'L:
+      label L in
       let sum = Int31.(+) y[!i] !carry in
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
-      if Int31.ne arr[!i] zero then non_null_idx := !i;
+      if arr[!i] <> zero then non_null_idx := !i;
       assert {
-        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+        MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+         value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
       i := Int31.(+) !i one;
     done;
-    'L:
+    label L in
     arr[!i] <- !carry;
     assert {
-      MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+      MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-       value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+       value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
     assert { value_array arr = value_array x + value_array y };
-    abstract
+    begin
      ensures { -1 <= to_int !non_null_idx <= to_int !i }
      ensures { to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
      ensures {
         forall j. to_int !non_null_idx < j <= to_int !i -> to_int arr[j] = 0 }
-     (if Int31.ne arr[!i] zero then non_null_idx := !i)
+     (if arr[!i] <> zero then non_null_idx := !i)
     end;
     let len = Int31.(+) !non_null_idx one in
     assert { value_sub arr.elts 0 (to_int !i + 1) (to_int h + 1) =
@@ -452,9 +452,9 @@ module Z
 
   use import int.Int
   use import int.Power
-  constant base : int = 32768
-  constant max_digit : int = 16384
-  constant min_digit : int = -16384
+  let constant base : int = 32768
+  let constant max_digit : int = 16384
+  let constant min_digit : int = -16384
 
   type t = { mutable digits: array int31 }
 
@@ -547,7 +547,7 @@ module Z
         value_sub x.elts 0 (to_int !i) (to_int l)
         + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int l - to_int !i }
-      'L:
+      label L in
       let sum = Int31.(+) (Int31.(+) x[!i] y[!i]) !carry in
       if Int31.(>=) sum max_digit31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
@@ -556,9 +556,9 @@ module Z
         then begin arr[!i] <- Int31.(+) sum base31; carry := minusone end
         else begin arr[!i] <- sum; carry := zero end;
       assert {
-        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+        MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+         value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
       i := Int31.(+) !i one;
     done;
     while Int31.(<) !i h do
@@ -572,7 +572,7 @@ module Z
         value_sub x.elts 0 (to_int l) (to_int l)
         + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int h - to_int !i }
-      'L:
+      label L in
       let sum = Int31.(+) y[!i] !carry in
       if Int31.(>=) sum max_digit31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
@@ -581,17 +581,17 @@ module Z
         then begin arr[!i] <- Int31.(+) sum base31; carry := minusone end
         else begin arr[!i] <- sum; carry := zero end;
       assert {
-        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+        MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+         value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
       i := Int31.(+) !i one;
     done;
-    'L:
+    label L in
     arr[!i] <- !carry;
     assert {
-      MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+      MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
-       value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
+       value_sub (arr at L).elts 0 (to_int !i) (to_int h + 1) };
     arr
 
   let add (x y:t) : t

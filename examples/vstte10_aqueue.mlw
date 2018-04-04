@@ -14,21 +14,20 @@ module AmortizedQueue
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
-    invariant { length self.front = self.lenf >= length self.rear = self.lenr }
+    invariant { length front = lenf >= length rear = lenr }
+    by { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
   function sequence (q: queue 'a) : list 'a =
     q.front ++ reverse q.rear
 
-  let empty () ensures { sequence result = Nil }
-  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 } : queue 'a
+  let empty () : queue 'a
+    ensures { sequence result = Nil }
+  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
   let head (q: queue 'a)
     requires { sequence q <> Nil }
     ensures { hd (sequence q) = Some result }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons x _ -> x
-    end
+  = let Cons x _ = q.front in x
 
   let create (f: list 'a) (lf: int) (r: list 'a) (lr: int)
     requires { lf = length f /\ lr = length r }
@@ -42,10 +41,8 @@ module AmortizedQueue
   let tail (q: queue 'a)
     requires { sequence q <> Nil }
     ensures { tl (sequence q) = Some (sequence result) }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
-    end
+  = let Cons _ r = q.front in
+    create r (q.lenf - 1) q.rear q.lenr
 
   let enqueue (x: 'a) (q: queue 'a)
     ensures { sequence result = sequence q ++ Cons x Nil }

@@ -33,13 +33,12 @@ module Flag
     let b = ref 0 in
     let i = ref 0 in
     let r = ref (length a) in
-    'Init:
     while !i < !r do
       invariant { 0 <= !b <= !i <= !r <= length a }
       invariant { monochrome a 0  !b Blue }
       invariant { monochrome a !b !i White }
       invariant { monochrome a !r (length a) Red }
-      invariant { permut_all (at a 'Init) a }
+      invariant { permut_all (old a) a }
       variant   { !r - !i }
       match a[!i] with
       | Blue ->

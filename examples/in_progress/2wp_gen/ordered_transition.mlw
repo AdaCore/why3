@@ -1,0 +1,463 @@
+(* Encoding of ordered transition systems into games. *)
+
+(* Definition of ordered transition systems. *)
+module OrderedTransition
+
+  use import int.Int
+  use import ho_rel.Rel
+  use import ho_set.Set
+  use import order.Ordered
+  use import fn.Image
+  use import fn.Fun
+  use import transition.Trace
+
+  constant pos : set int = (<=) 0
+
+  (* FIXME: same problem with 'by' introduction that with the traces. *)
+  lemma existence : exists r:erel 'a,pi:'a -> 'o,o:erel 'o.
+    order o /\ (forall a b. r a b -> o (pi a) (pi b)) /\
+    (forall t. t.rel = r /\ not t.finite ->
+      (exists sp. supremum o (image (compose pi t.nth) pos) sp)
+      by false)
+    by r = (fun _ _ -> false) /\ o = (=)
+    so forall t. t.rel = r /\ not t.finite -> r (t.nth 0) (t.nth 1)
+
+  type otrans 'a 'o = {
+    transition : erel 'a;
+    projection : 'a -> 'o;
+    progress : erel 'o;
+  } invariant { order progress }
+  invariant { forall a b. transition a b ->
+    progress (projection a) (projection b) }
+  invariant { forall t. t.rel = transition /\ not t.finite ->
+    exists sp. supremum progress (image (compose projection t.nth) pos) sp }
+
+  meta remove_prop lemma existence
+
+end
+
+module OTGameCommon
+
+  use import int.Int
+  use import ho_set.Set
+  use import ho_rel.Rel
+  use import game.Game as G
+  use import order.LimUniq
+  use import fn.Image
+  use import fn.Fun
+  use import transition.Trace
+  use export OrderedTransition
+
+  type state 'a 'o =
+    | Transient 'a int
+    | Limit 'o
+
+  predicate substate (s:otrans 'a 'o) (s1 s2:state 'a 'o) =
+    match s1, s2 with
+    | Transient x n, Transient y m ->
+      n <= m /\ s.progress (s.projection x) (s.projection y) /\
+      (n = m -> x = y)
+    | Transient x n, Limit y -> s.progress (s.projection x) y
+    | Limit x, Limit y -> s.progress x y
+    | _ -> false
+    end
+
+  lemma substate_order : forall s:otrans 'a 'o.
+    let o = substate s in order o
+    by (forall a b. o a b /\ o b a -> a <> b -> false
+      by match a, b with
+      | Transient x n, Transient y m -> false by n = m
+      | Limit x, Limit y -> false by antisymetric s.progress
+      | _ -> false
+      end)
+    so forall a b c. o a b /\ o b c -> o a c
+      by match a, b, c with
+      | Transient x n, Transient y m, Transient z o -> n <= o
+      | Transient x _, (Transient _ _| Limit _), Limit z ->
+        s.progress (s.projection x) z
+      | Limit x, Limit y, Limit z -> transitive s.progress
+      | _ -> false
+      end
+
+  predicate next_state (s:otrans 'a 'o) (s1 s2:state 'a 'o) =
+    match s1, s2 with
+    | Transient x n, Transient y m -> m = n + 1 /\ s.transition x y
+    | _ -> false
+    end
+
+  function join_lim (st:set 'a) (sl:set 'o) : set (state 'a 'o) =
+    fun x -> match x with
+    | Transient x _ -> st x
+    | Limit x -> sl x
+    end
+
+  predicate ot_trace_witness (s:otrans 'a 'o) (x:'a)
+                             (q:set 'a) (qi:set 'o) (t:trace 'a) =
+    t.rel = s.transition /\ t.nth 0 = x /\
+    if t.finite then q (t.nth t.length) else
+    qi (sup s.progress (image (compose s.projection t.nth) pos))
+
+  predicate ot_enforce_ex (s:otrans 'a 'o)
+                          (p:set 'a) (pi:set 'o)
+                          (q:set 'a) (qi:set 'o) =
+    subset pi qi /\ forall x. p x -> exists t. ot_trace_witness s x q qi t
+
+  predicate ot_trace_covered (s:otrans 'a 'o)
+                             (q:set 'a) (qi:set 'o) (t:trace 'a) =
+    (exists n. 0 <= n /\ (t.finite -> n <= t.length) /\ q (t.nth n))
+    \/ (not t.finite /\
+      qi (sup s.progress (image (compose s.projection t.nth) pos)))
+    \/ (t.finite
+      /\ exists t2. subtrace t t2 /\ (t2.finite -> t2.length > t.length))
+
+  predicate ot_enforce_unv (s:otrans 'a 'o)
+                           (p:set 'a) (pi:set 'o)
+                           (q:set 'a) (qi:set 'o) =
+    subset pi qi /\ forall t. t.rel = s.transition /\ p (t.nth 0) ->
+      ot_trace_covered s q qi t
+
+  let ghost function game_ex_ot
+    (s:otrans 'a 'o) : game {state 'a 'o}
+  = { G.progress = substate s;
+      G.transition = fun x xs -> pure { image (=) (next_state s x) xs } }
+
+  let ghost function game_unv_ot
+    (s:otrans 'a 'o) : game {state 'a 'o}
+  = { G.progress = substate s;
+      G.transition = fun x xs -> pure { inhabited xs /\ xs = next_state s x } }
+
+end
+
+module OTGame "W:non_conservative_extension:N" (* => OTGameProof *)
+
+  use import game.Game
+  use export OTGameCommon
+
+  axiom ot_enforce_ex : forall s:otrans 'a 'o,p pi q qi.
+    have_uniform_winning_strat (game_ex_ot s)
+                               (join_lim p pi)
+                               (join_lim q qi) <->
+    ot_enforce_ex s p pi q qi
+
+  axiom ot_enforce_unv : forall s:otrans 'a 'o,p pi q qi.
+    have_uniform_winning_strat (game_unv_ot s)
+                               (join_lim p pi)
+                               (join_lim q qi) <->
+    ot_enforce_unv s p pi q qi
+
+end
+
+module OTGameProof
+
+  use import int.Int
+  use import transition.TraceConstructors
+  use import transition.TraceGame
+  use import order.Ordered
+  use import order.Chain
+  use import ho_set.Set
+  use import ho_rel.RelSet
+  use import fn.Fun
+  use import fn.Image
+  use import choice.Choice
+  use import game.Game as G
+  use import OTGameCommon
+  use import game.BasicStrats
+  use import game_simulation.Sim
+
+  predicate ecart (s:otrans 'a 'o) (d:int) (t:trace 'a) (st:state 'a 'o) =
+    t.rel = s.transition /\
+    match st with
+    | Transient x n ->
+      d <= n /\ t.finite /\ t.length = n - d /\ t.nth (n-d) = x
+    | Limit o -> let trs = image (compose s.projection t.nth) pos in
+      not t.finite /\ supremum s.progress trs o
+    end
+
+  let rec lemma increasing_trace (s:otrans 'a 'o) (t:trace 'a)
+                                 (u v:int)
+    requires { t.rel = s.transition }
+    requires { 0 <= u <= v /\ (t.finite -> v <= t.length) }
+    ensures  { s.progress (s.projection (t.nth u)) (s.projection (t.nth v)) }
+    variant { v }
+  = if u <> v then increasing_trace s t u (v-1)
+
+  lemma simulations : forall s:otrans 'a 'o,d:int.
+    let rf = ecart s d in let rb = flip rf in
+    let ge = game_ex_ot s in let gu = game_unv_ot s in
+    let get = game_ex_trace in let gut = game_unv_trace in
+    let o = substate s in
+    (simulate get rf ge by step_simulate get rf ge)
+    /\ (simulate gut rf gu by step_simulate gut rf gu)
+    /\ (simulate ge rb get by step_simulate ge rb get)
+    /\ (simulate gu rb gut by step_simulate gu rb gut)
+    by ("stop_split" forall x x2 y. next_trace x x2 /\ rf x y ->
+      (exists y2. next_state s y y2 /\ rf x2 y2)
+      by match y with Limit _ -> false
+      | Transient v0 n -> v0 = x.nth x.length
+        so let v1 = x2.nth x2.length in
+          let y2 = Transient v1 (n+1) in
+          (next_state s y y2
+           by s.transition v0 v1 by v0 = x2.nth (x2.length - 1))
+        so rf x2 y2
+      end
+    ) /\ ("stop_split" forall x x2 y. next_state s x x2 /\ rb x y ->
+      (exists y2. next_trace y y2 /\ rb x2 y2)
+      by match x, x2 with Limit _, _ | _, Limit _ -> false
+        | Transient v0 _, Transient v1 _ ->
+          let y2 = add_suffix_trace y v1 in
+          next_trace y y2 /\ rb x2 y2
+        end
+    )
+    so ("stop_split" forall x y xs. get.G.transition x xs /\ rf x y ->
+      have_winning_strat ge y (related rf xs)
+      by exists x2. next_trace x x2 /\ xs = (=) x2
+      so exists y2. next_state s y y2 /\ rf x2 y2
+      so ge.G.transition y ((=) y2) /\ subset ((=) y2) (related rf xs)
+    ) /\ ("stop_split" forall x y xs. ge.G.transition x xs /\ rb x y ->
+      have_winning_strat get y (related rb xs)
+      by exists x2. next_state s x x2 /\ xs = (=) x2
+      so exists y2. next_trace y y2 /\ rb x2 y2
+      so get.G.transition y ((=) y2) /\ subset ((=) y2) (related rb xs)
+    ) /\ ("stop_split" forall x y xs. gut.G.transition x xs /\ rf x y ->
+      have_winning_strat gu y (related rf xs)
+      by xs = next_trace x /\ inhabited xs
+      so let ys = next_state s y in
+        gu.G.transition y ys /\ subset ys (related rf xs)
+    ) /\ ("stop_split" forall x y xs. gu.G.transition x xs /\ rb x y ->
+      have_winning_strat gut y (related rb xs)
+      by xs = next_state s x /\ inhabited xs
+      so let ys = next_trace y in
+      gut.G.transition y ys /\ subset ys (related rb xs)
+    ) /\ ("stop_split" forall ch f. chain subtrace ch /\ inhabited ch ->
+      monotone_on ch subtrace f o /\ rel_mapping ch f rf ->
+      let s1 = sup_chain_trace ch in
+      let s2 = sup o (image f ch) in
+      supremum subtrace ch s1
+      && (supremum o (image f ch) s2 /\ rf s1 s2
+        by if ch s1
+          then maximum o (image f ch) (f s1) so s2 = f s1
+            so rf s1 s2
+          else not s1.finite
+            so (forall n. 0 <= n -> exists x. ch x /\ n <= x.length)
+            so (s1.rel = s.transition by exists t0. ch t0
+              so rf t0 (f t0) so subtrace t0 s1)
+            so let fc = compose s.projection s1.nth in
+              let sc = image fc pos in
+              exists s_2. supremum s.progress sc s_2
+            so let l2 = Limit s_2 in rf s1 l2
+            so (supremum o (image f ch) l2 so s2 = l2)
+            by (forall st. image f ch st -> o st l2
+              by exists t. ch t /\ f t = st so t.finite /\ rf t st
+              so match st with Limit _ -> false
+              | Transient _ _ -> subtrace t s1
+                so t.nth t.length = s1.nth t.length
+                so sc (fc t.length)
+              end
+            ) /\ (forall lu. upper_bound o (image f ch) lu -> o l2 lu
+              by match lu with
+              | Transient _ n -> false
+                by let u = (if n >= 0 then n else -n)
+                           + (if d >= 0 then d else -d)
+                           + 1 in
+                  0 <= u
+                so exists t. ch t /\ u <= t.length so t.finite
+                so image f ch (f t) /\ rf t (f t)
+                so o (f t) lu so match (f t) with Limit _ -> false
+                | Transient _ _ -> true
+                end
+              | Limit u -> s.progress s_2 u by upper_bound s.progress sc u
+                by forall n. pos n -> s.progress (fc n) u
+                by exists t. ch t /\ n <= t.length so t.finite
+                so subtrace t s1
+                so t.nth n = s1.nth n /\ t.nth t.length = s1.nth t.length
+                so s.progress (fc n) (fc t.length) /\ rf t (f t)
+                so image f ch (f t)
+                so match f t with Limit _ -> false
+                  | Transient x _ -> s.progress (fc t.length) u
+                    by s.projection x = fc t.length /\ o (f t) lu
+                  end
+              end
+            )
+      )
+    ) so ("stop_split" forall ch f. chain o ch /\ inhabited ch ->
+      monotone_on ch o f subtrace /\ rel_mapping ch f rb ->
+      let s2 = sup_chain_trace (image f ch) in
+      let s1 = sup o ch in
+      supremum subtrace (image f ch) s2 /\
+      supremum o ch s1 /\
+      rb s1 s2
+      by let g = fun x -> choice (inter ch (preimage f ((=) x))) in
+        let ch0 = image f ch in
+        (forall x. ch0 x ->
+          f (g x) = x /\ ch (g x) by exists y. ch y /\ f y = x
+            so inter ch (preimage f ((=) x)) y)
+      so (forall x. ch x -> let z = g (f x) in z = x
+        by f z = f x /\ ch z
+        so rf (f x) x /\ rf (f z) z
+        so match x, z with
+          | Limit u, Limit v ->
+            let fc = compose s.projection (f x).nth in
+            u = sup s.progress (image fc pos) = v
+          | Transient _ _, Transient _ _ -> true
+          | _ -> false
+          end
+      )
+      so (image g ch0 = ch)
+      so rel_mapping ch0 g rf
+      so (monotone_on ch0 subtrace g o
+        by forall u v. ch0 u /\ ch0 v /\ subtrace u v -> if o (g u) (g v)
+          then true else false
+          by o (g v) (g u) so u = v by subtrace (f (g v)) (f (g u)))
+      so (inhabited ch0 by exists x. ch x so ch0 (f x))
+      so chain subtrace ch0
+    )
+
+  lemma det_ecart : forall s:otrans 'a 'o,p d.
+    let r = ecart s d in let rb = flip r in
+    let rp = related rb p in
+    subset (related r rp) p by forall x. related r rp x -> p x
+    by exists t. rp t /\ r t x
+    so exists y. p y /\ rb y t so x = y by match x, y with
+      | Limit u, Limit v ->
+        let fc = compose s.projection t.nth in
+        u = sup s.progress (image fc pos) = v
+      | Transient _ _, Transient _ _ -> true
+      | _ -> false
+      end
+
+  lemma ot_enforce_ex : forall s:otrans 'a 'o,p pi q qi.
+    let jp = join_lim p pi in let jq = join_lim q qi in
+    let ge = game_ex_ot s in let get = game_ex_trace in
+    (have_uniform_winning_strat ge jp jq ->
+      ot_enforce_ex s p pi q qi
+      by let r = flip (ecart s 0) in
+        let rjp = related r jp in let rjq = related r jq in
+        have_uniform_winning_strat get rjp rjq
+      so (subset pi qi by forall u. pi u -> qi u
+        by let lu = Limit u in
+          jp lu
+        so have_winning_strat ge lu jq
+        so jq lu \/ (false by exists a. ge.G.transition lu a
+          so exists y. next_state s lu y
+          so match y with Limit _ -> false | Transient _ _ -> true end)
+      ) /\ forall x. p x ->
+        let t = singleton_trace s.transition x in
+        (rjp t by r (Transient x 0) t)
+        so have_winning_strat get t rjq
+        so exists tex. rjq tex /\ subtrace t tex
+        so ot_trace_witness s x q qi tex
+        by exists st. jq st /\ r st tex so ecart s 0 tex st
+        so match st with
+          | Limit u -> true
+          | Transient _ _ -> true
+          end
+    ) /\ (ot_enforce_ex s p pi q qi ->
+      have_uniform_winning_strat ge jp jq
+      by forall x. jp x -> have_winning_strat ge x jq
+      by match x with
+      | Limit _ -> jq x
+      | Transient vx d -> let r = ecart s d in
+        let rb = flip r in
+        let rjp = related rb ((=) x) in let rjq = related rb jq in
+        (have_uniform_winning_strat get rjp rjq
+         by forall t. rjp t -> have_winning_strat get t rjq
+         by exists tex. ot_trace_witness s vx q qi tex
+         so ecart s d t x
+         so subtrace t tex so rjq tex
+         by let v = if tex.finite
+           then Transient (tex.nth tex.length) (tex.length + d)
+           else let fc = compose s.projection tex.nth in
+             Limit (sup s.progress (image fc pos))
+           in jq v /\ r tex v
+        ) so have_uniform_winning_strat ge (related r rjp) (related r rjq)
+        so (subset ((=) x) (related r rjp) by related r rjp x
+          by rb x (singleton_trace s.transition vx)
+        ) so have_uniform_winning_strat ge ((=) x) jq
+      end
+    )
+
+  lemma ot_enforce_unv : forall s:otrans 'a 'o,p pi q qi.
+    let jp = join_lim p pi in let jq = join_lim q qi in
+    let gu = game_unv_ot s in let gut = game_unv_trace in
+    (have_uniform_winning_strat gu jp jq ->
+     ot_enforce_unv s p pi q qi
+     by let r = flip (ecart s 0) in
+       let rjp = related r jp in let rjq = related r jq in
+       have_uniform_winning_strat gut rjp rjq
+     so (subset pi qi by forall u. pi u -> qi u
+       by let lu = Limit u in
+         jp lu
+       so have_winning_strat gu lu jq
+       so jq lu \/ (false by exists a. gu.G.transition lu a
+         so exists y. next_state s lu y
+         so match y with Limit _ -> false | Transient _ _ -> true end)
+     ) /\ forall t. t.rel = s.transition /\ p (t.nth 0) ->
+       ot_trace_covered s q qi t
+       by let t0 = singleton_trace s.transition (t.nth 0) in
+         subtrace t0 t
+       so (rjp t0 by let x = Transient (t.nth 0) 0 in jp x /\ r x t0)
+       so have_winning_strat gut t0 rjq
+       so will_reach_trace_in t0 rjq
+       so if maximal_trace t
+         then has_midpoint_in t0 t rjq
+           so exists t1. subtrace t0 t1 /\ subtrace t1 t /\ rjq t1
+           so if t1.finite
+             then (q (t1.nth t1.length)
+                 by exists y. jq y /\ r y t1 so match y with
+                   | Limit _ -> false
+                   | Transient _ _ -> true
+                   end
+               )
+               so t.nth t1.length = t1.nth t1.length
+               so 0 <= t1.length /\ (t.finite -> t1.length <= t.length)
+             else (t1 = t by subtrace t t1)
+               so let fc = compose s.projection t.nth in
+                 let u = sup s.progress (image fc pos) in
+                 qi u by exists y. jq y /\ r y t so match y with
+                 | Limit v -> u = v
+                 | Transient _ _ -> false
+                 end
+         else exists t2. next_trace t t2
+           so t.finite /\ subtrace t t2 /\ t2.length > t.length
+    ) /\ (ot_enforce_unv s p pi q qi ->
+      have_uniform_winning_strat gu jp jq
+      by forall x. jp x -> have_winning_strat gu x jq
+      by match x with
+      | Limit _ -> jq x
+      | Transient vx d -> let r = ecart s d in
+        let rb = flip r in
+        let rjp = related rb ((=) x) in let rjq = related rb jq in
+        (have_uniform_winning_strat gut rjp rjq
+         by forall t. rjp t -> have_winning_strat gut t rjq
+         by forall t2. subtrace t t2 /\ maximal_trace t2 ->
+           has_midpoint_in t t2 rjq
+         by ot_trace_covered s q qi t2
+         so (exists n. 0 <= n /\ (t2.finite -> n <= t2.length) /\ q (t2.nth n)
+           so let t3 = prefix_trace n t2 in
+             subtrace t t3 /\ subtrace t3 t2
+           so rjq t3 by let vn = Transient (t2.nth n) (n+d) in
+             jq vn /\ rb vn t3
+         ) \/ (let fc = compose s.projection t2.nth in
+           let sc = image fc pos in
+           let u = sup s.progress sc in
+           not t2.finite /\ qi u
+           so subtrace t t2 /\ subtrace t2 t2
+           so rjq t2 by let lu = Limit u in
+             jq lu /\ (rb lu t2 by ecart s d t2 lu)
+         ) \/ (false by t2.finite
+           && exists t3. subtrace t2 t3 /\ (t3.finite -> t3.length > t2.length)
+           so let t4 = prefix_trace (t2.length + 1) t3 in
+             next_trace t2 t4 by subtrace t2 t4
+         )
+        ) so have_uniform_winning_strat gu (related r rjp) (related r rjq)
+        so (subset ((=) x) (related r rjp) by related r rjp x
+          by rb x (singleton_trace s.transition vx)
+        ) so have_uniform_winning_strat gu ((=) x) jq
+      end
+    )
+
+
+
+  clone OTGame with goal ot_enforce_ex, goal ot_enforce_unv
+
+end

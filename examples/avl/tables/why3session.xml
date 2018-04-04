@@ -2,1925 +2,742 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../tables.mlw">
-<theory name="MapBase" sum="b2cea1fc176a503fae753b0970e50873">
- <goal name="D.WP_parameter measure" expl="VC for measure">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../tables.mlw" proved="true">
+<theory name="MapBase" proved="true">
+ <goal name="VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="A.O.Refl" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
+ <goal name="D.VC measure" expl="VC for measure" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="A.O.Trans" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
+ <goal name="M.VC neutral_" expl="VC for neutral_" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="A.O.eq_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
+ <goal name="M.assoc" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="A.O.lt_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
+ <goal name="M.neutral" proved="true">
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="M.WP_parameter neutral_" expl="VC for neutral_">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
+ <goal name="M.M.assoc" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="M.assoc" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
+ <goal name="M.M.neutral" proved="true">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="M.neutral" expl="">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <goal name="M.VC zero" expl="VC for zero" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="M.M.assoc" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
+ <goal name="M.VC op" expl="VC for op" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="M.M.neutral" expl="">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="M.WP_parameter zero" expl="VC for zero">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
- </goal>
- <goal name="M.WP_parameter op" expl="VC for op">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
- </goal>
- <goal name="WP_parameter selected_sem" expl="VC for selected_sem">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter selected_sem.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ <goal name="VC selected_part" expl="VC for selected_part" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC selected_part.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter selected_sem.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC selected_part.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter selected_sem.3" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="126"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.6" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.7" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.8" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="81"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.9" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="85"/></proof>
-  </goal>
-  <goal name="WP_parameter selected_sem.10" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.56" steps="1032"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter selected_part" expl="VC for selected_part">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter selected_part.1" expl="postcondition">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter selected_part.1.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter selected_part.1.1.1" expl="postcondition">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter selected_part.1.1.1.1" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.2" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.3" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="1.22" steps="1436"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.4" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.03" steps="24"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.5" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.6" expl="VC for selected_part">
-     <proof prover="1"><result status="valid" time="2.30"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.1.1.1.7" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.14" steps="111"/></proof>
-     </goal>
-    </transf>
+  <goal name="VC selected_part.2" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC selected_part.2.0" expl="VC for selected_part" proved="true">
+   <proof prover="1"><result status="valid" time="0.12" steps="490"/></proof>
+   </goal>
+   <goal name="VC selected_part.2.1" expl="VC for selected_part" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="44"/></proof>
+   </goal>
+   <goal name="VC selected_part.2.2" expl="VC for selected_part" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC selected_part.2.2.0" expl="VC for selected_part" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="1.86" steps="2859"/></proof>
+    </goal>
+    <goal name="VC selected_part.2.2.1" expl="VC for selected_part" proved="true">
+    <proof prover="1"><result status="valid" time="0.03" steps="27"/></proof>
+    </goal>
+    <goal name="VC selected_part.2.2.2" expl="VC for selected_part" proved="true">
+    <proof prover="1"><result status="valid" time="0.02" steps="26"/></proof>
     </goal>
    </transf>
    </goal>
+   <goal name="VC selected_part.2.3" expl="VC for selected_part" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="44"/></proof>
+   </goal>
+   <goal name="VC selected_part.2.4" expl="VC for selected_part" proved="true">
+   <proof prover="1"><result status="valid" time="0.52" steps="1544"/></proof>
+   </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter selected_part.2" expl="postcondition">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter selected_part.2.1" expl="postcondition">
-   <transf name="inline_goal">
-    <goal name="WP_parameter selected_part.2.1.1" expl="postcondition">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter selected_part.2.1.1.1" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.2" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.08" steps="264"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.3" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.4" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.5" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="4.25" steps="6398"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.6" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.7" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.19" steps="235"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.8" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.16" steps="292"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.9" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.56" steps="1365"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.10" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.03" steps="14"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.11" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.12" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
-     </goal>
-     <goal name="WP_parameter selected_part.2.1.1.13" expl="VC for selected_part">
-     <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
-     </goal>
-    </transf>
+ </transf>
+ </goal>
+ <goal name="Sel.M.assoc" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.M.neutral" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Sel.M.VC zero" expl="VC for zero" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.M.VC op" expl="VC for op" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.M.agg_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.M.agg_sing" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Sel.M.agg_cat" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.D.VC measure" expl="VC for measure" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="Sel.selection_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
+ </goal>
+ <goal name="Sel.VC selected_part" expl="VC for selected_part" proved="true">
+ <proof prover="1"><result status="valid" time="0.07" steps="432"/></proof>
+ </goal>
+ <goal name="VC t" expl="VC for t" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+ </goal>
+ <goal name="VC make_func" expl="VC for make_func" proved="true">
+ <proof prover="1"><result status="valid" time="0.29" steps="885"/></proof>
+ </goal>
+ <goal name="VC correction" expl="VC for correction" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="167"/></proof>
+ </goal>
+ <goal name="VC selected_model" expl="VC for selected_model" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC selected_model.0" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC selected_model.0.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.22" steps="553"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="69"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.2" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="144"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.3" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="91"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.4" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.16" steps="6051"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.5" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.15" steps="353"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.6" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.86" steps="3394"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.7" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.17" steps="349"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.8" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="20"><result status="valid" time="8.76" steps="16489"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.9" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="20"><result status="valid" time="5.74" steps="9531"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.10" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.11" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.03" steps="47"/></proof>
+   </goal>
+   <goal name="VC selected_model.0.12" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="222"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC selected_sorted" expl="VC for selected_sorted" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC selected_sorted.0" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC selected_sorted.0.0" expl="VC for selected_sorted" proved="true">
+   <proof prover="1"><result status="valid" time="1.06" steps="1512"/></proof>
+   </goal>
+   <goal name="VC selected_sorted.0.1" expl="VC for selected_sorted" proved="true">
+   <proof prover="1"><result status="valid" time="0.79" steps="1376"/></proof>
+   </goal>
+   <goal name="VC selected_sorted.0.2" expl="VC for selected_sorted" proved="true">
+   <proof prover="1"><result status="valid" time="0.46" steps="847"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="42"/></proof>
+ </goal>
+ <goal name="VC singleton" expl="VC for singleton" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="123"/></proof>
+ </goal>
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="65"/></proof>
+ </goal>
+ <goal name="VC min" expl="VC for min" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="240"/></proof>
+ </goal>
+ <goal name="VC max" expl="VC for max" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="112"/></proof>
+ </goal>
+ <goal name="VC decompose_min" expl="VC for decompose_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.79" steps="1892"/></proof>
+ </goal>
+ <goal name="VC decompose_max" expl="VC for decompose_max" proved="true">
+ <proof prover="1"><result status="valid" time="1.06" steps="2558"/></proof>
+ </goal>
+ <goal name="VC add_min" expl="VC for add_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.52" steps="1180"/></proof>
+ </goal>
+ <goal name="VC add_max" expl="VC for add_max" proved="true">
+ <proof prover="1"><result status="valid" time="0.54" steps="1183"/></proof>
+ </goal>
+ <goal name="VC ordered_union" expl="VC for ordered_union" proved="true">
+ <proof prover="1"><result status="valid" time="0.40" steps="1028"/></proof>
+ </goal>
+ <goal name="VC get" expl="VC for get" proved="true">
+ <proof prover="1"><result status="valid" time="0.24" steps="518"/></proof>
+ </goal>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC insert.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="VC insert.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="62"/></proof>
+  </goal>
+  <goal name="VC insert.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="VC insert.3" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="42"/></proof>
+  </goal>
+  <goal name="VC insert.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.36" steps="668"/></proof>
+  </goal>
+  <goal name="VC insert.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="51"/></proof>
+  </goal>
+  <goal name="VC insert.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.88" steps="1801"/></proof>
+  </goal>
+  <goal name="VC insert.7" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.39" steps="870"/></proof>
+  </goal>
+  <goal name="VC insert.8" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.10" steps="201"/></proof>
+  </goal>
+  <goal name="VC insert.9" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="VC insert.10" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC insert.10.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.47" steps="1457"/></proof>
+   </goal>
+   <goal name="VC insert.10.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.52" steps="1729"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC insert.11" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.77" steps="2205"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC remove.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="VC remove.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.22" steps="377"/></proof>
+  </goal>
+  <goal name="VC remove.2" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.22" steps="441"/></proof>
+  </goal>
+  <goal name="VC remove.3" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.58" steps="1208"/></proof>
+  </goal>
+  <goal name="VC remove.4" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="18"/></proof>
+  </goal>
+  <goal name="VC remove.5" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="20"><result status="valid" time="5.16" steps="6636"/></proof>
+  </goal>
+  <goal name="VC remove.6" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="4.39" steps="5656"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC split" expl="VC for split" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC split.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="VC split.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="145"/></proof>
+  </goal>
+  <goal name="VC split.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="157"/></proof>
+  </goal>
+  <goal name="VC split.3" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC split.3.0" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
+   </goal>
+   <goal name="VC split.3.1" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="129"/></proof>
+   </goal>
+   <goal name="VC split.3.2" expl="VC for split" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.07" steps="137"/></proof>
+   </goal>
+   <goal name="VC split.3.3" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.12" steps="130"/></proof>
+   </goal>
+   <goal name="VC split.3.4" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
+   </goal>
+   <goal name="VC split.3.5" expl="VC for split" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.06" steps="129"/></proof>
+   </goal>
+   <goal name="VC split.3.6" expl="VC for split" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.08" steps="137"/></proof>
+   </goal>
+   <goal name="VC split.3.7" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.03" steps="130"/></proof>
+   </goal>
+   <goal name="VC split.3.8" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="153"/></proof>
+   </goal>
+   <goal name="VC split.3.9" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="144"/></proof>
+   </goal>
+   <goal name="VC split.3.10" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.09" steps="154"/></proof>
+   </goal>
+   <goal name="VC split.3.11" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="161"/></proof>
+   </goal>
+   <goal name="VC split.3.12" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
+   </goal>
+   <goal name="VC split.3.13" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.08" steps="164"/></proof>
+   </goal>
+   <goal name="VC split.3.14" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.09" steps="185"/></proof>
+   </goal>
+   <goal name="VC split.3.15" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.07" steps="163"/></proof>
+   </goal>
+   <goal name="VC split.3.16" expl="VC for split" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="165"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC view" expl="VC for view" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC view.0" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="1.34" steps="1398"/></proof>
+  </goal>
+  <goal name="VC view.1" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.55" steps="916"/></proof>
+  </goal>
+  <goal name="VC view.2" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC view.2.0" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="61"/></proof>
+   </goal>
+   <goal name="VC view.2.1" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.05" steps="63"/></proof>
+   </goal>
+   <goal name="VC view.2.2" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.06" steps="142"/></proof>
+   </goal>
+   <goal name="VC view.2.3" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="62"/></proof>
+   </goal>
+   <goal name="VC view.2.4" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.63" steps="1120"/></proof>
+   </goal>
+   <goal name="VC view.2.5" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="2.27" steps="2212"/></proof>
+   </goal>
+   <goal name="VC view.2.6" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.26" steps="1983"/></proof>
+   </goal>
+   <goal name="VC view.2.7" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.13" steps="2026"/></proof>
+   </goal>
+   <goal name="VC view.2.8" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.29" steps="1996"/></proof>
+   </goal>
+   <goal name="VC view.2.9" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="2.48" steps="3224"/></proof>
+   </goal>
+   <goal name="VC view.2.10" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="2.76" steps="3795"/></proof>
+   </goal>
+   <goal name="VC view.2.11" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.95" steps="2912"/></proof>
+   </goal>
+   <goal name="VC view.2.12" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="0.49" steps="651"/></proof>
+   </goal>
+   <goal name="VC view.2.13" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.46" steps="2150"/></proof>
+   </goal>
+   <goal name="VC view.2.14" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.56" steps="1272"/></proof>
+   </goal>
+   <goal name="VC view.2.15" expl="VC for view" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="2.09" steps="2176"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC join" expl="VC for join" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC join.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.29" steps="567"/></proof>
+  </goal>
+  <goal name="VC join.1" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="1.86" steps="2539"/></proof>
+  </goal>
+  <goal name="VC join.2" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.63" steps="871"/></proof>
+  </goal>
+  <goal name="VC join.3" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.86" steps="951"/></proof>
+  </goal>
+  <goal name="VC join.4" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.71" steps="1057"/></proof>
+  </goal>
+  <goal name="VC join.5" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.99" steps="1110"/></proof>
+  </goal>
+  <goal name="VC join.6" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.76" steps="1161"/></proof>
+  </goal>
+  <goal name="VC join.7" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="49"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC add_all" expl="VC for add_all" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC add_all.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="235"/></proof>
+  </goal>
+  <goal name="VC add_all.1" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.12" steps="138"/></proof>
+  </goal>
+  <goal name="VC add_all.2" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.54" steps="1550"/></proof>
+  </goal>
+  <goal name="VC add_all.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.52" steps="1532"/></proof>
+  </goal>
+  <goal name="VC add_all.4" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="233"/></proof>
+  </goal>
+  <goal name="VC add_all.5" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.16" steps="268"/></proof>
+  </goal>
+  <goal name="VC add_all.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.12" steps="242"/></proof>
+  </goal>
+  <goal name="VC add_all.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="239"/></proof>
+  </goal>
+  <goal name="VC add_all.8" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC add_all.8.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_all.8.0.0" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
+    </goal>
+    <goal name="VC add_all.8.0.1" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="2.81" steps="5901"/></proof>
     </goal>
    </transf>
    </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
- <goal name="Sel.M.assoc" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
- </goal>
- <goal name="Sel.M.neutral" expl="">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="Sel.M.sum_def_nil" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="6"/></proof>
- </goal>
- <goal name="Sel.M.sum_def_cons" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="8"/></proof>
- </goal>
- <goal name="Sel.balancing_positive" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
- </goal>
- <goal name="Sel.selection_empty" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.06" steps="23"/></proof>
- </goal>
- <goal name="Sel.WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
- </goal>
- <goal name="Sel.WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
- </goal>
- <goal name="Sel.WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
- </goal>
- <goal name="Sel.WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="171"/></proof>
- </goal>
- <goal name="WP_parameter m" expl="VC for m">
- <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="3"/></proof>
- </goal>
- <goal name="WP_parameter m_def" expl="VC for m_def">
- <proof prover="2" timelimit="1"><result status="valid" time="0.03" steps="5"/></proof>
- </goal>
- <goal name="WP_parameter correction" expl="VC for correction">
- <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="54"/></proof>
- </goal>
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="31"/></proof>
- </goal>
- <goal name="WP_parameter singleton" expl="VC for singleton">
- <proof prover="2" timelimit="1"><result status="valid" time="0.10" steps="92"/></proof>
- </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="125"/></proof>
- </goal>
- <goal name="WP_parameter decompose_min" expl="VC for decompose_min">
- <proof prover="2"><result status="valid" time="0.44" steps="1042"/></proof>
- </goal>
- <goal name="WP_parameter decompose_max" expl="VC for decompose_max">
- <proof prover="2"><result status="valid" time="0.47" steps="932"/></proof>
- </goal>
- <goal name="WP_parameter add_min" expl="VC for add_min">
- <proof prover="2"><result status="valid" time="0.17" steps="417"/></proof>
- </goal>
- <goal name="WP_parameter add_max" expl="VC for add_max">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter add_max.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter add_max.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.60" steps="990"/></proof>
-  </goal>
-  <goal name="WP_parameter add_max.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.11" steps="151"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter concat" expl="VC for concat">
- <proof prover="2"><result status="valid" time="0.78" steps="1680"/></proof>
- </goal>
- <goal name="WP_parameter get" expl="VC for get">
- <proof prover="2"><result status="valid" time="0.25" steps="792"/></proof>
- </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter insert.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.2" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter insert.2.1" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.36" steps="411"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.2" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.57" steps="453"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.3" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.11" steps="154"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.4" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.58" steps="1014"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.5" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.04" steps="33"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.6" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.18" steps="204"/></proof>
-   </goal>
-   <goal name="WP_parameter insert.2.7" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter remove.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.2" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter remove.2.1" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.74" steps="660"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.2" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.94" steps="981"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.3" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.09" steps="80"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.4" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="1.42" steps="1583"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.5" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.04" steps="31"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.6" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.58" steps="432"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.2.7" expl="VC for remove">
-   <proof prover="2"><result status="valid" time="0.10" steps="100"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter split" expl="VC for split">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter split.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter split.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.55" steps="1582"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter view" expl="VC for view">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter view.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter view.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.70" steps="2278"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter join" expl="VC for join">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter join.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter join.2" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter join.2.1" expl="postcondition">
-   <proof prover="2"><result status="valid" time="2.28" steps="3106"/></proof>
-   </goal>
-   <goal name="WP_parameter join.2.2" expl="postcondition">
-   <proof prover="2" timelimit="30"><result status="valid" time="9.30" steps="7631"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="pred" arity="1" id="8"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="pred"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="tuple2" arity="2" id="1359"
-     ip_theory="Tuple2">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple2"/>
-     <ip_qualid name="tuple2"/>
-    </ts_pos>
-    <ts_pos name="part_base" arity="1" id="4740"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="part_base"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="4808"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ts_pos name="tuple3" arity="3" id="7715"
-     ip_theory="Tuple3">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple3"/>
-     <ip_qualid name="tuple3"/>
-    </ts_pos>
-    <ts_pos name="t" arity="0" id="9675"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="t"/>
-    </ts_pos>
-    <ts_pos name="selector" arity="0" id="9788"
-     ip_theory="MapBase">
-     <ip_qualid name="selector"/>
-    </ts_pos>
-    <ts_pos name="view" arity="1" id="10390"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="view"/>
-    </ts_pos>
-    <ts_pos name="part" arity="0" id="10398"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="part"/>
-    </ts_pos>
-    <ts_pos name="t" arity="1" id="10838"
-     ip_theory="MapBase">
-     <ip_qualid name="t"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="15"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
-    <ls_pos name="zero" id="643"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="644"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="645"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="648"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1814"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1815"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1816"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="option_to_list" id="4759"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="option_to_list"/>
-    </ls_pos>
-    <ls_pos name="left_extend" id="4775"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="left_extend"/>
-    </ls_pos>
-    <ls_pos name="right_extend" id="4792"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="right_extend"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="4814"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="balancing" id="7981"
-     ip_theory="MapBase">
-     <ip_qualid name="balancing"/>
-    </ls_pos>
-    <ls_pos name="key" id="7998" ip_theory="MapBase">
-     <ip_qualid name="key"/>
-    </ls_pos>
-    <ls_pos name="le" id="8199"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="eq" id="8210"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="eq"/>
-    </ls_pos>
-    <ls_pos name="lt" id="8216"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt"/>
-    </ls_pos>
-    <ls_pos name="precede" id="9520"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="precede"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1817"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1824"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1827"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1830"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1833"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1836"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1841"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1848"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1855"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1873"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1878"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1881"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1893"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1896"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="1903"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="1908"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="1913"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="1914"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="1921"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Length_nonnegative" id="2686"
-     ip_theory="Length">
-     <ip_library name="list"/>
-     <ip_qualid name="Length_nonnegative"/>
-    </pr_pos>
-    <pr_pos name="Length_nil" id="2689"
-     ip_theory="Length">
-     <ip_library name="list"/>
-     <ip_qualid name="Length_nil"/>
-    </pr_pos>
-    <pr_pos name="Append_assoc" id="4083"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_assoc"/>
-    </pr_pos>
-    <pr_pos name="Append_l_nil" id="4090"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_l_nil"/>
-    </pr_pos>
-    <pr_pos name="Append_length" id="4093"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_length"/>
-    </pr_pos>
-    <pr_pos name="mem_append" id="4098"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="mem_append"/>
-    </pr_pos>
-    <pr_pos name="mem_decomp" id="4105"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="mem_decomp"/>
-    </pr_pos>
-    <pr_pos name="rebuild_aternative_def" id="4768"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="rebuild_aternative_def"/>
-    </pr_pos>
-    <pr_pos name="balancing_positive" id="7982"
-     ip_theory="MapBase">
-     <ip_qualid name="balancing_positive"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="8200"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="8203"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="eq_def" id="8211"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="eq_def"/>
-    </pr_pos>
-    <pr_pos name="lt_def" id="8217"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt_def"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="8222"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="8225"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Symm" id="8232"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Symm"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="8237"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Asymm" id="8244"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Asymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="8249"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="lt_def2" id="8259"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt_def2"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="9305"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="9308"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Symm" id="9315"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Symm"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="9320"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Asymm" id="9327"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Asymm"/>
-    </pr_pos>
-    <pr_pos name="appear_append" id="9363"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="appear_append"/>
-    </pr_pos>
-    <pr_pos name="model_domain" id="9430"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_domain"/>
-    </pr_pos>
-    <pr_pos name="model_key" id="9436"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_key"/>
-    </pr_pos>
-    <pr_pos name="model_congruence" id="9445"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_congruence"/>
-    </pr_pos>
-    <pr_pos name="model_singleton" id="9457"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_singleton"/>
-    </pr_pos>
-    <pr_pos name="model_concat" id="9462"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_concat"/>
-    </pr_pos>
-    <pr_pos name="smaller_lower_bound" id="9533"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="smaller_lower_bound"/>
-    </pr_pos>
-    <pr_pos name="bigger_upper_bound" id="9540"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="bigger_upper_bound"/>
-    </pr_pos>
-    <pr_pos name="increasing_precede" id="9563"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="increasing_precede"/>
-    </pr_pos>
-    <pr_pos name="assoc" id="9718"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="assoc"/>
-    </pr_pos>
-    <pr_pos name="neutral" id="9725"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="neutral"/>
-    </pr_pos>
-    <pr_pos name="real_height_nonnegative" id="10336"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="real_height_nonnegative"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="15"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="643"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="644"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="645"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="648"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1814"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1815"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1816"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4759"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4775"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4792"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4814"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="7981"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="7998"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8199"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8210"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8216"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="9520"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1817"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1824"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1827"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1830"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1833"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1836"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1841"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1848"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1855"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1873"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1878"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1881"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1893"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1896"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1903"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1908"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1913"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1914"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1921"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2686"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2689"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4083"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4090"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4105"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4768"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="7982"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8200"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8203"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8211"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8217"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8222"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8225"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8232"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8237"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8244"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8249"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8259"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9305"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9308"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9315"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9320"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9327"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9363"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9430"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9436"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9445"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9457"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9462"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9533"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9540"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9563"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9718"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9725"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="10336"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="8"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="1359"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="4740"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="4808"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="7715"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="9675"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="9788"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10390"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10398"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10838"/>
-    </meta>
-    <goal name="WP_parameter join.2.2" expl="postcondition">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter join.2.2.1" expl="postcondition">
-     <proof prover="2" timelimit="30"><result status="valid" time="0.07" steps="182"/></proof>
-     </goal>
-    </transf>
+   <goal name="VC add_all.8.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_all.8.1.0" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="28"/></proof>
     </goal>
-   </metas>
-   </goal>
-   <goal name="WP_parameter join.2.3" expl="postcondition">
-   <proof prover="2" timelimit="30"><result status="valid" time="5.45" steps="5546"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="pred" arity="1" id="8"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="pred"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="tuple2" arity="2" id="1359"
-     ip_theory="Tuple2">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple2"/>
-     <ip_qualid name="tuple2"/>
-    </ts_pos>
-    <ts_pos name="part_base" arity="1" id="4740"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="part_base"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="4808"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ts_pos name="tuple3" arity="3" id="7715"
-     ip_theory="Tuple3">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple3"/>
-     <ip_qualid name="tuple3"/>
-    </ts_pos>
-    <ts_pos name="t" arity="0" id="9675"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="t"/>
-    </ts_pos>
-    <ts_pos name="selector" arity="0" id="9788"
-     ip_theory="MapBase">
-     <ip_qualid name="selector"/>
-    </ts_pos>
-    <ts_pos name="view" arity="1" id="10390"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="view"/>
-    </ts_pos>
-    <ts_pos name="part" arity="0" id="10398"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="part"/>
-    </ts_pos>
-    <ts_pos name="t" arity="1" id="10838"
-     ip_theory="MapBase">
-     <ip_qualid name="t"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="15"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
-    <ls_pos name="zero" id="643"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="644"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="645"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="648"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1814"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1815"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1816"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="andb" id="3770"
-     ip_theory="Bool">
-     <ip_library name="bool"/>
-     <ip_qualid name="andb"/>
-    </ls_pos>
-    <ls_pos name="orb" id="3779"
-     ip_theory="Bool">
-     <ip_library name="bool"/>
-     <ip_qualid name="orb"/>
-    </ls_pos>
-    <ls_pos name="notb" id="3788"
-     ip_theory="Bool">
-     <ip_library name="bool"/>
-     <ip_qualid name="notb"/>
-    </ls_pos>
-    <ls_pos name="xorb" id="3793"
-     ip_theory="Bool">
-     <ip_library name="bool"/>
-     <ip_qualid name="xorb"/>
-    </ls_pos>
-    <ls_pos name="implb" id="3802"
-     ip_theory="Bool">
-     <ip_library name="bool"/>
-     <ip_qualid name="implb"/>
-    </ls_pos>
-    <ls_pos name="rebuild" id="4747"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="rebuild"/>
-    </ls_pos>
-    <ls_pos name="option_to_list" id="4759"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="option_to_list"/>
-    </ls_pos>
-    <ls_pos name="left_extend" id="4775"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="left_extend"/>
-    </ls_pos>
-    <ls_pos name="right_extend" id="4792"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="right_extend"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="4814"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="balancing" id="7981"
-     ip_theory="MapBase">
-     <ip_qualid name="balancing"/>
-    </ls_pos>
-    <ls_pos name="key" id="7998" ip_theory="MapBase">
-     <ip_qualid name="key"/>
-    </ls_pos>
-    <ls_pos name="le" id="8199"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="eq" id="8210"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="eq"/>
-    </ls_pos>
-    <ls_pos name="lt" id="8216"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt"/>
-    </ls_pos>
-    <ls_pos name="selection_possible" id="9789"
-     ip_theory="MapBase">
-     <ip_qualid name="selection_possible"/>
-    </ls_pos>
-    <ls_pos name="selected" id="9800"
-     ip_theory="MapBase">
-     <ip_qualid name="selected"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1817"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1824"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1827"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1830"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1833"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1836"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1841"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1848"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1855"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1873"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1878"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1881"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1893"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1896"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="1903"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="1908"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="1913"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="1914"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="1921"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Length_nonnegative" id="2686"
-     ip_theory="Length">
-     <ip_library name="list"/>
-     <ip_qualid name="Length_nonnegative"/>
-    </pr_pos>
-    <pr_pos name="Length_nil" id="2689"
-     ip_theory="Length">
-     <ip_library name="list"/>
-     <ip_qualid name="Length_nil"/>
-    </pr_pos>
-    <pr_pos name="Append_assoc" id="4083"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_assoc"/>
-    </pr_pos>
-    <pr_pos name="Append_l_nil" id="4090"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_l_nil"/>
-    </pr_pos>
-    <pr_pos name="Append_length" id="4093"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="Append_length"/>
-    </pr_pos>
-    <pr_pos name="mem_append" id="4098"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="mem_append"/>
-    </pr_pos>
-    <pr_pos name="mem_decomp" id="4105"
-     ip_theory="Append">
-     <ip_library name="list"/>
-     <ip_qualid name="mem_decomp"/>
-    </pr_pos>
-    <pr_pos name="rebuild_aternative_def" id="4768"
-     ip_theory="SelectionTypes">
-     <ip_library name="avl"/>
-     <ip_qualid name="rebuild_aternative_def"/>
-    </pr_pos>
-    <pr_pos name="balancing_positive" id="7982"
-     ip_theory="MapBase">
-     <ip_qualid name="balancing_positive"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="8200"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="8203"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="lt_def" id="8217"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt_def"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="8222"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="8225"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Symm" id="8232"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Symm"/>
-    </pr_pos>
-    <pr_pos name="Asymm" id="8244"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Asymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="8249"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="lt_def2" id="8259"
-     ip_theory="MapBase">
-     <ip_qualid name="CO"/>
-     <ip_qualid name="lt_def2"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="9305"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="9308"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Symm" id="9315"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Eq"/>
-     <ip_qualid name="Symm"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="9320"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Asymm" id="9327"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="O"/>
-     <ip_qualid name="Lt"/>
-     <ip_qualid name="Asymm"/>
-    </pr_pos>
-    <pr_pos name="appear_append" id="9363"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="appear_append"/>
-    </pr_pos>
-    <pr_pos name="model_domain" id="9430"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_domain"/>
-    </pr_pos>
-    <pr_pos name="model_key" id="9436"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_key"/>
-    </pr_pos>
-    <pr_pos name="model_congruence" id="9445"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_congruence"/>
-    </pr_pos>
-    <pr_pos name="model_singleton" id="9457"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_singleton"/>
-    </pr_pos>
-    <pr_pos name="smaller_lower_bound" id="9533"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="smaller_lower_bound"/>
-    </pr_pos>
-    <pr_pos name="bigger_upper_bound" id="9540"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="bigger_upper_bound"/>
-    </pr_pos>
-    <pr_pos name="increasing_midpoint" id="9568"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="increasing_midpoint"/>
-    </pr_pos>
-    <pr_pos name="increasing_snoc" id="9577"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="S"/>
-     <ip_qualid name="increasing_snoc"/>
-    </pr_pos>
-    <pr_pos name="model_split" id="9602"
-     ip_theory="MapBase">
-     <ip_qualid name="A"/>
-     <ip_qualid name="model_split"/>
-    </pr_pos>
-    <pr_pos name="neutral_" id="9716"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="neutral_"/>
-    </pr_pos>
-    <pr_pos name="assoc" id="9718"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="assoc"/>
-    </pr_pos>
-    <pr_pos name="neutral" id="9725"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="neutral"/>
-    </pr_pos>
-    <pr_pos name="sum_append" id="9764"
-     ip_theory="MapBase">
-     <ip_qualid name="M"/>
-     <ip_qualid name="sum_append"/>
-    </pr_pos>
-    <pr_pos name="selected_sem" id="10054"
-     ip_theory="MapBase">
-     <ip_qualid name="selected_sem"/>
-    </pr_pos>
-    <pr_pos name="sum_append" id="10264"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="M"/>
-     <ip_qualid name="sum_append"/>
-    </pr_pos>
-    <pr_pos name="real_height_nonnegative" id="10336"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="real_height_nonnegative"/>
-    </pr_pos>
-    <pr_pos name="rotation_preserve_model" id="10371"
-     ip_theory="MapBase">
-     <ip_qualid name="Sel"/>
-     <ip_qualid name="rotation_preserve_model"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="15"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="643"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="644"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="645"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="648"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1814"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1815"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1816"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3770"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3779"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3788"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3793"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3802"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4747"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4759"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4775"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4792"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="4814"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="7981"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="7998"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8199"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8210"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="8216"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="9789"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="9800"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1817"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1824"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1827"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1830"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1833"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1836"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1841"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1848"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1855"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1873"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1878"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1881"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1893"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1896"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1903"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1908"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1913"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1914"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1921"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2686"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2689"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4083"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4090"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4105"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="4768"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="7982"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8200"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8203"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8217"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8222"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8225"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8232"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8244"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8249"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="8259"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9305"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9308"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9315"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9320"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9327"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9363"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9430"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9436"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9445"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9457"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9533"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9540"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9568"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9577"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9602"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9716"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9718"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9725"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="9764"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="10054"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="10264"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="10336"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="10371"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="8"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="1359"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="4740"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="4808"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="7715"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="9675"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="9788"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10390"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10398"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="10838"/>
-    </meta>
-    <goal name="WP_parameter join.2.3" expl="postcondition">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter join.2.3.1" expl="postcondition">
-     <proof prover="2" timelimit="30"><result status="valid" time="0.14" steps="205"/></proof>
+    <goal name="VC add_all.8.1.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC add_all.8.1.1.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="76"/></proof>
      </goal>
-    </transf>
-    </goal>
-   </metas>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter join.3" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter join.3.1" expl="VC for join">
-   <proof prover="2"><result status="valid" time="0.05" steps="33"/></proof>
-   </goal>
-   <goal name="WP_parameter join.3.2" expl="VC for join">
-   <transf name="introduce_premises">
-    <goal name="WP_parameter join.3.2.1" expl="VC for join">
-    <transf name="inline_goal">
-     <goal name="WP_parameter join.3.2.1.1" expl="VC for join">
-     <transf name="split_goal_wp">
-      <goal name="WP_parameter join.3.2.1.1.1" expl="VC for join">
-      <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+     <goal name="VC add_all.8.1.1.1" expl="postcondition" proved="true">
+     <transf name="split_goal_wp" proved="true" >
+      <goal name="VC add_all.8.1.1.1.0" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.34" steps="780"/></proof>
       </goal>
-      <goal name="WP_parameter join.3.2.1.1.2" expl="VC for join">
-      <proof prover="2"><result status="valid" time="4.73" steps="4332"/></proof>
+      <goal name="VC add_all.8.1.1.1.1" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="1.98" steps="4878"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="VC add_all.8.1.1.2" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.23" steps="780"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC add_all.9" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC add_all.9.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="28"/></proof>
+   </goal>
+   <goal name="VC add_all.9.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_all.9.1.0" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="8"/></proof>
+    </goal>
+    <goal name="VC add_all.9.1.1" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="1.43" steps="4423"/></proof>
+    </goal>
+    <goal name="VC add_all.9.1.2" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC add_all.9.1.2.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.21" steps="711"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC add_all.10" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="4.72" steps="12633"/></proof>
+  </goal>
+  <goal name="VC add_all.11" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="265"/></proof>
+  </goal>
+  <goal name="VC add_all.12" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.28" steps="416"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC filter" expl="VC for filter" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC filter.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="239"/></proof>
+  </goal>
+  <goal name="VC filter.1" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.09" steps="135"/></proof>
+  </goal>
+  <goal name="VC filter.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.20" steps="696"/></proof>
+  </goal>
+  <goal name="VC filter.3" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.64" steps="1780"/></proof>
+  </goal>
+  <goal name="VC filter.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.36" steps="1003"/></proof>
+  </goal>
+  <goal name="VC filter.5" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="237"/></proof>
+  </goal>
+  <goal name="VC filter.6" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.12" steps="271"/></proof>
+  </goal>
+  <goal name="VC filter.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.32" steps="696"/></proof>
+  </goal>
+  <goal name="VC filter.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="53"/></proof>
+  </goal>
+  <goal name="VC filter.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="53"/></proof>
+  </goal>
+  <goal name="VC filter.10" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC filter.10.0" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.16" steps="9584"/></proof>
+   </goal>
+   <goal name="VC filter.10.1" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.28" steps="8818"/></proof>
+   </goal>
+   <goal name="VC filter.10.2" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.98" steps="13681"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC filter.11" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC filter.11.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
+   </goal>
+   <goal name="VC filter.11.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC filter.11.1.0" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="14"/></proof>
+    </goal>
+    <goal name="VC filter.11.1.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC filter.11.1.1.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.62" steps="2200"/></proof>
+     </goal>
+     <goal name="VC filter.11.1.1.1" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.81" steps="2556"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC filter.11.1.2" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC filter.11.1.2.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.32" steps="718"/></proof>
+     </goal>
+     <goal name="VC filter.11.1.2.1" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.69" steps="2129"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC filter.12" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.35" steps="1085"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC remove_all" expl="VC for remove_all" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC remove_all.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.11" steps="239"/></proof>
+  </goal>
+  <goal name="VC remove_all.1" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.09" steps="130"/></proof>
+  </goal>
+  <goal name="VC remove_all.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.19" steps="663"/></proof>
+  </goal>
+  <goal name="VC remove_all.3" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="237"/></proof>
+  </goal>
+  <goal name="VC remove_all.4" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="270"/></proof>
+  </goal>
+  <goal name="VC remove_all.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="238"/></proof>
+  </goal>
+  <goal name="VC remove_all.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="240"/></proof>
+  </goal>
+  <goal name="VC remove_all.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.20" steps="759"/></proof>
+  </goal>
+  <goal name="VC remove_all.8" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC remove_all.8.0" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="2.00" steps="5877"/></proof>
+   </goal>
+   <goal name="VC remove_all.8.1" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.24" steps="7317"/></proof>
+   </goal>
+   <goal name="VC remove_all.8.2" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="1.74" steps="5898"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC remove_all.9" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="3.38" steps="8954"/></proof>
+  </goal>
+  <goal name="VC remove_all.10" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.25" steps="380"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC symdiff" expl="VC for symdiff" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC symdiff.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.09" steps="235"/></proof>
+  </goal>
+  <goal name="VC symdiff.1" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="132"/></proof>
+  </goal>
+  <goal name="VC symdiff.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="233"/></proof>
+  </goal>
+  <goal name="VC symdiff.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.14" steps="235"/></proof>
+  </goal>
+  <goal name="VC symdiff.4" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.69" steps="2064"/></proof>
+  </goal>
+  <goal name="VC symdiff.5" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="233"/></proof>
+  </goal>
+  <goal name="VC symdiff.6" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="266"/></proof>
+  </goal>
+  <goal name="VC symdiff.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.25" steps="546"/></proof>
+  </goal>
+  <goal name="VC symdiff.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.24" steps="552"/></proof>
+  </goal>
+  <goal name="VC symdiff.9" expl="precondition" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.63" steps="2064"/></proof>
+  </goal>
+  <goal name="VC symdiff.10" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC symdiff.10.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC symdiff.10.0.0" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.03" steps="35"/></proof>
+    </goal>
+    <goal name="VC symdiff.10.0.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC symdiff.10.0.1.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.05" steps="45"/></proof>
+     </goal>
+     <goal name="VC symdiff.10.0.1.1" expl="postcondition" proved="true">
+     <transf name="split_goal_wp" proved="true" >
+      <goal name="VC symdiff.10.0.1.1.0" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.27" steps="861"/></proof>
+      </goal>
+      <goal name="VC symdiff.10.0.1.1.1" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="1.54" steps="3080"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="VC symdiff.10.0.1.2" expl="postcondition" proved="true">
+     <transf name="split_goal_wp" proved="true" >
+      <goal name="VC symdiff.10.0.1.2.0" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.32" steps="859"/></proof>
+      </goal>
+      <goal name="VC symdiff.10.0.1.2.1" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="1.43" steps="3574"/></proof>
       </goal>
      </transf>
      </goal>
@@ -1928,632 +745,309 @@
     </goal>
    </transf>
    </goal>
+   <goal name="VC symdiff.10.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC symdiff.10.1.0" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
+    </goal>
+    <goal name="VC symdiff.10.1.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC symdiff.10.1.1.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="8"/></proof>
+     </goal>
+     <goal name="VC symdiff.10.1.1.1" expl="postcondition" proved="true">
+     <transf name="split_goal_wp" proved="true" >
+      <goal name="VC symdiff.10.1.1.1.0" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="787"/></proof>
+      </goal>
+      <goal name="VC symdiff.10.1.1.1.1" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.99" steps="2863"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="VC symdiff.10.1.1.2" expl="postcondition" proved="true">
+     <transf name="split_goal_wp" proved="true" >
+      <goal name="VC symdiff.10.1.1.2.0" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="790"/></proof>
+      </goal>
+      <goal name="VC symdiff.10.1.1.2.1" expl="postcondition" proved="true">
+      <proof prover="1" timelimit="5"><result status="valid" time="1.26" steps="3512"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC symdiff.10.2" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="5"><result status="valid" time="3.75" steps="14165"/></proof>
+   </goal>
   </transf>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter add_all" expl="VC for add_all">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter add_all.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.5" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.6" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="40"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.7" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.8" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.9" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.10" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.23" steps="470"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.11" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.12" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.21" steps="568"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.13" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="83"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.14" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.15" expl="precondition">
-  <proof prover="2"><result status="valid" time="1.21" steps="2462"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.16" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.17" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="172"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.18" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.19" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.20" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.28"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.21" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.43"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.22" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="173"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.23" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.24" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.25" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.19" steps="494"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.26" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="89"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.27" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.24" steps="598"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.28" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="115"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.29" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.30" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.18"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.31" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.19"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.32" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="178"/></proof>
-  </goal>
-  <goal name="WP_parameter add_all.33" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="21"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter filter" expl="VC for filter">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter filter.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.5" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.6" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="60"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.7" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="83"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.8" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.9" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.10" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.14" steps="473"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.11" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.12" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.20" steps="663"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.13" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="83"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.14" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.15" expl="precondition">
-  <proof prover="2"><result status="valid" time="1.98" steps="2613"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.16" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.18"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.17" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.11" steps="129"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.18" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.19" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.20" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.48"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.21" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.42"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.22" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.21" steps="283"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.23" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.24" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.25" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.21" steps="497"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.26" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="89"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.27" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.27" steps="693"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.28" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="115"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.29" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.30" expl="precondition">
-  <proof prover="2"><result status="valid" time="1.69" steps="2200"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.31" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.20"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.32" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="125"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.33" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.34" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.35" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.70" steps="1752"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.36" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.26"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.37" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.14" steps="369"/></proof>
-  </goal>
-  <goal name="WP_parameter filter.38" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="22"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter remove_all" expl="VC for remove_all">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter remove_all.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.6" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.7" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.8" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.13" steps="473"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.9" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.10" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.16" steps="532"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.11" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="82"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.12" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.13" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.32"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.14" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.46"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.15" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.16" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.17" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.13" steps="497"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.18" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="89"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.19" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.25" steps="509"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.20" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="114"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.21" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.22" expl="precondition">
-  <proof prover="2"><result status="valid" time="2.00" steps="2983"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.23" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.28"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.24" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="154"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.25" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.26" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.34"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.27" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.38"/></proof>
-  </goal>
-  <goal name="WP_parameter remove_all.28" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="155"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter symdiff" expl="VC for symdiff">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter symdiff.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="57"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="84"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.6" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.7" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.8" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.14" steps="470"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.9" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.10" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.21" steps="658"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.11" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="82"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.12" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.13" expl="precondition">
-  <proof prover="2"><result status="valid" time="1.40" steps="2385"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.14" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.15" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="113"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.16" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.17" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.41"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.18" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.94"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.19" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.13" steps="114"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.20" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.21" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.23" steps="494"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.22" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="89"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.23" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.29" steps="688"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.24" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.11" steps="114"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.25" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.26" expl="precondition">
-  <proof prover="2"><result status="valid" time="1.84" steps="2730"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.27" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.26"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.28" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.13" steps="154"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.29" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.30" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.49"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.31" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.51"/></proof>
-  </goal>
-  <goal name="WP_parameter symdiff.32" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.10" steps="155"/></proof>
+  <goal name="VC symdiff.11" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC symdiff.11.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.03" steps="21"/></proof>
+   </goal>
+   <goal name="VC symdiff.11.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC symdiff.11.1.0" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="9"/></proof>
+    </goal>
+    <goal name="VC symdiff.11.1.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC symdiff.11.1.1.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.35" steps="694"/></proof>
+     </goal>
+     <goal name="VC symdiff.11.1.1.1" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="1.42" steps="4079"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC symdiff.11.1.2" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC symdiff.11.1.2.0" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="731"/></proof>
+     </goal>
+     <goal name="VC symdiff.11.1.2.1" expl="postcondition" proved="true">
+     <proof prover="1" timelimit="5"><result status="valid" time="0.94" steps="2456"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC symdiff.12" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.63"/></proof>
+  </goal>
+  <goal name="VC symdiff.13" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.26" steps="662"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Map" sum="3b0dc7ad12f01af75afa6c2569cb19c4">
- <goal name="D.WP_parameter get_key" expl="VC for get_key">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
+<theory name="Map" proved="true">
+ <goal name="VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="MB.balancing_positive" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
+ <goal name="D.VC key" expl="VC for key" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="MB.CO.Refl" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
+ <goal name="MB.VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="MB.CO.Trans" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
+ <goal name="MB.VC key" expl="VC for key" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="MB.CO.eq_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
+ <goal name="MB.CO.Refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="MB.CO.lt_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
+ <goal name="MB.CO.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="MB.CO.Total" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="3"/></proof>
+ <goal name="MB.CO.eq_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="MB.WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="3"/></proof>
+ <goal name="MB.CO.lt_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="MB.WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
+ <goal name="MB.CO.Total" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="WP_parameter m_def" expl="VC for m_def">
- <proof prover="2"><result status="valid" time="0.91" steps="1765"/></proof>
+ <goal name="MB.CO.VC compare" expl="VC for compare" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter correction" expl="VC for correction">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="45"/></proof>
- </goal>
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="22"/></proof>
- </goal>
- <goal name="WP_parameter singleton" expl="VC for singleton">
- <proof prover="2" timelimit="1"><result status="valid" time="0.08" steps="77"/></proof>
- </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.08" steps="53"/></proof>
- </goal>
- <goal name="WP_parameter decompose_min" expl="VC for decompose_min">
- <proof prover="2"><result status="valid" time="0.36" steps="786"/></proof>
- </goal>
- <goal name="WP_parameter decompose_max" expl="VC for decompose_max">
- <proof prover="2"><result status="valid" time="0.38" steps="786"/></proof>
- </goal>
- <goal name="WP_parameter add_min" expl="VC for add_min">
- <proof prover="2" timelimit="1"><result status="valid" time="0.09" steps="258"/></proof>
- </goal>
- <goal name="WP_parameter add_max" expl="VC for add_max">
- <proof prover="2" timelimit="1"><result status="valid" time="0.09" steps="284"/></proof>
- </goal>
- <goal name="WP_parameter concat" expl="VC for concat">
- <proof prover="2"><result status="valid" time="0.15" steps="454"/></proof>
- </goal>
- <goal name="WP_parameter get" expl="VC for get">
- <proof prover="2" timelimit="1"><result status="valid" time="0.13" steps="119"/></proof>
- </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <proof prover="2"><result status="valid" time="0.12" steps="297"/></proof>
- </goal>
- <goal name="WP_parameter remove" expl="VC for remove">
- <proof prover="2" timelimit="1"><result status="valid" time="0.10" steps="272"/></proof>
- </goal>
- <goal name="WP_parameter split" expl="VC for split">
- <proof prover="2"><result status="valid" time="0.28" steps="715"/></proof>
- </goal>
-</theory>
-<theory name="Set" sum="4136cf7c473e4c0ea62656646bfba52b">
- <goal name="D.WP_parameter get_key" expl="VC for get_key">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
- </goal>
- <goal name="MB.balancing_positive" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
- </goal>
- <goal name="MB.CO.Refl" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
- </goal>
- <goal name="MB.CO.Trans" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
- </goal>
- <goal name="MB.CO.eq_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
- </goal>
- <goal name="MB.CO.lt_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
- </goal>
- <goal name="MB.CO.Total" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="3"/></proof>
- </goal>
- <goal name="MB.WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="5"/></proof>
- </goal>
- <goal name="MB.WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare">
- <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="5"/></proof>
- </goal>
- <goal name="WP_parameter m_def" expl="VC for m_def">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter m_def.1" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.15"/></proof>
+ <goal name="VC correction" expl="VC for correction" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC correction.0" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter m_def.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter m_def.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.15"/></proof>
-  </goal>
-  <goal name="WP_parameter m_def.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="6"/></proof>
+  <goal name="VC correction.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter correction" expl="VC for correction">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="83"/></proof>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
  </goal>
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="27"/></proof>
+ <goal name="VC singleton" expl="VC for singleton" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="58"/></proof>
  </goal>
- <goal name="WP_parameter singleton" expl="VC for singleton">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="65"/></proof>
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="55"/></proof>
+ <goal name="VC min_binding" expl="VC for min_binding" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="51"/></proof>
  </goal>
- <goal name="WP_parameter decompose_min" expl="VC for decompose_min">
- <proof prover="2"><result status="valid" time="0.18" steps="607"/></proof>
+ <goal name="VC max_binding" expl="VC for max_binding" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="51"/></proof>
  </goal>
- <goal name="WP_parameter decompose_max" expl="VC for decompose_max">
- <proof prover="2"><result status="valid" time="0.19" steps="607"/></proof>
+ <goal name="VC decompose_min" expl="VC for decompose_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.39" steps="660"/></proof>
  </goal>
- <goal name="WP_parameter add_min" expl="VC for add_min">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="270"/></proof>
+ <goal name="VC decompose_max" expl="VC for decompose_max" proved="true">
+ <proof prover="1"><result status="valid" time="0.40" steps="643"/></proof>
  </goal>
- <goal name="WP_parameter add_max" expl="VC for add_max">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="272"/></proof>
+ <goal name="VC add_min_binding" expl="VC for add_min_binding" proved="true">
+ <proof prover="1"><result status="valid" time="0.17" steps="402"/></proof>
  </goal>
- <goal name="WP_parameter concat" expl="VC for concat">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="213"/></proof>
+ <goal name="VC add_max_binding" expl="VC for add_max_binding" proved="true">
+ <proof prover="1"><result status="valid" time="0.18" steps="370"/></proof>
  </goal>
- <goal name="WP_parameter mem" expl="VC for mem">
- <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="131"/></proof>
+ <goal name="VC ordered_join" expl="VC for ordered_join" proved="true">
+ <proof prover="1"><result status="valid" time="0.24" steps="340"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add">
- <proof prover="2" timelimit="1"><result status="valid" time="0.17" steps="455"/></proof>
+ <goal name="VC get" expl="VC for get" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="108"/></proof>
  </goal>
- <goal name="WP_parameter remove" expl="VC for remove">
- <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="402"/></proof>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <proof prover="1"><result status="valid" time="0.38" steps="777"/></proof>
  </goal>
- <goal name="WP_parameter split" expl="VC for split">
- <proof prover="2"><result status="valid" time="0.38" steps="1201"/></proof>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <proof prover="1"><result status="valid" time="0.20" steps="376"/></proof>
  </goal>
- <goal name="WP_parameter union" expl="VC for union">
- <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="170"/></proof>
- </goal>
- <goal name="WP_parameter inter" expl="VC for inter">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="192"/></proof>
- </goal>
- <goal name="WP_parameter diff" expl="VC for diff">
- <proof prover="2" timelimit="1"><result status="valid" time="0.15" steps="181"/></proof>
- </goal>
- <goal name="WP_parameter symdiff" expl="VC for symdiff">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="222"/></proof>
+ <goal name="VC split" expl="VC for split" proved="true">
+ <proof prover="1"><result status="valid" time="0.53" steps="1064"/></proof>
  </goal>
 </theory>
-<theory name="IMapAndSet" sum="ff61b4113e7742621c274153ebf13364">
- <goal name="WP_parameter compare" expl="VC for compare">
- <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="0"/></proof>
+<theory name="Set" proved="true">
+ <goal name="VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="M.balancing_positive" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="D.VC key" expl="VC for key" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="M.CO.Refl" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="MB.VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="M.CO.Trans" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="MB.VC key" expl="VC for key" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="M.CO.eq_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="MB.CO.Refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="M.CO.lt_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="MB.CO.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="M.CO.Total" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="MB.CO.eq_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="M.WP_parameter   Map  CO compare" expl="VC for   Map  CO compare">
- <proof prover="2" timelimit="3"><result status="valid" time="0.06" steps="5"/></proof>
+ <goal name="MB.CO.lt_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="S.balancing_positive" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.06" steps="1"/></proof>
+ <goal name="MB.CO.Total" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="S.CO.Refl" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="1"/></proof>
+ <goal name="MB.CO.VC compare" expl="VC for compare" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="S.CO.Trans" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="3"/></proof>
+ <goal name="VC correction" expl="VC for correction" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
  </goal>
- <goal name="S.CO.eq_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="S.CO.lt_def" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
+ <goal name="VC singleton" expl="VC for singleton" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="17"/></proof>
  </goal>
- <goal name="S.CO.Total" expl="">
- <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="1"/></proof>
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="S.WP_parameter   Set  CO compare" expl="VC for   Set  CO compare">
- <proof prover="2" timelimit="3"><result status="valid" time="0.08" steps="8"/></proof>
+ <goal name="VC min_elt" expl="VC for min_elt" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="9"/></proof>
+ </goal>
+ <goal name="VC max_elt" expl="VC for max_elt" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
+ </goal>
+ <goal name="VC decompose_min" expl="VC for decompose_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="339"/></proof>
+ </goal>
+ <goal name="VC decompose_max" expl="VC for decompose_max" proved="true">
+ <proof prover="1"><result status="valid" time="0.08" steps="316"/></proof>
+ </goal>
+ <goal name="VC add_min_elt" expl="VC for add_min_elt" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="26"/></proof>
+ </goal>
+ <goal name="VC add_max_elt" expl="VC for add_max_elt" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="26"/></proof>
+ </goal>
+ <goal name="VC ordered_union" expl="VC for ordered_union" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
+ </goal>
+ <goal name="VC mem" expl="VC for mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="98"/></proof>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="30"/></proof>
+ </goal>
+ <goal name="VC split" expl="VC for split" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="505"/></proof>
+ </goal>
+ <goal name="VC union" expl="VC for union" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
+ </goal>
+ <goal name="VC inter" expl="VC for inter" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="8"/></proof>
+ </goal>
+ <goal name="VC diff" expl="VC for diff" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
+ </goal>
+ <goal name="VC symdiff" expl="VC for symdiff" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="8"/></proof>
+ </goal>
+</theory>
+<theory name="IMapAndSet" proved="true">
+ <goal name="VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="VC compare" expl="VC for compare" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="M.VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="M.CO.Refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="M.CO.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="M.CO.eq_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="M.CO.lt_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="M.CO.Total" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="M.CO.VC compare" expl="VC for compare" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="S.VC balancing" expl="VC for balancing" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="S.CO.Refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="S.CO.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+ </goal>
+ <goal name="S.CO.eq_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="S.CO.lt_def" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
+ </goal>
+ <goal name="S.CO.Total" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="4"/></proof>
+ </goal>
+ <goal name="S.CO.VC compare" expl="VC for compare" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
 </file>

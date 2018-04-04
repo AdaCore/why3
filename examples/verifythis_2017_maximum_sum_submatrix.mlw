@@ -1,0 +1,100 @@
+
+(**
+
+{1 VerifyThis @ ETAPS 2017 competition
+   Challenge 2: Maximum-sum submatrix}
+
+See https://formal.iti.kit.edu/ulbrich/verifythis2017/
+
+Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(* note: this is a 2D-version of maximum-sum subarray, for which several
+   verified implementations can be found in maximum_subarray.mlw,
+   including Kadane's linear algorithm *)
+
+module Kadane2D
+
+  use import int.Int
+  use import ref.Refint
+  use import int.Sum
+  use import array.Array as A
+  use import matrix.Matrix as M
+
+  (* maximum-sum subarray problem is assumed *)
+
+  function array_sum (a: A.array int) (l h: int) : int
+    = sum (fun i -> a[i]) l h
+
+  val maximum_subarray (a: A.array int) : (int, int, int)
+    returns { s, lo, hi ->
+              0 <= lo <= hi <= A.length a /\ s = array_sum a lo hi /\
+              forall l h. 0 <= l <= h <= A.length a -> s >= array_sum a l h }
+
+  (* sum of a submatrix *)
+
+  function col (m: matrix int) (j i: int) : int = m.elts i j
+
+  function matrix_sum (m: matrix int) (rl rh cl ch: int) : int
+    = sum (fun j -> sum (col m j) rl rh) cl ch
+
+  let maximum_submatrix (m: matrix int) : (int, int, int, int, int)
+    returns { s, rlo, rhi, clo, chi ->
+              (* this is a legal submatrix *)
+              0 <= rlo <= rhi <= rows m /\
+              0 <= clo <= chi <= columns m /\
+              (* s is its sum *)
+              s = matrix_sum m rlo rhi clo chi /\
+              (* and it is maximal *)
+              forall rl rh. 0 <= rl <= rh <= rows m ->
+              forall cl ch. 0 <= cl <= ch <= columns m ->
+              s >= matrix_sum m rl rh cl ch }
+  = let a = A.make m.columns 0 in
+    let maxsum = ref 0 in
+    let rlo = ref 0 in
+    let rhi = ref 0 in
+    let clo = ref 0 in
+    let chi = ref 0 in
+    for rl = 0 to rows m - 1 do
+      invariant { 0 <= !rlo <= !rhi <= rows m }
+      invariant { 0 <= !clo <= !chi <= columns m }
+      invariant { !maxsum = matrix_sum m !rlo !rhi !clo !chi >= 0 }
+      invariant { forall rl' rh. 0 <= rl' < rl -> rl' <= rh <= rows m ->
+                  forall cl ch. 0 <= cl <= ch <= columns m ->
+                  !maxsum >= matrix_sum m rl' rh cl ch }
+      A.fill a 0 (columns m) 0;
+      for rh = rl + 1 to rows m do
+        invariant { 0 <= !rlo <= !rhi <= rows m }
+        invariant { 0 <= !clo <= !chi <= columns m }
+        invariant { !maxsum = matrix_sum m !rlo !rhi !clo !chi >= 0 }
+        invariant { forall rl' rh'. 0 <= rl' <= rh' <= rows m ->
+                    (rl' < rl \/ rl' = rl /\ rh' < rh) ->
+                    forall cl ch. 0 <= cl <= ch <= columns m ->
+                    !maxsum >= matrix_sum m rl' rh' cl ch }
+        invariant { forall j. 0 <= j < columns m ->
+                    a[j] = sum (col m j) rl (rh - 1) }
+        (* update array a *)
+        for c = 0 to columns m -1 do
+          invariant { forall j. 0 <= j < c ->
+                      a[j] = sum (col m j) rl rh }
+          invariant { forall j. c <= j < columns m ->
+                      a[j] = sum (col m j) rl (rh - 1) }
+          a[c] <- a[c] + get m (rh - 1) c
+        done;
+        (* then use Kadane algorithme on array a *)
+        let sum, lo, hi = maximum_subarray a in
+        assert { sum = matrix_sum m rl rh lo hi };
+        assert { forall cl ch. 0 <= cl <= ch <= columns m ->
+                 sum >= matrix_sum m rl rh cl ch
+                 by array_sum a cl ch = matrix_sum m rl rh cl ch };
+        (* update the maximum if needed *)
+        if sum > !maxsum then begin
+          maxsum := sum;
+          rlo := rl; rhi := rh;
+          clo := lo; chi := hi
+        end
+      done;
+    done;
+    !maxsum, !rlo, !rhi, !clo, !chi
+
+end

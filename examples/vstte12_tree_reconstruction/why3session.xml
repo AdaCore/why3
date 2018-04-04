@@ -2,254 +2,203 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.7.1" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="6" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../vstte12_tree_reconstruction.mlw" expanded="true">
-<theory name="Tree" sum="94da36b854220cd722a2d451bd7b45a0">
- <goal name="depths_head" expl="">
- <transf name="induction_ty_lex">
-  <goal name="depths_head.1" expl="">
-  <proof prover="2"><result status="valid" time="0.02" steps="97"/></proof>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../vstte12_tree_reconstruction.mlw" proved="true">
+<theory name="Tree" proved="true">
+ <goal name="VC depths" expl="VC for depths" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+ </transf>
+ </goal>
+ <goal name="depths_head" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="depths_head.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="97"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter depths_unique" expl="VC for depths_unique">
- <proof prover="2"><result status="valid" time="0.08" steps="450"/></proof>
+ <goal name="VC depths_unique" expl="VC for depths_unique" proved="true">
+ <proof prover="2"><result status="valid" time="0.10" steps="623"/></proof>
  </goal>
- <goal name="depths_prefix" expl="">
- <transf name="induction_ty_lex">
-  <goal name="depths_prefix.1" expl="">
+ <goal name="depths_prefix" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="depths_prefix.0" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="98"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="depths_prefix_simple" expl="">
- <proof prover="6"><result status="valid" time="0.05"/></proof>
+ <goal name="depths_prefix_simple" proved="true">
+ <proof prover="6"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter depths_subtree" expl="VC for depths_subtree">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter depths_subtree.1" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter depths_subtree.2" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04" steps="123"/></proof>
-  </goal>
-  <goal name="WP_parameter depths_subtree.3" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter depths_subtree.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter depths_subtree.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="89"/></proof>
-  </goal>
- </transf>
+ <goal name="VC depths_subtree" expl="VC for depths_subtree" proved="true">
+ <proof prover="2"><result status="valid" time="0.21" steps="516"/></proof>
  </goal>
- <goal name="depths_unique2" expl="">
+ <goal name="depths_unique2" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="TreeReconstruction" sum="51f93448aee207eaecaa456d1d46298c">
- <goal name="WP_parameter build_rec" expl="VC for build_rec">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter build_rec.1" expl="exceptional postcondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+<theory name="TreeReconstruction" proved="true">
+ <goal name="VC build_rec" expl="VC for build_rec" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC build_rec.0" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.2" expl="exceptional postcondition">
+  <goal name="VC build_rec.1" expl="exceptional postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.3" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="28"/></proof>
+  <goal name="VC build_rec.2" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.4" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
+  <goal name="VC build_rec.3" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.5" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="77"/></proof>
+  <goal name="VC build_rec.4" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.6" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC build_rec.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.7" expl="exceptional postcondition">
-  <proof prover="4" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v"><result status="valid" time="0.50"/></proof>
+  <goal name="VC build_rec.6" expl="exceptional postcondition" proved="true">
+  <proof prover="5" edited="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"><result status="valid" time="0.48"/></proof>
   </goal>
-  <goal name="WP_parameter build_rec.8" expl="exceptional postcondition">
-  <proof prover="4" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v"><result status="valid" time="0.37"/></proof>
+  <goal name="VC build_rec.7" expl="exceptional postcondition" proved="true">
+  <proof prover="5" edited="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_2.v"><result status="valid" time="0.36"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter build" expl="VC for build">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter build.1" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter build.2" expl="exceptional postcondition">
-  <proof prover="3"><result status="valid" time="0.13"/></proof>
-  </goal>
-  <goal name="WP_parameter build.3" expl="exceptional postcondition">
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
-  </goal>
- </transf>
+ <goal name="VC build" expl="VC for build" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Harness" sum="56c03581d3b05363d5c47a3a9faf947c">
- <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter harness.1" expl="postcondition">
-  <proof prover="4" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="0.31"/></proof>
+<theory name="Harness" proved="true">
+ <goal name="VC harness" expl="VC for harness" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC harness.0" expl="postcondition" proved="true">
+  <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness_1.v"><result status="valid" time="0.33"/></proof>
   </goal>
-  <goal name="WP_parameter harness.2" expl="VC for harness">
-  <proof prover="4" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v"><result status="valid" time="0.29"/></proof>
+  <goal name="VC harness.1" expl="exceptional postcondition" proved="true">
+  <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness_2.v"><result status="valid" time="0.35"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter harness2" expl="VC for harness2">
- <proof prover="4" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"><result status="valid" time="0.38"/></proof>
+ <goal name="VC harness2" expl="VC for harness2" proved="true">
+ <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness2_1.v"><result status="valid" time="0.49"/></proof>
  </goal>
 </theory>
-<theory name="ZipperBasedTermination" sum="68cebb9857482610e9524fbc061fb285">
- <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter tc.1" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.00" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter tc.2" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
-  </goal>
-  <goal name="WP_parameter tc.3" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
-  </goal>
-  <goal name="WP_parameter tc.4" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter tc.5" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="47"/></proof>
-  </goal>
- </transf>
+<theory name="ZipperBasedTermination" proved="true">
+ <goal name="VC tc" expl="VC for tc" proved="true">
+ <proof prover="4"><result status="valid" time="0.56"/></proof>
  </goal>
 </theory>
-<theory name="ZipperBased" sum="3445bf6bce561868d94ea5facd4b83d1">
- <goal name="forest_depths_append" expl="">
- <proof prover="4" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
+<theory name="ZipperBased" proved="true">
+ <goal name="forest_depths_append" proved="true">
+ <proof prover="5" timelimit="10" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
  </goal>
- <goal name="g_append" expl="">
- <proof prover="4" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="0.97"/></proof>
+ <goal name="g_append" proved="true">
+ <proof prover="5" timelimit="20" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
- <goal name="right_nil" expl="">
- <proof prover="4" timelimit="29" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="2.67"/></proof>
+ <goal name="right_nil" proved="true">
+ <proof prover="5" timelimit="29" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="2.76"/></proof>
  </goal>
- <goal name="main_lemma" expl="">
- <proof prover="2"><result status="valid" time="0.02" steps="107"/></proof>
+ <goal name="main_lemma" proved="true">
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter tc.1" expl="exceptional postcondition">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <goal name="VC tc" expl="VC for tc" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC tc.0" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16"/></proof>
   </goal>
-  <goal name="WP_parameter tc.2" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <goal name="VC tc.1" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter tc.3" expl="exceptional postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <goal name="VC tc.2" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter tc.4" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
+  <goal name="VC tc.3" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter tc.5" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="302"/></proof>
+  <goal name="VC tc.4" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter tc.6" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.85"/></proof>
+  <goal name="VC tc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.42"/></proof>
   </goal>
-  <goal name="WP_parameter tc.7" expl="exceptional postcondition">
-  <proof prover="3"><result status="valid" time="0.52"/></proof>
+  <goal name="VC tc.6" expl="exceptional postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30"/></proof>
   </goal>
-  <goal name="WP_parameter tc.8" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC tc.7" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter tc.9" expl="precondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter tc.9.1" expl="VC for tc">
-   <proof prover="2"><result status="valid" time="0.34" steps="539"/></proof>
-   </goal>
-   <goal name="WP_parameter tc.9.2" expl="VC for tc">
-   <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter tc.9.3" expl="VC for tc">
-   <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
-   </goal>
-   <goal name="WP_parameter tc.9.4" expl="VC for tc">
-   <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
-   </goal>
-  </transf>
+  <goal name="VC tc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.40" steps="715"/></proof>
   </goal>
-  <goal name="WP_parameter tc.10" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC tc.9" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter tc.11" expl="exceptional postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC tc.10" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter tc.12" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+  <goal name="VC tc.11" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter tc.13" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.21" steps="371"/></proof>
+  <goal name="VC tc.12" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter tc.14" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC tc.13" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter tc.15" expl="exceptional postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC tc.14" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter tc.16" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
+  <goal name="VC tc.15" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter tc.17" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.31" steps="990"/></proof>
+  <goal name="VC tc.16" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter tc.18" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.84"/></proof>
+  <goal name="VC tc.17" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.44"/></proof>
   </goal>
-  <goal name="WP_parameter tc.19" expl="exceptional postcondition">
-  <proof prover="1"><result status="valid" time="2.92"/></proof>
-  <proof prover="3"><result status="valid" time="0.46"/></proof>
+  <goal name="VC tc.18" expl="exceptional postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.24"/></proof>
   </goal>
-  <goal name="WP_parameter tc.20" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="39"/></proof>
+  <goal name="VC tc.19" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter tc.21" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.84" steps="1486"/></proof>
+  <goal name="VC tc.20" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.74" steps="1486"/></proof>
   </goal>
-  <goal name="WP_parameter tc.22" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  <goal name="VC tc.21" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter tc.23" expl="exceptional postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC tc.22" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="map_leaf_depths" expl="">
- <transf name="induction_ty_lex">
-  <goal name="map_leaf_depths.1" expl="">
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
+ <goal name="VC map_leaf" expl="VC for map_leaf" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="map_leaf_depths" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="map_leaf_depths.0" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="map_leaf_only_leaf" expl="">
- <transf name="induction_ty_lex">
-  <goal name="map_leaf_only_leaf.1" expl="">
-  <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
+ <goal name="map_leaf_only_leaf" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="map_leaf_only_leaf.0" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter build" expl="VC for build">
- <proof prover="2"><result status="valid" time="0.03" steps="139"/></proof>
+ <goal name="VC build" expl="VC for build" proved="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
 </file>

@@ -24,6 +24,11 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
+(* Meta to tag projection functions *)
+let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
+
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls =
@@ -54,7 +59,7 @@ let ident_printer () =
       "and"; "distinct"; "is_int"; "not"; "or"; "select";
       "store"; "to_int"; "to_real"; "xor";
 
-      "div"; "mod";
+      "div"; "mod"; "rem";
 
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
@@ -113,6 +118,8 @@ let ident_printer () =
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
+type version = V20 | V26
+
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
@@ -121,7 +128,12 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
+  mutable list_projs : Stdlib.Sstr.t;
+  info_version : version;
+  meta_model_projection : Sls.t;
+  mutable list_records : ((string * string) list) Stdlib.Mstr.t;
   info_cntexample_need_push : bool;
+  info_cntexample: bool
 }
 
 let debug_print_term message t =
@@ -137,10 +149,15 @@ let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
 (** type *)
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
+  | Tyvar s ->
+      begin match info.info_version with
+      | V20 -> unsupported "smtv2: you must encode type polymorphism"
+      | V26 -> fprintf fmt "%s" (id_unique info.info_printer s.tv_name)
+      end
   | Tyapp (ts, l) ->
-     begin match query_syntax info.info_syn ts.ts_name, l with
+      begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
       | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
       | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
@@ -168,11 +185,11 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
-let model_projected_label = Ident.create_label "model_projected"
-
 let collect_model_ls info ls =
+  if Sls.mem ls info.meta_model_projection then
+    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
-  Slab.mem model_projected_label ls.ls_name.id_label) then
+  Slab.mem Ident.model_projected_label ls.ls_name.id_label) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -293,7 +310,6 @@ let rec print_term info fmt t =
   in
 
   check_exit_vc_term t info.info_in_goal info.info_vc_term;
-
 
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
@@ -443,10 +459,17 @@ let print_type_decl info fmt ts =
 
 let print_param_decl info fmt ls =
   if Mid.mem ls.ls_name info.info_syn then () else
-  fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
-    (print_ident info) ls.ls_name
-    (print_list space (print_type info)) ls.ls_args
-    (print_type_value info) ls.ls_value
+    match ls.ls_args with
+    (* only in SMTLIB 2.5
+    | [] -> fprintf fmt "@[<hov 2>(declare-const %a %a)@]@\n@\n"
+              (print_ident info) ls.ls_name
+              (print_type_value info) ls.ls_value
+     *)
+    | _  ->
+        fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
+                    (print_ident info) ls.ls_name
+                    (print_list space (print_type info)) ls.ls_args
+                    (print_type_value info) ls.ls_value
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else begin
@@ -460,10 +483,10 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model cntexample fmt info =
+let print_info_model fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if not (S.is_empty info_model) && cntexample then
+  if not (S.is_empty info_model) && info.info_cntexample then
     begin
       fprintf fmt "@[(get-model ";
       let model_map =
@@ -483,7 +506,7 @@ let print_info_model cntexample fmt info =
   else
     Stdlib.Mstr.empty
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
+let print_prop_decl vc_loc args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -498,46 +521,93 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      if cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
+      if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
       fprintf fmt "@[(check-sat)@]@\n";
-      let model_list = print_info_model cntexample fmt info in
+      let model_list = print_info_model fmt info in
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; }
-  | Plemma| Pskip -> assert false
+                                queried_terms = model_list;
+                                list_projections = info.list_projs;
+                                Printer.list_records = info.list_records}
+  | Plemma -> assert false
 
 
 let print_constructor_decl info fmt (ls,args) =
-  match args with
-  | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name
-  | _ ->
-     fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
-     let _ =
-       List.fold_left2
-         (fun i ty pr ->
-          begin match pr with
-          | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
-          | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
-          end;
-          fprintf fmt " %a)" (print_type info) ty;
-          succ i) 1 ls.ls_args args
-     in
-     fprintf fmt ")@]"
+  let field_names =
+    (match args with
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
+    | _ ->
+        fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
+        let field_names, _ =
+          List.fold_left2
+          (fun (acc, i) ty pr ->
+            let field_name =
+              match pr with
+              | Some pr ->
+                  let field_name = sprintf "%a" (print_ident info) pr.ls_name in
+                  fprintf fmt "(%s" field_name;
+                  let trace_name =
+                    try
+                      let lab = Slab.choose (Slab.filter (fun x ->
+                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
+                      Strings.remove_prefix "model_trace:" lab.lab_string
+                    with
+                      Not_found -> ""
+                  in
+                  (field_name, trace_name)
+              | None ->
+                  let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
+                  fprintf fmt "(%s" field_name;
+                  (field_name, "")
+            in
+            fprintf fmt " %a)" (print_type info) ty;
+            (field_name :: acc, succ i)) ([], 1) ls.ls_args args
+        in
+        fprintf fmt ")@]";
+        List.rev field_names)
+  in
+
+  if Strings.has_prefix "mk " ls.ls_name.id_string then
+    begin
+      info.list_records <- Stdlib.Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+    end
 
 let print_data_decl info fmt (ts,cl) =
   fprintf fmt "@[(%a@ %a)@]"
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample args info fmt d =
+let print_data_def info fmt (ts,cl) =
+  if ts.ts_args <> [] then
+    let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
+    fprintf fmt "@[(par (%a) (%a))@]"
+      (print_list space (print_ident info)) args
+      (print_list space (print_constructor_decl info)) cl
+  else
+    fprintf fmt "@[(%a)@]"
+      (print_list space (print_constructor_decl info)) cl
+
+let print_sort_decl info fmt (ts,_) =
+  fprintf fmt "@[(%a %d)@]"
+    (print_ident info) ts.ts_name
+    (List.length ts.ts_args)
+
+let print_decl vc_loc args info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-        (print_list space (print_data_decl info)) dl
+      begin match info.info_version with
+      | V20 ->
+          fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+            (print_list space (print_data_decl info)) dl
+      | V26 ->
+          fprintf fmt "@[<v>(declare-datatypes (%a)@ (%a))@,@]"
+            (print_list space (print_sort_decl info)) dl
+            (print_list space (print_data_def info)) dl
+      end
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
@@ -547,17 +617,17 @@ let print_decl vc_loc cntexample args info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc cntexample args info fmt k pr f
+      print_prop_decl vc_loc args info fmt k pr f
 
-let set_produce_models fmt cntexample =
-  if cntexample then
+let set_produce_models fmt info =
+  if info.info_cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
 let meta_counterexmp_need_push =
   Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
                             ~desc:"Internal@ use@ only"
 
-let print_task args ?old:_ fmt task =
+let print_task version args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
@@ -573,23 +643,30 @@ let print_task args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
+    list_projs = Stdlib.Sstr.empty;
+    info_version = version;
+    meta_model_projection = Task.on_tagged_ls meta_projection task;
+    list_records = Stdlib.Mstr.empty;
     info_cntexample_need_push = need_push;
+    info_cntexample = cntexample;
     }
   in
   print_prelude fmt args.prelude;
-  set_produce_models fmt cntexample;
+  set_produce_models fmt info;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
     | Some t ->
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample args info fmt d
+            begin try print_decl vc_loc args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in
   print_decls task;
   pp_print_flush fmt ()
 
-let () = register_printer "smtv2" print_task
+let () = register_printer "smtv2" (print_task V20)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."
+let () = register_printer "smtv2.6" (print_task V26)
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 2.6@ format."

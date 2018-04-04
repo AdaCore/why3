@@ -3,48 +3,48 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="4000"/>
-<file name="../metitarski.why" expanded="true">
-<theory name="P" sum="c067026fa2e37e0590912fc2aea3b100">
- <goal name="x_mul_x_pos" expl="">
+<file name="../metitarski.why">
+<theory name="P" proved="true">
+ <goal name="x_mul_x_pos" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="sqr_pos" expl="">
+ <goal name="sqr_pos" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="P2" sum="c44743f94245f6b49a66ee5191114b20">
- <goal name="sqr_pos" expl="">
+<theory name="P2" proved="true">
+ <goal name="sqr_pos" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="P3" sum="63ccbf7ec3a78e28e96caaa0d850f9c9" expanded="true">
- <goal name="cos_bound" expl="" expanded="true">
- <proof prover="1"><result status="timeout" time="5.20"/></proof>
+<theory name="P3">
+ <goal name="cos_bound">
+ <proof prover="1"><result status="timeout" time="5.00"/></proof>
  </goal>
- <goal name="cos_bound_harder" expl="">
+ <goal name="cos_bound_harder" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="MethodErrorOK" expl="">
+ <goal name="MethodErrorOK" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="MethodErrorWrong" expl="" expanded="true">
- <proof prover="1"><result status="timeout" time="4.42"/></proof>
+ <goal name="MethodErrorWrong">
+ <proof prover="1"><result status="timeout" time="5.00"/></proof>
  </goal>
 </theory>
-<theory name="Power" sum="b5231ccc77e9a6d894e03c6d67f636ef" expanded="true">
- <goal name="G" expl="" expanded="true">
- <proof prover="1"><result status="unknown" time="0.16"/></proof>
- </goal>
- <goal name="G1" expl="" expanded="true">
- <proof prover="1"><result status="unknown" time="0.15"/></proof>
- </goal>
- <goal name="G2" expl="" expanded="true">
+<theory name="Power">
+ <goal name="G">
  <proof prover="1"><result status="unknown" time="0.10"/></proof>
  </goal>
+ <goal name="G1">
+ <proof prover="1"><result status="unknown" time="0.16"/></proof>
+ </goal>
+ <goal name="G2">
+ <proof prover="1"><result status="unknown" time="0.07"/></proof>
+ </goal>
 </theory>
-<theory name="PolyPaverExamples" sum="ff8347daf8eeb17b891ab5bb2aaff984" expanded="true">
- <goal name="g1" expl="" expanded="true">
- <proof prover="1"><result status="unknown" time="0.24"/></proof>
+<theory name="PolyPaverExamples">
+ <goal name="g1">
+ <proof prover="1"><result status="unknown" time="0.20"/></proof>
  </goal>
 </theory>
 </file>

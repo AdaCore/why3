@@ -2,465 +2,711 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="12" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../blocking_semantics5.mlw" expanded="true">
-<theory name="Syntax" sum="f7cde33e5e26ee60d3da8eec7b217241">
- <goal name="mident_decide" expl="">
- <proof prover="9"><result status="valid" time="0.01" steps="1"/></proof>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="10" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../blocking_semantics5.mlw" proved="true">
+<theory name="Syntax" proved="true">
+ <goal name="mident_decide" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="ident_decide" expl="">
- <proof prover="9"><result status="valid" time="0.00" steps="1"/></proof>
+ <goal name="ident_decide" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="decide_is_skip" expl="">
- <proof prover="9"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="decide_is_skip" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="SemOp" sum="60fbf73e1f7166ff30a0a13e124972f7">
- <goal name="get_stack_eq" expl="">
- <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
- <proof prover="7"><result status="valid" time="0.04"/></proof>
- <proof prover="9"><result status="valid" time="0.01" steps="3"/></proof>
- <proof prover="12"><result status="valid" time="0.03"/></proof>
+<theory name="SemOp" proved="true">
+ <goal name="get_stack_eq" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="get_stack_neq" expl="">
- <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
- <proof prover="7"><result status="valid" time="0.20"/></proof>
- <proof prover="9"><result status="valid" time="0.02" steps="8"/></proof>
- <proof prover="12"><result status="valid" time="0.05"/></proof>
+ <goal name="get_stack_neq" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
- <goal name="steps_non_neg" expl="">
+ <goal name="steps_non_neg" proved="true">
  <proof prover="1" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
 </theory>
-<theory name="TestSemantics" sum="86970d496f2db125feae52276a283ee6">
- <goal name="Test13" expl="">
- <proof prover="9"><result status="valid" time="0.02" steps="16"/></proof>
- <proof prover="10"><result status="valid" time="0.03"/></proof>
+<theory name="TestSemantics" proved="true">
+ <goal name="Test13" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="Test42" expl="">
- <proof prover="9"><result status="valid" time="0.03" steps="4"/></proof>
+ <goal name="Test42" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="Test0" expl="">
- <proof prover="9"><result status="valid" time="0.05" steps="18"/></proof>
+ <goal name="Test0" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
- <goal name="Test55" expl="">
+ <goal name="Test55" proved="true">
  <proof prover="10"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="Ass42" expl="">
- <proof prover="3" timelimit="5"><result status="valid" time="0.05"/></proof>
- <proof prover="9"><result status="valid" time="0.05" steps="107"/></proof>
+ <goal name="Ass42" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="124"/></proof>
  </goal>
- <goal name="If42" expl="">
- <proof prover="1" timelimit="6" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="0.81"/></proof>
- </goal>
-</theory>
-<theory name="Typing" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="TypingAndSemantics" sum="a93f17496bf551e48a79468a47f1668b">
- <goal name="type_inversion" expl="">
- <transf name="induction_ty_lex">
-  <goal name="type_inversion.1" expl="">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.24"/></proof>
-  <proof prover="7"><result status="valid" time="0.07"/></proof>
-  <proof prover="9"><result status="valid" time="0.08" steps="68"/></proof>
-  <proof prover="12"><result status="valid" time="0.07"/></proof>
+ <goal name="If42" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="If42.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_type_term" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_type_term.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_type_term.1.1" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
-   <proof prover="9"><result status="valid" time="0.07" steps="131"/></proof>
-   </goal>
-   <goal name="eval_type_term.1.2" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.06" steps="143"/></proof>
-   </goal>
-   <goal name="eval_type_term.1.3" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.05"/></proof>
-   <proof prover="9"><result status="valid" time="0.08" steps="143"/></proof>
-   </goal>
-   <goal name="eval_type_term.1.4" expl="">
-   <proof prover="1" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="1.50"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="type_preservation" expl="">
- <proof prover="1" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="1.52"/></proof>
- </goal>
-</theory>
-<theory name="FreshVariables" sum="e8d942e6e9d0add73d0d37a3267da968">
- <goal name="Cons_append" expl="">
- <proof prover="9"><result status="valid" time="0.03" steps="13"/></proof>
- </goal>
- <goal name="Append_nil_l" expl="">
- <proof prover="9"><result status="valid" time="0.03" steps="6"/></proof>
- </goal>
- <goal name="eval_msubst_term" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_msubst_term.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_msubst_term.1.1" expl="">
-   <proof prover="3" timelimit="5" memlimit="4000"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="14"/></proof>
-   </goal>
-   <goal name="eval_msubst_term.1.2" expl="">
-   <proof prover="3" timelimit="5" memlimit="4000"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="14"/></proof>
-   </goal>
-   <goal name="eval_msubst_term.1.3" expl="">
-   <proof prover="3" timelimit="5" memlimit="4000"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.05" steps="22"/></proof>
-   </goal>
-   <goal name="eval_msubst_term.1.4" expl="">
-   <proof prover="3" timelimit="5" memlimit="4000"><result status="valid" time="0.06"/></proof>
-   <proof prover="9"><result status="valid" time="0.12" steps="34"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_msubst" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_msubst.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_msubst.1.1" expl="">
-   <proof prover="3"><result status="valid" time="0.10"/></proof>
-   <proof prover="9"><result status="valid" time="0.05" steps="34"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.2" expl="">
-   <proof prover="3"><result status="valid" time="0.08"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="40"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.3" expl="">
-   <proof prover="9"><result status="valid" time="0.04" steps="77"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.4" expl="">
-   <proof prover="9"><result status="valid" time="0.06" steps="80"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.5" expl="">
-   <proof prover="3"><result status="valid" time="0.51"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="35"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.6" expl="">
-   <proof prover="9"><result status="valid" time="0.04" steps="42"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.7" expl="">
-   <proof prover="3"><result status="valid" time="0.48"/></proof>
-   <proof prover="9"><result status="valid" time="0.07" steps="57"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.8" expl="">
-   <proof prover="9"><result status="valid" time="0.03" steps="79"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.9" expl="">
-   <proof prover="3"><result status="valid" time="4.08"/></proof>
-   <proof prover="9" timelimit="30"><result status="valid" time="0.23" steps="586"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.10" expl="">
-   <proof prover="9"><result status="valid" time="0.30" steps="655"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.11" expl="">
-   <proof prover="1" edited="blocking_semantics5_FreshVariables_eval_msubst_2.v"><result status="valid" time="0.80"/></proof>
-   </goal>
-   <goal name="eval_msubst.1.12" expl="">
-   <proof prover="9"><result status="valid" time="0.30" steps="561"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="199"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_swap_term" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_swap_term.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_swap_term.1.1" expl="">
-   <proof prover="3"><result status="valid" time="0.08"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="12"/></proof>
-   </goal>
-   <goal name="eval_swap_term.1.2" expl="">
-   <proof prover="1" edited="blocking_semantics5_FreshVariables_eval_swap_term_1.v"><result status="valid" time="0.93"/></proof>
-   </goal>
-   <goal name="eval_swap_term.1.3" expl="">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
-   <proof prover="9"><result status="valid" time="0.05" steps="12"/></proof>
-   </goal>
-   <goal name="eval_swap_term.1.4" expl="">
-   <proof prover="3"><result status="valid" time="0.25"/></proof>
-   <proof prover="9"><result status="valid" time="0.03" steps="51"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.4" proved="true">
+  <proof prover="10"><result status="valid" time="0.08"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_swap_gen" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_swap_gen.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_swap_gen.1.1" expl="">
-   <proof prover="9"><result status="valid" time="0.03" steps="47"/></proof>
-   <proof prover="10"><result status="valid" time="0.04"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.2" expl="">
-   <proof prover="3" memlimit="4000"><result status="valid" time="0.23"/></proof>
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.03" steps="47"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.3" expl="">
-   <proof prover="3" memlimit="4000"><result status="valid" time="0.30"/></proof>
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.10" steps="81"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.4" expl="">
-   <proof prover="3" memlimit="4000"><result status="valid" time="0.32"/></proof>
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.11" steps="81"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.5" expl="">
-   <proof prover="9"><result status="valid" time="0.03" steps="46"/></proof>
-   <proof prover="10"><result status="valid" time="0.04"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.6" expl="">
-   <proof prover="9"><result status="valid" time="0.03" steps="46"/></proof>
-   <proof prover="10"><result status="valid" time="0.05"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.7" expl="">
-   <proof prover="3" memlimit="4000"><result status="valid" time="0.41"/></proof>
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.04" steps="51"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.8" expl="">
-   <proof prover="3" memlimit="4000"><result status="valid" time="0.31"/></proof>
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.04" steps="51"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.9" expl="">
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.07" steps="112"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.10" expl="">
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.08" steps="112"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.11" expl="">
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.71" steps="735"/></proof>
-   </goal>
-   <goal name="eval_swap_gen.1.12" expl="">
-   <proof prover="9" timelimit="30" memlimit="4000"><result status="valid" time="0.70" steps="734"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_swap" expl="">
- <proof prover="1" memlimit="4000" edited="blocking_semantics5_FreshVariables_eval_swap_3.v"><result status="valid" time="0.33"/></proof>
- </goal>
- <goal name="eval_term_change_free" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_term_change_free.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_term_change_free.1.1" expl="">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="7"/></proof>
-   </goal>
-   <goal name="eval_term_change_free.1.2" expl="">
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="29"/></proof>
-   </goal>
-   <goal name="eval_term_change_free.1.3" expl="">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="7"/></proof>
-   </goal>
-   <goal name="eval_term_change_free.1.4" expl="">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
-   <proof prover="9"><result status="valid" time="0.07" steps="33"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="eval_change_free" expl="">
- <transf name="induction_ty_lex">
-  <goal name="eval_change_free.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="eval_change_free.1.1" expl="">
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
-   <proof prover="9"><result status="valid" time="0.05" steps="35"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.2" expl="">
-   <proof prover="3"><result status="valid" time="0.15"/></proof>
-   <proof prover="9"><result status="valid" time="0.06" steps="29"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.3" expl="">
-   <proof prover="3"><result status="valid" time="0.18"/></proof>
-   <proof prover="9"><result status="valid" time="0.08" steps="101"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.4" expl="">
-   <proof prover="3"><result status="valid" time="0.07"/></proof>
-   <proof prover="9"><result status="valid" time="0.12" steps="53"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.5" expl="">
-   <proof prover="3"><result status="valid" time="0.18"/></proof>
-   <proof prover="9"><result status="valid" time="0.05" steps="39"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.6" expl="">
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
-   <proof prover="9"><result status="valid" time="0.06" steps="28"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.7" expl="">
-   <proof prover="3"><result status="valid" time="0.07"/></proof>
-   <proof prover="9"><result status="valid" time="0.07" steps="83"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.8" expl="">
-   <proof prover="3"><result status="valid" time="0.07"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="34"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.9" expl="">
-   <proof prover="3"><result status="valid" time="0.29"/></proof>
-   <proof prover="9"><result status="valid" time="0.26" steps="539"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.10" expl="">
-   <proof prover="3"><result status="valid" time="0.33"/></proof>
-   <proof prover="9"><result status="valid" time="0.07" steps="89"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.11" expl="">
-   <proof prover="1" edited="blocking_semantics5_FreshVariables_eval_change_free_4.v"><result status="valid" time="1.30"/></proof>
-   </goal>
-   <goal name="eval_change_free.1.12" expl="">
-   <proof prover="9"><result status="valid" time="0.18" steps="280"/></proof>
-   </goal>
-  </transf>
+  <goal name="If42.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="HoareLogic" sum="23cedd132ddce3b408fd64127096ec7a">
- <goal name="many_steps_seq" expl="">
- <proof prover="1" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="0.92"/></proof>
+<theory name="TypingAndSemantics" proved="true">
+ <goal name="type_inversion" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="type_inversion.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="consequence_rule" expl="">
- <proof prover="3"><result status="valid" time="0.24"/></proof>
+ <goal name="eval_type_term" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_type_term.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_type_term.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="281"/></proof>
+   </goal>
+   <goal name="eval_type_term.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
+   </goal>
+   <goal name="eval_type_term.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="205"/></proof>
+   </goal>
+   <goal name="eval_type_term.0.3" proved="true">
+   <proof prover="1" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="0.38"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="skip_rule" expl="">
- <proof prover="1" edited="blocking_semantics5_HoareLogic_skip_rule_1.v"><result status="valid" time="0.43"/></proof>
+ <goal name="type_preservation" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="type_preservation.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="420"/></proof>
+  </goal>
+  <goal name="type_preservation.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="562"/></proof>
+  </goal>
+  <goal name="type_preservation.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="61"/></proof>
+  </goal>
+  <goal name="type_preservation.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
+  </goal>
+  <goal name="type_preservation.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="81"/></proof>
+  </goal>
+  <goal name="type_preservation.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="type_preservation.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="118"/></proof>
+  </goal>
+  <goal name="type_preservation.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="assign_rule" expl="">
- <proof prover="1" timelimit="12" edited="blocking_semantics5_HoareLogic_assign_rule_1.v"><result status="valid" time="1.12"/></proof>
+</theory>
+<theory name="FreshVariables" proved="true">
+ <goal name="Cons_append" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="seq_rule" expl="">
- <proof prover="7"><result status="valid" time="0.09"/></proof>
- <proof prover="12"><result status="valid" time="0.06"/></proof>
+ <goal name="Append_nil_l" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="if_rule" expl="">
- <proof prover="1" edited="blocking_semantics5_HoareLogic_if_rule_1.v"><result status="valid" time="0.94"/></proof>
+ <goal name="eval_msubst_term" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_msubst_term.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_msubst_term.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="eval_msubst_term.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="eval_msubst_term.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
+   </goal>
+   <goal name="eval_msubst_term.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="assert_rule" expl="">
- <proof prover="1" edited="blocking_semantics5_HoareLogic_assert_rule_1.v"><result status="valid" time="0.46"/></proof>
+ <goal name="eval_msubst" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_msubst.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_msubst.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="90"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="92"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.5" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="57"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="90"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.8" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="480"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.9" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="114"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.10" proved="true">
+   <proof prover="0"><result status="valid" time="0.38" steps="1543"/></proof>
+   </goal>
+   <goal name="eval_msubst.0.11" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="271"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="assert_rule_ext" expl="">
- <proof prover="1" edited="blocking_semantics5_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="0.38"/></proof>
+ <goal name="eval_swap_term" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_swap_term.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_swap_term.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+   </goal>
+   <goal name="eval_swap_term.0.1" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="eval_swap_term.0.1.0" proved="true">
+    <transf name="induction_arg_ty_lex" proved="true" arg1="l">
+     <goal name="eval_swap_term.0.1.0.0" proved="true">
+     <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.18" steps="676"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="eval_swap_term.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+   </goal>
+   <goal name="eval_swap_term.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="66"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="while_rule" expl="">
+ <goal name="eval_swap_gen" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_swap_gen.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_swap_gen.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="48"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="48"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="131"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="131"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="52"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.5" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="52"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="63"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="63"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.8" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="170"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.9" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="170"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.10" proved="true">
+   <proof prover="0"><result status="valid" time="4.64" steps="2510"/></proof>
+   </goal>
+   <goal name="eval_swap_gen.0.11" proved="true">
+   <proof prover="0"><result status="valid" time="4.54" steps="2510"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="eval_swap" proved="true">
+ <proof prover="10"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="eval_term_change_free" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_term_change_free.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_term_change_free.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+   </goal>
+   <goal name="eval_term_change_free.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
+   </goal>
+   <goal name="eval_term_change_free.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+   </goal>
+   <goal name="eval_term_change_free.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="eval_change_free" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="eval_change_free.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="eval_change_free.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="116"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="78"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.5" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="114"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.8" proved="true">
+   <proof prover="0"><result status="valid" time="0.05" steps="176"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.9" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="110"/></proof>
+   </goal>
+   <goal name="eval_change_free.0.10" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="eval_change_free.0.10.0" proved="true">
+    <transf name="subst" proved="true" arg1="f">
+     <goal name="eval_change_free.0.10.0.0" proved="true">
+     <transf name="compute_in_goal" proved="true" >
+      <goal name="eval_change_free.0.10.0.0.0" proved="true">
+      <transf name="destruct_alg" proved="true" arg1="x1">
+       <goal name="eval_change_free.0.10.0.0.0.0" proved="true">
+       <proof prover="7"><result status="valid" time="0.13"/></proof>
+       </goal>
+       <goal name="eval_change_free.0.10.0.0.0.1" proved="true">
+       <proof prover="7"><result status="valid" time="0.18"/></proof>
+       </goal>
+       <goal name="eval_change_free.0.10.0.0.0.2" proved="true">
+       <proof prover="7"><result status="valid" time="0.15"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="eval_change_free.0.11" proved="true">
+   <proof prover="0"><result status="valid" time="0.09" steps="431"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="HoareLogic" proved="true">
+ <goal name="many_steps_seq" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="many_steps_seq.0" proved="true">
+  <transf name="induction" proved="true" arg1="n">
+   <goal name="many_steps_seq.0.0" expl="base case" proved="true">
+   <proof prover="7"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="many_steps_seq.0.1" expl="recursive case" proved="true">
+   <transf name="inversion_arg_pr" proved="true" arg1="H">
+    <goal name="many_steps_seq.0.1.0" expl="recursive case" proved="true">
+    <proof prover="7"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="many_steps_seq.0.1.1" expl="recursive case" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="many_steps_seq.0.1.1.0" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="many_steps_seq.0.1.1.0.0" proved="true">
+      <transf name="inversion_arg_pr" proved="true" arg1="H2">
+       <goal name="many_steps_seq.0.1.1.0.0.0" proved="true">
+       <proof prover="7"><result status="valid" time="0.08"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.1" proved="true">
+       <proof prover="7"><result status="valid" time="0.09"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.2" proved="true">
+       <proof prover="7"><result status="valid" time="0.06"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.3" proved="true">
+       <proof prover="7"><result status="valid" time="0.07"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.4" proved="true">
+       <proof prover="7"><result status="valid" time="0.09"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.5" proved="true">
+       <proof prover="7"><result status="valid" time="0.08"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.6" proved="true">
+       <proof prover="7"><result status="valid" time="0.06"/></proof>
+       </goal>
+       <goal name="many_steps_seq.0.1.1.0.0.7" proved="true">
+       <proof prover="7"><result status="valid" time="0.06"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="consequence_rule" proved="true">
+ <proof prover="3" timelimit="30"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="skip_rule" proved="true">
+ <proof prover="0"><result status="valid" time="0.07" steps="306"/></proof>
+ </goal>
+ <goal name="assign_rule" proved="true">
+ <proof prover="0"><result status="valid" time="0.53" steps="1865"/></proof>
+ </goal>
+ <goal name="seq_rule" proved="true">
+ <proof prover="0"><result status="valid" time="0.12" steps="488"/></proof>
+ </goal>
+ <goal name="if_rule" proved="true">
+ <transf name="inline_all" proved="true" >
+  <goal name="if_rule.0" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="if_rule.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+   </goal>
+   <goal name="if_rule.0.1" proved="true">
+   <proof prover="10" timelimit="10" memlimit="4000"><result status="valid" time="2.72"/></proof>
+   <transf name="inversion_pr" proved="true" >
+    <goal name="if_rule.0.1.0" proved="true">
+    <proof prover="10"><result status="valid" time="0.08"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.1" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.2" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.3" proved="true">
+    <proof prover="7"><result status="valid" time="0.11"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.4" proved="true">
+    <proof prover="7"><result status="valid" time="0.10"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.5" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.6" proved="true">
+    <proof prover="10"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="if_rule.0.1.7" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="assert_rule" proved="true">
+ <proof prover="0"><result status="valid" time="0.15" steps="628"/></proof>
+ </goal>
+ <goal name="assert_rule_ext" proved="true">
+ <proof prover="0"><result status="valid" time="0.34" steps="1384"/></proof>
+ </goal>
+ <goal name="while_rule" proved="true">
  <proof prover="1" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="0.46"/></proof>
  </goal>
 </theory>
-<theory name="WP" sum="5cc3a5597ba7d5d9898b25547d8addba">
- <goal name="monotonicity" expl="">
- <transf name="induction_ty_lex">
-  <goal name="monotonicity.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="monotonicity.1.1" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.08"/></proof>
-   <proof prover="7"><result status="valid" time="0.09"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="11"/></proof>
-   <proof prover="12"><result status="valid" time="0.10"/></proof>
+<theory name="WP" proved="true">
+ <goal name="monotonicity" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="monotonicity.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="monotonicity.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="11"/></proof>
    </goal>
-   <goal name="monotonicity.1.2" expl="">
-   <proof prover="1" timelimit="30" edited="blocking_semantics5_WP_monotonicity_1.v"><result status="valid" time="0.80"/></proof>
+   <goal name="monotonicity.0.1" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="monotonicity.0.1.0" proved="true">
+    <transf name="subst" proved="true" arg1="s">
+     <goal name="monotonicity.0.1.0.0" proved="true">
+     <transf name="unfold" proved="true" arg1="wp">
+      <goal name="monotonicity.0.1.0.0.0" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="monotonicity.0.1.0.0.0.0" proved="true">
+       <transf name="unfold" proved="true" arg1="valid_fmla">
+        <goal name="monotonicity.0.1.0.0.0.0.0" proved="true">
+        <transf name="unfold" proved="true" arg1="valid_fmla" arg2="in" arg3="H">
+         <goal name="monotonicity.0.1.0.0.0.0.0.0" proved="true">
+         <transf name="unfold" proved="true" arg1="eval_fmla" arg2="in" arg3="H">
+          <goal name="monotonicity.0.1.0.0.0.0.0.0.0" proved="true">
+          <transf name="unfold" proved="true" arg1="eval_fmla">
+           <goal name="monotonicity.0.1.0.0.0.0.0.0.0.0" proved="true">
+           <transf name="compute_specified" proved="true" >
+            <goal name="monotonicity.0.1.0.0.0.0.0.0.0.0.0" proved="true">
+            <proof prover="7"><result status="valid" time="0.14"/></proof>
+            </goal>
+           </transf>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="monotonicity.1.3" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.14"/></proof>
-   <proof prover="9"><result status="valid" time="0.06" steps="47"/></proof>
+   <goal name="monotonicity.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
    </goal>
-   <goal name="monotonicity.1.4" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.24"/></proof>
+   <goal name="monotonicity.0.3" proved="true">
+   <proof prover="3"><result status="valid" time="0.24"/></proof>
    </goal>
-   <goal name="monotonicity.1.5" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.09"/></proof>
+   <goal name="monotonicity.0.4" proved="true">
+   <proof prover="3"><result status="valid" time="0.09"/></proof>
    </goal>
-   <goal name="monotonicity.1.6" expl="">
+   <goal name="monotonicity.0.5" proved="true">
    <proof prover="1" edited="blocking_semantics5_WP_monotonicity_3.v"><result status="valid" time="0.40"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="distrib_conj" expl="">
- <transf name="induction_ty_lex">
-  <goal name="distrib_conj.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="distrib_conj.1.1" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.07"/></proof>
-   <proof prover="9"><result status="valid" time="0.06" steps="30"/></proof>
+ <goal name="distrib_conj" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="distrib_conj.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="distrib_conj.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
    </goal>
-   <goal name="distrib_conj.1.2" expl="">
-   <proof prover="9"><result status="valid" time="0.55" steps="1402"/></proof>
+   <goal name="distrib_conj.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.41" steps="1727"/></proof>
    </goal>
-   <goal name="distrib_conj.1.3" expl="">
-   <proof prover="1" edited="blocking_semantics5_WP_distrib_conj_2.v"><result status="valid" time="0.95"/></proof>
+   <goal name="distrib_conj.0.2" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="distrib_conj.0.2.0" proved="true">
+    <transf name="assert" proved="true" arg1="(valid_fmla (Fimplies (Fand (wp x p) (wp x q)) (wp x (Fand p q))))">
+     <goal name="distrib_conj.0.2.0.0" proved="true">
+     <proof prover="7"><result status="valid" time="0.13"/></proof>
+     </goal>
+     <goal name="distrib_conj.0.2.0.1" proved="true">
+     <transf name="instantiate" proved="true" arg1="monotonicity" arg2="x1">
+      <goal name="distrib_conj.0.2.0.1.0" proved="true">
+      <transf name="instantiate" proved="true" arg1="Hinst" arg2="(Fand (wp x p) (wp x q))">
+       <goal name="distrib_conj.0.2.0.1.0.0" proved="true">
+       <transf name="instantiate" proved="true" arg1="Hinst" arg2="(wp x (Fand p q))">
+        <goal name="distrib_conj.0.2.0.1.0.0.0" proved="true">
+        <proof prover="5"><result status="valid" time="0.15"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="distrib_conj.1.4" expl="">
-   <proof prover="9"><result status="valid" time="0.34" steps="959"/></proof>
-   <proof prover="10"><result status="valid" time="0.08"/></proof>
+   <goal name="distrib_conj.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="277"/></proof>
    </goal>
-   <goal name="distrib_conj.1.5" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.23"/></proof>
-   <proof prover="9"><result status="valid" time="0.14" steps="333"/></proof>
+   <goal name="distrib_conj.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="175"/></proof>
    </goal>
-   <goal name="distrib_conj.1.6" expl="">
+   <goal name="distrib_conj.0.5" proved="true">
    <proof prover="1" edited="blocking_semantics5_WP_distrib_conj_3.v"><result status="valid" time="0.63"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="wp_preserved_by_reduction" expl="">
- <proof prover="1" memlimit="4000" edited="blocking_semantics5_WP_wp_preserved_by_reduction_4.v"><result status="valid" time="1.76"/></proof>
+ <goal name="wp_preserved_by_reduction" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="wp_preserved_by_reduction.0" proved="true">
+  <proof prover="2"><result status="valid" time="2.47" steps="3551"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.1" proved="true">
+  <proof prover="7"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.2" proved="true">
+  <proof prover="7"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.3" proved="true">
+  <proof prover="7"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.4" proved="true">
+  <proof prover="7"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.5" proved="true">
+  <proof prover="7"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.6" proved="true">
+  <proof prover="7"><result status="valid" time="0.46"/></proof>
+  </goal>
+  <goal name="wp_preserved_by_reduction.7" proved="true">
+  <proof prover="7"><result status="valid" time="0.42"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="progress" expl="">
- <transf name="induction_ty_lex">
-  <goal name="progress.1" expl="">
-  <transf name="split_goal_wp">
-   <goal name="progress.1.1" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
-   <proof prover="7"><result status="valid" time="0.00"/></proof>
-   <proof prover="9"><result status="valid" time="0.04" steps="10"/></proof>
-   <proof prover="12"><result status="valid" time="0.00"/></proof>
+ <goal name="progress" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="progress.0" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="progress.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
-   <goal name="progress.1.2" expl="">
+   <goal name="progress.0.1" proved="true">
    <proof prover="1" edited="blocking_semantics5_WP_progress_1.v"><result status="valid" time="0.39"/></proof>
+   <proof prover="10"><result status="valid" time="0.20"/></proof>
    </goal>
-   <goal name="progress.1.3" expl="">
-   <proof prover="1" edited="blocking_semantics5_WP_progress_2.v"><result status="valid" time="0.83"/></proof>
+   <goal name="progress.0.2" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="progress.0.2.0" proved="true">
+    <transf name="case" proved="true" arg1="(x1 = Sskip)">
+     <goal name="progress.0.2.0.0" expl="true case" proved="true">
+     <proof prover="5"><result status="valid" time="0.15"/></proof>
+     </goal>
+     <goal name="progress.0.2.0.1" expl="false case" proved="true">
+     <transf name="inversion_arg_pr" proved="true" arg1="H2">
+      <goal name="progress.0.2.0.1.0" expl="false case" proved="true">
+      <proof prover="7"><result status="valid" time="0.07"/></proof>
+      </goal>
+      <goal name="progress.0.2.0.1.1" expl="false case" proved="true">
+      <transf name="introduce_premises" proved="true" >
+       <goal name="progress.0.2.0.1.1.0" expl="false case" proved="true">
+       <transf name="instantiate" proved="true" arg1="H8" arg2="sigma1">
+        <goal name="progress.0.2.0.1.1.0.0" expl="false case" proved="true">
+        <transf name="instantiate" proved="true" arg1="Hinst" arg2="pi1">
+         <goal name="progress.0.2.0.1.1.0.0.0" expl="false case" proved="true">
+         <transf name="instantiate" proved="true" arg1="Hinst" arg2="sigmat">
+          <goal name="progress.0.2.0.1.1.0.0.0.0" expl="false case" proved="true">
+          <transf name="instantiate" proved="true" arg1="Hinst" arg2="pit">
+           <goal name="progress.0.2.0.1.1.0.0.0.0.0" expl="false case" proved="true">
+           <transf name="instantiate" proved="true" arg1="Hinst" arg2="(wp s2 q)">
+            <goal name="progress.0.2.0.1.1.0.0.0.0.0.0" expl="false case" proved="true">
+            <proof prover="5" timelimit="1"><result status="valid" time="0.30"/></proof>
+            </goal>
+           </transf>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="progress.0.2.0.1.2" expl="false case" proved="true">
+      <proof prover="7"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="progress.0.2.0.1.3" expl="false case" proved="true">
+      <proof prover="7"><result status="valid" time="0.10"/></proof>
+      </goal>
+      <goal name="progress.0.2.0.1.4" expl="false case" proved="true">
+      <proof prover="7"><result status="valid" time="0.11"/></proof>
+      </goal>
+      <goal name="progress.0.2.0.1.5" expl="false case" proved="true">
+      <proof prover="7"><result status="valid" time="0.10"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="progress.1.4" expl="">
+   <goal name="progress.0.3" proved="true">
    <proof prover="1" edited="blocking_semantics5_WP_progress_3.v"><result status="valid" time="0.35"/></proof>
+   <proof prover="10" timelimit="10" memlimit="4000"><result status="valid" time="3.91"/></proof>
    </goal>
-   <goal name="progress.1.5" expl="">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.45"/></proof>
-   <proof prover="11"><result status="valid" time="0.20"/></proof>
+   <goal name="progress.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.05" steps="179"/></proof>
    </goal>
-   <goal name="progress.1.6" expl="">
+   <goal name="progress.0.5" proved="true">
    <proof prover="1" edited="blocking_semantics5_WP_progress_5.v"><result status="valid" time="0.39"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="wp_soundness" expl="">
+ <goal name="wp_soundness" proved="true">
  <proof prover="1" timelimit="30" edited="blocking_semantics5_WP_wp_soundness_1.v"><result status="valid" time="0.44"/></proof>
  </goal>
 </theory>

@@ -10,26 +10,22 @@
 (********************************************************************)
 
 {
-  open Format
   open Parser
-
-  exception IllegalCharacter of char
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | _ -> raise e)
 
   let keywords = Hashtbl.create 97
   let () =
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
+        "alias", ALIAS;
         "as", AS;
         "axiom", AXIOM;
+        "break", BREAK;
         "by", BY;
         "clone", CLONE;
         "coinductive", COINDUCTIVE;
         "constant", CONSTANT;
+        "continue", CONTINUE;
         "else", ELSE;
         "end", END;
         "epsilon", EPSILON;
@@ -48,11 +44,10 @@
         "let", LET;
         "match", MATCH;
         "meta", META;
-        "namespace", NAMESPACE;
         "not", NOT;
         "predicate", PREDICATE;
-        "prop", PROP;
         "range", RANGE;
+        "scope", SCOPE;
         "so", SO;
         "then", THEN;
         "theory", THEORY;
@@ -66,6 +61,7 @@
         "any", ANY;
         "assert", ASSERT;
         "assume", ASSUME;
+        "at", AT;
         "begin", BEGIN;
         "check", CHECK;
         "diverges", DIVERGES;
@@ -78,16 +74,18 @@
         "fun", FUN;
         "ghost", GHOST;
         "invariant", INVARIANT;
-        "loop", LOOP;
-        "model", MODEL;
+        "label", LABEL;
         "module", MODULE;
         "mutable", MUTABLE;
+        "old", OLD;
         "private", PRIVATE;
+        "pure", PURE;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
         "requires", REQUIRES;
+        "return", RETURN;
         "returns", RETURNS;
         "to", TO;
         "try", TRY;
@@ -132,8 +130,10 @@ rule token = parse
     (digit+ as echar) space* "#"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
+  | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
+      { ATTRIBUTE lbl }
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | '_'
@@ -170,12 +170,8 @@ rule token = parse
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
-  | "~'" (lident as id)
-      { OPAQUE_QUOTE_LIDENT id }
   | "'" (lident as id)
       { QUOTE_LIDENT id }
-  | "'" (uident as id)
-      { QUOTE_UIDENT id }
   | ","
       { COMMA }
   | "("
@@ -204,8 +200,6 @@ rule token = parse
       { AND }
   | "\\/"
       { OR }
-  | "\\"
-      { LAMBDA }
   | "."
       { DOT }
   | ".."
@@ -241,23 +235,49 @@ rule token = parse
   | eof
       { EOF }
   | _ as c
-      { raise (IllegalCharacter c) }
+      { Lexlib.illegal_character c lexbuf }
 
 {
+
+  let debug = Debug.register_info_flag "print_modules"
+    ~desc:"Print@ program@ modules@ after@ typechecking."
+
+(*
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
     Loc.with_location (logic_file token) lb;
     Typing.close_file ()
+*)
 
-  let parse_program_file inc lb =
-    open_file token (Lexing.from_string "") inc;
-    Loc.with_location (program_file token) lb
+  let parse_term lb = Loc.with_location (Parser.term_eof token) lb
+
+  let parse_term_list lb = Loc.with_location (Parser.term_comma_list_eof token) lb
+
+  let parse_qualid lb = Loc.with_location (Parser.qualid_eof token) lb
+
+  let parse_list_ident lb = Loc.with_location (Parser.ident_comma_list_eof token) lb
+
+  let parse_list_qualid lb = Loc.with_location (Parser.qualid_comma_list_eof token) lb
+
+
+  open Stdlib
+  open Ident
+  open Theory
+  open Pmodule
 
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    parse_logic_file env path lb
+    Typing.open_file env path;
+    let mm = Loc.with_location (mlw_file token) lb in
+    if path = [] && Debug.test_flag debug then begin
+      let print_m _ m = Format.eprintf "%a@\n@." print_module m in
+      let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
+      Mid.iter print_m (Mstr.fold add_m mm Mid.empty)
+    end;
+    mm
 
-  let () = Env.register_format Env.base_language "why" ["why"] read_channel
-    ~desc:"WhyML@ logical@ language"
+  let () = Env.register_format mlw_language "whyml" ["mlw";"why"] read_channel
+    ~desc:"WhyML@ programming@ and@ specification@ language"
+
 }

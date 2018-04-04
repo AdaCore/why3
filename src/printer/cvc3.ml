@@ -134,9 +134,9 @@ let rec print_term info fmt t = match t.t_node with
       fprintf fmt "@[(IF %a@ THEN %a@ ELSE %a ENDIF)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase _ -> unsupportedTerm t
-      "cvc3 : you must eliminate match"
+      "cvc3: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "cvc3 : you must eliminate epsilon"
+      "cvc3: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
@@ -191,7 +191,7 @@ and print_fmla info fmt f = match f.t_node with
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
   | Tcase _ -> unsupportedTerm f
-      "cvc3 : you must eliminate match"
+      "cvc3: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
@@ -240,13 +240,13 @@ let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata _ -> unsupportedDecl d
-      "cvc3 : algebraic type are not supported"
+      "cvc3: algebraic type are not supported"
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "cvc3 : inductive definition are not supported"
+      "cvc3: inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>%% %s@\nASSERT@ %a;@]@\n@\n"
@@ -258,7 +258,7 @@ let print_decl info fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[%% %a@]@\n" Loc.gen_report_position loc
         | None -> ());
       fprintf fmt "  @[%a;@]@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) -> assert false
+  | Dprop (Plemma, _, _) -> assert false
 
 let print_decls =
   let print_decl (sm,ct) fmt d =

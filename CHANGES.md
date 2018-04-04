@@ -1,5 +1,58 @@
 :x: marks a potential source of incompatibility
 
+Core
+  * improved support of counter-examples
+
+Language
+  * numerous changes to syntax, see documentation appendix :x:
+  * `let function`, `let predicate`, `val function`, and `val predicate`
+     introduce symbols in both logic and programs
+  * logical symbols can no longer be used in non-ghost code;
+    in particular, there is no polymorphic equality in programs any more,
+    so equality functions must be declared/defined on a per-type basis
+    (already done for type `int` in the standard library) :x:
+  * added overloading of program symbols
+  * new clause `alias` in function contracts :x:
+  * support for multiple assignments
+  * type invariants now produce logical axioms;
+    a type with an invariant must be proved to be inhabited :x:
+  * support for local exceptions using `exception ... in ...`
+  * added `break`, `continue`, and `return` statements
+  * support for `exception` branches in `match` constructs
+  * support for `for` loops on range types
+    (including machine integers from the standard library)
+  * attribute `[@vc:sp]` on an expression switches from traditional WP to
+    Flanagan-Saxe-like VC generation
+  * support for type coercions in logic using `meta coercion`
+  * deprecated `theory`; use `module` instead
+
+Standard library
+  * machine integers in `mach.int.*` are now range types :x:
+  * added a minimal memory model for the C language in `mach.c`
+
+Extraction
+  * improved extraction to OCaml
+  * added partial extraction to C using the memory model of `mach.c`
+
+Transformations
+  * transformations can now have arguments
+  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc, à la Coq
+  * added transformations for reflection-based proofs
+
+Drivers
+  * support for `use` in theory drivers
+
+IDE
+  * source is now editable
+  * premises are no longer implicitly introduced
+  * command-line interface to call transformations and provers
+
+Tools
+  * deprecated `.why` file extension; use `.mlw` instead
+
+Provers
+  * deprecated the `why3` Coq tactic
+
 Version 0.88.3, January 11, 2018
 --------------------------------
 
@@ -65,6 +118,9 @@ User features
   * counterexamples: better support for array values, support for
     floating-point values, support for Z3 in addition to CVC4.
     More details in the manual, section 6.3.5 "Displaying Counterexamples".
+
+Plugins
+  * new input format for a small subset of Python
 
 Provers
   * support for Isabelle 2017 (released Oct 2017)

@@ -13,8 +13,8 @@ module BigNum
   use import int.Int
   use import list.List
 
-  constant base: int
-  axiom base_gt1: base > 1
+  val constant base: int
+    ensures { result > 1 }
 
   type digit = int
   type num = list digit

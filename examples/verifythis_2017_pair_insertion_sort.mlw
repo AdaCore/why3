@@ -1,0 +1,105 @@
+(**
+
+{1 VerifyThis @ ETAPS 2017 competition
+   Challenge 1: Pair Insertion Sort}
+
+See https://formal.iti.kit.edu/ulbrich/verifythis2017/
+
+Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module Challenge1
+
+  use import int.Int
+  use import ref.Refint
+  use import array.Array
+  use import array.ArrayPermut
+
+  let pair_insertion_sort (a: array int)
+    ensures { forall k l. 0 <= k <= l < length a -> a[k] <= a[l] }
+    ensures { permut_all (old a) a }
+  = let i = ref 0 in (* i is running index (inc by 2 every iteration)*)
+    while !i < length a - 1 do
+      invariant { 0 <= !i <= length a }
+      invariant { forall k l. 0 <= k <= l < !i -> a[k] <= a[l] }
+      invariant { permut_all (old a) a }
+      variant   { length a - !i }
+      let x = ref a[!i] in (* let x and y hold the next to elements in A *)
+      let y = ref a[!i + 1] in
+      if !x < !y then (* ensure that x is not smaller than y *)
+        begin let tmp = !x in x := !y; y := tmp end (* swap x and y *)
+        else begin
+          label L in
+          assert { exchange (a at L) a[(!i-1)+1 <- !y][(!i-1)+2 <- !x]
+                   ((!i-1)+1) ((!i-1)+2) }
+        end;
+      let j = ref (!i - 1) in
+      (* j is the index used to find the insertion point *)
+      while !j >= 0 && a[!j] > !x do (* find the insertion point for x *)
+        invariant { -1 <= !j < !i }
+        invariant { forall k l.
+                    0 <= k <= l <= !j                         -> a[k] <= a[l] }
+        invariant { forall k l.
+                    0 <= k      <= !j -> !j+2 <      l < !i+2 -> a[k] <= a[l] }
+        invariant { forall k l.
+                                         !j+2 < k <= l < !i+2 -> a[k] <= a[l] }
+        invariant { forall   l.
+                                         !j+2 <      l < !i+2 -> !x   <  a[l] }
+        invariant { permut_all (old a) a[!j+1 <- !y][!j+2 <- !x] }
+        variant   { !j }
+        label L in
+        a[!j + 2] <- a[!j]; (* shift existing content by 2 *)
+        assert { exchange (a at L)[!j+2 <- !x] a[!j <- !x] !j (!j + 2) };
+        assert { exchange (a at L)[!j+1 <- !y][!j+2 <- !x]
+                           a[!j+1 <- !y][!j <- !x] !j (!j + 2) };
+        assert { exchange (a at L)[!j+1 <- !y][!j+2 <- a[!j]][!j <- !x]
+                          a[!j <- !y][!j+1 <- !x][!j+2 <- a[!j]] !j (!j + 1) };
+        j := !j - 1
+      done;
+      a[!j + 2] <- !x; (* store x at its insertion place *)
+      (* A[j+1] is an available space now *)
+      while !j >= 0 && a[!j] > !y do (* #ind the insertion point for y *)
+        invariant { -1 <= !j < !i }
+        invariant { forall k l.
+                    0 <= k <= l <= !j                         -> a[k] <= a[l] }
+        invariant { forall k l.
+                    0 <= k      <= !j -> !j+1 <      l < !i+2 -> a[k] <= a[l] }
+        invariant { forall k l.
+                                         !j+1 < k <= l < !i+2 -> a[k] <= a[l] }
+        invariant { forall   l.
+                                         !j+1 <      l < !i+2 -> !y   <= a[l] }
+        invariant { permut_all (old a) a[!j+1 <- !y] }
+        variant   { !j }
+        label L in
+        a[!j + 1] <- a[!j]; (* shift existing content by 1 *)
+        assert { exchange (a at L)[!j+1 <- !y] a[!j <- !y] !j (!j + 1) };
+        j := !j - 1
+      done;
+      a[!j + 1] <- !y; (* store y at its insertion place *)
+
+      i := !i + 2
+   done;
+   if !i = length a  - 1 then begin (* if length(A) is odd, an extra  *)
+     let y = a[!i] in (* single insertion is needed for *)
+     let j = ref (!i - 1) in (* the last element *)
+     while !j >= 0 && a[!j] > y do
+       invariant { -1 <= !j < !i }
+       invariant { forall k l.
+                 0 <= k <= l <= !j                             -> a[k] <= a[l] }
+       invariant { forall k l.
+                 0 <= k      <= !j -> !j+1 <      l < length a -> a[k] <= a[l] }
+       invariant { forall k l.
+                                      !j+1 < k <= l < length a -> a[k] <= a[l] }
+       invariant { forall   l.
+                                      !j+1 <      l < length a -> y    <  a[l] }
+       invariant { permut_all (old a) a[!j+1 <- y] }
+       variant { !j }
+       label L in
+       a[!j+1] <- a[!j];
+       assert { exchange (a at L)[!j+1 <- y] a[!j <- y] !j (!j + 1) };
+       j := !j - 1
+     done;
+     a[!j + 1] <- y
+   end
+
+end

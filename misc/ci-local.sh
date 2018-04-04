@@ -2,6 +2,7 @@
 
 # Runner installation
 # -------------------
+# apt-get update
 # apt-get install curl autoconf automake
 # curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | bash
 # curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -

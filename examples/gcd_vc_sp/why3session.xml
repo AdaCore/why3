@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
+<file name="../gcd_vc_sp.mlw" proved="true">
+<theory name="EuclideanAlgorithm" proved="true">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+</theory>
+<theory name="EuclideanAlgorithmIterative" proved="true">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ </goal>
+</theory>
+<theory name="BinaryGcd" proved="true">
+ <goal name="even1" proved="true">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="odd1" proved="true">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="div_nonneg" proved="true">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="gcd_even_even" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+ </goal>
+ <goal name="gcd_even_odd" proved="true">
+ <proof prover="3" edited="gcd_vc_sp_BinaryGcd_gcd_even_odd_1.v"><result status="valid" time="0.33"/></proof>
+ </goal>
+ <goal name="gcd_even_odd2" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="29"/></proof>
+ </goal>
+ <goal name="odd_odd_div2" proved="true">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC gcd_odd_odd" expl="VC for gcd_odd_odd" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
+ </goal>
+ <goal name="gcd_odd_odd2" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="30"/></proof>
+ </goal>
+ <goal name="VC binary_gcd" expl="VC for binary_gcd" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC binary_gcd.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.4" expl="check division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.5" expl="check division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.6" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.8" expl="check division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.9" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.12" expl="check division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.13" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.14" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.15" expl="check division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.16" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.17" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC binary_gcd.18" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC binary_gcd.18.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC binary_gcd.18.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC binary_gcd.18.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC binary_gcd.18.3" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC binary_gcd.18.4" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC binary_gcd.18.5" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="EuclideanAlgorithm63" proved="true">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
+ <proof prover="2"><result status="valid" time="0.08"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

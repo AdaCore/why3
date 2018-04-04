@@ -9,7 +9,7 @@ module Hanoi
   type tower = {
     mutable rod : list int;
   } invariant {
-    sorted self.rod
+    sorted rod
   }
 
   function prepend (n: int) (s: list int) : list int
@@ -72,7 +72,7 @@ module Tower_of_Hanoi
   type tower = {
     mutable rod : list int;
   } invariant {
-    Incr.sorted self.rod
+    Incr.sorted rod
   }
 
   let move (a b: tower) (ghost x: int) (ghost s: list int)
@@ -98,7 +98,7 @@ module Tower_of_Hanoi
     ensures  { c.rod = old c.rod }
   = if n > 0 then begin
       let ghost t = c.rod in
-      let x,r = match p with Cons x r -> (x,r) | Nil -> absurd end in
+      let x,r = match p with Cons x r -> x,r | Nil -> absurd end in
       hanoi_rec a c b (n-1) r (Cons x s);
       move a b x s;
       hanoi_rec c b a (n-1) r t

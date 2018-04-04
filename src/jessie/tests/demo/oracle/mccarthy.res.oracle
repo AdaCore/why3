@@ -6,23 +6,156 @@
 [kernel] Parsing tests/demo/mccarthy.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
 [jessie3] processing function f91
-[jessie3] failure: Exception raised when loading prover drivers:
-                   anomaly: Log.FeatureRequest("jessie3", "named behaviors")
-[kernel] Current source was: tests/demo/mccarthy.c:15
-         The full backtrace is:
-         Raised at file "src/kernel/log.ml", line 524, characters 30-31
-         Called from file "src/kernel/log.ml", line 518, characters 9-16
-         Re-raised at file "src/kernel/log.ml", line 521, characters 15-16
-         Called from file "register.ml", line 87, characters 6-113
-         Called from file "queue.ml", line 134, characters 6-20
-         Called from file "src/kernel/boot.ml", line 37, characters 4-20
-         Called from file "src/kernel/cmdline.ml", line 763, characters 2-9
-         Called from file "src/kernel/cmdline.ml", line 216, characters 4-8
-         
-         Plug-in jessie3 aborted: internal error.
-         Please report as 'crash' at http://bts.frama-c.com/.
-         Your Frama-C version is Sodium-20150201.
-         Note that a version and a backtrace alone often do not contain enough
-         information to understand the bug. Guidelines for reporting bugs are at:
-         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines
+[jessie3] lookup program function f91 (67)
+[jessie3] lookup program function f91 (67)
+[jessie3] created program function f91 (67)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 0 theory(ies)
+[jessie3] made 1 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.bv.BVCheck32 *)
+            
+            (* use mach.int.Int64 *)
+            
+            goal VC_f91 :
+              forall n:t.
+               (0 <= 0 /\ 0 < two_power_size) /\
+                (forall o:t.
+                  to_uint o = 0 /\ o = of_int 0 ->
+                   (0 <= 0 /\ 0 < two_power_size) /\
+                    (forall o1:t.
+                      to_uint o1 = 0 /\ o1 = of_int 0 ->
+                       (0 <= 0 /\ 0 < two_power_size) /\
+                        (forall o2:t.
+                          to_uint o2 = 0 /\ o2 = of_int 0 ->
+                           (0 <= 100 /\ 100 < two_power_size) /\
+                            (forall o3:t.
+                              to_uint o3 = 100 /\ o3 = of_int 100 ->
+                               (to_uint n <= to_uint o3 <-> ule n o3) ->
+                                (if to_uint n <= to_uint o3 then (0 <= 11 /\
+                                                                   11 < two_power_size) /\
+                                                                  (forall o4:t.
+                                                                    to_uint o4 = 11 /\
+                                                                     o4 = of_int 11 ->
+                                                                     (0 <=
+                                                                       (to_uint n +
+                                                                         to_uint o4) /\
+                                                                       (to_uint n +
+                                                                         to_uint o4) <
+                                                                        two_power_size) /\
+                                                                      (forall o5:t.
+                                                                        to_uint o5 =
+                                                                         (to_uint n +
+                                                                           to_uint o4) /\
+                                                                         o5 = add n o4 ->
+                                                                         (0 <=
+                                                                           (101 -
+                                                                             to_uint n) /\
+                                                                           (101 -
+                                                                             to_uint o5) <
+                                                                            (101 -
+                                                                              to_uint n)) /\
+                                                                          (forall o6:t.
+                                                                            (to_uint o5 >=
+                                                                              101 ->
+                                                                              to_uint
+                                                                              o6 =
+                                                                              (to_uint
+                                                                              o5 - 10)) /\
+                                                                             (to_uint
+                                                                              o5 <= 100 ->
+                                                                              to_uint
+                                                                              o6 = 91) ->
+                                                                             (forall tmp:
+                                                                              t.
+                                                                              tmp = o6 ->
+                                                                              (0 <=
+                                                                              (101 -
+                                                                              to_uint n) /\
+                                                                              (101 -
+                                                                              to_uint
+                                                                              tmp) <
+                                                                              (101 -
+                                                                              to_uint n)) /\
+                                                                              (forall o7:
+                                                                              t.
+                                                                              (to_uint
+                                                                              tmp >=
+                                                                              101 ->
+                                                                              to_uint
+                                                                              o7 =
+                                                                              (to_uint
+                                                                              tmp - 10)) /\
+                                                                              (to_uint
+                                                                              tmp <=
+                                                                              100 ->
+                                                                              to_uint
+                                                                              o7 = 91) ->
+                                                                              (forall tmp_0:
+                                                                              t.
+                                                                              tmp_0 =
+                                                                              o7 ->
+                                                                              (forall us_retres:
+                                                                              t.
+                                                                              us_retres =
+                                                                              tmp_0 ->
+                                                                              (to_uint
+                                                                              n >= 101 ->
+                                                                              to_uint
+                                                                              us_retres =
+                                                                              (to_uint
+                                                                              n - 10)) /\
+                                                                              (to_uint
+                                                                              n <= 100 ->
+                                                                              to_uint
+                                                                              us_retres =
+                                                                              91))))))))
+                                else (0 <= 10 /\ 10 < two_power_size) /\
+                                      (forall o4:t.
+                                        to_uint o4 = 10 /\ o4 = of_int 10 ->
+                                         (0 <= (to_uint n - to_uint o4) /\
+                                           (to_uint n - to_uint o4) < two_power_size) /\
+                                          (let o5 = sub n o4 in
+                                          to_uint o5 = (to_uint n - to_uint o4) ->
+                                           (forall us_retres:t.
+                                             us_retres = o5 ->
+                                              (to_uint n >= 101 ->
+                                                to_uint us_retres = (to_uint n - 10)) /\
+                                               (to_uint n <= 100 ->
+                                                 to_uint us_retres = 91)))))))))
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 6 (VC f91) (precondition): Valid, Valid, Timeout
+[jessie3] Task 7 (VC f91) (variant decrease): Valid, Valid, Valid
+[jessie3] Task 8 (VC f91) (variant decrease): Valid, Valid, Valid
+[jessie3] Task 9 (VC f91) (postcondition): Valid, Valid, Valid
+[jessie3] Task 10 (VC f91) (postcondition): Valid, Timeout, Valid
+[jessie3] Task 11 (VC f91) (precondition): Valid, Valid, Valid
+[jessie3] Task 12 (VC f91) (precondition): Valid, Valid, Timeout
+[jessie3] Task 13 (VC f91) (postcondition): Valid, Valid, Valid
+[jessie3] Task 14 (VC f91) (postcondition): Valid, Valid, Valid

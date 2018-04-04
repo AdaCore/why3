@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="8" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="9" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="0"/>
@@ -14,10 +14,10 @@
 <file name="../explicit_subst.why" expanded="true">
 <theory name="LambdaCalc" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Example" sum="898521eed6e3a3606fdeb36a460b2847" expanded="true">
+<theory name="Example" sum="befcd266c1f484dfa381084b8131ba5c" expanded="true">
  <goal name="G1">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.02"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -27,19 +27,19 @@
  <proof prover="13"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G2">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  <proof prover="8"><result status="valid" time="0.02"/></proof>
  <proof prover="9"><result status="valid" time="0.06"/></proof>
  <proof prover="10" timelimit="10"><result status="valid" time="0.03" steps="45"/></proof>
  <proof prover="11"><result status="valid" time="0.00"/></proof>
- <proof prover="12"><result status="valid" time="1.80"/></proof>
+ <proof prover="12"><result status="valid" time="2.09"/></proof>
  <proof prover="13"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="G5b">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -49,8 +49,8 @@
  <proof prover="13"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G5c">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -59,38 +59,38 @@
  <proof prover="13"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G5">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.05"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.02"/></proof>
  <proof prover="11"><result status="valid" time="0.01"/></proof>
- <proof prover="12"><result status="valid" time="0.75"/></proof>
+ <proof prover="12"><result status="valid" time="0.73"/></proof>
  <proof prover="13"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="G3">
  <proof prover="6" timelimit="9"><result status="valid" time="0.03"/></proof>
  <proof prover="8"><result status="valid" time="0.03"/></proof>
  <proof prover="9"><result status="valid" time="0.07"/></proof>
- <proof prover="11"><result status="valid" time="0.17"/></proof>
- <proof prover="12"><result status="valid" time="1.57"/></proof>
+ <proof prover="11"><result status="valid" time="0.34"/></proof>
+ <proof prover="12"><result status="valid" time="1.31"/></proof>
  </goal>
  <goal name="G4">
- <proof prover="2"><result status="valid" time="0.53"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.82"/></proof>
  <proof prover="6" timelimit="7"><result status="valid" time="0.03"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.07"/></proof>
- <proof prover="11"><result status="valid" time="0.01"/></proof>
- <proof prover="12"><result status="valid" time="1.56"/></proof>
+ <proof prover="11"><result status="valid" time="0.13"/></proof>
+ <proof prover="12"><result status="valid" time="1.37"/></proof>
  <proof prover="13"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="LambdaCalc2" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Example2" sum="15e91ffa458219a3505c872fc2e5e8d1" expanded="true">
+<theory name="Example2" sum="ab79d277a8f71ff7d72600bdefbe809e" expanded="true">
  <goal name="G1">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -107,7 +107,7 @@
  <proof prover="13" memlimit="1000"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="G5b">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -116,7 +116,7 @@
  <proof prover="13"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G5c">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.01"/></proof>
@@ -125,7 +125,7 @@
  <proof prover="13"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G5">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="9"><result status="valid" time="0.01"/></proof>
@@ -135,8 +135,8 @@
  </goal>
  <goal name="G3">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
- <proof prover="8"><result status="valid" time="0.03"/></proof>
- <proof prover="9"><result status="valid" time="0.01"/></proof>
+ <proof prover="8"><result status="valid" time="0.14"/></proof>
+ <proof prover="9"><result status="valid" time="0.14"/></proof>
  <proof prover="11"><result status="valid" time="0.04"/></proof>
  <proof prover="12"><result status="valid" time="0.00"/></proof>
  </goal>

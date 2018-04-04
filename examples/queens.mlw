@@ -5,19 +5,15 @@
    c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
 *)
 
-theory S "finite sets of with succ and pred operations"
+theory S
 
   use export set.Fsetint
 
-  function succ (set int) : set int
+  val function succ (s: set int): set int
+    ensures { forall i: int. mem i result <-> i >= 1 /\ mem (i - 1) s }
 
-  axiom succ_def:
-    forall s: set int, i: int. mem i (succ s) <-> i >= 1 /\ mem (i-1) s
-
-  function pred (set int) : set int
-
-  axiom pred_def:
-    forall s: set int, i: int. mem i (pred s) <-> i >= 0 /\ mem (i+1) s
+  val function pred (s: set int): set int
+    ensures { forall i: int. mem i result <-> i >= 0 /\ mem (i + 1) s }
 
 end
 
@@ -30,7 +26,7 @@ module NQueensSetsTermination
     if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
       let f = ref 0 in
-   'L:while not (is_empty !e) do
+      while not (is_empty !e) do
         invariant { subset !e (diff (diff a b) c) }
         variant { cardinal !e }
         let d = min_elt !e in
@@ -123,21 +119,31 @@ module NQueensSets
       eq_prefix (old !sol) !sol (old !s) }
   = if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
+      (* first, you show that if u is a solution with the same k-prefix as col, then
+          u[k] (the position of the queen on the row k) must belong to e *)
+      assert { forall u:solution. solution u /\ eq_prefix !col u !k ->
+               S.mem u[!k] !e };
       let f = ref 0 in
-   'L:while not (is_empty !e) do
+      label L in
+      while not (is_empty !e) do
         invariant {
-          !f = !s - at !s 'L >= 0 /\ !k = at !k 'L /\
+          !f = !s - (!s at L) >= 0 /\ !k = !k at L /\
           subset !e (diff (diff a b) c) /\
           partial_solution !k !col /\
-          sorted !sol (at !s 'L) !s /\
-          (forall i j: int. mem i (diff (at !e 'L) !e) -> mem j !e -> i < j) /\
+          sorted !sol (!s at L) !s /\
+          (forall i j: int. mem i (diff (!e at L) !e) -> mem j !e -> i < j) }
+        invariant { forall i:int. (!s at L) <= i < !s -> 
+           solution !sol[i] /\ eq_prefix !col !sol[i] !k /\ 
+           mem !sol[i][!k] (diff (!e at L) !e) }
+        invariant {
           (forall t: solution.
-           (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (at !e 'L) !e))
-           <->
-           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
-          (* assigns *)
-          eq_prefix (at !col 'L) !col !k /\
-          eq_prefix (at !sol 'L) !sol (at !s 'L) }
+           (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (!e at L) !e))
+           ->
+           mem t[!k] (!e at L) && not (mem t[!k] !e) &&
+           (exists i: int. (!s at L) <= i < !s /\ eq_sol t !sol[i])) }
+        (* assigns *)
+        invariant { eq_prefix (!col at L) !col !k }
+        invariant { eq_prefix (!sol at L) !sol (!s at L) }
         variant { cardinal !e }
         let d = min_elt !e in
         ghost col := !col[!k <- d];

@@ -14,7 +14,7 @@
   open Ptree
   open Py_ast
 
-  let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
+  let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error"
     | _ -> raise exn)
 
@@ -31,15 +31,13 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let empty_annotation =
-    { loop_invariant = []; loop_variant = [] }
-
   let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
   let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
 
   let empty_spec = {
-    sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
-    sp_reads   = [];    sp_writes  = [];  sp_variant = [];
+    sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
+    sp_reads   = [];    sp_writes  = [];  sp_alias  = [];
+    sp_variant = [];
     sp_checkrw = false; sp_diverge = false;
   }
 
@@ -49,6 +47,7 @@
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_alias   = s1.sp_alias @ s2.sp_alias;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
@@ -75,10 +74,10 @@
 %nonassoc IN
 %nonassoc DOT ELSE
 %right ARROW LRARROW
-%left OR
-%left AND
+%right OR
+%right AND
 %nonassoc NOT
-%left CMP
+%right CMP
 %left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc unary_minus prec_prefix_op
@@ -135,7 +134,7 @@ single_spec:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar id) $startpos $endpos, $1] }
+      [mk_pat (Pvar (id, false)) $startpos $endpos, $1] }
 
 expr:
 | d = expr_desc
@@ -204,9 +203,9 @@ stmt_desc:
 | IF c = expr COLON s1 = suite s2=else_branch
     { Sif (c, s1, s2) }
 | WHILE e = expr COLON b=loop_body
-    { let a, l = b in Swhile (e, a, l) }
+    { let i, v, l = b in Swhile (e, i, v, l) }
 | FOR x = ident IN e = expr COLON b=loop_body
-    { let a, l = b in Sfor (x, e, a.loop_invariant, l) }
+    { let i, _, l = b in Sfor (x, e, i, l) }
 ;
 
 else_branch:
@@ -220,17 +219,17 @@ else_branch:
 
 loop_body:
 | s = simple_stmt NEWLINE
-  { empty_annotation, [s] }
+  { [], [], [s] }
 | NEWLINE BEGIN a=loop_annotation l=nonempty_list(stmt) END
-  { a, l }
+  { fst a, snd a, l }
 
 loop_annotation:
 | (* epsilon *)
-    { empty_annotation }
+    { [], [] }
 | invariant loop_annotation
-    { let a = $2 in { a with loop_invariant = $1 :: a.loop_invariant } }
+    { let (i, v) = $2 in ($1::i, v) }
 | variant loop_annotation
-    { let a = $2 in { a with loop_variant = variant_union $1 a.loop_variant } }
+    { let (i, v) = $2 in (i, variant_union $1 v) }
 
 invariant:
 | INVARIANT i=term NEWLINE { i }
@@ -258,9 +257,9 @@ simple_stmt_desc:
 ;
 
 assertion_kind:
-| ASSERT  { Aassert }
-| ASSUME  { Aassume }
-| CHECK   { Acheck }
+| ASSERT  { Expr.Assert }
+| ASSUME  { Expr.Assume }
+| CHECK   { Expr.Check }
 
 ident:
   id = IDENT { mk_id id $startpos $endpos }
@@ -275,16 +274,18 @@ term: t = mk_term(term_) { t }
 term_:
 | term_arg_
     { match $1 with (* break the infix relation chain *)
-      | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
+      | Tinfix (l,o,r) -> Tinnfix (l,o,r)
+      | Tbinop (l,o,r) -> Tbinnop (l,o,r)
+      | d -> d }
 | NOT term
-    { Tunop (Tnot, $2) }
+    { Tnot $2 }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
-| l = term ; o = infix_op ; r = term
+| l = term ; o = infix_op_1 ; r = term
     { Tinfix (l, o, r) }
-| l = term ; o = div_mod_op ; r = term
+| l = term ; o = infix_op_234 ; r = term
     { Tidapp (Qident o, [l; r]) }
 | IF term THEN term ELSE term
     { Tif ($2, $4, $6) }
@@ -297,8 +298,8 @@ term_:
     { Tidapp (Qident id, l) }
 
 quant:
-| FORALL  { Tforall }
-| EXISTS  { Texists }
+| FORALL  { Dterm.DTforall }
+| EXISTS  { Dterm.DTexists }
 
 term_arg: mk_term(term_arg_) { $1 }
 
@@ -318,17 +319,14 @@ term_sub_:
     { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 
 %inline bin_op:
-| ARROW   { Timplies }
-| LRARROW { Tiff }
-| OR      { Tor }
-| AND     { Tand }
+| ARROW   { Dterm.DTimplies }
+| LRARROW { Dterm.DTiff }
+| OR      { Dterm.DTor }
+| AND     { Dterm.DTand }
 
-%inline infix_op:
-| PLUS   { mk_id (Ident.infix "+") $startpos $endpos }
-| MINUS  { mk_id (Ident.infix "-") $startpos $endpos }
-| TIMES  { mk_id (Ident.infix "*") $startpos $endpos }
+%inline infix_op_1:
 | c=CMP  { let op = match c with
-          | Beq -> "="
+          | Beq  -> "="
           | Bneq -> "<>"
           | Blt  -> "<"
           | Ble  -> "<="
@@ -340,9 +338,12 @@ term_sub_:
 %inline prefix_op:
 | MINUS { mk_id (Ident.prefix "-")  $startpos $endpos }
 
-%inline div_mod_op:
-| DIV  { mk_id "div" $startpos $endpos }
-| MOD  { mk_id "mod" $startpos $endpos }
+%inline infix_op_234:
+| DIV    { mk_id "div" $startpos $endpos }
+| MOD    { mk_id "mod" $startpos $endpos }
+| PLUS   { mk_id (Ident.infix "+") $startpos $endpos }
+| MINUS  { mk_id (Ident.infix "-") $startpos $endpos }
+| TIMES  { mk_id (Ident.infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }

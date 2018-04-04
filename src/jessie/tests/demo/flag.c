@@ -1,7 +1,8 @@
-
 /* run.config
    OPT: -journal-disable -jessie3
 */
+
+// ISSUE: enum not implemented
 
 /* Dijkstra's dutch flag */
 
@@ -85,6 +86,6 @@ void flag(color t[], int l) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 flag.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 flag.c"
 End:
 */

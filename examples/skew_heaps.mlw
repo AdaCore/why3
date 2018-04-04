@@ -68,7 +68,7 @@ module SkewHeaps
 
   type elt
 
-  predicate le elt elt
+  val predicate le elt elt
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
 
   (* [e] is no greater than the root of [t], if any *)
@@ -97,8 +97,8 @@ module SkewHeaps
   = match t with
     | Empty -> absurd
     | Node l _ r ->
-        if l <> Empty then root_is_min l;
-        if r <> Empty then root_is_min r
+        if not (is_empty l) then root_is_min l;
+        if not (is_empty r) then root_is_min r
     end
 
   let empty () : tree elt
@@ -107,16 +107,6 @@ module SkewHeaps
     ensures { forall e. not (mem e result) }
   =
     Empty
-
-  let is_empty (t: tree elt) : bool
-    ensures { result <-> size t = 0 }
-  =
-    t = Empty
-
-  let size (t: tree elt) : int
-    ensures { result = size t }
-  =
-    size t
 
   let get_min (t: tree elt) : elt
     requires { heap t && 0 < size t }
@@ -193,13 +183,13 @@ module HeapSort
       t := add a[i] !t;
       assert { M.occ a[i] a.elts i n = 1 + M.occ a[i] a.elts (i+1) n }
     done;
-    'I:
+    label I in
     for i = 0 to n - 1 do
       invariant { sorted_sub a 0 i }
       invariant { heap !t && size !t = n - i }
       invariant { forall j. 0 <= j < i -> forall e. mem e !t -> le a[j] e }
       invariant { forall e.
-                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (at a.elts 'I) 0 n }
+                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (a.elts at I) 0 n }
       a[i] <- get_min !t;
       t := remove_min !t
     done

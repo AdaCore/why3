@@ -6,7 +6,7 @@
 [kernel] Parsing tests/basic/app.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
-[jessie3] creating logic symbol 68 (f)
+[jessie3] Starting translation
 [jessie3] processing function g
 [jessie3] created program function g (69)
 [jessie3] found 1 logic decl(s)
@@ -17,15 +17,21 @@
 [jessie3] theory Global_logic_declarations
             (* use why3.BuiltIn.BuiltIn *)
             
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             function f (x:int) : int = x + 1
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use why3.BuiltIn.BuiltIn *)
@@ -34,13 +40,13 @@
             
             (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude.Prelude *)
-            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use Global_logic_declarations *)
             
@@ -48,7 +54,8 @@
             
             (* use mach.bv.BVCheck32 *)
             
-            goal WP_parameter_g : true
+            (* use mach.int.Int64 *)
+            
+            goal VC_g : true
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (WP_parameter g): Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1

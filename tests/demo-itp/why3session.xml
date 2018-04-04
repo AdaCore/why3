@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../demo-itp.mlw">
+<theory name="Naming">
+ <goal name="G">
+ </goal>
+</theory>
+<theory name="ApplyRewrite">
+ <goal name="g1" proved="true">
+ <transf name="apply" proved="true" arg1="H">
+ </transf>
+ <transf name="rewrite" proved="true" arg1="H">
+  <goal name="g1.0" proved="true">
+  <transf name="compute_in_goal" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g3" proved="true">
+ <transf name="apply" proved="true" arg1="Ha">
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="compute_specified" >
+  <goal name="g2.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="A">
+ <goal name="g1" proved="true">
+ <transf name="apply" proved="true" arg1="H">
+ </transf>
+ </goal>
+ <goal name="g">
+ </goal>
+ <goal name="ga" proved="true">
+ <transf name="apply" proved="true" arg1="Ha">
+ </transf>
+ </goal>
+ <goal name="gb">
+ </goal>
+</theory>
+<theory name="Soundness">
+ <goal name="A">
+ <proof prover="2" timelimit="5" obsolete="true"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="Fail">
+ <transf name="assert" arg1="(forall y:int, z:int. y = z -&gt; p (fun (x:int) -&gt; f0 x y z))">
+  <goal name="Fail.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="Fail.1">
+  <transf name="compute_specified" >
+   <goal name="Fail.1.0">
+   <proof prover="2"><result status="unknown" time="0.01"/></proof>
+   <proof prover="4"><result status="timeout" time="1.00"/></proof>
+   <proof prover="6"><result status="timeout" time="1.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Absurd">
+ <proof prover="2" timelimit="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="TestCEX">
+ <goal name="g">
+ <proof prover="2" timelimit="5" obsolete="true"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="TestCopyPaste">
+ <goal name="g1">
+ <transf name="split_goal_wp" >
+  <goal name="g1.0">
+  <proof prover="6" timelimit="5" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  </goal>
+  <goal name="g1.1">
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  <proof prover="6" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="split_goal_wp" >
+  <goal name="g2.0">
+  <proof prover="6" timelimit="5" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  </goal>
+  <goal name="g2.1">
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="unknown" time="0.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  <proof prover="6" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  </goal>
+  <goal name="g2.2">
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.89"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="M" proved="true">
+</theory>
+<theory name="TestWarnings">
+ <goal name="g1">
+ </goal>
+ <goal name="g2">
+ </goal>
+</theory>
+<theory name="TestTaskPrinting">
+ <goal name="g1">
+ </goal>
+ <goal name="g2">
+ </goal>
+ <goal name="g3">
+ </goal>
+ <goal name="g4">
+ </goal>
+ <goal name="g5">
+ </goal>
+ <goal name="g6">
+ </goal>
+ <goal name="g7">
+ </goal>
+ <goal name="g8">
+ </goal>
+</theory>
+<theory name="TestAutomaticIntro">
+ <goal name="g">
+ </goal>
+</theory>
+<theory name="TestInduction">
+ <goal name="g">
+ <transf name="introduce_premises" >
+  <goal name="g.0">
+  <transf name="induction" arg1="n">
+   <goal name="g.0.0" expl="base case">
+   <proof prover="2"><result status="unknown" time="0.01"/></proof>
+   <proof prover="4"><result status="unknown" time="0.02"/></proof>
+   <proof prover="6"><result status="unknown" time="0.01"/></proof>
+   </goal>
+   <goal name="g.0.1" expl="recursive case">
+   <proof prover="2"><result status="unknown" time="0.00"/></proof>
+   <proof prover="4"><result status="unknown" time="0.02"/></proof>
+   <proof prover="6"><result status="unknown" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestInfixSymbols">
+ <goal name="g">
+ </goal>
+</theory>
+<theory name="TestAutoFocus">
+ <goal name="g0">
+ </goal>
+ <goal name="g1">
+ </goal>
+ <goal name="g2">
+ </goal>
+</theory>
+<theory name="TestRewritePoly">
+ <goal name="g">
+ <transf name="rewrite" arg1="Append_assoc">
+  <goal name="g.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Power">
+ <goal name="power_1">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.17"/></proof>
+ </goal>
+ <goal name="sqrt4_256" proved="true">
+ <transf name="exists" proved="true" arg1="4">
+  <goal name="sqrt4_256.0" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="power_sum" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="power_sum.0" proved="true">
+  <transf name="induction" proved="true" arg1="n">
+   <goal name="power_sum.0.0" expl="base case" proved="true">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="power_sum.0.1" expl="recursive case" proved="true">
+   <transf name="case" proved="true" arg1="(n=0)">
+    <goal name="power_sum.0.1.0" expl="true case (recursive case)" proved="true">
+    <proof prover="1"><result status="valid" time="0.01"/></proof>
+    <proof prover="2"><result status="valid" time="0.00"/></proof>
+    </goal>
+    <goal name="power_sum.0.1.1" expl="false case (recursive case)" proved="true">
+    <transf name="instantiate" proved="true" arg1="Hrec" arg2="(n-1)">
+     <goal name="power_sum.0.1.1.0" expl="false case (recursive case)" proved="true">
+     <transf name="replace" proved="true" arg1="(n+m)" arg2="((n-1)+m+1)">
+      <goal name="power_sum.0.1.1.0.0" expl="false case (recursive case)" proved="true">
+      <proof prover="0"><result status="valid" time="0.09" steps="15"/></proof>
+      </goal>
+      <goal name="power_sum.0.1.1.0.1" proved="true">
+      <proof prover="2"><result status="valid" time="0.00"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   <transf name="instantiate" proved="true" arg1="Hrec" arg2="(n-1)">
+    <goal name="power_sum.0.1.0" expl="recursive case" proved="true">
+    <transf name="replace" proved="true" arg1="(n+m)" arg2="((n-1)+m+1)">
+     <goal name="power_sum.0.1.0.0" expl="recursive case" proved="true">
+     <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+     </goal>
+     <goal name="power_sum.0.1.0.1" proved="true">
+     <proof prover="2"><result status="valid" time="0.00"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="power_0_left" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="power_0_left.0" proved="true">
+  <transf name="replace" proved="true" arg1="n" arg2="(n-1+1)">
+   <goal name="power_0_left.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+   </goal>
+   <goal name="power_0_left.0.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="little_fermat_3">
+ </goal>
+</theory>
+</file>
+</why3session>

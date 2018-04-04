@@ -14,7 +14,25 @@
 Require Import BuiltIn.
 Require BuiltIn.
 
+(* Why3 assumption *)
+Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)) : Prop :=
+  match o with
+  | Init.Datatypes.None => True
+  | (Init.Datatypes.Some _) => False
+  end.
+
+(* Why3 goal *)
+Lemma is_none_spec {a:Type} {a_WT:WhyType a} :
+  forall (o:(option a)), (is_none o) <-> (o = Init.Datatypes.None).
+Proof.
+intros o.
+split.
+now destruct o.
+now intros ->.
+Qed.
+
 Global Instance option_WhyType : forall T {T_WT : WhyType T}, WhyType (option T).
+Proof.
 split.
 apply @None.
 intros [x|] [y|] ; try (now right) ; try (now left).

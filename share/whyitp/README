@@ -1,0 +1,5 @@
+To use Proof General with Why3ITP add the following lines in your
+.emacs after the line loading proof-general itself.
+
+(autoload 'whyitp-mode "(MY_PATH_TO_WHY3)/share/whyitp/whyitp.el" "Major mode for Why3 ITP." t)
+(setq auto-mode-alist (cons '("\\.whyitp" . whyitp-mode) auto-mode-alist))

@@ -11,35 +11,24 @@ module KodaRuskey_Spec
   use import list.List
   use import list.Append
   use import int.Int
+  use import tree.Forest
+  use import tree.SizeForest
+  use import tree.MemForest
 
   type color = White | Black
 
-  type forest =
-    | E
-    | N int forest forest
+  val eq (c1 c2: color) : bool
+    ensures { result <-> c1 = c2 }
 
   type coloring = map int color
 
-  function size_forest (f: forest) : int = match f with
-    | E -> 0
-    | N _ f1 f2 -> 1 + size_forest f1 + size_forest f2
-    end
-
-  lemma size_forest_nonneg : forall f.
-    size_forest f >= 0
-
-  predicate mem_forest (n: int) (f: forest) = match f with
-    | E -> false
-    | N i f1 f2 -> i = n || mem_forest n f1 || mem_forest n f2
-    end
-
-  predicate between_range_forest (i j: int) (f: forest) =
+  predicate between_range_forest (i j: int) (f: forest int) =
     forall n. mem_forest n f -> i <= n < j
 
-  predicate disjoint (f1 f2: forest) =
+  predicate disjoint (f1 f2: forest int) =
     forall x. mem_forest x f1 -> mem_forest x f2 -> false
 
-  predicate no_repeated_forest (f: forest) = match f with
+  predicate no_repeated_forest (f: forest int) = match f with
     | E -> true
     | N i f1 f2 ->
       no_repeated_forest f1 && no_repeated_forest f2 &&
@@ -47,17 +36,17 @@ module KodaRuskey_Spec
       disjoint f1 f2
     end
 
-  predicate valid_nums_forest (f: forest) (n: int) =
+  predicate valid_nums_forest (f: forest int) (n: int) =
     between_range_forest 0 n f &&
     no_repeated_forest f
 
-  predicate white_forest (f: forest) (c: coloring) = match f with
+  predicate white_forest (f: forest int) (c: coloring) = match f with
     | E -> true
     | N i f1 f2 ->
       c[i] = White && white_forest f1 c && white_forest f2 c
   end
 
-  predicate valid_coloring (f: forest) (c: coloring) =
+  predicate valid_coloring (f: forest int) (c: coloring) =
     match f with
     | E -> true
     | N i f1 f2 ->
@@ -68,13 +57,12 @@ module KodaRuskey_Spec
       end
     end
 
-  function count_forest (f: forest) : int = match f with
+  let rec function count_forest (f: forest int) : int
+    ensures { result >= 1 }
+  = match f with
     | E         -> 1
     | N _ f1 f2 -> (1 + count_forest f1) * count_forest f2
     end
-
-  lemma count_forest_nonneg:
-    forall f. count_forest f >= 1
 
   predicate eq_coloring (n: int) (c1 c2: coloring) =
     forall i. 0 <= i < n -> c1[i] = c2[i]
@@ -88,15 +76,18 @@ module Lemmas
   use import list.Append
   use import int.Int
   use import KodaRuskey_Spec
+  use import tree.Forest
+  use import tree.SizeForest
+  use import tree.MemForest
 
-  type stack = list forest
+  type stack = list (forest int)
 
   predicate mem_stack (n: int) (st: stack) = match st with
     | Nil       -> false
     | Cons f tl -> mem_forest n f || mem_stack n tl
     end
 
-  lemma mem_app: forall n st1 "induction" st2.
+  lemma mem_app: forall n st1 [@induction] st2.
     mem_stack n (st1 ++ st2) -> mem_stack n st1 || mem_stack n st2
 
   function size_stack (st: stack) : int = match st with
@@ -111,12 +102,12 @@ module Lemmas
     forall f c.
     white_forest f c <-> (forall i. mem_forest i f -> c[i] = White)
 
-  predicate even_forest (f: forest) = match f with
+  predicate even_forest (f: forest int) = match f with
     | E -> false
     | N _ f1 f2 -> not (even_forest f1) || even_forest f2
     end
 
-  predicate final_forest (f: forest) (c: coloring) = match f with
+  predicate final_forest (f: forest int) (c: coloring) = match f with
     | E -> true
     | N i f1 f2 ->
       c[i] = Black && final_forest f1 c &&
@@ -124,7 +115,7 @@ module Lemmas
       else final_forest f2 c
     end
 
-  predicate any_forest (f: forest) (c: coloring) =
+  predicate any_forest (f: forest int) (c: coloring) =
     white_forest f c || final_forest f c
 
   lemma any_forest_frame:
@@ -188,7 +179,7 @@ module Lemmas
     inverse (Cons f st) c1 c2 ->
     final_forest f c2
 
-  let lemma white_final_exclusive (f: forest) (c: coloring)
+  let lemma white_final_exclusive (f: forest int) (c: coloring)
     requires { f <> E }
     ensures  { white_forest f c -> final_forest f c -> false }
   = match f with E -> () | N _ _ _ -> () end
@@ -211,7 +202,7 @@ module Lemmas
     | Cons f st' -> if even_forest f then () else inverse_inverse st' c1 c2 c3
     end
 
-  inductive sub stack forest coloring =
+  inductive sub stack (forest int) coloring =
   | Sub_reflex:
       forall f, c. sub (Cons f Nil) f c
   | Sub_brother:
@@ -254,7 +245,7 @@ module Lemmas
     sub st f0 c ->
     sub st f0 c'
 
-  predicate disjoint_stack (f: forest) (st: stack) =
+  predicate disjoint_stack (f: forest int) (st: stack) =
     forall i. mem_forest i f -> mem_stack i st -> false
 
   lemma sub_no_rep: forall f st' f0 c.
@@ -318,7 +309,7 @@ module Lemmas
     white_forest f c[i <- White]
 
   let rec lemma sub_valid_coloring_white
-    (f0: forest) (i: int) (f1 f2: forest) (c1: coloring)
+    (f0: forest int) (i: int) (f1 f2: forest int) (c1: coloring)
     requires { no_repeated_forest f0 }
     requires { valid_coloring f0 c1 }
     requires { white_forest f1 c1 }
@@ -345,7 +336,7 @@ module Lemmas
   type visited = S.seq coloring
 
   predicate stored_solutions
-    (f0: forest) (bits: coloring) (st: stack) (v1 v2: visited) =
+    (f0: forest int) (bits: coloring) (st: stack) (v1 v2: visited) =
     let n = size_forest f0 in
     let start = S.length v1 in
     let stop  = S.length v2 in
@@ -360,7 +351,7 @@ module Lemmas
         not (eq_coloring n (S.get v2 j) (S.get v2 k))
 
   let lemma stored_trans1
-      (f0: forest) (bits1 bits2: coloring) (i: int) (f1 f2: forest) (st: stack)
+      (f0: forest int) (bits1 bits2: coloring) (i: int) (f1 f2: forest int) (st: stack)
       (v1 v2 v3: visited)
     requires { valid_nums_forest f0 (size_forest f0) }
     requires { 0 <= i < size_forest f0 }
@@ -377,7 +368,7 @@ module Lemmas
 
 
   let lemma stored_trans2
-      (f0: forest) (bits1 bits2: coloring) (i: int) (f1 f2: forest) (st: stack)
+      (f0: forest int) (bits1 bits2: coloring) (i: int) (f1 f2: forest int) (st: stack)
       (v1 v2 v3: visited)
     requires { valid_nums_forest f0 (size_forest f0) }
     requires { 0 <= i < size_forest f0 }
@@ -404,13 +395,17 @@ module KodaRuskey
   use import array.Array
   use import int.Int
   use import ref.Ref
+  use import tree.Forest
+  use import tree.SizeForest
+  use import tree.MemForest
 
   val map_of_array (a: array 'a) : M.map int 'a
     ensures { result = a.elts }
 
   val ghost visited: ref visited
 
-  let rec enum (bits: array color) (ghost f0: forest) (st: list forest) : unit
+  let rec enum
+    (bits: array color) (ghost f0: forest int) (st: list (forest int)) : unit
     requires { size_forest f0 = length bits }
     requires { valid_nums_forest f0 (length bits) }
     requires { sub st f0 bits.elts }
@@ -440,43 +435,49 @@ module KodaRuskey
         assert { disjoint_stack f1 st' };
         assert { not (mem_stack i st') };
         let ghost visited1 = !visited in
-        if bits[i] = White then begin
-    'A:   enum bits f0 (Cons f2 st');
+        if eq bits[i] White then begin
+          label A in
+          enum bits f0 (Cons f2 st');
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
-    'B:   bits[i] <- Black;
+          label B in
+          bits[i] <- Black;
           assert { sub st f0 bits.elts };
           assert { white_forest f1 bits.elts };
-          assert { unchanged (Cons f2 st') (at bits 'B).elts bits.elts};
-          assert { inverse (Cons f2 st') (at bits 'A).elts bits.elts };
-    'C:   enum bits f0 (Cons f1 (Cons f2 st'));
+          assert { unchanged (Cons f2 st') (bits at B).elts bits.elts};
+          assert { inverse (Cons f2 st') (bits at A).elts bits.elts };
+          label C in
+	  enum bits f0 (Cons f1 (Cons f2 st'));
           assert { bits[i] = Black };
           assert { final_forest f1 bits.elts };
           assert { if not (even_forest f1)
-                   then inverse (Cons f2 st') (at bits 'C).elts bits.elts &&
+                   then inverse (Cons f2 st') (bits at C).elts bits.elts &&
                         white_forest f2 bits.elts
-                   else unchanged (Cons f2 st') (at bits 'C).elts bits.elts &&
+                   else unchanged (Cons f2 st') (bits at C).elts bits.elts &&
                         final_forest f2 bits.elts };
           ghost stored_trans1 f0 bits1 (map_of_array bits)
     i f1 f2 st' visited1 visited2 !visited
         end else begin
           assert { if not (even_forest f1) then white_forest f2 bits.elts
                    else final_forest f2 bits.elts };
-    'A:   enum bits f0 (Cons f1 (Cons f2 st'));
+          label A in
+          enum bits f0 (Cons f1 (Cons f2 st'));
           assert { sub st f0 bits.elts };
           let ghost bits1 = map_of_array bits in
           let ghost visited2 = !visited in
-    'B:   bits[i] <- White;
+          label B in
+          bits[i] <- White;
           assert { unchanged (Cons f1 (Cons f2 st'))
-                     (at bits 'B).elts bits.elts };
+                     (bits at B).elts bits.elts };
           assert { inverse (Cons f1 (Cons f2 st'))
-                     (at bits 'A).elts bits.elts };
+                     (bits at A).elts bits.elts };
           assert { sub st f0 bits.elts };
           assert { if even_forest f1 || even_forest f2
-                   then unchanged st' (at bits 'A).elts bits.elts
-                   else inverse st' (at bits 'A).elts bits.elts };
-    'C:   enum bits f0 (Cons f2 st');
+                   then unchanged st' (bits at A).elts bits.elts
+                   else inverse st' (bits at A).elts bits.elts };
+          label C in
+          enum bits f0 (Cons f2 st');
           assert { bits[i] = White };
           assert { white_forest f  bits.elts };
           ghost stored_trans2 f0 bits1 (map_of_array bits)
@@ -484,7 +485,7 @@ module KodaRuskey
        end
     end
 
-  let main (bits: array color) (f0: forest)
+  let main (bits: array color) (f0: forest int)
     requires { white_forest f0 bits.elts }
     requires { size_forest f0 = length bits }
     requires { valid_nums_forest f0 (length bits) }
@@ -503,6 +504,7 @@ end
 (** Independently, let's prove that count_forest is indeed the number
     of colorings. *)
 
+(* wip
 module CountCorrect
 
   use import seq.Seq as S
@@ -513,13 +515,12 @@ module CountCorrect
   use import KodaRuskey_Spec
   use import Lemmas
   use import ref.Ref
-  use import int.EuclideanDivision
 
-  predicate id_forest (f: forest) (c1 c2: coloring) =
+  predicate id_forest (f: forest int) (c1 c2: coloring) =
     forall j. mem_forest j f -> M.get c1 j = M.get c2 j
 
   (* valid coloring, all white outside of f *)
-  predicate solution (f: forest) (c: coloring) =
+  predicate solution (f: forest int) (c: coloring) =
     valid_coloring f c &&
     forall j. not (mem_forest j f) -> M.get c j = White
 
@@ -529,18 +530,18 @@ module CountCorrect
   (*   valid_nums_forest f n -> *)
   (*   solution f c1 -> eq_coloring n c1 c2 -> solution f c2 *)
 
-  predicate is_product (i: int) (f1 f2: forest) (c1 c2 r: coloring) =
+  predicate is_product (i: int) (f1 f2: forest int) (c1 c2 r: coloring) =
     solution (N i f1 f2) r &&
     M.get r i = Black &&
     id_forest f1 r c1 &&
     id_forest f2 r c2
 
-  let product (n: int) (i: int) (f1 f2: forest) (c1 c2: coloring) : coloring
+  let product (n: int) (i: int) (f1 f2: forest int) (c1 c2: coloring) : coloring
     requires { valid_nums_forest (N i f1 f2) n }
     requires { solution f1 c1 }
     requires { solution f2 c2 }
     ensures  { is_product i f1 f2 c1 c2 result }
-  = let rec copy (acc: coloring) (f: forest)
+  = let rec copy (acc: coloring) (f: forest int)
       variant { f }
       ensures { forall i. M.get result i =
       	          if mem_forest i f then M.get c2 i else M.get acc i }
@@ -559,14 +560,14 @@ module CountCorrect
     solution f1 c1 -> solution f2 c2 ->
     is_product i f1 f2 c1 c2 c -> solution (N i f1 f2) c
 
-  predicate solutions (n: int) (f: forest) (s: seq coloring) =
+  predicate solutions (n: int) (f: forest int) (s: seq coloring) =
      (forall j. 0 <= j < length s -> solution f s[j]) &&
      (* colorings are disjoint *)
      (forall j. 0 <= j < length s ->
       	forall k. 0 <= k < length s -> j <> k ->
 	not (eq_coloring n s[j] s[k]))
 
-  let product_all (n: int) (i: int) (f1 f2: forest) (s1 s2: seq coloring)
+  let product_all (n: int) (i: int) (f1 f2: forest int) (s1 s2: seq coloring)
     : seq coloring
     requires { valid_nums_forest (N i f1 f2) n }
     requires { solutions n f1 s1 }
@@ -600,7 +601,7 @@ module CountCorrect
     done;
     !s
 
-  let lemma solution_white_or_black (n i: int) (f1 f2: forest) : unit
+  let lemma solution_white_or_black (n i: int) (f1 f2: forest int) : unit
     requires { valid_nums_forest (N i f1 f2) n }
     ensures  { valid_nums_forest f1 n }
     ensures  { valid_nums_forest f2 n }
@@ -615,7 +616,7 @@ module CountCorrect
   lemma solution_E:
     forall c. solution E c -> forall n. eq_coloring n c (const White)
 
-  let rec enum (n: int) (f: forest) : seq coloring
+  let rec enum (n: int) (f: forest int) : seq coloring
     requires { valid_nums_forest f n }
     ensures  { length result = count_forest f }
     ensures  { solutions n f result }
@@ -640,3 +641,4 @@ module CountCorrect
    end
 
 end
+*)

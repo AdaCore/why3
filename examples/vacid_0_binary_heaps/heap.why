@@ -23,8 +23,8 @@ predicate parentChild (i: int) (j: int) =
     0 <= i < j -> (j = left i) || (j = right i)
 
 
-use import map.Map as A
-type map = A.map int int
+clone import appmap.Appmap as A with type key = int
+type map = A.t int
 type logic_heap = (map, int)
 
 predicate is_heap_array (a: map) (idx: int) (sz: int) =
@@ -79,10 +79,15 @@ lemma Right_sup_el:
         forall j: int. 0 <= j < n -> right j < n ->
            a[j] <= a[right j]
 
-lemma Is_heap_relation:
-  forall a:map, n :int. n > 0 ->
-    is_heap_array a 0 n ->
-	forall j: int. 0 <= j -> j < n ->  a[0] <= a[j]
+let rec lemma is_heap_relation (a:map) (n :int) (j:int)
+   requires { n > 0 }
+   requires { is_heap_array a 0 n }
+   requires { 0 <= j < n }
+   variant { j }
+   ensures  { a[0] <= a[j] }
+ = if j > 0 then begin
+     is_heap_relation a n (parent j)
+   end
 
 end
 

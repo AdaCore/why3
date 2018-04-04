@@ -33,16 +33,18 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable default_prover : string; (* "" means none *)
-      mutable default_editor : string;
       mutable intro_premises : bool;
+      mutable show_full_context : bool;
       mutable show_labels : bool;
+      mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
+      mutable allow_source_editing : bool;
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
@@ -51,7 +53,6 @@ type t =
       mutable error_color : string;
       mutable iconset : string;
       (** colors *)
-      mutable env : Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
@@ -69,22 +70,24 @@ type ide = {
   ide_window_width : int;
   ide_window_height : int;
   ide_tree_width : int;
+  ide_task_height : int;
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
   ide_intro_premises : bool;
+  ide_show_full_context : bool;
   ide_show_labels : bool;
+  ide_show_coercions : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
   ide_max_boxes : int;
+  ide_allow_source_editing : bool;
   ide_saving_policy : int;
   ide_premise_color : string;
   ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
   ide_iconset : string;
-  ide_default_prover : string;
-  ide_default_editor : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
 }
@@ -93,24 +96,24 @@ let default_ide =
   { ide_window_width = 1024;
     ide_window_height = 768;
     ide_tree_width = 512;
+    ide_task_height = 400;
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
     ide_intro_premises = true;
+    ide_show_full_context = false;
     ide_show_labels = false;
+    ide_show_coercions = true;
     ide_show_locs = false;
     ide_show_time_limit = false;
     ide_max_boxes = 16;
+    ide_allow_source_editing = true;
     ide_saving_policy = 2;
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
     ide_error_color = "orange";
     ide_iconset = "fatcow";
-    ide_default_prover = "";
-    ide_default_editor =
-      (try Sys.getenv "EDITOR" ^ " %f"
-       with Not_found -> "editor %f");
     ide_hidden_provers = [];
   }
 
@@ -121,6 +124,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_window_height "window_height";
     ide_tree_width =
       get_int section ~default:default_ide.ide_tree_width "tree_width";
+    ide_task_height =
+      get_int section ~default:default_ide.ide_task_height "task_height";
     ide_current_tab =
       get_int section ~default:default_ide.ide_current_tab "current_tab";
     ide_font_size =
@@ -130,8 +135,13 @@ let load_ide section =
     ide_intro_premises =
       get_bool section ~default:default_ide.ide_intro_premises
         "intro_premises";
+    ide_show_full_context =
+      get_bool section ~default:default_ide.ide_show_full_context
+        "show_full_context";
     ide_show_labels =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
+    ide_show_coercions =
+      get_bool section ~default:default_ide.ide_show_labels "print_coercions";
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_show_time_limit =
@@ -140,6 +150,8 @@ let load_ide section =
     ide_max_boxes =
       get_int section ~default:default_ide.ide_max_boxes
         "max_boxes";
+    ide_allow_source_editing =
+      get_bool section ~default:default_ide.ide_allow_source_editing "allow_source_editing";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_premise_color =
@@ -157,12 +169,6 @@ let load_ide section =
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
-    ide_default_editor =
-      get_string section ~default:default_ide.ide_default_editor
-        "default_editor";
-    ide_default_prover =
-      get_string section ~default:default_ide.ide_default_prover
-        "default_prover";
     ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
   }
 
@@ -172,41 +178,48 @@ let set_labels_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+let set_coercions_flag =
+  let fl = Debug.lookup_flag "print_coercions" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
 let set_locs_flag =
   let fl = Debug.lookup_flag "print_locs" in
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
-let load_config config original_config env =
+let load_config config original_config =
   let main = get_main config in
   let ide  = match Whyconf.get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
   in
   set_labels_flag ide.ide_show_labels;
+  set_coercions_flag ide.ide_show_coercions;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
+    task_height   = ide.ide_task_height;
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
+    show_full_context= ide.ide_show_full_context ;
     show_labels   = ide.ide_show_labels ;
+    show_coercions = ide.ide_show_coercions ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
     max_boxes = ide.ide_max_boxes;
+    allow_source_editing = ide.ide_allow_source_editing ;
     saving_policy = ide.ide_saving_policy ;
     premise_color = ide.ide_premise_color;
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
     iconset = ide.ide_iconset;
-    default_prover = ide.ide_default_prover;
-    default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
-    env            = env;
     hidden_provers = ide.ide_hidden_provers;
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
@@ -215,7 +228,7 @@ let load_config config original_config env =
 }
 
 let save_config t =
-  Debug.dprintf debug "[GUI config] saving IDE config file@.";
+  Debug.dprintf debug "[config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
   (* copy possibly modified settings to original config *)
@@ -236,23 +249,24 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
+  let ide = set_bool ide "show_full_context" t.show_full_context in
   let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_coercions" t.show_coercions in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
   let ide = set_int ide "max_boxes" t.max_boxes in
+  let ide = set_bool ide "allow_source_editing" t.allow_source_editing in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "iconset" t.iconset in
-  let ide = set_string ide "default_prover" t.default_prover in
-  let ide = set_string ide "default_editor" t.default_editor in
-  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
@@ -262,19 +276,57 @@ let config,load_config =
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf base_conf env ->
-    let c = load_config conf base_conf env in
+  (fun conf base_conf ->
+    let c = load_config conf base_conf in
     config := Some c)
 
 let save_config () = save_config (config ())
 
 let get_main () = (get_main (config ()).config)
 
+(*
+
+
+  font size
+
+
+ *)
+
+
+let sans_font_family = "Sans"
+let mono_font_family = "Monospace"
+
+let modifiable_sans_font_views = ref []
+let modifiable_mono_font_views = ref []
+
+let add_modifiable_sans_font_view v =
+  modifiable_sans_font_views := v :: !modifiable_sans_font_views
+
+let add_modifiable_mono_font_view v =
+  modifiable_mono_font_views := v :: !modifiable_mono_font_views
+
+let change_font size =
+(*
+  Tools.resize_images (!Colors.font_size * 2 - 4);
+*)
+  let sff = sans_font_family ^ " " ^ string_of_int size in
+  let mff = mono_font_family ^ " " ^ string_of_int size in
+  let sf = Pango.Font.from_string sff in
+  let mf = Pango.Font.from_string mff in
+  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
+  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
+
 let incr_font_size n =
   let c = config () in
   let s = max (c.font_size + n) 4 in
   c.font_size <- s;
   s
+
+let enlarge_fonts () = change_font (incr_font_size 1)
+
+let reduce_fonts () = change_font (incr_font_size (-1))
+
+let set_fonts () = change_font (incr_font_size 0)
 
 (*
 
@@ -324,11 +376,13 @@ let image ?size f =
     Filename.concat (datadir main)
       (Filename.concat "images" (f^".png"))
   in
+  try (
   match size with
     | None ->
         GdkPixbuf.from_file n
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
+  ) with _ -> !image_default
 
 let iconname_default = ref ""
 let iconname_undone = ref ""
@@ -463,7 +517,7 @@ let resize_images size =
   ()
 
 let init () =
-  Debug.dprintf debug "[GUI config] reading icons...@?";
+  Debug.dprintf debug "[config] reading icons...@?";
   load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
@@ -520,6 +574,12 @@ let show_legend_window () =
   i "   Valid but obsolete result\n";
   ib image_unknown_obs;
   i "   Answer not conclusive and obsolete\n";
+  ib image_timeout_obs;
+  i "   Time limit reached, obsolete\n";
+  ib image_outofmemory_obs;
+  i "   Out of memory, obsolete\n";
+  ib image_steplimitexceeded_obs;
+  i "   Step limit exceeded, obsolete\n";
   ib image_invalid_obs;
   i "   Prover disproved goal, but obsolete\n";
   ib image_failure_obs;
@@ -653,6 +713,15 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     cntexample_check#connect#toggled ~callback:
       (fun () -> c.session_cntexample <- not c.session_cntexample)
   in
+  (* source editing allowed *)
+  let source_editing_check = GButton.check_button ~label:"allow editing source files"
+    ~packing:vb#add ()
+    ~active:c.allow_source_editing
+  in
+  let (_: GtkSignal.id) =
+    source_editing_check#connect#toggled ~callback:
+      (fun () -> c.allow_source_editing <- not c.allow_source_editing)
+  in
   (* session saving policy *)
   let set_saving_policy n () = c.saving_policy <- n in
   let saving_policy_frame =
@@ -740,6 +809,15 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     intropremises#connect#toggled ~callback:
       (fun () -> c.intro_premises <- not c.intro_premises)
   in
+  let showfullcontext =
+    GButton.check_button ~label:"show full task context"
+      ~packing:display_options_box#add ()
+      ~active:c.show_full_context
+  in
+  let (_ : GtkSignal.id) =
+    showfullcontext#connect#toggled ~callback:
+      (fun () -> c.show_full_context <- not c.show_full_context)
+  in
   let showlabels =
     GButton.check_button
       ~label:"show labels in formulas"
@@ -751,6 +829,18 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
       (fun () ->
          c.show_labels <- not c.show_labels;
          set_labels_flag c.show_labels)
+  in
+  let showcoercions =
+    GButton.check_button
+      ~label:"show coercions in formulas"
+      ~packing:display_options_box#add ()
+      ~active:c.show_coercions
+  in
+  let (_ : GtkSignal.id) =
+    showcoercions#connect#toggled ~callback:
+      (fun () ->
+         c.show_coercions <- not c.show_coercions;
+         set_coercions_flag c.show_coercions)
   in
   let showlocs =
     GButton.check_button
@@ -889,6 +979,7 @@ let provers_page c (notebook:GPack.notebook) =
       in ())
     (Whyconf.get_provers c.config);
   (* default prover *)
+(*
   let frame2 =
     GBin.frame ~label:"Default prover" ~packing:hbox_pack () in
   let provers_box =
@@ -897,9 +988,9 @@ let provers_page c (notebook:GPack.notebook) =
   let group =
     let b =
       GButton.radio_button ~label:"(none)" ~packing:provers_box#add
-                           ~active:(c.default_prover = "") () in
+                           ~active:(c.config.default_prover = "") () in
     let (_ : GtkSignal.id) =
-      b#connect#toggled ~callback:(fun () -> c.default_prover <- "") in
+      b#connect#toggled ~callback:(fun () -> c.config.default_prover <- "") in
     b#group in
   Mprover.iter
     (fun _ p ->
@@ -907,12 +998,13 @@ let provers_page c (notebook:GPack.notebook) =
       let label = Pp.string_of_wnl print_prover p.prover in
       let b =
         GButton.radio_button ~label ~group ~packing:provers_box#add
-                             ~active:(name = c.default_prover) () in
+                             ~active:(name = c.config.default_prover) () in
       let (_ : GtkSignal.id) =
-        b#connect#toggled ~callback:(fun () -> c.default_prover <- name)
+        b#connect#toggled ~callback:(fun () -> c.config.default_prover <- name)
       in ())
     (Whyconf.get_provers c.config)
-
+ *)
+  ()
 
 
 (* Page "Uninstalled provers" *)
@@ -972,12 +1064,16 @@ let editors_page c (notebook:GPack.notebook) =
   let default_editor_frame =
     GBin.frame ~label:"Default editor" ~packing:vbox_pack ()
   in
+  let main = Whyconf.get_main c.config in
   let editor_entry =
-   GEdit.entry ~text:c.default_editor ~packing:default_editor_frame#add ()
+   GEdit.entry ~text:(default_editor main) ~packing:default_editor_frame#add ()
   in
   let (_ : GtkSignal.id) =
-    editor_entry#connect#changed ~callback:
-      (fun () -> c.default_editor <- editor_entry#text)
+    editor_entry#connect#changed
+      ~callback:
+      (fun () ->
+       c.config <- Whyconf.set_main c.config
+	(Whyconf.set_default_editor main editor_entry#text))
   in
   let frame = GBin.frame ~label:"Specific editors" ~packing:vbox_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
@@ -1021,7 +1117,7 @@ let editors_page c (notebook:GPack.notebook) =
                   try Meditor.find s map
                   with Not_found -> assert false
             in
-	    (* Debug.dprintf debug "prover %a : selected editor '%s'@." *)
+	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
             let provers = Whyconf.get_provers c.config in
             c.config <-
@@ -1061,7 +1157,7 @@ let preferences (c : t) =
   in
   let (_ : GtkSignal.id) =
     color_sel#connect ColorSelection.S.color_changed ~callback:
-      (fun c -> Format.eprintf "Gconfig.color_sel : %s@."
+      (fun c -> Format.eprintf "Gconfig.color_sel: %s@."
          c)
   in
 *)
@@ -1095,19 +1191,18 @@ let run_auto_detection gconfig =
   ()
 *)
 
-(*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
+(*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-let uninstalled_prover c eS unknown =
-  try
-    Whyconf.get_prover_upgrade_policy c.config unknown
-  with Not_found ->
-    let others,names,versions = Session_tools.unknown_to_known_provers
-      (Whyconf.get_provers eS.Session.whyconf) unknown in
-    let dialog = GWindow.dialog
-      ~icon:(!why_icon) ~modal:true
-      ~title:"Why3: Uninstalled prover" ()
-    in
-    let vbox = dialog#vbox in
+let uninstalled_prover_dialog c unknown =
+  let others,names,versions =
+    Whyconf.unknown_to_known_provers
+      (Whyconf.get_provers c.config) unknown
+  in
+  let dialog = GWindow.dialog
+                 ~icon:(!why_icon) ~modal:true
+                 ~title:"Why3: Uninstalled prover" ()
+  in
+  let vbox = dialog#vbox in
 (* Does not work: why ??
     let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
     let hbox = GPack.hbox ~packing:vbox_pack () in
@@ -1205,10 +1300,11 @@ let uninstalled_prover c eS unknown =
         | _ -> assert false
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
-    policy
+    ()
+
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.opt"
 End:
 *)

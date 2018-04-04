@@ -81,6 +81,10 @@ val cntexample: main -> bool
 val set_limits: main -> int -> int -> int -> main
 val set_cntexample: main -> bool -> main
 
+val default_editor: main -> string
+(** editor name used when no specific editor known for a prover *)
+val set_default_editor: main -> string -> main
+
 val plugins : main -> string list
 val pluginsdir : main -> string
 val set_plugins : main -> string list -> main
@@ -128,6 +132,10 @@ val get_complete_command : config_prover -> with_steps:bool -> string
 val get_provers : config -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
+
+val get_prover_config: config -> prover -> config_prover
+(** [get_prover_config config prover] get the prover config as stored in
+ the config. Raise Not_found if the prover does not exists in the config. *)
 
 val set_provers : config ->
   ?shortcuts:prover Mstr.t -> config_prover Mprover.t -> config
@@ -235,7 +243,6 @@ val why3_regexp_of_string : string -> Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 
-(** Access to the Rc.t *)
 val get_section : config -> string -> Rc.section option
 (** [get_section config name] Same as {!Rc.get_section} except name
     must not be "main" *)
@@ -253,6 +260,7 @@ val set_family  : config -> string -> Rc.family  -> config
 (** Common command line options *)
 
 module Args : sig
+
   val initialize :
     ?extra_help : (Format.formatter -> unit -> unit) ->
     (string * Arg.spec * string) list ->
@@ -260,6 +268,7 @@ module Args : sig
     config * config * Env.env
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+
 end
 
 
@@ -269,3 +278,8 @@ val load_driver : main -> Env.env -> string -> string list -> Driver.driver
 (** wrapper for loading a driver from a file that may be relative to the datadir.
     See [Driver.load_driver_absolute]
 *)
+
+val unknown_to_known_provers  :
+  config_prover Mprover.t -> prover ->
+  prover list * prover list * prover list
+(** return others, same name, same version *)

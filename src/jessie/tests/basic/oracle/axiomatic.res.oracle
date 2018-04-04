@@ -6,10 +6,7 @@
 [kernel] Parsing tests/basic/axiomatic.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
-[jessie3] creating logic symbol 68 (f1)
-[jessie3] creating logic symbol 72 (occ)
-[jessie3] creating logic symbol 77 (singleton)
-[jessie3] creating logic symbol 83 (bag_union)
+[jessie3] Starting translation
 [jessie3] found 1 logic decl(s)
 [jessie3] made 3 theory(ies)
 [jessie3] made 0 function(s)
@@ -18,27 +15,39 @@
 [jessie3] theory Global_logic_declarations
             (* use why3.BuiltIn.BuiltIn *)
             
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             function f1 (x:int) : int = (x * x) + 1
             
             lemma l1 : forall x:int. f1 x >= 1
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (l1): Valid, Unknown, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (l1) (): Valid, Unknown, Valid
 [jessie3] running theory 1:
 [jessie3] theory BagInt
             (* use why3.BuiltIn.BuiltIn *)
             
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use Global_logic_declarations *)
             
@@ -64,24 +73,30 @@
             
             lemma l2 : f1 1 = 2
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (l2): Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (l2) (): Valid, Valid, Valid
 [jessie3] running theory 1:
 [jessie3] theory Global_logic_declarations1
             (* use why3.BuiltIn.BuiltIn *)
             
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use BagInt *)
             
             lemma union_comm : forall b1:bag, b2:bag. bag_union b1 b2 = bag_union b2 b1
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (union_comm): Unknown, Unknown, Unknown, Timeout, Timeout
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (union_comm) (): Unknown, Unknown, Timeout
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use why3.BuiltIn.BuiltIn *)
@@ -90,18 +105,20 @@
             
             (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude.Prelude *)
-            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use Global_logic_declarations1 *)
             
             (* use ref.Ref *)
             
             (* use mach.bv.BVCheck32 *)
+            
+            (* use mach.int.Int64 *)
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1

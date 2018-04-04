@@ -14,6 +14,8 @@
 open Ident
 open Ty
 
+(** {1 Terms and Formulas} *)
+
 (** {2 Variable symbols} *)
 
 type vsymbol = private {
@@ -38,7 +40,6 @@ type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
-  ls_opaque : Stv.t;
   ls_constr : int;
 }
 
@@ -51,17 +52,13 @@ val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty option -> lsymbol
+val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
 
-val create_fsymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
+val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
 (** ~constr is the number of constructors of the type in which the
    symbol is a constructor otherwise it must be the default 0. *)
 
-
-val create_psymbol :
-  ?opaque:Stv.t -> preid -> ty list -> lsymbol
+val create_psymbol : preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 
@@ -85,7 +82,7 @@ type pattern = private {
   pat_ty   : ty;
 }
 
-and pattern_node = private
+and pattern_node =
   | Pwild
   | Pvar of vsymbol
   | Papp of lsymbol * pattern list
@@ -126,7 +123,7 @@ type term = private {
   t_loc   : Loc.position option;
 }
 
-and term_node = private
+and term_node =
   | Tvar of vsymbol
   | Tconst of Number.constant
   | Tapp of lsymbol * term list
@@ -155,6 +152,8 @@ module Hterm : Exthtbl.S with type key = term
 val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
+(* Equality modulo labels and triggers *)
+val t_equal_nt_nl : term -> term -> bool
 
 (** {2 Bindings} *)
 
@@ -169,6 +168,9 @@ val t_close_quant : vsymbol list -> trigger -> term -> term_quant
 val t_open_bound : term_bound -> vsymbol * term
 val t_open_branch : term_branch -> pattern * term
 val t_open_quant : term_quant -> vsymbol list * trigger * term
+
+val t_open_bound_with : term -> term_bound -> term
+val t_clone_bound_id : term_bound -> preid
 
 (** open bindings with optimized closing callbacks *)
 
@@ -206,6 +208,8 @@ val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
+val check_literal : Number.constant -> ty -> unit
+
 val t_var : vsymbol -> term
 val t_const : Number.constant -> ty -> term
 val t_if : term -> term -> term -> term
@@ -229,9 +233,17 @@ val t_nat_const : int -> term
     n must be non-negative *)
 val t_bigint_const : BigInt.t -> term
 
-val asym_label : label
+val stop_split : label
+val asym_split : label
+
+val t_and_l : term list -> term
+val t_or_l : term list -> term
+
 val t_and_asym : term -> term -> term
 val t_or_asym : term -> term -> term
+
+val t_and_asym_l : term list -> term
+val t_or_asym_l : term list -> term
 
 val t_let_close : vsymbol -> term -> term -> term
 val t_eps_close : vsymbol -> term -> term
@@ -246,8 +258,6 @@ val t_label_remove : label -> term -> term
 val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
-
-val keep_on_simp_label : label
 
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
@@ -373,6 +383,7 @@ val t_pred_app_beta_l : term -> term list -> term
 
 val t_map : (term -> term) -> term -> term
 val t_fold : ('a -> term -> 'a) -> 'a -> term -> 'a
+val t_iter : (term -> unit) -> term -> unit
 val t_map_fold : ('a -> term -> 'a * term) -> 'a -> term -> 'a * term
 
 val t_all : (term -> bool) -> term -> bool
@@ -460,9 +471,12 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
     mapping [mt] and term variables by mapping [mv] in term [t] *)
 
 val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
-(** [t_subst_types mt mv t] substitutes type variables by
-    mapping [mt] simultaneously in substitution [mv] and in term [t].
-    This operation may rename the variables in [t]. *)
+(** [t_subst_types mt mv t] substitutes type variables of term [t] by
+    mapping [mt]. This operation may rename the variables in [t], and
+    the same renaming is simultaneously applied to the variables of
+    the substitution [mv] (both domain and codomain).
+    Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
+       returns ({z:int -> t:int},(f z))   *)
 
 (** {2 Find free variables and type variables} *)
 

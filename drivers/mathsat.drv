@@ -31,7 +31,7 @@ theory BuiltIn
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Int
@@ -51,16 +51,16 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -92,16 +92,16 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -112,38 +112,38 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
 theory Bool
-   syntax type     bool  "Bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding : kept" type bool
+  syntax type     bool  "Bool"
+  syntax function True  "true"
+  syntax function False "false"
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
-   syntax function notb  "(not %1)"
-   syntax function implb "(=> %1 %2)"
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function xorb  "(xor %1 %2)"
+  syntax function notb  "(not %1)"
+  syntax function implb "(=> %1 %2)"
 end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
-  meta "encoding : lskept" function ite
+  meta "encoding:lskept" function ite
 end
 
 (* needs to be checked
 theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
 end
 *)
 
@@ -165,23 +165,22 @@ theory real.Truncate
 end
 *)
 
-theory map.Map
-  syntax type map "(Array %1 %2)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+theory HighOrd
+  syntax type     (->) "(Array %1 %2)"
+  syntax function (@) "(select %1 %2)"
 
-  syntax function get   "(select %1 %2)"
-  syntax function set   "(store %1 %2 %3)"
+  meta "encoding:lskept" function (@)
+end
+
+theory map.Map
+  syntax function get "(select %1 %2)"
+  syntax function set "(store %1 %2 %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
 end
 
 theory map.Const
-  meta "encoding : lskept" function const
+  meta "encoding:lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)

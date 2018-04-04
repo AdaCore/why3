@@ -76,7 +76,7 @@ replay:
 	@printf "===================================\n"
 	@for i in *.mlw; do \
 		printf "Replaying $$i..." ; \
-		why3 $(WHY3FLAGS) replay -q $$i ; \
+		why3 $(WHY3FLAGS) replay -q `basename $$i .mlw` ; \
 	 done
 	@printf "===================================\n"
 	@printf "Ending time (UTC): "

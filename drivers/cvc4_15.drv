@@ -17,6 +17,7 @@ model_parser "smtv2"
 
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "cvc4_bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -54,23 +55,21 @@ steplimitexceeded "??"
 
 (* CVC4 division seems to be the Euclidean one, not the Computer one *)
 theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
 end
 
 (*
 theory int.ComputerDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
 end
 *)
-
-import "cvc4_bv.gen"

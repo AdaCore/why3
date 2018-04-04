@@ -32,6 +32,8 @@ type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
   queried_terms : Term.term Stdlib.Mstr.t;
+  list_projections: Stdlib.Sstr.t;
+  list_records: ((string * string) list) Stdlib.Mstr.t;
 }
 
 type printer_args = {
@@ -55,6 +57,8 @@ let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
   queried_terms = Stdlib.Mstr.empty;
+  list_projections = Stdlib.Sstr.empty;
+  list_records = Stdlib.Mstr.empty;
 }
 
 let register_printer ~desc s p =
@@ -165,7 +169,7 @@ exception BadSyntaxArity of int * int
 let int_of_string s =
   try int_of_string s
   with _ ->
-    Format.eprintf "bad argument for int_of_string : %s@." s;
+    Format.eprintf "bad argument for int_of_string: %s@." s;
     assert false
 
 let check_syntax s len =
@@ -325,7 +329,7 @@ let print_prelude_of_theories th_used fmt pm =
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,_) } -> th::acc
+    | { td_node = Use th | Clone (th,_) } -> th::acc
     | _ -> acc) [] task
   in
   print_prelude_of_theories th_used fmt pm
@@ -577,7 +581,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
   | Unsupported s ->
-      fprintf fmt "@[<hov 3> Uncatched exception 'Unsupported %s'@]" s
+      fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
       fprintf fmt "@[@[<hov 3> This type isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_ty e s

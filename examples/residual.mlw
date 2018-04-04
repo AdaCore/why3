@@ -7,6 +7,9 @@ module Residuals
 
   type char
 
+  val predicate eq (x y : char)
+    ensures { result <-> x = y }
+
   clone export regexp.Regexp with type char = char
 
   let rec accepts_epsilon (r:regexp) : bool
@@ -38,7 +41,7 @@ module Residuals
   = match r with
     | Empty -> Empty
     | Epsilon -> Empty
-    | Char c' -> if c = c' then Epsilon else Empty
+    | Char c' -> if eq c c' then Epsilon else Empty
     | Alt r1 r2 -> Alt (residual r1 c) (residual r2 c)
     | Concat r1 r2 ->
        if accepts_epsilon r1 then
@@ -66,11 +69,11 @@ module Test
 
   clone import Residuals with type char = char
 
-  constant a : char = 65
+  let constant a : char = 65
 
-  constant aa : word = Cons a (Cons a Nil)
+  let constant aa : word = Cons a (Cons a Nil)
 
-  constant astar : regexp = Star (Char a)
+  let constant astar : regexp = Star (Char a)
 
   let test_astar () = decide_mem aa astar
 
@@ -99,7 +102,7 @@ module DFA
   function exec (a:t) (q:state) (w:word) : state =
     match w with
     | Nil -> q
-    | Cons c r -> let q' = a.transition[(q,c)] in exec a q' r
+    | Cons c r -> let q' = a.transition[q,c] in exec a q' r
     end
 
   function accepts (a:t) (w:word) : bool =

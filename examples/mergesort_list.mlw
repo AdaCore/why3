@@ -13,7 +13,7 @@ module Elt
   use export list.Permut
 
   type elt
-  predicate le elt elt
+  val predicate le elt elt
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
   clone export list.Sorted      with type t = elt, predicate le  = le,
   goal Transitive.Trans
@@ -88,7 +88,7 @@ module Mergesort
 
   let split (l0: list 'a) : (list 'a, list 'a)
     requires { length l0 >= 2 }
-    ensures  { let (l1, l2) = result in
+    ensures  { let l1, l2 = result in
       1 <= length l1 /\ 1 <= length l2 /\ permut l0 (l1 ++ l2) }
   = let rec split_aux (l1 l2 l: list 'a) : (list 'a, list 'a)
       requires { length l2 = length l1 \/ length l2 = length l1 + 1 }
@@ -97,7 +97,7 @@ module Mergesort
         permut (r1 ++ r2) (l1 ++ (l2 ++ l)) }
       variant { length l }
     = match l with
-      | Nil -> (l1, l2)
+      | Nil -> l1, l2
       | Cons x r -> split_aux l2 (Cons x l1) r
       end
     in
@@ -288,6 +288,9 @@ module OCamlMergesort
     ensures { sorted result /\ permut result l }
   =
     let n = length l in
-    if n < 2 then l else sort n l
+    if n < 2 then begin
+      assert { sorted l by match l with
+               Nil | Cons _ Nil -> sorted l | _ -> false end }; l end
+    else sort n l
 
 end

@@ -13,13 +13,6 @@ Require number.Prime.
 Require number.Coprime.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
-(* Why3 assumption *)
 Definition lt_nat (x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x < y)%Z.
 
 (* Why3 assumption *)

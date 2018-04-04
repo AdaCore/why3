@@ -1,0 +1,152 @@
+(* Binary search
+
+   A classical example. Searches a sorted array for a given value v. *)
+
+module BinarySearch
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import array.Array
+
+  (* the code and its specification *)
+
+  exception Not_found (* raised to signal a search failure *)
+
+  let binary_search (a : array int) (v : int) : int
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = [@vc:sp]
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < length a }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+      variant { !u - !l }
+      let m = !l + div (!u - !l) 2 in
+      assert { !l <= m <= !u };
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
+
+end
+
+(* A generalization: the midpoint is computed by some abstract function.
+   The only requirement is that it lies between l and u. *)
+
+module BinarySearchAnyMidPoint
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+
+  exception Not_found (* raised to signal a search failure *)
+
+  val midpoint (l:int) (u:int) : int
+    requires { l <= u } ensures { l <= result <= u }
+
+  let binary_search (a :array int) (v : int) : int
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = [@vc:sp]
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < length a }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+      variant { !u - !l }
+      let m = midpoint !l !u in
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
+
+end
+
+(* binary search using 32-bit integers *)
+
+module BinarySearchInt32
+
+  use import int.Int
+  use import mach.int.Int32
+  use import ref.Ref
+  use import mach.array.Array32
+
+  (* the code and its specification *)
+
+  exception Not_found   (* raised to signal a search failure *)
+
+  let binary_search (a : array int32) (v : int32) : int32
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < a.length ->
+               a[i1] <= a[i2] }
+    ensures  { 0 <= result < a.length /\ a[result] = v }
+    raises   { Not_found ->
+                 forall i:int. 0 <= i < a.length -> a[i] <> v }
+  = [@vc:sp]
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < a.length }
+      invariant { forall i : int. 0 <= i < a.length ->
+                  a[i] = v -> !l <= i <= !u }
+      variant   { !u - !l }
+      let m = !l + (!u - !l) / 2 in
+      assert { !l <= m <= !u };
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
+
+end
+
+(* A particular case with Boolean values (0 or 1) and a sentinel 1 at the end.
+   We look for the first position containing a 1. *)
+
+module BinarySearchBoolean
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import array.Array
+
+  let binary_search (a: array int) : int
+    requires { 0 < a.length }
+    requires { forall i j. 0 <= i <= j < a.length -> 0 <= a[i] <= a[j] <= 1 }
+    requires { a[a.length - 1] = 1 }
+    ensures  { 0 <= result < a.length }
+    ensures  { a[result] = 1 }
+    ensures  { forall i. 0 <= i < result -> a[i] = 0 }
+  = [@vc:sp]
+    let lo = ref 0 in
+    let hi = ref (length a - 1) in
+    while !lo < !hi do
+      invariant { 0 <= !lo <= !hi < a.length }
+      invariant { a[!hi] = 1 }
+      invariant { forall i. 0 <= i < !lo -> a[i] = 0 }
+      variant   { !hi - !lo }
+      let mid = !lo + div (!hi - !lo) 2 in
+      if a[mid] = 1 then
+        hi := mid
+      else
+        lo := mid + 1
+    done;
+    !lo
+
+end

@@ -2,257 +2,52 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../unraveling_a_card_trick.mlw">
-<theory name="GilbreathCardTrickPure" sum="89a1923ea61027cfed5e32434adeacd0">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../unraveling_a_card_trick.mlw" expanded="true">
+<theory name="GilbreathCardTrickPure" sum="97f4d57607030ec2c6b15a087ebbc9f7" expanded="true">
  <goal name="shuffle_nil_nil_nil" expl="">
- <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="shuffle_sym" expl="">
  <transf name="induction_pr">
   <goal name="shuffle_sym.1" expl="">
-  <proof prover="2" timelimit="6"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="shuffle_sym.2" expl="">
-  <proof prover="2" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="shuffle_sym.3" expl="">
-  <proof prover="2" timelimit="6"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="shuffle_sym.4" expl="">
-  <proof prover="2" timelimit="6"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="shuffle_length" expl="">
- <transf name="induction_pr">
+ <goal name="shuffle_length" expl="" expanded="true">
+ <transf name="induction_pr" expanded="true">
   <goal name="shuffle_length.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2" timelimit="6"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="shuffle_length.2" expl="">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" timelimit="6"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="shuffle_length.3" expl="">
+  <goal name="shuffle_length.3" expl="" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="shuffle_length.4" expl="">
+  <goal name="shuffle_length.4" expl="" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="GilbreathCardTrick" sum="86ea96b5a7a96a828c175adbdc6ee466">
- <goal name="WP_parameter shuffle" expl="VC for shuffle">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter shuffle.1" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.2" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.3" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.5" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.6" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.7" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.8" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.9" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.10" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.11" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.12" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.13" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.14" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.15" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.16" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.17" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.18" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.19" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.20" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.21" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.22" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.23" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.24" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.25" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="62"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.26" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.05" steps="128"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.27" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.28" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="93"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.29" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.30" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.31" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="62"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.32" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.33" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.16" steps="126"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.34" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.35" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.36" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.37" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.38" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.39" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.07" steps="131"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.40" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.41" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.42" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.43" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.44" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.45" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.16" steps="133"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.46" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.47" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.48" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.49" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.50" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.51" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter shuffle.52" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
- </transf>
+<theory name="GilbreathCardTrick" sum="c633e7d045e5dba0c20e57011bae4a9a">
+ <goal name="VC shuffle" expl="VC for shuffle">
+ <proof prover="1"><result status="valid" time="2.17" steps="3619"/></proof>
  </goal>
- <goal name="WP_parameter card_trick" expl="VC for card_trick">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter card_trick.1" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter card_trick.2" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter card_trick.2.1" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
-   </goal>
-   <goal name="WP_parameter card_trick.2.2" expl="VC for card_trick">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.04"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter card_trick.3" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter card_trick.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter card_trick.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter card_trick.5.1" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
-   </goal>
-   <goal name="WP_parameter card_trick.5.2" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
-   </goal>
-   <goal name="WP_parameter card_trick.5.3" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter card_trick.6" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter card_trick.7" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter card_trick.7.1" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
-   </goal>
-   <goal name="WP_parameter card_trick.7.2" expl="VC for card_trick">
-   <proof prover="2"><result status="valid" time="0.28" steps="195"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <goal name="VC card_trick" expl="VC for card_trick">
+ <proof prover="1"><result status="valid" time="0.16" steps="607"/></proof>
  </goal>
 </theory>
 </file>

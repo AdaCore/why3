@@ -32,12 +32,12 @@ module FastExponentiation
     while !e > 0 do
       invariant { 0 <= !e /\ !r * power !p !e = power x n }
       variant   { !e }
-      'L:
+      label L in
       if mod !e 2 = 1 then r := !r * !p;
       p := !p * !p;
       e := div !e 2;
       assert { power !p !e =
-               let x = power (at !p 'L) !e in x * x }
+               let x = power (!p at L) !e in x * x }
     done;
     !r
 

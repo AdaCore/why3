@@ -6,17 +6,21 @@
 module TortoiseAndHare
 
   use import int.Int
+  use int.Iter
+
+
+  type t
+  val predicate eq (x y : t)
+    ensures { result <-> x = y }
 
   (* let f be a function from t to t *)
-  type t
-  function f t : t
+  val function f t : t
 
   (* given some initial value x0 *)
-  constant x0: t
+  val constant x0: t
 
   (* we can build the infinite sequence defined by x{i+1} = f(xi) *)
-  clone import int.Iter with type t = t, function f = f
-  function x (i: int): t = iter i x0
+  function x (i: int): t = Iter.iter f i x0
 
   (* let use assume now that the sequence (x_i) has finitely many distinct
      values (e.g. f is an integer function with values in 0..m)
@@ -69,7 +73,7 @@ module TortoiseAndHare
   let tortoise_hare () =
     let tortoise = ref (f x0) in
     let hare = ref (f (f x0)) in
-    while !tortoise <> !hare do
+    while not (eq !tortoise !hare) do
       invariant {
         exists t: int.
         1 <= t <= mu+lambda /\ !tortoise = x t /\ !hare = x (2 * t) /\

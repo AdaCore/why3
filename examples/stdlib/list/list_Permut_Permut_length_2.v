@@ -156,8 +156,8 @@ Ltac cvc := why3 "CVC4,1.4,"; admit.
 (* Why3 goal *)
 Theorem Permut_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
   a)) (l2:(list a)), (permut l1 l2) -> ((length l1) = (length l2)).
-(* Why3 intros a a_WT l1 l2 h1. *)
-intros a a_WT l1 l2 h1.
+(* Why3 intros l1 l2 h1. *)
+intros l1 l2 h1.
 generalize dependent l2.
 induction l1; intros.
 destruct l2.
