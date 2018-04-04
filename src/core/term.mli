@@ -56,6 +56,9 @@ val create_lsymbol :
 
 val create_fsymbol :
   ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
+(** ~constr is the number of constructors of the type in which the
+   symbol is a constructor otherwise it must be the default 0. *)
+
 
 val create_psymbol :
   ?opaque:Stv.t -> preid -> ty list -> lsymbol
