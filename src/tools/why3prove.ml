@@ -244,6 +244,8 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let unproved = ref false
+
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
@@ -256,7 +258,8 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
-          Call_provers.print_prover_result res
+          Call_provers.print_prover_result res;
+        if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
@@ -357,7 +360,8 @@ let () =
   try
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
-    Queue.iter (do_input env drv) opt_queue
+    Queue.iter (do_input env drv) opt_queue;
+    if !unproved then exit 1
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
