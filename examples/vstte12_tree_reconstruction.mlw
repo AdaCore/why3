@@ -222,7 +222,7 @@ module ZipperBased
   (* an easy lemma on [g] *)
 
   lemma g_append:
-    forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l1
+    forall l1 [@induction] l2: list (int, tree). g (l1 ++ l2) -> g l1
 
   (* key lemma for completeness: whenever we fail because [right] is empty,
      we have to prove that there is no solution

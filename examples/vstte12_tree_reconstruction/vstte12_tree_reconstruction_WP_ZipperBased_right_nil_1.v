@@ -20,70 +20,79 @@ Existing Instance tree_WhyType.
 Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
   | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
-  | (Node l r) => (Init.Datatypes.app (depths (d + 1%Z)%Z
-      l) (depths (d + 1%Z)%Z r))
+  | Node l r =>
+      (Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
   end.
 
-Axiom depths_head : forall (t:tree) (d:Z), match (depths d
-  t) with
+Axiom depths_head :
+  forall (t:tree) (d:Z),
+  match depths d t with
   | (Init.Datatypes.cons x _) => (d <= x)%Z
   | Init.Datatypes.nil => False
   end.
 
-Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
-  (s2:(list Z)), ((Init.Datatypes.app (depths d
-  t1) s1) = (Init.Datatypes.app (depths d t2) s2)) -> ((t1 = t2) /\
-  (s1 = s2)).
+Axiom depths_unique :
+  forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z)) (s2:(list Z)),
+  ((Init.Datatypes.app (depths d t1) s1) =
+   (Init.Datatypes.app (depths d t2) s2)) ->
+  (t1 = t2) /\ (s1 = s2).
 
-Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z))
-  (s2:(list Z)), ((Init.Datatypes.app (depths d1
-  t) s1) = (Init.Datatypes.app (depths d2 t) s2)) -> (d1 = d2).
+Axiom depths_prefix :
+  forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list Z)),
+  ((Init.Datatypes.app (depths d1 t) s1) =
+   (Init.Datatypes.app (depths d2 t) s2)) ->
+  (d1 = d2).
 
-Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
-  t) = (depths d2 t)) -> (d1 = d2).
+Axiom depths_prefix_simple :
+  forall (t:tree) (d1:Z) (d2:Z), ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
 
-Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z)
-  (s1:(list Z)), ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) ->
-  (d2 <= d1)%Z.
+Axiom depths_subtree :
+  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list Z)),
+  ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
 
-Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
-  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
+Axiom depths_unique2 :
+  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),
+  ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
 
 (* Why3 assumption *)
 Fixpoint forest_depths (f:(list (Z* tree)%type)) {struct f}: (list Z) :=
   match f with
   | Init.Datatypes.nil => Init.Datatypes.nil
-  | (Init.Datatypes.cons (d, t) r) => (Init.Datatypes.app (depths d
-      t) (forest_depths r))
+  | (Init.Datatypes.cons (d, t) r) =>
+      (Init.Datatypes.app (depths d t) (forest_depths r))
   end.
 
-Axiom forest_depths_append : forall (f1:(list (Z* tree)%type)) (f2:(list (Z*
-  tree)%type)),
-  ((forest_depths (Init.Datatypes.app f1 f2)) = (Init.Datatypes.app (forest_depths f1) (forest_depths f2))).
+Axiom forest_depths_append :
+  forall (f1:(list (Z* tree)%type)) (f2:(list (Z* tree)%type)),
+  ((forest_depths (Init.Datatypes.app f1 f2)) =
+   (Init.Datatypes.app (forest_depths f1) (forest_depths f2))).
 
 (* Why3 assumption *)
-Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop := (~ (d = d1)) /\
+Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop :=
+  ~ (d = d1) /\
   match t1 with
   | Leaf => True
-  | (Node l1 _) => (greedy d (d1 + 1%Z)%Z l1)
+  | Node l1 _ => greedy d (d1 + 1%Z)%Z l1
   end.
 
 (* Why3 assumption *)
 Inductive g: (list (Z* tree)%type) -> Prop :=
-  | Gnil : (g Init.Datatypes.nil)
-  | Gone : forall (d:Z) (t:tree), (g (Init.Datatypes.cons (d,
-      t) Init.Datatypes.nil))
-  | Gtwo : forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z*
-      tree)%type)), (greedy d1 d2 t2) -> ((g (Init.Datatypes.cons (d1,
-      t1) l)) -> (g (Init.Datatypes.cons (d2, t2) (Init.Datatypes.cons (d1,
-      t1) l)))).
+  | Gnil : g Init.Datatypes.nil
+  | Gone :
+      forall (d:Z) (t:tree),
+      g (Init.Datatypes.cons (d, t) Init.Datatypes.nil)
+  | Gtwo :
+      forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z* tree)%type)),
+      (greedy d1 d2 t2) -> (g (Init.Datatypes.cons (d1, t1) l)) ->
+      g (Init.Datatypes.cons (d2, t2) (Init.Datatypes.cons (d1, t1) l)).
 
-Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
-  tree)%type)), (g (Init.Datatypes.app l1 l2)) -> (g l1).
+Axiom g_append :
+  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
+  (g (Init.Datatypes.app l1 l2)) -> g l1.
 
 Require Import Why3. 
-Ltac z := why3 "Z3,4.5.0," timelimit 5; admit.
-Ltac ae := why3 "Alt-Ergo,1.30,"; admit.
+Ltac z := why3 "Z3,4.4.1," timelimit 5; admit.
+Ltac ae := why3 "Alt-Ergo,2.0.0,"; admit.
 
 Lemma depths_length: forall t d, (Length.length (depths d t) >= 1)%Z.
   induction t; simpl.
@@ -201,9 +210,10 @@ z.
 Admitted.
 
 (* Why3 goal *)
-Theorem right_nil : forall (l:(list (Z* tree)%type)),
-  (2%Z <= (list.Length.length l))%Z -> ((g l) -> forall (t:tree) (d:Z),
-  ~ ((forest_depths (Lists.List.rev l)) = (depths d t))).
+Theorem right_nil :
+  forall (l:(list (Z* tree)%type)), (2%Z <= (list.Length.length l))%Z ->
+  (g l) -> forall (t:tree) (d:Z),
+  ~ ((forest_depths (Lists.List.rev l)) = (depths d t)).
 (* Why3 intros l h1 h2 t d. *)
 intros l H hg.
 replace l with (List.rev (List.rev l)) in H, hg by z.
