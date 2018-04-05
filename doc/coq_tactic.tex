@@ -2,10 +2,11 @@
 \label{sec:coqtactic}
 
 \why provides a Coq tactic to call external theorem provers as oracles.
+This tactic is deprecated and might be removed in future versions of \why.
 
 \subsubsection{Installation}
 
-You need Coq version 8.4 or greater. If this is the case, \why's
+You need Coq version 8.5 or greater. If this is the case, \why's
 configuration detects it, then compiles and installs the Coq tactic.
 The Coq tactic is installed in
 \begin{center}
@@ -16,12 +17,8 @@ by \verb+why3 --print-libdir+. This directory
 is automatically added to Coq's load path if you are
 calling Coq via \why (from \texttt{why3 ide}, \texttt{why3 replay},
 etc.). If you are calling Coq by yourself, you need to add
-this directory to Coq's load path, either using Coq's command line
-option \texttt{-I} or by adding
-\begin{center}
-  \verb+Add LoadPath "+\textit{why3-lib-dir}\verb+/coq-tactic/".+
-\end{center}
-to your \texttt{\~{}/.coqrc} resource file.
+this directory to Coq's load path using Coq's command line
+options \texttt{-I} and \texttt{-R}.
 
 \subsubsection{Usage}
 
@@ -34,8 +31,8 @@ The string \textit{prover-name} identifies one of the automated theorem provers
 supported by \why, as reported by \verb+why3 --list-provers+
 (interactive provers excluded).
 \index{list-provers@\verb+--list-provers+}
-The current goal is then translated to \why's logic and the prover is
-called. If it reports the goal to be valid, then Coq's \texttt{admit}
+The tactics translates the current goal to \why's logic and then calls the prover.
+If it reports the goal to be valid, then Coq's \texttt{admit}
 tactic is used to assume the goal. The prover is called with a time
 limit in seconds as given by \why's configuration file
 (see Section~\ref{sec:whyconffile}). A different value may be given
