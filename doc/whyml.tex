@@ -1,25 +1,32 @@
-\chapter{The \whyml Programming Language}
+\chapter{The \whyml Language}
 \label{chap:whyml}
 %HEVEA\cutname{whyml.html}
 
-This chapter describes the \whyml programming language.
-A \whyml input text contains a list of modules (as in
-Chapter~\ref{chap:syntax}), where logical declarations are extended
-with \emph{program declarations}.
-%% Programs can use all types, symbols, and constructs from the logic.
-This includes:
+This chapter describes the \whyml specification and programming
+language.  A \whyml source file has suffix \texttt{.mlw}. It contains
+a list of modules. Each module contains a list of
+declarations. These includes
 \begin{itemize}
 \item
+  Logical declarations:
+  \begin{itemize}
+  \item types (abstract, record, or algebraic data types);
+  \item functions and predicates;
+  \item axioms, lemmas, and goals.
+  \end{itemize}
+\item
+  Program data types.
   In a record type declaration, some fields can be declared
   \texttt{mutable} and/or \texttt{ghost}.
   Additionally, a record type can be declared \texttt{abstract} (its
   fields are only visible in ghost code / specification).
+% \item
+%   In an algebraic type declaration (this includes record types), an
+%   invariant can be specified.
+%   %% FIXME vrai aussi dans la logique, non ?
 \item
-  In an algebraic type declaration (this includes record types), an
-  invariant can be specified.
-  %% FIXME vrai aussi dans la logique, non ?
-\item
-  There are programming constructs with no counterpart in the logic:
+  Program declarations and definitions.
+  Programs include many constructs with no counterpart in the logic:
   \begin{itemize}
   \item mutable field assignment;
   \item sequence;
@@ -29,12 +36,11 @@ This includes:
   \item ghost parameters and ghost code;
   \item annotations: pre- and postconditions, assertions, loop invariants.
   \end{itemize}
-\item
-  A program function can be non-terminating. (But termination can be
+  A program may be non-terminating. (But termination can be
   proved if we wish.)
 \end{itemize}
 %
-Command-line tools described in the previous chapters also apply to
+Command-line tools described in the previous chapter also apply to
 files containing programs. For instance
 \begin{verbatim}
 > why3 prove myfile.mlw
@@ -49,11 +55,180 @@ All this can be performed within the GUI tool \texttt{why3 ide} as well.
 See Chapter~\ref{chap:manpages} for more details regarding command lines.
 
 \medskip
-As an introduction to \whyml, we use the five problems from the VSTTE
+As an introduction to \whyml, we use a small logical puzzle
+(Sec.~\ref{sec:Einstein}) and then the five problems from the VSTTE
 2010 verification competition~\cite{vstte10comp}.
 The source code for all these examples is contained in \why's
 distribution, in sub-directory \texttt{examples/}. Look for files
-named \texttt{vstte10\_xxx.mlw}.
+\texttt{logic/einstein.why} and \texttt{vstte10\_xxx.mlw}.
+
+\section{Problem 0: Einstein's Problem}
+\label{sec:Einstein}
+\index{Einstein's logic problem}
+
+Let us use \why
+to solve a little puzzle known as ``Einstein's logic
+problem''.%
+%BEGIN LATEX
+\footnote{This \why example was contributed by St\'ephane Lescuyer.}
+%END LATEX
+%HEVEA {} (This \why example was contributed by St\'ephane Lescuyer.)
+The problem is stated as follows. Five persons, of five
+different nationalities, live in five houses in a row, all
+painted with different colors.
+These five persons own different pets, drink different beverages, and
+smoke different brands of cigars.
+We are given the following information:
+\begin{itemize}
+\item The Englishman lives in a red house;
+
+\item The Swede has dogs;
+
+\item The Dane drinks tea;
+
+\item The green house is on the left of the white one;
+
+\item The green house's owner drinks coffee;
+
+\item The person who smokes Pall Mall has birds;
+
+\item The yellow house's owner smokes Dunhill;
+
+\item In the house in the center lives someone who drinks milk;
+
+\item The Norwegian lives in the first house;
+
+\item The man who smokes Blends lives next to the one who has cats;
+
+\item The man who owns a horse lives next to the one who smokes Dunhills;
+
+\item The man who smokes Blue Masters drinks beer;
+
+\item The German smokes Prince;
+
+\item The Norwegian lives next to the blue house;
+
+\item The man who smokes Blends has a neighbour who drinks water.
+\end{itemize}
+The question is: what is the nationality of the fish's owner?
+
+We start by introducing a general-purpose theory defining the notion
+of \emph{bijection}, as two abstract types together with two functions from
+one to the other and two axioms stating that these functions are
+inverse of each other.
+\begin{whycode}
+theory Bijection
+  type t
+  type u
+
+  function of t : u
+  function to_ u : t
+
+  axiom To_of : forall x : t. to_ (of x) = x
+  axiom Of_to : forall y : u. of (to_ y) = y
+end
+\end{whycode}
+
+We now start a new theory, \texttt{Einstein}, which will contain all
+the individuals of the problem.
+\begin{whycode}
+theory Einstein "Einstein's problem"
+\end{whycode}
+First, we introduce enumeration types for houses, colors, persons,
+drinks, cigars, and pets.
+\begin{whycode}
+  type house  = H1 | H2 | H3 | H4 | H5
+  type color  = Blue | Green | Red | White | Yellow
+  type person = Dane | Englishman | German | Norwegian | Swede
+  type drink  = Beer | Coffee | Milk | Tea | Water
+  type cigar  = Blend | BlueMaster | Dunhill | PallMall | Prince
+  type pet    = Birds | Cats | Dogs | Fish | Horse
+\end{whycode}
+We now express that each house is associated bijectively to a color,
+by \emph{cloning} the \texttt{Bijection} theory appropriately.
+\begin{whycode}
+  clone Bijection as Color with type t = house, type u = color
+\end{whycode}
+Cloning a theory makes a copy of all its declarations, possibly in
+combination with a user-provided substitution. Here we substitute
+type \texttt{house} for type \texttt{t} and type \texttt{color}
+for type \texttt{u}.
+As a result, we get two new functions, namely \texttt{Color.of} and
+\texttt{Color.to\_}, from houses to colors and colors to houses,
+respectively, and two new axioms relating them.
+Similarly, we express that each house is associated bijectively to a
+person
+\begin{whycode}
+  clone Bijection as Owner with type t = house, type u = person
+\end{whycode}
+and that drinks, cigars, and pets are all associated bijectively to persons:
+\begin{whycode}
+  clone Bijection as Drink with type t = person, type u = drink
+  clone Bijection as Cigar with type t = person, type u = cigar
+  clone Bijection as Pet   with type t = person, type u = pet
+\end{whycode}
+Next, we need a way to state that a person lives next to another. We
+first define a predicate \texttt{leftof} over two houses.
+\begin{whycode}
+  predicate leftof (h1 h2 : house) =
+    match h1, h2 with
+    | H1, H2
+    | H2, H3
+    | H3, H4
+    | H4, H5 -> true
+    | _      -> false
+    end
+\end{whycode}
+Note how we advantageously used pattern matching, with an or-pattern
+for the four positive cases and a universal pattern for the remaining
+21 cases. It is then immediate to define a \texttt{neighbour}
+predicate over two houses, which completes theory \texttt{Einstein}.
+\begin{whycode}
+  predicate rightof (h1 h2 : house) =
+    leftof h2 h1
+  predicate neighbour (h1 h2 : house) =
+    leftof h1 h2 \/ rightof h1 h2
+end
+\end{whycode}
+
+The next theory contains the 15 hypotheses. It starts by importing
+theory \texttt{Einstein}.
+\begin{whycode}
+theory EinsteinHints "Hints"
+  use import Einstein
+\end{whycode}
+Then each hypothesis is stated in terms of \texttt{to\_} and \texttt{of}
+functions. For instance, the hypothesis ``The Englishman lives in a
+red house'' is declared as the following axiom.
+\begin{whycode}
+  axiom Hint1: Color.of (Owner.to_ Englishman) = Red
+\end{whycode}
+And so on for all other hypotheses, up to
+``The man who smokes Blends has a neighbour who drinks water'', which completes
+this theory.
+\begin{whycode}
+  ...
+  axiom Hint15:
+    neighbour (Owner.to_ (Cigar.to_ Blend)) (Owner.to_ (Drink.to_ Water))
+end
+\end{whycode}
+Finally, we declare the goal in a fourth theory:
+\begin{whycode}
+theory Problem "Goal of Einstein's problem"
+  use import Einstein
+  use import EinsteinHints
+
+  goal G: Pet.to_ Fish = German
+end
+\end{whycode}
+and we can use \why to discharge this goal with any prover
+of our choice.
+\begin{verbatim}
+> why3 prove -P alt-ergo einstein.why
+einstein.why Goals G: Valid (1.27s, 989 steps)
+\end{verbatim}
+The source code for this puzzle is available in the source
+distribution of \why, in file \verb|examples/logic/einstein.why|.
 
 \section{Problem 1: Sum and Maximum}
 \label{sec:MaxAndSum}
