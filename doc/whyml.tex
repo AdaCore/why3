@@ -233,6 +233,8 @@ distribution of \why, in file \verb|examples/logic/einstein.why|.
 \section{Problem 1: Sum and Maximum}
 \label{sec:MaxAndSum}
 
+Let us now move to the problems of the VSTTE 2010  verification
+competition~\cite{vstte10comp}.
 The first problem is stated as follows:
 \begin{quote}
   Given an $N$-element array of natural numbers,
@@ -359,7 +361,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 1}
+  \caption{Solution for VSTTE'10 competition problem 1.}
   \label{fig:MaxAndSum}
 \end{figure}
 %END LATEX
@@ -475,7 +477,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 2}
+  \caption{Solution for VSTTE'10 competition problem 2.}
   \label{fig:Inverting}
 \end{figure}
 %END LATEX
@@ -602,7 +604,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 3}
+  \caption{Solution for VSTTE'10 competition problem 3.}
   \label{fig:LinkedList}
 \end{figure}
 %END LATEX
@@ -774,7 +776,7 @@ module NQueens
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 4 (1/2)}
+  \caption{Solution for VSTTE'10 competition problem 4 (1/2).}
   \label{fig:NQueens1}
 \end{figure}
 %END LATEX
@@ -923,7 +925,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 4 (2/2)}
+  \caption{Solution for VSTTE'10 competition problem 4 (2/2).}
   \label{fig:NQueens2}
 \end{figure}
 %END LATEX
@@ -956,19 +958,20 @@ module AmortizedQueue
   use export list.ListRich
 \end{whycode}
 The queue data type is naturally introduced as a polymorphic record type.
-The two list lengths are explicitly stored, for better efficiency.
+The two list lengths are explicitly stored, for greater efficiency.
 \begin{whycode}
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
-  invariant {
-    length self.front = self.lenf >= length self.rear = self.lenr }
+  invariant { length front = lenf >= length rear = lenr }
+  by { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 \end{whycode}
 The type definition is accompanied with an invariant ---
 a logical property imposed on any value of the type.
 \why assumes that any \texttt{queue} passed as an argument to
 a program function satisfies the invariant and it produces
-a proof obligation every time a \texttt{queue} is created
-or modified in a program.
+a proof obligation every time a \texttt{queue} is created.
+The \texttt{by} clause ensures the non-vacuity of this type with
+invariant. If you omit it, a goal with an existential statement is generated.
 
 For the purpose of the specification, it is convenient to introduce a function
 \texttt{sequence} which builds the sequence of elements of a queue, that
@@ -976,12 +979,13 @@ is the front list concatenated to the reversed rear list.
 \begin{whycode}
   function sequence (q: queue 'a) : list 'a = q.front ++ reverse q.rear
 \end{whycode}
-It is worth pointing out that this function will only be used in
+It is worth pointing out that this function can only be used in
 specifications.
 We start with the easiest operation: building the empty queue.
 \begin{whycode}
-  let empty () ensures { sequence result = Nil }
-  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 } : queue 'a
+  let empty () : queue 'a
+    ensures { sequence result = Nil }
+  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 \end{whycode}
 The postcondition states that the returned queue represents
 the empty sequence. Another postcondition, saying that the
@@ -994,29 +998,27 @@ a given queue \texttt{q}. It naturally requires the queue to be non
 empty, which is conveniently expressed as \texttt{sequence q} not
 being \texttt{Nil}.
 \begin{whycode}
-  let head (q: queue 'a)
+  let head (q: queue 'a) : 'a
     requires { sequence q <> Nil }
-    ensures { hd (sequence q) = Some result }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons x _ -> x
-    end
+    ensures  { hd (sequence q) = Some result }
+  = let Cons x _ = q.front in x
 \end{whycode}
-That the argument \texttt{q} satisfies the type invariant is
+The fact that the argument \texttt{q} satisfies the type invariant is
 implicitly assumed. The type invariant is
-required to prove the absurdity of the first branch (if
-\texttt{q.front} is \texttt{Nil}, then so should be \texttt{sequence q}).
+required to prove the absurdity of
+\texttt{q.front} being \texttt{Nil}
+(otherwise, \texttt{sequence q} would be \texttt{Nil} as well).
 
 The next operation is \texttt{tail}, which removes the first element
 from a given queue. This is more subtle than \texttt{head}, since we
 may have to re-structure the queue to maintain the invariant.
-Since we will have to perform a similar operation when implementation
-operation \texttt{enqueue}, it is a good idea to introduce a smart
-constructor \texttt{create} which builds a queue from two lists, while
+Since we will have to perform a similar operation when implementing
+operation \texttt{enqueue} later, it is a good idea to introduce a smart
+constructor \texttt{create} that builds a queue from two lists while
 ensuring the invariant. The list lengths are also passed as arguments,
 to avoid unnecessary computations.
 \begin{whycode}
-  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int)
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) : queue 'a
     requires { lf = length f /\ lr = length r }
     ensures  { sequence result = f ++ reverse r }
   = if lf >= lr then
@@ -1033,19 +1035,17 @@ will be amortized over all queue operations. Implementing function
 \texttt{tail} is now straightforward and follows the structure of
 function \texttt{head}.
 \begin{whycode}
-  let tail (q: queue 'a)
+  let tail (q: queue 'a) : queue 'a
     requires { sequence q <> Nil }
     ensures  { tl (sequence q) = Some (sequence result) }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
-    end
+  = let Cons _ r = q.front in
+    create r (q.lenf - 1) q.rear q.lenr
 \end{whycode}
 The last operation is \texttt{enqueue}, which pushes a new element in
 a given queue. Reusing the smart constructor \texttt{create} makes it
 a one line code.
 \begin{whycode}
-  let enqueue (x: 'a) (q: queue 'a)
+  let enqueue (x: 'a) (q: queue 'a) : queue 'a
     ensures { sequence result = sequence q ++ Cons x Nil }
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 \end{whycode}
@@ -1060,28 +1060,29 @@ The verification conditions are all discharged automatically.
 %END LATEX
 \begin{whycode}
 module AmortizedQueue
+
   use import int.Int
-  use export list.ListRich
+  use import option.Option
+  use import list.ListRich
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
-  invariant {
-    length self.front = self.lenf >= length self.rear = self.lenr }
+    invariant { length front = lenf >= length rear = lenr }
+    by { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
-  function sequence (q: queue 'a) : list 'a = q.front ++ reverse q.rear
+  function sequence (q: queue 'a) : list 'a =
+    q.front ++ reverse q.rear
 
-  let empty () ensures { sequence result = Nil }
-  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 } : queue 'a
+  let empty () : queue 'a
+    ensures { sequence result = Nil }
+  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
-  let head (q: queue 'a)
+  let head (q: queue 'a) : 'a
     requires { sequence q <> Nil }
-    ensures { hd (sequence q) = Some result }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons x _ -> x
-    end
+    ensures  { hd (sequence q) = Some result }
+  = let Cons x _ = q.front in x
 
-  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int)
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) : queue 'a
     requires { lf = length f /\ lr = length r }
     ensures  { sequence result = f ++ reverse r }
   = if lf >= lr then
@@ -1090,22 +1091,21 @@ module AmortizedQueue
       let f = f ++ reverse r in
       { front = f; lenf = lf + lr; rear = Nil; lenr = 0 }
 
-  let tail (q: queue 'a)
+  let tail (q: queue 'a) : queue 'a
     requires { sequence q <> Nil }
     ensures  { tl (sequence q) = Some (sequence result) }
-  = match q.front with
-      | Nil      -> absurd
-      | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
-    end
+  = let Cons _ r = q.front in
+    create r (q.lenf - 1) q.rear q.lenr
 
-  let enqueue (x: 'a) (q: queue 'a)
+  let enqueue (x: 'a) (q: queue 'a) : queue 'a
     ensures { sequence result = sequence q ++ Cons x Nil }
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
+
 end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 5}
+  \caption{Solution for VSTTE'10 competition problem 5.}
   \label{fig:AQueue}
 \end{figure}
 %END LATEX
