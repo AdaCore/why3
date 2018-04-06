@@ -1,0 +1,29 @@
+
+module List_int
+
+  use import int.Int
+  
+  type list = Nil | Cons int list
+  
+  function length (l:list) : int = 
+    match l with
+    | Nil -> 0
+    | Cons _ l -> 1 + length l
+    end
+   
+  goal g1: forall l:list. length l <> 0
+
+  goal g2: forall l:list. length l <> 1
+  
+end
+
+module List_poly
+
+  use import list.List
+  use import list.Length
+  
+  goal g1: forall l:list int. length l <> 0
+
+  goal g2: forall l:list int. length l <> 1
+  
+end
