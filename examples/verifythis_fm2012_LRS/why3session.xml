@@ -352,13 +352,9 @@
   <goal name="VC lrs.20" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC lrs.20.0" expl="postcondition" proved="true">
-   <transf name="instantiate" proved="true" arg1="H7" arg2="x">
+   <transf name="instantiate" proved="true" arg1="H7" arg2="x,y">
     <goal name="VC lrs.20.0.0" expl="postcondition" proved="true">
-    <transf name="instantiate" proved="true" arg1="Hinst" arg2="y">
-     <goal name="VC lrs.20.0.0.0" expl="postcondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.04"/></proof>
-     </goal>
-    </transf>
+    <proof prover="2"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>

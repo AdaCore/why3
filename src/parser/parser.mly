@@ -1307,6 +1307,7 @@ qualid_comma_list_eof:
 ident_comma_list_eof:
 | comma_list1(ident) EOF { $1 }
 
-(* TODO: Weird to not have any parser conflicts here *)
 term_comma_list_eof:
-| comma_list1(term) EOF { $1 }
+| comma_list1(single_term) EOF { $1 }
+(* we use single_term to avoid conflict with tuples, that
+   do not need parentheses *)
