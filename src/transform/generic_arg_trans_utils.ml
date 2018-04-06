@@ -59,7 +59,10 @@ let subst_quant_list quant term_quant list_term : term =
     match list_term, vsl with
     | t :: lt_tl, v :: vsl_tl ->
         let (ty_subst, _) =
-          Reduction_engine.first_order_matching (Svs.add v Svs.empty) [Term.t_var v] [t]
+          try
+            Reduction_engine.first_order_matching (Svs.add v Svs.empty) [Term.t_var v] [t]
+          with Reduction_engine.NoMatch _e ->
+            raise (Arg_trans (Format.asprintf "cannot match %a with %a" Pretty.print_term (Term.t_var v) Pretty.print_term t))
         in
         create_mvs lt_tl vsl_tl (Mvs.add v t acc)
           (Ty.Mtv.union (fun _ _ y -> Some y) ty_subst acc_ty)
@@ -70,7 +73,7 @@ let subst_quant_list quant term_quant list_term : term =
   let (ty_subst, m_subst), variables_remaining =
     try
       create_mvs list_term vsl Mvs.empty Ty.Mtv.empty
-    with _ -> raise (Arg_trans ("subst_quant_list"))
+    with exn -> raise (Arg_trans (Format.asprintf "subst_quant_list: exception %a" Exn_printer.exn_printer exn))
   in
   try
     let new_t = t_ty_subst ty_subst m_subst te in
