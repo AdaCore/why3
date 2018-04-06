@@ -527,7 +527,8 @@ let () =
      *)
     Hstr.iter
       (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing)
+       source_view#set_editable gconfig.allow_source_editing;
+       source_view#set_auto_indent gconfig.allow_source_editing)
       source_view_table;
     send_session_config_to_server ()
   in
@@ -822,7 +823,7 @@ let create_source_view =
             ~packing:scrolled_source_view#add () in
         let source_view =
           GSourceView2.source_view
-            ~auto_indent:true
+            ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
