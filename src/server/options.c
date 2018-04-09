@@ -30,7 +30,7 @@ void parse_options(int argc, char **argv) {
   };
   while (1) {
      int option_index = 0;
-     char c = 0;
+     int c = 0;
      c = getopt_long (argc, argv, "j:s:",
                       long_options, &option_index);
      /* Detect the end of the options. */
