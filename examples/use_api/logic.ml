@@ -14,8 +14,11 @@
 This file builds some goals using the API and calls
 the alt-ergo prover to check them
 
+Note: the comments of the form BEGIN{id} and END{id} are there for automatic extraction
+of the chapter "The Why3 API" of the manual
 ******************)
 
+(* BEGIN{opening} *)
 (* opening the Why3 library *)
 open Why3
 
@@ -23,38 +26,52 @@ open Why3
 let fmla_true : Term.term = Term.t_true
 let fmla_false : Term.term = Term.t_false
 let fmla1 : Term.term = Term.t_or fmla_true fmla_false
+(* END{opening} *)
 
+(* BEGIN{printformula} *)
 (* printing it *)
 open Format
 let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
+(* END{printformula} *)
 
 
 (* a propositional goal: A and B implies A *)
 
-let prop_var_A : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "A") []
-let prop_var_B : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "B") []
+(* BEGIN{declarepropvars} *)
+let prop_var_A : Term.lsymbol =
+  Term.create_psymbol (Ident.id_fresh "A") []
+let prop_var_B : Term.lsymbol =
+  Term.create_psymbol (Ident.id_fresh "B") []
+(* END{declarepropvars} *)
+(* BEGIN{declarepropatoms} *)
 let atom_A : Term.term = Term.ps_app prop_var_A []
 let atom_B : Term.term = Term.ps_app prop_var_B []
-let fmla2 : Term.term = Term.t_implies (Term.t_and atom_A atom_B) atom_A
+let fmla2 : Term.term =
+  Term.t_implies (Term.t_and atom_A atom_B) atom_A
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
+(* END{declarepropatoms} *)
 
-
+(* BEGIN{buildtask} *)
 (* building the task for formula 1 alone *)
 let task1 : Task.task = None (* empty task *)
 let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1")
 let task1 : Task.task = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
+(* END{buildtask} *)
 
+(* BEGIN{printtask} *)
 (* printing the task *)
 let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
+(* END{printtask} *)
 
+(* BEGIN{buildtask2} *)
 (* task for formula 2 *)
 let task2 = None
 let task2 = Task.add_param_decl task2 prop_var_A
 let task2 = Task.add_param_decl task2 prop_var_B
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
-
 let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
+(* END{buildtask2} *)
 
 
 

@@ -1822,13 +1822,24 @@ doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/logic_%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
+
+OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
+	buildtask printtask buildtask2
+
+OCAMLCODE = $(addprefix doc/logic_, $(addsuffix .ml, $(OCAMLCODE_LOGIC)))
+
+doc/extract_ocaml_code: doc/extract_ocaml_code.ml
+	$(OCAMLC) str.cma -o $@ $<
+
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
       itp pvs coq coq_tactic isabelle
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
+doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 CLEANDIRS += doc

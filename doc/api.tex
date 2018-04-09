@@ -16,6 +16,7 @@ Section~\ref{sec:installlib}. The OCaml code given below is available in
 the source distribution in directory \verb|examples/use_api/| together
 with a few other examples.
 
+\lstset{language={[Objective]Caml}}
 
 \section{Building Propositional Formulas}
 
@@ -23,15 +24,7 @@ The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $\mathit{true} \lor
 \mathit{false}$.
-\begin{ocamlcode}
-(* opening the Why3 library *)
-open Why3
-
-(* a ground propositional goal: true or false *)
-let fmla_true : Term.term = Term.t_true
-let fmla_false : Term.term = Term.t_false
-let fmla1 : Term.term = Term.t_or fmla_true fmla_false
-\end{ocamlcode}
+\lstinputlisting{logic_opening.ml}
 The library uses the common type \texttt{term} both for terms
 (\ie expressions that produce a value of some particular type)
 and formulas (\ie boolean-valued expressions).
@@ -42,17 +35,12 @@ and formulas (\ie boolean-valued expressions).
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
-\begin{ocamlcode}
-(* printing it *)
-open Format
-let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
-\end{ocamlcode}
+\lstinputlisting{logic_printformula.ml}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
 \begin{verbatim}
-ocamlc str.cma unix.cma nums.cma dynlink.cma \
-        -I +ocamlgraph -I +why3 graph.cma why.cma f.ml -o f
+ocamlfind ocamlc -package why3 f.ml -o f
 \end{verbatim}
 Running the generated executable \texttt{f} results in the following output.
 \begin{verbatim}
@@ -62,23 +50,12 @@ formula 1 is: true \/ false
 Let us now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
-\begin{ocamlcode}
-let prop_var_A : Term.lsymbol =
-  Term.create_psymbol (Ident.id_fresh "A") []
-let prop_var_B : Term.lsymbol =
-  Term.create_psymbol (Ident.id_fresh "B") []
-\end{ocamlcode}
+\lstinputlisting{logic_declarepropvars.ml}
 The type \texttt{lsymbol} is the type of function and predicate symbols (which
 we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
 by the general function for applying a predicate symbol to a list of terms.
 Here we just need the empty list of arguments.
-\begin{ocamlcode}
-let atom_A : Term.term = Term.ps_app prop_var_A []
-let atom_B : Term.term = Term.ps_app prop_var_B []
-let fmla2 : Term.term =
-  Term.t_implies (Term.t_and atom_A atom_B) atom_A
-let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
-\end{ocamlcode}
+\lstinputlisting{logic_declarepropatoms.ml}
 
 As expected, the output is as follows.
 \begin{verbatim}
@@ -97,13 +74,7 @@ tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
 \texttt{add\_*\_decl} of module \texttt{Task}. For the formula $\mathit{true} \lor
 \mathit{false}$ above, this is done as follows.
-\begin{ocamlcode}
-let task1 : Task.task = None (* empty task *)
-let goal_id1 : Decl.prsymbol =
-  Decl.create_prsymbol (Ident.id_fresh "goal1")
-let task1 : Task.task =
-  Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
-\end{ocamlcode}
+\lstinputlisting{logic_buildtask.ml}
 To make the formula a goal, we must give a name to it, here ``goal1''. A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
@@ -115,23 +86,12 @@ Notice that lemmas are not allowed in tasks
 and can only be used in theories.
 
 Once a task is built, it can be printed.
-\begin{ocamlcode}
-(* printing the task *)
-let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
-\end{ocamlcode}
+\lstinputlisting{logic_printtask.ml}
 
 The task for our second formula is a bit more complex to build, because
 the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
-\begin{ocamlcode}
-(* task for formula 2 *)
-let task2 = None
-let task2 = Task.add_param_decl task2 prop_var_A
-let task2 = Task.add_param_decl task2 prop_var_B
-let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
-let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
-let () = printf "@[task 2 is:@\n%a@]@." Pretty.print_task task2
-\end{ocamlcode}
+\lstinputlisting{logic_buildtask2.ml}
 
 Execution of our OCaml program now outputs:
 \begin{verbatim}
