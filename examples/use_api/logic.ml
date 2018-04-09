@@ -159,22 +159,26 @@ An arithmetic goal: 2+2 = 4
 
 *)
 
+(* BEGIN{buildfmla} *)
 let two  : Term.term = Term.t_nat_const 2
 let four : Term.term = Term.t_nat_const 4
-
 let int_theory : Theory.theory = Env.read_theory env ["int"] "Int"
-
 let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
-
-let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
 let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two]
 let fmla3 : Term.term = Term.t_equ two_plus_two four
+(* END{buildfmla} *)
 
+(* BEGIN{buildtermalt} *)
+let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
+(* END{buildtermalt} *)
+
+(* BEGIN{buildtaskimport} *)
 let task3 = None
 let task3 = Task.use_export task3 int_theory
 let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3")
 let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
+(* END{buildtaskimport} *)
 
 (*
 let () = printf "@[task 3 created:@\n%a@]@." Pretty.print_task task3
@@ -191,21 +195,28 @@ let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
+(* BEGIN{quantfmla1} *)
 let zero : Term.term = Term.t_nat_const 0
-
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
-
 let ge_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
+(* END{quantfmla1} *)
 
+(* BEGIN{quantfmla2} *)
 let var_x : Term.vsymbol =
   Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
+(* END{quantfmla2} *)
 
+(* BEGIN{quantfmla3} *)
 let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
 let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
+(* END{quantfmla3} *)
+
+(* BEGIN{quantfmla4} *)
 let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
+(* END{quantfmla4} *)
 
 let task4 = None
 let task4 = Task.use_export task4 int_theory
@@ -226,53 +237,76 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 (* create a theory *)
 let () = printf "@[creating theory 'My_theory'@]@."
 
+(* BEGIN{buildth1} *)
 let my_theory : Theory.theory_uc =
   Theory.create_theory (Ident.id_fresh "My_theory")
+(* END{buildth1} *)
 
 (* add declarations of goals *)
 
 let () = printf "@[adding goal 1@]@."
-let decl_goal1 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
+(* BEGIN{buildth2} *)
+let decl_goal1 : Decl.decl =
+  Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal1
+(* END{buildth2} *)
 
 let () = printf "@[adding goal 2@]@."
-let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_A
-let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_B
+(* BEGIN{buildth3} *)
+let my_theory : Theory.theory_uc =
+  Theory.add_param_decl my_theory prop_var_A
+let my_theory : Theory.theory_uc =
+  Theory.add_param_decl my_theory prop_var_B
 let decl_goal2 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
+(* END{buildth3} *)
 
-(* helper function: [use th1 th2] insert the equivalent of a "use import th2"
-   in theory th1 under construction *)
+(* BEGIN{buildth4} *)
+(* helper function: [use th1 th2] insert the equivalent of a
+   "use import th2" in theory th1 under construction *)
 let use th1 th2 =
   let name = th2.Theory.th_name in
   Theory.close_namespace
-    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+    (Theory.use_export
+       (Theory.open_namespace th1 name.Ident.id_string) th2)
     true
+(* END{buildth4} *)
 
 let () = printf "@[adding goal 3@]@."
 (* use import int.Int *)
+(* BEGIN{buildth5} *)
 let my_theory : Theory.theory_uc = use my_theory int_theory
-let decl_goal3 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
+let decl_goal3 : Decl.decl =
+  Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal3
+(* END{buildth5} *)
 
 let () = printf "@[adding goal 4@]@."
-let decl_goal4 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
+(* BEGIN{buildth6} *)
+let decl_goal4 : Decl.decl =
+  Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal4
+(* END{buildth6} *)
 
 (* closing the theory *)
+(* BEGIN{buildth7} *)
 let my_theory : Theory.theory = Theory.close_theory my_theory
+(* END{buildth7} *)
 
 (* printing the result *)
-
-let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
+(* BEGIN{printtheory} *)
+let () = printf "@[my new theory is as follows:@\n@\n%a@]@."
+                Pretty.print_theory my_theory
+(* END{printtheory} *)
 
 (* getting set of task from a theory *)
-
+(* BEGIN{splittheory} *)
 let my_tasks : Task.task list =
   List.rev (Task.split_theory my_theory None None)
+(* END{splittheory} *)
 
-
+(* BEGIN{printalltasks} *)
 let () =
   printf "Tasks are:@.";
   let _ =
@@ -280,6 +314,7 @@ let () =
       (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
       1 my_tasks
   in ()
+(* END{printalltasks} *)
 
 
 

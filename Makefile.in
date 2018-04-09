@@ -1837,7 +1837,11 @@ doc/call_provers_%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
 	getconf getanyaltergo getaltergo200 \
-	getdriver callprover calltimelimit
+	getdriver callprover calltimelimit \
+	buildfmla buildtermalt buildtaskimport \
+	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
+	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
+	printtheory splittheory printalltasks
 
 OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
 
