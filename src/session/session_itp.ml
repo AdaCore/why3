@@ -1539,8 +1539,8 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
   theory
 
 (* add a why file to a session *)
-let add_file_section (s:session) (fn:string)
-    (theories:Theory.theory list option) format : file =
+let add_file_section (s:session) (fn:string) ~file_is_detached
+    (theories:Theory.theory list) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
@@ -1550,33 +1550,23 @@ let add_file_section (s:session) (fn:string)
       exit 2
     end
   else
-    match theories with
-    | None ->
-       let f = { file_name = fn;
-                 file_format = format;
-                 file_is_detached = true;
-                 file_theories = [] }
-       in
-       Hstr.add s.session_files fn f;
-       f
-    | Some ths ->
-       let f = { file_name = fn;
-                 file_format = format;
-                 file_is_detached = false;
-                 file_theories = [] }
-       in
-       Hstr.add s.session_files fn f;
-       let theories = List.map (make_theory_section ~detached:false s fn) ths in
-       f.file_theories <- theories;
-       f
+    let f = { file_name = fn;
+              file_format = format;
+              file_is_detached = file_is_detached;
+              file_theories = [] }
+    in
+    Hstr.add s.session_files fn f;
+    let theories = List.map (make_theory_section ~detached:false s fn) theories in
+    f.file_theories <- theories;
+    f
 
 (* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
-let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
+let merge_file_section ~use_shapes ~old_ses ~old_theories ~file_is_detached ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
   Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
-  let f = add_file_section s fn (Some []) format in
+  let f = add_file_section s fn ~file_is_detached [] format in
   let fn = f.file_name in
   let theories,detached =
     let old_th_table = Hstr.create 7 in
@@ -1638,12 +1628,12 @@ let merge_file  ~use_shapes env (ses : session) (old_ses : session) file =
   try
     let new_theories = read_file env file_name ?format in
     merge_file_section
-      ses ~use_shapes ~old_ses ~old_theories
+      ses ~use_shapes ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
     None
   with e -> (* TODO: capture only parsing and typing errors *)
     merge_file_section
-      ses ~use_shapes ~old_ses ~old_theories
+      ses ~use_shapes ~old_ses ~old_theories ~file_is_detached:true
       ~env file_name [] format;
     Some e
 
