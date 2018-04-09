@@ -244,11 +244,11 @@ let reload_files (c : controller) ~use_shapes =
  *)
 
 let add_file c ?format fname =
-  let theories,errors =
-    try Some (Session_itp.read_file c.controller_env ?format fname), None
-    with e -> None, Some e
+  let file_is_detached,theories,errors =
+    try false,(Session_itp.read_file c.controller_env ?format fname), None
+    with e -> true,[], Some e
   in
-  let (_ : file) = add_file_section c.controller_session fname theories format in
+  let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
   errors
 
 

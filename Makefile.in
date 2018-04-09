@@ -1878,13 +1878,40 @@ doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/extract_ocaml_code: doc/extract_ocaml_code.ml
+	$(OCAMLC) str.cma -o $@ $<
+
+doc/logic_%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
+
+doc/whyconf_%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/whyconf.ml $* doc
+
+doc/call_provers_%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
+
+OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
+	buildtask printtask buildtask2 \
+	getconf getanyaltergo getaltergo200 \
+	getdriver callprover calltimelimit \
+	buildfmla buildtermalt buildtaskimport \
+	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
+	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
+	printtheory splittheory printalltasks
+
+OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
+
+OCAMLCODE = $(addprefix doc/logic_, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/call_provers_, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	doc/whyconf_provertype.ml
+
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
       itp pvs coq coq_tactic isabelle
 
 DOCTEX = $(DOC:%=doc/%.tex)
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
+doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 update-doc-png:

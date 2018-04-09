@@ -16,6 +16,7 @@ Section~\ref{sec:installlib}. The OCaml code given below is available in
 the source distribution in directory \verb|examples/use_api/| together
 with a few other examples.
 
+\lstset{language={[Objective]Caml}}
 
 \section{Building Propositional Formulas}
 
@@ -23,15 +24,7 @@ The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $\mathit{true} \lor
 \mathit{false}$.
-\begin{ocamlcode}
-(* opening the Why3 library *)
-open Why3
-
-(* a ground propositional goal: true or false *)
-let fmla_true : Term.term = Term.t_true
-let fmla_false : Term.term = Term.t_false
-let fmla1 : Term.term = Term.t_or fmla_true fmla_false
-\end{ocamlcode}
+\lstinputlisting{logic_opening.ml}
 The library uses the common type \texttt{term} both for terms
 (\ie expressions that produce a value of some particular type)
 and formulas (\ie boolean-valued expressions).
@@ -42,17 +35,12 @@ and formulas (\ie boolean-valued expressions).
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
-\begin{ocamlcode}
-(* printing it *)
-open Format
-let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
-\end{ocamlcode}
+\lstinputlisting{logic_printformula.ml}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
 \begin{verbatim}
-ocamlc str.cma unix.cma nums.cma dynlink.cma \
-        -I +ocamlgraph -I +why3 graph.cma why.cma f.ml -o f
+ocamlfind ocamlc -package why3 f.ml -o f
 \end{verbatim}
 Running the generated executable \texttt{f} results in the following output.
 \begin{verbatim}
@@ -62,23 +50,12 @@ formula 1 is: true \/ false
 Let us now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
-\begin{ocamlcode}
-let prop_var_A : Term.lsymbol =
-  Term.create_psymbol (Ident.id_fresh "A") []
-let prop_var_B : Term.lsymbol =
-  Term.create_psymbol (Ident.id_fresh "B") []
-\end{ocamlcode}
+\lstinputlisting{logic_declarepropvars.ml}
 The type \texttt{lsymbol} is the type of function and predicate symbols (which
 we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
 by the general function for applying a predicate symbol to a list of terms.
 Here we just need the empty list of arguments.
-\begin{ocamlcode}
-let atom_A : Term.term = Term.ps_app prop_var_A []
-let atom_B : Term.term = Term.ps_app prop_var_B []
-let fmla2 : Term.term =
-  Term.t_implies (Term.t_and atom_A atom_B) atom_A
-let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
-\end{ocamlcode}
+\lstinputlisting{logic_declarepropatoms.ml}
 
 As expected, the output is as follows.
 \begin{verbatim}
@@ -97,13 +74,7 @@ tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
 \texttt{add\_*\_decl} of module \texttt{Task}. For the formula $\mathit{true} \lor
 \mathit{false}$ above, this is done as follows.
-\begin{ocamlcode}
-let task1 : Task.task = None (* empty task *)
-let goal_id1 : Decl.prsymbol =
-  Decl.create_prsymbol (Ident.id_fresh "goal1")
-let task1 : Task.task =
-  Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
-\end{ocamlcode}
+\lstinputlisting{logic_buildtask.ml}
 To make the formula a goal, we must give a name to it, here ``goal1''. A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
@@ -115,23 +86,12 @@ Notice that lemmas are not allowed in tasks
 and can only be used in theories.
 
 Once a task is built, it can be printed.
-\begin{ocamlcode}
-(* printing the task *)
-let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
-\end{ocamlcode}
+\lstinputlisting{logic_printtask.ml}
 
 The task for our second formula is a bit more complex to build, because
 the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
-\begin{ocamlcode}
-(* task for formula 2 *)
-let task2 = None
-let task2 = Task.add_param_decl task2 prop_var_A
-let task2 = Task.add_param_decl task2 prop_var_B
-let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
-let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
-let () = printf "@[task 2 is:@\n%a@]@." Pretty.print_task task2
-\end{ocamlcode}
+\lstinputlisting{logic_buildtask2.ml}
 
 Execution of our OCaml program now outputs:
 \begin{verbatim}
@@ -157,125 +117,63 @@ file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
-\begin{ocamlcode}
-(* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
-(* the [main] section of the config file *)
-let main : Whyconf.main = Whyconf.get_main config
-(* all the provers detected, from the config file *)
-let provers : Whyconf.config_prover Whyconf.Mprover.t =
-  Whyconf.get_provers config
-\end{ocamlcode}
+\lstinputlisting{logic_getconf.ml}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
 prover is a record with a name, a version, and an alternative description
 (to differentiate between various configurations of a given prover). Its
 definition is in the module \texttt{Whyconf}:
-\begin{ocamlcode}
-type prover =
-    { prover_name : string; (* "Alt-Ergo" *)
-      prover_version : string; (* "2.95" *)
-      prover_altern : string; (* "special" *)
-    }
-\end{ocamlcode}
+\lstinputlisting{whyconf_provertype.ml}
 The map \texttt{provers} provides the set of existing provers.
 In the following, we directly
-attempt to access the prover Alt-Ergo, which is known to be identified
-with id \texttt{"alt-ergo"}.
-\begin{ocamlcode}
-(* the [prover alt-ergo] section of the config file *)
-let alt_ergo : Whyconf.config_prover =
-  try
-    Whyconf.prover_by_id config "alt-ergo"
-  with Whyconf.ProverNotFound _ ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-\end{ocamlcode}
+attempt to access a prover named ``Alt-Ergo'', any version.
+\lstinputlisting{logic_getanyaltergo.ml}
 We could also get a specific version with :
-\begin{ocamlcode}
-let alt_ergo : Whyconf.config_prover =
-  try
-    let prover = {Whyconf.prover_name = "Alt-Ergo";
-                  prover_version = "0.92.3";
-                  prover_altern = ""} in
-    Whyconf.Mprover.find prover provers
-  with Not_found ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-\end{ocamlcode}
+\lstinputlisting{logic_getaltergo200.ml}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
-\begin{ocamlcode}
-(* builds the environment from the [loadpath] *)
-let env : Env.env =
-  Env.create_env (Whyconf.loadpath main)
-(* loading the Alt-Ergo driver *)
-let alt_ergo_driver : Driver.driver =
-  try
-    Driver.load_driver env alt_ergo.Whyconf.driver
-  with e ->
-    eprintf "Failed to load driver for alt-ergo: %a@."
-      Exn_printer.exn_printer e;
-    exit 1
-\end{ocamlcode}
+\lstinputlisting{logic_getdriver.ml}
 
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
 termination. Here is a simple way to proceed:
-\begin{ocamlcode}
-(* calls Alt-Ergo *)
-let result1 : Call_provers.prover_result =
-  Call_provers.wait_on_call
-    (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1 ()) ()
-(* prints Alt-Ergo answer *)
-let () = printf "@[On task 1, alt-ergo answers %a@]@."
-  Call_provers.print_prover_result result1
-\end{ocamlcode}
+\lstinputlisting{logic_callprover.ml}
 This way to call a prover is in general too naive, since it may never
 return if the prover runs without time limit. The function
-\texttt{prove\_task} has two optional parameters: \texttt{timelimit}
-is the maximum allowed running time in seconds, and \texttt{memlimit}
-is the maximum allowed memory in megabytes.  The type
-\texttt{prover\_result} is a record with three fields:
+\texttt{prove\_task} has an optional parameter \texttt{limit}, a record defined
+in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_resourcelimit.ml}
+where the field \texttt{limit\_time} is the maximum allowed running time in seconds,
+and \texttt{limit\_mem} is the maximum allowed memory in megabytes.  The type
+\texttt{prover\_result} is a record defined in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_proverresult.ml}
+with in particular the fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
-\item \texttt{pr\_output}: the output of the prover, \ie both
-  standard output and the standard error of the process
-  (a redirection in \texttt{why3.conf} is required);
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
 \end{itemize}
-A \texttt{pr\_answer} is a sum of several kind of answers:
+A \texttt{pr\_answer} is the sum type defined in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_proveranswer.ml}
+corresponding to these kinds of answers:
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover.
 \item \texttt{Invalid}: the task is invalid.
-\item \texttt{Timeout}: the prover exceeds the time or memory limit.
+\item \texttt{Timeout}: the prover exceeds the time limit.
+\item \texttt{OutOfMemory}: the prover exceeds the memory limit.
 \item \texttt{Unknown} $msg$: the prover can't determine if the task
   is valid; the string parameter $msg$ indicates some extra
   information.
-\item \texttt{Failure} $msg$: the prover reports a failure, \ie it
+\item \texttt{Failure} $msg$: the prover reports a failure, \eg it
   was unable to read correctly its input task.
 \item \texttt{HighFailure}: an error occurred while trying to call the
-  prover, or the prover answer was not understood (\ie none of the
+  prover, or the prover answer was not understood (\eg none of the
   given regular expressions in the driver file matches the output
   of the prover).
 \end{itemize}
 Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
-\begin{ocamlcode}
-let result2 : Call_provers.prover_result =
-   Call_provers.wait_on_call
-    (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    ~timelimit:10
-    alt_ergo_driver task2 ()) ()
-
-let () =
-  printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
-    Call_provers.print_prover_answer
-    result1.Call_provers.pr_answer
-    result1.Call_provers.pr_time
-\end{ocamlcode}
+\lstinputlisting{logic_calltimelimit.ml}
 The output of our program is now as follows.
 \begin{verbatim}
 On task 1, alt-ergo answers Valid (0.01s)
@@ -292,65 +190,29 @@ Here is the way we build the formula $2+2=4$. The main difficulty is to
 access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{sec:library}).
-\begin{ocamlcode}
-let two : Term.term =
-  Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
-let four : Term.term =
-  Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
-let int_theory : Theory.theory =
-  Env.read_theory env ["int"] "Int"
-let plus_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix "+"]
-let two_plus_two : Term.term =
-  Term.t_app_infer plus_symbol [two;two]
-let fmla3 : Term.term = Term.t_equ two_plus_two four
-\end{ocamlcode}
+\lstinputlisting{logic_buildfmla.ml}
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
 the constructor \texttt{t\_app\_infer} infers the type of the resulting
 term. One could also provide the expected type as follows.
-\begin{ocamlcode}
-let two_plus_two : Term.term =
-  Term.fs_app plus_symbol [two;two] Ty.ty_int
-\end{ocamlcode}
+\lstinputlisting{logic_buildtermalt.ml}
 
 When building a task with this formula, we need to declare that we use
 theory \texttt{Int}:
-\begin{ocamlcode}
-let task3 = None
-let task3 = Task.use_export task3 int_theory
-let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3")
-let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
-\end{ocamlcode}
+\lstinputlisting{logic_buildtaskimport.ml}
 
 \section{Building Quantified Formulas}
 
 To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
-\begin{ocamlcode}
-let zero : Term.term =
-  Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
-let mult_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix "*"]
-let ge_symbol : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export [Ident.infix ">="]
-\end{ocamlcode}
+\lstinputlisting{logic_quantfmla1.ml}
 The next step is to introduce the variable $x$ with the type int.
-\begin{ocamlcode}
-let var_x : Term.vsymbol =
-  Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
-\end{ocamlcode}
+\lstinputlisting{logic_quantfmla2.ml}
 The formula $x*x \geq 0$ is obtained as in the previous example.
-\begin{ocamlcode}
-let x : Term.term = Term.t_var var_x
-let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
-let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
-\end{ocamlcode}
+\lstinputlisting{logic_quantfmla3.ml}
 To quantify on $x$, we use the appropriate smart constructor as follows.
-\begin{ocamlcode}
-let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
-\end{ocamlcode}
+\lstinputlisting{logic_quantfmla4.ml}
 
 \section{Building Theories}
 
@@ -363,76 +225,37 @@ be done by a sequence of calls:
 \end{itemize}
 
 Creation of a theory named \verb|My_theory| is done by
-\begin{ocamlcode}
-let my_theory : Theory.theory_uc =
-  Theory.create_theory (Ident.id_fresh "My_theory")
-\end{ocamlcode}
-
+\lstinputlisting{logic_buildth1.ml}
 First let us add formula 1 above as a goal:
-\begin{ocamlcode}
-let decl_goal1 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
-let my_theory : Theory.theory_uc =
-  Theory.add_decl my_theory decl_goal1
-\end{ocamlcode}
+\lstinputlisting{logic_buildth2.ml}
 Note that we reused the goal identifier \verb|goal_id1| that we
 already defined to create task 1 above.
 
 Adding formula 2 needs to add the declarations of predicate variables A
 and B first:
-\begin{ocamlcode}
-let my_theory : Theory.theory_uc =
-  Theory.add_param_decl my_theory prop_var_A
-let my_theory : Theory.theory_uc =
-  Theory.add_param_decl my_theory prop_var_B
-let decl_goal2 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
-let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
-\end{ocamlcode}
+\lstinputlisting{logic_buildth3.ml}
 
 Adding formula 3 is a bit more complex since it uses integers, thus it
 requires to ``use'' the theory \verb|int.Int|. Using a theory is
 indeed not a primitive operation in the API: it must be done by a
 combination of an ``export'' and the creation of a namespace. We
 provide a helper function for that:
-\begin{ocamlcode}
-(* [use th1 th2] insert the equivalent of a "use import th2" in
-   theory th1 under construction *)
-let use th1 th2 =
-  let name = th2.Theory.th_name in
-  Theory.close_scope
-    (Theory.use_export
-      (Theory.open_scope th1 name.Ident.id_string) th2) true
-\end{ocamlcode}
+\lstinputlisting{logic_buildth4.ml}
 Addition of formula 3 is then
-\begin{ocamlcode}
-let my_theory : Theory.theory_uc = use my_theory int_theory
-let decl_goal3 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
-let my_theory : Theory.theory_uc =
-  Theory.add_decl my_theory decl_goal3
-\end{ocamlcode}
+\lstinputlisting{logic_buildth5.ml}
 
 Addition of goal 4 is nothing more complex:
-\begin{ocamlcode}
-let decl_goal4 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
-let my_theory :
-  Theory.theory_uc = Theory.add_decl my_theory decl_goal4
-\end{ocamlcode}
+\lstinputlisting{logic_buildth6.ml}
 
 Finally, we close our theory under construction as follows.
-\begin{ocamlcode}
-let my_theory : Theory.theory = Theory.close_theory my_theory
-\end{ocamlcode}
+\lstinputlisting{logic_buildth7.ml}
 
 We can inspect what we did by printing that theory:
-\begin{ocamlcode}
-let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
-\end{ocamlcode}
+\lstinputlisting{logic_printtheory.ml}
 which outputs
 \begin{verbatim}
-theory is:
+my new theory is as follows:
+
 theory My_theory
   (* use BuiltIn *)
 
@@ -454,23 +277,12 @@ end
 
 From a theory, one can compute at once all the proof tasks it contains
 as follows:
-\begin{ocamlcode}
-let my_tasks : Task.task list =
-  List.rev (Task.split_theory my_theory None None)
-\end{ocamlcode}
+\lstinputlisting{logic_splittheory.ml}
 Note that the tasks are returned in reverse order, so we reverse the
 list above.
 
 We can check our generated tasks by printing them:
-\begin{ocamlcode}
-let () =
-  printf "Tasks are:@.";
-  let _ =
-    List.fold_left
-      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
-      1 my_tasks
-  in ()
-\end{ocamlcode}
+\lstinputlisting{logic_printalltasks.ml}
 
 One can run provers on those tasks exactly as we did above.
 

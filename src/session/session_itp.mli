@@ -155,7 +155,7 @@ val empty_session : ?from:session -> string -> session
     argument *)
 
 val add_file_section :
-  session -> string -> Theory.theory list option ->
+  session -> string -> file_is_detached:bool -> Theory.theory list->
   Env.fformat option -> file
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
