@@ -45,6 +45,11 @@ type reason =
    | VC_Stronger_Post
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
+   (* VC_Warning_Kind - warnings *)
+   | VC_Inconsistent_Pre
+
+val is_warning_reason : reason -> bool
+(* returns whether a VC is generated to issue possibly a warning *)
 
 type check =
   { id             : id;

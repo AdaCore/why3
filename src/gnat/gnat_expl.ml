@@ -41,6 +41,54 @@ type reason =
    | VC_Stronger_Post
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
+   (* VC_Warning_Kind - warnings *)
+   | VC_Inconsistent_Pre
+
+let is_warning_reason r =
+  match r with
+   (* VC_RTE_Kind - run-time checks *)
+   | VC_Division_Check
+   | VC_Index_Check
+   | VC_Overflow_Check
+   | VC_FP_Overflow_Check
+   | VC_Range_Check
+   | VC_Predicate_Check
+   | VC_Predicate_Check_On_Default_Value
+   | VC_Invariant_Check
+   | VC_Invariant_Check_On_Default_Value
+   | VC_Length_Check
+   | VC_Discriminant_Check
+   | VC_Tag_Check
+   | VC_Ceiling_Interrupt
+   | VC_Interrupt_Reserved
+   | VC_Ceiling_Priority_Protocol
+   | VC_Task_Termination
+   (* VC_Assert_Kind - assertions *)
+   | VC_Initial_Condition
+   | VC_Default_Initial_Condition
+   | VC_Precondition
+   | VC_Precondition_Main
+   | VC_Postcondition
+   | VC_Refined_Post
+   | VC_Contract_Case
+   | VC_Disjoint_Contract_Cases
+   | VC_Complete_Contract_Cases
+   | VC_Loop_Invariant
+   | VC_Loop_Invariant_Init
+   | VC_Loop_Invariant_Preserv
+   | VC_Loop_Variant
+   | VC_Assert
+   | VC_Raise
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
+   | VC_Weaker_Pre
+   | VC_Trivial_Weaker_Pre
+   | VC_Stronger_Post
+   | VC_Weaker_Classwide_Pre
+   | VC_Stronger_Classwide_Post
+     -> false
+   (* VC_Warning_Kind - warnings *)
+   | VC_Inconsistent_Pre
+     -> true
 
 type subp_entity = Gnat_loc.loc
 
@@ -112,7 +160,9 @@ let reason_from_string s =
    | "VC_STRONGER_POST"             -> VC_Stronger_Post
    | "VC_WEAKER_CLASSWIDE_PRE"      -> VC_Weaker_Classwide_Pre
    | "VC_STRONGER_CLASSWIDE_POST"   -> VC_Stronger_Classwide_Post
-   | _                            ->
+   (* VC_Warning_Kind - warnings *)
+   | "VC_INCONSISTENT_PRE"          -> VC_Inconsistent_Pre
+   | _                              ->
        let s = Format.sprintf "unknown VC reason: %s@." s in
        Gnat_util.abort_with_message ~internal:true s
 
@@ -159,6 +209,8 @@ let reason_to_ada reason =
    | VC_Stronger_Post             -> "VC_STRONGER_POST"
    | VC_Weaker_Classwide_Pre      -> "VC_WEAKER_CLASSWIDE_PRE"
    | VC_Stronger_Classwide_Post   -> "VC_STRONGER_CLASSWIDE_POST"
+   (* VC_Warning_Kind - warnings *)
+   | VC_Inconsistent_Pre          -> "VC_INCONSISTENT_PRE"
 
 let reason_to_string reason =
    match reason with
@@ -201,6 +253,8 @@ let reason_to_string reason =
    | VC_Stronger_Post             -> "stronger_post"
    | VC_Weaker_Classwide_Pre      -> "weaker_classwide_pre"
    | VC_Stronger_Classwide_Post   -> "stronger_classwide_post"
+   (* VC_Warning_Kind - warnings *)
+   | VC_Inconsistent_Pre          -> "inconsistent_pre"
 
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc

@@ -17,6 +17,11 @@ val prover_ce : Whyconf.prover option
    None if counterexample should not be generated
 *)
 
+val prover_warn : Whyconf.prover option
+(* the prover for warning VCs
+   None if warning VCs should be ignored
+*)
+
 val is_ce_prover : Session_itp.session -> Session_itp.proofAttemptID -> bool
 (* check if the prover in argument is the prover for counter examples. returns
  * false if no prover is selected for counterexamples, or counterexamples are
@@ -39,7 +44,7 @@ val steps : prover : string -> int
 val back_convert_steps : prover : string -> int -> int
 (* given the raw steps a prover has taken, reconvert them to SPARK steps *)
 
-val limit : prover : string -> Call_provers.resource_limit
+val limit : prover : string -> warning:bool -> Call_provers.resource_limit
 
 type proof_mode =
     Progressive

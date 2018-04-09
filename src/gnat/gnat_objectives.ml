@@ -416,7 +416,8 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
     (* only count non-obsolete proof attempts with identical
        options *)
     (not pa.Session_itp.proof_obsolete &&
-    pa.Session_itp.limit = Gnat_config.limit ~prover:prover.Whyconf.prover_name)
+    pa.Session_itp.limit =
+      Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:false)
   with Not_found -> false
 
 let all_provers_tried s g =
@@ -541,7 +542,8 @@ let further_split_ce (c: Controller_itp.controller) (goal: goal_id) =
 let register_result ~ce ~has_model c goal result =
    let obj = get_objective goal in
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if not ce then begin
+   let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason obj) in
+   if not (ce || warn) then begin
      (* We first remove the goal from the list of goals to be tried. It may be
       * put back later, see below *)
      GoalSet.remove obj_rec.to_be_proved goal;
@@ -603,6 +605,9 @@ let register_result ~ce ~has_model c goal result =
          end
      end
    end
+
+   else if warn then
+     obj, (if result then Proved else Not_Proved)
 
    else
      begin
@@ -993,10 +998,12 @@ let run_goal ?save_to ~cntexample ?limit ~callback c prover g =
           ~callback ~notification
     end
   else
+    let check = get_objective g in
+    let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
     let limit =
       match limit with
 (* TODO we should pass the type prover not a string here ? *)
-      | None -> Gnat_config.limit ~prover:prover.Whyconf.prover_name
+      | None -> Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn
       | Some x -> x in
     if config_prover.Whyconf.interactive then () else
     C.schedule_proof_attempt ?save_to
@@ -1021,9 +1028,12 @@ let schedule_goal_with_prover ~cntexample ~callback c g p =
 let schedule_goal ~cntexample ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
-   let p = if cntexample then Opt.get (Gnat_config.prover_ce) else
-     find_best_untried_prover c.Controller_itp.controller_session g in
-   schedule_goal_with_prover ~cntexample ~callback c g p
+  let check = get_objective g in
+  let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
+  let p = if warn then Opt.get (Gnat_config.prover_warn)
+    else if cntexample then Opt.get (Gnat_config.prover_ce)
+    else find_best_untried_prover c.Controller_itp.controller_session g in
+  schedule_goal_with_prover ~cntexample ~callback c g p
 
 let clean_automatic_proofs c =
   let seen = GoalSet.empty () in
@@ -1036,7 +1046,9 @@ let clean_automatic_proofs c =
           let pan = Session_itp.get_proof_attempt_node s panid in
           if not pan.Session_itp.proof_obsolete &&
             pan.Session_itp.prover = prover &&
-            pan.Session_itp.limit = Gnat_config.limit ~prover:prover.Whyconf.prover_name then
+            pan.Session_itp.limit =
+              Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:false
+          then
             Controller_itp.remove_subtree c (Session_itp.APa panid)
               ~removed:(fun _ -> ()) ~notification:(fun _ -> ())
           else

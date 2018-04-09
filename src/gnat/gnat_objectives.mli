@@ -62,7 +62,6 @@ val add_to_objective : objective -> goal_id -> unit
    registered as well. Only do the registering if the objective is to de
    discharged (ie, if the --limit-subp / --limit-line directives apply). *)
 
-
 val set_not_interesting : goal_id -> unit
 (* Goals can be not interesting, when they are trivial *)
 

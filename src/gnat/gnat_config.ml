@@ -41,6 +41,7 @@ let is_builtin_prover =
 
 let opt_timeout : int option ref = ref None
 let opt_ce_timeout : int option ref = ref None
+let opt_warn_timeout : int ref = ref 1
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_debug_save_vcs = ref false
@@ -53,6 +54,7 @@ let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
 let opt_ce_mode = ref false
 let opt_ce_prover = ref "cvc4_ce"
+let opt_warn_prover = ref None
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -118,6 +120,12 @@ let set_timeout t =
 let set_ce_timeout t =
    opt_ce_timeout := Some t
 
+let set_warn_timeout t =
+   opt_warn_timeout := t
+
+let set_warn_prover s =
+   opt_warn_prover := Some s
+
 let set_steps t =
   if t > 0 then opt_steps := Some t
 
@@ -180,6 +188,8 @@ let options = Arg.align [
           " Set the timeout in seconds (default is 1 second)";
    "--ce-timeout", Arg.Int set_ce_timeout,
           " Set the timeout for counter examples in seconds";
+   "--warn-timeout", Arg.Int set_warn_timeout,
+          " Set the timeout for warnings in seconds (default is 1 second)";
    "--steps", Arg.Int set_steps,
        " Set the steps (default: no steps). " ^
          "This option is *not* passed to alt-ergo, " ^
@@ -232,8 +242,10 @@ let options = Arg.align [
           " Specify additionnal configuration file";
    "--counterexample", Arg.String set_ce_mode,
           " on if the counterexample for unproved VC should be get, off elsewhere";
-   "--ce_prover", Arg.Set_string opt_ce_prover,
-          " Give a specific prover for counterexamples"
+   "--ce-prover", Arg.Set_string opt_ce_prover,
+          " Give a specific prover for counterexamples";
+   "--warn-prover", Arg.String set_warn_prover,
+          " Give a specific prover for warnings"
 ]
 
 let () = Arg.parse options set_filename usage_msg
@@ -299,7 +311,7 @@ let compute_base_provers config str_list =
     let base_provers =
       Whyconf.Mprover.fold (fun _ v acc -> v :: acc)
         (Whyconf.get_provers config) [] in
-    base_provers, None
+    base_provers, None, None
   else try
     let filter_prover prover_string =
       Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover_string) in
@@ -310,7 +322,14 @@ let compute_base_provers config str_list =
         Some (filter_prover !opt_ce_prover)
       else
         None in
-    base_provers, base_prover_ce
+    (* unless specified explicitly, the prover for warnings is the first of the
+       base provers *)
+    let base_prover_warn =
+      match !opt_warn_prover with
+        | Some p -> Some (filter_prover p)
+        | None   -> (if base_provers = [] then None else Some (List.hd base_provers))
+    in
+    base_provers, base_prover_ce, base_prover_warn
   with
   | e when Debug.test_flag Debug.stack_trace -> raise e
   | Not_found ->
@@ -334,7 +353,7 @@ let get_gnatprove_config config =
 (* Depending on what kinds of provers are requested, environment loading is a
  * bit different, hence we do this all together here *)
 
-let provers, prover_ce, config, env =
+let provers, prover_ce, prover_warn, config, env =
   let prover_str_list = computer_prover_str_list () in
   (* did the user request some prover which is not shipped with SPARK? *)
   let builtin_provers_only = List.for_all is_builtin_prover prover_str_list in
@@ -377,7 +396,7 @@ let provers, prover_ce, config, env =
 
   (* now we build the Whyconf.config_prover for all requested provers
    * and for the prover for counterexample generation *)
-  let base_provers, base_prover_ce =
+  let base_provers, base_prover_ce, base_prover_warn =
     compute_base_provers config prover_str_list in
   let env =
     let config_main = Whyconf.get_main config in
@@ -396,7 +415,10 @@ let provers, prover_ce, config, env =
   let prover_ce =
     Opt.map (fun conf_prover -> conf_prover.Whyconf.prover) base_prover_ce
   in
-  provers, prover_ce, config, env
+  let prover_warn =
+    Opt.map (fun conf_prover -> conf_prover.Whyconf.prover) base_prover_warn
+  in
+  provers, prover_ce, prover_warn, config, env
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
    in the string cmd.
@@ -548,8 +570,10 @@ let filename =
 
 (* freeze values *)
 
-let limit_time ~prover =
-  match prover_ce, !opt_timeout with
+let limit_time ~prover ~warning =
+  if warning then
+    !opt_warn_timeout
+  else match prover_ce, !opt_timeout with
   | Some p, _ when prover = p.Whyconf.prover_name &&
                    !opt_ce_timeout <> None ->
       Opt.get !opt_ce_timeout
@@ -609,9 +633,9 @@ let steps ~prover =
 
 let back_convert_steps = Steps_conversion.back_convert
 
-let limit ~prover =
+let limit ~prover ~warning =
   { Call_provers.empty_limit with
-    Call_provers.limit_time = limit_time ~prover;
+    Call_provers.limit_time = limit_time ~prover ~warning;
     limit_steps = steps ~prover}
 
 let proof_mode = !opt_proof_mode
