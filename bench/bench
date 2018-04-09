@@ -59,14 +59,13 @@ valid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
 	printf "  "$f"... "
-	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
-	    echo "valid test $f failed!"
-	    echo "$pgm -P alt-ergo $f"
-	    $pgm -t 10 -P alt-ergo $f
+        if ! $pgm -t 15 -P alt-ergo $f > /dev/null 2>&1; then
+            echo "FAILED!"
+            echo "$pgm -t 15 -P alt-ergo $f"
+            $pgm -t 15 -P alt-ergo $f
 	    exit 1
-       else
-	    echo "ok"
        fi
+       echo "ok"
     done
 }
 

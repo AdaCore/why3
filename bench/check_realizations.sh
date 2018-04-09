@@ -33,5 +33,5 @@ else
     echo "Coq realizations OK"
 fi
 
-rm -r $TMPREAL
+rm -rf $TMPREAL
 exit $res
