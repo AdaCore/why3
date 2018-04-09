@@ -22,6 +22,7 @@ type reason_unknown =
   | Resourceout
   | Other
 
+(* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
   | Invalid
@@ -31,7 +32,9 @@ type prover_answer =
   | Unknown of (string * reason_unknown option)
   | Failure of string
   | HighFailure
+(* END{proveranswer} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
 type prover_result = {
   pr_answer : prover_answer;
   pr_status : Unix.process_status;
@@ -40,12 +43,15 @@ type prover_result = {
   pr_steps  : int;		(* -1 if unknown *)
   pr_model  : model;
 }
+(* END{proverresult} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
 type resource_limit = {
   limit_time  : int;
   limit_mem   : int;
   limit_steps : int;
 }
+(* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
 let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
 

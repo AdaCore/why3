@@ -117,125 +117,135 @@ file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
-\begin{ocamlcode}
-(* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
-(* the [main] section of the config file *)
-let main : Whyconf.main = Whyconf.get_main config
-(* all the provers detected, from the config file *)
-let provers : Whyconf.config_prover Whyconf.Mprover.t =
-  Whyconf.get_provers config
-\end{ocamlcode}
+% \begin{ocamlcode}
+% (* reads the config file *)
+% let config : Whyconf.config = Whyconf.read_config None
+% (* the [main] section of the config file *)
+% let main : Whyconf.main = Whyconf.get_main config
+% (* all the provers detected, from the config file *)
+% let provers : Whyconf.config_prover Whyconf.Mprover.t =
+%   Whyconf.get_provers config
+% \end{ocamlcode}
+\lstinputlisting{logic_getconf.ml}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
 prover is a record with a name, a version, and an alternative description
 (to differentiate between various configurations of a given prover). Its
 definition is in the module \texttt{Whyconf}:
-\begin{ocamlcode}
-type prover =
-    { prover_name : string; (* "Alt-Ergo" *)
-      prover_version : string; (* "2.95" *)
-      prover_altern : string; (* "special" *)
-    }
-\end{ocamlcode}
+% \begin{ocamlcode}
+% type prover =
+%     { prover_name : string; (* "Alt-Ergo" *)
+%       prover_version : string; (* "2.95" *)
+%       prover_altern : string; (* "special" *)
+%     }
+% \end{ocamlcode}
+\lstinputlisting{whyconf_provertype.ml}
 The map \texttt{provers} provides the set of existing provers.
 In the following, we directly
-attempt to access the prover Alt-Ergo, which is known to be identified
-with id \texttt{"alt-ergo"}.
-\begin{ocamlcode}
-(* the [prover alt-ergo] section of the config file *)
-let alt_ergo : Whyconf.config_prover =
-  try
-    Whyconf.prover_by_id config "alt-ergo"
-  with Whyconf.ProverNotFound _ ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-\end{ocamlcode}
+attempt to access a prover named ``Alt-Ergo'', any version.
+% \begin{ocamlcode}
+% (* the [prover alt-ergo] section of the config file *)
+% let alt_ergo : Whyconf.config_prover =
+%   try
+%     Whyconf.prover_by_id config "alt-ergo"
+%   with Whyconf.ProverNotFound _ ->
+%     eprintf "Prover alt-ergo not installed or not configured@.";
+%     exit 0
+% \end{ocamlcode}
+\lstinputlisting{logic_getanyaltergo.ml}
 We could also get a specific version with :
-\begin{ocamlcode}
-let alt_ergo : Whyconf.config_prover =
-  try
-    let prover = {Whyconf.prover_name = "Alt-Ergo";
-                  prover_version = "0.92.3";
-                  prover_altern = ""} in
-    Whyconf.Mprover.find prover provers
-  with Not_found ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-\end{ocamlcode}
+% \begin{ocamlcode}
+% let alt_ergo : Whyconf.config_prover =
+%   try
+%     let prover = {Whyconf.prover_name = "Alt-Ergo";
+%                   prover_version = "2.0.0";
+%                   prover_altern = ""} in
+%     Whyconf.Mprover.find prover provers
+%   with Not_found ->
+%     eprintf "Prover Alt-Ergo 2.0.0 not installed or not configured@.";
+%     exit 0
+% \end{ocamlcode}
+\lstinputlisting{logic_getaltergo200.ml}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
-\begin{ocamlcode}
-(* builds the environment from the [loadpath] *)
-let env : Env.env =
-  Env.create_env (Whyconf.loadpath main)
-(* loading the Alt-Ergo driver *)
-let alt_ergo_driver : Driver.driver =
-  try
-    Driver.load_driver env alt_ergo.Whyconf.driver
-  with e ->
-    eprintf "Failed to load driver for alt-ergo: %a@."
-      Exn_printer.exn_printer e;
-    exit 1
-\end{ocamlcode}
+% \begin{ocamlcode}
+% (* builds the environment from the [loadpath] *)
+% let env : Env.env =
+%   Env.create_env (Whyconf.loadpath main)
+% (* loading the Alt-Ergo driver *)
+% let alt_ergo_driver : Driver.driver =
+%   try
+%     Driver.load_driver env alt_ergo.Whyconf.driver
+%   with e ->
+%     eprintf "Failed to load driver for alt-ergo: %a@."
+%       Exn_printer.exn_printer e;
+%     exit 1
+% \end{ocamlcode}
+\lstinputlisting{logic_getdriver.ml}
 
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
 termination. Here is a simple way to proceed:
-\begin{ocamlcode}
-(* calls Alt-Ergo *)
-let result1 : Call_provers.prover_result =
-  Call_provers.wait_on_call
-    (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    alt_ergo_driver task1 ()) ()
-(* prints Alt-Ergo answer *)
-let () = printf "@[On task 1, alt-ergo answers %a@]@."
-  Call_provers.print_prover_result result1
-\end{ocamlcode}
+% \begin{ocamlcode}
+% (* calls Alt-Ergo *)
+% let result1 : Call_provers.prover_result =
+%   Call_provers.wait_on_call
+%     (Driver.prove_task ~command:alt_ergo.Whyconf.command
+%     alt_ergo_driver task1 ()) ()
+% (* prints Alt-Ergo answer *)
+% let () = printf "@[On task 1, alt-ergo answers %a@]@."
+%   Call_provers.print_prover_result result1
+% \end{ocamlcode}
+\lstinputlisting{logic_callprover.ml}
 This way to call a prover is in general too naive, since it may never
 return if the prover runs without time limit. The function
-\texttt{prove\_task} has two optional parameters: \texttt{timelimit}
-is the maximum allowed running time in seconds, and \texttt{memlimit}
-is the maximum allowed memory in megabytes.  The type
-\texttt{prover\_result} is a record with three fields:
+\texttt{prove\_task} has an optional parameter \texttt{limit}, a record defined
+in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_resourcelimit.ml}
+where the field \texttt{limit\_time} is the maximum allowed running time in seconds,
+and \texttt{limit\_mem} is the maximum allowed memory in megabytes.  The type
+\texttt{prover\_result} is a record defined in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_proverresult.ml}
+with in particular the fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
-\item \texttt{pr\_output}: the output of the prover, \ie both
-  standard output and the standard error of the process
-  (a redirection in \texttt{why3.conf} is required);
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
 \end{itemize}
-A \texttt{pr\_answer} is a sum of several kind of answers:
+A \texttt{pr\_answer} is the sum type defined in module \texttt{Call\_provers}:
+\lstinputlisting{call_provers_proveranswer.ml}
+corresponding to these kinds of answers:
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover.
 \item \texttt{Invalid}: the task is invalid.
-\item \texttt{Timeout}: the prover exceeds the time or memory limit.
+\item \texttt{Timeout}: the prover exceeds the time limit.
+\item \texttt{OutOfMemory}: the prover exceeds the memory limit.
 \item \texttt{Unknown} $msg$: the prover can't determine if the task
   is valid; the string parameter $msg$ indicates some extra
   information.
-\item \texttt{Failure} $msg$: the prover reports a failure, \ie it
+\item \texttt{Failure} $msg$: the prover reports a failure, \eg it
   was unable to read correctly its input task.
 \item \texttt{HighFailure}: an error occurred while trying to call the
-  prover, or the prover answer was not understood (\ie none of the
+  prover, or the prover answer was not understood (\eg none of the
   given regular expressions in the driver file matches the output
   of the prover).
 \end{itemize}
 Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
-\begin{ocamlcode}
-let result2 : Call_provers.prover_result =
-   Call_provers.wait_on_call
-    (Driver.prove_task ~command:alt_ergo.Whyconf.command
-    ~timelimit:10
-    alt_ergo_driver task2 ()) ()
+% \begin{ocamlcode}
+% let result2 : Call_provers.prover_result =
+%    Call_provers.wait_on_call
+%     (Driver.prove_task ~command:alt_ergo.Whyconf.command
+%     ~timelimit:10
+%     alt_ergo_driver task2 ()) ()
 
-let () =
-  printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
-    Call_provers.print_prover_answer
-    result1.Call_provers.pr_answer
-    result1.Call_provers.pr_time
-\end{ocamlcode}
+% let () =
+%   printf "@[On task 2, alt-ergo answers %a in %5.2f seconds@."
+%     Call_provers.print_prover_answer
+%     result1.Call_provers.pr_answer
+%     result1.Call_provers.pr_time
+% \end{ocamlcode}
+\lstinputlisting{logic_calltimelimit.ml}
 The output of our program is now as follows.
 \begin{verbatim}
 On task 1, alt-ergo answers Valid (0.01s)

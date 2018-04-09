@@ -52,11 +52,13 @@ let default_conf_file =
 
 (* Prover *)
 
+(* BEGIN{provertype} anchor for automatic documentation, do not remove *)
 type prover =
     { prover_name : string;
       prover_version : string;
       prover_altern : string;
     }
+(* END{provertype} anchor for automatic documentation, do not remove *)
 
 let print_altern fmt s =
   if s <> "" then Format.fprintf fmt " (%s)" s

@@ -1822,16 +1822,28 @@ doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/extract_ocaml_code: doc/extract_ocaml_code.ml
+	$(OCAMLC) str.cma -o $@ $<
+
 doc/logic_%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
 
+doc/whyconf_%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/whyconf.ml $* doc
+
+doc/call_provers_%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
+
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
-	buildtask printtask buildtask2
+	buildtask printtask buildtask2 \
+	getconf getanyaltergo getaltergo200 \
+	getdriver callprover calltimelimit
 
-OCAMLCODE = $(addprefix doc/logic_, $(addsuffix .ml, $(OCAMLCODE_LOGIC)))
+OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
 
-doc/extract_ocaml_code: doc/extract_ocaml_code.ml
-	$(OCAMLC) str.cma -o $@ $<
+OCAMLCODE = $(addprefix doc/logic_, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/call_provers_, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	doc/whyconf_provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
