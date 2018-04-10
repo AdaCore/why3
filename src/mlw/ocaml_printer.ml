@@ -357,8 +357,7 @@ module Print = struct
               let equal fmt () = fprintf fmt " = " in
               fprintf fmt "@[<hov 2>{ @[%a@] }@]"
                 (print_list2 semi equal (print_rs info) (print_expr info))
-                (pjl, tl)
-        end
+                (pjl, tl) end
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
     | _, _, tl ->
@@ -449,8 +448,7 @@ module Print = struct
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  ->
-        (* avoids parenthesis around values *)
+    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
     | Eapp (rs, pvl) ->
         begin match query_syntax info.info_convert rs.rs_name, pvl with
@@ -460,8 +458,7 @@ module Print = struct
               fprintf fmt (protect_on paren "%a")
                 (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e1, [p, e2], []) ->
-        fprintf fmt
-          (protect_on paren "let %a =@ %a in@ %a")
+        fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
     | Ematch (e, pl, []) ->
         fprintf fmt
@@ -476,17 +473,18 @@ module Print = struct
           | [] -> assert false | [a] -> assign fmt a
           | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
-        fprintf fmt (protect_on paren
-                       "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
+        fprintf fmt
+          (protect_on paren
+             "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
           (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
         fprintf fmt (protect_on paren "not %a") (print_expr info ~paren:true) e1
     | Eif (e1, e2, e3) when is_true e2 ->
         fprintf fmt (protect_on paren "@[<hv>%a || %a@]")
-          (print_expr info) e1 (print_expr info) e3
+          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e3
     | Eif (e1, e2, e3) when is_false e3 ->
         fprintf fmt (protect_on paren "@[<hv>%a && %a@]")
-          (print_expr info) e1 (print_expr info) e2
+          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e2
     | Eif (e1, e2, e3) ->
         fprintf fmt (protect_on paren
                        "@[<hv>@[<hov 2>if@ %a@ then@ begin@ @[%a@] end@]\

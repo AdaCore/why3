@@ -208,10 +208,8 @@ module Translate = struct
     let p (_, _, is_ghost) = not is_ghost in
     List.filter p args
 
-  let params = function
-    | [] -> []
-    | args -> let args = filter_params args in
-        if args = [] then [ML.mk_var_unit] else args
+  let params args = let args = filter_params args in
+    if args = [] then [ML.mk_var_unit] else args
 
   let filter_params_cty p def pvl cty_args =
     let rec loop = function
@@ -341,12 +339,15 @@ module Translate = struct
       when isconstructor info rs && cty.cty_args <> [] ->
         (* partial application of constructors *)
         mk_eta_expansion rs pvl cty
-    | Eexec ({c_node = Capp (rs, pvl)}, _) ->
+    | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _) ->
         Debug.dprintf debug_compile "compiling total application of %s@."
           rs.rs_name.id_string;
+        Debug.dprintf debug_compile "cty_args: %d@." (List.length cty.cty_args);
         let add_unit = function [] -> [ML.e_unit] | args -> args in
         let id_f = fun x -> x in
-        let f_zero = match rs.rs_logic with RLnone -> add_unit | _ -> id_f in
+        let f_zero = match rs.rs_logic with RLnone ->
+          Debug.dprintf debug_compile "it is a RLnone@."; add_unit
+                                          | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
@@ -356,6 +357,8 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling abstract block@.";
         expr info svar mask e
     | Eexec ({c_node = Cfun ef; c_cty = cty}, _) ->
+        (* is it the case that every argument here is non-ghost ? *)
+        Debug.dprintf debug_compile "compiling a lambda expression@.";
         let ef = expr info svar e.e_mask ef in
         ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff lbl
     | Eexec ({c_node = Cany}, _) ->
@@ -377,8 +380,7 @@ module Translate = struct
         let e1 = expr info svar e1.e_mask e1 in
         let e3 = expr info svar mask e3 in
         ML.e_if e1 ML.e_unit e3 mask eff lbl
-    | Eif (e1, e2, e3) ->
-        Debug.dprintf debug_compile "compiling if block@.";
+    | Eif (e1, e2, e3) -> Debug.dprintf debug_compile "compiling if block@.";
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
         let e3 = expr info svar mask e3 in
@@ -440,13 +442,12 @@ module Translate = struct
     let s = itd.itd_its in
     let ddata_constructs = (* point-free *)
       List.map (fun ({rs_cty = cty} as rs) ->
-          rs.rs_name,
-          let args = List.filter pv_not_ghost cty.cty_args in
-          List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args) in
+        let args = List.filter pv_not_ghost cty.cty_args in
+        (rs.rs_name, List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)) in
     let drecord_fields ({rs_cty = cty} as rs) =
-      (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields),
+      (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields,
       rs.rs_name,
-      mlty_of_ity cty.cty_mask cty.cty_result in
+      mlty_of_ity cty.cty_mask cty.cty_result) in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
@@ -460,8 +461,8 @@ module Translate = struct
           let p e = not (rs_ghost e) in
           let pjl = filter_ghost_params p drecord_fields pjl in
           begin match pjl with
-            | [] -> ML.mk_its_defn id args is_private
-                      (Some (ML.Dalias ML.tunit))
+            | [] ->
+                ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit))
             | [_, _, ty_pj] when is_optimizable_record_itd itd ->
                 ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
             | pjl ->
