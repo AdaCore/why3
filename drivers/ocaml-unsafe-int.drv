@@ -12,7 +12,7 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-import "ocaml-no-arith.drv"
+(* import "ocaml-no-arith.drv" *)
 
 (* int *)
 
@@ -150,8 +150,7 @@ module mach.int.Int31
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
   syntax val      ( % )     "(mod)"
-  syntax val      eq        "(=)"
-  syntax val      ne        "(<>)"
+  syntax val      (=)       "(=)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
@@ -170,8 +169,7 @@ module mach.int.Int63
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
   syntax val      ( % )     "(mod)"
-  syntax val      eq        "(=)"
-  syntax val      ne        "(<>)"
+  syntax val      (=)       "(=)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
@@ -207,7 +205,7 @@ module mach.array.Array31
   syntax val  self_blit "Array.blit"
 end
 module mach.array.Array63
-  syntax type array63 "(%1 array)"
+  syntax type array   "(%1 array)"
 
   syntax val  make   "Array.make"
   syntax val  ([])   "Array.get"
