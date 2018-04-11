@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Pretty-printing various objects from Why3's core logic *)
 
 val why3_keywords : string list
 

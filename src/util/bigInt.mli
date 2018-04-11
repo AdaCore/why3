@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Wrapper for big nums, implemented either with OCaml's [Nums] or [ZArith] *)
+
 type t
 
 val compare : t -> t -> int

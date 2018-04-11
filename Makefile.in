@@ -174,7 +174,7 @@ LIB_UTIL = config bigInt util opt lists strings \
 	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
-	   task pretty_sig pretty dterm env trans printer model_parser
+	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection \
@@ -1898,8 +1898,9 @@ MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/stdlib util/rc util/debug \
+	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/theory \
-	core/env core/task core/trans \
+	core/env core/task core/trans core/pretty_sig core/pretty core/printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
