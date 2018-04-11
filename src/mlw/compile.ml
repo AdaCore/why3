@@ -466,8 +466,7 @@ module Translate = struct
             | [_, _, ty_pj] when is_optimizable_record_itd itd ->
                 ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
             | pjl ->
-                ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
-          end
+                ML.mk_its_defn id args is_private (Some (ML.Drecord pjl)) end
       | Alias t, _, _ ->
           ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
             (Some (ML.Dalias (mlty_of_ity MaskVisible t)))
@@ -511,14 +510,16 @@ module Translate = struct
       when is_val e.e_node -> (* zero argument functions *)
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         [ML.Dlet (ML.Lany (rs, res, []))]
-    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e; c_cty}))
+    | PDlet (LDsym ({rs_cty = cty; rs_logic} as rs, {c_node = Cfun e; c_cty}))
       when c_cty.cty_args = [] ->
         Debug.dprintf debug_compile "compiling zero-arguments function %a@."
           Expr.print_rs rs;
         Debug.dprintf debug_compile "rs_cty_eff:%b@. c_cty_eff:%b@."
           (cty_pure cty) (cty_pure c_cty);
         Debug.dprintf debug_compile "e_eff:%b@." (eff_pure e.e_effect);
-        let args = params cty.cty_args in
+        let args = match rs_logic with RLnone ->
+          Debug.dprintf debug_compile "rlnone ici@."; [ML.mk_var_unit]
+                                     | _ -> [] in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let svar =
           let args' = List.map (fun (_, ty, _) -> ty) args in
