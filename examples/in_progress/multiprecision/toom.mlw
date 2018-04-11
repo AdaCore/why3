@@ -8,8 +8,9 @@ module Toom
   use import mach.int.UInt64GMP as Limb
   use import int.Int
   use import int.Power
+  use import valuation.Valuation
   use import mp2.N
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
 
 let constant toom22_threshold : int32 = 20
 
@@ -280,7 +281,8 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                                       + hv0 + m * lvinf - m * cy2 - m * m * !cy
                   \/ !cy = radix - 1
                       /\ value v0n (n+n) = a1 * b1 + a0 * b0  - (a0 - a1)*(b0 - b1)
-                         + hv0 + m * lvinf - m * cy2 + m * m }
+                         + hv0 + m * lvinf - m * cy2 + m * m
+                      /\ !cy at AddSub = 0 }
     assert { !vm1_neg /\ value scratch (n+n) = - (a0-a1)*(b0-b1)
              \/ not !vm1_neg /\ value scratch (n+n) = (a0-a1)*(b0-b1)
              by value scratch (n+n) = asm1_abs * bsm1_abs
@@ -317,7 +319,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                \/ !cy = radix - 1 /\ !cy at AddSub = 0 /\ b = 1
                by [@case_split]
                   ((!cy at AddSub = 0 /\ b = 1
-                   so !cy = mod (-1) radix = radix - 1)
+                   so !cy = EuclideanDivision.mod (-1) radix = radix - 1)
                    \/
                    (1 <= !cy at AddSub \/ b = 0
                    so 0 <= !cy at AddSub - b < radix
@@ -358,7 +360,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   assert { value r n = value rj n = lv0 };
   value_concat r n (Int32.( *) 3 n);
   value_sub_frame (pelts r) (pelts v0nj) (offset r + p2i n)
-                                        (offset r + 3 * p2i n);
+                                         (offset r + 3 * p2i n);
   assert { value r (3*n) = value r n + m * value (v0n at Join) (n+n)
            by offset v0nj = offset r + n
            so offset v0nj + (n + n) = offset r + 3 * n
@@ -461,16 +463,112 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   begin ensures { value r (sx + sy) + m * m * cy2  < m * m * m * m' }
         ensures { value x sx * value y sy < m * m * m * m' }
   assert { power radix (s+t) = m * m' };
-  assert { !cy = radix - 1 -> hvinf <= m' - 2
-           (* TODO v0n (n+n) < m * m -> lvinf=0 (by value v0n (n+n) < m*m)
-              -> a1*b1=m*hvinf
-              -> a1=b^k*a1', b1= b^l*b1', k+l = n
-              -> a1*b1 < m * (m' - 1) *) };
   value_sub_upper_bound (pelts r) (offset r) (offset r + int32'int n);
   value_sub_upper_bound (pelts v0nj) (offset v0nj)
                         (offset v0nj + int32'int n + int32'int n);
   value_sub_upper_bound (pelts x) (offset x) (offset x + int32'int sx);
   value_sub_upper_bound (pelts y) (offset y) (offset y + int32'int sy);
+  assert { !cy = radix - 1 -> hvinf <= m' - 2
+           by value v0nj (n+n) < power radix (n+n) = m * m
+           so value v0nj (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                     + hv0 + m * lvinf - m * cy2 + m * m
+                   = a0 * b1 + a1 * b0 + hv0 + m * lvinf - m * cy2 + m * m
+                              so (0 <= a0 * b1 by 0 <= a0 /\ 0 <= b1)
+           so (0 <= a1 * b0 by 0 <= a1 /\ 0 <= b0)
+           so hv0 >= 0
+           so value v0nj (n+n) >= m * lvinf - m * cy2 + m * m
+           so m * lvinf - m * cy2 + m * m < m * m
+           so m * (lvinf - cy2) = m * lvinf - m * cy2 < 0
+           so lvinf - cy2 < 0
+           so (cy2 <= 1 by !cy at AddSub = 0 so !cy at Add3 = 0)
+           so (lvinf = 0 by 0 <= lvinf)
+           so a1 * b1 = m * hvinf
+           so if a1*b1 <= 0
+           then (hvinf <= m' - 2
+                 by m*hvinf=0 so 0 <> m so hvinf = 0
+                 so 1 <= s+t-n
+                 so radix = power radix 1 <= power radix (s+t-n)
+                 so m' > 2
+                 so hvinf <= m' - 2)
+           else hvinf <= m'-2 by
+                (forall s. 0 <= s -> power radix s = power 2 (64*s)
+                by radix = power 2 64)
+           so (m = power 2 (64 * n)
+               by m = power radix n)
+           so m >= 1
+           so (hvinf >= 1 by m*hvinf > 0)
+           so valuation m 2 = 64*n
+           so 64*n <= valuation (a1*b1) 2 = valuation a1 2 + valuation b1 2
+           so if 64*n < valuation (a1*b1) 2
+           then hvinf <= m'-2
+                 by valuation (m*hvinf) 2 > 64*n
+                 so valuation m 2 = 64*n
+                 so if valuation hvinf 2 = 0
+                    then false by valuation (m*hvinf) 2 = valuation m 2
+                    else hvinf <= m'-2
+                    by even hvinf
+                    so (odd (m'-1)
+                       by m' = power radix (s+t-n)
+                             = power 2 (64*(s+t-n))
+                             = 2 * power 2 (64*(s+t-n) - 1)
+                          so even m')
+                    so hvinf <> m'-1
+                    so (hvinf < m'
+                        by hvinf = value vinfnj (s+t-n)
+                                 < power radix ((offset vinfnj +(s+t-n))
+                                                 - offset vinfnj)
+                                 = power radix (s+t-n))
+                    so hvinf < m'-1
+           else hvinf <= m'-2
+           by power radix s = power 2 (64*s)
+           so power radix t = power 2 (64*t)
+           so m' = power radix (s+t-n) = power 2 (64*(s+t-n))
+           so let k = valuation a1 2 in
+              let l = valuation b1 2 in
+              let a1' = div a1 (power 2 k) in
+              let b1' = div b1 (power 2 l) in
+              a1 = (power 2 k) * a1'
+           so b1 = (power 2 l) * b1'
+           so 64*n = k + l
+           so 1 <= a1 /\ 1 <= b1
+           so 0 <= k /\ 0 <= l
+           so 1 <= a1' /\ 1 <= b1'
+           so (k <= 64*s by power 2 k <= a1 < power 2 (64*s)
+                         so power 2 k < power 2 (64*s)
+                         so not 64*s < k)
+           so (l <= 64*t by power 2 l <= b1 < power 2 (64*t)
+                         so power 2 l < power 2 (64*t)
+                         so not 64*t < l)
+           so (forall a b c m:int. 0 <= a -> 0 <= b -> 0 < c -> 0 < m
+              -> a * c < m -> b * c >= m -> a < b)
+           so a1' < power 2 (64*s - k)
+              (*(by a1' * (power 2 k) = a1 < power radix s = power 2 (64*s)
+              so a1' * power 2 k < power 2 (64*s)
+              so power 2 (64*s-k) * power 2 k = power 2 (64*s))*)
+           so a1' <= power 2 (64*s - k) - 1
+           so b1' < power 2 (64*t - l)
+           so b1' <= power 2 (64*t - l) - 1
+           so a1' * b1'
+              <= (power 2 (64*s - k) - 1) * b1'
+              <= (power 2 (64*s - k) - 1) * (power 2 (64*t - l) - 1)
+              = (power 2 (64*s-k))*(power 2 (64*t -l))
+                - power 2 (64*s-k)
+                - power 2 (64*t-l)
+                + 1
+              <= (power 2 (64*s-k))*(power 2 (64*t -l)) - 2
+              = power 2 (64*(s+t) - (k+l)) - 2
+              = power 2 (64*(s+t) - 64*n) - 2
+              = power 2 (64*(s+t-n)) - 2
+              = power radix (s+t-n) - 2
+              = m' - 2
+           so a1 * b1 = (power 2 k) * a1' * (power 2 l) * b1'
+              = power 2 k * power 2 l * a1' * b1'
+              = (power 2 (k+l)) * a1' * b1'
+              = power 2 (64*n) * a1' * b1'
+              = power radix n * a1' * b1'
+              = m * (a1' * b1')
+           so a1 * b1 = m * hvinf = m * (a1' * b1')
+           so hvinf = a1' * b1' <= m' - 2 };
   assert { value x sx * value y sy < m * m * m * m'
            by (m * m * m * m' = power radix (n+n+s+t)
               by m * m * m * m'
