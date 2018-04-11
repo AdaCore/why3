@@ -6,7 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../isqrt_von_neumann.mlw" proved="true">
 <theory name="VonNeumann16" proved="true">
  <goal name="sqr_add" proved="true">
@@ -490,7 +490,7 @@
            <proof prover="3"><result status="valid" time="0.01"/></proof>
            </goal>
            <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.0.1.1" proved="true">
-           <proof prover="4"><result status="valid" time="0.14" steps="241"/></proof>
+           <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="241"/></proof>
            </goal>
           </transf>
           </goal>
@@ -654,9 +654,9 @@
                                <proof prover="2"><result status="valid" time="0.01"/></proof>
                                </goal>
                                <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1" proved="true">
-                               <transf name="rewrite" proved="true" arg1="h">
+                               <transf name="rewrite" proved="true" arg1="h1">
                                 <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1.0" proved="true">
-                                <proof prover="1"><result status="valid" time="0.02" steps="112"/></proof>
+                                <proof prover="4"><result status="valid" time="0.02" steps="122"/></proof>
                                 </goal>
                                </transf>
                                </goal>
