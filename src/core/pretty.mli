@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Pretty-printing various objects from Why3's core logic *)
 
 val label_coercion: Ident.label
 

@@ -11,7 +11,7 @@
 
 open Format
 
-(** Construction *)
+(** General functions for representations of numeric values *)
 
 exception InvalidConstantLiteral of int * string
 

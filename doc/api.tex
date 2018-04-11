@@ -40,7 +40,7 @@ providing pretty-printers.
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
 \begin{verbatim}
-ocamlfind ocamlc -package why3 f.ml -o f
+ocamlfind ocamlc -package why3 -linkpkg f.ml -o f
 \end{verbatim}
 Running the generated executable \texttt{f} results in the following output.
 \begin{verbatim}

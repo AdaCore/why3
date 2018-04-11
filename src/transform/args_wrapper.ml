@@ -179,11 +179,12 @@ let build_naming_tables task : naming_table =
     This only works for things defined in .why/.mlw because things
     added by the user are renamed on the fly. *)
   (* TODO:imported theories should be added in the namespace too *)
-  let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
-  let tables = List.fold_left (fun tables d -> add d tables) tables l in
+  let tables = Task.task_fold
+    (fun t d ->
+     match d.td_node with Decl d -> add d t | _ -> t) tables task
+  in
   let crc_map = build_coercion_map km_meta in
   {tables with coercion = crc_map}
-
 
 (************* wrapper  *************)
 
