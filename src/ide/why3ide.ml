@@ -1085,7 +1085,7 @@ let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
-  GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
+  GEdit.entry_completion ~model:completion_model ~minimum_key_length:2 ~entry:command_entry ()
 
 let add_completion_entry (s,desc) =
   let row = completion_model#append () in
