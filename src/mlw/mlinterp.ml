@@ -147,42 +147,42 @@ let eval_big_int_op op _ l =
   match l with
   | [Vbigint i1; Vbigint i2] ->
      (try Vbigint (op i1 i2) with Division_by_zero -> raise CannotReduce)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_big_int_uop uop _ l =
   match l with
   | [Vbigint i] -> Vbigint (uop i)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_big_int_rel r _ l =
   match l with
   | [Vbigint i1; Vbigint i2] ->
      Vbool (r i1 i2)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_int_op op _ l =
   match l with
   | [Vint i1; Vint i2] ->
      (try Vint (op i1 i2) with Division_by_zero -> raise CannotReduce)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_int_uop uop _ l =
   match l with
   | [Vint i] -> Vint (uop i)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_int_rel r _ l =
   match l with
   | [Vint i1; Vint i2] ->
      Vbool (r i1 i2)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let eval_of_big_int _ l =
   match l with
   | [Vbigint i] ->
      begin try Vint (BigInt.to_int i)
      with Failure _ -> raise CannotReduce end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigarray_make _ args =
   match args with
@@ -195,13 +195,13 @@ let exec_bigarray_make _ args =
        with _ -> raise CannotReduce
      end
   | _ ->
-     raise CannotReduce
+     assert false
 
 let exec_bigarray_copy _ args =
   match args with
   | [Varray a] -> Varray(Array.copy a)
   | _ ->
-     raise CannotReduce
+     assert false
 
 let exec_bigarray_get _ args =
   match args with
@@ -211,12 +211,12 @@ let exec_bigarray_get _ args =
          a.(BigInt.to_int i)
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigarray_length _ args =
   match args with
   | [Varray a] -> Vbigint (BigInt.of_int (Array.length a))
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigarray_set _ args =
   match args with
@@ -227,34 +227,34 @@ let exec_bigarray_set _ args =
          Vvoid
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_array_make _ args =
   match args with
   | [Vint n;def] -> Varray(Array.make n def)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_array_copy _ args =
   match args with
   | [Varray a] -> Varray(Array.copy a)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_array_get _ args =
   match args with
   | [Varray a;Vint i] -> a.(i)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_array_length _ args =
   match args with
   | [Varray a] -> Vint (Array.length a)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_array_set _ args =
   match args with
   | [Varray a;Vint i;v] ->
      a.(i) <- v;
      Vvoid
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigmatrix_make _ args =
   match args with
@@ -266,7 +266,7 @@ let exec_bigmatrix_make _ args =
          Vmatrix(Array.make_matrix r c def)
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigmatrix_get _ args =
   match args with
@@ -276,7 +276,7 @@ let exec_bigmatrix_get _ args =
          m.(BigInt.to_int i).(BigInt.to_int j)
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigmatrix_set _ args =
   match args with
@@ -287,7 +287,7 @@ let exec_bigmatrix_set _ args =
          Vvoid
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigmatrix_rows _ args =
   match args with
@@ -302,7 +302,7 @@ let exec_bigmatrix_cols _ args =
        try Vbigint (BigInt.of_int (Array.length m.(0)))
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_bigmatrix_copy _ args =
   match args with
@@ -312,7 +312,7 @@ let exec_bigmatrix_copy _ args =
        a.(i) <- Array.copy m.(i)
      done;
      Vmatrix a
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_matrix_make _ args =
   match args with
@@ -322,31 +322,31 @@ let exec_matrix_make _ args =
          Vmatrix(Array.make_matrix r c def)
        with _ -> raise CannotReduce
      end
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_matrix_get _ args =
   match args with
   | [Vmatrix m; Vint i; Vint j] -> m.(i).(j)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_matrix_set _ args =
   match args with
   | [Vmatrix m; Vint i; Vint j; v] ->
      m.(i).(j) <- v;
      Vvoid
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_matrix_rows _ args =
   match args with
   | [Vmatrix m] -> Vint (Array.length m)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 (* FIXME fails if rows=0 *)
 let exec_matrix_cols _ args =
   match args with
   | [Vmatrix m] ->
      Vint (Array.length m.(0))
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_matrix_copy _ args =
   match args with
@@ -356,25 +356,25 @@ let exec_matrix_copy _ args =
        a.(i) <- Array.copy m.(i)
      done;
      Vmatrix a
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_ref_make _ args =
   match args with
   | [v] ->
      Vref (ref v)
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_ref_get _ args =
   match args with
   | [Vref r] -> !r
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_ref_set _ args =
   match args with
   | [Vref r; v] ->
      r := v;
      Vvoid
-  | _ -> raise CannotReduce
+  | _ -> assert false
 
 let exec_print _ args =
   List.iter (eprintf "%a@." print_value) args;
@@ -587,7 +587,7 @@ let rec matching info v pat =
      | Vbool b ->
         let ls2 = if b then fs_bool_true else fs_bool_false in
         if ls_equal ls ls2 then info else raise NoMatch
-     | _ -> raise CannotReduce
+     | _ -> raise CannotReduce (* FIXME more cases ? *)
 
 let rec interp_expr info (e:Mltree.expr) : value =
   Mltree.(match e.e_node with
@@ -703,7 +703,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
                    | Fimmutable _ -> assert false
                  else
                    aux pvl vl
-              | _ -> raise CannotReduce
+              | _ -> assert false
             in
             aux c.rs_cty.cty_args args
          | _ -> assert false)
@@ -721,7 +721,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
         ignore (interp_expr info b);
         interp_expr info e
      | Vbool false -> Vvoid
-     | _ -> raise CannotReduce end
+     | _ -> assert false end
   | Efor (x, pv1, dir, pv2, e) ->
      Debug.dprintf debug_interp "for@.";
      begin match (get pv1 info, get pv2 info) with
@@ -822,7 +822,7 @@ let rec value_of_term kn t =
                    (List.map (fun t -> Fimmutable (value_of_term kn t)) lp))
   | Tnot t -> begin match value_of_term kn t with
               | Vbool b -> Vbool (not b)
-              | _ -> raise CannotReduce end
+              | _ -> assert false end
   (* TODO Tbinop maybe *)
   | Tconst (Number.ConstInt ic) -> value_of_const ic t.t_ty
   | Term.Tapp (ls,[]) ->
