@@ -1302,6 +1302,7 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 
 let found_obsolete = ref false
 let found_detached = ref false
+(* FIXME: distinguish found_new_goals and found_detached *)
 
 let save_detached_proof s parent old_pa_n =
   let old_pa = old_pa_n in
@@ -1534,7 +1535,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
     match merge with
     | Some (old_s, old_th, env, use_shapes) ->
        merge_theory ~use_shapes env old_s old_th s theory
-    | _ -> ()
+    | _ -> if tasks <> [] then found_detached := true (* should be found_new_goals instead of found_detached *)
   end;
   theory
 
@@ -1584,7 +1585,6 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~file_is_detached ~env
         make_theory_section ~detached:false ~merge:(old_ses,old_th,env,use_shapes) s fn th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
-        found_detached := true;
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
         make_theory_section ~detached:false s fn th
     in
