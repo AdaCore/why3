@@ -58,7 +58,7 @@ let search_begin () =
 
 let end_re = Str.regexp_string ("END{" ^ section ^ "}")
 
-let file_out = Filename.concat output_dir (basename ^ "_" ^ section ^ ext)
+let file_out = Filename.concat output_dir (basename ^ "__" ^ section ^ ext)
 
 let ch_out =
   try

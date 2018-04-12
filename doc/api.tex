@@ -24,7 +24,7 @@ The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $\mathit{true} \lor
 \mathit{false}$.
-\lstinputlisting{logic_opening.ml}
+\lstinputlisting{logic__opening.ml}
 The library uses the common type \texttt{term} both for terms
 (\ie expressions that produce a value of some particular type)
 and formulas (\ie boolean-valued expressions).
@@ -35,7 +35,7 @@ and formulas (\ie boolean-valued expressions).
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
-\lstinputlisting{logic_printformula.ml}
+\lstinputlisting{logic__printformula.ml}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
@@ -50,12 +50,12 @@ formula 1 is: true \/ false
 Let us now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
-\lstinputlisting{logic_declarepropvars.ml}
+\lstinputlisting{logic__declarepropvars.ml}
 The type \texttt{lsymbol} is the type of function and predicate symbols (which
 we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
 by the general function for applying a predicate symbol to a list of terms.
 Here we just need the empty list of arguments.
-\lstinputlisting{logic_declarepropatoms.ml}
+\lstinputlisting{logic__declarepropatoms.ml}
 
 As expected, the output is as follows.
 \begin{verbatim}
@@ -74,7 +74,7 @@ tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
 \texttt{add\_*\_decl} of module \texttt{Task}. For the formula $\mathit{true} \lor
 \mathit{false}$ above, this is done as follows.
-\lstinputlisting{logic_buildtask.ml}
+\lstinputlisting{logic__buildtask.ml}
 To make the formula a goal, we must give a name to it, here ``goal1''. A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
@@ -86,12 +86,12 @@ Notice that lemmas are not allowed in tasks
 and can only be used in theories.
 
 Once a task is built, it can be printed.
-\lstinputlisting{logic_printtask.ml}
+\lstinputlisting{logic__printtask.ml}
 
 The task for our second formula is a bit more complex to build, because
 the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
-\lstinputlisting{logic_buildtask2.ml}
+\lstinputlisting{logic__buildtask2.ml}
 
 Execution of our OCaml program now outputs:
 \begin{verbatim}
@@ -117,44 +117,44 @@ file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
-\lstinputlisting{logic_getconf.ml}
+\lstinputlisting{logic__getconf.ml}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
 prover is a record with a name, a version, and an alternative description
 (to differentiate between various configurations of a given prover). Its
 definition is in the module \texttt{Whyconf}:
-\lstinputlisting{whyconf_provertype.ml}
+\lstinputlisting{whyconf__provertype.ml}
 The map \texttt{provers} provides the set of existing provers.
 In the following, we directly
 attempt to access a prover named ``Alt-Ergo'', any version.
-\lstinputlisting{logic_getanyaltergo.ml}
+\lstinputlisting{logic__getanyaltergo.ml}
 We could also get a specific version with :
-\lstinputlisting{logic_getaltergo200.ml}
+\lstinputlisting{logic__getaltergo200.ml}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
-\lstinputlisting{logic_getdriver.ml}
+\lstinputlisting{logic__getdriver.ml}
 
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
 termination. Here is a simple way to proceed:
-\lstinputlisting{logic_callprover.ml}
+\lstinputlisting{logic__callprover.ml}
 This way to call a prover is in general too naive, since it may never
 return if the prover runs without time limit. The function
 \texttt{prove\_task} has an optional parameter \texttt{limit}, a record defined
 in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers_resourcelimit.ml}
+\lstinputlisting{call_provers__resourcelimit.ml}
 where the field \texttt{limit\_time} is the maximum allowed running time in seconds,
 and \texttt{limit\_mem} is the maximum allowed memory in megabytes.  The type
 \texttt{prover\_result} is a record defined in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers_proverresult.ml}
+\lstinputlisting{call_provers__proverresult.ml}
 with in particular the fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
 \end{itemize}
 A \texttt{pr\_answer} is the sum type defined in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers_proveranswer.ml}
+\lstinputlisting{call_provers__proveranswer.ml}
 corresponding to these kinds of answers:
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover.
@@ -173,7 +173,7 @@ corresponding to these kinds of answers:
 \end{itemize}
 Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
-\lstinputlisting{logic_calltimelimit.ml}
+\lstinputlisting{logic__calltimelimit.ml}
 The output of our program is now as follows.
 \begin{verbatim}
 On task 1, alt-ergo answers Valid (0.01s)
@@ -190,29 +190,29 @@ Here is the way we build the formula $2+2=4$. The main difficulty is to
 access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{sec:library}).
-\lstinputlisting{logic_buildfmla.ml}
+\lstinputlisting{logic__buildfmla.ml}
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
 the constructor \texttt{t\_app\_infer} infers the type of the resulting
 term. One could also provide the expected type as follows.
-\lstinputlisting{logic_buildtermalt.ml}
+\lstinputlisting{logic__buildtermalt.ml}
 
 When building a task with this formula, we need to declare that we use
 theory \texttt{Int}:
-\lstinputlisting{logic_buildtaskimport.ml}
+\lstinputlisting{logic__buildtaskimport.ml}
 
 \section{Building Quantified Formulas}
 
 To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
-\lstinputlisting{logic_quantfmla1.ml}
+\lstinputlisting{logic__quantfmla1.ml}
 The next step is to introduce the variable $x$ with the type int.
-\lstinputlisting{logic_quantfmla2.ml}
+\lstinputlisting{logic__quantfmla2.ml}
 The formula $x*x \geq 0$ is obtained as in the previous example.
-\lstinputlisting{logic_quantfmla3.ml}
+\lstinputlisting{logic__quantfmla3.ml}
 To quantify on $x$, we use the appropriate smart constructor as follows.
-\lstinputlisting{logic_quantfmla4.ml}
+\lstinputlisting{logic__quantfmla4.ml}
 
 \section{Building Theories}
 
@@ -225,33 +225,33 @@ be done by a sequence of calls:
 \end{itemize}
 
 Creation of a theory named \verb|My_theory| is done by
-\lstinputlisting{logic_buildth1.ml}
+\lstinputlisting{logic__buildth1.ml}
 First let us add formula 1 above as a goal:
-\lstinputlisting{logic_buildth2.ml}
+\lstinputlisting{logic__buildth2.ml}
 Note that we reused the goal identifier \verb|goal_id1| that we
 already defined to create task 1 above.
 
 Adding formula 2 needs to add the declarations of predicate variables A
 and B first:
-\lstinputlisting{logic_buildth3.ml}
+\lstinputlisting{logic__buildth3.ml}
 
 Adding formula 3 is a bit more complex since it uses integers, thus it
 requires to ``use'' the theory \verb|int.Int|. Using a theory is
 indeed not a primitive operation in the API: it must be done by a
 combination of an ``export'' and the creation of a namespace. We
 provide a helper function for that:
-\lstinputlisting{logic_buildth4.ml}
+\lstinputlisting{logic__buildth4.ml}
 Addition of formula 3 is then
-\lstinputlisting{logic_buildth5.ml}
+\lstinputlisting{logic__buildth5.ml}
 
 Addition of goal 4 is nothing more complex:
-\lstinputlisting{logic_buildth6.ml}
+\lstinputlisting{logic__buildth6.ml}
 
 Finally, we close our theory under construction as follows.
-\lstinputlisting{logic_buildth7.ml}
+\lstinputlisting{logic__buildth7.ml}
 
 We can inspect what we did by printing that theory:
-\lstinputlisting{logic_printtheory.ml}
+\lstinputlisting{logic__printtheory.ml}
 which outputs
 \begin{verbatim}
 my new theory is as follows:
@@ -277,12 +277,12 @@ end
 
 From a theory, one can compute at once all the proof tasks it contains
 as follows:
-\lstinputlisting{logic_splittheory.ml}
+\lstinputlisting{logic__splittheory.ml}
 Note that the tasks are returned in reverse order, so we reverse the
 list above.
 
 We can check our generated tasks by printing them:
-\lstinputlisting{logic_printalltasks.ml}
+\lstinputlisting{logic__printalltasks.ml}
 
 One can run provers on those tasks exactly as we did above.
 
