@@ -621,6 +621,10 @@ end
        else full
     | APn pn ->
        let name = (get_proof_name d.cont.controller_session pn).Ident.id_string in
+       (* Reduce the name of the goal to the minimum, by taking the
+          part after the last dot: "0" instead of "WP_Parameter.0" for
+          example.  *)
+       let name = List.hd (Strings.rev_split '.' name) in
        let expl = get_proof_expl d.cont.controller_session pn in
        if expl = "" then name else name ^ " [" ^ expl ^ "]"
     | APa pa ->
