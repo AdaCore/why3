@@ -434,6 +434,8 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
+         | None when n = "0" -> fprintf fmt "Z.zero"
+         | None when n = "1" -> fprintf fmt "Z.one"
          | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
