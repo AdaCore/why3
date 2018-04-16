@@ -165,6 +165,10 @@ rule token = parse
       { INTEGER (Number.int_literal_oct (Lexlib.remove_underscores s)) }
   | '0' ['b' 'B'] (bin bin_sep* as s)
       { INTEGER (Number.int_literal_bin (Lexlib.remove_underscores s)) }
+  | (dec+ as i) ".."
+      { Lexlib.backjump lexbuf 2; INTEGER (Number.int_literal_dec i) }
+  | '0' ['x' 'X'] (hex+ as i) ".."
+      { Lexlib.backjump lexbuf 2; INTEGER (Number.int_literal_hex i) }
   | (dec+ as i)     ("" as f)    ['e' 'E'] (['-' '+']? dec+ as e)
   | (dec+ as i) '.' (dec* as f) (['e' 'E'] (['-' '+']? dec+ as e))?
   | (dec* as i) '.' (dec+ as f) (['e' 'E'] (['-' '+']? dec+ as e))?
@@ -177,15 +181,9 @@ rule token = parse
         (['p' 'P'] (['-' '+']? dec+ as e))?
       { REAL (Number.real_const_hex i f
           (Opt.map Lexlib.remove_leading_plus e)) }
-  | "(**)"
-      { token lexbuf }
-  | "(*(*"
-      { Lexlib.comment lexbuf; Lexlib.comment lexbuf; token lexbuf }
-  | "(*" '\n'
-      { Lexing.new_line lexbuf; Lexlib.comment lexbuf; token lexbuf }
-  | "(*(*)"
-  | "(*" eof
-  | "(*" [^ ')']
+  | "(*)"
+      { Lexlib.backjump lexbuf 2; LEFTPAR }
+  | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
   | "'" (lident as id)
       { QUOTE_LIDENT id }

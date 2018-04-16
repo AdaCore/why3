@@ -109,9 +109,9 @@ module SchorrWaite
 
   let ghost tl_stackNodes (stack: stacknodes) : stacknodes
     requires { Seq.length stack > 0 }
-    ensures  { result = stack[1 .. ] }
+    ensures  { result = stack[1..] }
     ensures  { forall n. not_in_stack n stack -> not_in_stack n result }
-  = stack[1 .. ]
+  = stack[1..]
 
   (** two lemmas about stacks *)
 
@@ -124,7 +124,7 @@ module SchorrWaite
 
   let lemma tl_cons (s1 s2: stacknodes) (p: loc)
     requires { Seq.length s2 > 0 }
-    requires { s1 = s2[1 ..] }
+    requires { s1 = s2[1..] }
     requires { p = Seq.get s2 0 }
     ensures  { s2 = cons p s1 }
   = assert { Seq.(==) s2 (cons p s1) }

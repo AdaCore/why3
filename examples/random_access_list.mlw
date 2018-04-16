@@ -243,7 +243,7 @@ module RandomAccessListWithSeq
   let rec tail (l: ral 'a) : ral 'a
     requires { 0 < length (elements l) }
     variant  { l }
-    ensures  { elements result == (elements l)[1 .. ] }
+    ensures  { elements result == (elements l)[1..] }
     =
     match l with
     | Empty    -> absurd

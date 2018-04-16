@@ -98,6 +98,13 @@ and string_skip_spaces = parse
           pos_bol = pos.pos_cnum - chars;
       }
 
+  let backjump lexbuf chars =
+    if chars < 0 || chars > lexbuf.lex_curr_pos - lexbuf.lex_start_pos then
+      invalid_arg "Lexlib.backjump";
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_pos <- lexbuf.lex_curr_pos - chars;
+    lexbuf.lex_curr_p <- { pos with pos_cnum = pos.pos_cnum - chars }
+
   let remove_leading_plus s =
     let n = String.length s in
     if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s

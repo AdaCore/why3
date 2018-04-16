@@ -67,15 +67,9 @@ rule token = parse
       { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
-  | "(**)"
-      { token lexbuf }
-  | "(*(*"
-      { Lexlib.comment lexbuf; Lexlib.comment lexbuf; token lexbuf }
-  | "(*" '\n'
-      { Lexing.new_line lexbuf; Lexlib.comment lexbuf; token lexbuf }
-  | "(*(*)"
-  | "(*" eof
-  | "(*" [^ ')']
+  | "(*)"
+      { Lexlib.backjump lexbuf 2; LEFTPAR }
+  | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
   | '_'
       { UNDERSCORE }

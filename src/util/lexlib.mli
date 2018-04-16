@@ -17,6 +17,8 @@ val string : Lexing.lexbuf -> string
 
 val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
 
+val backjump : Lexing.lexbuf -> int -> unit
+
 val remove_leading_plus : string -> string
 
 val remove_underscores : string -> string

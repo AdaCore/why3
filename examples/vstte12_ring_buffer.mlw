@@ -214,8 +214,8 @@ module RingBufferSeq
     writes   { b.first, b.len, b.sequence }
     ensures  { length b = (old (length b)) - 1 }
     ensures  { result = S.get (old b.sequence) 0 }
-    ensures  { b.sequence = (old b.sequence)[1 ..] }
-  = ghost (b.sequence <- b.sequence[1 ..]);
+    ensures  { b.sequence = (old b.sequence)[1..] }
+  = ghost (b.sequence <- b.sequence[1..]);
     let r = b.data[b.first] in
     b.len <- b.len - 1;
     let n = Array.length b.data in
