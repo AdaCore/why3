@@ -380,6 +380,7 @@ let rec e_label_push ?loc l e = match e.e_node with
       let e1 = e_label_push ?loc l e1 in
       { e with e_node = Elet (ld, e1); e_loc = loc }
   | _ ->
+      let l = Slab.union l e.e_label in
       { e with e_label = l; e_loc = loc }
 
 let e_ghost e = e.e_effect.eff_ghost

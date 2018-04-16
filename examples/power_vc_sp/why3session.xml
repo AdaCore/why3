@@ -10,15 +10,15 @@
  <proof prover="0"><result status="valid" time="0.15" steps="54"/></proof>
  </goal>
  <goal name="VC fast_exp_imperative" expl="VC for fast_exp_imperative" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_intros_goal_wp" proved="true" >
   <goal name="VC fast_exp_imperative.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.3" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -27,21 +27,9 @@
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.96" steps="32"/></proof>
+  <proof prover="0"><result status="valid" time="0.84" steps="60"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="VC fast_exp_imperative.7" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC fast_exp_imperative.8" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC fast_exp_imperative.9" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.21" steps="36"/></proof>
-  </goal>
-  <goal name="VC fast_exp_imperative.10" expl="postcondition" proved="true">
+  <goal name="VC fast_exp_imperative.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>

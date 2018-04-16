@@ -694,7 +694,7 @@ let rec t_subst_unsafe m t =
     (u, bv_subst_unsafe m b, e) in
   match t.t_node with
   | Tvar u ->
-      Mvs.find_def t u m
+      t_label_copy t (Mvs.find_def t u m)
   | Tlet (e, bt) ->
       let d = t_subst e in
       t_label_copy t (t_let d (b_subst bt) t.t_ty)
