@@ -830,8 +830,8 @@ and clone_let_defn cl sm ld = match ld with
         ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
       sm_save_rs cl sm s s', ld
   | LDrec rdl ->
-      let conv_rs mrs {rec_rsym = {rs_name = id} as rs; rec_varl = varl} =
-        let cty = clone_cty cl sm ~drop_decr:(varl <> []) rs.rs_cty in
+      let conv_rs mrs {rec_rsym = {rs_name = id} as rs} =
+        let cty = clone_cty cl sm ~drop_decr:true rs.rs_cty in
         let rs' = create_rsymbol (id_clone id) ~ghost:(rs_ghost rs) cty in
         Mrs.add rs rs' mrs, rs' in
       let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in

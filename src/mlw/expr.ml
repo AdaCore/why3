@@ -1074,8 +1074,7 @@ and rec_fixp dl =
     if cty_ghost d.c_cty && not (rs_ghost s) then Loc.errorm
       "Expr.let_rec: ghost status mismatch";
     let c = c_cty_ghostify (rs_ghost s) d in
-    let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
-            then cty_add_pre [List.hd s.rs_cty.cty_pre] c else c in
+    let c = cty_add_pre [List.hd s.rs_cty.cty_pre] c in
     if eff_equal c.cty_effect s.rs_cty.cty_effect &&
        mask_equal c.cty_mask s.rs_cty.cty_mask then sm, (s,d)
     else let n = rs_dup s c in Mrs.add s n sm, (n,d) in
@@ -1122,13 +1121,10 @@ let let_rec fdl =
        c.cty_args = []
     then invalid_arg "Expr.let_rec";
     (* prepare the extra "decrease" precondition *)
-    let pre = match varl with
-      | [] -> c.cty_pre
-      | _::_ ->
-          let tl = List.map fst varl in
-          let id = id_fresh ("DECR " ^ s.rs_name.id_string) in
-          let ps = create_psymbol id (List.map t_type tl) in
-          ps_app ps tl :: c.cty_pre in
+    let decr_tl = List.map fst varl in
+    let decr_id = id_fresh ("DECR " ^ s.rs_name.id_string) in
+    let decr_ps = create_psymbol decr_id (List.map t_type decr_tl) in
+    let pre = ps_app decr_ps decr_tl :: c.cty_pre in
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
     let c = create_cty ~mask:c.cty_mask c.cty_args pre
@@ -1148,8 +1144,7 @@ let let_rec fdl =
   LDrec rdl, rdl
 
 let ls_decr_of_rec_defn = function
-  | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}};
-      rec_varl = _::_ } -> Some ls
+  | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}} } -> Some ls
   | _ -> None
 
 (* pretty-pringting *)

@@ -233,6 +233,7 @@ let decrease_def env loc old_t t =
   else decrease_alg env loc old_t t
 
 let decrease env loc lab expl olds news =
+  if olds = [] && news = [] then t_true else
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news
       when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
@@ -774,11 +775,9 @@ let rec k_expr env lps e res xmap =
         let init = wp_of_inv None lab expl_loop_init invl in
         let prev = sp_of_inv None lab expl_loop_init invl in
         let keep = wp_of_inv None lab expl_loop_keep invl in
-        let keep, oldies =
-          if varl = [] then keep, Mpv.empty else
-          let oldies, ovarl = oldify_variant varl in
-          let d = decrease env loc lab expl_loop_vari ovarl varl in
-          wp_and d keep, oldies in
+        let oldies, ovarl = oldify_variant varl in
+        let decr = decrease env loc lab expl_loop_vari ovarl varl in
+        let keep = wp_and decr keep in
         let iinv = inv_of_loop env e.e_loc invl varl in
         let j = List.fold_right assert_inv iinv (Kstop init) in
         let k = List.fold_right assert_inv iinv (Kstop keep) in
@@ -873,7 +872,6 @@ and k_rec env lps rdl =
   let k_rd {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with
       | Cfun e -> e | _ -> assert false in
-    if varl = [] then k_fun env lps c.c_cty e else
     (* store in lps our variant at the entry point
        and the list of well-founded orderings
        for each function in the let-rec block *)
