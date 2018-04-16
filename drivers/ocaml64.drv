@@ -10,7 +10,7 @@ end
 
 module HighOrd
   syntax type (->) "%1 -> %2"
-  syntax val  (@)  "%1 %2"
+  syntax val  ( @ )  "%1 %2"
 end
 
 theory option.Option
@@ -351,8 +351,8 @@ module mach.array.Array63
   syntax type array "(%1 array)"
 
   syntax val  make   "Array.make %1 %2"
-  syntax val  ([])   "Array.get %1 %2"
-  syntax val  ([]<-) "Array.set %1 %2 %3"
+  syntax val  ([])   "%1.(%2)"
+  syntax val  ([]<-) "%1.(%2) <- %3"
   syntax val  length "Array.length %1"
   syntax val  append "Array.append %1 %2"
   syntax val  sub    "Array.sub %1 %2 %3"
