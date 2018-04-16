@@ -6529,17 +6529,17 @@
    <goal name="VC div3by2_inv.5.4" expl="VC for div3by2_inv" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC div3by2_inv.5.4.0" expl="VC for div3by2_inv" proved="true">
-    <transf name="cut" proved="true" arg1="(v * (radix * uh) &lt;= v * d)">
+    <transf name="cut" proved="true" arg1="(v * (radix2 * uh) &lt;= v * d)">
      <goal name="VC div3by2_inv.5.4.0.0" expl="VC for div3by2_inv" proved="true">
-     <proof prover="3"><result status="valid" time="0.03"/></proof>
+     <proof prover="3"><result status="valid" time="0.01"/></proof>
      </goal>
      <goal name="VC div3by2_inv.5.4.0.1" proved="true">
      <transf name="apply" proved="true" arg1="prod_compat_r">
       <goal name="VC div3by2_inv.5.4.0.1.0" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.05"/></proof>
       </goal>
       <goal name="VC div3by2_inv.5.4.0.1.1" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.03"/></proof>
       </goal>
      </transf>
      </goal>
@@ -7333,14 +7333,14 @@
    <goal name="VC div3by2_inv.20.13" expl="VC for div3by2_inv" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC div3by2_inv.20.13.0" expl="VC for div3by2_inv" proved="true">
-    <transf name="cut" proved="true" arg1="(v* (radix*uh) &lt;= v*d)">
+    <transf name="cut" proved="true" arg1="(v * (radix2 * uh) &lt;= v * d)">
      <goal name="VC div3by2_inv.20.13.0.0" expl="VC for div3by2_inv" proved="true">
      <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC div3by2_inv.20.13.0.1" proved="true">
      <transf name="apply" proved="true" arg1="prod_compat_r">
       <goal name="VC div3by2_inv.20.13.0.1.0" proved="true">
-      <proof prover="3"><result status="valid" time="0.05"/></proof>
+      <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div3by2_inv.20.13.0.1.1" proved="true">
       <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -8397,12 +8397,12 @@
    <goal name="VC submul_limb.22.9" expl="VC for submul_limb" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC submul_limb.22.9.0" expl="VC for submul_limb" proved="true">
-    <transf name="cut" proved="true" arg1="(value r1 i = value r1 k + power radix k * lr)">
+    <transf name="cut" proved="true" arg1="(value r1 i = value r1 k + power radix2 k * lr)">
      <goal name="VC submul_limb.22.9.0.0" expl="VC for submul_limb" proved="true">
      <proof prover="3"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC submul_limb.22.9.0.1" proved="true">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
      </goal>
     </transf>
     </goal>
@@ -10365,12 +10365,12 @@
    <proof prover="2" timelimit="1"><result status="valid" time="0.44"/></proof>
    </goal>
    <goal name="VC div_sb_qr.162.13" expl="VC for div_sb_qr" proved="true">
-   <transf name="replace" proved="true" arg1="(power radix 2)" arg2="(radix * radix)">
+   <transf name="replace" proved="true" arg1="(power radix2 2)" arg2="(radix2 * radix2)">
     <goal name="VC div_sb_qr.162.13.0" expl="VC for div_sb_qr" proved="true">
-    <proof prover="2" memlimit="2000"><result status="valid" time="2.34"/></proof>
+    <proof prover="2" memlimit="2000"><result status="valid" time="1.67"/></proof>
     </goal>
     <goal name="VC div_sb_qr.162.13.1" proved="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
@@ -10488,12 +10488,12 @@
     <goal name="VC div_sb_qr.168.12.0" expl="VC for div_sb_qr" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC div_sb_qr.168.12.0.0" expl="VC for div_sb_qr" proved="true">
-     <transf name="cut" proved="true" arg1="(0 &lt;= x12 /\ 0 &lt;= power radix sy)">
+     <transf name="cut" proved="true" arg1="(0 &lt;= x12 /\ 0 &lt;= power radix2 sy)">
       <goal name="VC div_sb_qr.168.12.0.0.0" expl="VC for div_sb_qr" proved="true">
-      <proof prover="1"><result status="valid" time="0.53"/></proof>
+      <proof prover="1"><result status="valid" time="0.28"/></proof>
       </goal>
       <goal name="VC div_sb_qr.168.12.0.0.1" proved="true">
-      <proof prover="3"><result status="valid" time="0.06"/></proof>
+      <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.05"/></proof>
       </goal>
      </transf>
      </goal>
@@ -10807,12 +10807,12 @@
    <goal name="VC div_sb_qr.191.6" expl="VC for div_sb_qr" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC div_sb_qr.191.6.0" expl="VC for div_sb_qr" proved="true">
-    <transf name="cut" proved="true" arg1="((power radix (int32&#39;int sy - 1) * (uint64&#39;int x1 + radix * c&#39;))=(power radix (int32&#39;int sy - 1) * uint64&#39;int x1) + (power radix (int32&#39;int sy) * c&#39;))">
+    <transf name="cut" proved="true" arg1="((power radix2 (int32&#39;int sy - 1) * (uint64&#39;int x1 + radix2 * c&#39;))=(power radix2 (int32&#39;int sy - 1) * uint64&#39;int x1) + (power radix2 (int32&#39;int sy) * c&#39;))">
      <goal name="VC div_sb_qr.191.6.0.0" expl="VC for div_sb_qr" proved="true">
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.01"/></proof>
      </goal>
      <goal name="VC div_sb_qr.191.6.0.1" proved="true">
-     <proof prover="1"><result status="valid" time="0.54"/></proof>
+     <proof prover="1"><result status="valid" time="0.24"/></proof>
      </goal>
     </transf>
     </goal>
@@ -11364,12 +11364,12 @@
    <goal name="VC div_sb_qr.225.0" expl="assertion" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC div_sb_qr.225.0.0" expl="assertion" proved="true">
-    <transf name="replace" proved="true" arg1="(value qp ((int32&#39;int sx - int32&#39;int sy) - int32&#39;int i))" arg2="(uint64&#39;int ql+ radix*value_sub (pelts q) (offset qp + 1) (((offset qp + int32&#39;int sx) - int32&#39;int sy) - int32&#39;int i))">
+    <transf name="replace" proved="true" arg1="(value qp ((int32&#39;int sx - int32&#39;int sy) - int32&#39;int i))" arg2="(uint64&#39;int ql+ radix2 *value_sub (pelts q) (offset qp + 1) (((offset qp + int32&#39;int sx) - int32&#39;int sy) - int32&#39;int i))">
      <goal name="VC div_sb_qr.225.0.0.0" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.01"/></proof>
      </goal>
      <goal name="VC div_sb_qr.225.0.0.1" proved="true">
-     <proof prover="0"><result status="valid" time="0.03"/></proof>
+     <proof prover="0"><result status="valid" time="0.02"/></proof>
      </goal>
     </transf>
     </goal>
@@ -11560,9 +11560,9 @@
      <proof prover="0"><result status="valid" time="0.10"/></proof>
      </goal>
      <goal name="VC div_sb_qr.242.0.0.3" expl="VC for div_sb_qr" proved="true">
-     <transf name="cut" proved="true" arg1="(value y (sy - 1) = vly + (power radix (sy-2) * dl))">
+     <transf name="cut" proved="true" arg1="(value y (sy - 1) = vly + (power radix2 (sy-2) * dl))">
       <goal name="VC div_sb_qr.242.0.0.3.0" expl="VC for div_sb_qr" proved="true">
-      <proof prover="3"><result status="valid" time="0.01"/></proof>
+      <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.01"/></proof>
       </goal>
       <goal name="VC div_sb_qr.242.0.0.3.1" proved="true">
       <transf name="replace" proved="true" arg1="(sy - 1)" arg2="((sy - 2) + 1)">
@@ -11578,7 +11578,7 @@
        </transf>
        </goal>
        <goal name="VC div_sb_qr.242.0.0.3.1.1" proved="true">
-       <proof prover="3"><result status="valid" time="0.01"/></proof>
+       <proof prover="3"><result status="valid" time="0.02"/></proof>
        </goal>
       </transf>
       </goal>
@@ -12227,13 +12227,12 @@
    <goal name="VC divmod_2.47.14" expl="VC for divmod_2" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC divmod_2.47.14.0" expl="VC for divmod_2" proved="true">
-    <transf name="replace" proved="true" arg1="(value_sub (pelts q) (offset q + k) ((offset q + int32&#39;int sx) - 2) + (uint64&#39;int qh * power radix ((int32&#39;int sx - 2) - k)))" arg2="(value_sub (pelts q1) (offset q1 + k)
-           ((offset q1 + int32&#39;int sx) - 2) + (uint64&#39;int qh * power radix ((int32&#39;int sx - 2) - k)))">
+    <transf name="replace" proved="true" arg1="(value_sub (pelts q) (offset q + k) ((offset q + int32&#39;int sx) - 2) + (uint64&#39;int qh * power radix2 ((int32&#39;int sx - 2) - k)))" arg2="(value_sub (pelts q1) (offset q1 + k) ((offset q1 + int32&#39;int sx) - 2) + (uint64&#39;int qh * power radix2 ((int32&#39;int sx - 2) - k)))">
      <goal name="VC divmod_2.47.14.0.0" expl="VC for divmod_2" proved="true">
-     <proof prover="0"><result status="valid" time="0.04"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
      </goal>
      <goal name="VC divmod_2.47.14.0.1" proved="true">
-     <proof prover="1"><result status="valid" time="0.26"/></proof>
+     <proof prover="1"><result status="valid" time="0.11"/></proof>
      </goal>
     </transf>
     </goal>
@@ -12243,8 +12242,8 @@
    <transf name="introduce_premises" proved="true" >
     <goal name="VC divmod_2.47.15.0" expl="VC for divmod_2" proved="true">
     <proof prover="1"><result status="valid" time="0.14"/></proof>
-    <transf name="remove" proved="true" arg1="real,tuple0,unit,tuple2,map,ref,limb,zone,t,tuple3,zero1,one1,(&gt;),(&gt;=),abs,div1,mod1,get,([]),const,map_eq_sub,length1,([]),make,map_eq_sub_shift,min_unsigned1,max2,in_bounds2,zero_unsigned1,radix1,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int2,in_bounds3,uint32&#39;minInt,length,in_bounds,is_msb_set,(!),uint64&#39;minInt,radix2,to_int3,min_unsigned2,in_bounds4,zero_unsigned2,is_msb_set1,in_us_bounds,null_zone,min1,zone,plength,valid_ptr_shift,valid,is_not_null,compare_int,reciprocal,reciprocal_3by2,normalized,zero,two,uzero,uone,dinv,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_monotonic,array&#39;invariant,make_spec,map_eq_shift,map_eq_shift_zero,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,radix_def,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,is_msb_set_spec,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set_spec1,limb_max_bound,prod_compat_strict_r,prod_compat_r,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,valid_itv_to_shift,is_not_null_spec,value_tail,value_concat,pow2_64,mod_mult,fact_div,bounds_imply_rec3by2,H,H1,H2,H3,H4,H5,H6,H7,H8,H9,H11,H12,H13,H15,H18,H19,H20,H21,H22,H23,H24,H25,H26,H27,H28,H29,H30,H31,H32,H34,H35,H36,H37,H38,H39,H40,H41,H42,H43,H44,H45,H46,H47,H48,H49,H50,H51,H52,H53,H54,H55,H56,H57,H58,H59,H60,H61,H62,H64,H65,H66,H67,H68">
-     <goal name="VC divmod_2.47.15.0.0" expl="VC for divmod_2" proved="true">
+    <transf name="remove" arg1="real,tuple0,unit,tuple2,map,ref,limb,zone,t,tuple3,zero1,one1,(&gt;),(&gt;=),abs,div1,mod1,get,([]),const,map_eq_sub,length1,([]),make,map_eq_sub_shift,min_unsigned1,max2,in_bounds2,zero_unsigned1,radix1,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int2,in_bounds3,uint32&#39;minInt,length,in_bounds,is_msb_set,(!),uint64&#39;minInt,radix2,to_int3,min_unsigned2,in_bounds4,zero_unsigned2,is_msb_set1,in_us_bounds,null_zone,min1,zone,plength,valid_ptr_shift,valid,is_not_null,compare_int,reciprocal,reciprocal_3by2,normalized,zero,two,uzero,uone,dinv,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_monotonic,array&#39;invariant,make_spec,map_eq_shift,map_eq_shift_zero,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,radix_def,to_int_in_bounds2,extensionality2,to_int_in_bounds,extensionality,zero_unsigned_is_zero,is_msb_set_spec,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set_spec1,limb_max_bound,prod_compat_strict_r,prod_compat_r,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,valid_itv_to_shift,is_not_null_spec,value_tail,value_concat,pow2_64,mod_mult,fact_div,bounds_imply_rec3by2,H,H1,H2,H3,H4,H5,H6,H7,H8,H9,H11,H12,H13,H15,H18,H19,H20,H21,H22,H23,H24,H25,H26,H27,H28,H29,H30,H31,H32,H34,H35,H36,H37,H38,H39,H40,H41,H42,H43,H44,H45,H46,H47,H48,H49,H50,H51,H52,H53,H54,H55,H56,H57,H58,H59,H60,H61,H62,H64,H65,H66,H67,H68">
+     <goal name="VC divmod_2.47.15.0.0">
      <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
      <proof prover="3"><result status="valid" time="0.07"/></proof>
      </goal>
