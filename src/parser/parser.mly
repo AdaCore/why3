@@ -116,7 +116,7 @@
 
 (* Tokens *)
 
-%token <string> LIDENT LIDENT_QUOTE UIDENT UIDENT_QUOTE
+%token <string> LIDENT CORE_LIDENT UIDENT CORE_UIDENT
 %token <Number.integer_literal> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Number.real_literal> REAL
@@ -1145,22 +1145,22 @@ ident_nq:
 
 uident:
 | UIDENT          { mk_id $1 $startpos $endpos }
-| UIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+| CORE_UIDENT     { mk_id $1 $startpos $endpos }
 
 uident_nq:
 | UIDENT          { mk_id $1 $startpos $endpos }
-| UIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+| CORE_UIDENT     { let loc = floc $startpos($1) $endpos($1) in
                     Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
-| LIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+| CORE_LIDENT     { mk_id $1 $startpos $endpos }
 
 lident_nq:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
-| LIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+| CORE_LIDENT     { let loc = floc $startpos($1) $endpos($1) in
                     Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
 
 lident_keyword:
@@ -1168,7 +1168,7 @@ lident_keyword:
 | FLOAT           { "float" }
 
 quote_lident:
-| QUOTE_LIDENT  { mk_id $1 $startpos $endpos }
+| QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
 
 (* Idents + symbolic operation names *)
 

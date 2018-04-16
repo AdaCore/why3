@@ -97,18 +97,29 @@
 }
 
 let space = [' ' '\t' '\r']
-let lalpha = ['a'-'z' '_']
+let quote = '\''
+
+let bin     = ['0' '1']
+let oct     = ['0'-'7']
+let dec     = ['0'-'9']
+let hex     = ['0'-'9' 'a'-'f' 'A'-'F']
+
+let bin_sep = ['0' '1' '_']
+let oct_sep = ['0'-'7' '_']
+let dec_sep = ['0'-'9' '_']
+let hex_sep = ['0'-'9' 'a'-'f' 'A'-'F' '_']
+
+let lalpha = ['a'-'z']
 let ualpha = ['A'-'Z']
-let alpha = lalpha | ualpha
-let digit = ['0'-'9']
-let digit_or_us = ['0'-'9' '_']
-let alpha_no_us = ['a'-'z' 'A'-'Z']
-let suffix = (alpha_no_us | '\''* digit_or_us)* '\''*
-let lident = lalpha suffix
-let uident = ualpha suffix
-let lident_quote = lident ('\'' alpha_no_us suffix)+
-let uident_quote = uident ('\'' alpha_no_us suffix)+
-let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
+let alpha  = ['a'-'z' 'A'-'Z']
+
+let suffix = (alpha | quote* dec_sep)* quote*
+let lident = ['a'-'z' '_'] suffix
+let uident = ['A'-'Z'] suffix
+
+let core_suffix = quote alpha suffix
+let core_lident = lident core_suffix+
+let core_uident = uident core_suffix+
 
 let op_char_1 = ['=' '<' '>' '~']
 let op_char_2 = ['+' '-']
@@ -122,12 +133,12 @@ let op_char_pref = ['!' '?']
 
 rule token = parse
   | "##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
-    space* (digit+ as line) space* (digit+ as char) space* "##"
+    space* (dec+ as line) space* (dec+ as char) space* "##"
       { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
   | "#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
-    space* (digit+ as line) space* (digit+ as bchar) space*
-    (digit+ as echar) space* "#"
+    space* (dec+ as line) space* (dec+ as bchar) space*
+    (dec+ as echar) space* "#"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
@@ -140,30 +151,30 @@ rule token = parse
       { UNDERSCORE }
   | lident as id
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
-  | lident_quote as id
-      { LIDENT_QUOTE id }
+  | core_lident as id
+      { CORE_LIDENT id }
   | uident as id
       { UIDENT id }
-  | uident_quote as id
-      { UIDENT_QUOTE id }
-  | ['0'-'9'] ['0'-'9' '_']* as s
+  | core_uident as id
+      { CORE_UIDENT id }
+  | dec dec_sep* as s
       { INTEGER (Number.int_literal_dec (Lexlib.remove_underscores s)) }
-  | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
+  | '0' ['x' 'X'] (hex hex_sep* as s)
       { INTEGER (Number.int_literal_hex (Lexlib.remove_underscores s)) }
-  | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
+  | '0' ['o' 'O'] (oct oct_sep* as s)
       { INTEGER (Number.int_literal_oct (Lexlib.remove_underscores s)) }
-  | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
+  | '0' ['b' 'B'] (bin bin_sep* as s)
       { INTEGER (Number.int_literal_bin (Lexlib.remove_underscores s)) }
-  | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
-  | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-  | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
+  | (dec+ as i)     ("" as f)    ['e' 'E'] (['-' '+']? dec+ as e)
+  | (dec+ as i) '.' (dec* as f) (['e' 'E'] (['-' '+']? dec+ as e))?
+  | (dec* as i) '.' (dec+ as f) (['e' 'E'] (['-' '+']? dec+ as e))?
       { REAL (Number.real_const_dec i f
           (Opt.map Lexlib.remove_leading_plus e)) }
-  | '0' ['x' 'X'] (hexadigit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
-  | '0' ['x' 'X'] (hexadigit+ as i) '.' (hexadigit* as f)
-        (['p' 'P'] (['-' '+']? digit+ as e))?
-  | '0' ['x' 'X'] (hexadigit* as i) '.' (hexadigit+ as f)
-        (['p' 'P'] (['-' '+']? digit+ as e))?
+  | '0' ['x' 'X'] (hex+ as i) ("" as f) ['p' 'P'] (['-' '+']? dec+ as e)
+  | '0' ['x' 'X'] (hex+ as i) '.' (hex* as f)
+        (['p' 'P'] (['-' '+']? dec+ as e))?
+  | '0' ['x' 'X'] (hex* as i) '.' (hex+ as f)
+        (['p' 'P'] (['-' '+']? dec+ as e))?
       { REAL (Number.real_const_hex i f
           (Opt.map Lexlib.remove_leading_plus e)) }
   | "(**)"
