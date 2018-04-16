@@ -26,7 +26,7 @@
 %token BLACKLIST
 %token MODULE EXCEPTION VAL CONVERTER LITERAL
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
-%token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
+%token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
 
 %nonassoc SYNTAX REMOVE PRELUDE
@@ -133,7 +133,6 @@ ident:
 
 ident_rich:
 | ident                     { $1 }
-| LEFTPAR_STAR_RIGHTPAR     { Ident.infix "*" }
 | LEFTPAR operator RIGHTPAR { $2 }
 
 operator:

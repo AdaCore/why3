@@ -52,7 +52,6 @@
         "converter", CONVERTER;
         "literal", LITERAL;
       ]
-
 }
 
 let space = [' ' '\t' '\r']
@@ -65,12 +64,18 @@ let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
 
 rule token = parse
   | '\n'
-      { new_line lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
-  | "(*)"
-      { LEFTPAR_STAR_RIGHTPAR }
-  | "(*"
+  | "(**)"
+      { token lexbuf }
+  | "(*(*"
+      { Lexlib.comment lexbuf; Lexlib.comment lexbuf; token lexbuf }
+  | "(*" '\n'
+      { Lexing.new_line lexbuf; Lexlib.comment lexbuf; token lexbuf }
+  | "(*(*)"
+  | "(*" eof
+  | "(*" [^ ')']
       { Lexlib.comment lexbuf; token lexbuf }
   | '_'
       { UNDERSCORE }

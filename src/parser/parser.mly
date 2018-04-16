@@ -147,7 +147,7 @@
 %token BAR
 %token COLON COMMA
 %token DOT DOTDOT EQUAL LT GT LTGT MINUS
-%token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
+%token LEFTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
 %token UNDERSCORE
@@ -1183,11 +1183,6 @@ lident_rich:
 
 lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
-| LEFTPAR_STAR_RIGHTPAR
-    { (* parentheses are removed from the location *)
-      let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
-      let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
-      mk_id (Ident.infix "*") s e }
 
 lident_op:
 | op_symbol               { Ident.infix $1 }

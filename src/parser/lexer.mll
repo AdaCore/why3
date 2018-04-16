@@ -166,9 +166,15 @@ rule token = parse
         (['p' 'P'] (['-' '+']? digit+ as e))?
       { REAL (Number.real_const_hex i f
           (Opt.map Lexlib.remove_leading_plus e)) }
-  | "(*)"
-      { LEFTPAR_STAR_RIGHTPAR }
-  | "(*"
+  | "(**)"
+      { token lexbuf }
+  | "(*(*"
+      { Lexlib.comment lexbuf; Lexlib.comment lexbuf; token lexbuf }
+  | "(*" '\n'
+      { Lexing.new_line lexbuf; Lexlib.comment lexbuf; token lexbuf }
+  | "(*(*)"
+  | "(*" eof
+  | "(*" [^ ')']
       { Lexlib.comment lexbuf; token lexbuf }
   | "'" (lident as id)
       { QUOTE_LIDENT id }
