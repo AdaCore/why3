@@ -133,7 +133,7 @@ let rec fmla_remove_quant ~keep_model_vars f =
               | Tforall -> false | Texists -> true in
             let vsl, f' = fmla_quant ~keep_model_vars sign f' vsl in
             let f' = fmla_remove_quant ~keep_model_vars f' in
-            t_quant k (close vsl [] f')
+            t_label_copy f (t_quant k (close vsl [] f'))
     | _ -> Term.t_map (fmla_remove_quant ~keep_model_vars) f
 
 (*let fmla_remove_quant f =
