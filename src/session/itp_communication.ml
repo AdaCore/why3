@@ -109,8 +109,6 @@ type ide_request =
   | Set_config_param        of string * int
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
-  | Focus_req               of node_ID
-  | Unfocus_req
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
@@ -130,7 +128,7 @@ let modify_session (r: ide_request) =
   | Set_config_param _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
   | Save_req | Exit_req | Get_global_infos
-  | Interrupt_req | Focus_req _ | Unfocus_req -> false
+  | Interrupt_req -> false
 
 
 (* Debugging functions *)
@@ -145,8 +143,6 @@ let print_request fmt r =
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
   | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
-  | Focus_req _nid                  -> fprintf fmt "focus"
-  | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Save_file_req _                 -> fprintf fmt "save file"

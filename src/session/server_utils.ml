@@ -366,6 +366,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -471,6 +473,10 @@ let interp commands_table cont id s =
                    end
                | "mark", _ ->
                    Mark_Obsolete
+               | "Focus", _ ->
+                   Focus_req
+               | "Unfocus", _ ->
+                   Unfocus_req
                | "clean", _ ->
                    Clean
                | "help", [trans] ->

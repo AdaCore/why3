@@ -1288,13 +1288,11 @@ end
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
+     | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
      | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
-     | Focus_req nid ->
-         Hint.mem model_any nid
      | Remove_subtree nid ->
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
@@ -1339,18 +1337,6 @@ end
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
-    | Focus_req nid ->
-        let d = get_server_data () in
-        let s = d.cont.controller_session in
-        let any = any_from_node_ID nid in
-        let focus_on =
-          match any with
-          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-          | _ -> any
-        in
-        focused_node := Focus_on [focus_on];
-        reset_and_send_the_whole_tree ()
-    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
@@ -1388,6 +1374,18 @@ end
         | Replay valid_only       -> replay ~valid_only snid
         | Clean                   -> clean snid
         | Mark_Obsolete           -> mark_obsolete snid
+        | Focus_req ->
+            let d = get_server_data () in
+            let s = d.cont.controller_session in
+            let any = any_from_node_ID nid in
+            let focus_on =
+              match any with
+              | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+              | _ -> any
+            in
+            focused_node := Focus_on [focus_on];
+            reset_and_send_the_whole_tree ()
+        | Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

@@ -2098,14 +2098,15 @@ let () =
   connect_menu_item
     focus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Focus_req id));
+                                (fun id -> Command_req (id, "Focus")));
   connect_menu_item
     remove_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
-    ~callback:(fun () -> send_request Unfocus_req)
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+                                (fun id -> Command_req (id, "Unfocus")))
 
 
 (*************************************)
