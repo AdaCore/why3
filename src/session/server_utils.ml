@@ -19,7 +19,6 @@ let has_extension f =
 let get_session_dir ~allow_mkdir files =
   if Queue.is_empty files then invalid_arg "no files given";
   let first = Queue.pop files in
-  (* The remaining files in [files] are going to be open *)
   let dir =
     if Sys.file_exists first then
       if Sys.is_directory first then
@@ -36,12 +35,12 @@ let get_session_dir ~allow_mkdir files =
             with Invalid_argument _ ->
               invalid_arg ("'" ^ first ^ "' has no extension and is not a directory")
           in
-          Queue.push first files; (* we need to open [first] *)
+          Queue.push first files;
           d
         else
           invalid_arg ("'" ^ first ^ "' is not a directory")
     else
-      (* first does not exists *)
+      (* first does not exist *)
       if has_extension first then
         invalid_arg ("file not found: " ^ first)
       else first
