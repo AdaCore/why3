@@ -48,7 +48,7 @@ let get_session_dir ~allow_mkdir files =
   in
   if not (Sys.file_exists dir) then
     begin
-      if allow_mkdir then Unix.mkdir dir 0o777 else
+      if allow_mkdir then Unix.mkdir dir 0o700 else
         invalid_arg ("session directory '" ^ dir ^ "' not found")
     end;
   dir
