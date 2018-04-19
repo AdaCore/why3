@@ -367,19 +367,14 @@ let init () =
 (* This creates initializes and returns the controller. It also creates the
    session *)
 let init_cont () =
-
-  (* Standard way to create a session is through Server_utils.get_session_dir
-     by giving a queue of files. The first one can be the directory of the
-     session: it is in our case *)
-  let files = Queue.create () in
   let session_dir = get_session_dir () in
-  Queue.add session_dir files;
-  let session_dir = Server_utils.get_session_dir ~allow_mkdir:true files in
   let is_new_session, (session, use_shapes) =
     if not Gnat_config.force && Sys.file_exists session_dir then
       false, Session_itp.load_session session_dir
-    else
-      true, (Session_itp.empty_session session_dir, false) in
+    else begin
+      if not (Sys.file_exists session_dir) then Unix.mkdir session_dir 0o700;
+      true, (Session_itp.empty_session session_dir, false)
+    end in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
   if is_new_session || not (has_file session) then begin
     let (_: exn option) = Controller_itp.add_file c Gnat_config.filename in
