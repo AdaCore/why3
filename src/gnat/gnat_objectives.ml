@@ -382,9 +382,11 @@ let init_cont () =
   end;
   (* Init why3server *)
   init ();
-  (* Reloading file to get an up to date controller/session. *)
-  let (le: exn list), (_: bool), (_: bool) =
-      Controller_itp.reload_files c ~use_shapes in
+  let le =
+    if is_new_session then []
+    else let le, (_ : bool), (_ : bool) =
+      Controller_itp.reload_files c ~use_shapes in le
+  in
   match le with
   | [] -> c
   | e :: _ ->
