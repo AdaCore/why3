@@ -223,73 +223,8 @@ let report_messages c obj =
       Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
- (* This is the main code. We read the file into the session if not already
-    done, we apply the split_goal transformation when needed, and we schedule
-    the first VC of all objectives. When done, we save the session.
- *)
-
-let c =
-  try
-    Gnat_objectives.init_cont ()
-  with
-  | e when Debug.test_flag Debug.stack_trace -> raise e
-  | e ->
-      let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
-      Gnat_util.abort_with_message ~internal:true s
-
-let _ =
-   (* save session on interrupt initiated by the user *)
-   let save_session_and_exit c signum =
-     (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
-        gnatprove is called in GPS, so that the session file is always saved *)
-     Sys.set_signal Sys.sigint Sys.Signal_ignore;
-     Sys.set_signal Sys.sighup Sys.Signal_ignore;
-     Sys.set_signal Sys.sigterm Sys.Signal_ignore;
-     C.save_session c;
-     exit signum
-   in
-
-   (* This has to be done after initialization of controller. Otherwise we don't
-      have session or nothing. *)
-   Sys.set_signal Sys.sigint (Sys.Signal_handle (save_session_and_exit c));
-   Util.init_timing ();
-   Util.timing_step_completed "gnatwhy3.init"
-
-let normal_handle_one_subp c subp =
-   let s = c.Controller_itp.controller_session in
-   if C.matches_subp_filter s subp then begin
-     C.init_subp_vcs c subp;
-     let s = c.Controller_itp.controller_session in
-     Gnat_objectives.iter_leaf_goals s subp (register_goal s)
-   end
-
-let _ =
-   try
-     match Gnat_config.proof_mode with
-     | Gnat_config.Progressive
-     | Gnat_config.Per_Path
-     | Gnat_config.Per_Check ->
-        C.iter_subps c (normal_handle_one_subp c);
-        Util.timing_step_completed "gnatwhy3.register_vcs";
-        if Gnat_config.replay then begin
-          C.replay c (*;
-          Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());*)
-        end else begin
-          Gnat_objectives.iter (handle_obj c);
-          Util.timing_step_completed "gnatwhy3.schedule_vcs";
-        end;
-     | Gnat_config.All_Split ->
-        C.iter_subps c (all_split_subp c)
-     | Gnat_config.No_WP ->
-        (* we should never get here *)
-        ()
-    with e when Debug.test_flag Debug.stack_trace -> raise e
-    | e ->
-       let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
-       Gnat_util.abort_with_message ~internal:true s
-
 (* This is to be executed when scheduling ends *)
-let ending () =
+let ending c () =
   C.remove_all_valid_ce_attempt c.Controller_itp.controller_session;
   Util.timing_step_completed "gnatwhy3.run_vcs";
   C.save_session c;
@@ -308,11 +243,58 @@ let ending () =
       (Filename.basename Gnat_config.filename) in
   Unix.putenv "GMON_OUT_PREFIX" (basename ^ "_gnatwhy3_gmon.out")
 
+let normal_handle_one_subp c subp =
+   let s = c.Controller_itp.controller_session in
+   if C.matches_subp_filter s subp then begin
+     C.init_subp_vcs c subp;
+     let s = c.Controller_itp.controller_session in
+     Gnat_objectives.iter_leaf_goals s subp (register_goal s)
+   end
+
+(* save session on interrupt initiated by the user *)
+let save_session_and_exit c signum =
+  (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
+     gnatprove is called in GPS, so that the session file is always saved *)
+  Sys.set_signal Sys.sigint Sys.Signal_ignore;
+  Sys.set_signal Sys.sighup Sys.Signal_ignore;
+  Sys.set_signal Sys.sigterm Sys.Signal_ignore;
+  C.save_session c;
+  exit signum
+
+ (* This is the main code. We read the file into the session if not already
+    done, we apply the split_goal transformation when needed, and we schedule
+    the first VC of all objectives. When done, we save the session.
+ *)
 
 let _ =
+  Util.init_timing ();
   try
-    Gnat_scheduler.main_loop ending
+    let c = Gnat_objectives.init_cont () in
+    (* This has to be done after initialization of controller. Otherwise we
+       don't have session. *)
+    Sys.set_signal Sys.sigint (Sys.Signal_handle (save_session_and_exit c));
+    Util.timing_step_completed "gnatwhy3.init";
+    begin match Gnat_config.proof_mode with
+    | Gnat_config.Progressive
+    | Gnat_config.Per_Path
+    | Gnat_config.Per_Check ->
+        C.iter_subps c (normal_handle_one_subp c);
+        Util.timing_step_completed "gnatwhy3.register_vcs";
+        if Gnat_config.replay then begin
+          C.replay c (*;
+          Gnat_objectives.do_scheduled_jobs (fun _ _ -> ());*)
+        end else begin
+          Gnat_objectives.iter (handle_obj c);
+          Util.timing_step_completed "gnatwhy3.schedule_vcs";
+        end;
+     | Gnat_config.All_Split ->
+        C.iter_subps c (all_split_subp c)
+     | Gnat_config.No_WP ->
+        (* we should never get here *)
+        ()
+    end;
+    Gnat_scheduler.main_loop (ending c);
   with e when Debug.test_flag Debug.stack_trace -> raise e
-    | e ->
-       let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
-       Gnat_util.abort_with_message ~internal:true s
+  | e ->
+      let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
+      Gnat_util.abort_with_message ~internal:true s
