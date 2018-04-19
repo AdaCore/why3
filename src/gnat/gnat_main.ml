@@ -223,6 +223,11 @@ let report_messages c obj =
       Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
+ (* This is the main code. We read the file into the session if not already
+    done, we apply the split_goal transformation when needed, and we schedule
+    the first VC of all objectives. When done, we save the session.
+ *)
+
 let c =
   try
     Gnat_objectives.init_cont ()
@@ -233,11 +238,6 @@ let c =
       Gnat_util.abort_with_message ~internal:true s
 
 let _ =
-   (* This is the main code. We read the file into the session if not already
-      done, we apply the split_goal transformation when needed, and we schedule
-      the first VC of all objectives. When done, we save the session.
-   *)
-
    (* save session on interrupt initiated by the user *)
    let save_session_and_exit c signum =
      (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
@@ -264,7 +264,6 @@ let normal_handle_one_subp c subp =
    end
 
 let _ =
-   begin
    try
      match Gnat_config.proof_mode with
      | Gnat_config.Progressive
@@ -288,7 +287,6 @@ let _ =
     | e ->
        let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
        Gnat_util.abort_with_message ~internal:true s
-   end
 
 (* This is to be executed when scheduling ends *)
 let ending () =
