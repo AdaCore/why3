@@ -379,6 +379,22 @@ let query_on_task cont f id args =
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"
 
+let help_message commands_table =
+  Pp.sprintf
+    "Please type a command among the following (automatic completion available)@\n\
+     @\n\
+     @ <transformation name> [arguments]@\n\
+     @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+     @ <query> [arguments]@\n\
+     @ <strategy shortcut>@\n\
+     @ mark @\n\
+     @ clean @\n\
+     @ replay @\n\
+     @ bisect @\n\
+     @ help <transformation_name> @\n\
+     @ list_ide_command @ \n\
+     @\n\
+     Available queries are:@\n@[%a@]" help_on_queries commands_table
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
@@ -407,23 +423,8 @@ let interp commands_table cont id s =
    then
       match cmd, args with
       | "help", _ ->
-        let text = Pp.sprintf
-                         "Please type a command among the following (automatic completion available)@\n\
-                          @\n\
-                          @ <transformation name> [arguments]@\n\
-                          @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                          @ <query> [arguments]@\n\
-                          @ <strategy shortcut>@\n\
-                          @ mark @\n\
-                          @ clean @\n\
-                          @ replay @\n\
-                          @ bisect @\n\
-                          @ help <transformation_name> @\n\
-                          @ list_ide_command @ \n\
-                          @\n\
-                          Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
-                  Help_message text
+          let text = help_message commands_table in
+          Help_message text
       | _ -> QError ("Command cannot be applied on a detached node")
    else
      begin
@@ -489,22 +490,7 @@ let interp commands_table cont id s =
                     with
                     | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
                | "help", _ ->
-                  let text = Pp.sprintf
-                               "Please type a command among the following (automatic completion available)@\n\
-                                @\n\
-                                @ <transformation name> [arguments]@\n\
-                                @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                                @ <query> [arguments]@\n\
-                                @ <strategy shortcut>@\n\
-                                @ mark @\n\
-                                @ clean @\n\
-                                @ replay @\n\
-                                @ bisect @\n\
-                                @ help <transformation_name> @\n\
-                                @ list_ide_command @ \n\
-                                @\n\
-                                Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
+                  let text = help_message commands_table in
                   Help_message text
                | _ ->
                   Other (cmd, args)
