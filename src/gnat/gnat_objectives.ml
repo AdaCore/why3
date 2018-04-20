@@ -377,8 +377,13 @@ let init_cont () =
     end in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
   if is_new_session || not (has_file session) then begin
-    let (_: exn option) = Controller_itp.add_file c Gnat_config.filename in
-    ();
+    let (e_opt: exn option) = Controller_itp.add_file c Gnat_config.filename in
+    match e_opt with
+    | None -> ()
+    | Some e ->
+        Gnat_util.abort_with_message ~internal:true
+          (Pp.sprintf "could not add file %s to the session: %a"
+             Gnat_config.filename Exn_printer.exn_printer e);
   end;
   (* Init why3server *)
   init ();
