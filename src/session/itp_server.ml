@@ -1094,6 +1094,8 @@ end
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
       send_new_subtree_from_trans nid trans_id
+    | TSfailed (_, NoProgress) ->
+        P.notify (Message (Information "The transformation made no progress"))
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
