@@ -47,6 +47,7 @@ type reason =
    | VC_Stronger_Classwide_Post
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
+   | VC_Dead_Code
 
 val is_warning_reason : reason -> bool
 (* returns whether a VC is generated to issue possibly a warning *)
