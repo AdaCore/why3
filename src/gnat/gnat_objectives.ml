@@ -875,7 +875,10 @@ let add_to_stat prover pr stat =
       let check = get_objective goal in
       let driver =
         snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
-      let vc_fn = vc_name check driver in
+      (* Reusing a filename to get several prover files with the same name is
+         unsafe.
+      *)
+      let vc_fn = Sysutil.uniquify (vc_name check driver) in
       GM.add goal_map goal vc_fn;
       Sysutil.write_file vc_fn "";
       vc_fn
