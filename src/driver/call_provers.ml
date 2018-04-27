@@ -16,8 +16,6 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
-let keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
-
 type reason_unknown =
   | Resourceout
   | Other
@@ -351,7 +349,11 @@ let handle_answer answer =
       let id = answer.Prove_client.id in
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
-      if Debug.test_noflag debug && Debug.test_noflag keep_vcs then begin
+      let keep_vcs =
+        try let flag = Debug.lookup_flag "keep_vcs" in Debug.test_flag flag with
+        | _ -> false
+      in
+      if Debug.test_noflag debug && not keep_vcs then begin
         Sys.remove save.vc_file;
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
