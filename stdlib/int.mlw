@@ -539,6 +539,19 @@ module Induction
 
 end
 
+module HOInduction
+
+  use import Int
+
+  let lemma induction (p: int -> bool)
+    requires { p 0 }
+    requires { forall n. 0 <= n >= 0 -> p n -> p (n+1) }
+    ensures  { forall n. 0 <= n -> p n }
+  = let rec lemma f (n: int) requires { n >= 0 } ensures  { p n } variant {n}
+    = if n > 0 then f (n-1) in f 0
+
+end
+
 (** {2 Fibonacci numbers} *)
 
 module Fibonacci
