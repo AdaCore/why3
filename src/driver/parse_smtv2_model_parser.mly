@@ -131,7 +131,7 @@ application:
 | LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
 (* This should not happen in relevant part of the model *)
 | LPAREN INT_TO_BV smt_term RPAREN {
-  Smt2_model_defs.Other ("int2bv of type " ^ $2) }
+  Smt2_model_defs.Apply($2, [$3]) }
 
 
 binop:
