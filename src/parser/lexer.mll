@@ -257,34 +257,66 @@ rule token = parse
   let debug = Debug.register_info_flag "print_modules"
     ~desc:"Print@ program@ modules@ after@ typechecking."
 
-(*
-  let parse_logic_file env path lb =
-    open_file token (Lexing.from_string "") (Typing.open_file env path);
-    Loc.with_location (logic_file token) lb;
-    Typing.close_file ()
-*)
+  exception Error of string
 
-  let parse_term lb = Loc.with_location (Parser.term_eof token) lb
+  let () = Exn_printer.register (fun fmt exn -> match exn with
+  (* This ad hoc switch allows to not edit the automatically generated
+     handcrafted.messages in ad hoc ways. *)
+  | Error s when s = "<YOUR SYNTAX ERROR MESSAGE HERE>\n" ->
+      Format.fprintf fmt "syntax error"
+  | Error s -> Format.fprintf fmt "syntax error:\n %s" s
+  | _ -> raise exn)
 
-  let parse_term_list lb = Loc.with_location (Parser.term_comma_list_eof token) lb
+  (* Associate each token to a text representing it *)
+  let match_tokens t =
+    (* TODO generate this automatically *)
+    match t with
+    | None -> assert false
+    | Some _t -> "NOT IMPLEMENTED"
 
-  let parse_qualid lb = Loc.with_location (Parser.qualid_eof token) lb
-
-  let parse_list_ident lb = Loc.with_location (Parser.ident_comma_list_eof token) lb
-
-  let parse_list_qualid lb = Loc.with_location (Parser.qualid_comma_list_eof token) lb
-
+  let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =
+    (* This records the last token which was read (for error messages) *)
+    let last = ref None in
+    let module I = Parser.MenhirInterpreter in
+    let checkpoint = parser_entry lb.Lexing.lex_curr_p
+    and supplier =
+      I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := Some t; t) lb
+    and succeed t = t
+    and fail checkpoint =
+      let t = Lexing.lexeme lb in
+      let token = match_tokens !last in
+      let s = Report.report (t, token) checkpoint in
+      (* Typing.close_file is supposedly done at the end of the file in
+         parsing.mly. If there is a syntax error, we still need to close it (to
+         be able to reload). *)
+      Loc.with_location (fun _x ->
+        (try ignore(Typing.close_file ()) with
+        | _e -> ());
+        raise (Error s)) lb
+    in
+    I.loop_handle succeed fail supplier checkpoint
 
   open Stdlib
   open Ident
   open Theory
   open Pmodule
 
+  let parse_term lb =
+    build_parsing_function Parser.Incremental.term_eof lb
+
+  let parse_term_list lb = build_parsing_function Parser.Incremental.term_comma_list_eof lb
+
+  let parse_qualid lb = build_parsing_function Parser.Incremental.qualid_eof lb
+
+  let parse_list_ident lb = build_parsing_function Parser.Incremental.ident_comma_list_eof lb
+
+  let parse_list_qualid lb = build_parsing_function Parser.Incremental.qualid_comma_list_eof lb
+
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     Typing.open_file env path;
-    let mm = Loc.with_location (mlw_file token) lb in
+    let mm = build_parsing_function Parser.Incremental.mlw_file lb in
     if path = [] && Debug.test_flag debug then begin
       let print_m _ m = Format.eprintf "%a@\n@." print_module m in
       let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
