@@ -499,8 +499,6 @@ module Translate = struct
           print_pv pv;
         [ML.Dlet (ML.Lvar (pv, expr info Stv.empty e.e_mask e))]
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
-        Debug.dprintf debug_compile "compiling top-level ghost function %a@."
-          Expr.print_rs rs;
         []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cany})) ->
         let args = params cty.cty_args in

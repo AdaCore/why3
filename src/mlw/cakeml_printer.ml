@@ -18,7 +18,6 @@ open Expr
 open Ty
 open Theory
 open Pmodule
-open Stdlib
 open Pdecl
 open Printer
 
@@ -37,9 +36,7 @@ type info = {
 
 module Print = struct
 
-  (** print type declarations *)
-
-open Mltree
+  open Mltree
 
   (* extraction labels *)
   let sml_remove = create_label "sml:remove"
@@ -119,9 +116,8 @@ open Mltree
         let s = id_unique ~sanitizer iprinter id in
         fprintf fmt "%s" s
     | Local ->
-        let _, _, q =
-          try Pmodule.restore_path id with Not_found ->
-            Theory.restore_path id in
+        let _, _, q = try Pmodule.restore_path id with Not_found ->
+          Theory.restore_path id in
         let q = remove_prefix q (List.rev info.info_current_ph) in
         print_path ~sanitizer fmt (q, id)
 
@@ -279,7 +275,7 @@ open Mltree
     | DownTo -> fprintf fmt "downto"
 
   let rec print_apply_args info fmt = function
-    | expr :: exprl, pv :: pvl ->
+    | expr :: exprl, _ :: pvl ->
         fprintf fmt "%a" (print_expr ~paren:true info) expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
@@ -311,8 +307,7 @@ open Mltree
           (print_list comma (print_expr info)) tl
     | _, None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
-    | _, None, tl when isconstructor () ->
-        let pjl = get_record info rs in
+    | _, None, tl when isconstructor () -> let pjl = get_record info rs in
         begin match pjl, tl with
           | [], [] ->
               (print_uident info) fmt rs.rs_name
@@ -321,7 +316,7 @@ open Mltree
                 (print_expr ~paren:true info) t
           | [], tl ->
               fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
-                (print_list space (print_expr info)) tl
+                (print_list space (print_expr ~paren:true info)) tl
           | pjl, tl ->
               let equal fmt () = fprintf fmt " = " in
               fprintf fmt "@[<hov 2>{ @[%a@] }@]"
@@ -355,12 +350,15 @@ open Mltree
         (print_list space (print_lident info)) id_args
         (print_expr info) e
 
-  and print_let_def ?(functor_arg=false) info fmt = function
+  and print_let_def info fmt = function
     | Lvar (pv, e) ->
-        fprintf fmt "@[<hov 2>val %a =@ %a@]"
-          (print_lident info) (pv_name pv)
-          (print_expr info) e;
-    | Lsym (rs, res, args, ef) ->
+        fprintf fmt "@[<hov 2>val %a =@ %a@]" (print_lident info) (pv_name pv)
+          (print_expr info) e
+    | Lsym (rs, _, [], ef) ->
+        (* TODO? zero-arguments functions as Lvar in compile.Translate *)
+        fprintf fmt "@[<hov 2>val %a =@ @[%a@]@]"
+          (print_lident info) rs.rs_name (print_expr info) ef;
+    | Lsym (rs, _, args, ef) ->
         fprintf fmt "@[<hov 2>fun %a @[%a@] =@ @[%a@]@]"
           (print_lident info) rs.rs_name
           (print_list space (print_vs_arg info)) args
@@ -374,24 +372,12 @@ open Mltree
                 (if fst then "fun" else "and")
                 (print_lident info) rs1.rs_name
                 (print_fun_type_args info) (args, s, res, e);
-              forget_vars args
-        in
+              forget_vars args in
         List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
         print_list_next newline print_one fmt rdef;
         List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
-    | Lany (rs, res, []) when functor_arg ->
-        fprintf fmt "@[<hov 2>val %a : %a@]"
-          (print_lident info) rs.rs_name
-          (print_ty info) res;
-    | Lany (rs, res, args) when functor_arg ->
-        let print_ty_arg info fmt (_, ty, _) =
-          fprintf fmt "@[%a@]" (print_ty info) ty in
-        fprintf fmt "@[<hov 2>val %a : @[%a@] ->@ %a@]"
-          (print_lident info) rs.rs_name
-          (print_list arrow (print_ty_arg info)) args
-          (print_ty info) res;
-        forget_vars args
-    | Lany (rs, _, _) -> check_val_in_drv info rs
+    | Lany (rs, _, _) ->
+        check_val_in_drv info rs
 
   and print_expr ?(paren=false) info fmt e = match e.e_node with
     | Econst c ->
@@ -429,8 +415,9 @@ open Mltree
         fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
     | Ematch (e, [], xl) ->
-        fprintf fmt "(@[<hv>@[<hov 2>try@ %a@] with@]@\n@[<hov>%a@]@\n)"
-          (print_expr info) e (print_list newline (print_xbranch info false)) xl
+        fprintf fmt "(@[%a@]@\n@[handle@;<1 0>@[<hov>%a@]@])"
+          (print_expr ~paren:true info) e
+          (print_list_next newline (print_xbranch false info)) xl
     | Ematch (e, pl, []) ->
         fprintf fmt
           (protect_on paren "(case @[%a@] of@\n@[<hov>%a@])")
@@ -439,7 +426,7 @@ open Mltree
         fprintf fmt
           (protect_on paren "(case @[%a@] of@\n@[<hov>%a@\n%a@])")
           (print_expr info) e (print_list_next newline (print_branch info)) bl
-          (print_list newline (print_xbranch info true)) xl
+          (print_list_next newline (print_xbranch true info)) xl
     | Eassign al ->
         let assign fmt (rho, rs, pv) =
           fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
@@ -462,19 +449,18 @@ open Mltree
         fprintf fmt (protect_on paren "@[<hv>%a andalso %a@]")
           (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e2
     | Eif (e1, e2, e3) ->
-        fprintf fmt (protect_on paren
-                       "@[<hv>@[<hov 2>if@ %a@ then@ (@[%a@])@]\
-                        @;<1 0>else (@[%a@])@]")
+        fprintf fmt
+          (protect_on paren
+             "@[<hv>@[<hov 2>if@ %a@ then@ (@[%a@])@] @;<1 0>else (@[%a@])@]")
           (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
         print_expr info fmt e
     | Eblock el ->
-        fprintf fmt "@[<hv>(@[%a@])@]"
-          (print_list semi (print_expr info)) el
+        fprintf fmt "@[<hv>(@[%a@])@]" (print_list semi (print_expr info)) el
     | Efun (varl, e) ->
-        fprintf fmt (protect_on paren "@[<hov 2>fun %a ->@ %a@]")
+        fprintf fmt (protect_on paren "@[<hov 2>fn %a =>@ %a@]")
           (print_list space (print_vs_arg info)) varl (print_expr info) e
     | Ewhile (e1, e2) ->
         fprintf fmt "@[<hov 2>while %a do@\n%a@ done@]"
@@ -528,22 +514,28 @@ open Mltree
         fprintf fmt (protect_on paren "raise (%a %a)")
           (print_uident info) xs.xs_name (print_expr ~paren:true info) e
 
-  and print_xbranch info case fmt (xs, pvl, e) =
+  and print_xbranch case info fst fmt (xs, pvl, e) =
     let print_exn fmt () =
       if case then fprintf fmt "exception " else fprintf fmt "" in
     let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
-    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
-        print_exn () (syntax_arguments s print_var) pvl
-        (print_expr info ~paren:true) e
-    | None, [] -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
-        print_exn () (print_uident info) xs.xs_name (print_expr info) e
-    | None, [pv] -> fprintf fmt "@[<hov 4>| %a%a %a ->@ %a@]"
-        print_exn () (print_uident info) xs.xs_name print_var pv
-        (print_expr info) e
-    | None, pvl -> fprintf fmt "@[<hov 4>| %a%a (%a) ->@ %a@]"
-        print_exn () (print_uident info) xs.xs_name
-        (print_list comma print_var) pvl (print_expr info) e
+    | Some s, _ ->
+        fprintf fmt "@[<hov 4>%s %a%a =>@ %a@]"
+          (if fst then " " else "|")
+          print_exn () (syntax_arguments s print_var) pvl
+          (print_expr info ~paren:true) e
+    | None, [] ->
+        fprintf fmt "@[<hov 4>%s %a%a =>@ %a@]"
+          (if fst then " " else "|") print_exn () (print_uident info) xs.xs_name
+          (print_expr info) e
+    | None, [pv] ->
+        fprintf fmt "@[<hov 4>%s %a%a %a =>@ %a@]"
+          (if fst then " " else "|") print_exn () (print_uident info) xs.xs_name
+          print_var pv (print_expr info) e
+    | None, pvl ->
+        fprintf fmt "@[<hov 4>%s %a%a (%a) =>@ %a@]"
+          (if fst then " " else "|") print_exn () (print_uident info) xs.xs_name
+          (print_list comma print_var) pvl (print_expr info) e
 
   let print_type_decl info fmt its =
     let print_constr fst fmt (id, cs_args) =
@@ -560,7 +552,7 @@ open Mltree
         (print_lident info) id (print_ty ~paren:false info) ty in
     let print_def info name fmt = function
       | None ->
-          ()
+          () (* TODO: check if it is in driver *)
       | Some (Ddata csl) ->
           fprintf fmt "datatype %a =@\n%a"
             (print_lident info) name (print_list_next newline print_constr) csl
@@ -580,28 +572,19 @@ open Mltree
       fprintf fmt "@[<hov 2>@[%a@]@[%a@]@]" print_tv_args its.its_args
         (print_def info its.its_name) its.its_def
 
-  let rec is_signature_decl info = function
-    | Dtype _ -> true
-    | Dlet (Lany _) -> true
-    | Dlet _ -> false
-    | Dexn _ -> true
-    | Dmodule (_, dl) -> is_signature info dl
+  (** Extract declarations defined inside scopes. As CakeML does not support
+      nested modules, declarations from internal scopes will be lifted to
+      the top-level module *)
+  let extract_module_decl dl =
+    let rec extract acc = function
+      | Dmodule (_, dlx) ->
+          List.fold_left extract acc dlx
+      | dl -> dl::acc in
+    List.rev (List.fold_left extract [] dl)
 
-  and is_signature info dl =
-    List.for_all (is_signature_decl info) dl
-
-  let extract_functor_args info dl =
-    let rec extract args = function
-      (* FIXME remove empty args? *)
-      (* | Dmodule (_, []) :: dl -> extract args dl *)
-      | Dmodule (x, dlx) :: dl when is_signature info dlx ->
-          extract ((x, dlx) :: args) dl
-      | dl -> List.rev args, dl in
-    extract [] dl
-
-  let rec print_decl ?(functor_arg=false) info fmt = function
+  let rec print_decl info fmt = function
     | Dlet ldef ->
-        print_let_def info ~functor_arg fmt ldef
+        print_let_def info fmt ldef
     | Dtype dl ->
         print_list newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
@@ -610,20 +593,10 @@ open Mltree
         fprintf fmt "@[<hov 2>exception %a of %a@]"
           (print_uident info) xs.xs_name (print_ty ~paren:true info) t
     | Dmodule (s, dl) ->
-        let args, dl = extract_functor_args info dl in
+        let dl = extract_module_decl dl in
         let info = { info with info_current_ph = s :: info.info_current_ph } in
-        fprintf fmt "@[@[<hov 2>module %s%a@ =@]@\n@[<hov 2>struct@ %a@]@ end" s
-          (print_functor_args info) args
-          (print_list newline2 (print_decl info)) dl
-
-  and print_functor_args info fmt args =
-    let print_sig info fmt dl =
-      fprintf fmt "sig@ %a@ end"
-        (print_list newline (print_decl info ~functor_arg:true)) dl in
-    let print_pair fmt (s, dl) =
-      let info = { info with info_current_ph = s :: info.info_current_ph } in
-      fprintf fmt "(%s:@ %a)" s (print_sig info) dl in
-    fprintf fmt "%a" (print_list space print_pair) args
+        fprintf fmt "@[@[<hov 2>structure %s@ = struct@]@;<1 2>@[%a@]@ end@]"
+          s (print_list newline2 (print_decl info)) dl
 
   let print_decl info fmt decl =
     (* avoids printing the same decl for mutually recursive decls *)
