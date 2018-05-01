@@ -290,12 +290,16 @@ let find_decl mm id =
 
 let rec visit ~recurs mm id =
   if not (Ident.Hid.mem visited id) then begin try
-      let d = find_decl mm id in
-      Ident.Hid.add visited id ();
-      if recurs then Mltree.iter_deps (visit ~recurs mm) d;
-      toextract := { info_rec = recurs; info_id = id } :: !toextract
-    with Not_found -> ()
-  end
+    let (path_th, _, _) = Pmodule.restore_path id in
+    match path_th with
+    (* this test avoids symbols from the Why3's standard library (e.g. Tuples_n)
+       to get extracted *)
+    | t::_ when is_not_extractable_theory t -> ()
+    | _ -> let d = find_decl mm id in
+        Ident.Hid.add visited id ();
+        if recurs then Mltree.iter_deps (visit ~recurs mm) d;
+        toextract := { info_rec = recurs; info_id = id } :: !toextract
+    with Not_found -> () end
 
 let flat_extraction mm = function
   | File fname ->

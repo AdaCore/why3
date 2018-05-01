@@ -62,6 +62,7 @@ drivers () {
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
+        if [[ $f == drivers/cakeml.drv ]]; then continue; fi
 	printf "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
