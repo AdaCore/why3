@@ -167,8 +167,6 @@ end
 module array.Array
   syntax type array "%1 array"
 
-  syntax function ([]) "%1.(Z.to_int %2)"
-
   (* syntax exception OutOfBounds "Why3__Array.OutOfBounds" *) (* FIXME *)
 
   syntax val ([])          "%1.(Z.to_int %2)"
