@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../challenge3.mlw" proved="true">
+<theory name="Top" proved="true">
+ <goal name="VC k" expl="VC for k" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC n" expl="VC for n" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="VC bounded_int" expl="VC for bounded_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="VC bzero" expl="VC for bzero" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="VC bounded_int2" expl="VC for bounded_int2" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="VC ticket" expl="VC for ticket" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="VC zero" expl="VC for zero" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+ </goal>
+ <goal name="VC increment" expl="VC for increment" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC increment.0" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC increment.0.0" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+   </goal>
+   <goal name="VC increment.0.1" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+   </goal>
+   <goal name="VC increment.0.2" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+   <goal name="VC increment.0.3" expl="VC for increment" proved="true">
+   <proof prover="2"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC increment.0.4" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
+   </goal>
+   <goal name="VC increment.0.5" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.13" steps="59"/></proof>
+   </goal>
+   <goal name="VC increment.0.6" expl="VC for increment" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="34"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC increment.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC increment.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC increment.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC modn" expl="VC for modn" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
+ </goal>
+ <goal name="VC tinc" expl="VC for tinc" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="49"/></proof>
+ </goal>
+ <goal name="VC main" expl="VC for main" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC main.0" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC main.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC main.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC main.3" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC main.4" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC main.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC main.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC main.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC main.8" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="VC main.9" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC main.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="274"/></proof>
+  </goal>
+  <goal name="VC main.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="59"/></proof>
+  </goal>
+  <goal name="VC main.12" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC main.13" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC main.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
+  </goal>
+  <goal name="VC main.15" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC main.16" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="68"/></proof>
+  </goal>
+  <goal name="VC main.17" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="66"/></proof>
+  </goal>
+  <goal name="VC main.18" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+  <goal name="VC main.19" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="VC main.20" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="120"/></proof>
+  </goal>
+  <goal name="VC main.21" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="VC main.22" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="19"/></proof>
+  </goal>
+  <goal name="VC main.23" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="399"/></proof>
+  </goal>
+  <goal name="VC main.24" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="127"/></proof>
+  </goal>
+  <goal name="VC main.25" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="VC main.26" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="VC main.27" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC main.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="78"/></proof>
+  </goal>
+  <goal name="VC main.29" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.29.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="2.96" steps="287"/></proof>
+   </goal>
+   <goal name="VC main.29.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="1.51" steps="411"/></proof>
+   </goal>
+   <goal name="VC main.29.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="3.51" steps="365"/></proof>
+   </goal>
+   <goal name="VC main.29.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="2.42" steps="367"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.30" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="VC main.31" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC main.32" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="VC main.33" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.41" steps="507"/></proof>
+  </goal>
+  <goal name="VC main.34" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.63" steps="803"/></proof>
+  </goal>
+  <goal name="VC main.35" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC main.36" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.36.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC main.36.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.05" steps="315"/></proof>
+   </goal>
+   <goal name="VC main.36.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.09" steps="397"/></proof>
+   </goal>
+   <goal name="VC main.36.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.05" steps="315"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.37" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
+  </goal>
+  <goal name="VC main.38" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="531"/></proof>
+  </goal>
+  <goal name="VC main.39" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC main.40" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="VC main.41" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC main.42" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="76"/></proof>
+  </goal>
+  <goal name="VC main.43" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="76"/></proof>
+  </goal>
+  <goal name="VC main.44" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="VC main.45" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.45.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="469"/></proof>
+   </goal>
+   <goal name="VC main.45.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="341"/></proof>
+   </goal>
+   <goal name="VC main.45.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.10" steps="468"/></proof>
+   </goal>
+   <goal name="VC main.45.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="342"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.46" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC main.47" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="VC main.48" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.35" steps="195"/></proof>
+  </goal>
+  <goal name="VC main.49" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.49.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC main.49.1" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC main.49.2" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC main.49.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="128"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.50" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC main.51" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC main.52" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="VC main.53" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.80" steps="655"/></proof>
+  </goal>
+  <goal name="VC main.54" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.54.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.07" steps="232"/></proof>
+   </goal>
+   <goal name="VC main.54.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.19" steps="709"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.55" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.55.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.21"/></proof>
+   </goal>
+   <goal name="VC main.55.1" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.23"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.56" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.56.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.15" steps="356"/></proof>
+   </goal>
+   <goal name="VC main.56.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.19" steps="447"/></proof>
+   </goal>
+   <goal name="VC main.56.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.16" steps="357"/></proof>
+   </goal>
+   <goal name="VC main.56.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="3.30" steps="1301"/></proof>
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.57" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="67"/></proof>
+  </goal>
+  <goal name="VC main.58" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="370"/></proof>
+  </goal>
+  <goal name="VC main.59" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC main.60" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="VC main.61" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC main.62" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+  <goal name="VC main.63" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+  <goal name="VC main.64" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="VC main.65" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="1.00" steps="4200"/></proof>
+  </goal>
+  <goal name="VC main.66" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC main.67" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="VC main.68" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="1.22" steps="590"/></proof>
+  </goal>
+  <goal name="VC main.69" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.69.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="3.36" steps="713"/></proof>
+   </goal>
+   <goal name="VC main.69.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="1.59" steps="727"/></proof>
+   </goal>
+   <goal name="VC main.69.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="3.94" steps="818"/></proof>
+   </goal>
+   <goal name="VC main.69.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="3.98" steps="1390"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.70" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC main.71" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC main.72" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC main.73" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.73.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC main.73.1" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.74" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC main.75" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC main.76" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.76.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="2.50" steps="1319"/></proof>
+   </goal>
+   <goal name="VC main.76.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.34" steps="691"/></proof>
+   </goal>
+   <goal name="VC main.76.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.31" steps="577"/></proof>
+   </goal>
+   <goal name="VC main.76.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.43" steps="807"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.77" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="74"/></proof>
+  </goal>
+  <goal name="VC main.78" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="114"/></proof>
+  </goal>
+  <goal name="VC main.79" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="122"/></proof>
+  </goal>
+  <goal name="VC main.80" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="86"/></proof>
+  </goal>
+  <goal name="VC main.81" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
+  </goal>
+  <goal name="VC main.82" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="37"/></proof>
+  </goal>
+  <goal name="VC main.83" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="119"/></proof>
+  </goal>
+  <goal name="VC main.84" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.84.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC main.84.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="2.26" steps="255"/></proof>
+   </goal>
+   <goal name="VC main.84.2" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC main.84.3" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.85" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.85.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.36" steps="718"/></proof>
+   </goal>
+   <goal name="VC main.85.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.43" steps="647"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.86" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC main.87" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="VC main.88" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="VC main.89" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="VC main.90" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="VC main.91" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC main.91.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC main.91.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.42" steps="743"/></proof>
+   </goal>
+   <goal name="VC main.91.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.33" steps="692"/></proof>
+   </goal>
+   <goal name="VC main.91.3" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC main.92" expl="unreachable point" proved="true">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC main.93" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="67"/></proof>
+  </goal>
+  <goal name="VC main.94" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="466"/></proof>
+  </goal>
+  <goal name="VC main.95" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC main.96" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
+  </goal>
+  <goal name="VC main.97" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="VC main.98" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+  <goal name="VC main.99" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+  <goal name="VC main.100" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+  </goal>
+  <goal name="VC main.101" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.68" steps="3461"/></proof>
+  </goal>
+  <goal name="VC main.102" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="VC main.103" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

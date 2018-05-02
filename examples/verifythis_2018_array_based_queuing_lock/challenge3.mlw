@@ -1,0 +1,188 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 3: Array-Based Queuing Lock}
+
+Author: Martin Clochard (LRI, Université Paris Sud)
+*)
+
+use import int.Int
+use import int.ComputerDivision
+use import seq.Seq as S
+use import array.Array
+use import ref.Ref
+
+val constant k : int ensures { result > 0 }
+val constant n : int ensures { result > 0 }
+
+(* Model of bounded arithmetic.
+   Note: bincrement only model the incrementation behind fetch_and_add,
+   not the atomic operation itself. *)
+type bounded_int = private { ghost bmodel : int }
+invariant { 0 <= bmodel < k * n } by { bmodel = 0 }
+val constant bzero : bounded_int
+  ensures { result.bmodel = 0 }
+val bincrement (b:bounded_int) : bounded_int
+  ensures { let v = b.bmodel + 1 in
+    result.bmodel = if v = k * n then 0 else v }
+val bmodn (b:bounded_int) : int
+  ensures { result = mod b.bmodel n }
+
+(* Minor ghost wrapping of the model to get rid of k from the model,
+   while keeping the same operational meaning. *)
+type bounded_int2 = {
+  value : bounded_int;
+  ghost model : int;
+} invariant { 0 <= model < n }
+invariant { model = mod value.bmodel n }
+by { value = bzero; model = 0 }
+type ticket = { tvalue : int } invariant { 0 <= tvalue < n }
+
+let zero () : bounded_int2
+  ensures { result.model = 0 }
+= { value = bzero; model = 0 }
+let increment (b:bounded_int2) : bounded_int2
+  ensures { let v = b.model + 1 in
+    result.model = if v = n then 0 else v }
+= let ghost v0 = b.model in
+  let ghost v1 = if v0+1 = n then 0 else v0 + 1 in
+  let ghost v2 = b.value.bmodel in
+  assert { mod (v2+1) n = v1 by exists q.
+    v2 = n * q + v0 so q >= 0 so v2 + 1 = n * q + (v0+1)
+    so if v0+1 < n then v0+1 = mod (v2+1) n else
+      v2+1 = n * (q+1) + 0 so 0 = mod (v2+1) n };
+  { value = bincrement b.value; model = v1 }
+let modn (b:bounded_int2) : ticket
+  ensures { result.tvalue = b.model }
+= { tvalue = bmodn b.value }
+let tinc (t:ticket) : ticket
+  ensures { let v = t.tvalue + 1 in result.tvalue = if v = n then 0 else v }
+= { tvalue = mod (t.tvalue + 1) n }
+
+(* Break down the thread state between each operation that affect or
+   read the global state *)
+type thread_state =
+  | AcqFetched ticket (* Corresponds to control point right after the fetch. *)
+  | Granted ticket (* Corresponds to observation that pass was true.
+    If it was false, there may be intermediate steps, but they do not
+    rely on global state --> state equivalent to lock granted. *)
+  | RelSet ticket (* Corresponds to the pass = false operation. *)
+  | Released ticket (* Corresponds to a released state.
+    for technical reasons, we keep the last ticket used here
+    (which is defaulted to the thread id at the beginning *)
+
+function ticket (s:thread_state) : int = match s with
+  | AcqFetched t | Granted t | RelSet t | Released t -> t.tvalue
+  end
+
+predicate released (s:thread_state) = match s with
+  | Released _ -> true | _ -> false
+  end
+
+(* For verification of task 2: log of request/acquire events
+   identified by thread id. *)
+type event =
+  | Request int
+  | Acquire int
+
+type hidden = private mutable {}
+val hidden : hidden
+
+(* scheduler. *)
+val schedule () : int
+  writes { hidden }
+  ensures { 0 <= result < n }
+
+(* if a thread is in a granted or released state,
+   check whether it begins an acquire or release. Otherwise,
+   the state stays the same. *)
+val acqrel (id: int) : bool
+  writes { hidden }
+
+(* Model execution of concurrent program. *)
+let main () : unit
+  diverges
+= (* Model of the pass buffer. The begin-end block with post-condition
+     hide the fact that the array was technically initialized. *)
+  let pass = begin ensures { result.length = n } make n false end in
+  (* Model of the next variable. *)
+  let next = ref (zero ()) in
+  (* Thread state. *)
+  let state = make n (Released { tvalue = 0 }) in
+  (* Additional reciprocal map for the cyclically allocated tickets. *)
+  let tmap = make n 0 in
+  for i = 0 to n - 1 do
+    invariant { forall j. 0 <= j < i -> match state[j] with
+      | Released t -> t.tvalue = j
+      | _ -> false end }
+    invariant { forall j. 0 <= j < i -> tmap[j] = j }
+    state[i] <- Released { tvalue = i };
+    tmap[i] <- i
+  done;
+  (* Extra variable for verification: index of the currently held ticket. *)
+  let current = ref (modn (zero ())) in
+  (* Event log (for second task). *)
+  (* let log = ref empty in *)
+  (* Initialisation, done before the threads are executed. *)
+  for i = 1 to n - 1 do
+    invariant { forall j. 1 <= j < i -> not pass[j] }
+    pass[i] <- false;
+  done;
+  pass[0] <- true;
+  while true do
+    invariant { forall i. 0 <= i < n /\ pass[i] -> i = !current.tvalue }
+    invariant { forall i. 0 <= i < n -> match state[i] with
+      | Granted t -> t.tvalue = !current.tvalue /\ pass[t.tvalue]
+      | RelSet t -> t.tvalue = !current.tvalue /\ not pass[t.tvalue]
+      | _ -> true
+      end
+    }
+    invariant { forall i. 0 <= i < n -> 0 <= tmap[i] < n }
+    invariant { forall i. 0 <= i < n -> ticket state[tmap[i]] = i }
+    invariant { forall i. 0 <= i < n -> tmap[ticket state[i]] = i }
+    invariant { !next.model < !current.tvalue ->
+      (forall i. 0 <= i < !next.model \/ !current.tvalue <= i < n ->
+        not released state[tmap[i]])
+      /\ (forall i. !next.model <= i < !current.tvalue ->
+        released state[tmap[i]]) }
+    invariant { !next.model > !current.tvalue ->
+      (forall i. !current.tvalue <= i < !next.model ->
+        not released state[tmap[i]])
+      /\ (forall i. 0 <= i < !current.tvalue \/ !next.model <= i < n ->
+        released state[tmap[i]]) }
+    invariant { !next.model = !current.tvalue ->
+      forall i j. 0 <= i < j < n ->
+        released state[tmap[i]] <-> released state[tmap[j]] }
+    (* Invariant corresponding to Task 1, slightly strengthened. *)
+    invariant { forall i j. 0 <= i < j < n ->
+      match state[i], state[j] with
+      | (Granted _ | RelSet _), (Granted _ | RelSet _) -> false
+      | _ -> true end
+    }
+    let id = schedule () in
+    match state[id] with
+    | AcqFetched ticket ->
+      if pass[ticket.tvalue] then state[id] <- Granted ticket
+    | Granted ticket -> if acqrel id then begin
+        state[id] <- RelSet ticket;
+        pass[ticket.tvalue] <- false;
+      end
+    | RelSet ticket ->
+        state[id] <- Released ticket;
+        pass[(tinc ticket).tvalue] <- true;
+        current := tinc !current;
+    | Released told -> if acqrel id then begin
+        let ticket = modn !next in
+        let id2 = tmap[ticket.tvalue] in
+        match state[id2] with
+        | Released _ -> state[id2] <- Released told;
+          tmap[ticket.tvalue] <- id;
+          tmap[told.tvalue] <- id2
+        | _ -> absurd
+        end;
+        state[id] <- AcqFetched ticket;
+        next := increment !next
+      end
+    end
+  done
+
