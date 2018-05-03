@@ -161,4 +161,10 @@ y = {"type" : "Integer" ,
 "val" : "1073749692" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline : Valid
-bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline : Timeout
+bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 58:
+x = {"type" : "Integer" , "val" : "1073741824" }
+y = {"type" : "Integer" ,
+"val" : "1073741824" }
+

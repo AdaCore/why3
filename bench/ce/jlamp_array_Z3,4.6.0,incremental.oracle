@@ -5,8 +5,10 @@ a.length = {"type" : "Integer" ,
 "val" : "0" }
 File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" ,
-"val" : "0" }
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
 
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
@@ -82,7 +84,7 @@ bench/ce/jlamp_array.mlw Array WP_parameter f : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" , "val" : "0" }
+a.length = {"type" : "Integer" , "val" : "1" }
 a.elts = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
