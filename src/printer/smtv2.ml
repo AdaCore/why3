@@ -522,9 +522,10 @@ let property_on_incremental f =
   | Tquant _ -> true
   | _ -> false
 
-let rec property_on_incremental2 b f =
+let rec property_on_incremental2 _ f =
   match f.t_node with
   | Tquant _ -> true
+  | Teps _ -> true
   | _ -> Term.t_fold property_on_incremental2 false f
 
 let property_on_incremental2 f =
