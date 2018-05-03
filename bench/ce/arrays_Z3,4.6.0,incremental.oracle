@@ -15,21 +15,47 @@ Line 10:
 a.length = {"type" : "Integer" , "val" : "2" }
 a.elts = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
-{"others" : {"type" : "Integer" , "val" : "5" } }] }
+{"others" : {"type" : "Integer" , "val" : "6" } }] }
 a = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" ,
-"val" : "5" } }] }
+"val" : "6" } }] }
 Line 12:
 a = {"type" : "Array" , "val" : [{"indice" : "0" ,
 "value" : {"type" : "Integer" , "val" : "42" } }, {"indice" : "1" ,
 "value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" ,
-"val" : "5" } }] }
+"val" : "6" } }] }
 
 bench/ce/arrays.mlw B WP_parameter f1 : Unknown (other)
+Counter-example model:File arrays.mlw:
+Line 26:
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 27:
+old a.length = {"type" : "Integer" ,
+"val" : "0" }
+old a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
 bench/ce/arrays.mlw B WP_parameter f2 : Unknown (other)
+Counter-example model:File arrays.mlw:
+Line 31:
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 32:
+old a.length = {"type" : "Integer" ,
+"val" : "0" }
+old a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
 bench/ce/arrays.mlw A WP_parameter f1 : Unknown (other)
 Counter-example model:File array.mlw:
 Line 28:
@@ -57,6 +83,19 @@ old a.elts = {"type" : "Array" , "val" : [{"indice" : "1" ,
 "val" : "5" } }] }
 
 bench/ce/arrays.mlw B WP_parameter f1 : Unknown (other)
+Counter-example model:File arrays.mlw:
+Line 26:
+a.length = {"type" : "Integer" , "val" : "0" }
+a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 27:
+old a.length = {"type" : "Integer" ,
+"val" : "0" }
+old a.elts = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
 bench/ce/arrays.mlw B WP_parameter f2 : Valid
 bench/ce/arrays.mlw B WP_parameter f2 : Unknown (other)
 Counter-example model:File arrays.mlw:
