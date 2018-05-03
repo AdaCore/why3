@@ -522,17 +522,25 @@ let property_on_incremental f =
   | Tquant _ -> true
   | _ -> false
 
+let rec property_on_incremental2 b f =
+  match f.t_node with
+  | Tquant _ -> true
+  | _ -> Term.t_fold property_on_incremental2 false f
+
+let property_on_incremental2 f =
+  property_on_incremental2 false f
+
 (* TODO if the property doesnt begin with quantifier, then we print it first.
    Else, we print it afterwards. *)
 let print_incremental_axiom info fmt =
   let l = info.incr_list in
   List.iter (fun (pr, f) ->
-    if not (property_on_incremental f) then
+    if not (property_on_incremental2 f) then
       print_prop info fmt pr f;
             ) l;
   add_check_sat info fmt;
   List.iter (fun (pr, f) ->
-    if property_on_incremental f then
+    if property_on_incremental2 f then
       print_prop info fmt pr f)
     l;
   add_check_sat info fmt
