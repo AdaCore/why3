@@ -34,21 +34,28 @@ let get_position lexbuf =
 let do_parsing model =
   let lexbuf = Lexing.from_string model in
   try
-    Parse_smtv2_model_parser.output Parse_smtv2_model_lexer.token lexbuf
+    Debug.dprintf debug "Entering smtv2 model parser@.";
+    let x = Parse_smtv2_model_parser.output Parse_smtv2_model_lexer.token lexbuf in
+    Debug.dprintf debug "smtv2 model parser: OK@.";
+    x
   with
   | Parse_smtv2_model_lexer.SyntaxError ->
-    Warning.emit
-      ~loc:(get_position lexbuf)
-      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
-      (Lexing.lexeme lexbuf);
-    Stdlib.Mstr.empty
+     let l = Lexing.lexeme lexbuf in
+     Debug.dprintf debug "smtv2 model parser: SyntaxError on lexeme '%s'@." l;
+     Warning.emit
+       ~loc:(get_position lexbuf)
+       "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
+       l;
+     Stdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
-    begin
-      let loc = get_position lexbuf in
-      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
-      (Lexing.lexeme lexbuf);
-      Stdlib.Mstr.empty
-    end
+     let l = Lexing.lexeme lexbuf in
+     Debug.dprintf debug "smtv2 model parser: Error on lexeme '%s'@." l;
+     let loc = get_position lexbuf in
+     Warning.emit
+       ~loc:loc
+       "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
+       l;
+     Stdlib.Mstr.empty
 
 let do_parsing list_proj list_records model =
   let m = do_parsing model in
