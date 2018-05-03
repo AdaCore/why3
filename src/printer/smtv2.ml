@@ -517,18 +517,25 @@ let add_check_sat info fmt =
   if info.info_cntexample then
     fprintf fmt "@[(get-model)@]@\n"
 
+let property_on_incremental f =
+  match f.t_node with
+  | Tquant _ -> true
+  | _ -> false
+
+(* TODO if the property doesnt begin with quantifier, then we print it first.
+   Else, we print it afterwards. *)
 let print_incremental_axiom info fmt =
   let l = info.incr_list in
-  let n =
-    List.fold_left (fun n (pr, f) ->
+  List.iter (fun (pr, f) ->
+    if not (property_on_incremental f) then
       print_prop info fmt pr f;
-      if n mod 10 = 0 then (* TODO we dont check-sat and get-model each time we
-                              have a new decl. 10 is random. *)
-        add_check_sat info fmt;
-      n + 1) 0 l
-  in
-  if n mod 10 != 0 then (* TODO 10 is random *)
-    add_check_sat info fmt
+            ) l;
+  add_check_sat info fmt;
+  List.iter (fun (pr, f) ->
+    if property_on_incremental f then
+      print_prop info fmt pr f)
+    l;
+  add_check_sat info fmt
 
 let print_prop_decl vc_loc args info fmt k pr f = match k with
   | Paxiom ->
