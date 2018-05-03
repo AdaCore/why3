@@ -33,9 +33,11 @@
 %token LET
 %token AND LE GE NOT
 %token DIV
-%token <Smt2_model_defs.float_type> FLOAT_VALUE
+%token <Model_parser.float_type> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
+%token <string> BITVECTOR_EXTRACT
+%token <string> INT_TO_BV
 %token BITVECTOR_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
@@ -126,6 +128,16 @@ list_smt_term:
 
 application:
 | LPAREN name list_smt_term RPAREN { Smt2_model_defs.Apply($2, List.rev $3) }
+| LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
+(* This should not happen in relevant part of the model *)
+| LPAREN INT_TO_BV smt_term RPAREN {
+  Smt2_model_defs.Apply($2, [$3]) }
+
+
+binop:
+| LE { "<=" }
+| GE { ">=" }
+
 
 array:
 | LPAREN
@@ -155,14 +167,13 @@ name:
 | ATOM { $1 }
 (* Should not happen in relevant part of the model (ad hoc) *)
 | BITVECTOR_TYPE { "" }
+| BITVECTOR_EXTRACT { $1 }
 
 (* Z3 specific boolean expression. This should maybe be used in the future as
    it may give some information on the counterexample. *)
 boolean_expression:
 | LPAREN FORALL LPAREN args_lists RPAREN smt_term RPAREN {  }
 | LPAREN NOT smt_term RPAREN { }
-| LPAREN LE smt_term smt_term RPAREN { }
-| LPAREN GE smt_term smt_term RPAREN { }
 | LPAREN AND list_smt_term RPAREN { }
 
 integer:

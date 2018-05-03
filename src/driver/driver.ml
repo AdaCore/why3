@@ -254,10 +254,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ~limit
-                   ?inplace ~filename ~printer_mapping drv buffer =
+let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
+    ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
-    ~command ~limit ~res_parser:drv.drv_res_parser
+    ~command ~limit ~gen_new_file ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
 (** print'n'prove *)
@@ -325,35 +325,60 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let file_name_of_task ?old ?inplace drv task =
+let file_name_of_task ?old ?inplace ?interactive drv task =
   match old, inplace with
-    | Some fn, Some true -> fn
-    | _ ->
+    | Some fn, Some true ->
+        (* Example: Isabelle. No file should be generated, it should be done
+           in_place and we keep the same file. *)
+        false, fn
+    | Some fn, _ when interactive <> Some true ->
+        (* Example: cvc4. If a file is provided, it means it was passed to
+           schedule_proof_attempt via its save_to argument. So we ask to erase
+           and regenerate the file (the advantage is that we decide the location
+           of the file).
+        *)
+        false, fn
+    | Some _, _ ->
+        (* Example: Coq.
+           For Coq, the interactively edited file should be kept (not erased)
+           and a new temp file is generated using the old one.
+        *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
           | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
-        get_filename drv fn "T" pr.pr_name.id_string
+        true, get_filename drv fn "T" pr.pr_name.id_string
+    | _ ->
+        (* Example: cvc4 without ?save_to argument
+           No file were provided. We have to generate a new one.
+        *)
+        let pr = Task.task_goal task in
+        let fn = match pr.pr_name.id_loc with
+          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | None -> "" in
+        let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+        true, get_filename drv fn "T" pr.pr_name.id_string
 
-let prove_task_prepared ~command ~limit ?old ?inplace drv task =
+let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
+  let gen_new_file, filename =
+    file_name_of_task ?old ?inplace ?interactive drv task in
   let old_channel = Opt.map open_in old in
-  let filename = file_name_of_task ?old ?inplace drv task in
   let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ~limit
+    call_on_buffer ~command ~limit ~gen_new_file
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
 let prove_task ~command ~limit ?(cntexample=false) ?old
-               ?inplace drv task =
+               ?inplace ?interactive drv task =
   let task = prepare_task ~cntexample drv task in
-  prove_task_prepared ~command ~limit ?old ?inplace drv task
+  prove_task_prepared ~command ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)
 

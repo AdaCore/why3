@@ -1,0 +1,35 @@
+
+module A
+
+  use import int.Int
+  use import array.Array
+
+  let f1 (a:array int) : int
+  = a[0]
+
+  let f2 (a:array int) : unit
+    requires { a.length >= 2 }
+    ensures { a[0] <> a[1] }
+  = a[0] <- 42
+
+end
+
+module B
+
+  use import int.Int
+  use import array.Array
+  clone import array.Sorted with 
+    type elt=int,
+    predicate le=(<=)
+  
+
+  let f1 (a:array int) : unit
+    ensures { sorted a }
+  = ()
+
+
+  let f2 (a:array int) : array int
+    ensures { sorted result }
+  = a
+
+end

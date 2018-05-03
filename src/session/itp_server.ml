@@ -262,78 +262,6 @@ let get_exception_message ses id e =
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 
 
-(* Debugging functions *)
-let print_request fmt r =
-  match r with
-  | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
-  | Add_file_req f                  -> fprintf fmt "open file %s" f
-  | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
-  | Get_file_contents _f            -> fprintf fmt "get file contents"
-  | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
-  | Focus_req _nid                  -> fprintf fmt "focus"
-  | Unfocus_req                     -> fprintf fmt "unfocus"
-  | Remove_subtree _nid             -> fprintf fmt "remove subtree"
-  | Copy_paste _                    -> fprintf fmt "copy paste"
-  | Save_file_req _                 -> fprintf fmt "save file"
-  | Save_req                        -> fprintf fmt "save"
-  | Reload_req                      -> fprintf fmt "reload"
-  | Exit_req                        -> fprintf fmt "exit"
-  | Interrupt_req                   -> fprintf fmt "interrupt"
-  | Get_global_infos                -> fprintf fmt "get_global_infos"
-
-let print_msg fmt m =
-  match m with
-  | Proof_error (_ids, s)                        -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, _tr, _args, _loc, s, _d) -> fprintf fmt "transf error %s" s
-  | Strat_error (_ids, s)                        -> fprintf fmt "start error %s" s
-  | Replay_Info s                                -> fprintf fmt "replay info %s" s
-  | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
-  | Query_Error (_ids, s)                        -> fprintf fmt "query error %s" s
-  | Information s                                -> fprintf fmt "info %s" s
-  | Task_Monitor _                               -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
-  | File_Saved s                                 -> fprintf fmt "file saved %s" s
-  | Error s                                      -> fprintf fmt "%s" s
-  | Open_File_Error s                            -> fprintf fmt "%s" s
-
-(* TODO ad hoc printing. Should reuse print_loc. *)
-let print_loc fmt (loc: Loc.position) =
-  let (f,l,b,e) = Loc.get loc in
-   fprintf fmt "File \"%s\", line %d, characters %d-%d" f l b e
-
-let print_list_loc fmt l =
-  Pp.print_list
-    (fun _fmt () -> ())
-    (fun fmt (loc, _c) -> Format.fprintf fmt "(%a, color)" print_loc loc)
-    fmt l
-
-let print_notify fmt n =
-  match n with
-  | Reset_whole_tree -> fprintf fmt "reset whole tree"
-  | Node_change (ni, nf) ->
-      begin
-        match nf with
-        | Proved b -> fprintf fmt "node change %d: proved=%b" ni b
-        | Name_change n -> fprintf fmt "node change %d: renamed to '%s'" ni n
-        | Proof_status_change(st,b,_lim) ->
-           fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
-                   ni Controller_itp.print_status st b
-      end
-  | New_node (ni, pni, _nt,  _nf, _d) -> fprintf fmt "new node = %d, parent = %d" ni pni
-  | Remove _ni                         -> fprintf fmt "remove"
-  | Next_Unproven_Node_Id (ni, nj)   -> fprintf fmt "next unproven node_id from %d is %d" ni nj
-  | Initialized _gi                    -> fprintf fmt "initialized"
-  | Saved                              -> fprintf fmt "saved"
-  | Message msg                        ->
-      print_msg fmt msg
-  | Dead s                             -> fprintf fmt "dead :%s" s
-  | File_contents (_f, _s)             -> fprintf fmt "file contents"
-  | Source_and_ce (_s, _list_loc)      -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc)            ->
-      fprintf fmt "task for node_ID %d which contains a list of loc %a"
-        ni print_list_loc list_loc
-
 module type Protocol = sig
   val get_requests : unit -> ide_request list
   val notify : notification -> unit
@@ -693,6 +621,10 @@ end
        else full
     | APn pn ->
        let name = (get_proof_name d.cont.controller_session pn).Ident.id_string in
+       (* Reduce the name of the goal to the minimum, by taking the
+          part after the last dot: "0" instead of "WP_Parameter.0" for
+          example.  *)
+       let name = List.hd (Strings.rev_split '.' name) in
        let expl = get_proof_expl d.cont.controller_session pn in
        if expl = "" then name else name ^ " [" ^ expl ^ "]"
     | APa pa ->
@@ -792,9 +724,19 @@ end
       add_node_to_table node new_id;
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
-      P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
-      get_node_proved new_id node;
+      begin
+        (* Do not send theories that do not contain any goal *)
+        match node with
+        | ATh th when theory_goals th = [] -> ()
+        | _ ->
+            P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+            get_node_proved new_id node
+      end;
       new_id
+
+  (* Same as new_node but do not return the node. *)
+  let create_node ~parent node =
+    let _: node_ID = new_node ~parent node in ()
 
   (****************************)
   (* Iter on the session tree *)
@@ -857,25 +799,19 @@ end
   (* Initialization of session tree *)
   (**********************************)
 
-(*
-  let _init_the_tree (): unit =
-    let f ~parent node_id = ignore (new_node ~parent node_id) in
-    iter_the_files f root_node
-*)
 
   let send_new_subtree_from_trans parent trans_id : unit =
     iter_subtree_from_trans
-      (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
+      create_node parent trans_id
 
   let send_new_subtree_from_file f =
-    iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
-      f
+    iter_subtree_from_file create_node f
 
   let reset_and_send_the_whole_tree (): unit =
     P.notify Reset_whole_tree;
     iter_on_files
       ~on_file:(fun file -> read_and_send (file_name file))
-      ~on_subtree:(fun ~parent id -> ignore (new_node ~parent id))
+      ~on_subtree:create_node
 
   let unfocus () =
     focused_node := Unfocused;
@@ -1038,7 +974,7 @@ end
          (s,n,p) :: acc) (Whyconf.get_provers config) []
     in
     load_strategies c;
-    let transformation_list = List.map fst (list_transforms ()) in
+    let transformation_list = List.map (fun (a, b) -> (a, Format.sprintf "%( %)" b)) (list_transforms ()) in
     let strategies_list = list_strategies c in
     let infos =
       {
@@ -1123,7 +1059,7 @@ end
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover ~counterexmp
+    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover ~counterexmp
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
@@ -1158,6 +1094,8 @@ end
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
       send_new_subtree_from_trans nid trans_id
+    | TSfailed (_, NoProgress) ->
+        P.notify (Message (Information "The transformation made no progress"))
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
@@ -1352,13 +1290,11 @@ end
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
+     | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
      | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
-     | Focus_req nid ->
-         Hint.mem model_any nid
      | Remove_subtree nid ->
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
@@ -1390,7 +1326,7 @@ end
           P.notify (Message (Error (Pp.string_of
             (fun fmt r -> Format.fprintf fmt
               "The following request refer to obsolete node_ids:\n %a\n"
-             print_request r) r)))
+             Itp_communication.print_request r) r)))
       end
     else
     try (
@@ -1403,18 +1339,6 @@ end
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
-    | Focus_req nid ->
-        let d = get_server_data () in
-        let s = d.cont.controller_session in
-        let any = any_from_node_ID nid in
-        let focus_on =
-          match any with
-          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-          | _ -> any
-        in
-        focused_node := Focus_on [focus_on];
-        reset_and_send_the_whole_tree ()
-    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
@@ -1452,6 +1376,18 @@ end
         | Replay valid_only       -> replay ~valid_only snid
         | Clean                   -> clean snid
         | Mark_Obsolete           -> mark_obsolete snid
+        | Focus_req ->
+            let d = get_server_data () in
+            let s = d.cont.controller_session in
+            let any = any_from_node_ID nid in
+            let focus_on =
+              match any with
+              | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+              | _ -> any
+            in
+            focused_node := Focus_on [focus_on];
+            reset_and_send_the_whole_tree ()
+        | Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

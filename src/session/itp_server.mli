@@ -9,11 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Itp_communication
+(** Server for a client/server communication with an external graphical interface *)
 
-val print_request: Format.formatter -> ide_request -> unit
-val print_msg: Format.formatter -> message_notification -> unit
-val print_notify: Format.formatter -> notification -> unit
+open Itp_communication
 
 (* The server part of the protocol *)
 module type Protocol = sig

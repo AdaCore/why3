@@ -13,14 +13,6 @@ open Stdlib
 
 type variable = string
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-
 type array =
   | Const of term
   | Store of array * term * term
@@ -29,7 +21,7 @@ and term =
   | Integer of string
   | Decimal of (string * string)
   | Fraction of (string * string)
-  | Float of float_type
+  | Float of Model_parser.float_type
   | Apply of (string * term list)
   | Other of string
   | Array of array

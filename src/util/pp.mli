@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*i $Id: pp.mli,v 1.22 2009-10-19 11:55:33 bobot Exp $ i*)
+(** Helpers for formatted pretty-printing *)
 
 open Format
 

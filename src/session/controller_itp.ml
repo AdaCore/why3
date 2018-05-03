@@ -244,11 +244,11 @@ let reload_files (c : controller) ~use_shapes =
  *)
 
 let add_file c ?format fname =
-  let theories,errors =
-    try Some (Session_itp.read_file c.controller_env ?format fname), None
-    with e -> None, Some e
+  let file_is_detached,theories,errors =
+    try false,(Session_itp.read_file c.controller_env ?format fname), None
+    with e -> true,[], Some e
   in
-  let (_ : file) = add_file_section c.controller_session fname theories format in
+  let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
   errors
 
 
@@ -366,10 +366,11 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
+    let interactive = config_pr.Whyconf.interactive in
     try
       let call =
         Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace ~command
-                          ~limit driver task
+                          ~limit ~interactive driver task
       in
       let pa = (c.controller_session,id,pr,callback,false,call,ores) in
       Hashtbl.replace prover_tasks_in_progress call pa
@@ -437,10 +438,10 @@ let timeout_handler () =
       let prover_update = Call_provers.query_call call in
       match prover_update with
       | Call_provers.NoUpdates -> Queue.add c q
-      | Call_provers.ProverFinished _res ->
+      | Call_provers.ProverFinished res ->
           (* res is meaningless for edition, we returned the old result *)
           (* inform the callback *)
-          callback (match ores with None -> Undone | Some r -> Done r)
+          callback (match ores with None -> Done res | Some r -> Done r)
       | _ -> assert (false) (* An edition can only return Noupdates or finished *)
     done;
     Queue.transfer q prover_tasks_edited;
@@ -493,7 +494,7 @@ let run_timeout_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr
+let schedule_proof_attempt c id pr ?save_to
                            ~counterexmp ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
@@ -531,12 +532,16 @@ let schedule_proof_attempt c id pr
       let interactive = config_pr.Whyconf.interactive in
       let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
       let limit = adapt_limits ~interactive ~use_steps limit a in
-      let script = Opt.map (fun s ->
+      let script =
+        if save_to = None then
+          Opt.map (fun s ->
                             Debug.dprintf debug_sched "Script file = %s@." s;
                             Filename.concat (get_dir ses) s) a.proof_script
+        else
+          save_to
       in
       limit, old_res, script
-    with Not_found | Session_itp.BadID -> limit,None,None
+    with Not_found | Session_itp.BadID -> limit,None,save_to
   in
   let panid = graft_proof_attempt ~limit ses id pr in
   Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,counterexmp,ores)
@@ -737,7 +742,7 @@ let run_strategy_on_goal
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ~counterexmp ~limit ~callback ~notification
+         schedule_proof_attempt c g p ?save_to:None ~counterexmp ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -853,7 +858,7 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn ~counterexmp:false
+      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn ~counterexmp:false
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
@@ -906,6 +911,7 @@ let copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
 (***************** {2 replay} ****************)
 
 
+let debug_replay = Debug.register_flag "replay" ~desc:"Debug@ info@ for@ replay"
 
 let find_prover notification c goal_id pr =
   if Hprover.mem c.controller_provers pr then Some pr else
@@ -949,7 +955,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
+       schedule_proof_attempt ?save_to:None c parid pr' ~counterexmp:false ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1021,10 +1027,13 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
     | Detached -> decr count
   in
 
-  let need_replay pa =
+  let need_replay id pa =
     filter pa &&
       (pa.proof_obsolete || not obsolete_only) &&
-        (not valid_only ||
+        (* When on a single proofattempt node, we want to always replay even non
+           valid proofattempts.
+        *)
+        (any = Some (APa id) || not valid_only ||
            match pa.Session_itp.proof_state with
            | None -> false
            | Some pr -> Call_provers.(pr.pr_answer = Valid))
@@ -1036,14 +1045,17 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
   (match any with
   | None ->
       Session_itp.session_iter_proof_attempt
-        (fun _ pa -> if need_replay pa then incr count) session
+        (fun paid pa -> if need_replay paid pa then incr count) session
   | Some nid ->
       Session_itp.any_iter_proof_attempt session
-        (fun _ pa -> if need_replay pa then incr count) nid);
+        (fun paid pa -> if need_replay paid pa then incr count) nid);
 
   (* Replaying function *)
   let replay_pa id pa =
-    if need_replay pa then
+    let is_need_replay = need_replay id pa in
+    Debug.dprintf debug_replay "Need_replay is set to %b for prover %a@."
+      is_need_replay Whyconf.print_prover pa.prover;
+    if is_need_replay then
       begin
         let parid = pa.parent in
         let pr = pa.prover in
@@ -1148,7 +1160,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                                    Call_provers.print_prover_result res
                   end
                 in
-                schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
+                schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1228,7 +1240,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
+            schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
          | _ -> assert false
       end
     in

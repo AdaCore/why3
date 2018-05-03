@@ -16,7 +16,6 @@ open Stdlib
 open Ide_utils
 open History
 open Itp_communication
-open Itp_server
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -521,7 +520,8 @@ let () =
      *)
     Hstr.iter
       (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing)
+       source_view#set_editable gconfig.allow_source_editing;
+       source_view#set_auto_indent gconfig.allow_source_editing)
       source_view_table;
     send_session_config_to_server ()
   in
@@ -816,7 +816,7 @@ let create_source_view =
             ~packing:scrolled_source_view#add () in
         let source_view =
           GSourceView2.source_view
-            ~auto_indent:true
+            ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
@@ -1085,7 +1085,7 @@ let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
-  GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
+  GEdit.entry_completion ~model:completion_model ~minimum_key_length:2 ~entry:command_entry ()
 
 let add_completion_entry (s,desc) =
   let row = completion_model#append () in
@@ -1934,7 +1934,7 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
-  List.iter (fun s -> add_completion_entry (s,"transformation")) transformations;
+  List.iter add_completion_entry transformations;
   (* add the name of the commands *)
   List.iter (fun s -> add_completion_entry (s,"command")) commands;
   (* todo: add queries *)
@@ -1967,9 +1967,13 @@ let init_completion provers transformations strategies commands =
   List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
-  (* does not work: it replaces the previous column as text result
-  command_entry_completion#set_text_column completion_desc;
-   *)
+  (* Adding a column which contains the description of the
+     prover/transformation/strategy. *)
+  let name_renderer = GTree.cell_renderer_text [ ] in
+  name_renderer#set_properties [`BACKGROUND "lightgrey"];
+  command_entry_completion#pack name_renderer;
+  command_entry_completion#add_attribute name_renderer "text" completion_desc;
+
   command_entry_completion#set_match_func match_function;
 
   command_entry#set_completion command_entry_completion
@@ -2094,14 +2098,15 @@ let () =
   connect_menu_item
     focus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Focus_req id));
+                                (fun id -> Command_req (id, "Focus")));
   connect_menu_item
     remove_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
-    ~callback:(fun () -> send_request Unfocus_req)
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+                                (fun id -> Command_req (id, "Unfocus")))
 
 
 (*************************************)
@@ -2208,24 +2213,6 @@ let treat_notification n =
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
-       let name =
-         (* Reduce the name of the goals to the minimum: "0" instead of
-            "WP_Parameter.0" for example.
-            In cases where we want the explanation to be printed, and the
-            explanation contains filename (with '.'), this does not work. So, we
-            additionally check that the first part of the name is a number.
-         *)
-         if typ = NGoal then
-           let new_name = List.hd (Strings.rev_split '.' name) in
-           try
-             let name_number = List.hd (Strings.split ' ' new_name) in
-             ignore (int_of_string name_number);
-             new_name
-           with _ ->
-             (* The name is empty or the first part is not a number *)
-             name
-         else name
-       in
        try
          let parent = get_node_row parent_id in
          ignore (new_node ~parent id name typ detached);

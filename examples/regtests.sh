@@ -96,6 +96,7 @@ run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir avl "-L avl"
 run_dir double_wp "-L double_wp"
 run_dir prover "-L prover --debug ignore_unused_vars"
+run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"
 echo ""
 
 echo "Summary       : $success/$total"

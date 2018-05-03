@@ -34,6 +34,60 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+  | Float_hexa of string * float
+
+
+                               let interp_float b eb sb =
+    try
+      let is_neg = match b with
+        | "#b0" -> false
+        | "#b1" -> true
+        | _ -> raise Exit
+      in
+      if String.length eb = 13 && String.sub eb 0 2 = "#b" &&
+         String.length sb = 15 && String.sub sb 0 2 = "#x" then
+         (* binary 64 *)
+         let exp_base2 = String.sub eb 2 11 in
+         let mant_base16 = String.sub sb 2 13 in
+         let exp = int_of_string ("0b" ^ exp_base2) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-1023"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 2047 then (* infinities and NaN *)
+             if mant_base16="0000000000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 1023 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else
+      if String.length eb = 4 && String.sub eb 0 2 = "#x" &&
+         String.length sb = 25 && String.sub sb 0 2 = "#b" then
+         (* binary 32 *)
+         let exp_base16 = String.sub eb 2 2 in
+         let mant_base2 = String.sub sb 2 23 in
+         let mant_base16 =
+           Format.asprintf "%06x" (2*int_of_string ("0b" ^ mant_base2))
+         in
+         let exp = int_of_string ("0x" ^ exp_base16) in
+         if exp = 0 then (* subnormals *)
+           let s = (if is_neg then "-" else "")^
+                   "0x0."^mant_base16^"p-127"
+            in Float_hexa(s,float_of_string s)
+           else if exp = 255 then (* infinities and NaN *)
+             if mant_base16="0000000" then
+                if is_neg then Minus_infinity else Plus_infinity
+                else Not_a_number
+           else
+           let exp = exp - 127 in
+           let s = (if is_neg then "-" else "")^
+                   "0x1."^mant_base16^"p"^(string_of_int exp)
+           in Float_hexa(s,float_of_string s)
+      else raise Exit
+   with Exit -> Float_value (b, eb, sb)
 
 type model_value =
  | Integer of string
@@ -98,6 +152,11 @@ let convert_float_value f =
       let m = Mstr.add "sign" (Json_base.String b) m in
       let m = Mstr.add "exponent" (Json_base.String eb) m in
       let m = Mstr.add "significand" (Json_base.String sb) m in
+      Json_base.Record m
+  | Float_hexa(s,f) ->
+      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Stdlib.Mstr.empty in
+      let m = Mstr.add "str_hexa" (Json_base.String s) m in
+      let m = Mstr.add "value" (Json_base.Float f) m in
       Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
@@ -200,7 +259,8 @@ let print_float_human fmt f =
   | Not_a_number ->
       fprintf fmt "NaN"
   | Float_value (b, eb, sb) ->
-      fprintf fmt "float(%s,%s,%s)" b eb sb
+     fprintf fmt "float_bits(%s,%s,%s)" b eb sb
+  | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
   fprintf fmt "(";
@@ -222,7 +282,7 @@ and print_model_value_human fmt (v: model_value) =
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
   | Apply (s, lt) ->
-    fprintf fmt "[%s %a]" s (Pp.print_list Pp.space print_model_value_human) lt
+    fprintf fmt "(%s %a)" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Bitvector s -> fprintf fmt "%s" s

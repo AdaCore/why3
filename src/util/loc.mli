@@ -9,9 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Source locations *)
+
 open Format
 
-(* Lexing locations *)
+(** {2 Lexing locations} *)
 
 val current_offset : int ref
 val reloc : Lexing.position -> Lexing.position
@@ -19,7 +21,7 @@ val set_file : string -> Lexing.lexbuf -> unit
 
 val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 
-(* locations in files *)
+(** {2 locations in files} *)
 
 type position
 
@@ -40,7 +42,7 @@ val gen_report_position : formatter -> position -> unit
 
 val report_position : formatter -> position -> unit
 
-(* located exceptions *)
+(** {2 located exceptions} *)
 
 exception Located of position * exn
 
@@ -64,7 +66,7 @@ val try7: ?loc:position ->
 
 val error: ?loc:position -> exn -> 'a
 
-(* messages *)
+(** {2 located error messages} *)
 
 exception Message of string
 

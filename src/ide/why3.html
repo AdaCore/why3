@@ -88,46 +88,53 @@
 
       </div>
 
-      <div id="why3-main-panel" class="why3-wide-view">
+      <div id="why3-main-panel">
 
-	<div id="why3-tab-container" class="why3-container">
-	  <div id="why3-tab-panel" class="why3-tab-group">
-	    <span class="why3-tab-label why3-widget" >Task tree</span>
-	    <div class="why3-widget why3-tab">
-	      <div id="why3-task-list" class="why3-widget">
-              </div>
-	    </div>
-	    <span class="why3-tab-label why3-widget why3-inactive">Source code</span>
-	    <div class="why3-widget why3-tab">
-	      <div id="why3-editor-container" class="why3-container">
-                <div id="why3-editor">Ceci est le code source</div>
-	      </div>
-            </div>
-	    <span class="why3-tab-label why3-widget why3-inactive">Log</span>
-	    <div class="why3-widget why3-tab">
-              <div id="why3-log-container" class="why3-container">
-                <iframe name="form-answer"></iframe>
-                <div id="why3-log-bg" class="why3-widget">
-                Log</div>
-              </div>
-            </div>
-	  </div>
-	</div>
+	<div id="why3-task-list-container">
+          <div id="why3-task-list">
+            Task tree not loaded yet. You may need to click on the 'reload' button (counterclockwise circular arrow above)
+          </div>
+        </div>
 
 	<div id="why3-resize-bar" class="why3-widget" ></div>
 
-	<div id="why3-task-viewer-container" class="why3-container">
-          <div id="why3-viewer-bg" class="why3-widget"> </div>
-          <div id="why3-task-viewer"> </div>
-	</div>
+        <div id="why3-right-panel">
 
+	  <div id="why3-tab-container" class="why3-container">
+	    <div id="why3-tab-panel" class="why3-tab-group">
+	      <span class="why3-tab-label why3-widget" >Task</span>
+	      <div class="why3-widget why3-tab">
+                <div id="why3-task-viewer"> No current proof task yet</div>
+	      </div>
+	      <span class="why3-tab-label why3-widget why3-inactive">Source code</span>
+	      <div class="why3-widget why3-tab">
+	        <div id="why3-editor-container" class="why3-container">
+                  <div id="why3-editor">No source code loaded yet</div>
+	        </div>
+              </div>
+	      <span class="why3-tab-label why3-widget why3-inactive">Log</span>
+	      <div class="why3-widget why3-tab">
+                <div id="why3-log-container" class="why3-container">
+                  <div id="why3-log-bg" class="why3-widget">
+                    Log</div>
+                </div>
+              </div>
+	    </div>
+	  </div>
 
-      </div>
+          <!--
+              <div id="why3-task-viewer-container" class="why3-container">
+                <div id="why3-viewer-bg" class="why3-widget"> </div>
+	      </div>
+              -->
+
 
 <!-- TODO remove useless attribute inside why3-form -->
 
+      <div id="why3-resize-bar2" class="why3-widget" ></div>
+
 <!-- TODO saisie -->
-      <div id="why3-form-cont" class="why3-wide-view">
+      <div id="why3-form-cont">
         <form id="why3-form" method="get"
               enctype="plain/text"
               action="http://localho" target="form-answer">
@@ -135,8 +142,6 @@
           <input type="submit" name="Submit" class="why3-hidden">
         </form>
       </div>
-
-      <div id="why3-resize-bar2" class="why3-widget" ></div>
 
       <div id="why3-tab-container2">
 	<div id="why3-tab-panel2">
@@ -149,6 +154,8 @@
         </div>
       </div>
 
+        </div>
+      </div>
     </div>
 
     <!-- open and save -->

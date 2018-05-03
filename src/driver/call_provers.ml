@@ -20,6 +20,7 @@ type reason_unknown =
   | Resourceout
   | Other
 
+(* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
   | Invalid
@@ -29,7 +30,9 @@ type prover_answer =
   | Unknown of (string * reason_unknown option)
   | Failure of string
   | HighFailure
+(* END{proveranswer} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
 type prover_result = {
   pr_answer : prover_answer;
   pr_status : Unix.process_status;
@@ -38,12 +41,15 @@ type prover_result = {
   pr_steps  : int;		(* -1 if unknown *)
   pr_model  : model;
 }
+(* END{proverresult} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
 type resource_limit = {
   limit_time  : int;
   limit_mem   : int;
   limit_steps : int;
 }
+(* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
 let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
 
@@ -370,8 +376,8 @@ let adapt_limits limit on_timelimit =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
       then (2 * limit.limit_time + 1)
-      (* if prover implements time limit, use t + 1 *)
-      else if on_timelimit then succ limit.limit_time
+      (* if prover implements time limit, use 16t + 1 *)
+      else if on_timelimit then 16 * limit.limit_time + 1
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -406,15 +412,19 @@ let handle_answer answer =
       let id = answer.Prove_client.id in
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
-      if Debug.test_noflag debug then begin
-	Sys.remove save.vc_file;
-	if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
+      let keep_vcs =
+        try let flag = Debug.lookup_flag "keep_vcs" in Debug.test_flag flag with
+        | _ -> false
+      in
+      if Debug.test_noflag debug && not keep_vcs then begin
+        Sys.remove save.vc_file;
+        if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let out = read_and_delete_file answer.Prove_client.out_file in
       let ret = answer.Prove_client.exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-	  answer.Prove_client.time out ret save.limit ~printer_mapping in
+          answer.Prove_client.time out ret save.limit ~printer_mapping in
       id, Some ans
   | Prove_client.Started id ->
       id, None
@@ -440,6 +450,11 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
+  Debug.dprintf
+    debug
+    "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
+    limit.limit_time limit.limit_mem
+    (Pp.print_list Pp.comma Pp.string) cmd;
   Prove_client.send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
@@ -501,7 +516,7 @@ let rec wait_on_call = function
   | ServerCall id as pc ->
       begin match query_result_buffer id with
         | ProverFinished r -> r
-	| _ ->
+        | _ ->
             fetch_new_results ~blocking:true;
             wait_on_call pc
       end
@@ -510,14 +525,18 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ?(inplace=false) buffer =
+                   ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
-    if inplace then begin
-      let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
-      Sys.rename filename (backup_file filename);
-      filename, open_out filename
-    end else
-      Filename.open_temp_file "why_" ("_" ^ filename) in
+    if gen_new_file then
+      Filename.open_temp_file "why_" ("_" ^ filename)
+    else
+      begin
+        let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
+        if inplace then
+          Sys.rename filename (backup_file filename);
+        filename, open_out filename
+      end
+  in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
 

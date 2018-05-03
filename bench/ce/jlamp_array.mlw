@@ -15,22 +15,22 @@ module Array
   axiom three_def : to_int three = 3
 
 
-  let f (a "model" "model_projected" :array t) : unit
+  let f (a : array t) : unit
     requires { a[42] = three }
     writes { a }
-    ensures { "model_vc" a[42] = three }
+    ensures { a[42] = three }
   = a[42] <- two
 
-  let g (a "model" "model_projected" :array t) : unit
+  let g (a : array t) : unit
     requires { a.length >= 43 /\ a[17] = three }
     writes { a }
-    ensures { "model_vc" a[42] = three }
+    ensures { a[42] = three }
   = a[42] <- two
 
-  let h (a "model" "model_projected" :array t) : unit
+  let h (a : array t) : unit
     requires { a.length >= 43 /\ a[17] = three }
     writes { a }
-    ensures { "model_vc" a[42] = three }
+    ensures { a[42] = three }
   = a[17] <- two
 
 end

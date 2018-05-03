@@ -13,14 +13,6 @@ open Stdlib
 
 type variable = string
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-
 type array =
   | Const of term
   | Store of array * term * term
@@ -29,7 +21,7 @@ and term =
   | Integer of string
   | Decimal of (string * string)
   | Fraction of (string * string)
-  | Float of float_type
+  | Float of Model_parser.float_type
   | Apply of (string * term list)
   | Other of string
   | Array of array
@@ -54,12 +46,13 @@ type correspondence_table = (bool * definition) Mstr.t
 
 let print_float fmt f =
   match f with
-  | Plus_infinity -> Format.fprintf fmt "Plus_infinity"
-  | Minus_infinity -> Format.fprintf fmt "Minus_infinity"
-  | Plus_zero -> Format.fprintf fmt "Plus_zero"
-  | Minus_zero -> Format.fprintf fmt "Minus_zero"
-  | Not_a_number -> Format.fprintf fmt "NaN"
-  | Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
+  | Model_parser.Plus_infinity -> Format.fprintf fmt "Plus_infinity"
+  | Model_parser.Minus_infinity -> Format.fprintf fmt "Minus_infinity"
+  | Model_parser.Plus_zero -> Format.fprintf fmt "Plus_zero"
+  | Model_parser.Minus_zero -> Format.fprintf fmt "Minus_zero"
+  | Model_parser.Not_a_number -> Format.fprintf fmt "NaN"
+  | Model_parser.Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
+  | Model_parser.Float_hexa(s,f) -> Format.fprintf fmt "%s (%g)" s f
 
 let rec print_array fmt a =
   match a with
