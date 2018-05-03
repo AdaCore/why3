@@ -60,7 +60,7 @@ let escape_string s =
   for i = 0 to String.length s - 1 do
     n := !n +
       (match String.unsafe_get s i with
-         | '"' | '\\' | '\n' | '\r' | '\t' -> 2
+         | '"' | '\\' | '\r' | '\t' -> 2
          | _ -> 1)
   done;
   if !n = String.length s then s else begin
@@ -69,12 +69,12 @@ let escape_string s =
     for i = 0 to String.length s - 1 do
       let c = String.unsafe_get s i in
       begin match c with
-        | ('"' | '\\' | '\n' | '\r' | '\t') ->
+        | ('"' | '\\' | '\r' | '\t') ->
           Bytes.set s' !n '\\'; incr n
         | _ -> ()
       end;
       Bytes.set s' !n
-        (match c with '\n' -> 'n' | '\r' -> 'r' | '\t' -> 't' | _ -> c);
+        (match c with '\r' -> 'r' | '\t' -> 't' | _ -> c);
       incr n
     done;
     Bytes.unsafe_to_string s'
