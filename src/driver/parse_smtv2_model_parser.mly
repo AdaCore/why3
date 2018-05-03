@@ -147,6 +147,9 @@ array:
 | LPAREN
     STORE array smt_term smt_term
   RPAREN { Smt2_model_defs.Store ($3, $4, $5) }
+| LPAREN
+    STORE name smt_term smt_term
+  RPAREN { Smt2_model_defs.Store (Smt2_model_defs.Array_var $3, $4, $5) }
 (* When array is of type int -> bool, Cvc4 returns something that looks like:
    (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
 | LPAREN
