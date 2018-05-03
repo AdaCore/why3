@@ -510,10 +510,9 @@ let print_prop info fmt pr f =
     (print_fmla info) f
 
 let add_check_sat info fmt =
-  fprintf fmt "@[(check-sat)@]@\n";
-  (* Push if necessary *)
   if info.info_cntexample && info.info_cntexample_need_push then
     fprintf fmt "@[(push)@]@\n";
+  fprintf fmt "@[(check-sat)@]@\n";
   if info.info_cntexample then
     fprintf fmt "@[(get-model)@]@\n"
 
@@ -562,7 +561,6 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
       add_check_sat info fmt;
 
       (* If in incremental mode, we empty the list of axioms we stored *)
