@@ -1002,14 +1002,16 @@ let print_message ~kind ~notif_kind fmt =
     (fun _ -> let s = flush_str_formatter () in
               let s = try_convert s in
               add_to_log notif_kind s;
+              let buf = message_zone#buffer in
+              buf#delete ~start:buf#start_iter ~stop:buf#end_iter;
               if kind>0 then
                 begin
                   if Strings.ends_with notif_kind "error" ||
                      Strings.ends_with notif_kind "Error"
                   then
-                    message_zone#buffer#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
                   else
-                    message_zone#buffer#insert (s ^ "\n");
+                    buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
                 end)
     str_formatter
