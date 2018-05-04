@@ -66,6 +66,7 @@ type color =
   | Premise_color
   | Goal_color
   | Error_color
+  | Error_line_color
 
 type update_info =
   | Proved of bool

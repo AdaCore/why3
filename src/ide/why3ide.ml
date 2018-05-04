@@ -245,18 +245,18 @@ let try_convert s =
 let create_colors v =
   let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-
   let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-
   let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-
+  let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.neg_premise_color] in
+      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
+  let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
   ()
 
@@ -266,7 +266,8 @@ let erase_color_loc (v:GSourceView2.source_view) =
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter
 
 
 
@@ -946,7 +947,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error" [`BACKGROUND gconfig.neg_premise_color]
+  ~name:"error" [`BACKGROUND gconfig.error_line_color]
 
 (**** Message-zone printing functions *****)
 
@@ -1156,6 +1157,7 @@ let convert_color (color: color): string =
   | Premise_color -> "premise_tag"
   | Goal_color -> "goal_tag"
   | Error_color -> "error_tag"
+  | Error_line_color -> "error_line_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 (line - 1) in
@@ -1690,9 +1692,8 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
-         color_line ~color:Goal_color rel_loc;
+         color_line ~color:Error_line_color rel_loc;
          color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
