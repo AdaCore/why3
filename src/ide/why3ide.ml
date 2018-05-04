@@ -1003,6 +1003,7 @@ let print_message ~kind ~notif_kind fmt =
               let s = try_convert s in
               add_to_log notif_kind s;
               let buf = message_zone#buffer in
+              buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
               buf#delete ~start:buf#start_iter ~stop:buf#end_iter;
               if kind>0 then
                 begin
@@ -1653,11 +1654,11 @@ let treat_message_notification msg = match msg with
       else
         begin
           let buf = message_zone#buffer in
-          (* remove all coloration in message_zone *)
-          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
           print_message ~kind:1 ~notif_kind:"Transformation Error"
                         "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
+          (* remove all coloration in message_zone before coloring *)
+          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
           let color = "error" in
           let _, _, beg_char, end_char = Loc.get loc in
           let start = buf#start_iter#forward_lines 3 in
