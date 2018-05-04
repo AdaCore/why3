@@ -726,30 +726,6 @@ let clear_tree_and_table goals_model =
 (* Menu items *)
 (**************)
 
-
-let reload_unsafe () = send_request Reload_req
-
-let save_and_reload () = save_sources (); reload_unsafe ()
-
-(* Same as reload_safe but propose to save edited sources before reload *)
-let reload_safe () =
-  if files_need_saving () then
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving source files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
-    in
-    match answer with
-    | 1 -> save_and_reload ()
-    | 2 -> reload_unsafe ()
-    | _ -> ()
-  else
-    reload_unsafe ()
-
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
-
-
 (* vpan222 contains:
    2.2.2.1 a notebook containing view of the current task, source code etc
    2.2.2.2 a vertical pan which contains [vbox2222]
@@ -996,6 +972,11 @@ let add_to_log =
   log_zone#buffer#insert ("] " ^ s ^ "\n");
   log_zone#scroll_to_mark `INSERT
 
+let clear_message_zone () =
+  let buf = message_zone#buffer in
+  buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#delete ~start:buf#start_iter ~stop:buf#end_iter
+
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
   Format.kfprintf
@@ -1003,8 +984,6 @@ let print_message ~kind ~notif_kind fmt =
               let s = try_convert s in
               add_to_log notif_kind s;
               let buf = message_zone#buffer in
-              buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
-              buf#delete ~start:buf#start_iter ~stop:buf#end_iter;
               if kind>0 then
                 begin
                   if Strings.ends_with notif_kind "error" ||
@@ -1078,6 +1057,34 @@ let update_monitor =
   let f = if r = 0 then " " else fan !c in
   let text = Printf.sprintf "%s %d/%d/%d" f t s r in
   monitor#set_text text
+
+
+(*********************)
+(* Reaload Menu Item *)
+(*********************)
+
+let reload_unsafe () = clear_message_zone (); send_request Reload_req
+
+let save_and_reload () = save_sources (); reload_unsafe ()
+
+(* Same as reload_safe but propose to save edited sources before reload *)
+let reload_safe () =
+  if files_need_saving () then
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving source files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
+    in
+    match answer with
+    | 1 -> save_and_reload ()
+    | 2 -> reload_unsafe ()
+    | _ -> ()
+  else
+    reload_unsafe ()
+
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
+
 
 
 
