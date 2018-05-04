@@ -1004,8 +1004,13 @@ let print_message ~kind ~notif_kind fmt =
               add_to_log notif_kind s;
               if kind>0 then
                 begin
-                  message_zone#buffer#insert (s ^ "\n");
-                  messages_notebook#goto_page error_page
+                  if Strings.ends_with notif_kind "error" ||
+                     Strings.ends_with notif_kind "Error"
+                  then
+                    message_zone#buffer#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                  else
+                    message_zone#buffer#insert (s ^ "\n");
+                  messages_notebook#goto_page error_page;
                 end)
     str_formatter
     fmt
