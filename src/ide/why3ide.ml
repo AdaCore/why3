@@ -2296,7 +2296,10 @@ let treat_notification n =
      if is_selected_alone id then
        begin
          task_view#source_buffer#set_text s;
-         apply_loc_on_source list_loc;
+         (* Avoid erasing colors at startup when selecting the first node. In
+            all other cases, it should change nothing. *)
+         if list_loc != [] then
+           apply_loc_on_source list_loc;
          (* scroll to end of text *)
          task_view#scroll_to_mark `INSERT
        end
