@@ -285,16 +285,7 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
   | task -> update task
 
-let add_cntexample_meta task cntexample =
-  if not (cntexample) then task
-  else
-    let cnt_meta = lookup_meta "get_counterexmp" in
-    let g,task = Task.task_separate_goal task in
-    let task = Task.add_meta task cnt_meta [] in
-    Task.add_tdecl task g
-
-let prepare_task ~cntexample drv task =
-  let task = add_cntexample_meta task cntexample in
+let prepare_task drv task =
   let lookup_transform t = lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
   let apply task tr = Trans.apply tr task in
@@ -316,8 +307,8 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) drv fmt task =
-  let task = prepare_task ~cntexample drv task in
+let print_task ?old drv fmt task =
+  let task = prepare_task drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
 
@@ -375,9 +366,8 @@ let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?(cntexample=false) ?old
-               ?inplace ?interactive drv task =
-  let task = prepare_task ~cntexample drv task in
+let prove_task ~command ~limit ?old ?inplace ?interactive drv task =
+  let task = prepare_task drv task in
   prove_task_prepared ~command ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)
