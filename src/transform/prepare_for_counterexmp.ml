@@ -16,7 +16,7 @@ let debug = Debug.register_info_flag "prepare_for_counterexmp"
     for@ getting@ counter-example."
 
 let meta_get_counterexmp =
-  Theory.register_meta_excl "get_counterexmp" []
+  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
   ~desc:"Set@ when@ counter-example@ should@ be@ get."
 
 let get_counterexmp task =

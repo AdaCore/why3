@@ -54,3 +54,6 @@ val has_suffix : string -> string -> bool
 val remove_suffix : string -> string -> string
 (** [remove_suffix suff s] removes the suffix [suff] from [s].
     Raises [Not_found] if [s] does not end with [suff] *)
+
+val ends_with : string -> string -> bool
+(** test if a string ends with another *)

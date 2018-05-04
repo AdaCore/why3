@@ -32,6 +32,7 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_line_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
@@ -41,7 +42,6 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
 val load_config : Whyconf.config -> Whyconf.config -> unit

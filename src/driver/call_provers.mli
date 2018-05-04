@@ -84,7 +84,7 @@ val stepregexp : string -> int -> stepregexp
     [s] is a regular expression, [n] is the group number with steps number. *)
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;

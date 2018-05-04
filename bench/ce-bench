@@ -30,12 +30,10 @@ fi
 run () {
     printf "  $2 ($1)... "
     f="$2_$1"
-    $dir/../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
+    $dir/../bin/why3prove.opt -P "$1,counterexamples" --timelimit 1 -a split_intros_goal_wp "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' > "$f.out"
-    $dir/../bin/why3prove.opt -P "$1" --timelimit 1 -a split_intros_goal_wp --get-ce "$2.mlw" | \
-        sed 's/ ([0-9]\+\.[0-9]\+s)//' >> "$f.out"
     if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
      echo "ok"
   else
@@ -57,6 +55,5 @@ for file in $files; do
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
     run CVC4,1.5 $filedir/$filebase
-    run Z3,4.5.0 $filedir/$filebase
     run Z3,4.6.0 $filedir/$filebase
 done

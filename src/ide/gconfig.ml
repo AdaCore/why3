@@ -51,6 +51,7 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_line_color : string;
       mutable iconset : string;
       (** colors *)
       mutable config : Whyconf.config;
@@ -62,7 +63,6 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
 
@@ -87,6 +87,7 @@ type ide = {
   ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_error_line_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -112,7 +113,8 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
-    ide_error_color = "orange";
+    ide_error_color = "red";
+    ide_error_line_color = "yellow";
     ide_iconset = "fatcow";
     ide_hidden_provers = [];
   }
@@ -166,6 +168,9 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_error_line_color =
+      get_string section ~default:default_ide.ide_error_line_color
+        "error_line_color";
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
@@ -217,6 +222,7 @@ let load_config config original_config =
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    error_line_color = ide.ide_error_line_color;
     iconset = ide.ide_iconset;
     config         = config;
     original_config = original_config;
@@ -224,7 +230,6 @@ let load_config config original_config =
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
     session_nb_processes = Whyconf.running_provers_max main;
-    session_cntexample = Whyconf.cntexample main;
 }
 
 let save_config t =
@@ -237,9 +242,6 @@ let save_config t =
   let mem = Whyconf.memlimit new_main in
   let nb = Whyconf.running_provers_max new_main in
   let config = set_main config (set_limits (get_main config) time mem nb) in
-  let new_main = Whyconf.get_main t.config in
-  let cntexample = Whyconf.cntexample new_main in
-  let config = set_main config (set_cntexample (get_main config) cntexample) in
   (* copy also provers section since it may have changed (the editor
      can be set via the preferences dialog) *)
   let config = set_provers config (get_provers t.config) in
@@ -266,6 +268,7 @@ let save_config t =
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
@@ -705,6 +708,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
   in
   (* counter-example *)
+(*
   let cntexample_check = GButton.check_button ~label:"get counter-example"
     ~packing:vb#add ()
     ~active:c.session_cntexample
@@ -713,6 +717,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     cntexample_check#connect#toggled ~callback:
       (fun () -> c.session_cntexample <- not c.session_cntexample)
   in
+*)
   (* source editing allowed *)
   let source_editing_check = GButton.check_button ~label:"allow editing source files"
     ~packing:vb#add ()
@@ -1171,9 +1176,6 @@ let preferences (c : t) =
       c.config <- Whyconf.set_main c.config
         (Whyconf.set_limits (Whyconf.get_main c.config)
            c.session_time_limit c.session_mem_limit c.session_nb_processes);
-      c.config <- Whyconf.set_main c.config
-	(Whyconf.set_cntexample (Whyconf.get_main c.config)
-	   c.session_cntexample);
       save_config ()
     | `CLOSE | `DELETE_EVENT -> ()
   end;

@@ -46,7 +46,6 @@ val call_on_buffer :
 
 val print_task :
   ?old       : in_channel ->
-  ?cntexample : bool ->
   driver -> Format.formatter -> Task.task -> unit
 
 val print_theory :
@@ -57,14 +56,13 @@ val print_theory :
 val prove_task :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
-val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
+val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->

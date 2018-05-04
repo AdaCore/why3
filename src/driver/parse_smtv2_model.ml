@@ -34,21 +34,28 @@ let get_position lexbuf =
 let do_parsing model =
   let lexbuf = Lexing.from_string model in
   try
-    Parse_smtv2_model_parser.output Parse_smtv2_model_lexer.token lexbuf
+    Debug.dprintf debug "Entering smtv2 model parser@.";
+    let x = Parse_smtv2_model_parser.output Parse_smtv2_model_lexer.token lexbuf in
+    Debug.dprintf debug "smtv2 model parser: OK@.";
+    x
   with
   | Parse_smtv2_model_lexer.SyntaxError ->
-    Warning.emit
-      ~loc:(get_position lexbuf)
-      "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
-      (Lexing.lexeme lexbuf);
-    Stdlib.Mstr.empty
+     let l = Lexing.lexeme lexbuf in
+     Debug.dprintf debug "smtv2 model parser: SyntaxError on lexeme '%s'@." l;
+     Warning.emit
+       ~loc:(get_position lexbuf)
+       "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
+       l;
+     Stdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
-    begin
-      let loc = get_position lexbuf in
-      Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
-      (Lexing.lexeme lexbuf);
-      Stdlib.Mstr.empty
-    end
+     let l = Lexing.lexeme lexbuf in
+     Debug.dprintf debug "smtv2 model parser: Error on lexeme '%s'@." l;
+     let loc = get_position lexbuf in
+     Warning.emit
+       ~loc:loc
+       "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
+       l;
+     Stdlib.Mstr.empty
 
 let do_parsing list_proj list_records model =
   let m = do_parsing model in
@@ -61,12 +68,12 @@ let do_parsing list_proj list_records model =
    parsing on a fresh new line ".*" ensures it *)
 let parse : raw_model_parser = fun list_proj list_records input ->
   try
-    let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
+(*    let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
     ignore (Str.search_forward r input 0);
-    let match_end = Str.match_end () in
+    let match_end = Str.match_end () in*)
     let nr = Str.regexp "^)" in
     let res = Str.search_backward nr input (String.length input) in
-    let model_string = String.sub input match_end (res + 1 - match_end) in
+    let model_string = String.sub input 0 (res + 1) in
     do_parsing list_proj list_records model_string
   with
   | Not_found -> []

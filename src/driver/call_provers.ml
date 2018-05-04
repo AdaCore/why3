@@ -136,7 +136,7 @@ let grep_reason_unknown out =
     Other
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
@@ -193,11 +193,82 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-let backup_file f = f ^ ".save"
+(*
+let rec grep out l = match l with
+  | [] ->
+      HighFailure
+  | (re,pa) :: l ->
+      begin try
+        ignore (Str.search_forward re out 0);
+        match pa with
+        | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
+        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
+        | Failure s -> Failure (Str.replace_matched s out)
+        | HighFailure -> assert false
+      with Not_found -> grep out l end
+*)
 
+(* Create a regexp matching the same as the union of all regexp of the list. *)
+let craft_efficient_re l =
+  let s = Format.asprintf "%a"
+    (Pp.print_list_delim
+       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
+       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
+       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
+       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
+  in
+  Str.regexp s
+
+(*
+let print_delim fmt d =
+  match d with
+  | Str.Delim s -> Format.fprintf fmt "Delim %s" s
+  | Str.Text s -> Format.fprintf fmt "Text %s" s
+ *)
 let debug_print_model model =
   let model_str = Model_parser.model_to_string model in
   Debug.dprintf debug "Call_provers: %s@." model_str
+
+let analyse_result res_parser printer_mapping out =
+  let list_re = res_parser.prp_regexps in
+  let re = craft_efficient_re list_re in
+  let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
+  let result_list = Str.full_split re out in
+(*  Format.eprintf "[incremental model parsing] results list is @[[%a]@]@."
+                 (Pp.print_list Pp.semi print_delim) result_list;
+*)
+  let rec analyse saved_model saved_res l =
+    match l with
+    | [] ->
+        if saved_res = None then
+          (HighFailure, saved_model)
+        else
+          (Opt.get saved_res, saved_model)
+    | Str.Delim res :: Str.Text model :: tl ->
+        (* Parse the text of the result *)
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          (* get model if possible *)
+          let m = res_parser.prp_model_parser model printer_mapping in
+          Debug.dprintf debug "Call_provers: model:@.";
+          debug_print_model m;
+          let m = if is_model_empty m then saved_model else (Some m) in
+          analyse m (Some res) tl
+    | Str.Delim res :: tl ->
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          analyse saved_model (Some res) tl
+    | Str.Text _fail :: tl -> analyse saved_model saved_res tl
+  in
+
+  analyse None None result_list
+
+let backup_file f = f ^ ".save"
+
 
 let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
@@ -206,9 +277,13 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans =
-    try List.assoc int_exitcode res_parser.prp_exitcodes
-    with Not_found -> grep out res_parser.prp_regexps in
+  let ans, model =
+    try List.assoc int_exitcode res_parser.prp_exitcodes, None
+    with Not_found -> analyse_result res_parser printer_mapping out
+      (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
+      t, None *)
+  in
+  let model = match model with | Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -248,10 +323,6 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
     | _ -> ans, time
   in
    ***)
-  (* get counterexample if any *)
-  let model = res_parser.prp_model_parser out printer_mapping in
-  Debug.dprintf debug "Call_provers: model:@.";
-  debug_print_model model;
   { pr_answer = ans;
     pr_status = Unix.WEXITED int_exitcode;
     pr_output = out;

@@ -356,7 +356,7 @@ let fuzzy_proof_time nres ores =
   else nres
 
 
-let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
+let build_prover_call ?proof_script c id pr limit callback ores =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let with_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let command =
@@ -369,7 +369,7 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
     let interactive = config_pr.Whyconf.interactive in
     try
       let call =
-        Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace ~command
+        Driver.prove_task ?old:proof_script ~inplace ~command
                           ~limit ~interactive driver task
       in
       let pa = (c.controller_session,id,pr,callback,false,call,ores) in
@@ -454,10 +454,10 @@ let timeout_handler () =
     try
       for _i = Hashtbl.length prover_tasks_in_progress
           to S.multiplier * !session_max_tasks do
-        let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
+        let (c,id,pr,limit,proof_script,callback,ores) =
           Queue.pop scheduled_proof_attempts in
         try
-          build_prover_call ?proof_script ~cntexample c id pr limit callback ores
+          build_prover_call ?proof_script c id pr limit callback ores
         with e when not (Debug.test_flag Debug.stack_trace) ->
           callback (InternalFailure e)
       done
@@ -481,7 +481,7 @@ let interrupt () =
   *)
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample,_ores) =
+    let (_c,_id,_pr,_limit,_proof_script,callback,_ores) =
       Queue.pop scheduled_proof_attempts in
     callback Interrupted
   done;
@@ -494,8 +494,7 @@ let run_timeout_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ?save_to
-                           ~counterexmp ~limit ~callback ~notification =
+let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -544,7 +543,7 @@ let schedule_proof_attempt c id pr ?save_to
     with Not_found | Session_itp.BadID -> limit,None,save_to
   in
   let panid = graft_proof_attempt ~limit ses id pr in
-  Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,counterexmp,ores)
+  Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,ores)
             scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
@@ -619,7 +618,7 @@ let prepare_edition c ?file pn pr ~notification =
   let fmt = formatter_of_out_channel ch in
   let task = Session_itp.get_task session pn in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  Driver.print_task ~cntexample:false ?old driver fmt task;
+  Driver.print_task ?old driver fmt task;
   Opt.iter close_in old;
   close_out ch;
   panid,file,old_res
@@ -714,7 +713,7 @@ let schedule_transformation c id name args ~callback ~notification =
 open Strategy
 
 let run_strategy_on_goal
-    c id strat ~counterexmp ~callback_pa ~callback_tr ~callback ~notification =
+    c id strat ~callback_pa ~callback_tr ~callback ~notification =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -742,7 +741,7 @@ let run_strategy_on_goal
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ?save_to:None ~counterexmp ~limit ~callback ~notification
+         schedule_proof_attempt c g p ?save_to:None ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -858,7 +857,7 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn ~counterexmp:false
+      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
@@ -955,7 +954,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt ?save_to:None c parid pr' ~counterexmp:false ~limit ~callback ~notification
+       schedule_proof_attempt ?save_to:None c parid pr' ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1160,7 +1159,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                                    Call_provers.print_prover_result res
                   end
                 in
-                schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
+                schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1240,7 +1239,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt ?save_to:None c pn prover ~counterexmp:false ~limit ~callback ~notification
+            schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
          | _ -> assert false
       end
     in
