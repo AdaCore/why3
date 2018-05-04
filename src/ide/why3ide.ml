@@ -2284,6 +2284,7 @@ let treat_notification n =
      main_window#show ();
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
+     Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
