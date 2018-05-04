@@ -37,6 +37,7 @@
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
 %token <string> BITVECTOR_EXTRACT
+%token <string> INT_TO_BV
 %token BITVECTOR_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
@@ -128,6 +129,10 @@ list_smt_term:
 application:
 | LPAREN name list_smt_term RPAREN { Smt2_model_defs.Apply($2, List.rev $3) }
 | LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
+(* This should not happen in relevant part of the model *)
+| LPAREN INT_TO_BV smt_term RPAREN {
+  Smt2_model_defs.Apply($2, [$3]) }
+
 
 binop:
 | LE { "<=" }
@@ -142,6 +147,9 @@ array:
 | LPAREN
     STORE array smt_term smt_term
   RPAREN { Smt2_model_defs.Store ($3, $4, $5) }
+| LPAREN
+    STORE name smt_term smt_term
+  RPAREN { Smt2_model_defs.Store (Smt2_model_defs.Array_var $3, $4, $5) }
 (* When array is of type int -> bool, Cvc4 returns something that looks like:
    (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
 | LPAREN

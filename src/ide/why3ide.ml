@@ -2105,14 +2105,15 @@ let () =
   connect_menu_item
     focus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Focus_req id));
+                                (fun id -> Command_req (id, "Focus")));
   connect_menu_item
     remove_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
-    ~callback:(fun () -> send_request Unfocus_req)
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+                                (fun id -> Command_req (id, "Unfocus")))
 
 
 (*************************************)
@@ -2219,24 +2220,6 @@ let treat_notification n =
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
-       let name =
-         (* Reduce the name of the goals to the minimum: "0" instead of
-            "WP_Parameter.0" for example.
-            In cases where we want the explanation to be printed, and the
-            explanation contains filename (with '.'), this does not work. So, we
-            additionally check that the first part of the name is a number.
-         *)
-         if typ = NGoal then
-           let new_name = List.hd (Strings.rev_split '.' name) in
-           try
-             let name_number = List.hd (Strings.split ' ' new_name) in
-             ignore (int_of_string name_number);
-             new_name
-           with _ ->
-             (* The name is empty or the first part is not a number *)
-             name
-         else name
-       in
        try
          let parent = get_node_row parent_id in
          ignore (new_node ~parent id name typ detached);

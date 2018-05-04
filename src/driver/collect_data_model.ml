@@ -50,6 +50,8 @@ let rec get_variables_term (table: correspondence_table) t =
 
 and get_variables_array table a =
    match a with
+   | Array_var _v ->
+     table
    | Const t ->
     let table = get_variables_term table t in
     table
@@ -146,6 +148,7 @@ let rec refine_definition table t =
 
 and refine_array table a =
   match a with
+  | Array_var _v -> a
   | Const t ->
     let t = refine_function table t in
     Const t
@@ -225,6 +228,7 @@ let rec convert_array_value (a: array) : Model_parser.model_array =
 
   let rec create_array_value a =
     match a with
+    | Array_var _v -> raise Not_value
     | Const t -> { Model_parser.arr_indices = !array_indices;
                    Model_parser.arr_others = convert_to_model_value t}
     | Store (a, t1, t2) ->
@@ -288,6 +292,7 @@ let default_apply_to_record (list_records: (string list) Mstr.t) (t: term) =
 
   let rec array_apply_to_record (a: array) =
     match a with
+    | Array_var _v -> raise Not_value
     | Const x ->
         let x = apply_to_record x in
         Const x

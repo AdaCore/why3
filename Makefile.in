@@ -1913,13 +1913,13 @@ doc/bnf$(EXE): doc/bnf.mll
 doc/extract_ocaml_code: doc/extract_ocaml_code.ml
 	$(OCAMLC) str.cma -o $@ $<
 
-doc/logic_%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+doc/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
 
-doc/whyconf_%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+doc/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code src/driver/whyconf.ml $* doc
 
-doc/call_provers_%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+doc/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
 
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
@@ -1933,9 +1933,9 @@ OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 
 OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
 
-OCAMLCODE = $(addprefix doc/logic_, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
-	$(addprefix doc/call_provers_, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
-	doc/whyconf_provertype.ml
+OCAMLCODE = $(addprefix doc/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	doc/whyconf__provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \

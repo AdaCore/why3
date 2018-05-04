@@ -19,7 +19,6 @@ let has_extension f =
 let get_session_dir ~allow_mkdir files =
   if Queue.is_empty files then invalid_arg "no files given";
   let first = Queue.pop files in
-  (* The remaining files in [files] are going to be open *)
   let dir =
     if Sys.file_exists first then
       if Sys.is_directory first then
@@ -36,19 +35,19 @@ let get_session_dir ~allow_mkdir files =
             with Invalid_argument _ ->
               invalid_arg ("'" ^ first ^ "' has no extension and is not a directory")
           in
-          Queue.push first files; (* we need to open [first] *)
+          Queue.push first files;
           d
         else
           invalid_arg ("'" ^ first ^ "' is not a directory")
     else
-      (* first does not exists *)
+      (* first does not exist *)
       if has_extension first then
         invalid_arg ("file not found: " ^ first)
       else first
   in
   if not (Sys.file_exists dir) then
     begin
-      if allow_mkdir then Unix.mkdir dir 0o777 else
+      if allow_mkdir then Unix.mkdir dir 0o700 else
         invalid_arg ("session directory '" ^ dir ^ "' not found")
     end;
   dir
@@ -366,6 +365,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -377,6 +378,22 @@ let query_on_task cont f id args =
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"
 
+let help_message commands_table =
+  Pp.sprintf
+    "Please type a command among the following (automatic completion available)@\n\
+     @\n\
+     @ <transformation name> [arguments]@\n\
+     @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+     @ <query> [arguments]@\n\
+     @ <strategy shortcut>@\n\
+     @ mark @\n\
+     @ clean @\n\
+     @ replay @\n\
+     @ bisect @\n\
+     @ help <transformation_name> @\n\
+     @ list_ide_command @ \n\
+     @\n\
+     Available queries are:@\n@[%a@]" help_on_queries commands_table
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
@@ -405,23 +422,8 @@ let interp commands_table cont id s =
    then
       match cmd, args with
       | "help", _ ->
-        let text = Pp.sprintf
-                         "Please type a command among the following (automatic completion available)@\n\
-                          @\n\
-                          @ <transformation name> [arguments]@\n\
-                          @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                          @ <query> [arguments]@\n\
-                          @ <strategy shortcut>@\n\
-                          @ mark @\n\
-                          @ clean @\n\
-                          @ replay @\n\
-                          @ bisect @\n\
-                          @ help <transformation_name> @\n\
-                          @ list_ide_command @ \n\
-                          @\n\
-                          Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
-                  Help_message text
+          let text = help_message commands_table in
+          Help_message text
       | _ -> QError ("Command cannot be applied on a detached node")
    else
      begin
@@ -471,6 +473,10 @@ let interp commands_table cont id s =
                    end
                | "mark", _ ->
                    Mark_Obsolete
+               | "Focus", _ ->
+                   Focus_req
+               | "Unfocus", _ ->
+                   Unfocus_req
                | "clean", _ ->
                    Clean
                | "help", [trans] ->
@@ -483,22 +489,7 @@ let interp commands_table cont id s =
                     with
                     | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
                | "help", _ ->
-                  let text = Pp.sprintf
-                               "Please type a command among the following (automatic completion available)@\n\
-                                @\n\
-                                @ <transformation name> [arguments]@\n\
-                                @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                                @ <query> [arguments]@\n\
-                                @ <strategy shortcut>@\n\
-                                @ mark @\n\
-                                @ clean @\n\
-                                @ replay @\n\
-                                @ bisect @\n\
-                                @ help <transformation_name> @\n\
-                                @ list_ide_command @ \n\
-                                @\n\
-                                Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
+                  let text = help_message commands_table in
                   Help_message text
                | _ ->
                   Other (cmd, args)

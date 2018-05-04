@@ -14,14 +14,16 @@ val get_session_dir : allow_mkdir:bool -> string Queue.t -> string
 (** [get_session_dir q] analyses the queue of filenames [q] and
     returns the session directory from it.
 
-    That directory is created if it does not exists and [allow_mkdir]
-    is true.
+    If the first element of the queue [q] is a directory, it is used as the
+    session dir, and removed from the queue. If it is an existing file, the
+    name obtained by removing the extension is used as the session dir; the
+    file stays in the queue.
 
-    raises [Invalid_arg s] with some appropriate explnation [s] if no
-    valid directory can be extracted.
+    In the other cases, the function raises [Invalid_arg s] with some
+    appropriate explanation [s].
 
-    The first element of queue [q] is removed if it is not a file to
-    load later in the session.
+    The so computed session directory is created if it does not exist and
+    [allow_mkdir] is true.
 
  *)
 
@@ -69,6 +71,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string
