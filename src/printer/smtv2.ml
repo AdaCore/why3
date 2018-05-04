@@ -516,11 +516,6 @@ let add_check_sat info fmt =
   if info.info_cntexample then
     fprintf fmt "@[(get-model)@]@\n"
 
-let property_on_incremental f =
-  match f.t_node with
-  | Tquant _ -> true
-  | _ -> false
-
 let rec property_on_incremental2 _ f =
   match f.t_node with
   | Tquant _ -> true

@@ -177,8 +177,6 @@ type main = {
   (* max number of running prover processes *)
   plugins : string list;
   (* plugins to load, without extension, relative to [libdir]/plugins *)
-  cntexample : bool;
-  (* true provers should be asked for counter-example model *)
   default_editor : string;
   (* editor name used when no specific editor known for a prover *)
 }
@@ -211,7 +209,6 @@ let set_loadpath m l = { m with loadpath = l}
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
-let cntexample m = m.cntexample
 let default_editor m = m.default_editor
 
 exception StepsCommandNotSpecified of string
@@ -228,9 +225,6 @@ let get_complete_command pc ~with_steps =
 
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
-
-let set_cntexample m cntexample =
-  { m with cntexample = cntexample }
 
 let set_default_editor m e = { m with default_editor = e }
 
@@ -273,7 +267,6 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    cntexample = false;  (* no counter-examples by default *)
     default_editor = (try Sys.getenv "EDITOR" ^ " %f"
                       with Not_found -> "editor %f");
   }
@@ -294,7 +287,6 @@ let set_main rc main =
   let section =
     set_int section "running_provers_max" main.running_provers_max in
   let section = set_stringl section "plugin" main.plugins in
-  let section = set_bool section "cntexample" main.cntexample in
   let section = set_string section "default_editor" main.default_editor in
   set_section rc "main" section
 
@@ -533,7 +525,6 @@ let load_main dirname section =
     running_provers_max = get_int ~default:default_main.running_provers_max
                                   section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
-    cntexample = get_bool ~default:default_main.cntexample section "cntexample";
     default_editor = get_string ~default:default_main.default_editor section "default_editor";
   }
 

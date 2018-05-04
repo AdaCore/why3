@@ -61,7 +61,6 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
 
@@ -212,7 +211,6 @@ let load_config config original_config =
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
     session_nb_processes = Whyconf.running_provers_max main;
-    session_cntexample = Whyconf.cntexample main;
 }
 
 let save_config t =
@@ -225,9 +223,6 @@ let save_config t =
   let mem = Whyconf.memlimit new_main in
   let nb = Whyconf.running_provers_max new_main in
   let config = set_main config (set_limits (get_main config) time mem nb) in
-  let new_main = Whyconf.get_main t.config in
-  let cntexample = Whyconf.cntexample new_main in
-  let config = set_main config (set_cntexample (get_main config) cntexample) in
   (* copy also provers section since it may have changed (the editor
      can be set via the preferences dialog) *)
   let config = set_provers config (get_provers t.config) in
@@ -692,6 +687,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
   in
   (* counter-example *)
+(*
   let cntexample_check = GButton.check_button ~label:"get counter-example"
     ~packing:vb#add ()
     ~active:c.session_cntexample
@@ -700,6 +696,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     cntexample_check#connect#toggled ~callback:
       (fun () -> c.session_cntexample <- not c.session_cntexample)
   in
+*)
   (* source editing allowed *)
   let source_editing_check = GButton.check_button ~label:"allow editing source files"
     ~packing:vb#add ()
@@ -1146,9 +1143,6 @@ let preferences (c : t) =
       c.config <- Whyconf.set_main c.config
         (Whyconf.set_limits (Whyconf.get_main c.config)
            c.session_time_limit c.session_mem_limit c.session_nb_processes);
-      c.config <- Whyconf.set_main c.config
-	(Whyconf.set_cntexample (Whyconf.get_main c.config)
-	   c.session_cntexample);
       save_config ()
     | `CLOSE | `DELETE_EVENT -> ()
   end;
