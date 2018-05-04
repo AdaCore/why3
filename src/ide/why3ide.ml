@@ -253,7 +253,7 @@ let create_colors v =
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
 
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
+      ~name:"error_tag" [`BACKGROUND gconfig.neg_premise_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
@@ -1140,21 +1140,12 @@ let () = send_session_config_to_server ()
 (* Locations colors *)
 (********************)
 
-(* This apply a background [color] on a location given by its file view [v] line
-   [l] beginning char [b] and end char [e]. *)
-let color_loc (v:GSourceView2.source_view) ~color l b e =
-  let buf = v#buffer in
-  let top = buf#start_iter in
-  let start = top#forward_lines (l-1) in
-  let start = start#forward_chars b in
-  let stop = start#forward_chars (e-b) in
-  buf#apply_tag_by_name ~start ~stop color
-
 let convert_color (color: color): string =
   match color with
   | Neg_premise_color -> "neg_premise_tag"
   | Premise_color -> "premise_tag"
   | Goal_color -> "goal_tag"
+  | Error_color -> "error_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 (line - 1) in
@@ -1164,9 +1155,41 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
+let color_line ~color loc =
+  let color_line (v:GSourceView2.source_view) ~color l =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let stop = start#forward_lines 1 in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
+  let f, l, _, _ = Loc.get loc in
+  try
+    let (_, v, _, _) = get_source_view_table f in
+    let color = convert_color color in
+    color_line ~color v l
+  with
+  | Nosourceview f ->
+    (* If the file is not present do nothing *)
+    print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
+    Debug.dprintf debug "color_loc: no source view for file %s@." f
+
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ?(ce=false) ~color loc =
+
+  (* This apply a background [color] on a location given by its file view [v] line
+     [l] beginning char [b] and end char [e]. *)
+  let color_loc (v:GSourceView2.source_view) ~color l b e =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let start = start#forward_chars b in
+    let stop = start#forward_chars (e-b) in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
   let f, l, b, e = Loc.get loc in
   try
     let v = if ce then counterexample_view else
@@ -1659,7 +1682,8 @@ let treat_message_notification msg = match msg with
        begin
          (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
-         color_loc ~color:Goal_color rel_loc;
+         color_line ~color:Goal_color rel_loc;
+         color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else
