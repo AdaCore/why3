@@ -947,7 +947,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error" [`BACKGROUND gconfig.error_line_color]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color]
 
 (**** Message-zone printing functions *****)
 
@@ -1667,8 +1667,8 @@ let treat_message_notification msg = match msg with
                         "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
           (* remove all coloration in message_zone before coloring *)
-          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
-          let color = "error" in
+          buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+          let color = "error_tag" in
           let _, _, beg_char, end_char = Loc.get loc in
           let start = buf#start_iter#forward_lines 3 in
           buf#apply_tag_by_name
