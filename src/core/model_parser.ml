@@ -282,7 +282,7 @@ and print_model_value_human fmt (v: model_value) =
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
   | Apply (s, lt) ->
-    fprintf fmt "[%s %a]" s (Pp.print_list Pp.space print_model_value_human) lt
+    fprintf fmt "(%s %a)" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Bitvector s -> fprintf fmt "%s" s

@@ -63,6 +63,7 @@ rule token = parse
   | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
   | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
+  | "(_" space+ "int2bv" space+ num ")" as s { INT_TO_BV s}
 
   | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
   | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }

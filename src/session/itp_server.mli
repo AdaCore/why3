@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Server for a client/server communication with an external graphical interface *)
+
 open Itp_communication
 
 (* The server part of the protocol *)

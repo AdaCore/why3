@@ -36,6 +36,9 @@ let int_theory : Theory.theory =
 let mul_int : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
 
+let ge_int : Term.lsymbol =
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
+
 let unit_type = Ty.ty_tuple []
 
 (* start a module named "Program" *)
@@ -159,6 +162,75 @@ let d2 =
 
 
 
+ (* let f (a:array int)
+      requires { a.length >= 1 }
+      ensures { a[0] = 42 }
+    = a[0] <- 42
+  *)
+
+
+let array_module : Mlw_module.modul =
+  Mlw_module.read_module env ["array"] "Array"
+
+let array_theory : Theory.theory =
+  array_module.Mlw_module.mod_theory
+
+let array_type : Mlw_ty.T.itysymbol =
+  Mlw_module.ns_find_its array_module.Mlw_module.mod_export ["array"]
+
+let ls_length : Term.lsymbol =
+  Theory.ns_find_ls array_theory.Theory.th_export ["length"]
+
+(* the "[]" logic symbol *)
+let ls_select : Term.lsymbol =
+  Theory.ns_find_ls array_theory.Theory.th_export ["mixfix []"]
+
+(* the "[]<-" program symbol *)
+let store_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps array_module.Mlw_module.mod_export ["mixfix []<-"]
+
+
+let d3 =
+  try
+  let ity = Mlw_ty.ity_app_fresh array_type [Mlw_ty.ity_int] in
+  let a = Mlw_ty.create_pvsymbol (Ident.id_fresh "a") ity in
+  let result = Term.create_vsymbol (Ident.id_fresh "result") (Ty.ty_tuple []) in
+  let pre =
+    Term.ps_app ge_int
+                [Term.t_app_infer ls_length [Term.t_var a.Mlw_ty.pv_vs];Term.t_nat_const 1]
+  in
+  let post =
+    Term.ps_app Term.ps_equ
+                [Term.t_app_infer ls_select [Term.t_var a.Mlw_ty.pv_vs;Term.t_nat_const 0 ] ;
+                 Term.t_nat_const 42 ]
+  in
+  let spec = {
+    Mlw_ty.c_pre = pre;
+    c_post = Mlw_ty.create_post result post;
+    c_xpost = Mlw_ty.Mexn.empty;
+    c_effect = Mlw_ty.eff_empty;
+    c_variant = [];
+    c_letrec  = 0;
+  }
+  in
+  (* building expression "a[0]<-42" *)
+  let e1 = Mlw_expr.e_arrow store_fun [ity;Mlw_ty.ity_int;Mlw_ty.ity_int] Mlw_ty.ity_unit in
+  let body =
+    Mlw_expr.e_app e1
+                   [Mlw_expr.e_value a;
+                    Mlw_expr.e_const (Number.const_of_int 0) Mlw_ty.ity_int;
+                    Mlw_expr.e_const (Number.const_of_int 42) Mlw_ty.ity_int]
+  in
+  let lambda = {
+    Mlw_expr.l_args = [a];
+    l_expr = body;
+    l_spec = spec;
+  }
+  in
+  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
+    Mlw_decl.create_rec_decl [def]
+  with e -> Format.eprintf "Error: %a@." Exn_printer.exn_printer e;
+            exit 1
 
 
 

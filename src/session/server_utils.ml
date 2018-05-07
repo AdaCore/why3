@@ -53,59 +53,6 @@ let get_session_dir ~allow_mkdir files =
   dir
 
 
-
-
-(******************************)
-(* Creation of the controller *)
-(******************************)
-
-(* [cont_from_session]: returns an option to a boolean which returns None in
-   case of failure, true if nothing is left to do and false if sessions was
-   loaded but [f] should still be added to the session as a file. *)
-(*
-let cont_from_session ~notify cont f : bool option =
-  (* If a file is given, find the corresponding directory *)
-  let dir = try (Filename.chop_extension f) with
-  | Invalid_argument _ -> f in
-  (* create project directory if needed *)
-  if Sys.file_exists dir then
-    begin
-      (* Case of user giving a file that gets chopped to an other file *)
-      if not (Sys.is_directory dir) then
-        begin
-          Format.eprintf "Not a directory: %s@." dir;
-          exit 1
-        end
-    end
-  else
-    begin
-      Format.dprintf debug "'%s' does not exist. \
-               Creating directory of that name for the Why3 session@." dir;
-      Unix.mkdir dir 0o777
-    end;
-  (* we load the session *)
-  let ses,use_shapes = load_session dir in
-  Format.dprintf debug "using shapes: %b@." use_shapes;
-  (* temporary, this should not be donne like this ! *)
-  Controller_itp.set_session cont ses;
-  (* update the session *)
-  try (Controller_itp.reload_files cont ~use_shapes;
-    (* Check if the initial file given was a file or not. If it was, we return
-       that it should be added to the session.  *)
-    if Sys.file_exists f && not (Sys.is_directory f) then
-      Some false
-    else
-      Some true) with
-  | e ->
-    begin
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      notify (Message (Parse_Or_Type_Error s));
-      None
-    end
-*)
-
-
-
 (******************)
 (* Simple queries *)
 (******************)
@@ -365,6 +312,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -376,6 +325,22 @@ let query_on_task cont f id args =
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"
 
+let help_message commands_table =
+  Pp.sprintf
+    "Please type a command among the following (automatic completion available)@\n\
+     @\n\
+     @ <transformation name> [arguments]@\n\
+     @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+     @ <query> [arguments]@\n\
+     @ <strategy shortcut>@\n\
+     @ mark @\n\
+     @ clean @\n\
+     @ replay @\n\
+     @ bisect @\n\
+     @ help <transformation_name> @\n\
+     @ list_ide_command @ \n\
+     @\n\
+     Available queries are:@\n@[%a@]" help_on_queries commands_table
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
@@ -404,23 +369,8 @@ let interp commands_table cont id s =
    then
       match cmd, args with
       | "help", _ ->
-        let text = Pp.sprintf
-                         "Please type a command among the following (automatic completion available)@\n\
-                          @\n\
-                          @ <transformation name> [arguments]@\n\
-                          @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                          @ <query> [arguments]@\n\
-                          @ <strategy shortcut>@\n\
-                          @ mark @\n\
-                          @ clean @\n\
-                          @ replay @\n\
-                          @ bisect @\n\
-                          @ help <transformation_name> @\n\
-                          @ list_ide_command @ \n\
-                          @\n\
-                          Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
-                  Help_message text
+          let text = help_message commands_table in
+          Help_message text
       | _ -> QError ("Command cannot be applied on a detached node")
    else
      begin
@@ -470,6 +420,10 @@ let interp commands_table cont id s =
                    end
                | "mark", _ ->
                    Mark_Obsolete
+               | "Focus", _ ->
+                   Focus_req
+               | "Unfocus", _ ->
+                   Unfocus_req
                | "clean", _ ->
                    Clean
                | "help", [trans] ->
@@ -482,22 +436,7 @@ let interp commands_table cont id s =
                     with
                     | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
                | "help", _ ->
-                  let text = Pp.sprintf
-                               "Please type a command among the following (automatic completion available)@\n\
-                                @\n\
-                                @ <transformation name> [arguments]@\n\
-                                @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                                @ <query> [arguments]@\n\
-                                @ <strategy shortcut>@\n\
-                                @ mark @\n\
-                                @ clean @\n\
-                                @ replay @\n\
-                                @ bisect @\n\
-                                @ help <transformation_name> @\n\
-                                @ list_ide_command @ \n\
-                                @\n\
-                                Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
+                  let text = help_message commands_table in
                   Help_message text
                | _ ->
                   Other (cmd, args)

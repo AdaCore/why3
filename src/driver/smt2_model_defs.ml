@@ -14,6 +14,7 @@ open Stdlib
 type variable = string
 
 type array =
+  | Array_var of variable
   | Const of term
   | Store of array * term * term
 
@@ -56,6 +57,7 @@ let print_float fmt f =
 
 let rec print_array fmt a =
   match a with
+  | Array_var v -> Format.fprintf fmt "ARRAY_VAR : %s" v
   | Const t -> Format.fprintf fmt "CONST : %a" print_term t
   | Store (a, t1, t2) ->
       Format.fprintf fmt "STORE : %a %a %a"
@@ -103,6 +105,8 @@ exception Bad_local_variable
 
 let rec make_local_array vars_lists a =
   match a with
+  | Array_var v ->
+    Array_var v
   | Const t ->
     let t' = make_local vars_lists t in
     Const t'
@@ -178,6 +182,13 @@ let rec subst var value t =
 
 and subst_array var value a =
   match a with
+  | Array_var v ->
+    if v = var then
+      match value with
+      | Array a -> a
+      | _ -> Array_var v
+    else
+      Array_var v
   | Const t -> Const (subst var value t)
   | Store (a, t1, t2) ->
       let t1 = subst var value t1 in

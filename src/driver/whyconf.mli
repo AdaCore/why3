@@ -79,9 +79,7 @@ val default_loadpath : string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int
-val cntexample: main -> bool
 val set_limits: main -> int -> int -> int -> main
-val set_cntexample: main -> bool -> main
 
 val default_editor: main -> string
 (** editor name used when no specific editor known for a prover *)

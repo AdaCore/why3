@@ -587,14 +587,15 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
     capture_parse_or_type_errors
-      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
+      (fun c ->
+        try let (_,_) = reload_files ~use_shapes c in [] with
+        | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
     capture_parse_or_type_errors
       (fun c ->
-       match add_file c ?format fname with
-       | None -> []
-       | Some e -> [e]) cont
+        try add_file c ?format fname; [] with
+        | Errors_list le -> le) cont
 
 
   (* -----------------------------------   ------------------------------------- *)
@@ -621,6 +622,10 @@ end
        else full
     | APn pn ->
        let name = (get_proof_name d.cont.controller_session pn).Ident.id_string in
+       (* Reduce the name of the goal to the minimum, by taking the
+          part after the last dot: "0" instead of "WP_Parameter.0" for
+          example.  *)
+       let name = List.hd (Strings.rev_split '.' name) in
        let expl = get_proof_expl d.cont.controller_session pn in
        if expl = "" then name else name ^ " [" ^ expl ^ "]"
     | APa pa ->
@@ -1050,12 +1055,12 @@ end
       Format.eprintf "Fatal anomaly in Itp_server.notify_change_proved@.";
       exit 1
 
-  let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
+  let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover ~counterexmp
+    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
@@ -1090,6 +1095,8 @@ end
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
       send_new_subtree_from_trans nid trans_id
+    | TSfailed (_, NoProgress) ->
+        P.notify (Message (Information "The transformation made no progress"))
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
@@ -1158,7 +1165,7 @@ end
 
   let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
 
-  let run_strategy_on_task ~counterexmp nid s =
+  let run_strategy_on_task nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     try
@@ -1170,7 +1177,7 @@ end
       let callback_pa = callback_update_tree_proof d.cont in
       let callback_tr tr args st = callback_update_tree_transform tr args st in
       List.iter (fun id ->
-                 C.run_strategy_on_goal d.cont id st ~counterexmp
+                 C.run_strategy_on_goal d.cont id st
                     ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                 unproven_goals
     with
@@ -1284,13 +1291,11 @@ end
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
+     | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
      | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
-     | Focus_req nid ->
-         Hint.mem model_any nid
      | Remove_subtree nid ->
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
@@ -1308,7 +1313,6 @@ end
 
   let treat_request r =
     let d = get_server_data () in
-    let config = d.cont.controller_config in
     (* Check that the request does not refer to obsolete node_ids *)
     if not (request_is_valid r) then
       begin
@@ -1335,18 +1339,6 @@ end
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
-    | Focus_req nid ->
-        let d = get_server_data () in
-        let s = d.cont.controller_session in
-        let any = any_from_node_ID nid in
-        let focus_on =
-          match any with
-          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-          | _ -> any
-        in
-        focused_node := Focus_on [focus_on];
-        reset_and_send_the_whole_tree ()
-    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
@@ -1374,16 +1366,26 @@ end
         | Transform (s, _t, args) -> apply_transform nid s args
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
-            schedule_proof_attempt ~counterexmp nid p limit
+            schedule_proof_attempt nid p limit
         | Strategies st           ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
-            run_strategy_on_task ~counterexmp nid st
+            run_strategy_on_task nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
         | Replay valid_only       -> replay ~valid_only snid
         | Clean                   -> clean snid
         | Mark_Obsolete           -> mark_obsolete snid
+        | Focus_req ->
+            let d = get_server_data () in
+            let s = d.cont.controller_session in
+            let any = any_from_node_ID nid in
+            let focus_on =
+              match any with
+              | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+              | _ -> any
+            in
+            focused_node := Focus_on [focus_on];
+            reset_and_send_the_whole_tree ()
+        | Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

@@ -71,6 +71,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string

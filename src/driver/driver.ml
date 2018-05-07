@@ -86,14 +86,14 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   let add_to_list r v = (r := v :: !r) in
   let add_global (loc, g) = match g with
     | Prelude s -> add_to_list prelude s
-    | RegexpValid s -> add_to_list regexps (Str.regexp s, Valid)
-    | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
-    | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
-    | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
+    | RegexpValid s -> add_to_list regexps (s, Valid)
+    | RegexpInvalid s -> add_to_list regexps (s, Invalid)
+    | RegexpTimeout s -> add_to_list regexps (s, Timeout)
+    | RegexpOutOfMemory s -> add_to_list regexps (s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
-      add_to_list regexps (Str.regexp s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown (t, None))
-    | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
+      add_to_list regexps (s, StepLimitExceeded)
+    | RegexpUnknown (s,t) -> add_to_list regexps (s, Unknown (t, None))
+    | RegexpFailure (s,t) -> add_to_list regexps (s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
       add_to_list stepregexps (Call_provers.stepregexp r ns)
@@ -295,18 +295,7 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
   | task -> update task
 
-let add_cntexample_meta ~ce_prover task cntexample =
-  if not (cntexample) then task
-  else
-    let cnt_meta = lookup_meta "get_counterexmp" in
-    let g,task = Task.task_separate_goal task in
-    let task = Task.add_meta task cnt_meta [] in
-    let ce_meta_prover = lookup_meta "counterexmp_prover" in
-    let task = Task.add_meta task ce_meta_prover [MAstr ce_prover] in
-      Task.add_tdecl task g
-
-let prepare_task ~cntexample ?(ce_prover="cvc4_ce") drv task =
-  let task = add_cntexample_meta ~ce_prover task cntexample in
+let prepare_task drv task =
   let lookup_transform t =
     let stat_name = "gnatwhy3.transformations." ^ t in
     stat_name, lookup_transform t drv.drv_env in
@@ -333,9 +322,8 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) ?(ce_prover="cvc4_ce")
-    drv fmt task =
-  let task = prepare_task ~cntexample ~ce_prover drv task in
+let print_task ?old drv fmt task =
+  let task = prepare_task drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
 
@@ -397,9 +385,8 @@ let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   Buffer.reset buf;
   ServerCall res
 
-let prove_task ~command ~limit ?(cntexample=false) ?(ce_prover="cvc4_ce") ?old
-               ?inplace ?interactive drv task =
-  let task = prepare_task ~cntexample ~ce_prover drv task in
+let prove_task ~command ~limit ?old ?inplace ?interactive drv task =
+  let task = prepare_task drv task in
   prove_task_prepared ~command ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)

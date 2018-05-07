@@ -84,7 +84,7 @@ val stepregexp : string -> int -> stepregexp
     [s] is a regular expression, [n] is the group number with steps number. *)
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
@@ -136,6 +136,7 @@ type prover_call =
 
 val call_editor : command : string -> string -> prover_call
 
+(* internal use only
 val call_on_file :
   command         : string ->
   limit           : resource_limit ->
@@ -143,8 +144,7 @@ val call_on_file :
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
   string -> int
-(* inplace=true is used to make a save of the file on which the prover was
-   called. It is renamed as %f.save if the command [actualcommand] fails *)
+*)
 
 val call_on_buffer :
   command         : string ->
@@ -155,7 +155,7 @@ val call_on_buffer :
   gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> server_id
-(** Call a prover on the task printed in the {!type: Buffer.t} given.
+(** Build a prover call on the task already printed in the {!type: Buffer.t} given.
 
     @param limit : set the available time limit (def. 0 : unlimited), memory
     limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)

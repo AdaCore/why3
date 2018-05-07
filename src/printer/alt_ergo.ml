@@ -31,10 +31,6 @@ let meta_invalid_trigger =
   Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
   ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
 
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
@@ -486,7 +482,7 @@ let print_task args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_in_goal = false;
     list_projs = Stdlib.Sstr.empty;
-    meta_model_projection = Task.on_tagged_ls meta_projection task;
+    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

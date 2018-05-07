@@ -245,18 +245,18 @@ let try_convert s =
 let create_colors v =
   let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-
   let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-
   let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-
+  let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
+  let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
   ()
 
@@ -266,7 +266,8 @@ let erase_color_loc (v:GSourceView2.source_view) =
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter
 
 
 
@@ -520,7 +521,8 @@ let () =
      *)
     Hstr.iter
       (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing)
+       source_view#set_editable gconfig.allow_source_editing;
+       source_view#set_auto_indent gconfig.allow_source_editing)
       source_view_table;
     send_session_config_to_server ()
   in
@@ -725,30 +727,6 @@ let clear_tree_and_table goals_model =
 (* Menu items *)
 (**************)
 
-
-let reload_unsafe () = send_request Reload_req
-
-let save_and_reload () = save_sources (); reload_unsafe ()
-
-(* Same as reload_safe but propose to save edited sources before reload *)
-let reload_safe () =
-  if files_need_saving () then
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving source files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
-    in
-    match answer with
-    | 1 -> save_and_reload ()
-    | 2 -> reload_unsafe ()
-    | _ -> ()
-  else
-    reload_unsafe ()
-
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
-
-
 (* vpan222 contains:
    2.2.2.1 a notebook containing view of the current task, source code etc
    2.2.2.2 a vertical pan which contains [vbox2222]
@@ -815,7 +793,7 @@ let create_source_view =
             ~packing:scrolled_source_view#add () in
         let source_view =
           GSourceView2.source_view
-            ~auto_indent:true
+            ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
@@ -969,7 +947,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error" [`BACKGROUND gconfig.neg_premise_color]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color]
 
 (**** Message-zone printing functions *****)
 
@@ -995,16 +973,27 @@ let add_to_log =
   log_zone#buffer#insert ("] " ^ s ^ "\n");
   log_zone#scroll_to_mark `INSERT
 
+let clear_message_zone () =
+  let buf = message_zone#buffer in
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#delete ~start:buf#start_iter ~stop:buf#end_iter
+
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               let s = try_convert s in
               add_to_log notif_kind s;
+              let buf = message_zone#buffer in
               if kind>0 then
                 begin
-                  message_zone#buffer#insert (s ^ "\n");
-                  messages_notebook#goto_page error_page
+                  if Strings.ends_with notif_kind "error" ||
+                     Strings.ends_with notif_kind "Error"
+                  then
+                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                  else
+                    buf#insert (s ^ "\n");
+                  messages_notebook#goto_page error_page;
                 end)
     str_formatter
     fmt
@@ -1071,6 +1060,34 @@ let update_monitor =
   monitor#set_text text
 
 
+(*********************)
+(* Reaload Menu Item *)
+(*********************)
+
+let reload_unsafe () = clear_message_zone (); send_request Reload_req
+
+let save_and_reload () = save_sources (); reload_unsafe ()
+
+(* Same as reload_safe but propose to save edited sources before reload *)
+let reload_safe () =
+  if files_need_saving () then
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving source files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
+    in
+    match answer with
+    | 1 -> save_and_reload ()
+    | 2 -> reload_unsafe ()
+    | _ -> ()
+  else
+    reload_unsafe ()
+
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
+
+
+
 
 
 
@@ -1084,7 +1101,7 @@ let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
-  GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
+  GEdit.entry_completion ~model:completion_model ~minimum_key_length:2 ~entry:command_entry ()
 
 let add_completion_entry (s,desc) =
   let row = completion_model#append () in
@@ -1134,28 +1151,13 @@ let () = send_session_config_to_server ()
 (* Locations colors *)
 (********************)
 
-(* This apply a background [color] on a location given by its file view [v] line
-   [l] beginning char [b] and end char [e]. *)
-let color_loc (v:GSourceView2.source_view) ~color l b e =
-  let buf = v#buffer in
-  let top = buf#start_iter in
-  let start = top#forward_lines (l-1) in
-  (* When coloring source for a language compiled to Why3 (SPARK),
-     locations may be less precise (not specifying columns). In this case
-     we want to color the whole line. *)
-  if b = 0 && e = 0 then
-    let stop = start#forward_lines 1 in
-    buf#apply_tag_by_name ~start ~stop color
-  else
-    let start = start#forward_chars b in
-    let stop = start#forward_chars (e-b) in
-    buf#apply_tag_by_name ~start ~stop color
-
 let convert_color (color: color): string =
   match color with
   | Neg_premise_color -> "neg_premise_tag"
   | Premise_color -> "premise_tag"
   | Goal_color -> "goal_tag"
+  | Error_color -> "error_tag"
+  | Error_line_color -> "error_line_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 (line - 1) in
@@ -1165,9 +1167,41 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
+let color_line ~color loc =
+  let color_line (v:GSourceView2.source_view) ~color l =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let stop = start#forward_lines 1 in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
+  let f, l, _, _ = Loc.get loc in
+  try
+    let (_, v, _, _) = get_source_view_table f in
+    let color = convert_color color in
+    color_line ~color v l
+  with
+  | Nosourceview f ->
+    (* If the file is not present do nothing *)
+    print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
+    Debug.dprintf debug "color_loc: no source view for file %s@." f
+
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ?(ce=false) ~color loc =
+
+  (* This apply a background [color] on a location given by its file view [v] line
+     [l] beginning char [b] and end char [e]. *)
+  let color_loc (v:GSourceView2.source_view) ~color l b e =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let start = start#forward_chars b in
+    let stop = start#forward_chars (e-b) in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
   let f, l, b, e = Loc.get loc in
   try
     let v = if ce then counterexample_view else
@@ -1629,12 +1663,12 @@ let treat_message_notification msg = match msg with
       else
         begin
           let buf = message_zone#buffer in
-          (* remove all coloration in message_zone *)
-          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
           print_message ~kind:1 ~notif_kind:"Transformation Error"
                         "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
-          let color = "error" in
+          (* remove all coloration in message_zone before coloring *)
+          buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+          let color = "error_tag" in
           let _, _, beg_char, end_char = Loc.get loc in
           let start = buf#start_iter#forward_lines 3 in
           buf#apply_tag_by_name
@@ -1658,9 +1692,9 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
-         color_loc ~color:Goal_color rel_loc;
+         color_line ~color:Error_line_color rel_loc;
+         color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else
@@ -2104,14 +2138,15 @@ let () =
   connect_menu_item
     focus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Focus_req id));
+                                (fun id -> Command_req (id, "Focus")));
   connect_menu_item
     remove_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
-    ~callback:(fun () -> send_request Unfocus_req)
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+                                (fun id -> Command_req (id, "Unfocus")))
 
 
 (*************************************)
@@ -2218,24 +2253,6 @@ let treat_notification n =
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
-       let name =
-         (* Reduce the name of the goals to the minimum: "0" instead of
-            "WP_Parameter.0" for example.
-            In cases where we want the explanation to be printed, and the
-            explanation contains filename (with '.'), this does not work. So, we
-            additionally check that the first part of the name is a number.
-         *)
-         if typ = NGoal then
-           let new_name = List.hd (Strings.rev_split '.' name) in
-           try
-             let name_number = List.hd (Strings.split ' ' new_name) in
-             ignore (int_of_string name_number);
-             new_name
-           with _ ->
-             (* The name is empty or the first part is not a number *)
-             name
-         else name
-       in
        try
          let parent = get_node_row parent_id in
          ignore (new_node ~parent id name typ detached);
@@ -2278,6 +2295,7 @@ let treat_notification n =
      main_window#show ();
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
+     Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
@@ -2289,7 +2307,10 @@ let treat_notification n =
      if is_selected_alone id then
        begin
          task_view#source_buffer#set_text s;
-         apply_loc_on_source list_loc;
+         (* Avoid erasing colors at startup when selecting the first node. In
+            all other cases, it should change nothing. *)
+         if list_loc != [] then
+           apply_loc_on_source list_loc;
          (* scroll to end of text *)
          task_view#scroll_to_mark `INSERT
        end

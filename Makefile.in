@@ -175,7 +175,7 @@ LIB_UTIL = config bigInt util opt lists strings \
 	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
-	   task pretty_sig pretty dterm env trans printer model_parser
+	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection \
@@ -1938,13 +1938,40 @@ doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/extract_ocaml_code: doc/extract_ocaml_code.ml
+	$(OCAMLC) str.cma -o $@ $<
+
+doc/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
+
+doc/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/whyconf.ml $* doc
+
+doc/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
+
+OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
+	buildtask printtask buildtask2 \
+	getconf getanyaltergo getaltergo200 \
+	getdriver callprover calltimelimit \
+	buildfmla buildtermalt buildtaskimport \
+	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
+	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
+	printtheory splittheory printalltasks
+
+OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
+
+OCAMLCODE = $(addprefix doc/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	doc/whyconf__provertype.ml
+
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
       itp pvs coq coq_tactic isabelle
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
+doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 CLEANDIRS += doc
@@ -1987,8 +2014,9 @@ MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/stdlib util/rc util/debug \
+	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/theory \
-	core/env core/task core/trans \
+	core/env core/task core/trans core/pretty core/printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \

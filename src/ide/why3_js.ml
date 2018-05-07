@@ -85,9 +85,6 @@ module PE = struct
     error_container ##. innerHTML := Js.string s;
     log_print_msg s
 
-(* TODO remove this *)
-  let printAnswer s = log_print_msg s
-
 end
 
 let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) =
@@ -342,9 +339,9 @@ let sendRequest r =
    let onreadystatechange () =
      if xhr ##. readyState == XmlHttpRequest.DONE then
        if xhr ##. status == 200 then
-         PE.printAnswer ("Http request '" ^ r ^ "' returned " ^ readBody xhr)
+         PE.log_print_msg ("Http request '" ^ r ^ "' returned " ^ readBody xhr)
        else
-         PE.printAnswer ("Http request '" ^ r ^ "' failed with status " ^ string_of_int (xhr ##. status)) in
+         PE.log_print_msg ("Http request '" ^ r ^ "' failed with status " ^ string_of_int (xhr ##. status)) in
    xhr ## overrideMimeType (Js.string "text/json");
    let _ = xhr ## _open (Js.string "GET")
                 (Js.string ("http://localhost:6789/request?"^r))  Js._true in
@@ -587,7 +584,7 @@ let interpNotif (n: notification) =
             (Format.asprintf "Error while opening file: \"%s\"" s)
       | _ -> ();
       let s = Format.asprintf "%a" Json_util.print_notification n in
-      PE.printAnswer s
+      PE.log_print_msg s
     end
   | Dead s ->
       PE.error_print_msg s
@@ -626,17 +623,28 @@ let getNotification2 () =
   let xhr = XmlHttpRequest.create () in
   let onreadystatechange () =
     if xhr ##. readyState == XmlHttpRequest.DONE then
-      if xhr ##. status == 200 then
+      let stat = xhr ##. status in
+      if stat == 200 then
         let r = readBody xhr in
         let nl =
           try Json_util.parse_list_notification r
           with e ->
-            log ("ERROR in getNotification2: Json_util.parse_list_notification raised " ^ Printexc.to_string e ^
-                   " on the following notification: " ^ r); []
+               let s = "ERROR in getNotification2: Json_util.parse_list_notification raised " ^
+                         Printexc.to_string e ^ " on the following notification: " ^ r in
+               log s;
+               PE.log_print_msg s;
+               []
         in
         interpNotifications nl
       else
-        ()
+        if stat == 0 then
+          PE.log_print_msg "Why3 Web server not responding (HttpRequest got answer with status 0)"
+        else
+          begin
+            let s = "getNotification2: state changed to unknown status " ^ string_of_int stat in
+            log s;
+            PE.log_print_msg s
+          end
   in
   (xhr ##. onreadystatechange :=
     (Js.wrap_callback onreadystatechange));
@@ -677,15 +685,15 @@ let () =  form ##. onsubmit := Dom.full_handler
 
 let () =
   ToolBar.(add_action button_open
-    (fun () -> PE.printAnswer "Open"; startNotificationHandler ()))
+    (fun () -> PE.log_print_msg "Open"; startNotificationHandler ()))
 
 let () =
   ToolBar.(add_action button_save
-    (fun () -> PE.printAnswer "Save"; stopNotificationHandler ()))
+    (fun () -> PE.log_print_msg "Save"; stopNotificationHandler ()))
 
 let () =
   ToolBar.(add_action button_reload
-    (fun () -> PE.printAnswer "Reload"; TaskList.clear (); sendRequest Reload))
+    (fun () -> PE.log_print_msg "Reload"; TaskList.clear (); sendRequest Reload))
 
 (* TODO Server handling *)
 (*let () = Js.Unsafe.global##stopNotificationHandler <-

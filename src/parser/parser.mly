@@ -1126,6 +1126,5 @@ qualid_comma_list_eof:
 ident_comma_list_eof:
 | comma_list1(ident) EOF { $1 }
 
-(* TODO: Weird to not have any parser conflicts here *)
 term_comma_list_eof:
 | comma_list1(term) EOF { $1 }

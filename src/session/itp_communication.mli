@@ -74,6 +74,8 @@ type color =
   | Neg_premise_color
   | Premise_color
   | Goal_color
+  | Error_color
+  | Error_line_color
 
 type update_info =
   | Proved of bool
@@ -125,9 +127,6 @@ type ide_request =
       [id].  When [b] is true then the
       full context is show.  When [loc] is false the locations are not
       returned *)
-  | Focus_req               of node_ID
-  (** Focus on a node. The server only sends info about descendants of this ID *)
-  | Unfocus_req
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string

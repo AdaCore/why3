@@ -155,8 +155,6 @@ let convert_request_constructor (r: ide_request) =
   | Save_file_req _           -> String "Save_file_req"
   | Set_config_param _        -> String "Set_config_param"
   | Get_file_contents _       -> String "Get_file_contents"
-  | Focus_req _               -> String "Focus_req"
-  | Unfocus_req               -> String "Unfocus_req"
   | Get_task _                -> String "Get_task"
   | Remove_subtree _          -> String "Remove_subtree"
   | Copy_paste _              -> String "Copy_paste"
@@ -200,10 +198,6 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Get_first_unproven_node id ->
       convert_record ["ide_request", cc r;
            "node_ID", Int id]
-  | Focus_req id ->
-      convert_record ["ide_request", cc r;
-                      "node_ID", Int id]
-  | Unfocus_req
   | Save_req
   | Reload_req
   | Exit_req
@@ -289,7 +283,9 @@ let convert_color (color: color) : Json_base.json =
     match color with
     | Neg_premise_color -> "Neg_premise_color"
     | Premise_color -> "Premise_color"
-    | Goal_color -> "Goal_color")
+    | Goal_color -> "Goal_color"
+    | Error_color -> "Error_color"
+    | Error_line_color -> "Error_line_color")
 
 let convert_loc_color (loc,color: Loc.position * color) : Json_base.json =
   let loc = convert_loc loc in
@@ -307,6 +303,8 @@ let parse_color (j: json) : color =
   | String "Neg_premise_color" -> Neg_premise_color
   | String "Premise_color"     -> Premise_color
   | String "Goal_color"        -> Goal_color
+  | String "Error_color"       -> Error_color
+  | String "Error_line_color"  -> Error_line_color
   | _ -> raise Notcolor
 
 exception Notposition
@@ -422,12 +420,6 @@ let parse_request (constr: string) j =
     let nid = get_int (get_field j "node_ID") in
     let s = get_string (get_field j "command") in
     Command_req (nid, s)
-  | "Focus_req" ->
-    let nid = get_int (get_field j "node_ID") in
-    Focus_req nid
-
-  | "Unfocus_req" ->
-    Unfocus_req
 
   | "Get_first_unproven_node" ->
     let nid = get_int (get_field j "node_ID") in
