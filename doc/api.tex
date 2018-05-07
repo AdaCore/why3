@@ -111,6 +111,7 @@ end
 \end{verbatim}
 
 \section{Calling External Provers}
+\label{sec:api:callingprovers}
 
 To call an external prover, we need to access the \why configuration
 file \texttt{why3.conf}, as it was built using the \texttt{why3config}
@@ -303,24 +304,65 @@ from an OCaml program.
 
 \section{ML Programs}
 
-There are two ways for building \whyml programs from OCaml. The first
-is to build untyped syntax trees for such \whyml programs, and then
-call the \why typing procedure to build typed declarations. The second
-way is to directly build typed programs using smart constructors that
-check well-typedness at each step.
+The simplest way to build \whyml programs from OCaml is to build
+untyped syntax trees for such programs, and then
+call the \why typing procedure to build typed declarations.
 
-The first approach, building untyped trees and then typing them, is
-examplified in file \verb|examples/use_api/mlw_tree.ml| of the
-distribution. The second approach is
-examplified in file \verb|examples/use_api/mlw.ml|. The first approach
-is significantly simpler to do since the internal typing mechanism
-using regions remains implicit, whereas when one uses the second
-approach one should care about such typing. On the other hand, the
-second approach is more ``efficient'' in the sense that no
-intermediate form needs to be built in memory.
+The examples of this section are available in the file
+\verb|examples/use_api/mlw_tree.ml| of the distribution.
 
+The first step is to build an environment as already illustrated in
+Section~\ref{sec:api:callingprovers}, and open the OCaml module
+\verb|Ptree| which contains most of the OCaml functions we need in
+this section.
+\lstinputlisting{mlw_tree__buildenv.ml}
 
+To contain all the example programs we are going to build we need a
+module. We start the creation of that module using the following
+declarations, that first introduces a pseudo ``file'' to hold the
+module, then the module itself called \verb|Program|.
+\lstinputlisting{mlw_tree__openmodule.ml}
+Notice the use of a first
+simple helper function \verb|mk_ident| to build an identifier without
+any label nor any location.
 
+To write our programs, we need to import some other modules from the
+standard library. The following introduces two helper functions for
+building qualified identifiers and importing modules, and finally
+imports \verb|int.Int|.
+\lstinputlisting{mlw_tree__useimport.ml}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{mlw_tree__source1.ml}
+
+The OCaml code that programmatically build this Why3 function is as follows.
+\lstinputlisting{mlw_tree__code1.ml}
+This code makes uses of helper functions that are given in Figure~\ref{fig:helpers}.
+\begin{figure}[t]
+  \lstinputlisting{mlw_tree__helper1.ml}
+  \caption{Helper functions for building WhyML programs}
+  \label{fig:helpers}
+\end{figure}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{mlw_tree__source2.ml}
+We need to import the \verb|ref.Ref| module first. The rest is similar to the first example, the code is as follows
+\lstinputlisting{mlw_tree__code2.ml}
+
+The next example makes use of arrays.
+\lstinputlisting[language=why3]{mlw_tree__source3.ml}
+The corresponding OCaml code is as follows
+\lstinputlisting{mlw_tree__code3.ml}
+
+Having declared all the programs we wanted to write, we can now close
+the module and the file, and get as a result the set of modules of our
+file, under the form of a map of module names to modules.
+\lstinputlisting{mlw_tree__closemodule.ml}
+
+We can then construct the proofs tasks for our module, and then try to
+call the Alt-Ergo prover. The reste of that code is using OCaml
+functions that were already introduced before.
+\lstinputlisting{mlw_tree__checkingvcs.ml}
 
 %%% Local Variables:
 %%% mode: latex

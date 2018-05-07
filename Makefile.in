@@ -1925,6 +1925,9 @@ doc/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
 doc/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
 
+doc/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code examples/use_api/mlw_tree.ml $* doc
+
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
 	getconf getanyaltergo getaltergo200 \
@@ -1936,8 +1939,13 @@ OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 
 OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
 
+OCAMLCODE_MLWTREE = buildenv openmodule useimport \
+	source1 code1 helper1 source2 code2 source3 code3 \
+	closemodule checkingvcs
+
 OCAMLCODE = $(addprefix doc/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
 	$(addprefix doc/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	$(addprefix doc/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
 	doc/whyconf__provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \
