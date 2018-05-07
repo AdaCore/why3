@@ -27,32 +27,21 @@ let main : Whyconf.main = Whyconf.get_main config
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
+
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-let int_theory : Theory.theory =
-  Env.read_theory env ["int"] "Int"
-
-let mul_int : Term.lsymbol =
-  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
-
-let unit_type = Ty.ty_tuple []
-
-(* start a parsing *)
-
-let pathname = [] (* dummy pathname *)
-
-let t : Ptree.incremental = Mlw_typing.open_file env pathname
+let () = Typing.open_file env [] (* dummy pathname *)
 
 open Ptree
-
-(* start a module *)
 
 let mk_ident ?(label=[]) ?(loc=Loc.dummy_position) s = {
   id_str = s; id_lab=label; id_loc = loc
 }
 
-let m = t.open_module (mk_ident "Program")
+(* start a module *)
+
+let m = Typing.open_module (mk_ident "Program")
 
 
 (* use int.Int *)
@@ -66,24 +55,42 @@ let mk_qid l =
   in
   aux (List.rev l)
 
-let use_int_Int =
-  let qualid = mk_qid ["int" ; "Int"] in
-  {
-  use_theory = qualid;
-  use_import = Some(true,"Int");
-}
+let eq_symb = mk_qid [Ident.infix "="]
 
-let () = t.use_clone Loc.dummy_position (use_int_Int,None)
+let use_import (f, m) =
+  let loc = Loc.dummy_position in
+  let m = mk_ident ~loc m in
+  Typing.open_scope loc m;
+  Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_ident ~loc f), m)));
+  Typing.close_scope loc ~import:true
 
-let mul_int = mk_qid ["Int";"infix *"]
+let use_int_Int = use_import ("int","Int")
 
-let mk_lexpr p = { term_loc = Loc.dummy_position;
-                   term_desc = p }
+let int_type = mk_qid ["int"]
 
-let mk_const s =
-  mk_lexpr (Tconst Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
+let mul_int = mk_qid ["Int";Ident.infix "*"]
 
 let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
+
+let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
+
+let mk_pat p = { pat_desc = p; pat_loc = Loc.dummy_position }
+
+let no_params ~loc = [loc, None, false, Some (PTtuple [])]
+
+let param ~loc id ty = [loc, Some id, false, Some ty]
+
+let mk_tconst s =
+  mk_term
+    (Tconst
+       Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
+
+let mk_econst s =
+  mk_expr
+    (Econst
+       Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
+
+
 
 (* declaration of
      let f (_dummy:unit) : unit
@@ -92,33 +99,33 @@ let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
       =
         assert { 6*7 = 42 }
  *)
-let d : pdecl =
-  let args =
-    [Loc.dummy_position,Some(mk_ident "_dummy"),false,Some(PTtuple [])]
-  in
+let d : decl =
   let spec = {
     sp_pre = [];
     sp_post = [];
     sp_xpost = [];
     sp_reads = [];
     sp_writes = [];
+    sp_alias = [];
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
   }
   in
   let body =
-    let c6 = mk_const "6" in
-    let c7 = mk_const "7" in
-    let c42 = mk_const "42" in
-    let c6p7 = mk_lexpr (Tidapp(mul_int,[c6;c7])) in
-    let p = mk_lexpr (Tinfix(c6p7,mk_ident "infix =",c42)) in
-    mk_expr(Eassert(Aassert,p))
+    let c6 = mk_tconst "6" in
+    let c7 = mk_tconst "7" in
+    let c42 = mk_tconst "42" in
+    let c6p7 = mk_term (Tidapp(mul_int,[c6;c7])) in
+    let p = mk_term (Tidapp(eq_symb,[c6p7;c42])) in
+    mk_expr(Eassert(Expr.Assert,p))
   in
-  Dfun(mk_ident "f",Gnone,(args,None,body,spec))
+  let f = Efun(no_params Loc.dummy_position,None,Ity.MaskVisible,spec,body)
+  in
+  Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
 
 let () =
-  try t.new_pdecl Loc.dummy_position d
+  try Typing.add_decl Loc.dummy_position d
   with e ->
     Format.printf "Exception raised during typing of d:@ %a@."
       Exn_printer.exn_printer e
@@ -129,106 +136,172 @@ let () =
 declaration of
      let f (_dummy:unit) : unit
         requires { true }
-        ensures { result = 0 }
+        ensures { result >= 0 }
       =
-        let x = ref 0 in
+        let x = ref 42 in
         !x
 
 *)
 
+let ge_int = mk_qid ["Int";Ident.infix ">="]
 
-(* TODO *)
+let use_ref_Ref = use_import ("ref","Ref")
 
-(*
-(* import the ref.Ref module *)
+let mk_var id = mk_term (Tident (Qident id))
 
-let ref_modules, ref_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
-
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
-
-let ref_type : Mlw_ty.T.itysymbol =
-  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
-
-(* the "ref" function *)
-let ref_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
-
-(* the "!" function *)
-let get_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
+let pat_var id = mk_pat (Pvar (id,false))
 
 let d2 =
-  let args =
-    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
-  in
-  let result = Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int in
+  let result = mk_ident "result" in
+  let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst "0"])) in
   let spec = {
-    Mlw_ty.c_pre = Term.t_true;
-    c_post = Mlw_ty.create_post result Term.t_true;
-    c_xpost = Mlw_ty.Mexn.empty;
-    c_effect = Mlw_ty.eff_empty;
-    c_variant = [];
-    c_letrec  = 0;
+    sp_pre = [];
+    sp_post = [Loc.dummy_position,[pat_var result,post]];
+    sp_xpost = [];
+    sp_reads = [];
+    sp_writes = [];
+    sp_alias = [];
+    sp_variant = [];
+    sp_checkrw = false;
+    sp_diverge = false;
   }
   in
   let body =
-    (* building expression "ref 0" *)
-    let e =
-      (* recall that "ref" has polymorphic type "(v:'a) -> ref 'a".
-         We need to build an instance of it *)
-      (* we build "ref int" with a *fresh* region *)
-      let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
-      (* e1 : the appropriate instance of "ref" *)
-      let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
-      (* we apply it to 0 *)
-      let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
-      Mlw_expr.e_app e1 [c0]
-    in
-    (* building the first part of the let x = ref 0 *)
-    let letdef, var_x = Mlw_expr.create_let_pv_defn (Ident.id_fresh "x") e in
-    (* building expression "!x" *)
-    let bang_x =
-      (* recall that "!" as type "ref 'a -> 'a" *)
-      let e1 = Mlw_expr.e_arrow get_fun [var_x.Mlw_ty.pv_ity] Mlw_ty.ity_int in
-      Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
-    in
-    (* the complete body *)
-    Mlw_expr.e_let letdef bang_x
+    let e1 = mk_expr(Eidapp(mk_qid ["Ref";"ref"],[mk_econst "42"])) in
+    let id_x = mk_ident "x" in
+    let e2 = mk_expr(Eidapp(mk_qid ["Ref";Ident.prefix "!"],
+                            [mk_expr(Eident(Qident id_x))])) in
+    mk_expr(Elet(id_x,false,Expr.RKlocal,e1,e2))
   in
-  let lambda = {
-    Mlw_expr.l_args = args;
-    l_expr = body;
-    l_spec = spec;
-  }
+  let f = Efun(no_params Loc.dummy_position,None,Ity.MaskVisible,spec,body)
   in
-  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
-  Mlw_decl.create_rec_decl [def]
-
-
-*)
-
-
-
-
-(* TODO: continue *)
-
-(*
-let () = Printexc.record_backtrace true
+  Dlet(mk_ident "f2",false,Expr.RKnone, mk_expr f)
 
 let () =
+  try Typing.add_decl Loc.dummy_position d2
+  with e ->
+    Format.printf "Exception raised during typing of d2:@ %a@."
+      Exn_printer.exn_printer e
+
+(* let f (a:array int)
+      requires { a.length >= 1 }
+      ensures { a[0] = 42 }
+    = a[0] <- 42
+ *)
+
+let array_module = use_import ("array","Array")
+
+let ty_array = PTtyapp(mk_qid ["Array";"array"],[PTtyapp(int_type,[])])
+
+let length = mk_qid ["Array";"length"]
+
+let array_get = mk_qid ["Array";"mixfix []"]
+
+let array_set = mk_qid ["Array";"mixfix []<-"]
+
+let d3 =
+  let id_a = mk_ident "a" in
+  let pre = mk_term(Tidapp(ge_int,[mk_term(Tidapp(length,[mk_var id_a]));
+                                   mk_tconst "1"])) in
+  let result = mk_ident "result" in
+  let post =
+    mk_term(Tidapp(eq_symb,[mk_term(Tidapp(array_get,[mk_var id_a;mk_tconst "0"]));
+                            mk_tconst "42"])) in
+  let spec = {
+    sp_pre = [pre];
+    sp_post = [Loc.dummy_position,[pat_var result,post]];
+    sp_xpost = [];
+    sp_reads = [];
+    sp_writes = [];
+    sp_alias = [];
+    sp_variant = [];
+    sp_checkrw = false;
+    sp_diverge = false;
+  }
+  in
+  let body =
+    mk_expr(Eidapp(array_set,
+                   [mk_expr(Eident(Qident id_a));
+                    mk_econst "0";
+                    mk_econst "42"]))
+    in
+  let f = Efun(param Loc.dummy_position id_a ty_array,
+               None,Ity.MaskVisible,spec,body)
+  in
+  Dlet(mk_ident "f3",false,Expr.RKnone, mk_expr f)
+
+let () =
+  try Typing.add_decl Loc.dummy_position d3
+  with e ->
+    Format.printf "Exception raised during typing of d3:@ %a@."
+      Exn_printer.exn_printer e
+
+
+
+let () = Typing.close_module Loc.dummy_position
+
+let mods = Typing.close_file ()
+
+                             (* Checking the VCs *)
+
+let my_tasks : Task.task list =
+  let mods =
+    Stdlib.Mstr.fold
+      (fun _ m acc ->
+       List.rev_append (Task.split_theory m.Pmodule.mod_theory None None) acc)
+      mods []
+  in List.rev mods
+
+
+
+
+open Format
+
+let () =
+  printf "Tasks are:@.";
+  let _ =
+    List.fold_left
+      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
+      1 my_tasks
+  in ()
+
+let alt_ergo : Whyconf.config_prover =
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    exit 0
+  end else
+    snd (Whyconf.Mprover.max_binding provers)
+
+let alt_ergo_driver : Driver.driver =
   try
-    let _buggy : Mlw_module.module_uc = Mlw_module.add_pdecl ~wp:true m d in
-    ()
-  with Not_found ->
-    Printexc.print_backtrace stderr;
-    flush stderr
-*)
+    Whyconf.load_driver main env alt_ergo.Whyconf.driver []
+  with e ->
+    eprintf "Failed to load driver for alt-ergo: %a@."
+      Exn_printer.exn_printer e;
+    exit 1
 
-
+let () =
+  let _ =
+    List.fold_left
+      (fun i t ->
+       let r =
+         Call_provers.wait_on_call
+           (Driver.prove_task ~limit:Call_provers.empty_limit
+                              ~command:alt_ergo.Whyconf.command
+                              alt_ergo_driver t)
+       in
+       printf "@[On task %d, alt-ergo answers %a@."
+              i Call_provers.print_prover_result r;
+       i+1
+      )
+      1 my_tasks
+  in ()
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma mlw_tree.ml"
+compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma -I `ocamlfind query menhirLib` menhirLib.cmo -I `ocamlfind query camlzip` zip.cma ../../lib/why3/why3.cma mlw_tree.ml"
 End:
 *)

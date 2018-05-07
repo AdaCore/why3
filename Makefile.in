@@ -1783,22 +1783,26 @@ endif
 .PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
-  share/Makefile.config bin/why3extract.@OCAMLBEST@
+  share/Makefile.config bin/why3extract.@OCAMLBEST@ bench-api
 	bash bench/bench ".@OCAMLBEST@"
 	@echo ""
-	@echo "=== Checking Why3 API ==="
-	$(MAKE) test-api-logic.@OCAMLBEST@
-#	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
-#	$(MAKE) test-api-mlw.@OCAMLBEST@
-	$(MAKE) test-session.@OCAMLBEST@
+	@echo "=== Checking extraction ==="
 	$(MAKE) test-ocaml-extraction
-	# desactivé car requiert findlib
-	# if test -d examples/runstrat ; then \
-	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
+# desactivé car requiert findlib
+# if test -d examples/runstrat ; then \
+#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
 	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo ; \
 	   echo "=== Checking the Coq tactic ==="; \
 	   $(MAKE) test-coq-tactic; fi
+
+bench-api:
+	@echo ""
+	@echo "=== Checking Why3 API ==="
+	$(MAKE) test-api-logic.@OCAMLBEST@
+	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
+#	$(MAKE) test-api-mlw.@OCAMLBEST@
+	$(MAKE) test-session.@OCAMLBEST@
 
 ###############
 # test targets

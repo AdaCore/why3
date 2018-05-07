@@ -290,15 +290,18 @@ let mlw_int64_type = Ity.ity_app int64_type [] []
 
 (* helpers *)
 
+let de_rs rs = Dexpr.DEsym (Pmodule.RS rs)
 let de_app e1 e2 = Dexpr.dexpr(Dexpr.DEapp(e1,e2))
-let de_app1 rs e1 = de_app (Dexpr.dexpr(Dexpr.DErs rs)) e1
+let de_app1 rs e1 = de_app (Dexpr.dexpr(de_rs rs)) e1
 let de_app2 rs e1 e2 = de_app (de_app1 rs e1) e2
 let de_app3 rs e1 e2 e3 = de_app (de_app2 rs e1 e2) e3
 
-let e_void = Dexpr.dexpr (Dexpr.DErs (Expr.rs_tuple 0))
+let e_void = Dexpr.dexpr (de_rs (Expr.rs_tuple 0))
 let e_true = Dexpr.dexpr Dexpr.DEtrue
 
-let de_const_int s = Dexpr.dexpr (Dexpr.DEconst (Number.ConstInt (Literals.integer s)))
+let de_const_int s =
+  Dexpr.dexpr (Dexpr.DEconst(Number.(ConstInt { ic_negative = false;
+    ic_abs = Literals.integer s}), Dexpr.dity_of_ity mlw_int_type))
 
 let rec ctype_and_default ty =
   match ty with
@@ -382,11 +385,11 @@ let rec logic_type ty =
 let logic_constant c =
   match c with
     | Integer(_value,Some s) ->
-      let c = Literals.integer s in Number.ConstInt c
+      let c = Literals.integer s in Number.(ConstInt { ic_negative = false; ic_abs = c})
     | Integer(_value,None) ->
       Self.not_yet_implemented "logic_constant Integer None"
     | LReal { r_literal = s } ->
-      let c = Literals.floating_point s in Number.ConstReal c
+      let c = Literals.floating_point s in Number.(ConstReal {rc_negative = false; rc_abs = c})
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "logic_constant"
 
@@ -454,9 +457,9 @@ let get_lvar lv =
 let program_vars = Hashtbl.create 257
 
 let create_var v is_mutable =
-(**)
+(* *)
   Self.result "create local program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
- (**)
+ (* *)
   Hashtbl.add program_vars v.vid is_mutable
 
 let global_vars : (int,Ity.pvsymbol) Hashtbl.t = Hashtbl.create 257
@@ -1438,12 +1441,12 @@ let fundecl denv_global fdec =
     in
     let body = add_locals denv_params locals in
     let spec_later lvm old (ret_type:Ity.ity) =
-(**)
+(* *)
       let result =
         Ity.create_pvsymbol (Ident.id_fresh "result") ret_type
       in
       result_pvsymbol := result;
-(**)
+(* *)
       {
         Dexpr.ds_pre =
           List.map (fun t -> predicate_named ~label:Here t lvm old) pre;
