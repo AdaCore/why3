@@ -287,14 +287,21 @@ We can check our generated tasks by printing them:
 
 One can run provers on those tasks exactly as we did above.
 
-\section{Applying Transformations}
+\section{Operations on Terms and Formulas, Transformations}
 
-[TO BE COMPLETED]
+The following code illustrates a simple recursive functions of
+formulas. It explores the formula and when a negtion is found, it
+tries to push it down below a conjunction, a disjunction or a
+quantifier.
+\lstinputlisting{transform__negate.ml}
 
-\section{Writing New Functions on Terms}
+The following illustrates how to turn such an OCaml function into a
+transformation in the sens of Why3 API. moreover, it registers that
+transformation to make it available for example in Why3 IDE.
+\lstinputlisting{transform__register.ml}
 
-[TO BE COMPLETED]
-% pattern-matching on terms, opening a quantifier
+The directory \verb|src/transform| contains the code for the many
+transformations that are already available in Why3.
 
 \section{Proof Sessions}
 
