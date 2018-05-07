@@ -53,59 +53,6 @@ let get_session_dir ~allow_mkdir files =
   dir
 
 
-
-
-(******************************)
-(* Creation of the controller *)
-(******************************)
-
-(* [cont_from_session]: returns an option to a boolean which returns None in
-   case of failure, true if nothing is left to do and false if sessions was
-   loaded but [f] should still be added to the session as a file. *)
-(*
-let cont_from_session ~notify cont f : bool option =
-  (* If a file is given, find the corresponding directory *)
-  let dir = try (Filename.chop_extension f) with
-  | Invalid_argument _ -> f in
-  (* create project directory if needed *)
-  if Sys.file_exists dir then
-    begin
-      (* Case of user giving a file that gets chopped to an other file *)
-      if not (Sys.is_directory dir) then
-        begin
-          Format.eprintf "Not a directory: %s@." dir;
-          exit 1
-        end
-    end
-  else
-    begin
-      Format.dprintf debug "'%s' does not exist. \
-               Creating directory of that name for the Why3 session@." dir;
-      Unix.mkdir dir 0o777
-    end;
-  (* we load the session *)
-  let ses,use_shapes = load_session dir in
-  Format.dprintf debug "using shapes: %b@." use_shapes;
-  (* temporary, this should not be donne like this ! *)
-  Controller_itp.set_session cont ses;
-  (* update the session *)
-  try (Controller_itp.reload_files cont ~use_shapes;
-    (* Check if the initial file given was a file or not. If it was, we return
-       that it should be added to the session.  *)
-    if Sys.file_exists f && not (Sys.is_directory f) then
-      Some false
-    else
-      Some true) with
-  | e ->
-    begin
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      notify (Message (Parse_Or_Type_Error s));
-      None
-    end
-*)
-
-
-
 (******************)
 (* Simple queries *)
 (******************)

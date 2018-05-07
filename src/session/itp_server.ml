@@ -587,14 +587,15 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
     capture_parse_or_type_errors
-      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
+      (fun c ->
+        try let (_,_) = reload_files ~use_shapes c in [] with
+        | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
     capture_parse_or_type_errors
       (fun c ->
-       match add_file c ?format fname with
-       | None -> []
-       | Some e -> [e]) cont
+        try add_file c ?format fname; [] with
+        | Errors_list le -> le) cont
 
 
   (* -----------------------------------   ------------------------------------- *)
