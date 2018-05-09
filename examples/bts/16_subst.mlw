@@ -9,22 +9,34 @@ goal g2: forall x. p x -> forall _y:int. x = 42 -> q x
 
 goal g1: forall x. p x -> forall y. x = f y -> q x
 
+end
 
-constant x : int
-
-axiom h1 : p x
-
-constant y:int
-
-axiom h2: x = f y
-
-goal g: q x
+module More
 
 use import int.Int
+function f int : int
 
 goal g3: forall x:int.
   forall z. z = x+1 ->
-  forall y. y = z -> 
+  forall y. y = z ->
   x = f y -> y = f y + 1
+
+end
+
+module Other
+
+use import int.Int
+
+predicate p int
+
+constant x : int
+
+axiom H1 : p x
+
+constant y : int = 3
+
+axiom H2 : x = y+1
+
+goal g : x*y = 0
 
 end

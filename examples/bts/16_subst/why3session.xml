@@ -34,17 +34,17 @@
  <transf name="remove" arg1="h1,h2">
   <goal name="g3.0">
   <transf name="case" arg1="x=0">
-   <goal name="g3.0.0" expl="true case">
+   <goal name="g3.0.0">
    </goal>
-   <goal name="g3.0.1" expl="false case">
+   <goal name="g3.0.1">
    </goal>
   </transf>
   <transf name="introduce_premises" >
    <goal name="g3.0.0">
    <transf name="induction" arg1="x" arg2="from" arg3="42">
-    <goal name="g3.0.0.0" expl="base case">
+    <goal name="g3.0.0.0">
     </goal>
-    <goal name="g3.0.0.1" expl="recursive case">
+    <goal name="g3.0.0.1">
     </goal>
    </transf>
    </goal>
@@ -53,6 +53,22 @@
  </transf>
  <transf name="subst" arg1="x,y">
   <goal name="g3.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="More">
+ <goal name="g3">
+ </goal>
+</theory>
+<theory name="Other">
+ <goal name="g">
+ <transf name="subst" arg1="x">
+  <goal name="g.0">
+  </goal>
+ </transf>
+ <transf name="subst_all" >
+  <goal name="g.0">
   </goal>
  </transf>
  </goal>

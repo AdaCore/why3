@@ -11,12 +11,169 @@
 
 open Term
 open Decl
-open Theory
 open Generic_arg_trans_utils
 open Args_wrapper
 
 (* transformations "subst" and "subst_all" *)
 
+let debug_subst = Debug.register_flag "subst" ~desc:"debug transformations subst and subst_all"
+
+let rec subst_in_term sigma t =
+  match t.t_node with
+  | Tapp(ls,[]) ->
+     begin
+       try Mls.find ls sigma
+       with Not_found -> t
+     end
+  | _ -> t_map (subst_in_term sigma) t
+
+let subst_in_def sigma ls (d:ls_defn) =
+  let (vl,t) = open_ls_defn d in
+  make_ls_defn ls vl (subst_in_term sigma t)
+
+
+(* [apply_subst prs sigma] is a transformation that operates on each decls.
+
+   for each decl:
+
+   - if d is a prop whose prsymbol belongs to prs, then it is removed
+
+   - if d is a declaration of a constant symbol in the domain of sigma
+     then it is removed
+
+   - otherwise d is rewritten using the substitution sigma
+
+   in [sigma], the right hand sides must not contain any symbols
+   appearing in the left-hand-side
+
+ *)
+let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
+  Trans.decl
+    (fun d ->
+     match d.d_node with
+     | Dprop(_k,pr,_t) when Spr.mem pr prs -> []
+     | Dprop(k,pr,t) -> [create_prop_decl k pr (subst_in_term sigma t)]
+     | Dparam ls -> if Mls.mem ls sigma then [] else [d]
+     | Dlogic ld ->
+        let ld' =
+          List.fold_right
+            (fun (ls,ld) acc ->
+             if Mls.mem ls sigma then acc
+             else (subst_in_def sigma ls ld)::acc)
+            ld
+            []
+        in
+        begin
+          match ld' with
+          | [] -> []
+          | _ -> [create_logic_decl ld']
+        end
+     | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
+        let ind_list =
+          List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
+                    let idl = List.map (fun (pr, t) -> (pr, subst_in_term sigma t)) idl in
+                    (ls, idl)) ind_list
+        in
+        [create_ind_decl is ind_list]
+     | Dtype _ | Ddata _ -> [d])
+    None
+
+
+let rec occurs_in_term ls t =
+  match t.t_node with
+  | Tapp(ls',[]) when ls_equal ls' ls -> true
+  | _ -> t_any (occurs_in_term ls) t
+
+
+(* [find_equalities filter t] searches in task [t] for equalities of
+   the form constant = term or term = constant, where constant does
+   not occur in the term.  That function returns first the set of
+   prsymbols for the equalities found, and second a map from the
+   lsymbols of the constant to the associated term. That map is
+   normalized in the sense that the terms on the right are fully
+   substituted, for example if the equalities "x=t" and "y=x+u" are
+   found, then the map contains "x -> t" and "y ->t+u".  The [filter]
+   function applys a generic filter to the constants that can be taken
+   into consideration.  if several equalities occur for the same
+   constant, the first one is considered.
+ *)
+let find_equalities filter =
+  Trans.fold_decl
+    (fun d ((prs,sigma) as acc) ->
+     match d.d_node with
+     | Dprop (Pgoal, _, _) -> acc
+     | Dprop (_, pr, t) ->
+        begin
+          match t.t_node with
+          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+             begin
+               try match t1.t_node with
+               | Tapp (ls, []) when
+                      filter ls &&
+                        not (Mls.mem ls sigma) ->
+                  let t2' = subst_in_term sigma t2 in
+                  if occurs_in_term ls t2' then raise Exit
+                  else
+                    let () = Debug.dprintf debug_subst "selected: %a -> %a@."
+                                           Pretty.print_ls ls Pretty.print_term t2' in
+                    (Spr.add pr prs, Mls.add ls t2' sigma)
+               | _ -> raise Exit
+               with Exit ->
+                    match t2.t_node with
+                    | Tapp (ls, []) when
+                           filter ls &&
+                             not (Mls.mem ls sigma) ->
+                       let t1' = subst_in_term sigma t1 in
+                       if occurs_in_term ls t1' then acc
+                       else
+                         let () = Debug.dprintf debug_subst "selected: %a -> %a@."
+                                                Pretty.print_ls ls Pretty.print_term t1' in
+                         (Spr.add pr prs, Mls.add ls t1' sigma)
+                    | _ -> acc
+             end
+          | _ -> acc
+        end
+     | Dlogic ld ->
+        List.fold_left
+          (fun ((prs,sigma) as acc) (ls,ld) ->
+           if filter ls then
+             let vl, t = open_ls_defn ld in
+             if vl = [] && not (occurs_in_term ls t) then
+               let t = subst_in_term sigma t in
+               (prs, Mls.add ls t sigma)
+             else acc
+           else acc)
+          acc
+          ld
+     | Ddata _ | Dtype _ | Dparam _ | Dind _ -> acc)
+    (Spr.empty, Mls.empty)
+
+
+let subst_all =
+  Trans.bind (find_equalities (fun _ -> true)) apply_subst
+
+let () =
+  wrap_and_register ~desc:"substitutes with all equalities between a constant and a term"
+    "subst_all"
+    (Ttrans) subst_all
+
+let subst tl =
+  let to_subst =
+    List.fold_left
+      (fun acc t ->
+       match t.t_node with
+       | Tapp (ls, []) -> Sls.add ls acc
+       | _ -> raise (Arg_trans "subst: %a is not a constant")) Sls.empty tl
+  in
+  Trans.bind (find_equalities (fun ls -> Sls.mem ls to_subst)) apply_subst
+
+let () =
+  wrap_and_register ~desc:"substitutes with all equalities involving one of the given constants"
+    "subst"
+    (Ttermlist Ttrans) subst
+
+
+(*
 (* This found any equality which at one side contains a single lsymbol and is
    local. It gives same output as found_eq. *)
 let find_eq2 is_local_decl =
@@ -144,11 +301,13 @@ let () =
     "subst_all"
     (Ttrans) subst_all
 
-
+ *)
 
 (*********)
 (* Subst *)
 (*********)
+
+    (*
 
 (* Creation of as structure that associates the replacement of terms as a
    function of the
@@ -305,3 +464,4 @@ let subst args = Trans.bind (find args) readd_decls
 let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
     (Ttermlist Ttrans) subst
+     *)

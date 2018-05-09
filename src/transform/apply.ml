@@ -90,7 +90,7 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
         | Reduction_engine.NoMatch (Some (t1, t2)) ->
             Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
                 Pretty.print_term t1 Pretty.print_term t2;
-            raise (Arg_trans_term (trans_name, t1, t2))
+            raise (Arg_trans_term2 (trans_name, t1, t2))
         | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
             Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
               Pretty.print_pat p1 Pretty.print_pat p2;
@@ -112,7 +112,7 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
           if Term.t_equal_nt_nl y z then
             Some y
           else
-            raise (Arg_trans_term (trans_name ^ ": ", y, z)))
+            raise (Arg_trans_term2 (trans_name ^ ": ", y, z)))
           subst new_subst
       in
       subst_ty, subst
@@ -132,7 +132,7 @@ let matching_with_terms ~trans_name slv lv left_term right_term withed_terms =
       Debug.dprintf debug_matching
         "Term %a and %a can not be matched. Failure in matching@."
         Pretty.print_term t1 Pretty.print_term t2;
-      raise (Arg_trans_term (trans_name, t1, t2))
+      raise (Arg_trans_term2 (trans_name, t1, t2))
     | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
       Debug.dprintf debug_matching
         "Term %a and %a can not be matched. Failure in matching@."
@@ -174,7 +174,7 @@ let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
         List.map (fun ng -> Task.add_decl task
               (create_prop_decl Pgoal (create_prsymbol (gen_ident "G")) ng)) nlp
       else
-        raise (Arg_trans_term ("apply", inst_nt, g)))
+        raise (Arg_trans_term2 ("apply", inst_nt, g)))
 
 let replace rev f1 f2 t =
   match rev with
@@ -320,7 +320,7 @@ let detect_prop_list pr k hl =
 *)
 let replace t1 t2 hl =
   if not (Ty.ty_equal (t_type t1) (t_type t2)) then
-    raise (Arg_trans_term ("replace", t1, t2))
+    raise (Arg_trans_term2 ("replace", t1, t2))
   else
     (* Create a new goal for equality of the two terms *)
     let g = Decl.create_prop_decl Decl.Pgoal (create_prsymbol (gen_ident "G")) (t_app_infer ps_equ [t1; t2]) in
