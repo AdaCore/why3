@@ -241,30 +241,38 @@ let set_session_timelimit n = session_timelimit := n
 let set_session_memlimit n = session_memlimit := n
 
 
+type command_prover =
+  | Bad_Arguments of Whyconf.prover
+  | Not_Prover
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
-let parse_prover_name config name args :
-  (Whyconf.config_prover * Call_provers.resource_limit) option =
+let parse_prover_name config name args : command_prover =
   match (return_prover name config) with
-  | None -> None
+  | None -> Not_Prover
   | Some prover_config ->
     begin
-      if (List.length args > 2) then None else
-      match args with
-      | [] ->
-        let default_limit = Call_provers.{empty_limit with
-                                          limit_time = !session_timelimit;
-                                          limit_mem = !session_memlimit} in
-          Some (prover_config, default_limit)
-      | [timeout] -> Some (prover_config,
-                           Call_provers.{empty_limit with
-                                          limit_time = int_of_string timeout;
-                                          limit_mem = !session_memlimit})
-      | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom})
-      | _ -> None
+      let prover = prover_config.Whyconf.prover in
+      try
+        if (List.length args > 2) then Bad_Arguments prover else
+        match args with
+        | [] ->
+            let default_limit = Call_provers.{empty_limit with
+                                              limit_time = !session_timelimit;
+                                              limit_mem = !session_memlimit} in
+            Prover (prover_config, default_limit)
+        | [timeout] -> Prover (prover_config,
+                               Call_provers.{empty_limit with
+                                             limit_time = int_of_string timeout;
+                                             limit_mem = !session_memlimit})
+        | [timeout; oom ] ->
+            Prover (prover_config, Call_provers.{empty_limit with
+                                                 limit_time = int_of_string timeout;
+                                                 limit_mem = int_of_string oom})
+        | _ -> Bad_Arguments prover
+      with
+      | Failure _ -> Bad_Arguments prover
     end
 
 (*******************************)
@@ -385,12 +393,14 @@ let interp commands_table cont id s =
        with
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
-          | Some (prover_config, limit) ->
+          | Prover (prover_config, limit) ->
              if prover_config.Whyconf.interactive then
                Edit prover_config.Whyconf.prover
              else
                Prove (prover_config, limit)
-          | None ->
+          | Bad_Arguments prover ->
+              QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
+          | Not_Prover ->
              if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
                Strategies cmd
              else
