@@ -12,6 +12,7 @@ let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
 
   let rec array_apply_to_record (a: array) =
     match a with
+    | Array_var _ -> a
     | Const x ->
         let x = apply_to_record x in
         Const x

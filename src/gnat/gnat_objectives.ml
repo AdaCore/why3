@@ -377,27 +377,26 @@ let init_cont () =
     end in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
   if is_new_session || not (has_file session) then begin
-    let (e_opt: exn option) = Controller_itp.add_file c Gnat_config.filename in
-    match e_opt with
-    | None -> ()
-    | Some e ->
+    try
+      Controller_itp.add_file c Gnat_config.filename
+    with
+    | Controller_itp.Errors_list l ->
         Gnat_util.abort_with_message ~internal:true
           (Pp.sprintf "could not add file %s to the session: %a"
-             Gnat_config.filename Exn_printer.exn_printer e);
+             Gnat_config.filename (Pp.print_list Pp.space Exn_printer.exn_printer) l)
   end;
   (* Init why3server *)
   init ();
-  let le =
-    if is_new_session then []
-    else let le, (_ : bool), (_ : bool) =
-      Controller_itp.reload_files c ~use_shapes in le
-  in
-  match le with
-  | [] -> c
-  | e :: _ ->
+  if is_new_session then c
+  else
+    try
+      let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~use_shapes in
+      c
+    with
+    | Controller_itp.Errors_list l ->
       Gnat_util.abort_with_message ~internal:true
         (Pp.sprintf "could not reload files of the session: %a"
-           Exn_printer.exn_printer e)
+           (Pp.print_list Pp.space Exn_printer.exn_printer) l)
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
@@ -871,7 +870,7 @@ let add_to_stat prover pr stat =
       let ext = Driver.get_extension dr in
       Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
-   let save_vc ~cntexample c goal (prover: Whyconf.prover) =
+   let save_vc c goal (prover: Whyconf.prover) =
       let check = get_objective goal in
       let driver =
         snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
@@ -967,7 +966,7 @@ end
 
 open Save_VCs
 
-let run_goal ?save_to ~cntexample ?limit ~callback c prover g =
+let run_goal ?save_to ?limit ~callback c prover g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal. The next step of the program
      is now directly in the callback. *)
@@ -993,12 +992,12 @@ let run_goal ?save_to ~cntexample ?limit ~callback c prover g =
         let new_file = Gnat_manual.create_prover_file c g check prover in
         let _paid, _file, _ores = C.prepare_edition c ~file:new_file
           g prover ~notification in
-        C.schedule_proof_attempt ?save_to ~counterexmp:false ~limit:Call_provers.empty_limit
+        C.schedule_proof_attempt ?save_to ~limit:Call_provers.empty_limit
           c g prover ~callback ~notification
       | Some old_file ->
         let _paid, _file, _ores = C.prepare_edition c ~file:old_file
           g prover ~notification in
-        C.schedule_proof_attempt ?save_to:None ~counterexmp:cntexample
+        C.schedule_proof_attempt ?save_to:None
           ~limit:Call_provers.empty_limit c g prover
           ~callback ~notification
     end
@@ -1011,24 +1010,23 @@ let run_goal ?save_to ~cntexample ?limit ~callback c prover g =
       | None -> Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn
       | Some x -> x in
     if config_prover.Whyconf.interactive then () else
-    C.schedule_proof_attempt ?save_to
-      ~counterexmp:cntexample ~limit ~callback
+    C.schedule_proof_attempt ?save_to ~limit ~callback
       ~notification c g prover
 
 let goal_has_splits session (goal: goal_id) =
   let goal_transformations = Session_itp.get_transformations session goal in
   not ([] = goal_transformations)
 
-let schedule_goal_with_prover ~cntexample ~callback c g p =
+let schedule_goal_with_prover ~callback c g p =
 (* actually schedule the goal, i.e., call the prover. This function returns
    immediately. *)
   let save_to =
     if Gnat_config.debug || Gnat_config.debug_save_vcs then
-      Some (save_vc ~cntexample c g p)
+      Some (save_vc c g p)
     else
       None
   in
-  run_goal ?save_to ~cntexample ~callback c p g
+  run_goal ?save_to ~callback c p g
 
 let schedule_goal ~cntexample ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
@@ -1038,7 +1036,7 @@ let schedule_goal ~cntexample ~callback c g =
   let p = if warn then Opt.get (Gnat_config.prover_warn)
     else if cntexample then Opt.get (Gnat_config.prover_ce)
     else find_best_untried_prover c.Controller_itp.controller_session g in
-  schedule_goal_with_prover ~cntexample ~callback c g p
+  schedule_goal_with_prover ~callback c g p
 
 let clean_automatic_proofs c =
   let seen = GoalSet.empty () in
@@ -1289,7 +1287,7 @@ and replay_goal c goal =
                 compute_replay_limit_from_pas pas
             | _ -> assert false in
           C.schedule_proof_attempt ?save_to:None c goal prover
-            ~counterexmp:false ~limit ~callback:(fun _ _ -> ())
+            ~limit ~callback:(fun _ _ -> ())
             ~notification:(fun _ -> ())) prover
 
 

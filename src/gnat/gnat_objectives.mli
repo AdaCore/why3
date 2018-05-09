@@ -140,13 +140,10 @@ val schedule_goal :
 *)
 
 val schedule_goal_with_prover :
-  cntexample: bool ->
   callback:(Session_itp.proofAttemptID -> Controller_itp.proof_attempt_status -> unit) ->
   Controller_itp.controller -> goal_id -> Whyconf.prover -> unit
 (* schedule a goal for proof with given prover and
    default timeout. The function returns immediately.
-   @param cntexample indicates whether the prover should be queried for
-     a counterexample.
 *)
 
 val save_session : Controller_itp.controller -> unit
