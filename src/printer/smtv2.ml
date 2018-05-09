@@ -70,7 +70,11 @@ let ident_printer () =
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
       "rotate_right"; "bvredor"; "bvredand";
 
-      "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
+      "^"; "exp"; "sin"; "cos"; "tan";
+      "csc"; "sec"; "cot";
+      "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
+      "sqrt";
+      "asin"; "acos"; "atan"; "pi";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -94,14 +98,22 @@ let ident_printer () =
      (* the new proposed string theory *)
       "String";
       "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
-      "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
-      "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
-      "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
+      "str.indexof"; "str.replace";
+      "str.prefixof"; "str.suffixof";
+      "str.from-int"; "str.to-int"; "str.in-re"; "str.to-re";
+      "int.to.str"; "str.to.int"; "str.in.re"; "str.to.re";
+      "re.++"; "re.union"; "re.inter";
       "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+      "str.code"; "str.<"; "str.<=";
+      "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
+
+     (* separation logic theory *)
+      "sep"; "pto"; "wand"; "emp";
 
      (* the new proposed set theory *)
       "union"; "intersection"; "setminus"; "subset"; "member";
-      "singleton"; "insert";
+      "singleton"; "insert"; "card"; "complement"; "join";
+      "product"; "transpose"; "tclosure";
 
      (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
