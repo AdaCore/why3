@@ -20,19 +20,7 @@ open Theory
 open Pmodule
 open Pdecl
 open Printer
-
-type info = {
-  info_syn          : syntax_map;
-  info_convert      : syntax_map;
-  info_literal      : syntax_map;
-  info_current_th   : Theory.theory;
-  info_current_mo   : Pmodule.pmodule option;
-  info_th_known_map : Decl.known_map;
-  info_mo_known_map : Pdecl.known_map;
-  info_fname        : string option;
-  info_flat         : bool;
-  info_current_ph   : string list; (* current path *)
-}
+open Ml_printer
 
 module Print = struct
 
@@ -44,146 +32,16 @@ module Print = struct
   let is_sml_remove ~labels =
     Ident.Slab.mem sml_remove labels
 
-  let sml_keywords =
-    ["abstype"; "and"; "andalso"; "as"; "case"; "datatype"; "do"; "else";
-     "end"; "exception"; "fn"; "fun"; "handle"; "if"; "in"; "infix";
-     "infixr"; "let"; "local"; "nonfix"; "of"; "op"; "open"; "orelse";
-     "raise"; "rec"; "then"; "type"; "val"; "with"; "withtype"; "while";]
+  include MLPrinter(struct
+    let keywords =
+      ["abstype"; "and"; "andalso"; "as"; "case"; "datatype"; "do"; "else";
+       "end"; "exception"; "fn"; "fun"; "handle"; "if"; "in"; "infix";
+       "infixr"; "let"; "local"; "nonfix"; "of"; "op"; "open"; "orelse";
+       "raise"; "rec"; "then"; "type"; "val"; "with"; "withtype"; "while";]
+  end)
 
-  (* iprinter: local names
-     aprinter: type variables
-     tprinter: toplevel definitions *)
-  let iprinter, aprinter, tprinter =
-    let isanitize = sanitizer char_to_alpha char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-    create_ident_printer sml_keywords ~sanitizer:isanitize,
-    create_ident_printer sml_keywords ~sanitizer:lsanitize,
-    create_ident_printer sml_keywords ~sanitizer:lsanitize
-
-  let forget_id id = forget_id iprinter id
-  let _forget_ids = List.iter forget_id
-  let forget_var (id, _, _) = forget_id id
-  let forget_vars = List.iter forget_var
-
-  let forget_let_defn = function
-    | Lvar (v,_) -> forget_id v.pv_vs.vs_name
-    | Lsym (s,_,_,_) | Lany (s,_,_) -> forget_rs s
-    | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
-
-  let rec forget_pat = function
-    | Pwild -> ()
-    | Pvar {vs_name=id} -> forget_id id
-    | Papp (_, pl) | Ptuple pl -> List.iter forget_pat pl
-    | Por (p1, p2) -> forget_pat p1; forget_pat p2
-    | Pas (p, _) -> forget_pat p
-
-  let print_global_ident ~sanitizer fmt id =
-    let s = id_unique ~sanitizer tprinter id in
-    Ident.forget_id tprinter id;
-    fprintf fmt "%s" s
-
-  let print_path ~sanitizer fmt (q, id) =
-    assert (List.length q >= 1);
-    match Lists.chop_last q with
-    | [], _ -> print_global_ident ~sanitizer fmt id
-    | q, _  ->
-        fprintf fmt "%a.%a"
-          (print_list dot string) q (print_global_ident ~sanitizer) id
-
-  let rec remove_prefix acc current_path = match acc, current_path with
-    | [], _ | _, [] -> acc
-    | p1 :: _, p2 :: _ when p1 <> p2 -> acc
-    | _ :: r1, _ :: r2 -> remove_prefix r1 r2
-
-  let is_local_id info id =
-    Sid.mem id info.info_current_th.th_local ||
-    Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
-      false info.info_current_mo
-
-  exception Local
-
-  let print_qident ~sanitizer info fmt id =
-    try
-      if info.info_flat then raise Not_found;
-      if is_local_id info id then raise Local;
-      let p, t, q =
-        try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
-      let fname = if p = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname p t) in
-      fprintf fmt "%s.%a" m (print_path ~sanitizer) (q, id)
-    with
-    | Not_found ->
-        let s = id_unique ~sanitizer iprinter id in
-        fprintf fmt "%s" s
-    | Local ->
-        let _, _, q = try Pmodule.restore_path id with Not_found ->
-          Theory.restore_path id in
-        let q = remove_prefix q (List.rev info.info_current_ph) in
-        print_path ~sanitizer fmt (q, id)
-
-  let print_lident = print_qident ~sanitizer:Strings.uncapitalize
-  let print_uident = print_qident ~sanitizer:Strings.capitalize
-
-  let print_tv fmt tv =
-    fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
-
-  let protect_on b s =
-    if b then "(" ^^ s ^^ ")" else s
-
-  let star fmt () = fprintf fmt " *@ "
-
-  let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
-    match l1, l2 with
-    | [x1], [x2] ->
-        print1 fmt x1; sep_m fmt (); print2 fmt x2
-    | x1 :: r1, x2 :: r2 ->
-        print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
-        print_list2 sep sep_m print1 print2 fmt (r1, r2)
-    | _ -> ()
-
-  let print_rs info fmt rs =
-    fprintf fmt "%a" (print_lident info) rs.rs_name
-
-  (** Types *)
-
-  let rec print_ty ?(paren=false) info fmt = function
-    | Tvar tv ->
-        print_tv fmt tv
-    | Ttuple [] ->
-        fprintf fmt "unit"
-    | Ttuple [t] ->
-        print_ty ~paren info fmt t
-    | Ttuple tl ->
-        fprintf fmt (protect_on paren "@[%a@]")
-          (print_list star (print_ty ~paren:true info)) tl
-    | Tapp (ts, tl) ->
-        match query_syntax info.info_syn ts with
-        | Some s ->
-            fprintf fmt (protect_on paren "%a")
-              (syntax_arguments s (print_ty ~paren:true info)) tl
-        | None   ->
-            match tl with
-            | [] ->
-                (print_lident info) fmt ts
-            | [ty] ->
-                fprintf fmt (protect_on paren "%a@ %a")
-                  (print_ty ~paren:true info) ty (print_lident info) ts
-            | tl ->
-                fprintf fmt (protect_on paren "(%a)@ %a")
-                  (print_list comma (print_ty ~paren:false info)) tl
-                  (print_lident info) ts
-
-  let print_vsty_opt info fmt id ty =
-    fprintf fmt "?%s:(%a:@ %a)" id.id_string (print_lident info) id
-      (print_ty ~paren:false info) ty
-
-  let print_vsty_named info fmt id ty =
-    fprintf fmt "~%s:(%a:@ %a)" id.id_string (print_lident info) id
-      (print_ty ~paren:false info) ty
-
-  let print_vsty info fmt (id, ty, _) =
-    fprintf fmt "(%a:@ %a)" (print_lident info) id
-      (print_ty ~paren:false info) ty
+  let print_vsty info fmt (id, _, _) =
+    fprintf fmt "%a" (print_lident info) id
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -206,8 +64,8 @@ module Print = struct
   let rec print_pat info fmt = function
     | Pwild ->
         fprintf fmt "_"
-    | Pvar {vs_name=id} ->
-        (print_lident info) fmt id
+    | Pvar {vs_name = id} ->
+        print_lident info fmt id
     | Pas (p, {vs_name=id}) ->
         fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
     | Por (p1, p2) ->
@@ -248,14 +106,6 @@ module Print = struct
   let is_false e = match e.e_node with
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
-
-  let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
-    (* here [rs] refers to a [val] declaration *)
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn     rs.rs_name with
-    | None, None (* when info.info_flat *) ->
-        Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
-    | _ -> ()
 
   let is_mapped_to_int info ity =
     match ity.ity_node with
@@ -325,30 +175,28 @@ module Print = struct
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
     | _, _, tl ->
-        fprintf fmt "@[<hov 2>%a %a@]"
-          (print_lident info) rs.rs_name
+        fprintf fmt "@[<hov 2>%a %a@]" (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
-  (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
     Stv.iter (fun tv -> fprintf fmt "%a " print_tv tv) s
 
-  and print_fun_type_args info fmt (args, s, res, e) =
-    if Stv.is_empty s then
-      fprintf fmt "@[%a@] =@ %a"
-        (print_list space (print_vs_arg info)) args
+  and print_fun_type_args info fmt (args, _, _, e) =
+    (* TODO: search if CakeML supports some form of polymorphic recursion *)
+    (* if Stv.is_empty s then *)
+      fprintf fmt "@[%a@] =@ %a" (print_list space (print_vs_arg info)) args
         (print_expr info) e
-    else
-      let ty_args = List.map (fun (_, ty, _) -> ty) args in
-      let id_args = List.map (fun (id, _, _) -> id) args in
-      let arrow fmt () = fprintf fmt " ->@ " in
-      fprintf fmt ":@ @[<h>@[%a@]. @[%a ->@ %a@]@] =@ \
-                   @[<hov 2>fun @[%a@]@ ->@ %a@]"
-        print_svar s
-        (print_list arrow (print_ty ~paren:true info)) ty_args
-        (print_ty ~paren:true info) res
-        (print_list space (print_lident info)) id_args
-        (print_expr info) e
+    (* else
+     *   let ty_args = List.map (fun (_, ty, _) -> ty) args in
+     *   let id_args = List.map (fun (id, _, _) -> id) args in
+     *   let arrow fmt () = fprintf fmt " ->@ " in
+     *   fprintf fmt ":@ @[<h>@[%a@]. @[%a ->@ %a@]@] =@ \
+     *                @[<hov 2>fun @[%a@]@ ->@ %a@]"
+     *     print_svar s
+     *     (print_list arrow (print_ty ~paren:true info)) ty_args
+     *     (print_ty ~paren:true info) res
+     *     (print_list space (print_lident info)) id_args
+     *     (print_expr info) e *)
 
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
@@ -541,10 +389,10 @@ module Print = struct
     let print_constr fst fmt (id, cs_args) =
       match cs_args with
       | [] ->
-          fprintf fmt "@[<hov 4>%s %a@]" (if fst then " " else "|")
+          fprintf fmt "@[%s%a@]" (if fst then "" else "| ")
             (print_uident info) id
       | l ->
-          fprintf fmt "@[<hov 4>%s %a of %a@]" (if fst then " " else "|")
+          fprintf fmt "@[%s%a of %a@]" (if fst then "" else "| ")
             (print_uident info) id
             (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
@@ -554,8 +402,8 @@ module Print = struct
       | None ->
           () (* TODO: check if it is in driver *)
       | Some (Ddata csl) ->
-          fprintf fmt "datatype %a =@\n%a"
-            (print_lident info) name (print_list_next newline print_constr) csl
+          fprintf fmt "datatype %a @[<hv>= %a@]"
+            (print_lident info) name (print_list_next space print_constr) csl
       | Some (Drecord fl) ->
           fprintf fmt " = %s{@\n%a@\n}"
             (if its.its_private then "private " else "")
@@ -594,7 +442,7 @@ module Print = struct
           (print_uident info) xs.xs_name (print_ty ~paren:true info) t
     | Dmodule (s, dl) ->
         let dl = extract_module_decl dl in
-        let info = { info with info_current_ph = s :: info.info_current_ph } in
+        let info = add_current_path info s in
         fprintf fmt "@[@[<hov 2>structure %s@ = struct@]@;<1 2>@[%a@]@ end@]"
           s (print_list newline2 (print_decl info)) dl
 
@@ -613,20 +461,9 @@ end
 
 let print_decl =
   let memo = Hashtbl.create 16 in
-  fun pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d ->
+  fun pargs ?old ?fname ~flat m fmt d ->
     ignore (old);
-    let info = {
-      info_syn          = pargs.Pdriver.syntax;
-      info_convert      = pargs.Pdriver.converter;
-      info_literal      = pargs.Pdriver.literal;
-      info_current_th   = th;
-      info_current_mo   = Some m;
-      info_th_known_map = th.th_known;
-      info_mo_known_map = m.mod_known;
-      info_fname        = Opt.map Compile.clean_name fname;
-      info_flat         = flat;
-      info_current_ph   = [];
-    } in
+    let info = create_info pargs fname ~flat m in
     if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
       Print.print_decl info fmt d end
 
