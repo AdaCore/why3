@@ -1,30 +1,33 @@
-import "cvc4_14.drv"
+transformation "eliminate_unused_hypo"
+import "cvc4_16.drv"
 import "smt-libv2-gnatprove.gen"
+import "smt-libv2-floats-gnatprove.gen"
+import "smt-libv2-floats-int_via_real.gen"
 
-theory ieee_float.GenericFloat
- remove prop abs_special
- remove prop le_special
- remove prop lt_special
- remove prop eq_special
- remove prop add_special
- remove prop sub_special
- remove prop mul_special
- remove prop div_special
- remove prop neg_special
- remove prop fma_finite
- remove prop fma_special
- remove prop sqrt_finite
- remove prop sqrt_special
+(* These leftover axioms are generally not used by normal people, they are
+   only needed if you use nth, etc. predicates. Here we remove them to
+   remove a further source of quantifiers.
+*)
+theory bv.BV_Gen
+   remove allprops
+   meta "ls:eliminate" function nth
+   meta "ls:eliminate" function nth_bv
+   meta "ls:eliminate" predicate eq_sub
+   meta "ls:eliminate" predicate eq_sub_bv
+   syntax function nth "(error)"
+   syntax function nth_bv "(error)"
+   syntax predicate eq_sub "(error)"
+   syntax predicate eq_sub_bv "(error)"
 end
 
-theory ieee_float.Float32
- remove prop round_bound
-end
+(*
+theory int.ComputerDivision
+  prelude "(define-fun __cdiv ((x Int) (y Int)) Int (ite (>= x 0) (div x y) (- (div (- x) y))))"
+  prelude "(define-fun __cmod ((x Int) (y Int)) Int (ite (>= x 0) (mod x y) (- (mod (- x) y))))"
 
-theory ieee_float.Float64
- remove prop round_bound
-end
+  syntax function div "(__cdiv %1 %2)"
+  syntax function mod "(__cmod %1 %2)"
 
-theory real.Square
- remove allprops
+  remove allprops
 end
+*)

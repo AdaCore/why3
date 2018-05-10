@@ -11,9 +11,11 @@ prelude "(set-option :smt.macro-finder true)"
 
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "z3_bv.gen"
 import "smt-libv2-floats.gen"
 import "smt-libv2-gnatprove.gen"
 import "smt-libv2-floats-gnatprove.gen"
+import "smt-libv2-floats-int_via_bv.gen"
 import "discrimination.gen"
 
 (* Counterexamples: set model parser *)
@@ -48,53 +50,5 @@ steps ":rlimit-count *\\([0-9]+\\)" 1
 (** Z3 needs "(push)" to provide models *)
 theory BuiltIn
   meta "counterexample_need_smtlib_push" ""
-end
-
-(** Extra theories supported by Z3 *)
-
-(* float literals  *)
-
-theory ieee_float.Float64
-(* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
-   syntax function to_int
-     "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
-     (* we do not translate of_int since z3 will not prove anything if it appears in its context, see PC07-014 *)
-end
-
-theory ieee_float.Float32
-  (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
-   syntax function to_int
-     "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
-end
-
-(* bitvector theories are not in smt-libv2.drv since cvc4 and z3 don't
-   have the same name for the function to_uint *)
-theory bv.BV_Gen
-  syntax function to_uint "(bv2int %1)"
-
-  remove allprops
-end
-
-theory bv.BV64
-  syntax function of_int "((_ int2bv 64) %1)"
-end
-
-theory bv.BV32
-  syntax function of_int "((_ int2bv 32) %1)"
-end
-
-theory bv.BV16
-  syntax function of_int "((_ int2bv 16) %1)"
-end
-
-theory bv.BV8
-  syntax function of_int "((_ int2bv 8) %1)"
-end
-
-theory BuiltIn
-
   meta "get_counterexmp" ""
-(* Meta incremental not in spark yer. *)
-(*  meta "meta_incremental" ""*)
-
 end

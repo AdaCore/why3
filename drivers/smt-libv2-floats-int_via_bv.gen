@@ -1,0 +1,17 @@
+(* This is a encoding for int/float conversions via bitvectors. *)
+
+(* we do not translate of_int since z3 will not prove anything if it
+ * appears in its context, see PC07-014
+ *)
+
+theory ieee_float.Float32
+  (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
+   syntax function to_int
+     "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
+end
+
+theory ieee_float.Float64
+   (* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
+   syntax function to_int
+     "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
+end
