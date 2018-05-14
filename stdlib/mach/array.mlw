@@ -204,20 +204,31 @@ module Array31
 
 end
 
-(** {2 Arrays with 63-bit indices} *)
+(** {2 Arrays with 63-bit indices}
+
+    Contrary to arrays from module [Array], the contents of the array
+    is here modeled as a sequence. It makes it easier to resuse existing
+    functions over sequences. (We may consider doing this for regular arrays
+    as well in the future.)
+
+    A coercion is declared so that an array [a] can be used
+    as a sequence. As a consequence, notation [a[i]] in the logic is
+    directly that of sequences. You have to import module [seq.Seq] to be
+    able to use it.
+*)
 
 module Array63
 
   use import int.Int
   use import mach.int.Int63
-  use import map.Map as M
+  use import seq.Seq
 
   type array 'a = private {
-    mutable ghost elts : int -> 'a;
+    mutable ghost elts : seq 'a;
                 length : int63;
-  } invariant { 0 <= length }
+  } invariant { 0 <= length = Seq.length elts }
 
-  function ([]) (a: array 'a) (i: int) : 'a = a.elts i
+  meta coercion function elts
 
   val ([]) (a: array 'a) (i: int63) : 'a
     requires { [@expl:index in array bounds] 0 <= i < a.length }
@@ -309,11 +320,10 @@ module Array63Exchange
   use import int.Int
   use import mach.int.Int63
   use import Array63
-  use import map.MapExchange as M
+  use import seq.Exchange as SE
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
-    a1.length = a2.length /\
-    M.exchange a1.elts a2.elts 0 a1.length i j
+    SE.exchange a1.elts a2.elts i j
   (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
       by the swapping of elements at indices [i] and [j] *)
 
@@ -341,30 +351,30 @@ module Array63Permut
   use import int.Int
   use import mach.int.Int63
   use import Array63
-  use import map.MapPermut as MP
-  use import map.MapExchange as MX
-  use import map.MapEq
+  use import seq.Seq
+  use import seq.SeqEq
+  use import seq.Permut as SP
+  use import Array63Exchange
 
   predicate permut (a1 a2: array 'a) (l u: int) =
-    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
-    MP.permut a1.elts a2.elts l u
+    SP.permut a1.elts a2.elts l u
   (** [permut a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
       Values outside of the interval [(l..u-1)] are ignored. *)
 
   predicate array_eq (a1 a2: array 'a) (l u: int) =
-    map_eq_sub a1.elts a2.elts l u
+    seq_eq_sub a1.elts a2.elts l u
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
-    map_eq_sub a1.elts a2.elts 0 l /\
+    seq_eq_sub a1.elts a2.elts 0 l /\
     permut a1 a2 l u /\
-    map_eq_sub a1.elts a2.elts u (length a1)
+    seq_eq_sub a1.elts a2.elts u (length a1)
   (** [permut_sub a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
       and values outside of the interval [(l..u-1)] are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
-    a1.length = a2.length /\ MP.permut a1.elts a2.elts 0 a1.length
+    SP.permut a1.elts a2.elts 0 a1.length
   (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
       of array [a2]. *)
 
@@ -373,12 +383,6 @@ module Array63Permut
     forall a1 a2: array 'a, l1 u1 l2 u2: int.
     permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
     permut_sub a1 a2 l2 u2
-
-  predicate exchange (a1 a2: array 'a) (i j: int) =
-    a1.length = a2.length /\
-    MX.exchange a1.elts a2.elts 0 a1.length i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
 
   lemma exchange_permut_sub:
     forall a1 a2: array 'a, i j l u: int.
@@ -390,3 +394,4 @@ module Array63Permut
     exchange a1 a2 i j -> permut_all a1 a2
 
 end
+
