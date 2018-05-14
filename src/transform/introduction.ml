@@ -105,23 +105,9 @@ let () = Trans.register_transform
 let simplify_intros =
   Trans.compose Simplify_formula.simplify_trivial_wp_quantification introduce_premises
 
-let split_intros_goal_wp =
+let split_vc =
   Trans.compose_l Split_goal.split_goal_right (Trans.singleton simplify_intros)
 
-let split_intros_all_wp =
-  Trans.compose_l Split_goal.split_all_right (Trans.singleton simplify_intros)
-
-let split_intros_premise_wp =
-  Trans.compose Split_goal.split_premise_right simplify_intros
-
 let () = Trans.register_transform_l
-           "split_intros_goal_wp" split_intros_goal_wp
+           "split_vcp" split_vc
            ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ by@ simplify_trivial_quantifications@ followed@ by@ introduce_premises)."
-
-let () = Trans.register_transform_l
-           "split_intros_all_wp" split_intros_all_wp
-           ~desc:"Same@ as@ split_intros_goal_wp,@ but@ also@ split@ premises."
-
-let () = Trans.register_transform
-           "split_intros_premise_wp" split_intros_premise_wp
-           ~desc:"Same@ as@ split_intros_all_wp,@ but@ split@ only@ premises."
