@@ -8,7 +8,7 @@
 <file name="../verifythis_2017_odd_even_sort_rearranging.mlw" proved="true">
 <theory name="Top" proved="true">
  <goal name="VC array_max" expl="VC for array_max" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC array_max.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -54,7 +54,7 @@
  <proof prover="1"><result status="valid" time="0.56"/></proof>
  </goal>
  <goal name="VC entropy_pos" expl="VC for entropy_pos" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC entropy_pos.0" expl="variant decrease" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -76,7 +76,7 @@
  </transf>
  </goal>
  <goal name="VC decompose_entropy" expl="VC for decompose_entropy" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC decompose_entropy.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
@@ -98,7 +98,7 @@
  </transf>
  </goal>
  <goal name="VC inst_ext" expl="VC for inst_ext" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC inst_ext.0" expl="assertion" proved="true">
   <proof prover="2" memlimit="2000"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
@@ -108,7 +108,7 @@
  </transf>
  </goal>
  <goal name="VC my_swap" expl="VC for my_swap" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC my_swap.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -116,7 +116,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC my_swap.2" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC my_swap.2.0" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
    </goal>
@@ -138,7 +138,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="VC my_swap.4" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC my_swap.4.0" expl="VC for my_swap" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="16"/></proof>
    </goal>
@@ -183,7 +183,7 @@
  </transf>
  </goal>
  <goal name="VC local_order_implies_sort_sub" expl="VC for local_order_implies_sort_sub" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC local_order_implies_sort_sub.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -202,7 +202,7 @@
  </transf>
  </goal>
  <goal name="VC odd_even_sort" expl="VC for odd_even_sort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC odd_even_sort.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>

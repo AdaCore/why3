@@ -31,7 +31,7 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="VC app" expl="VC for app" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC app.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -101,7 +101,7 @@
  </transf>
  </goal>
  <goal name="VC in_place_reverse" expl="VC for in_place_reverse" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC in_place_reverse.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -152,7 +152,7 @@
  <proof prover="5"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="VC mem_decomp" expl="VC for mem_decomp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mem_decomp.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -177,7 +177,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="VC list_seg_functional" expl="VC for list_seg_functional" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_functional.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -202,7 +202,7 @@
  </transf>
  </goal>
  <goal name="VC list_seg_tail" expl="VC for list_seg_tail" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_tail.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -221,7 +221,7 @@
  </transf>
  </goal>
  <goal name="VC list_seg_append" expl="VC for list_seg_append" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_append.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -234,7 +234,7 @@
   <goal name="VC list_seg_append.3" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC list_seg_append.3.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC list_seg_append.3.0.0" expl="precondition" proved="true">
     <proof prover="2"><result status="valid" time="0.10"/></proof>
     </goal>
@@ -254,7 +254,7 @@
  <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
  </goal>
  <goal name="VC list_seg_prefix" expl="VC for list_seg_prefix" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_prefix.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -270,7 +270,7 @@
   <goal name="VC list_seg_prefix.4" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC list_seg_prefix.4.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC list_seg_prefix.4.0.0" expl="precondition" proved="true">
     <proof prover="2"><result status="valid" time="0.07"/></proof>
     </goal>
@@ -287,7 +287,7 @@
  </transf>
  </goal>
  <goal name="VC list_seg_sublistl" expl="VC for list_seg_sublistl" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_sublistl.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -350,7 +350,7 @@
  <proof prover="3"><result status="valid" time="0.03" steps="69"/></proof>
  </goal>
  <goal name="VC list_seg_no_repet" expl="VC for list_seg_no_repet" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_seg_no_repet.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -391,7 +391,7 @@
  </transf>
  </goal>
  <goal name="VC app" expl="VC for app" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC app.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.78"/></proof>
   </goal>
@@ -439,7 +439,7 @@
    <goal name="VC app.14.0" expl="loop invariant preservation" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC app.14.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC app.14.0.0.0" expl="loop invariant preservation" proved="true">
      <proof prover="3"><result status="valid" time="0.03" steps="103"/></proof>
      </goal>
@@ -479,7 +479,7 @@
  </transf>
  </goal>
  <goal name="VC in_place_reverse" expl="VC for in_place_reverse" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC in_place_reverse.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -513,7 +513,7 @@
   <goal name="VC in_place_reverse.10" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC in_place_reverse.10.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC in_place_reverse.10.0.0" expl="loop invariant preservation" proved="true">
     <proof prover="2"><result status="valid" time="0.08"/></proof>
     </goal>

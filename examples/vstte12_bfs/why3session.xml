@@ -44,7 +44,7 @@
 </theory>
 <theory name="BFS" proved="true">
  <goal name="VC fill_next" expl="VC for fill_next" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC fill_next.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
@@ -59,7 +59,7 @@
    <goal name="VC fill_next.3.0" expl="loop invariant preservation" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC fill_next.3.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC fill_next.3.0.0.0" expl="VC for fill_next" proved="true">
      <proof prover="2"><result status="valid" time="0.03" steps="116"/></proof>
      </goal>
@@ -111,7 +111,7 @@
  </transf>
  </goal>
  <goal name="VC bfs" expl="VC for bfs" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC bfs.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.19" steps="971"/></proof>
   </goal>
@@ -122,7 +122,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="VC bfs.3" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC bfs.3.0" expl="VC for bfs" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="98"/></proof>
    </goal>
@@ -143,13 +143,13 @@
   </transf>
   </goal>
   <goal name="VC bfs.4" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC bfs.4.0" expl="VC for bfs" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC bfs.4.0.0" expl="VC for bfs" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC bfs.4.0.0.0" expl="VC for bfs" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC bfs.4.0.0.0.0" expl="VC for bfs" proved="true">
       <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
       </goal>

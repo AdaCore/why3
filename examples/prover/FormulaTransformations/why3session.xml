@@ -14,7 +14,7 @@
 </theory>
 <theory name="Logic" proved="true">
  <goal name="WP_parameter is_nnf_subst" expl="VC for is_nnf_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_nnf_subst.0" expl="assertion" proved="true">
   <proof prover="10"><result status="valid" time="0.16" steps="167"/></proof>
   </goal>
@@ -91,7 +91,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter is_nnf_renaming" expl="VC for is_nnf_renaming" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_nnf_renaming.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
@@ -101,7 +101,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter is_simpl_subst" expl="VC for is_simpl_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_simpl_subst.0" expl="variant decrease" proved="true">
   <proof prover="10"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
@@ -180,7 +180,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter is_simpl_renaming" expl="VC for is_simpl_renaming" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_simpl_renaming.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.07" steps="4"/></proof>
   </goal>
@@ -193,7 +193,7 @@
  <proof prover="10"><result status="valid" time="0.09" steps="38"/></proof>
  </goal>
  <goal name="WP_parameter no_existential_subst" expl="VC for no_existential_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter no_existential_subst.0" expl="variant decrease" proved="true">
   <proof prover="10"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
@@ -263,7 +263,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter no_existential_renaming" expl="VC for no_existential_renaming" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter no_existential_renaming.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.06" steps="4"/></proof>
   </goal>
@@ -275,7 +275,7 @@
 </theory>
 <theory name="Impl" proved="true">
  <goal name="WP_parameter smart_and" expl="VC for smart_and" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter smart_and.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.23" steps="12"/></proof>
   </goal>
@@ -365,7 +365,7 @@
    <goal name="WP_parameter smart_and.28.0" expl="assertion" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter smart_and.28.0.0" expl="assertion" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter smart_and.28.0.0.0" expl="assertion" proved="true">
      <proof prover="10"><result status="valid" time="1.16" steps="2487"/></proof>
      </goal>
@@ -383,7 +383,7 @@
    <goal name="WP_parameter smart_and.30.0" expl="postcondition" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter smart_and.30.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter smart_and.30.0.0.0" expl="postcondition" proved="true">
      <proof prover="10"><result status="valid" time="0.15" steps="156"/></proof>
      </goal>
@@ -410,7 +410,7 @@
    <goal name="WP_parameter smart_and.33.0" expl="postcondition" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter smart_and.33.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter smart_and.33.0.0.0" expl="postcondition" proved="true">
      <proof prover="10"><result status="valid" time="0.16" steps="184"/></proof>
      </goal>
@@ -423,7 +423,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter smart_or" expl="VC for smart_or" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter smart_or.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="12"/></proof>
   </goal>
@@ -443,7 +443,7 @@
   <proof prover="10"><result status="valid" time="0.24" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter smart_or.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_or.6.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.12" steps="15"/></proof>
    </goal>
@@ -523,7 +523,7 @@
    <goal name="WP_parameter smart_or.30.0" expl="postcondition" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter smart_or.30.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter smart_or.30.0.0.0" expl="postcondition" proved="true">
      <proof prover="10"><result status="valid" time="0.15" steps="160"/></proof>
      </goal>
@@ -547,7 +547,7 @@
    <goal name="WP_parameter smart_or.33.0" expl="postcondition" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter smart_or.33.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter smart_or.33.0.0.0" expl="postcondition" proved="true">
      <proof prover="10"><result status="valid" time="0.22" steps="184"/></proof>
      </goal>
@@ -560,12 +560,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter smart_forall" expl="VC for smart_forall" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter smart_forall.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.23" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter smart_forall.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_forall.1.0" expl="VC for smart_forall" proved="true">
    <proof prover="10"><result status="valid" time="0.24" steps="18"/></proof>
    </goal>
@@ -578,7 +578,7 @@
   <proof prover="10"><result status="valid" time="0.25" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter smart_forall.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_forall.3.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.16" steps="46"/></proof>
    </goal>
@@ -621,7 +621,7 @@
   <proof prover="11"><result status="valid" time="0.69"/></proof>
   </goal>
   <goal name="WP_parameter smart_forall.15" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_forall.15.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.28" steps="149"/></proof>
    </goal>
@@ -634,7 +634,7 @@
   <proof prover="10"><result status="valid" time="0.27" steps="98"/></proof>
   </goal>
   <goal name="WP_parameter smart_forall.17" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_forall.17.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.11" steps="18"/></proof>
    </goal>
@@ -646,7 +646,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter smart_exists" expl="VC for smart_exists" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter smart_exists.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="10"/></proof>
   </goal>
@@ -672,7 +672,7 @@
   <proof prover="12"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter smart_exists.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_exists.8.0" expl="postcondition" proved="true">
    <proof prover="12" timelimit="20"><result status="valid" time="0.07"/></proof>
    </goal>
@@ -697,7 +697,7 @@
   <proof prover="11"><result status="valid" time="0.67"/></proof>
   </goal>
   <goal name="WP_parameter smart_exists.15" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_exists.15.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="1.03" steps="603"/></proof>
    </goal>
@@ -710,7 +710,7 @@
   <proof prover="10"><result status="valid" time="0.15" steps="99"/></proof>
   </goal>
   <goal name="WP_parameter smart_exists.17" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter smart_exists.17.0" expl="postcondition" proved="true">
    <proof prover="11"><result status="valid" time="0.55"/></proof>
    </goal>
@@ -722,7 +722,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter nnf_simpl" expl="VC for nnf_simpl" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter nnf_simpl.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.21" steps="9"/></proof>
   </goal>
@@ -733,7 +733,7 @@
   <proof prover="10"><result status="valid" time="0.22" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter nnf_simpl.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_simpl.3.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.22" steps="188"/></proof>
    </goal>
@@ -765,7 +765,7 @@
   <proof prover="12"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="WP_parameter nnf_simpl.12" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_simpl.12.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.12" steps="16"/></proof>
    </goal>
@@ -916,7 +916,7 @@
   <proof prover="10"><result status="valid" time="0.43" steps="601"/></proof>
   </goal>
   <goal name="WP_parameter nnf_simpl.61" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_simpl.61.0" expl="precondition" proved="true">
    <proof prover="10"><result status="valid" time="0.21" steps="20"/></proof>
    </goal>
@@ -963,7 +963,7 @@
   <proof prover="10"><result status="valid" time="0.41" steps="623"/></proof>
   </goal>
   <goal name="WP_parameter nnf_simpl.75" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_simpl.75.0" expl="precondition" proved="true">
    <proof prover="10"><result status="valid" time="0.23" steps="20"/></proof>
    </goal>
@@ -996,7 +996,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter nnf_neg_simpl" expl="VC for nnf_neg_simpl" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter nnf_neg_simpl.0" expl="precondition" proved="true">
   <proof prover="10" timelimit="20"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
@@ -1182,7 +1182,7 @@
   <proof prover="10" timelimit="20"><result status="valid" time="0.30" steps="460"/></proof>
   </goal>
   <goal name="WP_parameter nnf_neg_simpl.61" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_neg_simpl.61.0" expl="assertion" proved="true">
    <proof prover="10" timelimit="20"><result status="valid" time="0.22" steps="185"/></proof>
    </goal>
@@ -1240,7 +1240,7 @@
   <proof prover="10" timelimit="20"><result status="valid" time="0.12" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter nnf_neg_simpl.70" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_neg_simpl.70.0" expl="postcondition" proved="true">
    <proof prover="10" timelimit="20"><result status="valid" time="1.10" steps="673"/></proof>
    </goal>
@@ -1262,7 +1262,7 @@
   <proof prover="10" timelimit="20"><result status="valid" time="0.29" steps="510"/></proof>
   </goal>
   <goal name="WP_parameter nnf_neg_simpl.75" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter nnf_neg_simpl.75.0" expl="assertion" proved="true">
    <proof prover="10" timelimit="20"><result status="valid" time="0.26" steps="191"/></proof>
    </goal>
@@ -1331,7 +1331,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter nnf_simpl_list" expl="VC for nnf_simpl_list" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter nnf_simpl_list.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.21" steps="9"/></proof>
   </goal>
@@ -1410,7 +1410,7 @@
    <goal name="WP_parameter nnf_simpl_list.24.0" expl="postcondition" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter nnf_simpl_list.24.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter nnf_simpl_list.24.0.0.0" expl="postcondition" proved="true">
      <proof prover="10"><result status="valid" time="0.12" steps="54"/></proof>
      </goal>
@@ -1429,7 +1429,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter term_free_vars" expl="VC for term_free_vars" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter term_free_vars.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.20" steps="10"/></proof>
   </goal>
@@ -1463,7 +1463,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter term_list_free_vars" expl="VC for term_list_free_vars" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter term_list_free_vars.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.19" steps="10"/></proof>
   </goal>
@@ -1512,7 +1512,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter skolem_parameters" expl="VC for skolem_parameters" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter skolem_parameters.0" expl="postcondition" proved="true">
   <proof prover="10"><result status="valid" time="0.20" steps="12"/></proof>
   </goal>
@@ -1576,7 +1576,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter skolemize" expl="VC for skolemize" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter skolemize.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.20" steps="12"/></proof>
   </goal>
@@ -1818,7 +1818,7 @@
   <proof prover="10"><result status="valid" time="0.36" steps="575"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.80" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.80.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.24" steps="66"/></proof>
    </goal>
@@ -1828,7 +1828,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.81" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.81.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.15" steps="64"/></proof>
    </goal>
@@ -1844,7 +1844,7 @@
   <proof prover="10"><result status="valid" time="0.50" steps="692"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.84" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.84.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.24" steps="63"/></proof>
    </goal>
@@ -1863,7 +1863,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.85" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.85.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.23" steps="315"/></proof>
    </goal>
@@ -1969,7 +1969,7 @@
   <proof prover="10"><result status="valid" time="0.47" steps="583"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.118" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.118.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.15" steps="66"/></proof>
    </goal>
@@ -1979,7 +1979,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.119" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.119.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.25" steps="64"/></proof>
    </goal>
@@ -1995,7 +1995,7 @@
   <proof prover="10"><result status="valid" time="0.50" steps="637"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.122" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.122.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="63"/></proof>
    </goal>
@@ -2071,7 +2071,7 @@
   <proof prover="10"><result status="valid" time="0.24" steps="82"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.142" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.142.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.22" steps="194"/></proof>
    </goal>
@@ -2132,7 +2132,7 @@
   <proof prover="13"><result status="valid" time="0.62"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.152" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.152.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.31" steps="545"/></proof>
    </goal>
@@ -2148,7 +2148,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.153" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.153.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.24" steps="48"/></proof>
    </goal>
@@ -2161,7 +2161,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.154" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.154.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.26" steps="347"/></proof>
    </goal>
@@ -2234,7 +2234,7 @@
   <proof prover="10"><result status="valid" time="0.44" steps="1086"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.171" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.171.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.22" steps="200"/></proof>
    </goal>
@@ -2313,7 +2313,7 @@
   <proof prover="10"><result status="valid" time="0.23" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.187" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.187.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.25" steps="306"/></proof>
    </goal>
@@ -2377,14 +2377,14 @@
   <proof prover="13"><result status="valid" time="1.41"/></proof>
   </goal>
   <goal name="WP_parameter skolemize.203" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.203.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="77"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.204" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.204.0" expl="assertion" proved="true">
    <proof prover="10" timelimit="30"><result status="valid" time="15.92" steps="4153"/></proof>
    </goal>
@@ -2403,7 +2403,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.205" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.205.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.25" steps="44"/></proof>
    </goal>
@@ -2437,7 +2437,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.206" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.206.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.15" steps="79"/></proof>
    </goal>
@@ -2453,7 +2453,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize.207" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize.207.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.16" steps="77"/></proof>
    </goal>
@@ -2513,7 +2513,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter skolemize_list" expl="VC for skolemize_list" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter skolemize_list.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.19" steps="12"/></proof>
   </goal>
@@ -2596,7 +2596,7 @@
   <proof prover="10"><result status="valid" time="0.22" steps="244"/></proof>
   </goal>
   <goal name="WP_parameter skolemize_list.27" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize_list.27.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="64"/></proof>
    </goal>
@@ -2606,7 +2606,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter skolemize_list.28" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize_list.28.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="62"/></proof>
    </goal>
@@ -2622,7 +2622,7 @@
   <proof prover="10"><result status="valid" time="0.29" steps="308"/></proof>
   </goal>
   <goal name="WP_parameter skolemize_list.31" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter skolemize_list.31.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.12" steps="61"/></proof>
    </goal>
@@ -2673,7 +2673,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter term_free_vars_noghost" expl="VC for term_free_vars_noghost" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter term_free_vars_noghost.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="10"/></proof>
   </goal>
@@ -2704,7 +2704,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter term_list_free_vars_noghost" expl="VC for term_list_free_vars_noghost" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter term_list_free_vars_noghost.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="10"/></proof>
   </goal>
@@ -2747,7 +2747,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter collect_free_var_formula" expl="VC for collect_free_var_formula" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter collect_free_var_formula.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="10"/></proof>
   </goal>
@@ -2875,7 +2875,7 @@
   <proof prover="10"><result status="valid" time="0.11" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter collect_free_var_formula.42" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter collect_free_var_formula.42.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.23" steps="30"/></proof>
    </goal>
@@ -2929,7 +2929,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter collect_free_var_formula_list" expl="VC for collect_free_var_formula_list" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter collect_free_var_formula_list.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.21" steps="10"/></proof>
   </goal>
@@ -2969,7 +2969,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter exists_quantify" expl="VC for exists_quantify" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter exists_quantify.0" expl="postcondition" proved="true">
   <proof prover="10"><result status="valid" time="0.21" steps="13"/></proof>
   </goal>
@@ -2992,7 +2992,7 @@
   <proof prover="10"><result status="valid" time="0.28" steps="255"/></proof>
   </goal>
   <goal name="WP_parameter exists_quantify.7" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter exists_quantify.7.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.33" steps="258"/></proof>
    </goal>
@@ -3011,7 +3011,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter exists_quantify.8" expl="variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter exists_quantify.8.0" expl="VC for exists_quantify" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="31"/></proof>
    </goal>
@@ -3050,7 +3050,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter combine_with" expl="VC for combine_with" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter combine_with.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="15"/></proof>
   </goal>
@@ -3123,7 +3123,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter split" expl="VC for split" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter split.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="17"/></proof>
   </goal>
@@ -3244,7 +3244,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter preprocessing" expl="VC for preprocessing" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter preprocessing.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.22" steps="10"/></proof>
   </goal>
@@ -3342,7 +3342,7 @@
   <proof prover="10"><result status="valid" time="0.14" steps="71"/></proof>
   </goal>
   <goal name="WP_parameter preprocessing.32" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter preprocessing.32.0" expl="assertion" proved="true">
    <proof prover="10"><result status="valid" time="0.14" steps="83"/></proof>
    </goal>

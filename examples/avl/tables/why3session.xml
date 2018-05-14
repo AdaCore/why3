@@ -37,7 +37,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC selected_part" expl="VC for selected_part" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC selected_part.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
@@ -45,7 +45,7 @@
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC selected_part.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_part.2.0" expl="VC for selected_part" proved="true">
    <proof prover="1"><result status="valid" time="0.12" steps="490"/></proof>
    </goal>
@@ -53,7 +53,7 @@
    <proof prover="1"><result status="valid" time="0.02" steps="44"/></proof>
    </goal>
    <goal name="VC selected_part.2.2" expl="VC for selected_part" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC selected_part.2.2.0" expl="VC for selected_part" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="1.86" steps="2859"/></proof>
     </goal>
@@ -118,9 +118,9 @@
  <proof prover="1"><result status="valid" time="0.03" steps="167"/></proof>
  </goal>
  <goal name="VC selected_model" expl="VC for selected_model" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC selected_model.0" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_model.0.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.22" steps="553"/></proof>
    </goal>
@@ -165,9 +165,9 @@
  </transf>
  </goal>
  <goal name="VC selected_sorted" expl="VC for selected_sorted" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC selected_sorted.0" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_sorted.0.0" expl="VC for selected_sorted" proved="true">
    <proof prover="1"><result status="valid" time="1.06" steps="1512"/></proof>
    </goal>
@@ -215,7 +215,7 @@
  <proof prover="1"><result status="valid" time="0.24" steps="518"/></proof>
  </goal>
  <goal name="VC insert" expl="VC for insert" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC insert.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
@@ -247,7 +247,7 @@
   <proof prover="1"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
   <goal name="VC insert.10" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert.10.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.47" steps="1457"/></proof>
    </goal>
@@ -262,7 +262,7 @@
  </transf>
  </goal>
  <goal name="VC remove" expl="VC for remove" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC remove.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
@@ -287,7 +287,7 @@
  </transf>
  </goal>
  <goal name="VC split" expl="VC for split" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC split.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
@@ -298,7 +298,7 @@
   <proof prover="1"><result status="valid" time="0.07" steps="157"/></proof>
   </goal>
   <goal name="VC split.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC split.3.0" expl="VC for split" proved="true">
    <proof prover="1"><result status="valid" time="0.06" steps="134"/></proof>
    </goal>
@@ -355,7 +355,7 @@
  </transf>
  </goal>
  <goal name="VC view" expl="VC for view" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC view.0" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="1.34" steps="1398"/></proof>
   </goal>
@@ -363,7 +363,7 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.55" steps="916"/></proof>
   </goal>
   <goal name="VC view.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC view.2.0" expl="VC for view" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="61"/></proof>
    </goal>
@@ -417,7 +417,7 @@
  </transf>
  </goal>
  <goal name="VC join" expl="VC for join" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC join.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.29" steps="567"/></proof>
   </goal>
@@ -445,7 +445,7 @@
  </transf>
  </goal>
  <goal name="VC add_all" expl="VC for add_all" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add_all.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.10" steps="235"/></proof>
   </goal>
@@ -471,9 +471,9 @@
   <proof prover="1"><result status="valid" time="0.15" steps="239"/></proof>
   </goal>
   <goal name="VC add_all.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add_all.8.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_all.8.0.0" expl="postcondition" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
     </goal>
@@ -483,17 +483,17 @@
    </transf>
    </goal>
    <goal name="VC add_all.8.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_all.8.1.0" expl="postcondition" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="28"/></proof>
     </goal>
     <goal name="VC add_all.8.1.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC add_all.8.1.1.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="76"/></proof>
      </goal>
      <goal name="VC add_all.8.1.1.1" expl="postcondition" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC add_all.8.1.1.1.0" expl="postcondition" proved="true">
       <proof prover="1" timelimit="5"><result status="valid" time="0.34" steps="780"/></proof>
       </goal>
@@ -512,12 +512,12 @@
   </transf>
   </goal>
   <goal name="VC add_all.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add_all.9.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.05" steps="28"/></proof>
    </goal>
    <goal name="VC add_all.9.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_all.9.1.0" expl="postcondition" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="8"/></proof>
     </goal>
@@ -525,7 +525,7 @@
     <proof prover="1" timelimit="5"><result status="valid" time="1.43" steps="4423"/></proof>
     </goal>
     <goal name="VC add_all.9.1.2" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC add_all.9.1.2.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.21" steps="711"/></proof>
      </goal>
@@ -547,7 +547,7 @@
  </transf>
  </goal>
  <goal name="VC filter" expl="VC for filter" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC filter.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.10" steps="239"/></proof>
   </goal>
@@ -579,7 +579,7 @@
   <proof prover="1"><result status="valid" time="0.04" steps="53"/></proof>
   </goal>
   <goal name="VC filter.10" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC filter.10.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="3.16" steps="9584"/></proof>
    </goal>
@@ -592,17 +592,17 @@
   </transf>
   </goal>
   <goal name="VC filter.11" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC filter.11.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
    </goal>
    <goal name="VC filter.11.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC filter.11.1.0" expl="postcondition" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="14"/></proof>
     </goal>
     <goal name="VC filter.11.1.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC filter.11.1.1.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.62" steps="2200"/></proof>
      </goal>
@@ -612,7 +612,7 @@
     </transf>
     </goal>
     <goal name="VC filter.11.1.2" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC filter.11.1.2.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.32" steps="718"/></proof>
      </goal>
@@ -631,7 +631,7 @@
  </transf>
  </goal>
  <goal name="VC remove_all" expl="VC for remove_all" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC remove_all.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.11" steps="239"/></proof>
   </goal>
@@ -657,7 +657,7 @@
   <proof prover="1"><result status="valid" time="0.20" steps="759"/></proof>
   </goal>
   <goal name="VC remove_all.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC remove_all.8.0" expl="postcondition" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="2.00" steps="5877"/></proof>
    </goal>
@@ -678,7 +678,7 @@
  </transf>
  </goal>
  <goal name="VC symdiff" expl="VC for symdiff" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC symdiff.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.09" steps="235"/></proof>
   </goal>
@@ -710,19 +710,19 @@
   <proof prover="1" timelimit="5"><result status="valid" time="0.63" steps="2064"/></proof>
   </goal>
   <goal name="VC symdiff.10" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC symdiff.10.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC symdiff.10.0.0" expl="postcondition" proved="true">
     <proof prover="1"><result status="valid" time="0.03" steps="35"/></proof>
     </goal>
     <goal name="VC symdiff.10.0.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC symdiff.10.0.1.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.05" steps="45"/></proof>
      </goal>
      <goal name="VC symdiff.10.0.1.1" expl="postcondition" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC symdiff.10.0.1.1.0" expl="postcondition" proved="true">
       <proof prover="1" timelimit="5"><result status="valid" time="0.27" steps="861"/></proof>
       </goal>
@@ -732,7 +732,7 @@
      </transf>
      </goal>
      <goal name="VC symdiff.10.0.1.2" expl="postcondition" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC symdiff.10.0.1.2.0" expl="postcondition" proved="true">
       <proof prover="1" timelimit="5"><result status="valid" time="0.32" steps="859"/></proof>
       </goal>
@@ -746,17 +746,17 @@
    </transf>
    </goal>
    <goal name="VC symdiff.10.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC symdiff.10.1.0" expl="postcondition" proved="true">
     <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
     </goal>
     <goal name="VC symdiff.10.1.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC symdiff.10.1.1.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="8"/></proof>
      </goal>
      <goal name="VC symdiff.10.1.1.1" expl="postcondition" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC symdiff.10.1.1.1.0" expl="postcondition" proved="true">
       <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="787"/></proof>
       </goal>
@@ -766,7 +766,7 @@
      </transf>
      </goal>
      <goal name="VC symdiff.10.1.1.2" expl="postcondition" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC symdiff.10.1.1.2.0" expl="postcondition" proved="true">
       <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="790"/></proof>
       </goal>
@@ -785,17 +785,17 @@
   </transf>
   </goal>
   <goal name="VC symdiff.11" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC symdiff.11.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.03" steps="21"/></proof>
    </goal>
    <goal name="VC symdiff.11.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC symdiff.11.1.0" expl="postcondition" proved="true">
     <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="9"/></proof>
     </goal>
     <goal name="VC symdiff.11.1.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC symdiff.11.1.1.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.35" steps="694"/></proof>
      </goal>
@@ -805,7 +805,7 @@
     </transf>
     </goal>
     <goal name="VC symdiff.11.1.2" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC symdiff.11.1.2.0" expl="postcondition" proved="true">
      <proof prover="1" timelimit="5"><result status="valid" time="0.26" steps="731"/></proof>
      </goal>
@@ -859,7 +859,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC correction" expl="VC for correction" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC correction.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>

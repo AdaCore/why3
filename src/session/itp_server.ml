@@ -226,7 +226,11 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
       Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
+  | Generic_arg_trans_utils.Arg_trans_term (s, t) ->
+      Pp.sprintf "Error in transformation %s during with term:\n %a : %a " s
+        (print_term ses id) t (print_opt_type ses id) t.Term.t_ty,
+      Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_term2 (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
         (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
@@ -587,14 +591,15 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
     capture_parse_or_type_errors
-      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
+      (fun c ->
+        try let (_,_) = reload_files ~use_shapes c in [] with
+        | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
     capture_parse_or_type_errors
       (fun c ->
-       match add_file c ?format fname with
-       | None -> []
-       | Some e -> [e]) cont
+        try add_file c ?format fname; [] with
+        | Errors_list le -> le) cont
 
 
   (* -----------------------------------   ------------------------------------- *)

@@ -27,7 +27,7 @@
  <proof prover="0"><result status="valid" time="0.19" steps="242"/></proof>
  </goal>
  <goal name="WP_parameter formula_semantic_subst_commutation" expl="VC for formula_semantic_subst_commutation">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter formula_semantic_subst_commutation.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
   </goal>
@@ -94,7 +94,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter formula_semantic_rename_commutation" expl="VC for formula_semantic_rename_commutation">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter formula_semantic_rename_commutation.1" expl="assertion">
   <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
   </goal>
@@ -131,7 +131,7 @@
  <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
  </goal>
  <goal name="WP_parameter term_semantic_depend_only_free_var" expl="VC for term_semantic_depend_only_free_var">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter term_semantic_depend_only_free_var.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.08" steps="19"/></proof>
   </goal>
@@ -157,7 +157,7 @@
  </goal>
  <goal name="WP_parameter formula_semantic_depend_only_free_var" expl="VC for formula_semantic_depend_only_free_var">
  <proof prover="0"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter formula_semantic_depend_only_free_var.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
   </goal>
@@ -231,7 +231,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter formula_semantic_depend_only_free_var.25" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter formula_semantic_depend_only_free_var.25.1" expl="assertion">
    <proof prover="1"><result status="valid" time="1.22"/></proof>
    </goal>
@@ -273,9 +273,9 @@
  <proof prover="0"><result status="valid" time="0.21" steps="128"/></proof>
  </goal>
  <goal name="WP_parameter skolem_model_transformer" expl="VC for skolem_model_transformer">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter skolem_model_transformer.1" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter skolem_model_transformer.1.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.08" steps="6"/></proof>
    </goal>

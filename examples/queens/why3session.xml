@@ -14,7 +14,7 @@
 </theory>
 <theory name="NQueensSetsTermination" proved="true">
  <goal name="VC t" expl="VC for t" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC t.0" expl="loop invariant init" proved="true">
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -43,7 +43,7 @@
 </theory>
 <theory name="NQueensSets" proved="true">
  <goal name="VC t3" expl="VC for t3" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC t3.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="203"/></proof>
   </goal>
@@ -69,7 +69,7 @@
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC t3.8" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t3.8.0" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -108,7 +108,7 @@
     <goal name="VC t3.8.11.0" expl="VC for t3" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC t3.8.11.0.0" expl="VC for t3" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC t3.8.11.0.0.0" expl="VC for t3" proved="true">
       <proof prover="6"><result status="valid" time="0.05" steps="136"/></proof>
       </goal>
@@ -178,14 +178,14 @@
   <proof prover="10"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC t3.14" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t3.14.0" expl="loop invariant preservation" proved="true">
    <proof prover="10"><result status="valid" time="0.27"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC t3.15" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t3.15.0" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -220,7 +220,7 @@
   </transf>
   </goal>
   <goal name="VC t3.16" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t3.16.0" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -250,7 +250,7 @@
  </transf>
  </goal>
  <goal name="VC queens3" expl="VC for queens3" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC queens3.0" expl="precondition" proved="true">
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>

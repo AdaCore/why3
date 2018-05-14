@@ -60,7 +60,7 @@
  <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="VC find" expl="VC for find" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC find.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -121,7 +121,7 @@
  <proof prover="2"><result status="valid" time="1.98"/></proof>
  </goal>
  <goal name="VC resize" expl="VC for resize" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC resize.0" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -160,7 +160,7 @@
   <proof prover="3"><result status="valid" time="3.50"/></proof>
   </goal>
   <goal name="VC resize.12" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC resize.12.0" expl="loop invariant preservation" proved="true">
    <proof prover="0"><result status="valid" time="0.76"/></proof>
    </goal>
@@ -217,7 +217,7 @@
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC resize.18" expl="type invariant" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC resize.18.0" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -232,7 +232,7 @@
  </transf>
  </goal>
  <goal name="VC add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
@@ -261,11 +261,11 @@
   <proof prover="4"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC add.9" expl="type invariant" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add.9.0" expl="type invariant" proved="true">
    <transf name="unfold" proved="true" arg1="valid">
     <goal name="VC add.9.0.0" expl="VC for add" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC add.9.0.0.0" expl="VC for add" proved="true">
      <proof prover="7"><result status="valid" time="0.08"/></proof>
      </goal>
@@ -359,7 +359,7 @@
  <proof prover="1"><result status="valid" time="0.42" steps="1062"/></proof>
  </goal>
  <goal name="VC delete" expl="VC for delete" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC delete.0" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
@@ -475,7 +475,7 @@
   <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
   <goal name="VC delete.38" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC delete.38.0" expl="precondition" proved="true">
    <proof prover="0"><result status="valid" time="0.44"/></proof>
    </goal>
@@ -503,7 +503,7 @@
  </transf>
  </goal>
  <goal name="VC remove" expl="VC for remove" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC remove.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>

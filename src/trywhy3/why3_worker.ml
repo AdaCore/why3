@@ -56,7 +56,7 @@ let alt_ergo_driver : Driver.driver =
 
 let () = log_time ("Initialising why3 worker: end ")
 
-let split_trans = Trans.lookup_transform_l "split_intros_goal_wp" env
+let split_trans = Trans.lookup_transform_l "split_vc" env
 
 (* CF gmain.ml ligne 568 et suivante *)
 module W =

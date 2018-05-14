@@ -234,14 +234,15 @@ let reload_files (c : controller) ~use_shapes =
   Whyconf.Hprover.reset c.controller_provers;
   load_drivers c;
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
-(*  try
- *)
-    merge_files ~use_shapes c.controller_env c.controller_session old_ses
-(* not need_anymore
-  with e ->
-    c.controller_session <- old_ses;
-    raise e
- *)
+  merge_files ~use_shapes c.controller_env c.controller_session old_ses
+
+exception Errors_list of exn list
+
+let reload_files (c: controller) ~use_shapes =
+  let errors, b1, b2 = reload_files c ~use_shapes in
+  match errors with
+  | [] -> b1, b2
+  | _ -> raise (Errors_list errors)
 
 let add_file c ?format fname =
   let file_is_detached,theories,errors =
@@ -251,7 +252,11 @@ let add_file c ?format fname =
   let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
   errors
 
-
+let add_file c ?format fname =
+  let errors = add_file c ?format fname in
+  match errors with
+  | None -> ()
+  | Some error -> raise (Errors_list [error])
 
 module type Scheduler = sig
   val blocking: bool

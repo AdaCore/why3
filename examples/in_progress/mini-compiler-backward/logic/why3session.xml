@@ -12,7 +12,7 @@
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter infix ~" expl="VC for infix ~">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter infix ~.1" expl="1. assertion">
   <transf name="induction_pr">
    <goal name="WP_parameter infix ~.1.1" expl="1. assertion">
@@ -38,7 +38,7 @@
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter infix %" expl="VC for infix %">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter infix %.1" expl="1. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter infix %.1.1" expl="1. postcondition">
@@ -60,7 +60,7 @@
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter prefix $" expl="VC for prefix $">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter prefix $.1" expl="1. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter prefix $.1.1" expl="1. postcondition">
@@ -79,7 +79,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter hoare" expl="VC for hoare">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter hoare.1" expl="1. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter hoare.1.1" expl="1. postcondition">
@@ -98,7 +98,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter make_loop_hl" expl="VC for make_loop_hl">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter make_loop_hl.1" expl="1. assertion">
   <transf name="induction_pr">
    <goal name="WP_parameter make_loop_hl.1.1" expl="1.">

@@ -11,7 +11,7 @@
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC make" expl="VC for make" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC make.0" expl="array creation size" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
@@ -33,14 +33,14 @@
  </transf>
  </goal>
  <goal name="VC mixfix []" expl="VC for mixfix []" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mixfix [].0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC mixfix []&lt;-" expl="VC for mixfix []<-" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mixfix []&lt;-.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
@@ -56,7 +56,7 @@
  </transf>
  </goal>
  <goal name="VC resize" expl="VC for resize" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC resize.0" expl="array creation size" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
@@ -96,7 +96,7 @@
  </transf>
  </goal>
  <goal name="VC append" expl="VC for append" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC append.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
@@ -123,7 +123,7 @@
 </theory>
 <theory name="Test" proved="true">
  <goal name="VC test1" expl="VC for test1" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC test1.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
@@ -145,7 +145,7 @@
  </transf>
  </goal>
  <goal name="VC test2" expl="VC for test2" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC test2.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>

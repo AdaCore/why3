@@ -11,7 +11,7 @@
  <proof prover="0" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.46"/></proof>
  </goal>
  <goal name="VC prime_numbers" expl="VC for prime_numbers" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC prime_numbers.0" expl="array creation size" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -52,7 +52,7 @@
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC prime_numbers.13" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC prime_numbers.13.0" expl="VC for prime_numbers" proved="true">
    <proof prover="15"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -86,7 +86,7 @@
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC prime_numbers.22" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC prime_numbers.22.0" expl="VC for prime_numbers" proved="true">
    <proof prover="15"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -143,7 +143,7 @@
   <goal name="VC prime_numbers.38" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC prime_numbers.38.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC prime_numbers.38.0.0" expl="VC for prime_numbers" proved="true">
     <proof prover="15"><result status="valid" time="0.05"/></proof>
     </goal>

@@ -18,7 +18,7 @@
  <proof prover="1"><result status="valid" time="0.18" steps="194"/></proof>
  </goal>
  <goal name="VC aboveMin" expl="VC for aboveMin" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC aboveMin.0" expl="precondition" proved="true">
   <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -43,7 +43,7 @@
  </transf>
  </goal>
  <goal name="VC maxUnion" expl="VC for maxUnion" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC maxUnion.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
@@ -62,7 +62,7 @@
   <proof prover="1"><result status="valid" time="1.41" steps="2018"/></proof>
   </goal>
   <goal name="VC maxUnion.4" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC maxUnion.4.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>

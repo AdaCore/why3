@@ -982,7 +982,7 @@ let add_to_log =
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
-  buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#delete ~start:buf#start_iter ~stop:buf#end_iter
 
 (* Function used to print stuff on the message_zone *)

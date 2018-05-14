@@ -25,7 +25,7 @@
  <proof prover="4"><result status="valid" time="0.21" steps="473"/></proof>
  </goal>
  <goal name="VC head" expl="VC for head" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC head.0" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -35,7 +35,7 @@
  </transf>
  </goal>
  <goal name="VC pop" expl="VC for pop" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC pop.0" expl="unreachable point" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -43,7 +43,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC pop.2" expl="type invariant" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC pop.2.0" expl="type invariant" proved="true">
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -74,7 +74,7 @@
   <proof prover="0"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="VC pop.5" expl="type invariant" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC pop.5.0" expl="type invariant" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>

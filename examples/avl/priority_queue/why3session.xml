@@ -12,7 +12,7 @@
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="M.VC assoc_m" expl="VC for assoc_m" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC assoc_m.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -35,7 +35,7 @@
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC assoc_m.7" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC assoc_m.7.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -83,7 +83,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="M.VC op" expl="VC for op" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC op.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
@@ -99,7 +99,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC monoid_sum_is_min" expl="VC for monoid_sum_is_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC monoid_sum_is_min.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -113,7 +113,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
   <goal name="VC monoid_sum_is_min.4" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC monoid_sum_is_min.4.0" expl="VC for monoid_sum_is_min" proved="true">
    <proof prover="1"><result status="valid" time="0.09"/></proof>
    </goal>
@@ -128,12 +128,12 @@
  </transf>
  </goal>
  <goal name="VC selected_is_min" expl="VC for selected_is_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC selected_is_min.0" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC selected_is_min.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_is_min.1.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.68" steps="1664"/></proof>
    </goal>
@@ -154,9 +154,9 @@
  </transf>
  </goal>
  <goal name="VC selected_part" expl="VC for selected_part" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC selected_part.0" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_part.0.0" expl="VC for selected_part" proved="true">
    <proof prover="0"><result status="valid" time="0.07" steps="79"/></proof>
    </goal>
@@ -199,7 +199,7 @@
   </transf>
   </goal>
   <goal name="VC selected_part.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_part.1.0" expl="VC for selected_part" proved="true">
    <proof prover="0"><result status="valid" time="0.06" steps="252"/></proof>
    </goal>
@@ -242,7 +242,7 @@
   </transf>
   </goal>
   <goal name="VC selected_part.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_part.2.0" expl="VC for selected_part" proved="true">
    <proof prover="0"><result status="valid" time="0.05" steps="192"/></proof>
    </goal>
@@ -285,7 +285,7 @@
   </transf>
   </goal>
   <goal name="VC selected_part.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC selected_part.3.0" expl="VC for selected_part" proved="true">
    <proof prover="0"><result status="valid" time="0.16" steps="704"/></proof>
    </goal>
@@ -308,7 +308,7 @@
    <proof prover="0"><result status="valid" time="0.18" steps="518"/></proof>
    </goal>
    <goal name="VC selected_part.3.7" expl="VC for selected_part" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC selected_part.3.7.0" expl="VC for selected_part" proved="true">
     <proof prover="0"><result status="valid" time="0.37" steps="866"/></proof>
     </goal>
@@ -373,9 +373,9 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC to_bag_mem" expl="VC for to_bag_mem" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC to_bag_mem.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC to_bag_mem.0.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
    </goal>
@@ -396,7 +396,7 @@
  </transf>
  </goal>
  <goal name="VC get_minimum_index" expl="VC for get_minimum_index" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC get_minimum_index.0" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="64"/></proof>
   </goal>
@@ -448,7 +448,7 @@
  </transf>
  </goal>
  <goal name="VC split_gives_minimum" expl="VC for split_gives_minimum" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC split_gives_minimum.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
   </goal>
@@ -470,7 +470,7 @@
  </transf>
  </goal>
  <goal name="VC correction" expl="VC for correction" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC correction.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
@@ -507,7 +507,7 @@
  <proof prover="0"><result status="valid" time="0.26" steps="378"/></proof>
  </goal>
  <goal name="VC remove_count" expl="VC for remove_count" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC remove_count.0" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="61"/></proof>
   </goal>
@@ -520,7 +520,7 @@
  </transf>
  </goal>
  <goal name="VC extract_min" expl="VC for extract_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC extract_min.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="20"/></proof>
   </goal>
@@ -531,7 +531,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="VC extract_min.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extract_min.3.0" expl="VC for extract_min" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="21"/></proof>
    </goal>
@@ -555,7 +555,7 @@
  </transf>
  </goal>
  <goal name="VC min" expl="VC for min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC min.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -568,7 +568,7 @@
  </transf>
  </goal>
  <goal name="VC pop_min" expl="VC for pop_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC pop_min.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -579,7 +579,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
   <goal name="VC pop_min.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC pop_min.3.0" expl="VC for pop_min" proved="true">
    <proof prover="0"><result status="valid" time="0.12" steps="76"/></proof>
    </goal>
@@ -594,7 +594,7 @@
  </transf>
  </goal>
  <goal name="VC add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add.0" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="70"/></proof>
   </goal>

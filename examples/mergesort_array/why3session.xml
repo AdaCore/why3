@@ -10,7 +10,7 @@
 </theory>
 <theory name="Merge" proved="true">
  <goal name="VC merge" expl="VC for merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC merge.0" expl="loop invariant init" proved="true">
   <proof prover="11"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
@@ -98,7 +98,7 @@
   <goal name="VC merge.28" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC merge.28.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC merge.28.0.0" expl="VC for merge" proved="true">
     <proof prover="11"><result status="valid" time="0.01" steps="4"/></proof>
     </goal>
@@ -130,7 +130,7 @@
  </transf>
  </goal>
  <goal name="VC merge_using" expl="VC for merge_using" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC merge_using.0" expl="index in array bounds" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
@@ -202,7 +202,7 @@
 </theory>
 <theory name="BottomUpMergesort" proved="true">
  <goal name="VC bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC bottom_up_mergesort.0" expl="loop invariant init" proved="true">
   <proof prover="11"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -262,7 +262,7 @@
   <proof prover="11"><result status="valid" time="0.75" steps="478"/></proof>
   </goal>
   <goal name="VC bottom_up_mergesort.18" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC bottom_up_mergesort.18.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -330,7 +330,7 @@
  <proof prover="11"><result status="valid" time="0.02" steps="47"/></proof>
  </goal>
  <goal name="VC natural_mergesort" expl="VC for natural_mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC natural_mergesort.0" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -394,7 +394,7 @@
   <goal name="VC natural_mergesort.20" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC natural_mergesort.20.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC natural_mergesort.20.0.0" expl="VC for natural_mergesort" proved="true">
     <proof prover="11"><result status="valid" time="0.01" steps="25"/></proof>
     </goal>
@@ -459,7 +459,7 @@
  </transf>
  </goal>
  <goal name="VC naturalrec" expl="VC for naturalrec" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC naturalrec.0" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>

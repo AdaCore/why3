@@ -8,7 +8,7 @@
 <file name="../patience.mlw" proved="true">
 <theory name="PigeonHole" proved="true" sum="86e3b92f09d5bc472aced844df2fe365">
  <goal name="VC pigeon_hole" expl="VC for pigeon_hole" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC pigeon_hole.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -85,7 +85,7 @@
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC play_game" expl="VC for play_game" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC play_game.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -173,7 +173,7 @@
  <proof prover="1"><result status="valid" time="0.04" steps="132"/></proof>
  </goal>
  <goal name="VC play_card" expl="VC for play_card" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC play_card.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
@@ -182,7 +182,7 @@
    <goal name="VC play_card.1.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC play_card.1.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC play_card.1.0.0.0" expl="VC for play_card" proved="true">
      <proof prover="1"><result status="valid" time="0.05" steps="48"/></proof>
      </goal>
@@ -272,7 +272,7 @@
    <goal name="VC play_card.7.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC play_card.7.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC play_card.7.0.0.0" expl="VC for play_card" proved="true">
      <proof prover="1"><result status="valid" time="0.04" steps="52"/></proof>
      </goal>

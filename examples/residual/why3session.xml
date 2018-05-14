@@ -10,7 +10,7 @@
 <file name="../residual.mlw" proved="true">
 <theory name="Residuals" proved="true">
  <goal name="VC accepts_epsilon" expl="VC for accepts_epsilon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC accepts_epsilon.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
@@ -24,7 +24,7 @@
   <proof prover="9"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
   <goal name="VC accepts_epsilon.4" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC accepts_epsilon.4.0" expl="VC for accepts_epsilon" proved="true">
    <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -64,7 +64,7 @@
  <proof prover="9"><result status="valid" time="0.01" steps="22"/></proof>
  </goal>
  <goal name="VC residual" expl="VC for residual" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC residual.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
@@ -84,9 +84,9 @@
   <proof prover="9"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
   <goal name="VC residual.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC residual.6.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC residual.6.0.0" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.03" steps="135"/></proof>
     </goal>
@@ -111,7 +111,7 @@
    </transf>
    </goal>
    <goal name="VC residual.6.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC residual.6.1.0" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="55"/></proof>
     </goal>
@@ -140,7 +140,7 @@
  </transf>
  </goal>
  <goal name="VC decide_mem" expl="VC for decide_mem" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC decide_mem.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
@@ -161,7 +161,7 @@
  <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC test_astar" expl="VC for test_astar" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>

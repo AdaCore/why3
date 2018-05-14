@@ -7,7 +7,7 @@
 <file name="../compiler.mlw" proved="true">
 <theory name="Compile_aexpr" proved="true">
  <goal name="VC compile_aexpr" expl="VC for compile_aexpr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC compile_aexpr.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="63"/></proof>
   </goal>
@@ -27,7 +27,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="75"/></proof>
   </goal>
   <goal name="VC compile_aexpr.6" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC compile_aexpr.6.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
     <goal name="VC compile_aexpr.6.0.0" expl="precondition" proved="true">
@@ -119,7 +119,7 @@
 </theory>
 <theory name="Compile_bexpr" proved="true">
  <goal name="VC compile_bexpr" expl="VC for compile_bexpr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC compile_bexpr.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="39"/></proof>
   </goal>
@@ -130,9 +130,9 @@
   <proof prover="0"><result status="valid" time="0.09" steps="82"/></proof>
   </goal>
   <goal name="VC compile_bexpr.3" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC compile_bexpr.3.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC compile_bexpr.3.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="VC compile_bexpr.3.0.0.0" expl="precondition" proved="true">
@@ -166,7 +166,7 @@
    </transf>
    </goal>
    <goal name="VC compile_bexpr.3.1" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC compile_bexpr.3.1.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="VC compile_bexpr.3.1.0.0" expl="precondition" proved="true">
@@ -215,7 +215,7 @@
    </transf>
    </goal>
    <goal name="VC compile_bexpr.3.3" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC compile_bexpr.3.3.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="VC compile_bexpr.3.3.0.0" expl="precondition" proved="true">
@@ -249,7 +249,7 @@
    </transf>
    </goal>
    <goal name="VC compile_bexpr.3.4" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC compile_bexpr.3.4.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="VC compile_bexpr.3.4.0.0" expl="precondition" proved="true">
@@ -283,7 +283,7 @@
    </transf>
    </goal>
    <goal name="VC compile_bexpr.3.5" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC compile_bexpr.3.5.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="VC compile_bexpr.3.5.0.0" expl="precondition" proved="true">
@@ -335,7 +335,7 @@
  <proof prover="0"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
  <goal name="loop_variant_acc" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="loop_variant_acc.0" proved="true">
   <proof prover="0"><result status="valid" time="0.12" steps="200"/></proof>
   </goal>
@@ -398,7 +398,7 @@
  </transf>
  </goal>
  <goal name="VC compile_com" expl="VC for compile_com" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC compile_com.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="43"/></proof>
   </goal>
@@ -415,7 +415,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="43"/></proof>
   </goal>
   <goal name="VC compile_com.5" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC compile_com.5.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
     <goal name="VC compile_com.5.0.0" expl="precondition" proved="true">
@@ -453,7 +453,7 @@
      <goal name="VC compile_com.5.2.0.0" expl="precondition" proved="true">
      <transf name="compute_specified" proved="true" >
       <goal name="VC compile_com.5.2.0.0.0" expl="precondition" proved="true">
-      <transf name="split_goal_wp" proved="true" >
+      <transf name="split_goal_right" proved="true" >
        <goal name="VC compile_com.5.2.0.0.0.0" expl="VC for compile_com" proved="true">
        <proof prover="0"><result status="valid" time="0.13" steps="26"/></proof>
        </goal>
@@ -505,7 +505,7 @@
      <goal name="VC compile_com.5.4.0.0" expl="precondition" proved="true">
      <transf name="compute_specified" proved="true" >
       <goal name="VC compile_com.5.4.0.0.0" expl="precondition" proved="true">
-      <transf name="split_goal_wp" proved="true" >
+      <transf name="split_goal_right" proved="true" >
        <goal name="VC compile_com.5.4.0.0.0.0" expl="VC for compile_com" proved="true">
        <proof prover="0"><result status="valid" time="0.10" steps="50"/></proof>
        </goal>
@@ -612,7 +612,7 @@
  </transf>
  </goal>
  <goal name="VC compile_com_natural" expl="VC for compile_com_natural" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC compile_com_natural.0" expl="assertion" proved="true">
   <transf name="compute_specified" proved="true" >
    <goal name="VC compile_com_natural.0.0" expl="assertion" proved="true">

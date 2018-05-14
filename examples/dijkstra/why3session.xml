@@ -13,7 +13,7 @@
 <file name="../dijkstra.mlw" proved="true">
 <theory name="DijkstraShortestPath" proved="true">
  <goal name="VC relax" expl="VC for relax" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC relax.0" expl="postcondition" proved="true">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -90,7 +90,7 @@
  </transf>
  </goal>
  <goal name="VC shortest_path_code" expl="VC for shortest_path_code" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC shortest_path_code.0" expl="loop invariant init" proved="true">
   <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="290"/></proof>
   </goal>
@@ -142,7 +142,7 @@
   <goal name="VC shortest_path_code.12" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="inv">
    <goal name="VC shortest_path_code.12.0" expl="VC for shortest_path_code" proved="true">
-   <transf name="split_intros_goal_wp" proved="true" >
+   <transf name="split_vc" proved="true" >
     <goal name="VC shortest_path_code.12.0.0" expl="VC for shortest_path_code" proved="true">
     <proof prover="7"><result status="valid" time="0.12"/></proof>
     </goal>

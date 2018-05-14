@@ -155,7 +155,7 @@
  <proof prover="6"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
  <goal name="VC compute_writes" expl="VC for compute_writes" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC compute_writes.0" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
@@ -172,7 +172,7 @@
   <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
   <goal name="VC compute_writes.5" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC compute_writes.5.0" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -196,7 +196,7 @@
  </transf>
  </goal>
  <goal name="VC wp" expl="VC for wp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC wp.0" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
@@ -213,7 +213,7 @@
   <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
   <goal name="VC wp.5" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC wp.5.0" expl="postcondition" proved="true">
    <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>

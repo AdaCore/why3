@@ -526,15 +526,12 @@ let prep_premise split = Trans.store (fun t ->
 
 let split_goal_full  = prep_goal full_proof
 let split_goal_right = prep_goal right_proof
-let split_goal_wp    = split_goal_right
 
 let split_all_full  = prep_all full_proof
 let split_all_right = prep_all right_proof
-let split_all_wp    = split_all_right
 
 let split_premise_full  = prep_premise full_proof
 let split_premise_right = prep_premise right_proof
-let split_premise_wp    = split_premise_right
 
 let () = Trans.register_transform_l "split_goal_full" split_goal_full
   ~desc:"Put@ the@ goal@ in@ a@ conjunctive@ form,@ \
@@ -553,10 +550,3 @@ let () = Trans.register_transform_l "split_all_right" split_all_right
   ~desc:"Same@ as@ split_goal_right,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_right" split_premise_right
   ~desc:"Same@ as@ split_all_right,@ but@ split@ only@ premises."
-
-let () = Trans.register_transform_l "split_goal_wp" split_goal_wp
-  ~desc:"Same@ as@ split_goal_right."
-let () = Trans.register_transform_l "split_all_wp" split_all_wp
-  ~desc:"Same@ as@ split_goal_wp,@ but@ also@ split@ premises."
-let () = Trans.register_transform "split_premise_wp" split_premise_wp
-  ~desc:"Same@ as@ split_all_wp,@ but@ split@ only@ premises."

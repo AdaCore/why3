@@ -7,7 +7,7 @@
 <file name="../specs.mlw" proved="true">
 <theory name="VM_instr_spec" proved="true">
  <goal name="VC ifunf" expl="VC for ifunf" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ifunf.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.25"/></proof>
   </goal>
@@ -23,7 +23,7 @@
  </transf>
  </goal>
  <goal name="VC iconstf" expl="VC for iconstf" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC iconstf.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.32"/></proof>
   </goal>
@@ -42,7 +42,7 @@
  </transf>
  </goal>
  <goal name="VC ivarf" expl="VC for ivarf" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ivarf.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.66"/></proof>
   </goal>
@@ -61,7 +61,7 @@
  </transf>
  </goal>
  <goal name="VC create_binop" expl="VC for create_binop" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC create_binop.0" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
    <goal name="VC create_binop.0.0" expl="precondition" proved="true">
@@ -109,7 +109,7 @@
  <proof prover="0"><result status="valid" time="0.07" steps="50"/></proof>
  </goal>
  <goal name="VC inil" expl="VC for inil" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC inil.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
@@ -120,7 +120,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="VC inil.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC inil.3.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
    </goal>
@@ -129,7 +129,7 @@
  </transf>
  </goal>
  <goal name="VC ibranchf" expl="VC for ibranchf" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ibranchf.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="3.38"/></proof>
   </goal>

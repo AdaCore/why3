@@ -47,7 +47,7 @@
  </transf>
  </goal>
  <goal name="VC path_unique" expl="VC for path_unique">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC path_unique.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
@@ -80,7 +80,7 @@
  </transf>
  </goal>
  <goal name="VC path_last" expl="VC for path_last">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC path_last.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -116,7 +116,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="120"/></proof>
  </goal>
  <goal name="VC path_dist" expl="VC for path_dist">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC path_dist.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
@@ -147,7 +147,7 @@
  </transf>
  </goal>
  <goal name="VC path_compression" expl="VC for path_compression">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC path_compression.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
@@ -175,7 +175,7 @@
  </transf>
  </goal>
  <goal name="VC find" expl="VC for find" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC find.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
@@ -183,7 +183,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="VC find.3" expl="variant decrease">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC find.3.1" expl="VC for find">
    <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
    </goal>
@@ -202,7 +202,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
   <goal name="VC find.7" expl="type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <transf name="split_goal_right" expanded="true">
    <goal name="VC find.7.1" expl="VC for find">
    <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
    </goal>
@@ -236,7 +236,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="64"/></proof>
   </goal>
   <goal name="VC find.10" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC find.10.1" expl="postcondition">
    <proof prover="4"><result status="valid" time="0.00"/></proof>
    </goal>
@@ -248,7 +248,7 @@
  </transf>
  </goal>
  <goal name="VC union" expl="VC for union" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC union.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
@@ -271,7 +271,7 @@
   <proof prover="3" obsolete="true"><result status="unknown" time="0.14"/></proof>
   <proof prover="4" obsolete="true"><undone/></proof>
   <proof prover="5" obsolete="true"><result status="timeout" time="5.00"/></proof>
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC union.6.1" expl="assertion">
    <proof prover="0"><result status="timeout" time="4.99"/></proof>
    <proof prover="1" obsolete="true"><result status="unknown" time="10.07"/></proof>
@@ -308,7 +308,7 @@
   <proof prover="0"><result status="valid" time="0.69" steps="609"/></proof>
   </goal>
   <goal name="VC union.14" expl="type invariant">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC union.14.1" expl="VC for union">
    <proof prover="0"><result status="valid" time="0.01" steps="49"/></proof>
    </goal>
@@ -350,7 +350,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
   <goal name="VC union.18" expl="type invariant">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC union.18.1" expl="VC for union">
    <proof prover="0"><result status="valid" time="0.01" steps="48"/></proof>
    </goal>
@@ -405,7 +405,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="Intf.VC union" expl="VC for union">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC union.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>

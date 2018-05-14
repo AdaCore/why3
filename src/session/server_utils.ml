@@ -53,59 +53,6 @@ let get_session_dir ~allow_mkdir files =
   dir
 
 
-
-
-(******************************)
-(* Creation of the controller *)
-(******************************)
-
-(* [cont_from_session]: returns an option to a boolean which returns None in
-   case of failure, true if nothing is left to do and false if sessions was
-   loaded but [f] should still be added to the session as a file. *)
-(*
-let cont_from_session ~notify cont f : bool option =
-  (* If a file is given, find the corresponding directory *)
-  let dir = try (Filename.chop_extension f) with
-  | Invalid_argument _ -> f in
-  (* create project directory if needed *)
-  if Sys.file_exists dir then
-    begin
-      (* Case of user giving a file that gets chopped to an other file *)
-      if not (Sys.is_directory dir) then
-        begin
-          Format.eprintf "Not a directory: %s@." dir;
-          exit 1
-        end
-    end
-  else
-    begin
-      Format.dprintf debug "'%s' does not exist. \
-               Creating directory of that name for the Why3 session@." dir;
-      Unix.mkdir dir 0o777
-    end;
-  (* we load the session *)
-  let ses,use_shapes = load_session dir in
-  Format.dprintf debug "using shapes: %b@." use_shapes;
-  (* temporary, this should not be donne like this ! *)
-  Controller_itp.set_session cont ses;
-  (* update the session *)
-  try (Controller_itp.reload_files cont ~use_shapes;
-    (* Check if the initial file given was a file or not. If it was, we return
-       that it should be added to the session.  *)
-    if Sys.file_exists f && not (Sys.is_directory f) then
-      Some false
-    else
-      Some true) with
-  | e ->
-    begin
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      notify (Message (Parse_Or_Type_Error s));
-      None
-    end
-*)
-
-
-
 (******************)
 (* Simple queries *)
 (******************)
@@ -294,30 +241,38 @@ let set_session_timelimit n = session_timelimit := n
 let set_session_memlimit n = session_memlimit := n
 
 
+type command_prover =
+  | Bad_Arguments of Whyconf.prover
+  | Not_Prover
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
-let parse_prover_name config name args :
-  (Whyconf.config_prover * Call_provers.resource_limit) option =
+let parse_prover_name config name args : command_prover =
   match (return_prover name config) with
-  | None -> None
+  | None -> Not_Prover
   | Some prover_config ->
     begin
-      if (List.length args > 2) then None else
-      match args with
-      | [] ->
-        let default_limit = Call_provers.{empty_limit with
-                                          limit_time = !session_timelimit;
-                                          limit_mem = !session_memlimit} in
-          Some (prover_config, default_limit)
-      | [timeout] -> Some (prover_config,
-                           Call_provers.{empty_limit with
-                                          limit_time = int_of_string timeout;
-                                          limit_mem = !session_memlimit})
-      | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom})
-      | _ -> None
+      let prover = prover_config.Whyconf.prover in
+      try
+        if (List.length args > 2) then Bad_Arguments prover else
+        match args with
+        | [] ->
+            let default_limit = Call_provers.{empty_limit with
+                                              limit_time = !session_timelimit;
+                                              limit_mem = !session_memlimit} in
+            Prover (prover_config, default_limit)
+        | [timeout] -> Prover (prover_config,
+                               Call_provers.{empty_limit with
+                                             limit_time = int_of_string timeout;
+                                             limit_mem = !session_memlimit})
+        | [timeout; oom ] ->
+            Prover (prover_config, Call_provers.{empty_limit with
+                                                 limit_time = int_of_string timeout;
+                                                 limit_mem = int_of_string oom})
+        | _ -> Bad_Arguments prover
+      with
+      | Failure _ -> Bad_Arguments prover
     end
 
 (*******************************)
@@ -438,12 +393,14 @@ let interp commands_table cont id s =
        with
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
-          | Some (prover_config, limit) ->
+          | Prover (prover_config, limit) ->
              if prover_config.Whyconf.interactive then
                Edit prover_config.Whyconf.prover
              else
                Prove (prover_config, limit)
-          | None ->
+          | Bad_Arguments prover ->
+              QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
+          | Not_Prover ->
              if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
                Strategies cmd
              else

@@ -52,6 +52,7 @@ val par : task trans list -> task tlist
 (** {2 Iterating transformations} *)
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
+val fold_decl : (decl -> 'a -> 'a     ) -> 'a -> 'a trans
 
 val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
 val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist

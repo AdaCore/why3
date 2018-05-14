@@ -10,7 +10,7 @@
 <file name="../vstte12_tree_reconstruction.mlw" proved="true">
 <theory name="Tree" proved="true">
  <goal name="VC depths" expl="VC for depths" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
  <goal name="depths_head" proved="true">
@@ -42,7 +42,7 @@
 </theory>
 <theory name="TreeReconstruction" proved="true">
  <goal name="VC build_rec" expl="VC for build_rec" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC build_rec.0" expl="exceptional postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
@@ -75,7 +75,7 @@
 </theory>
 <theory name="Harness" proved="true">
  <goal name="VC harness" expl="VC for harness" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC harness.0" expl="postcondition" proved="true">
   <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness_1.v"><result status="valid" time="0.33"/></proof>
   </goal>
@@ -111,7 +111,7 @@
  <proof prover="8"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC tc" expl="VC for tc" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC tc.0" expl="exceptional postcondition" proved="true">
   <proof prover="4" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>

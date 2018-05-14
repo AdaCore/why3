@@ -7,7 +7,7 @@
 <file name="../verifythis_2018_le_rouge_et_le_noir_2.mlw" proved="true">
 <theory name="Top" proved="true">
  <goal name="VC bij_preserve" expl="VC for bij_preserve" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC bij_preserve.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
@@ -41,7 +41,7 @@
  <proof prover="0"><result status="valid" time="0.00" steps="17"/></proof>
  </goal>
  <goal name="VC main" expl="VC for main" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC main.0" expl="array creation size" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
@@ -73,7 +73,7 @@
   <proof prover="0" timelimit="5"><result status="valid" time="2.01" steps="4248"/></proof>
   </goal>
   <goal name="VC main.10" expl="loop invariant init" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main.10.0" expl="loop invariant init" proved="true">
    <proof prover="0" timelimit="5"><result status="valid" time="3.53" steps="5327"/></proof>
    </goal>
@@ -83,7 +83,7 @@
   </transf>
   </goal>
   <goal name="VC main.11" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main.11.0" expl="VC for main" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
@@ -135,7 +135,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="240"/></proof>
   </goal>
   <goal name="VC main.17" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main.17.0" expl="VC for main" proved="true">
    <proof prover="0"><result status="valid" time="0.42" steps="406"/></proof>
    </goal>
@@ -150,7 +150,7 @@
     <goal name="VC main.17.3.0" expl="VC for main" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC main.17.3.0.0" expl="VC for main" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="VC main.17.3.0.0.0" expl="VC for main" proved="true">
       <proof prover="0" timelimit="5"><result status="valid" time="1.32" steps="1358"/></proof>
       </goal>
@@ -253,7 +253,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
   <goal name="VC main.28" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main.28.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.25" steps="538"/></proof>
    </goal>
@@ -299,7 +299,7 @@
   </transf>
   </goal>
   <goal name="VC main.29" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main.29.0" expl="VC for main" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="134"/></proof>
    </goal>

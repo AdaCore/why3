@@ -10,7 +10,7 @@
 <file name="../compiler.mlw">
 <theory name="Compile_aexpr">
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compile_aexpr.1" expl="1. precondition">
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
@@ -22,7 +22,7 @@
    <goal name="WP_parameter compile_aexpr.3.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.3.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_aexpr.3.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.07"/></proof>
      </goal>
@@ -61,7 +61,7 @@
    <goal name="WP_parameter compile_aexpr.8.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.8.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_aexpr.8.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.06"/></proof>
      </goal>
@@ -118,7 +118,7 @@
    <goal name="WP_parameter compile_aexpr.19.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.19.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_aexpr.19.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.12"/></proof>
      </goal>
@@ -181,7 +181,7 @@
    <goal name="WP_parameter compile_aexpr.30.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.30.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_aexpr.30.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.14"/></proof>
      </goal>
@@ -244,7 +244,7 @@
    <goal name="WP_parameter compile_aexpr.41.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.41.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_aexpr.41.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.21"/></proof>
      </goal>
@@ -283,7 +283,7 @@
 </theory>
 <theory name="Compile_bexpr">
  <goal name="WP_parameter compile_bexpr" expl="VC for compile_bexpr">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compile_bexpr.1" expl="1. precondition">
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -295,7 +295,7 @@
    <goal name="WP_parameter compile_bexpr.3.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.3.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.3.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.07"/></proof>
      </goal>
@@ -337,7 +337,7 @@
    <goal name="WP_parameter compile_bexpr.8.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.8.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.8.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.07"/></proof>
      </goal>
@@ -379,7 +379,7 @@
    <goal name="WP_parameter compile_bexpr.13.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.13.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.13.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.07"/></proof>
      </goal>
@@ -421,7 +421,7 @@
    <goal name="WP_parameter compile_bexpr.18.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.18.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.18.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.07"/></proof>
      </goal>
@@ -466,7 +466,7 @@
    <goal name="WP_parameter compile_bexpr.24.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.24.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.24.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.09"/></proof>
      </goal>
@@ -523,7 +523,7 @@
    <goal name="WP_parameter compile_bexpr.34.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.34.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.34.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.19"/></proof>
      </goal>
@@ -595,7 +595,7 @@
    <goal name="WP_parameter compile_bexpr.43.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.43.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.43.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.23"/></proof>
      </goal>
@@ -655,7 +655,7 @@
    <goal name="WP_parameter compile_bexpr.52.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.52.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.52.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.12"/></proof>
      </goal>
@@ -715,7 +715,7 @@
    <goal name="WP_parameter compile_bexpr.61.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.61.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.61.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.11"/></proof>
      </goal>
@@ -775,7 +775,7 @@
    <goal name="WP_parameter compile_bexpr.70.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_bexpr.70.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_bexpr.70.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.16"/></proof>
      </goal>
@@ -817,7 +817,7 @@
 </theory>
 <theory name="Compile_com">
  <goal name="WP_parameter compile_com" expl="VC for compile_com">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compile_com.1" expl="1. precondition">
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -829,7 +829,7 @@
    <goal name="WP_parameter compile_com.3.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.3.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.3.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.10"/></proof>
      </goal>
@@ -874,7 +874,7 @@
    <goal name="WP_parameter compile_com.10.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.10.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.10.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.14"/></proof>
      </goal>
@@ -928,7 +928,7 @@
    <goal name="WP_parameter compile_com.19.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.19.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.19.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.14"/></proof>
      </goal>
@@ -1000,7 +1000,7 @@
    <goal name="WP_parameter compile_com.34.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.34.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.34.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.38"/></proof>
      </goal>
@@ -1105,7 +1105,7 @@
    <goal name="WP_parameter compile_com.45.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.45.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.45.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.26"/></proof>
      </goal>
@@ -1153,7 +1153,7 @@
    <goal name="WP_parameter compile_com.53.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_com.53.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter compile_com.53.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.36"/></proof>
      </goal>
@@ -1196,9 +1196,9 @@
  </transf>
  </goal>
  <goal name="WP_parameter compile_program" expl="VC for compile_program">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compile_program.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter compile_program.1.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
@@ -1215,7 +1215,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_program.2" expl="2. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter compile_program.2.1" expl="1. assertion">
    <proof prover="4"><result status="valid" time="0.08"/></proof>
    </goal>

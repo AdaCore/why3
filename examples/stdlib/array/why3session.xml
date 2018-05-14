@@ -75,7 +75,7 @@
  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
  <goal name="VC to_seq_length" expl="VC for to_seq_length" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC to_seq_length.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
@@ -88,7 +88,7 @@
  </transf>
  </goal>
  <goal name="VC to_seq_nth" expl="VC for to_seq_nth" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC to_seq_nth.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -106,7 +106,7 @@
 </theory>
 <theory name="Inversions" proved="true">
  <goal name="VC exchange_inversion" expl="VC for exchange_inversion" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC exchange_inversion.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
@@ -114,7 +114,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC exchange_inversion.2" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC exchange_inversion.2.0" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -150,7 +150,7 @@
   </transf>
   </goal>
   <goal name="VC exchange_inversion.4" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC exchange_inversion.4.0" expl="VC for exchange_inversion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC exchange_inversion.4.0.0" expl="VC for exchange_inversion" proved="true">
@@ -164,7 +164,7 @@
   </transf>
   </goal>
   <goal name="VC exchange_inversion.5" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC exchange_inversion.5.0" expl="VC for exchange_inversion" proved="true">
    <proof prover="2"><result status="valid" time="0.06" steps="154"/></proof>
    </goal>

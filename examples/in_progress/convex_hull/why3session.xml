@@ -39,7 +39,7 @@
 </theory>
 <theory name="Jarvis">
  <goal name="WP_parameter lowest_pt" expl="VC for lowest_pt">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter lowest_pt.0" expl="loop invariant init">
   <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -76,7 +76,7 @@
   <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter lowest_pt.9" expl="postcondition">
-  <transf name="split_goal_wp" >
+  <transf name="split_goal_right" >
    <goal name="WP_parameter lowest_pt.9.0" expl="postcondition">
    <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
    <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>

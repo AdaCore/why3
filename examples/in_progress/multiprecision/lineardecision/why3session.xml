@@ -12,7 +12,7 @@
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC cone" expl="VC for cone" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
  <goal name="neg_mul" proved="true">
@@ -39,7 +39,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC expr_bound_w" expl="VC for expr_bound_w" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC expr_bound_w.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -67,7 +67,7 @@
  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
  </goal>
  <goal name="VC ctx_bound_w" expl="VC for ctx_bound_w" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ctx_bound_w.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -83,7 +83,7 @@
  </transf>
  </goal>
  <goal name="VC apply_r" expl="VC for apply_r" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC apply_r.0" expl="array creation size" proved="true">
   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
@@ -120,7 +120,7 @@
  </transf>
  </goal>
  <goal name="VC apply_l" expl="VC for apply_l" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC apply_l.0" expl="array creation size" proved="true">
   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
@@ -157,7 +157,7 @@
  </transf>
  </goal>
  <goal name="VC sprod" expl="VC for sprod" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC sprod.0" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -176,7 +176,7 @@
  </transf>
  </goal>
  <goal name="VC m_append" expl="VC for m_append" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC m_append.0" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -252,7 +252,7 @@
  </transf>
  </goal>
  <goal name="VC v_append" expl="VC for v_append" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC v_append.0" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -295,7 +295,7 @@
  </transf>
  </goal>
  <goal name="VC infix ==" expl="VC for infix ==" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC infix ==.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -335,9 +335,9 @@
  <proof prover="0"><result status="valid" time="0.04" steps="258"/></proof>
  </goal>
  <goal name="VC opp_expr" expl="VC for opp_expr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC opp_expr.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC opp_expr.0.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
@@ -367,7 +367,7 @@
   <proof prover="2"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="VC opp_expr.4" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC opp_expr.4.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
@@ -386,7 +386,7 @@
   </transf>
   </goal>
   <goal name="VC opp_expr.5" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC opp_expr.5.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
@@ -411,7 +411,7 @@
  </transf>
  </goal>
  <goal name="VC norm_eq_aux" expl="VC for norm_eq_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC norm_eq_aux.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
@@ -448,7 +448,7 @@
  </transf>
  </goal>
  <goal name="VC norm_eq" expl="VC for norm_eq" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC norm_eq.0" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="55"/></proof>
   </goal>
@@ -456,7 +456,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC norm_eq.2" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC norm_eq.2.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="64"/></proof>
    </goal>
@@ -478,7 +478,7 @@
   </transf>
   </goal>
   <goal name="VC norm_eq.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC norm_eq.3.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
@@ -496,7 +496,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_impl" expl="VC for interp_ctx_impl" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_impl.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -509,7 +509,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_valid" expl="VC for interp_ctx_valid" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_valid.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -525,7 +525,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="139"/></proof>
  </goal>
  <goal name="VC mul_expr" expl="VC for mul_expr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul_expr.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
@@ -571,7 +571,7 @@
  </transf>
  </goal>
  <goal name="VC add_expr" expl="VC for add_expr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add_expr.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.29"/></proof>
   </goal>
@@ -582,7 +582,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC add_expr.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add_expr.3.0" expl="postcondition" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC add_expr.3.0.0" expl="postcondition" proved="true">
@@ -596,7 +596,7 @@
   </transf>
   </goal>
   <goal name="VC add_expr.4" expl="postcondition" proved="true">
-  <transf name="split_intros_goal_wp" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="VC add_expr.4.0" expl="VC for add_expr" proved="true">
    <proof prover="3"><result status="valid" time="0.39"/></proof>
    </goal>
@@ -615,9 +615,9 @@
   <proof prover="0"><result status="valid" time="0.01" steps="69"/></proof>
   </goal>
   <goal name="VC add_expr.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add_expr.8.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_expr.8.0.0" expl="postcondition" proved="true">
     <proof prover="0"><result status="valid" time="0.02" steps="63"/></proof>
     </goal>
@@ -660,7 +660,7 @@
    <goal name="VC add_expr.17.0" expl="postcondition" proved="true">
    <transf name="revert" proved="true" arg1="H">
     <goal name="VC add_expr.17.0.0" expl="postcondition" proved="true">
-    <transf name="split_intros_goal_wp" proved="true" >
+    <transf name="split_vc" proved="true" >
      <goal name="VC add_expr.17.0.0.0" expl="postcondition" proved="true">
      <proof prover="3"><result status="valid" time="0.56"/></proof>
      </goal>
@@ -766,7 +766,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
  </goal>
  <goal name="VC add_eq" expl="VC for add_eq" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add_eq.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -788,7 +788,7 @@
  </transf>
  </goal>
  <goal name="VC zero_expr" expl="VC for zero_expr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC zero_expr.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -796,7 +796,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zero_expr.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC zero_expr.2.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
@@ -809,7 +809,7 @@
   </transf>
   </goal>
   <goal name="VC zero_expr.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC zero_expr.3.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -821,9 +821,9 @@
  </transf>
  </goal>
  <goal name="VC sub_expr" expl="VC for sub_expr" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC sub_expr.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC sub_expr.0.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -853,7 +853,7 @@
  </transf>
  </goal>
  <goal name="VC same_eq" expl="VC for same_eq" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC same_eq.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
@@ -867,7 +867,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC same_eq.4" expl="exceptional postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
   </transf>
   </goal>
   <goal name="VC same_eq.5" expl="exceptional postcondition" proved="true">
@@ -879,7 +879,7 @@
  </transf>
  </goal>
  <goal name="VC norm_context" expl="VC for norm_context" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC norm_context.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -901,7 +901,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
  </goal>
  <goal name="VC check_combination" expl="VC for check_combination" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC check_combination.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -924,7 +924,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC check_combination.7" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC check_combination.7.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
    </goal>
@@ -996,7 +996,7 @@
  <proof prover="0"><result status="valid" time="0.14" steps="843"/></proof>
  </goal>
  <goal name="VC gauss_jordan" expl="VC for gauss_jordan" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC gauss_jordan.0" expl="index in array bounds" proved="true">
   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -1088,7 +1088,7 @@
   <goal name="VC gauss_jordan.27" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC gauss_jordan.27.0" expl="assertion" proved="true">
-   <transf name="split_intros_goal_wp" proved="true" >
+   <transf name="split_vc" proved="true" >
     <goal name="VC gauss_jordan.27.0.0" expl="VC for gauss_jordan" proved="true">
     <proof prover="0"><result status="valid" time="0.04" steps="51"/></proof>
     </goal>
@@ -1104,7 +1104,7 @@
     <goal name="VC gauss_jordan.27.0.4" expl="VC for gauss_jordan" proved="true">
     <transf name="revert" proved="true" arg1="H">
      <goal name="VC gauss_jordan.27.0.4.0" expl="VC for gauss_jordan" proved="true">
-     <transf name="split_intros_goal_wp" proved="true" >
+     <transf name="split_vc" proved="true" >
       <goal name="VC gauss_jordan.27.0.4.0.0" expl="VC for gauss_jordan" proved="true">
       <proof prover="2"><result status="valid" time="0.04"/></proof>
       </goal>
@@ -1154,7 +1154,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC gauss_jordan.37" expl="assertion" proved="true">
-  <transf name="split_intros_goal_wp" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="VC gauss_jordan.37.0" expl="VC for gauss_jordan" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
    </goal>
@@ -1170,7 +1170,7 @@
    <goal name="VC gauss_jordan.37.4" expl="VC for gauss_jordan" proved="true">
    <transf name="revert" proved="true" arg1="H">
     <goal name="VC gauss_jordan.37.4.0" expl="VC for gauss_jordan" proved="true">
-    <transf name="split_intros_goal_wp" proved="true" >
+    <transf name="split_vc" proved="true" >
      <goal name="VC gauss_jordan.37.4.0.0" expl="VC for gauss_jordan" proved="true">
      <proof prover="2"><result status="valid" time="0.04"/></proof>
      </goal>
@@ -1207,7 +1207,7 @@
   </goal>
   <goal name="VC gauss_jordan.45" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <transf name="split_intros_goal_wp" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="VC gauss_jordan.45.0" expl="VC for gauss_jordan" proved="true">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -1268,7 +1268,7 @@
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="VC linear_decision" expl="VC for linear_decision" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC linear_decision.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -1602,7 +1602,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC simp" expl="VC for simp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC simp.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
@@ -1731,9 +1731,9 @@
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="VC cross_d" expl="VC for cross_d" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC cross_d.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC cross_d.0.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.56"/></proof>
    </goal>
@@ -1759,7 +1759,7 @@
  </transf>
  </goal>
  <goal name="VC cross_ind" expl="VC for cross_ind" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC cross_ind.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -1767,7 +1767,7 @@
   <proof prover="3" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC cross_ind.2" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC cross_ind.2.0" expl="VC for cross_ind" proved="true">
    <proof prover="3" timelimit="10"><result status="valid" time="2.47"/></proof>
    </goal>
@@ -1795,7 +1795,7 @@
  </goal>
  <goal name="VC gcd" expl="VC for gcd" proved="true">
  <proof prover="1"><result status="valid" time="0.30"/></proof>
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC gcd.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -1835,7 +1835,7 @@
  </transf>
  </goal>
  <goal name="VC simp" expl="VC for simp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC simp.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -1852,7 +1852,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC simp.5" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC simp.5.0" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -1867,12 +1867,12 @@
  </transf>
  </goal>
  <goal name="VC radd" expl="VC for radd" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC radd.0" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC radd.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC radd.1.0" expl="assertion" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="VC radd.1.0.0" expl="assertion" proved="true">
@@ -1937,12 +1937,12 @@
  </transf>
  </goal>
  <goal name="VC rmul" expl="VC for rmul" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC rmul.0" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC rmul.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC rmul.1.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
    </goal>
@@ -1973,7 +1973,7 @@
  </transf>
  </goal>
  <goal name="VC req" expl="VC for req" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC req.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -1986,7 +1986,7 @@
  </transf>
  </goal>
  <goal name="VC rinv" expl="VC for rinv" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC rinv.0" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -2007,9 +2007,9 @@
  </transf>
  </goal>
  <goal name="VC is_zero" expl="VC for is_zero" proved="true">
- <transf name="split_intros_goal_wp" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="VC is_zero.0" expl="postcondition" proved="true">
-  <transf name="split_intros_goal_wp" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="VC is_zero.0.0" expl="VC for is_zero" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC is_zero.0.0.0" expl="VC for is_zero" proved="true">
@@ -2280,7 +2280,7 @@
  <proof prover="0"><result status="valid" time="0.05" steps="182"/></proof>
  </goal>
  <goal name="VC add_sub_exp" expl="VC for add_sub_exp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add_sub_exp.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
@@ -2360,9 +2360,9 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC add_sub_exp.26" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC add_sub_exp.26.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_sub_exp.26.0.0" expl="postcondition" proved="true">
     <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
     </goal>
@@ -2375,7 +2375,7 @@
    </transf>
    </goal>
    <goal name="VC add_sub_exp.26.1" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_sub_exp.26.1.0" expl="postcondition" proved="true">
     <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
     </goal>
@@ -2518,9 +2518,9 @@
   <goal name="VC add_sub_exp.69" expl="postcondition" proved="true">
   <transf name="eliminate_if" proved="true" >
    <goal name="VC add_sub_exp.69.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC add_sub_exp.69.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC add_sub_exp.69.0.0.0" expl="postcondition" proved="true">
      <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
      </goal>
@@ -2533,7 +2533,7 @@
     </transf>
     </goal>
     <goal name="VC add_sub_exp.69.0.1" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="VC add_sub_exp.69.0.1.0" expl="postcondition" proved="true">
      <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
      </goal>
@@ -2628,7 +2628,7 @@
  </goal>
  <goal name="VC add_exp" expl="VC for add_exp" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add_exp.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
@@ -2638,7 +2638,7 @@
  </transf>
  </goal>
  <goal name="VC zero_exp" expl="VC for zero_exp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC zero_exp.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -2666,7 +2666,7 @@
  </transf>
  </goal>
  <goal name="VC same_exp" expl="VC for same_exp" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC same_exp.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
@@ -2721,7 +2721,7 @@
  </transf>
  </goal>
  <goal name="VC madd" expl="VC for madd" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC madd.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.64" steps="161"/></proof>
   </goal>
@@ -2729,7 +2729,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC madd.2" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC madd.2.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -2766,12 +2766,12 @@
  </transf>
  </goal>
  <goal name="VC mmul" expl="VC for mmul" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mmul.0" expl="postcondition" proved="true">
   <proof prover="3" timelimit="10"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC mmul.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC mmul.1.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -2817,7 +2817,7 @@
  <proof prover="0"><result status="valid" time="0.24" steps="756"/></proof>
  </goal>
  <goal name="VC meq" expl="VC for meq" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC meq.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.67" steps="226"/></proof>
   </goal>
@@ -2835,7 +2835,7 @@
  </transf>
  </goal>
  <goal name="VC minv" expl="VC for minv" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC minv.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -3024,9 +3024,9 @@
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC m" expl="VC for m" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC m.0" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC m.0.0" expl="postcondition" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="VC m.0.0.0" expl="postcondition" proved="true">
@@ -3037,7 +3037,7 @@
   </transf>
   </goal>
   <goal name="VC m.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC m.1.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.12" steps="116"/></proof>
    </goal>
@@ -3052,7 +3052,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC m_cprod" expl="VC for m_cprod" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC m_cprod.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="61"/></proof>
   </goal>
@@ -3077,7 +3077,7 @@
 </theory>
 <theory name="EqPropMP" proved="true">
  <goal name="VC expr_bound&#39;" expl="VC for expr_bound'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC expr_bound&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.36"/></proof>
   </goal>
@@ -3099,15 +3099,15 @@
  </transf>
  </goal>
  <goal name="VC eq_bound&#39;" expl="VC for eq_bound'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
  <goal name="VC ctx_bound&#39;" expl="VC for ctx_bound'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
  <goal name="VC expr_bound_w&#39;" expl="VC for expr_bound_w'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC expr_bound_w&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.33"/></proof>
   </goal>
@@ -3171,7 +3171,7 @@
  <proof prover="0"><result status="valid" time="0.09" steps="109"/></proof>
  </goal>
  <goal name="VC ctx_bound_w&#39;" expl="VC for ctx_bound_w'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ctx_bound_w&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.24"/></proof>
   </goal>
@@ -3187,7 +3187,7 @@
  </transf>
  </goal>
  <goal name="VC max_var&#39;" expl="VC for max_var'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC max_var&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.51"/></proof>
   </goal>
@@ -3233,7 +3233,7 @@
  </transf>
  </goal>
  <goal name="VC max_var_e&#39;" expl="VC for max_var_e'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC max_var_e&#39;.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14"/></proof>
   </goal>
@@ -3249,7 +3249,7 @@
  </transf>
  </goal>
  <goal name="VC max_var_ctx&#39;" expl="VC for max_var_ctx'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC max_var_ctx&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
   </goal>
@@ -3268,7 +3268,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_valid&#39;" expl="VC for interp_ctx_valid'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_valid&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.22"/></proof>
   </goal>
@@ -3278,7 +3278,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_wr&#39;" expl="VC for interp_ctx_wr'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_wr&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
@@ -3288,7 +3288,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_wl&#39;" expl="VC for interp_ctx_wl'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_wl&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.25"/></proof>
   </goal>
@@ -3306,14 +3306,14 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_cons&#39;" expl="VC for interp_ctx_cons'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_cons&#39;.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.18"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC holds_interp_ctx&#39;" expl="VC for holds_interp_ctx'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC holds_interp_ctx&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
@@ -3326,7 +3326,7 @@
  </transf>
  </goal>
  <goal name="VC interp_holds&#39;" expl="VC for interp_holds'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_holds&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.21"/></proof>
   </goal>
@@ -3342,7 +3342,7 @@
  </transf>
  </goal>
  <goal name="VC impl_holds&#39;" expl="VC for impl_holds'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC impl_holds&#39;.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="73"/></proof>
   </goal>
@@ -3367,7 +3367,7 @@
  </transf>
  </goal>
  <goal name="VC ctx_impl&#39;" expl="VC for ctx_impl'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ctx_impl&#39;.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
@@ -3392,7 +3392,7 @@
  </transf>
  </goal>
  <goal name="VC interp_ctx_impl&#39;" expl="VC for interp_ctx_impl'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC interp_ctx_impl&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.20"/></proof>
   </goal>
@@ -3405,14 +3405,14 @@
  </transf>
  </goal>
  <goal name="VC impl_cons" expl="VC for impl_cons" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC impl_cons.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC impl_wl&#39;" expl="VC for impl_wl'" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC impl_wl&#39;.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.19"/></proof>
   </goal>
@@ -3425,7 +3425,7 @@
  </transf>
  </goal>
  <goal name="VC impl_self" expl="VC for impl_self" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC impl_self.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
   </goal>
@@ -3438,7 +3438,7 @@
  </transf>
  </goal>
  <goal name="VC prop_ctx" expl="VC for prop_ctx" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC prop_ctx.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
@@ -3539,7 +3539,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC prop_ctx.33" expl="variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC prop_ctx.33.0" expl="VC for prop_ctx" proved="true">
    <proof prover="2"><result status="valid" time="0.30"/></proof>
    </goal>
@@ -3672,7 +3672,7 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC prop_ctx.75" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC prop_ctx.75.0" expl="VC for prop_ctx" proved="true">
    <proof prover="0"><result status="valid" time="0.07" steps="89"/></proof>
    </goal>
@@ -4124,7 +4124,7 @@
  </transf>
  </goal>
  <goal name="VC prop_mp_decision" expl="VC for prop_mp_decision" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC prop_mp_decision.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>

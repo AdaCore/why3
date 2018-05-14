@@ -54,7 +54,7 @@
  <goal name="min_dist_equal" proved="true">
  <transf name="inline_goal" proved="true" >
   <goal name="min_dist_equal.0" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="min_dist_equal.0.0" proved="true">
    <proof prover="11"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -84,7 +84,7 @@
  <goal name="min_dist_eps" proved="true">
  <transf name="inline_goal" proved="true" >
   <goal name="min_dist_eps.0" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="min_dist_eps.0.0" proved="true">
    <proof prover="11"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -111,7 +111,7 @@
  <goal name="min_dist_eps_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="min_dist_eps_length.0" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="min_dist_eps_length.0.0" proved="true">
    <proof prover="11"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -128,7 +128,7 @@
  <proof prover="2" timelimit="5" memlimit="1000" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="0.26"/></proof>
  </goal>
  <goal name="VC distance" expl="VC for distance" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC distance.0" expl="array creation size" proved="true">
   <proof prover="11"><result status="valid" time="0.03"/></proof>
   </goal>
