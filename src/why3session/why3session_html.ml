@@ -159,7 +159,7 @@ let rec num_lines s acc tr =
     fprintf fmt "</tr>@\n";
     let nl = num_lines s 0 tr in
     if nl > 0 then begin
-      fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" nl;
+      fprintf fmt "<tr><td rowspan=\"%d\" style=\"width:1ex\"></td>" nl;
     let (_:bool) = List.fold_left
       (fun needs_tr g ->
         print_goal fmt s needs_tr (depth+1) max_depth provers g;
@@ -202,7 +202,7 @@ let rec num_lines s acc tr =
     else fprintf fmt "not fully verified";
     fprintf fmt "</span></h2>@\n";
 
-    fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
+    fprintf fmt "<table border=\"1\" style=\"border-collapse:collapse\"><tr><td colspan=\"%d\">Obligations</td>" depth;
     List.iter
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
