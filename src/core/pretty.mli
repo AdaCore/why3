@@ -76,8 +76,6 @@ module type Printer = sig
 
 include Printer
 
-val meta_introduced_hypotheses : Theory.meta
-
 val create  : Ident.ident_printer ->Ident.ident_printer ->
               Ident.ident_printer -> Ident.ident_printer ->
               bool -> (module Printer)
