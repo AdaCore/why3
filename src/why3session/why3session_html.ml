@@ -153,7 +153,7 @@ let rec num_lines s acc tr =
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (tn_proved s tr)
       (max_depth - depth + 1);
-    fprintf fmt "%s</td>" (get_transf_string s tr);
+    fprintf fmt "%a</td>" Pp.html_string (get_transf_string s tr);
     for _i=1 to List.length provers do
       fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
@@ -174,7 +174,7 @@ let rec num_lines s acc tr =
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (pn_proved s g)
       (max_depth - depth + 1);
-    fprintf fmt "%s</td>" (get_proof_name s g).Ident.id_string;
+    fprintf fmt "%a</td>" Pp.html_string (get_proof_name s g).Ident.id_string;
     print_results fmt s provers (get_proof_attempt_ids s g);
     fprintf fmt "</tr>@\n";
     List.iter
@@ -262,8 +262,8 @@ struct
       print_proof_status pa.proof_state
 
   let rec print_transf s fmt tr =
-    fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      (get_transf_string s tr)
+    fprintf fmt "<li>%a : <ul>%a</ul></li>"
+      Pp.html_string (get_transf_string s tr)
       (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =
