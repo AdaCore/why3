@@ -9,9 +9,9 @@
 <file name="../specs.mlw">
 <theory name="VM_instr_spec">
  <goal name="WP_parameter ifunf" expl="VC for ifunf">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter ifunf.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter ifunf.1.1" expl="1. assertion">
    <proof prover="0" edited="specs_VM_instr_spec_WP_parameter_ifunf_2.v"><result status="valid" time="3.19"/></proof>
    </goal>
@@ -26,7 +26,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter iconstf" expl="VC for iconstf">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter iconstf.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -56,9 +56,9 @@
  </transf>
  </goal>
  <goal name="WP_parameter ivarf" expl="VC for ivarf">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter ivarf.1" expl="1. precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter ivarf.1.1" expl="1. precondition">
    <transf name="simplify_trivial_quantification">
     <goal name="WP_parameter ivarf.1.1.1" expl="1.">
@@ -98,9 +98,9 @@
  </transf>
  </goal>
  <goal name="WP_parameter create_binop" expl="VC for create_binop">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter create_binop.1" expl="1. precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter create_binop.1.1" expl="1. precondition">
    <transf name="simplify_trivial_quantification">
     <goal name="WP_parameter create_binop.1.1.1" expl="1.">
@@ -149,14 +149,14 @@
  <proof prover="3"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="WP_parameter inil" expl="VC for inil">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter inil.1" expl="1. postcondition">
   <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter ibranchf" expl="VC for ibranchf">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter ibranchf.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -186,7 +186,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter create_cjump" expl="VC for create_cjump">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter create_cjump.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.90"/></proof>
   </goal>
@@ -228,9 +228,9 @@
  <proof prover="3"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="WP_parameter isetvarf" expl="VC for isetvarf">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter isetvarf.1" expl="1. precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter isetvarf.1.1" expl="1. precondition">
    <transf name="simplify_trivial_quantification">
     <goal name="WP_parameter isetvarf.1.1.1" expl="1.">

@@ -7,7 +7,7 @@
 <file name="../binary_sort.mlw">
 <theory name="BinarySort">
  <goal name="WP_parameter occ_shift" expl="VC for occ_shift">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter occ_shift.1" expl="assertion">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
@@ -41,7 +41,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter binary_sort" expl="VC for binary_sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter binary_sort.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>

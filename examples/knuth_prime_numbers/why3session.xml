@@ -20,7 +20,7 @@
  <proof prover="12" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter prime_numbers.0" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -67,14 +67,14 @@
   <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.13" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter prime_numbers.13.0" expl="precondition" proved="true">
    <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.14" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter prime_numbers.14.0" expl="VC for prime_numbers" proved="true">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="33"/></proof>
    </goal>
@@ -102,14 +102,14 @@
   <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.21" expl="variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter prime_numbers.21.0" expl="variant decrease" proved="true">
    <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.22" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter prime_numbers.22.0" expl="VC for prime_numbers" proved="true">
    <proof prover="1" memlimit="1000"><result status="valid" time="0.02" steps="32"/></proof>
    <proof prover="5"><result status="valid" time="0.01" steps="32"/></proof>
@@ -167,7 +167,7 @@
   <goal name="WP_parameter prime_numbers.38" expl="index in array bounds" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter prime_numbers.38.0" expl="index in array bounds" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter prime_numbers.38.0.0" expl="VC for prime_numbers" proved="true">
     <proof prover="0"><result status="valid" time="0.02"/></proof>
     <proof prover="1" memlimit="1000"><result status="valid" time="0.09" steps="18"/></proof>
@@ -185,7 +185,7 @@
   <goal name="WP_parameter prime_numbers.39" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter prime_numbers.39.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter prime_numbers.39.0.0" expl="VC for prime_numbers" proved="true">
     <proof prover="1" memlimit="1000"><result status="valid" time="0.04" steps="36"/></proof>
     <proof prover="4" timelimit="2"><result status="valid" time="0.04"/></proof>

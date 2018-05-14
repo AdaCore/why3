@@ -12,7 +12,7 @@
 </theory>
 <theory name="Merge" proved="true">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
@@ -172,7 +172,7 @@
   <goal name="WP_parameter merge.52" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter merge.52.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter merge.52.0.0" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.00" steps="3"/></proof>
     </goal>
@@ -201,7 +201,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter merge_using" expl="VC for merge_using" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge_using.0" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
@@ -235,7 +235,7 @@
   <goal name="WP_parameter merge_using.10" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter merge_using.10.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter merge_using.10.0.0" expl="VC for merge_using" proved="true">
     <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
     </goal>
@@ -269,7 +269,7 @@
 </theory>
 <theory name="TopDownMergesort" proved="true">
  <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter mergesort_rec.0" expl="check division by zero" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
@@ -323,7 +323,7 @@
 </theory>
 <theory name="BottomUpMergesort" proved="true">
  <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter bottom_up_mergesort.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
@@ -382,7 +382,7 @@
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter bottom_up_mergesort.19" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bottom_up_mergesort.19.0" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="47"/></proof>
    </goal>
@@ -392,7 +392,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter bottom_up_mergesort.20" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bottom_up_mergesort.20.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -429,7 +429,7 @@
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter bottom_up_mergesort.26" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bottom_up_mergesort.26.0" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
@@ -479,7 +479,7 @@
 </theory>
 <theory name="NaturalMergesort" proved="true">
  <goal name="WP_parameter find_run" expl="VC for find_run" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter find_run.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -522,7 +522,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter natural_mergesort.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -560,7 +560,7 @@
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter natural_mergesort.12" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter natural_mergesort.12.0" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="24"/></proof>
    </goal>
@@ -633,7 +633,7 @@
   <proof prover="13"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter natural_mergesort.34" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter natural_mergesort.34.0" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="16"/></proof>
    </goal>
@@ -651,7 +651,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter naturalrec" expl="VC for naturalrec" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter naturalrec.0" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
@@ -710,7 +710,7 @@
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter naturalrec.19" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter naturalrec.19.0" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.00" steps="26"/></proof>
    </goal>
@@ -785,7 +785,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter natural_mergesort2.0" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>

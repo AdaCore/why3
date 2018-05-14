@@ -91,7 +91,7 @@
  <proof prover="9"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter find" expl="VC for find" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter find.0" expl="exceptional postcondition" proved="true">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -134,12 +134,12 @@
  <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
  <goal name="WP_parameter lbalance" expl="VC for lbalance" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter lbalance.0" expl="postcondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="1.43" steps="1420"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter lbalance.1.0" expl="VC for lbalance" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -181,7 +181,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter lbalance.6.0" expl="VC for lbalance" proved="true">
    <proof prover="0" timelimit="12"><result status="valid" time="0.18" steps="436"/></proof>
    </goal>
@@ -207,7 +207,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter lbalance.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter lbalance.8.0" expl="VC for lbalance" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="20"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -231,7 +231,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter lbalance.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter lbalance.9.0" expl="VC for lbalance" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="19"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -276,7 +276,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter rbalance" expl="VC for rbalance" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter rbalance.0" expl="postcondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="1.40" steps="1523"/></proof>
   </goal>
@@ -299,7 +299,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter rbalance.6.0" expl="VC for rbalance" proved="true">
    <proof prover="0" timelimit="14"><result status="valid" time="0.23" steps="554"/></proof>
    </goal>
@@ -325,7 +325,7 @@
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter rbalance.8.0" expl="VC for rbalance" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="20"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -349,7 +349,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter rbalance.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter rbalance.9.0" expl="VC for rbalance" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -380,7 +380,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rbalance.12" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter rbalance.12.0" expl="VC for rbalance" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -414,7 +414,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter insert.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="109"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -427,7 +427,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter insert.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.3.0" expl="VC for insert" proved="true">
    <proof prover="0"><result status="valid" time="0.05" steps="76"/></proof>
    </goal>
@@ -463,7 +463,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter insert.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.6.0" expl="VC for insert" proved="true">
    <proof prover="0"><result status="valid" time="0.05" steps="76"/></proof>
    </goal>
@@ -506,7 +506,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter insert.11" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.11.0" expl="VC for insert" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -547,7 +547,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="65"/></proof>
   </goal>
   <goal name="WP_parameter insert.15" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.15.0" expl="VC for insert" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -583,13 +583,13 @@
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter add.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter add.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter add.1.0" expl="VC for add" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
    <proof prover="2"><result status="valid" time="0.00"/></proof>

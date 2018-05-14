@@ -19,7 +19,7 @@
  <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter hanoi_rec.1" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.53"/></proof>
   <proof prover="7"><result status="valid" time="0.67"/></proof>
@@ -140,7 +140,7 @@
  <proof prover="10"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter hanoi_rec.1" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -277,7 +277,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter tower_of_hanoi" expl="VC for tower_of_hanoi">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tower_of_hanoi.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>

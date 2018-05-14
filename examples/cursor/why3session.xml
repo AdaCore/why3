@@ -13,7 +13,7 @@
 </theory>
 <theory name="TestCursor">
  <goal name="WP_parameter sum" expl="VC for sum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sum.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
   <proof prover="3"><result status="valid" time="0.04" steps="2"/></proof>
@@ -70,7 +70,7 @@
 </theory>
 <theory name="TestListCursor">
  <goal name="WP_parameter list_sum" expl="VC for list_sum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter list_sum.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -109,7 +109,7 @@
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter reverse_cons" expl="VC for reverse_cons">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter reverse_cons.1" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
@@ -125,7 +125,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter next" expl="VC for next">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter next.1" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -147,7 +147,7 @@
  <proof prover="1"><result status="valid" time="0.04" steps="46"/></proof>
  </goal>
  <goal name="WP_parameter array_sum" expl="VC for array_sum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter array_sum.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="6.44" steps="63"/></proof>
   </goal>

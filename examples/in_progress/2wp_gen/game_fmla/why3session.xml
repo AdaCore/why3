@@ -12,7 +12,7 @@
 </theory>
 <theory name="FmlaRulesProof">
  <goal name="pre_monotonic">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="pre_monotonic.1" expl="1.">
   <proof prover="4" steplimit="1"><result status="valid" time="0.03" steps="7"/></proof>
   </goal>
@@ -37,7 +37,7 @@
  </transf>
  </goal>
  <goal name="reach_above">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="reach_above.1" expl="1.">
   <proof prover="4" steplimit="1"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
@@ -74,7 +74,7 @@
  <proof prover="4" steplimit="1"><result status="valid" time="0.04" steps="114"/></proof>
  </goal>
  <goal name="kont_intro">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="kont_intro.1" expl="1.">
   <proof prover="4" steplimit="1"><result status="valid" time="0.08" steps="21"/></proof>
   </goal>
@@ -157,7 +157,7 @@
  </transf>
  </goal>
  <goal name="external_pre">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="external_pre.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.09" steps="10"/></proof>
   </goal>
@@ -173,7 +173,7 @@
  </transf>
  </goal>
  <goal name="crude_trampoline">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="crude_trampoline.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.11" steps="42"/></proof>
   </goal>
@@ -190,7 +190,7 @@
   <proof prover="4"><result status="valid" time="0.11" steps="28"/></proof>
   </goal>
   <goal name="crude_trampoline.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="crude_trampoline.6.1" expl="1.">
    <proof prover="1"><result status="valid" time="2.98"/></proof>
    </goal>
@@ -206,7 +206,7 @@
   </transf>
   </goal>
   <goal name="crude_trampoline.7" expl="7.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="crude_trampoline.7.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.37" steps="290"/></proof>
    </goal>
@@ -237,7 +237,7 @@
   </transf>
   </goal>
   <goal name="crude_trampoline.8" expl="8.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="crude_trampoline.8.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.72" steps="1219"/></proof>
    </goal>
@@ -324,7 +324,7 @@
  </transf>
  </goal>
  <goal name="iprod_order">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="iprod_order.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.09" steps="28"/></proof>
   </goal>
@@ -352,7 +352,7 @@
  </transf>
  </goal>
  <goal name="better_trampoline">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="better_trampoline.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.12" steps="36"/></proof>
   </goal>
@@ -363,12 +363,12 @@
   <proof prover="4"><result status="valid" time="0.10" steps="16"/></proof>
   </goal>
   <goal name="better_trampoline.4" expl="4.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="better_trampoline.4.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.08" steps="36"/></proof>
    </goal>
    <goal name="better_trampoline.4.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_trampoline.4.2.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.09" steps="21"/></proof>
     </goal>
@@ -435,7 +435,7 @@
    <proof prover="4"><result status="valid" time="0.69" steps="576"/></proof>
    </goal>
    <goal name="better_trampoline.4.4" expl="4.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_trampoline.4.4.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.11" steps="74"/></proof>
     </goal>
@@ -537,7 +537,7 @@
   </transf>
   </goal>
   <goal name="better_trampoline.5" expl="5.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="better_trampoline.5.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.26" steps="181"/></proof>
    </goal>
@@ -569,7 +569,7 @@
    <proof prover="4"><result status="valid" time="1.15" steps="674"/></proof>
    </goal>
    <goal name="better_trampoline.5.11" expl="11.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_trampoline.5.11.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.26" steps="186"/></proof>
     </goal>
@@ -597,7 +597,7 @@
    </transf>
    </goal>
    <goal name="better_trampoline.5.12" expl="12.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_trampoline.5.12.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.25" steps="191"/></proof>
     </goal>
@@ -680,7 +680,7 @@
  </transf>
  </goal>
  <goal name="trampoline">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trampoline.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.17" steps="82"/></proof>
   </goal>
@@ -768,7 +768,7 @@
  <proof prover="4"><result status="valid" time="0.06" steps="14"/></proof>
  </goal>
  <goal name="sequence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="sequence.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.36" steps="273"/></proof>
   </goal>
@@ -838,7 +838,7 @@
  <proof prover="4"><result status="valid" time="0.09" steps="46"/></proof>
  </goal>
  <goal name="mgame_larger">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="mgame_larger.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.10" steps="24"/></proof>
   </goal>
@@ -848,7 +848,7 @@
  </transf>
  </goal>
  <goal name="mgame_enforce">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="mgame_enforce.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.23" steps="185"/></proof>
   </goal>
@@ -870,7 +870,7 @@
  </transf>
  </goal>
  <goal name="max_cprefix_by_unique">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="max_cprefix_by_unique.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.47" steps="557"/></proof>
   </goal>
@@ -895,7 +895,7 @@
  </transf>
  </goal>
  <goal name="max_cprefix_by_unique_crossed">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="max_cprefix_by_unique_crossed.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.52" steps="695"/></proof>
   </goal>
@@ -905,9 +905,9 @@
  </transf>
  </goal>
  <goal name="clex_order">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="clex_order.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="clex_order.1.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.90" steps="782"/></proof>
    </goal>
@@ -926,7 +926,7 @@
   </transf>
   </goal>
   <goal name="clex_order.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="clex_order.2.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.19" steps="43"/></proof>
    </goal>
@@ -1013,7 +1013,7 @@
     <goal name="clex_order.2.28.1" expl="1.">
     <transf name="inline_goal">
      <goal name="clex_order.2.28.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="clex_order.2.28.1.1.1" expl="1.">
       <proof prover="4"><result status="valid" time="0.10" steps="14"/></proof>
       </goal>
@@ -1048,7 +1048,7 @@
    <proof prover="4"><result status="valid" time="0.16" steps="27"/></proof>
    </goal>
    <goal name="clex_order.2.33" expl="33.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="clex_order.2.33.1" expl="1.">
     <proof prover="4"><result status="valid" time="2.55" steps="4118"/></proof>
     </goal>
@@ -1073,7 +1073,7 @@
    </transf>
    </goal>
    <goal name="clex_order.2.34" expl="34.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="clex_order.2.34.1" expl="1.">
     <proof prover="4"><result status="valid" time="1.07" steps="2148"/></proof>
     </goal>
@@ -1122,7 +1122,7 @@
    <proof prover="4"><result status="valid" time="0.16" steps="28"/></proof>
    </goal>
    <goal name="clex_order.2.45" expl="45.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="clex_order.2.45.1" expl="1.">
     <proof prover="4"><result status="valid" time="1.80" steps="3903"/></proof>
     </goal>
@@ -1147,7 +1147,7 @@
    </transf>
    </goal>
    <goal name="clex_order.2.46" expl="46.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="clex_order.2.46.1" expl="1.">
     <proof prover="4"><result status="valid" time="1.20" steps="2710"/></proof>
     </goal>
@@ -1191,7 +1191,7 @@
  </transf>
  </goal>
  <goal name="later_frame_transitive">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="later_frame_transitive.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.18" steps="26"/></proof>
   </goal>
@@ -1213,7 +1213,7 @@
  </transf>
  </goal>
  <goal name="lframe_later_frame">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="lframe_later_frame.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.32" steps="137"/></proof>
   </goal>
@@ -1232,7 +1232,7 @@
  </transf>
  </goal>
  <goal name="lframe_o">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="lframe_o.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.15" steps="9"/></proof>
   </goal>
@@ -1278,7 +1278,7 @@
  <proof prover="4"><result status="valid" time="0.22" steps="14"/></proof>
  </goal>
  <goal name="wf_chain_subsets">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="wf_chain_subsets.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.22" steps="9"/></proof>
   </goal>
@@ -1288,7 +1288,7 @@
  </transf>
  </goal>
  <goal name="wf_chain_add">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="wf_chain_add.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.16" steps="13"/></proof>
   </goal>
@@ -1316,7 +1316,7 @@
  </transf>
  </goal>
  <goal name="rc_as_trampoline_step">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="rc_as_trampoline_step.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.13" steps="8"/></proof>
   </goal>
@@ -1339,9 +1339,9 @@
   <proof prover="4"><result status="valid" time="0.26" steps="110"/></proof>
   </goal>
   <goal name="rc_as_trampoline_step.8" expl="8.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_step.8.1" expl="1.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="rc_as_trampoline_step.8.1.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.49" steps="412"/></proof>
     </goal>
@@ -1381,7 +1381,7 @@
    <proof prover="4"><result status="valid" time="0.61" steps="441"/></proof>
    </goal>
    <goal name="rc_as_trampoline_step.8.3" expl="3.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="rc_as_trampoline_step.8.3.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.27" steps="142"/></proof>
     </goal>
@@ -1445,7 +1445,7 @@
    <proof prover="4"><result status="valid" time="1.57" steps="1285"/></proof>
    </goal>
    <goal name="rc_as_trampoline_step.8.9" expl="9.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="rc_as_trampoline_step.8.9.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.69" steps="418"/></proof>
     </goal>
@@ -1505,7 +1505,7 @@
      <goal name="rc_as_trampoline_step.8.9.19.1" expl="1.">
      <transf name="inline_goal">
       <goal name="rc_as_trampoline_step.8.9.19.1.1" expl="1.">
-      <transf name="split_goal_wp">
+      <transf name="split_goal_right">
        <goal name="rc_as_trampoline_step.8.9.19.1.1.1" expl="1.">
        <proof prover="4"><result status="valid" time="0.22" steps="54"/></proof>
        </goal>
@@ -1598,7 +1598,7 @@
   <proof prover="4"><result status="valid" time="0.72" steps="601"/></proof>
   </goal>
   <goal name="rc_as_trampoline_step.29" expl="29.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_step.29.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.41" steps="251"/></proof>
    </goal>
@@ -1646,7 +1646,7 @@
  </transf>
  </goal>
  <goal name="subchain_chain">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="subchain_chain.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.21" steps="38"/></proof>
   </goal>
@@ -1677,7 +1677,7 @@
  </transf>
  </goal>
  <goal name="rc_as_trampoline_limit">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="rc_as_trampoline_limit.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.18" steps="12"/></proof>
   </goal>
@@ -1694,7 +1694,7 @@
   <proof prover="4"><result status="valid" time="0.36" steps="193"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.6.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.53" steps="170"/></proof>
    </goal>
@@ -1722,7 +1722,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.7" expl="7.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.7.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.51" steps="181"/></proof>
    </goal>
@@ -1774,7 +1774,7 @@
   <proof prover="4"><result status="valid" time="0.23" steps="20"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.11" expl="11.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.11.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.36" steps="96"/></proof>
    </goal>
@@ -1802,7 +1802,7 @@
   <proof prover="4"><result status="valid" time="0.21" steps="25"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.15" expl="15.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.15.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.23" steps="26"/></proof>
    </goal>
@@ -1848,7 +1848,7 @@
   <proof prover="4"><result status="valid" time="0.32" steps="37"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.20" expl="20.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.20.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.26" steps="38"/></proof>
    </goal>
@@ -1888,7 +1888,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.21" expl="21.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.21.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.27" steps="35"/></proof>
    </goal>
@@ -1916,7 +1916,7 @@
   <proof prover="4"><result status="valid" time="0.28" steps="39"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.24" expl="24.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.24.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.40" steps="112"/></proof>
    </goal>
@@ -2025,7 +2025,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.25" expl="25.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.25.1" expl="1.">
    <proof prover="4"><result status="valid" time="3.60" steps="1507"/></proof>
    </goal>
@@ -2095,7 +2095,7 @@
   <proof prover="4"><result status="valid" time="0.49" steps="105"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.28" expl="28.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.28.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.56" steps="196"/></proof>
    </goal>
@@ -2111,7 +2111,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.29" expl="29.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.29.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.23" steps="35"/></proof>
    </goal>
@@ -2133,7 +2133,7 @@
   <proof prover="4"><result status="valid" time="1.95" steps="780"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.31" expl="31.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.31.1" expl="1.">
    <proof prover="4"><result status="valid" time="1.38" steps="771"/></proof>
    </goal>
@@ -2158,9 +2158,9 @@
   <proof prover="4"><result status="valid" time="0.93" steps="320"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.34" expl="34.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.34.1" expl="1.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="rc_as_trampoline_limit.34.1.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.81" steps="201"/></proof>
     </goal>
@@ -2221,7 +2221,7 @@
    </transf>
    </goal>
    <goal name="rc_as_trampoline_limit.34.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="rc_as_trampoline_limit.34.2.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.31" steps="52"/></proof>
     </goal>
@@ -2332,7 +2332,7 @@
      <goal name="rc_as_trampoline_limit.34.2.36.1" expl="1.">
      <transf name="inline_goal">
       <goal name="rc_as_trampoline_limit.34.2.36.1.1" expl="1.">
-      <transf name="split_goal_wp">
+      <transf name="split_goal_right">
        <goal name="rc_as_trampoline_limit.34.2.36.1.1.1" expl="1.">
        <proof prover="4"><result status="valid" time="0.23" steps="50"/></proof>
        </goal>
@@ -2455,7 +2455,7 @@
   <proof prover="4"><result status="valid" time="4.03" steps="1571"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.37" expl="37.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.37.1" expl="1.">
    <proof prover="0"><result status="valid" time="2.48"/></proof>
    </goal>
@@ -2519,7 +2519,7 @@
   <proof prover="4"><result status="valid" time="2.38" steps="740"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.39" expl="39.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.39.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.27" steps="61"/></proof>
    </goal>
@@ -2565,7 +2565,7 @@
   <proof prover="4"><result status="valid" time="0.69" steps="93"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.48" expl="48.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.48.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.39" steps="63"/></proof>
    </goal>
@@ -2620,7 +2620,7 @@
   <proof prover="4"><result status="valid" time="0.45" steps="83"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.51" expl="51.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.51.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.58" steps="120"/></proof>
    </goal>
@@ -2680,7 +2680,7 @@
     <goal name="rc_as_trampoline_limit.51.19.1" expl="1.">
     <transf name="inline_goal">
      <goal name="rc_as_trampoline_limit.51.19.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="rc_as_trampoline_limit.51.19.1.1.1" expl="1.">
       <proof prover="4"><result status="valid" time="0.17" steps="52"/></proof>
       </goal>
@@ -2780,7 +2780,7 @@
   <proof prover="4"><result status="valid" time="0.34" steps="48"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.53" expl="53.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.53.1" expl="1.">
    <proof prover="4"><result status="valid" time="1.21" steps="701"/></proof>
    </goal>
@@ -2859,7 +2859,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.54" expl="54.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.54.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.31" steps="65"/></proof>
    </goal>
@@ -2899,7 +2899,7 @@
   <proof prover="4"><result status="valid" time="0.26" steps="30"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.59" expl="59.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.59.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.26" steps="35"/></proof>
    </goal>
@@ -2996,7 +2996,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.60" expl="60.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.60.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.24" steps="44"/></proof>
    </goal>
@@ -3057,7 +3057,7 @@
   <proof prover="4"><result status="valid" time="1.16" steps="504"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.62" expl="62.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.62.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.54" steps="230"/></proof>
    </goal>
@@ -3079,7 +3079,7 @@
   <proof prover="4"><result status="valid" time="0.22" steps="32"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.64" expl="64.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.64.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.33" steps="62"/></proof>
    </goal>
@@ -3185,7 +3185,7 @@
   <proof prover="4"><result status="valid" time="2.96" steps="771"/></proof>
   </goal>
   <goal name="rc_as_trampoline_limit.76" expl="76.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.76.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.37" steps="92"/></proof>
    </goal>
@@ -3258,7 +3258,7 @@
   </transf>
   </goal>
   <goal name="rc_as_trampoline_limit.77" expl="77.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="rc_as_trampoline_limit.77.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.51" steps="195"/></proof>
    </goal>
@@ -3378,12 +3378,12 @@
  </transf>
  </goal>
  <goal name="crude_recursion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="crude_recursion.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.13" steps="12"/></proof>
   </goal>
   <goal name="crude_recursion.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="crude_recursion.2.1" expl="1.">
    <proof prover="4"><result status="valid" time="1.24" steps="809"/></proof>
    </goal>
@@ -3527,7 +3527,7 @@
  <proof prover="4"><result status="valid" time="0.28" steps="57"/></proof>
  </goal>
  <goal name="better_recursion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="better_recursion.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.19" steps="17"/></proof>
   </goal>
@@ -3535,7 +3535,7 @@
   <proof prover="4"><result status="valid" time="0.27" steps="66"/></proof>
   </goal>
   <goal name="better_recursion.3" expl="3.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="better_recursion.3.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.71" steps="394"/></proof>
    </goal>
@@ -3563,7 +3563,7 @@
   </transf>
   </goal>
   <goal name="better_recursion.4" expl="4.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="better_recursion.4.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.20" steps="39"/></proof>
    </goal>
@@ -3574,14 +3574,14 @@
    <proof prover="4"><result status="valid" time="0.26" steps="22"/></proof>
    </goal>
    <goal name="better_recursion.4.4" expl="4.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.4.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.17" steps="21"/></proof>
     </goal>
     <goal name="better_recursion.4.4.2" expl="2.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="better_recursion.4.4.2.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="better_recursion.4.4.2.1.1" expl="1.">
       <proof prover="4"><result status="valid" time="0.33" steps="133"/></proof>
       </goal>
@@ -3680,7 +3680,7 @@
     </transf>
     </goal>
     <goal name="better_recursion.4.4.3" expl="3.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="better_recursion.4.4.3.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.23" steps="36"/></proof>
      </goal>
@@ -3719,7 +3719,7 @@
    <proof prover="4"><result status="valid" time="0.25" steps="0"/></proof>
    </goal>
    <goal name="better_recursion.4.6" expl="6.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.6.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.17" steps="26"/></proof>
     </goal>
@@ -3783,7 +3783,7 @@
    <proof prover="4"><result status="valid" time="0.28" steps="51"/></proof>
    </goal>
    <goal name="better_recursion.4.11" expl="11.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.11.1" expl="1.">
     <proof prover="4"><result status="valid" time="4.74" steps="1848"/></proof>
     </goal>
@@ -3791,7 +3791,7 @@
     <proof prover="4"><result status="valid" time="0.27" steps="34"/></proof>
     </goal>
     <goal name="better_recursion.4.11.3" expl="3.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="better_recursion.4.11.3.1" expl="1.">
      <proof prover="4"><result status="valid" time="4.40" steps="2055"/></proof>
      </goal>
@@ -3866,7 +3866,7 @@
    <proof prover="4"><result status="valid" time="3.42" steps="1677"/></proof>
    </goal>
    <goal name="better_recursion.4.20" expl="20.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.20.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.40" steps="316"/></proof>
     </goal>
@@ -3909,7 +3909,7 @@
    </transf>
    </goal>
    <goal name="better_recursion.4.21" expl="21.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.21.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.22" steps="30"/></proof>
     </goal>
@@ -3937,7 +3937,7 @@
    </transf>
    </goal>
    <goal name="better_recursion.4.22" expl="22.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="better_recursion.4.22.1" expl="1.">
     <proof prover="4"><result status="valid" time="0.22" steps="29"/></proof>
     </goal>
@@ -4001,7 +4001,7 @@
    <goal name="better_recursion.5.1" expl="1.">
    <transf name="inline_goal">
     <goal name="better_recursion.5.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="better_recursion.5.1.1.1" expl="1.">
      <proof prover="4"><result status="valid" time="0.18" steps="7"/></proof>
      </goal>
@@ -4080,7 +4080,7 @@
  </transf>
  </goal>
  <goal name="recursion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="recursion.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.24" steps="38"/></proof>
   </goal>

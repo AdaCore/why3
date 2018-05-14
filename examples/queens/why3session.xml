@@ -13,7 +13,7 @@
 </theory>
 <theory name="NQueensSetsTermination">
  <goal name="WP_parameter t" expl="VC for t">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -47,7 +47,7 @@
 </theory>
 <theory name="NQueensSets">
  <goal name="WP_parameter t3" expl="VC for t3">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t3.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.21"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -59,7 +59,7 @@
   <proof prover="11"><result status="valid" time="0.11" steps="140"/></proof>
   </goal>
   <goal name="WP_parameter t3.3" expl="precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t3.3.1" expl="VC for t3">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -106,7 +106,7 @@
    <goal name="WP_parameter t3.3.12" expl="VC for t3">
    <transf name="inline_goal">
     <goal name="WP_parameter t3.3.12.1" expl="VC for t3">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter t3.3.12.1.1" expl="VC for t3">
      <proof prover="11"><result status="valid" time="0.14" steps="184"/></proof>
      </goal>
@@ -129,7 +129,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t3.4" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t3.4.1" expl="VC for t3">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    <proof prover="9"><result status="valid" time="0.44"/></proof>
@@ -190,7 +190,7 @@
   <proof prover="11"><result status="valid" time="0.07" steps="49"/></proof>
   </goal>
   <goal name="WP_parameter t3.6" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t3.6.1" expl="VC for t3">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -237,7 +237,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t3.7" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t3.7.1" expl="VC for t3">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -281,7 +281,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter queens3" expl="VC for queens3">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter queens3.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.22"/></proof>
   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>

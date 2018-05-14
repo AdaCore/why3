@@ -10,7 +10,7 @@
  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter insert.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
@@ -38,7 +38,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter insertion_sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="2"/></proof>
   </goal>

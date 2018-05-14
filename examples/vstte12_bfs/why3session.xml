@@ -47,7 +47,7 @@
 </theory>
 <theory name="BFS">
  <goal name="WP_parameter fill_next" expl="VC for fill_next">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter fill_next.1" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -55,7 +55,7 @@
   <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter fill_next.3" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter fill_next.3.1" expl="VC for fill_next">
    <proof prover="3" timelimit="20"><result status="valid" time="4.37"/></proof>
    </goal>
@@ -75,7 +75,7 @@
   <proof prover="8" timelimit="5" memlimit="4000"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter fill_next.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter fill_next.5.1" expl="VC for fill_next">
    <proof prover="9"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
@@ -98,7 +98,7 @@
   <proof prover="8" timelimit="5" memlimit="4000"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter fill_next.7" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter fill_next.7.1" expl="VC for fill_next">
    <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
@@ -113,9 +113,9 @@
  </transf>
  </goal>
  <goal name="WP_parameter bfs" expl="VC for bfs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter bfs.1" expl="loop invariant init">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter bfs.1.1" expl="VC for bfs">
    <proof prover="3"><result status="valid" time="0.18"/></proof>
    </goal>
@@ -141,7 +141,7 @@
   <proof prover="9"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter bfs.4" expl="precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter bfs.4.1" expl="VC for bfs">
    <proof prover="9"><result status="valid" time="0.05" steps="202"/></proof>
    </goal>
@@ -158,11 +158,11 @@
   </transf>
   </goal>
   <goal name="WP_parameter bfs.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter bfs.5.1" expl="VC for bfs">
    <transf name="inline_goal">
     <goal name="WP_parameter bfs.5.1.1" expl="VC for bfs">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter bfs.5.1.1.1" expl="VC for bfs">
      <proof prover="9"><result status="valid" time="0.02" steps="17"/></proof>
      </goal>
@@ -203,7 +203,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter bfs.6" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter bfs.6.1" expl="VC for bfs">
    <proof prover="9"><result status="valid" time="0.00" steps="14"/></proof>
    </goal>

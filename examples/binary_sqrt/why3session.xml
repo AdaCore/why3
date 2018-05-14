@@ -10,7 +10,7 @@
 <file name="../binary_sqrt.mlw">
 <theory name="BinarySqrt">
  <goal name="WP_parameter sqrt" expl="VC for sqrt">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sqrt.1" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -56,7 +56,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter sqrt_main" expl="VC for sqrt_main">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sqrt_main.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>

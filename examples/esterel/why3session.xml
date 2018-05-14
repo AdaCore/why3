@@ -14,7 +14,7 @@
  <proof prover="1"><result status="valid" time="0.18" steps="198"/></proof>
  </goal>
  <goal name="WP_parameter aboveMin" expl="VC for aboveMin" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter aboveMin.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.15" steps="225"/></proof>
   </goal>
@@ -36,7 +36,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter maxUnion" expl="VC for maxUnion" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter maxUnion.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.01" steps="72"/></proof>
@@ -56,7 +56,7 @@
   <proof prover="1"><result status="valid" time="1.27" steps="1464"/></proof>
   </goal>
   <goal name="WP_parameter maxUnion.4" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter maxUnion.4.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>

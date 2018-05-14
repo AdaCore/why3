@@ -19,7 +19,7 @@
 </theory>
 <theory name="Simple" proved="true">
  <goal name="WP_parameter isqrt" expl="VC for isqrt" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter isqrt.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -52,7 +52,7 @@
 </theory>
 <theory name="NewtonMethod" proved="true">
  <goal name="WP_parameter sqrt" expl="VC for sqrt" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter sqrt.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
@@ -75,7 +75,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.7" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter sqrt.7.0" expl="VC for sqrt" proved="true">
    <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -124,7 +124,7 @@
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.14" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter sqrt.14.0" expl="VC for sqrt" proved="true">
    <proof prover="7" timelimit="5" memlimit="4000"><result status="valid" time="0.01"/></proof>
    </goal>

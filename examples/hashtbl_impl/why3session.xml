@@ -20,7 +20,7 @@
  <proof prover="0"><result status="valid" time="0.16" steps="121"/></proof>
  </goal>
  <goal name="WP_parameter resize" expl="VC for resize" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter resize.0" expl="array creation size" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
@@ -53,7 +53,7 @@
   <goal name="WP_parameter resize.8" expl="precondition" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="WP_parameter resize.8.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter resize.8.0.0" expl="precondition" proved="true">
     <proof prover="3"><result status="valid" time="0.06"/></proof>
     </goal>
@@ -145,7 +145,7 @@
  <proof prover="0"><result status="valid" time="0.04" steps="59"/></proof>
  </goal>
  <goal name="WP_parameter find" expl="VC for find" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter find.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
@@ -155,7 +155,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter list_remove" expl="VC for list_remove" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter list_remove.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="2"/></proof>
   </goal>
@@ -174,7 +174,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter remove.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
   <proof prover="1"><result status="valid" time="0.07"/></proof>
@@ -223,7 +223,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter add.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
   <proof prover="1"><result status="valid" time="0.07"/></proof>
@@ -242,7 +242,7 @@
   <goal name="WP_parameter add.4" expl="type invariant" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="WP_parameter add.4.0" expl="type invariant" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter add.4.0.0" expl="type invariant" proved="true">
     <proof prover="1" timelimit="20"><result status="valid" time="1.72"/></proof>
     </goal>

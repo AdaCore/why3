@@ -11,7 +11,7 @@
  <proof prover="0" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="0.52"/></proof>
  </goal>
  <goal name="WP_parameter heapSort" expl="VC for heapSort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter heapSort.1" expl="precondition">
   <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
@@ -19,7 +19,7 @@
   <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter heapSort.3" expl="loop invariant init">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter heapSort.3.1" expl="VC for heapSort">
    <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
    </goal>
@@ -68,7 +68,7 @@
   <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter heapSort.13" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter heapSort.13.1" expl="VC for heapSort">
    <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
    </goal>
@@ -102,7 +102,7 @@
   <proof prover="3"><result status="valid" time="0.03" steps="95"/></proof>
   </goal>
   <goal name="WP_parameter heapSort.20" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter heapSort.20.1" expl="VC for heapSort">
    <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
@@ -201,7 +201,7 @@
 <file name="../test_harness.mlw">
 <theory name="TestHarness">
  <goal name="WP_parameter testHarness" expl="VC for testHarness">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter testHarness.1" expl="array creation size">
   <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
@@ -279,7 +279,7 @@
  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter insert.1" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
@@ -290,7 +290,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter insert.4" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter insert.4.1" expl="VC for insert">
    <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
    </goal>
@@ -300,7 +300,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter insert.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter insert.5.1" expl="VC for insert">
    <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
@@ -334,7 +334,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter insert.9" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter insert.9.1" expl="VC for insert">
    <proof prover="3"><result status="valid" time="0.02" steps="47"/></proof>
    </goal>
@@ -346,7 +346,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter extractMin" expl="VC for extractMin">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter extractMin.1" expl="assertion">
   <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -354,7 +354,7 @@
   <proof prover="3"><result status="valid" time="0.16" steps="163"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.3" expl="loop invariant init">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.3.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
    </goal>
@@ -382,7 +382,7 @@
   <proof prover="3"><result status="valid" time="0.84" steps="444"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.7" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.7.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="16"/></proof>
    </goal>
@@ -407,7 +407,7 @@
   <proof prover="3"><result status="valid" time="1.11" steps="476"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.12" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.12.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
@@ -420,7 +420,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter extractMin.13" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.13.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
    </goal>
@@ -433,7 +433,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter extractMin.14" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.14.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
@@ -467,7 +467,7 @@
   <proof prover="3"><result status="valid" time="1.13" steps="520"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.19" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.19.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
@@ -483,7 +483,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.21" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.21.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
    </goal>
@@ -517,7 +517,7 @@
   <proof prover="3"><result status="valid" time="1.03" steps="469"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.26" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.26.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
@@ -530,7 +530,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter extractMin.27" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.27.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
@@ -543,7 +543,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter extractMin.28" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.28.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
    </goal>
@@ -583,7 +583,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter extractMin.35" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter extractMin.35.1" expl="VC for extractMin">
    <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>

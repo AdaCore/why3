@@ -44,7 +44,7 @@
  <goal name="inorder_zip" expl="">
  <transf name="induction_ty_lex">
   <goal name="inorder_zip.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="inorder_zip.1.1" expl="">
    <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
    <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -85,7 +85,7 @@
  <proof prover="4" edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"><result status="valid" time="8.32"/></proof>
  </goal>
  <goal name="WP_parameter search_tree_delete_min" expl="VC for search_tree_delete_min">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter search_tree_delete_min.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -322,7 +322,7 @@
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.28" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter search_tree_delete_min.28.1" expl="VC for search_tree_delete_min">
    <proof prover="0"><result status="valid" time="0.10" steps="114"/></proof>
    <proof prover="3"><result status="valid" time="0.05"/></proof>

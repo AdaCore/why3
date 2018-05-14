@@ -34,7 +34,7 @@
 </theory>
 <theory name="FibRecGhost" proved="true">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fib_aux.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="7"/></proof>
@@ -67,7 +67,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter fib" expl="VC for fib" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fib.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="3"/></proof>
@@ -103,7 +103,7 @@
 </theory>
 <theory name="FibRecNoGhost" proved="true">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fib_aux.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="10"/></proof>
@@ -132,7 +132,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter fib" expl="VC for fib" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fib.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.00" steps="3"/></proof>
@@ -161,7 +161,7 @@
  <proof prover="8" timelimit="6"><result status="valid" time="0.03" steps="12"/></proof>
  </goal>
  <goal name="WP_parameter fib_increasing" expl="VC for fib_increasing" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fib_increasing.0" expl="variant decrease" proved="true">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
@@ -180,7 +180,7 @@
  <proof prover="11"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter zeckendorf" expl="VC for zeckendorf" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter zeckendorf.0" expl="loop invariant init" proved="true">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="4"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
@@ -226,7 +226,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter zeckendorf_fast" expl="VC for zeckendorf_fast" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter zeckendorf_fast.0" expl="postcondition" proved="true">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
@@ -270,7 +270,7 @@
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter zeckendorf_fast.14" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter zeckendorf_fast.14.0" expl="VC for zeckendorf_fast" proved="true">
    <proof prover="11"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -343,7 +343,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter zeckendorf_unique" expl="VC for zeckendorf_unique" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter zeckendorf_unique.0" expl="unreachable point" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -444,7 +444,7 @@
 </theory>
 <theory name="FibonacciLogarithmic" proved="true">
  <goal name="WP_parameter logfib" expl="VC for logfib" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter logfib.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>

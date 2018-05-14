@@ -10,7 +10,7 @@
 <theory name="SimplePrioriyQueue">
  <goal name="numof_occ">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.02"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="numof_occ.1" expl="1.">
   <proof prover="3" timelimit="5"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -30,7 +30,7 @@
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add.1" expl="1. index in array bounds">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -99,7 +99,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter highest" expl="VC for highest">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter highest.1" expl="1. index in array bounds">
   <proof prover="3" timelimit="5"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -113,7 +113,7 @@
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
  <proof prover="1" obsolete="true"><result status="timeout" time="5.01"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove.1" expl="1. index in array bounds">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>

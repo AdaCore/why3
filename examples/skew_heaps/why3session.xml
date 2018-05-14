@@ -9,7 +9,7 @@
 </theory>
 <theory name="SkewHeaps">
  <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter root_is_min.1" expl="unreachable point">
   <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -55,7 +55,7 @@
  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="WP_parameter get_min" expl="VC for get_min">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter get_min.1" expl="unreachable point">
   <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -65,7 +65,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter merge.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -126,7 +126,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
@@ -145,7 +145,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove_min" expl="VC for remove_min">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove_min.1" expl="unreachable point">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -169,7 +169,7 @@
 </theory>
 <theory name="HeapSort">
  <goal name="WP_parameter heapsort" expl="VC for heapsort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter heapsort.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>

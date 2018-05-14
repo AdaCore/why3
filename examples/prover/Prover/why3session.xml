@@ -12,7 +12,7 @@
 </theory>
 <theory name="Logic" proved="true">
  <goal name="WP_parameter is_atom_subst" expl="VC for is_atom_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_atom_subst.0" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="224"/></proof>
   </goal>
@@ -28,7 +28,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter is_atom_list_subst" expl="VC for is_atom_list_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_atom_list_subst.0" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.22" steps="13"/></proof>
   </goal>
@@ -44,7 +44,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter is_procedure_tableau_subst" expl="VC for is_procedure_tableau_subst" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter is_procedure_tableau_subst.0" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="13"/></proof>
   </goal>
@@ -62,7 +62,7 @@
 </theory>
 <theory name="Impl" proved="true">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
@@ -132,7 +132,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter contract_tableau" expl="VC for contract_tableau" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter contract_tableau.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="14"/></proof>
   </goal>
@@ -185,7 +185,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="92"/></proof>
   </goal>
   <goal name="WP_parameter contract_tableau.17" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contract_tableau.17.0" expl="VC for contract_tableau" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.44" steps="796"/></proof>
    </goal>
@@ -227,7 +227,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter branch_conflict_atom" expl="VC for branch_conflict_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter branch_conflict_atom.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="15"/></proof>
   </goal>
@@ -350,7 +350,7 @@
    <goal name="WP_parameter branch_conflict_atom.39.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter branch_conflict_atom.39.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter branch_conflict_atom.39.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="1.63" steps="3962"/></proof>
      </goal>
@@ -363,7 +363,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter branch_conflict_neg_atom" expl="VC for branch_conflict_neg_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter branch_conflict_neg_atom.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="15"/></proof>
   </goal>
@@ -392,7 +392,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.43" steps="657"/></proof>
   </goal>
   <goal name="WP_parameter branch_conflict_neg_atom.9" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter branch_conflict_neg_atom.9.0" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="1.00" steps="1821"/></proof>
    </goal>
@@ -475,7 +475,7 @@
    <goal name="WP_parameter branch_conflict_neg_atom.32.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter branch_conflict_neg_atom.32.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter branch_conflict_neg_atom.32.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="3.00" steps="9848"/></proof>
      </goal>
@@ -518,7 +518,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter clause_conflicts" expl="VC for clause_conflicts" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter clause_conflicts.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="16"/></proof>
   </goal>
@@ -671,7 +671,7 @@
    <goal name="WP_parameter clause_conflicts.49.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter clause_conflicts.49.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter clause_conflicts.49.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="2.93" steps="9389"/></proof>
      </goal>
@@ -687,7 +687,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter decompose" expl="VC for decompose" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter decompose.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="29"/></proof>
   </goal>
@@ -892,7 +892,7 @@
   <goal name="WP_parameter decompose.67" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter decompose.67.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter decompose.67.0.0" expl="VC for decompose" proved="true">
     <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="69"/></proof>
     </goal>
@@ -1021,7 +1021,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.30" steps="389"/></proof>
   </goal>
   <goal name="WP_parameter decompose.102" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter decompose.102.0" expl="VC for decompose" proved="true">
    <proof prover="6" timelimit="20"><result status="valid" time="4.01"/></proof>
    </goal>
@@ -1040,7 +1040,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="2.60" steps="6102"/></proof>
   </goal>
   <goal name="WP_parameter decompose.106" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter decompose.106.0" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="394"/></proof>
    </goal>
@@ -1062,7 +1062,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter decompose.107" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter decompose.107.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.28" steps="329"/></proof>
    </goal>
@@ -1344,7 +1344,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter decompose_literal" expl="VC for decompose_literal" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter decompose_literal.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="26"/></proof>
   </goal>
@@ -1641,7 +1641,7 @@
    <goal name="WP_parameter decompose_literal.97.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter decompose_literal.97.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter decompose_literal.97.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5"><result status="valid" time="2.19" steps="3848"/></proof>
      </goal>
@@ -1753,7 +1753,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter contradiction_atom" expl="VC for contradiction_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter contradiction_atom.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="25"/></proof>
   </goal>
@@ -1863,7 +1863,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="126"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.36" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.36.0" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="133"/></proof>
    </goal>
@@ -1928,7 +1928,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.43" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.43.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="1.03" steps="2025"/></proof>
    </goal>
@@ -1944,7 +1944,7 @@
   <proof prover="5"><result status="valid" time="0.18" steps="114"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.46" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.46.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="2.46" steps="5159"/></proof>
    </goal>
@@ -1990,7 +1990,7 @@
   <proof prover="5"><result status="valid" time="0.27" steps="135"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.59" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.59.0" expl="VC for contradiction_atom" proved="true">
    <proof prover="5"><result status="valid" time="0.20" steps="139"/></proof>
    </goal>
@@ -2000,7 +2000,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_atom.60" expl="exceptional postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.60.0" expl="VC for contradiction_atom" proved="true">
    <proof prover="5"><result status="valid" time="0.20" steps="139"/></proof>
    </goal>
@@ -2046,7 +2046,7 @@
   <proof prover="5"><result status="valid" time="0.19" steps="135"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.73" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.73.0" expl="VC for contradiction_atom" proved="true">
    <proof prover="5"><result status="valid" time="0.27" steps="139"/></proof>
    </goal>
@@ -2064,7 +2064,7 @@
   <goal name="WP_parameter contradiction_atom.76" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_atom.76.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_atom.76.0.0" expl="VC for contradiction_atom" proved="true">
     <proof prover="1"><result status="valid" time="6.62"/></proof>
     </goal>
@@ -2166,7 +2166,7 @@
   <proof prover="5"><result status="valid" time="0.29" steps="163"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.102" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.102.0" expl="VC for contradiction_atom" proved="true">
    <proof prover="5"><result status="valid" time="0.80" steps="810"/></proof>
    </goal>
@@ -2176,7 +2176,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_atom.103" expl="exceptional postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_atom.103.0" expl="VC for contradiction_atom" proved="true">
    <proof prover="5"><result status="valid" time="0.78" steps="810"/></proof>
    </goal>
@@ -2197,7 +2197,7 @@
   <goal name="WP_parameter contradiction_atom.107" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_atom.107.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_atom.107.0.0" expl="VC for contradiction_atom" proved="true">
     <proof prover="1"><result status="valid" time="5.96"/></proof>
     </goal>
@@ -2307,7 +2307,7 @@
   <goal name="WP_parameter contradiction_atom.135" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_atom.135.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_atom.135.0.0" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.25" steps="85"/></proof>
     </goal>
@@ -2488,7 +2488,7 @@
    <goal name="WP_parameter contradiction_atom.186.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter contradiction_atom.186.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter contradiction_atom.186.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="4.08" steps="9724"/></proof>
      </goal>
@@ -2578,7 +2578,7 @@
    <goal name="WP_parameter contradiction_atom.212.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter contradiction_atom.212.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter contradiction_atom.212.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="2.02" steps="3557"/></proof>
      </goal>
@@ -2591,7 +2591,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter contradiction_neg_atom" expl="VC for contradiction_neg_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter contradiction_neg_atom.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="25"/></proof>
   </goal>
@@ -2693,7 +2693,7 @@
   <proof prover="5"><result status="valid" time="0.20" steps="117"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.33" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.33.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.19" steps="124"/></proof>
    </goal>
@@ -2758,7 +2758,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="55"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.40" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.40.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.56" steps="856"/></proof>
    <proof prover="6"><result status="valid" time="1.62"/></proof>
@@ -2776,7 +2776,7 @@
   <proof prover="5"><result status="valid" time="0.18" steps="105"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.43" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.43.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.83" steps="1820"/></proof>
    <proof prover="6"><result status="valid" time="1.61"/></proof>
@@ -2877,7 +2877,7 @@
   <goal name="WP_parameter contradiction_neg_atom.73" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.73.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_neg_atom.73.0.0" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="1"><result status="valid" time="4.24"/></proof>
     </goal>
@@ -2996,7 +2996,7 @@
   <goal name="WP_parameter contradiction_neg_atom.104" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.104.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_neg_atom.104.0.0" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.77" steps="601"/></proof>
     </goal>
@@ -3106,7 +3106,7 @@
   <goal name="WP_parameter contradiction_neg_atom.132" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.132.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_neg_atom.132.0.0" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.23" steps="79"/></proof>
     </goal>
@@ -3362,7 +3362,7 @@
    <goal name="WP_parameter contradiction_neg_atom.208.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter contradiction_neg_atom.208.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter contradiction_neg_atom.208.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5"><result status="valid" time="1.58" steps="3587"/></proof>
      </goal>
@@ -3375,7 +3375,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter extend_branch" expl="VC for extend_branch" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter extend_branch.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.25" steps="19"/></proof>
   </goal>
@@ -3458,7 +3458,7 @@
   <proof prover="1"><result status="valid" time="0.35"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.27" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter extend_branch.27.0" expl="precondition" proved="true">
    <proof prover="5"><result status="valid" time="0.20" steps="328"/></proof>
    </goal>
@@ -3665,7 +3665,7 @@
    <goal name="WP_parameter extend_branch.93.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter extend_branch.93.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter extend_branch.93.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5"><result status="valid" time="1.62" steps="3649"/></proof>
      </goal>
@@ -3678,7 +3678,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter contradiction_find_atom" expl="VC for contradiction_find_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter contradiction_find_atom.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="26"/></proof>
   </goal>
@@ -3884,7 +3884,7 @@
   <proof prover="1"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.68" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_atom.68.0" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="112"/></proof>
    </goal>
@@ -3939,7 +3939,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.69" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_atom.69.0" expl="precondition" proved="true">
    <proof prover="5"><result status="valid" time="0.16" steps="50"/></proof>
    </goal>
@@ -3964,7 +3964,7 @@
   <proof prover="1" timelimit="5"><result status="valid" time="1.19"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.76" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_atom.76.0" expl="precondition" proved="true">
    <proof prover="4"><result status="valid" time="0.24"/></proof>
    </goal>
@@ -4151,7 +4151,7 @@
   <proof prover="6"><result status="valid" time="1.55"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.137" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_atom.137.0" expl="postcondition" proved="true">
    <proof prover="5"><result status="valid" time="0.19" steps="104"/></proof>
    </goal>
@@ -4172,7 +4172,7 @@
   <goal name="WP_parameter contradiction_find_atom.142" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_find_atom.142.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_find_atom.142.0.0" expl="precondition" proved="true">
     <proof prover="5" timelimit="5"><result status="valid" time="0.22" steps="80"/></proof>
     </goal>
@@ -4347,7 +4347,7 @@
    <goal name="WP_parameter contradiction_find_atom.197.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
     <goal name="WP_parameter contradiction_find_atom.197.0.0" expl="unreachable point" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter contradiction_find_atom.197.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5"><result status="valid" time="1.79" steps="3536"/></proof>
      </goal>
@@ -4360,7 +4360,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter contradiction_find_neg_atom" expl="VC for contradiction_find_neg_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter contradiction_find_neg_atom.0" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.25" steps="26"/></proof>
   </goal>
@@ -4560,7 +4560,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.66" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_neg_atom.66.0" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.22" steps="103"/></proof>
    </goal>
@@ -4615,7 +4615,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.67" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_neg_atom.67.0" expl="precondition" proved="true">
    <proof prover="5"><result status="valid" time="0.15" steps="45"/></proof>
    </goal>
@@ -4640,7 +4640,7 @@
   <proof prover="6"><result status="valid" time="2.93"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.74" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_neg_atom.74.0" expl="precondition" proved="true">
    <proof prover="4"><result status="valid" time="0.28"/></proof>
    </goal>
@@ -4827,7 +4827,7 @@
   <proof prover="6"><result status="valid" time="1.66"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.135" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter contradiction_find_neg_atom.135.0" expl="postcondition" proved="true">
    <proof prover="5"><result status="valid" time="0.19" steps="95"/></proof>
    </goal>
@@ -4848,7 +4848,7 @@
   <goal name="WP_parameter contradiction_find_neg_atom.140" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter contradiction_find_neg_atom.140.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter contradiction_find_neg_atom.140.0.0" expl="precondition" proved="true">
     <proof prover="5"><result status="valid" time="0.20" steps="74"/></proof>
     </goal>
@@ -5021,7 +5021,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter select_lemma" expl="VC for select_lemma" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter select_lemma.0" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="44"/></proof>
   </goal>
@@ -5136,7 +5136,7 @@
   <goal name="WP_parameter select_lemma.37" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter select_lemma.37.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter select_lemma.37.0.0" expl="VC for select_lemma" proved="true">
     <proof prover="5" timelimit="5"><result status="valid" time="0.29" steps="68"/></proof>
     </goal>

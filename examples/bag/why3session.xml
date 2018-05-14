@@ -32,7 +32,7 @@
  <proof prover="5"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="4"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
@@ -112,7 +112,7 @@
 </theory>
 <theory name="Harness">
  <goal name="WP_parameter test1" expl="VC for test1">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter test1.1" expl="assertion">
   <proof prover="0" timelimit="10"><result status="valid" time="0.39" steps="195"/></proof>
   <proof prover="1" timelimit="10"><result status="valid" time="0.18"/></proof>

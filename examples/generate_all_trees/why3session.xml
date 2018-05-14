@@ -26,7 +26,7 @@
  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="WP_parameter combine" expl="VC for combine">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter combine.1" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
@@ -50,7 +50,7 @@
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter combine.8" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter combine.8.1" expl="postcondition">
    <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"><result status="valid" time="0.33"/></proof>
    <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -74,7 +74,7 @@
   <proof prover="8"><result status="valid" time="0.24" steps="730"/></proof>
   </goal>
   <goal name="WP_parameter combine.13" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter combine.13.1" expl="postcondition">
    <proof prover="4"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -90,7 +90,7 @@
   <proof prover="8"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter combine.16" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter combine.16.1" expl="postcondition">
    <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="212"/></proof>
    </goal>
@@ -102,7 +102,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter all_trees" expl="VC for all_trees">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter all_trees.1" expl="array creation size">
   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -158,7 +158,7 @@
   <proof prover="8"><result status="valid" time="0.08" steps="103"/></proof>
   </goal>
   <goal name="WP_parameter all_trees.19" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter all_trees.19.1" expl="loop invariant preservation">
    <proof prover="2"><result status="valid" time="0.12"/></proof>
    <proof prover="3"><result status="valid" time="0.16"/></proof>

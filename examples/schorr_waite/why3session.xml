@@ -10,7 +10,7 @@
 <file name="../schorr_waite.mlw" proved="true">
 <theory name="SchorrWaite" proved="true">
  <goal name="WP_parameter tl_stackNodes" expl="VC for tl_stackNodes" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter tl_stackNodes.0" expl="postcondition" proved="true">
   <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -22,7 +22,7 @@
  <goal name="WP_parameter cons_not_in" expl="VC for cons_not_in" proved="true">
  <transf name="inline_goal" proved="true" >
   <goal name="WP_parameter cons_not_in.0" expl="VC for cons_not_in" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter cons_not_in.0.0" expl="assertion" proved="true">
    <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -37,7 +37,7 @@
  <proof prover="0"><result status="valid" time="0.04" steps="29"/></proof>
  </goal>
  <goal name="WP_parameter trans_path" expl="VC for trans_path" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter trans_path.0" expl="variant decrease" proved="true">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
@@ -67,7 +67,7 @@
  <proof prover="2" timelimit="5"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter schorr_waite" expl="VC for schorr_waite" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter schorr_waite.0" expl="precondition" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -356,7 +356,7 @@
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.95" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.95.0" expl="loop invariant preservation" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="WP_parameter schorr_waite.95.0.0" expl="loop invariant preservation" proved="true">
@@ -410,7 +410,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.108" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.108.0" expl="loop invariant preservation" proved="true">
    <proof prover="2"><result status="valid" time="0.56"/></proof>
    </goal>
@@ -671,7 +671,7 @@
   <goal name="WP_parameter schorr_waite.189" expl="loop invariant preservation" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="WP_parameter schorr_waite.189.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter schorr_waite.189.0.0" expl="VC for schorr_waite" proved="true">
     <proof prover="2" timelimit="5"><result status="valid" time="0.05"/></proof>
     </goal>
@@ -723,7 +723,7 @@
    <goal name="WP_parameter schorr_waite.202.0" expl="loop invariant preservation" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="WP_parameter schorr_waite.202.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter schorr_waite.202.0.0.0" expl="VC for schorr_waite" proved="true">
      <proof prover="2"><result status="valid" time="0.04"/></proof>
      </goal>
@@ -781,7 +781,7 @@
   <goal name="WP_parameter schorr_waite.217" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter schorr_waite.217.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter schorr_waite.217.0.0" expl="loop invariant preservation" proved="true">
     <proof prover="2"><result status="valid" time="0.05"/></proof>
     </goal>
@@ -802,7 +802,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.219" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.219.0" expl="loop invariant preservation" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="WP_parameter schorr_waite.219.0.0" expl="loop invariant preservation" proved="true">
@@ -856,7 +856,7 @@
    <goal name="WP_parameter schorr_waite.232.0" expl="loop invariant preservation" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter schorr_waite.232.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter schorr_waite.232.0.0.0" expl="VC for schorr_waite" proved="true">
      <proof prover="2"><result status="valid" time="0.02"/></proof>
      </goal>
@@ -965,7 +965,7 @@
   <goal name="WP_parameter schorr_waite.263" expl="loop invariant preservation" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="WP_parameter schorr_waite.263.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter schorr_waite.263.0.0" expl="VC for schorr_waite" proved="true">
     <proof prover="2"><result status="valid" time="0.02"/></proof>
     </goal>
@@ -1261,7 +1261,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.357" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.357.0" expl="loop invariant preservation" proved="true">
    <proof prover="2"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -1368,7 +1368,7 @@
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.390" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.390.0" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -1387,7 +1387,7 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter schorr_waite.394" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter schorr_waite.394.0" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>

@@ -8,7 +8,7 @@
 </theory>
 <theory name="Static">
  <goal name="WP_parameter dfs" expl="VC for dfs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter dfs.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -60,7 +60,7 @@
   <goal name="WP_parameter dfs.17" expl="postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter dfs.17.1" expl="postcondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter dfs.17.1.1" expl="VC for dfs">
     <proof prover="0"><result status="valid" time="0.11"/></proof>
     </goal>
@@ -96,11 +96,11 @@
  </transf>
  </goal>
  <goal name="WP_parameter topo_order" expl="VC for topo_order">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter topo_order.1" expl="loop invariant init">
   <transf name="inline_goal">
    <goal name="WP_parameter topo_order.1.1" expl="loop invariant init">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter topo_order.1.1.1" expl="VC for topo_order">
     <proof prover="0"><result status="valid" time="0.07"/></proof>
     </goal>
@@ -160,14 +160,14 @@
 </theory>
 <theory name="Online_Basic">
  <goal name="WP_parameter create" expl="VC for create">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter create.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter dfs" expl="VC for dfs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter dfs.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -234,7 +234,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_edge" expl="VC for add_edge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_edge.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>

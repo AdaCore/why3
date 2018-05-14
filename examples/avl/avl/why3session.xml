@@ -45,7 +45,7 @@
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.07" steps="257"/></proof>
  </goal>
  <goal name="WP_parameter balance" expl="VC for balance">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter balance.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -196,7 +196,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter insert.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -272,7 +272,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -351,7 +351,7 @@
  <proof prover="1"><result status="valid" time="0.79" steps="2065"/></proof>
  </goal>
  <goal name="WP_parameter extract" expl="VC for extract">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter extract.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>

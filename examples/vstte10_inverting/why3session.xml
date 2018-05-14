@@ -10,7 +10,7 @@
 <file name="../vstte10_inverting.mlw">
 <theory name="InvertingAnInjection">
  <goal name="WP_parameter inverting" expl="VC for inverting">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter inverting.1" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
@@ -38,12 +38,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter inverting2" expl="VC for inverting2">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter inverting2.1" expl="array creation size">
   <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter inverting2.2" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter inverting2.2.1" expl="VC for inverting2">
    <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
    <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="8"/></proof>
@@ -83,7 +83,7 @@
   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter inverting2.9" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter inverting2.9.1" expl="VC for inverting2">
    <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
    </goal>
@@ -100,7 +100,7 @@
 </theory>
 <theory name="Test">
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter test.1" expl="array creation size">
   <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
   </goal>

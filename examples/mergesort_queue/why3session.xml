@@ -11,7 +11,7 @@
  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter merge.1" expl="loop invariant init">
   <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -189,7 +189,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter mergesort" expl="VC for mergesort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter mergesort.1" expl="loop invariant init">
   <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
@@ -243,7 +243,7 @@
   <proof prover="8"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.18" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter mergesort.18.1" expl="VC for mergesort">
    <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
    </goal>

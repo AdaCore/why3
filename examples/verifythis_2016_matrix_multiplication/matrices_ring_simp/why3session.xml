@@ -22,7 +22,7 @@
  <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
  </goal>
  <goal name="LOCAL.WP_parameter m_collapse_ok" expl="VC for m_collapse_ok" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter m_collapse_ok.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -59,7 +59,7 @@
  <proof prover="2"><result status="valid" time="0.16" steps="608"/></proof>
  </goal>
  <goal name="LOCAL.WP_parameter lm_merge_ok" expl="VC for lm_merge_ok" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter lm_merge_ok.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
@@ -120,7 +120,7 @@
  <proof prover="2"><result status="valid" time="0.19" steps="479"/></proof>
  </goal>
  <goal name="LOCAL.WP_parameter lm_opp_ok" expl="VC for lm_opp_ok" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter lm_opp_ok.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
@@ -169,7 +169,7 @@
  <proof prover="2"><result status="valid" time="0.03" steps="28"/></proof>
  </goal>
  <goal name="WP_parameter harness" expl="VC for harness" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter harness.0" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
    <goal name="WP_parameter harness.0.0" expl="precondition" proved="true">

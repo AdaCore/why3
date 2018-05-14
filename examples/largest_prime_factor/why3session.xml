@@ -12,9 +12,9 @@
 <file name="../largest_prime_factor.mlw">
 <theory name="PrimeFactor">
  <goal name="WP_parameter smallest_divisor" expl="VC for smallest_divisor">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter smallest_divisor.1" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter smallest_divisor.1.1" expl="assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
@@ -89,7 +89,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter largest_prime_factor" expl="VC for largest_prime_factor">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter largest_prime_factor.1" expl="precondition">
   <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -100,7 +100,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter largest_prime_factor.4" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter largest_prime_factor.4.1" expl="VC for largest_prime_factor">
    <proof prover="4"><result status="valid" time="0.77" steps="50"/></proof>
    </goal>
@@ -131,7 +131,7 @@
   <proof prover="4"><result status="valid" time="0.10" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter largest_prime_factor.12" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter largest_prime_factor.12.1" expl="VC for largest_prime_factor">
    <proof prover="4"><result status="valid" time="0.02" steps="23"/></proof>
    </goal>
@@ -156,7 +156,7 @@
   <proof prover="5"><result status="valid" time="3.00"/></proof>
   </goal>
   <goal name="WP_parameter largest_prime_factor.17" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter largest_prime_factor.17.1" expl="VC for largest_prime_factor">
    <proof prover="4"><result status="valid" time="2.75" steps="85"/></proof>
    </goal>
@@ -166,7 +166,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter largest_prime_factor.18" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter largest_prime_factor.18.1" expl="assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
    </goal>

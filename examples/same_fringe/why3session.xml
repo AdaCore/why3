@@ -7,7 +7,7 @@
 <file name="../same_fringe.mlw">
 <theory name="SameFringe">
  <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter enum.1" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -20,7 +20,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter eq_enum" expl="VC for eq_enum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter eq_enum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="6"/></proof>

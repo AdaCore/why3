@@ -42,11 +42,11 @@
  <proof prover="0" memlimit="4000" edited="bf_WP_BellmanFord_key_lemma_2_1.v"><result status="valid" time="2.76"/></proof>
  </goal>
  <goal name="WP_parameter relax" expl="VC for relax" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter relax.0" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter relax.0.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter relax.0.0.0" expl="postcondition" proved="true">
     <proof prover="0" timelimit="10" memlimit="0" edited="bf_WP_BellmanFord_WP_parameter_relax_7.v"><result status="valid" time="1.00"/></proof>
     </goal>
@@ -70,7 +70,7 @@
   <goal name="WP_parameter relax.1" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter relax.1.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter relax.1.0.0" expl="postcondition" proved="true">
     <proof prover="2"><result status="valid" time="0.12"/></proof>
     <proof prover="8" timelimit="15" memlimit="0"><result status="valid" time="0.04" steps="110"/></proof>
@@ -96,11 +96,11 @@
  </transf>
  </goal>
  <goal name="WP_parameter bellman_ford" expl="VC for bellman_ford" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter bellman_ford.0" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter bellman_ford.0.0" expl="assertion" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter bellman_ford.0.0.0" expl="assertion" proved="true">
     <proof prover="4"><result status="valid" time="2.66"/></proof>
     <proof prover="7"><result status="valid" time="0.16"/></proof>
@@ -141,7 +141,7 @@
   <proof prover="8"><result status="valid" time="0.06" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter bellman_ford.7" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bellman_ford.7.0" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.10"/></proof>
    <proof prover="8"><result status="valid" time="0.06" steps="83"/></proof>
@@ -159,7 +159,7 @@
   <goal name="WP_parameter bellman_ford.8" expl="loop invariant init" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter bellman_ford.8.0" expl="loop invariant init" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter bellman_ford.8.0.0" expl="loop invariant init" proved="true">
     <proof prover="7"><result status="valid" time="0.16"/></proof>
     <proof prover="11"><result status="valid" time="0.12"/></proof>
@@ -181,7 +181,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter bellman_ford.9" expl="loop invariant init" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bellman_ford.9.0" expl="VC for bellman_ford" proved="true">
    <proof prover="8" timelimit="10"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
@@ -200,14 +200,14 @@
   <proof prover="8" timelimit="15"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter bellman_ford.13" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bellman_ford.13.0" expl="VC for bellman_ford" proved="true">
    <proof prover="8"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
    <goal name="WP_parameter bellman_ford.13.1" expl="VC for bellman_ford" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter bellman_ford.13.1.0" expl="VC for bellman_ford" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter bellman_ford.13.1.0.0" expl="VC for bellman_ford" proved="true">
      <proof prover="2" timelimit="30" memlimit="1000"><result status="valid" time="0.35"/></proof>
      <proof prover="8" timelimit="10"><result status="valid" time="0.48" steps="858"/></proof>
@@ -245,7 +245,7 @@
   <goal name="WP_parameter bellman_ford.16" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter bellman_ford.16.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter bellman_ford.16.0.0" expl="loop invariant preservation" proved="true">
     <proof prover="8"><result status="valid" time="0.16" steps="222"/></proof>
     </goal>
@@ -280,7 +280,7 @@
   <proof prover="0" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_15.v"><result status="valid" time="1.44"/></proof>
   </goal>
   <goal name="WP_parameter bellman_ford.21" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bellman_ford.21.0" expl="VC for bellman_ford" proved="true">
    <proof prover="8" timelimit="15" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
@@ -296,7 +296,7 @@
   <proof prover="8" timelimit="15" memlimit="0"><result status="valid" time="0.06" steps="73"/></proof>
   </goal>
   <goal name="WP_parameter bellman_ford.24" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter bellman_ford.24.0" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.13"/></proof>
    <proof prover="5"><result status="valid" time="0.03"/></proof>

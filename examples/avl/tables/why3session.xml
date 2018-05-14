@@ -44,7 +44,7 @@
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter selected_sem" expl="VC for selected_sem" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter selected_sem.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -78,13 +78,13 @@
  </transf>
  </goal>
  <goal name="WP_parameter selected_part" expl="VC for selected_part" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter selected_part.0" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="WP_parameter selected_part.0.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter selected_part.0.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter selected_part.0.0.0.0" expl="VC for selected_part" proved="true">
      <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
      </goal>
@@ -117,7 +117,7 @@
    <goal name="WP_parameter selected_part.1.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter selected_part.1.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter selected_part.1.0.0.0" expl="VC for selected_part" proved="true">
      <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
      </goal>
@@ -223,7 +223,7 @@
  <proof prover="1"><result status="valid" time="0.17" steps="417"/></proof>
  </goal>
  <goal name="WP_parameter add_max" expl="VC for add_max" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter add_max.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -242,12 +242,12 @@
  <proof prover="1"><result status="valid" time="0.25" steps="792"/></proof>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter insert.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter insert.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.1.0" expl="VC for insert" proved="true">
    <proof prover="1"><result status="valid" time="0.36" steps="411"/></proof>
    </goal>
@@ -274,12 +274,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter remove.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter remove.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter remove.1.0" expl="VC for remove" proved="true">
    <proof prover="1"><result status="valid" time="0.74" steps="660"/></proof>
    </goal>
@@ -306,7 +306,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter split" expl="VC for split" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter split.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -316,7 +316,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter view" expl="VC for view" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter view.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -326,12 +326,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter join" expl="VC for join" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter join.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter join.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter join.1.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="2.28" steps="3106"/></proof>
    </goal>
@@ -344,7 +344,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter join.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter join.2.0" expl="VC for join" proved="true">
    <proof prover="1"><result status="valid" time="0.05" steps="33"/></proof>
    </goal>
@@ -353,7 +353,7 @@
     <goal name="WP_parameter join.2.1.0" expl="VC for join" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="WP_parameter join.2.1.0.0" expl="VC for join" proved="true">
-     <transf name="split_goal_wp" proved="true" >
+     <transf name="split_goal_right" proved="true" >
       <goal name="WP_parameter join.2.1.0.0.0" expl="VC for join" proved="true">
       <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
       </goal>
@@ -371,7 +371,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_all" expl="VC for add_all" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter add_all.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>
@@ -474,7 +474,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter filter" expl="VC for filter" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter filter.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -592,7 +592,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove_all" expl="VC for remove_all" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter remove_all.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -680,7 +680,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter symdiff" expl="VC for symdiff" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter symdiff.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -880,7 +880,7 @@
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="5"/></proof>
  </goal>
  <goal name="WP_parameter m_def" expl="VC for m_def" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter m_def.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.15"/></proof>
   </goal>

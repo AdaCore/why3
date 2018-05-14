@@ -13,7 +13,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter sieve" expl="VC for sieve">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sieve.1" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -48,7 +48,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter sieve.12" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter sieve.12.1" expl="VC for sieve">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -67,7 +67,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter sieve.15" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter sieve.15.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.68" steps="83"/></proof>
    </goal>
@@ -89,7 +89,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter sieve.17" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter sieve.17.1" expl="loop invariant preservation">
    <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
    </goal>
@@ -102,7 +102,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter sieve.19" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter sieve.19.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
    </goal>
@@ -136,7 +136,7 @@
   <proof prover="1"><result status="valid" time="0.68"/></proof>
   </goal>
   <goal name="WP_parameter sieve.24" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter sieve.24.1" expl="assertion">
    <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>

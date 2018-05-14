@@ -17,7 +17,7 @@
  </goal>
  <goal name="WP_parameter value_sub_frame" expl="VC for value_sub_frame">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_frame.1" expl="1. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -46,7 +46,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_tail" expl="VC for value_sub_tail">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_tail.1" expl="1. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -71,7 +71,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_concat" expl="VC for value_sub_concat">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_concat.1" expl="1. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -96,7 +96,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_update" expl="VC for value_sub_update">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_update.1" expl="1. assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -131,7 +131,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_zero" expl="VC for value_zero">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_zero.1" expl="1. variant decrease">
   <proof prover="10"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>
@@ -147,7 +147,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter zero" expl="VC for zero">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter zero.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -160,7 +160,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter from_limb" expl="VC for from_limb">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter from_limb.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -173,7 +173,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter copy" expl="VC for copy">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter copy.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -201,7 +201,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter enlarge" expl="VC for enlarge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter enlarge.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -275,7 +275,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_lower_bound" expl="VC for value_sub_lower_bound">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_lower_bound.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.03"/></proof>
@@ -305,7 +305,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_upper_bound" expl="VC for value_sub_upper_bound">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_upper_bound.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -340,7 +340,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter value_sub_lower_bound_tight" expl="VC for value_sub_lower_bound_tight">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter value_sub_lower_bound_tight.1" expl="1. assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -363,7 +363,7 @@
  <proof prover="12"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter compare_limbs" expl="VC for compare_limbs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compare_limbs.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -423,7 +423,7 @@
   </goal>
   <goal name="WP_parameter compare_limbs.13" expl="13. assertion">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter compare_limbs.13.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -591,7 +591,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter compare" expl="VC for compare">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compare.1" expl="1. integer overflow">
   <proof prover="10" timelimit="3"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -626,7 +626,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_limb" expl="VC for add_limb">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_limb.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
@@ -706,7 +706,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_limbs" expl="VC for add_limbs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_limbs.1" expl="1. integer overflow">
   <proof prover="10" timelimit="3"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -804,7 +804,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_aux_in_place" expl="VC for add_aux_in_place">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_aux_in_place.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -871,7 +871,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_in_place" expl="VC for add_in_place">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_in_place.1" expl="1. precondition">
   <proof prover="10"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
@@ -892,7 +892,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_array" expl="VC for add_array">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_array.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -980,7 +980,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add.1" expl="1. precondition">
   <proof prover="10"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
@@ -996,7 +996,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter mul_limb" expl="VC for mul_limb">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter mul_limb.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
@@ -1077,7 +1077,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter mul_limbs" expl="VC for mul_limbs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter mul_limbs.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
@@ -1168,7 +1168,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter mul" expl="VC for mul">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter mul.1" expl="1. integer overflow">
   <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>

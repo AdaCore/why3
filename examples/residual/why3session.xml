@@ -13,7 +13,7 @@
 <file name="../residual.mlw" proved="true">
 <theory name="Residuals" proved="true">
  <goal name="WP_parameter accepts_epsilon" expl="VC for accepts_epsilon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter accepts_epsilon.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
@@ -42,7 +42,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter accepts_epsilon.9.0" expl="VC for accepts_epsilon" proved="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
@@ -117,7 +117,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
  </goal>
  <goal name="WP_parameter residual" expl="VC for residual" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter residual.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="89"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -182,7 +182,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter decide_mem" expl="VC for decide_mem" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter decide_mem.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
@@ -197,7 +197,7 @@
 </theory>
 <theory name="Test" proved="true">
  <goal name="WP_parameter test_astar" expl="VC for test_astar" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>
