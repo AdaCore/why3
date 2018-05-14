@@ -7,41 +7,41 @@
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tables.mlw" proved="true">
 <theory name="MapBase" proved="true">
- <goal name="WP_parameter measure" expl="VC for measure" proved="true">
+ <goal name="D.WP_parameter measure" expl="VC for measure" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Refl" proved="true">
+ <goal name="A.O.Refl" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Trans" proved="true">
+ <goal name="A.O.Trans" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
- <goal name="eq_def" proved="true">
+ <goal name="A.O.eq_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="lt_def" proved="true">
+ <goal name="A.O.lt_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="WP_parameter neutral_" expl="VC for neutral_" proved="true">
+ <goal name="M.WP_parameter neutral_" expl="VC for neutral_" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
- <goal name="assoc" proved="true">
+ <goal name="M.assoc" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="1"/></proof>
  </goal>
- <goal name="neutral" proved="true">
+ <goal name="M.neutral" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="assoc" proved="true">
+ <goal name="M.M.assoc" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
- <goal name="neutral" proved="true">
+ <goal name="M.M.neutral" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter zero" expl="VC for zero" proved="true">
- <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
- </goal>
- <goal name="WP_parameter op" expl="VC for op" proved="true">
+ <goal name="M.WP_parameter zero" expl="VC for zero" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
+ </goal>
+ <goal name="M.WP_parameter op" expl="VC for op" proved="true">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter selected_sem" expl="VC for selected_sem" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -165,34 +165,34 @@
   </goal>
  </transf>
  </goal>
- <goal name="assoc" proved="true">
+ <goal name="Sel.M.assoc" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
- <goal name="neutral" proved="true">
+ <goal name="Sel.M.neutral" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sum_def_nil" proved="true">
+ <goal name="Sel.M.sum_def_nil" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="6"/></proof>
  </goal>
- <goal name="sum_def_cons" proved="true">
+ <goal name="Sel.M.sum_def_cons" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="8"/></proof>
  </goal>
- <goal name="balancing_positive" proved="true">
+ <goal name="Sel.balancing_positive" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
- <goal name="selection_empty" proved="true">
+ <goal name="Sel.selection_empty" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.06" steps="23"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero" proved="true">
+ <goal name="Sel.WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op" proved="true">
+ <goal name="Sel.WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure" proved="true">
+ <goal name="Sel.WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="2"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part" proved="true">
+ <goal name="Sel.WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="171"/></proof>
  </goal>
  <goal name="WP_parameter m" expl="VC for m" proved="true">
@@ -533,7 +533,7 @@
   <proof prover="1"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter filter.19" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.48"/></proof>
+  <proof prover="0"><result status="valid" time="0.33"/></proof>
   </goal>
   <goal name="WP_parameter filter.20" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.42"/></proof>
@@ -781,31 +781,31 @@
  </goal>
 </theory>
 <theory name="Map" proved="true">
- <goal name="WP_parameter get_key" expl="VC for get_key" proved="true">
+ <goal name="D.WP_parameter get_key" expl="VC for get_key" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="balancing_positive" proved="true">
+ <goal name="MB.balancing_positive" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Refl" proved="true">
+ <goal name="MB.CO.Refl" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Trans" proved="true">
+ <goal name="MB.CO.Trans" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
- <goal name="eq_def" proved="true">
+ <goal name="MB.CO.eq_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="lt_def" proved="true">
+ <goal name="MB.CO.lt_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="Total" proved="true">
+ <goal name="MB.CO.Total" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
- <goal name="WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key" proved="true">
+ <goal name="MB.WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="3"/></proof>
  </goal>
- <goal name="WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare" proved="true">
+ <goal name="MB.WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter m_def" expl="VC for m_def" proved="true">
@@ -852,31 +852,31 @@
  </goal>
 </theory>
 <theory name="Set" proved="true">
- <goal name="WP_parameter get_key" expl="VC for get_key" proved="true">
+ <goal name="D.WP_parameter get_key" expl="VC for get_key" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="balancing_positive" proved="true">
+ <goal name="MB.balancing_positive" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Refl" proved="true">
+ <goal name="MB.CO.Refl" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Trans" proved="true">
+ <goal name="MB.CO.Trans" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
- <goal name="eq_def" proved="true">
+ <goal name="MB.CO.eq_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="lt_def" proved="true">
+ <goal name="MB.CO.lt_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
- <goal name="Total" proved="true">
+ <goal name="MB.CO.Total" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
- <goal name="WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key" proved="true">
+ <goal name="MB.WP_parameter   MapBase  get_key" expl="VC for   MapBase  get_key" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare" proved="true">
+ <goal name="MB.WP_parameter   MapBase  CO compare" expl="VC for   MapBase  CO compare" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.04" steps="5"/></proof>
  </goal>
  <goal name="WP_parameter m_def" expl="VC for m_def" proved="true">
@@ -951,46 +951,46 @@
  <goal name="WP_parameter compare" expl="VC for compare" proved="true">
  <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="0"/></proof>
  </goal>
- <goal name="balancing_positive" proved="true">
+ <goal name="M.balancing_positive" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="0"/></proof>
  </goal>
- <goal name="Refl" proved="true">
+ <goal name="M.CO.Refl" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="0"/></proof>
  </goal>
- <goal name="Trans" proved="true">
+ <goal name="M.CO.Trans" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
- <goal name="eq_def" proved="true">
+ <goal name="M.CO.eq_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="lt_def" proved="true">
+ <goal name="M.CO.lt_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="Total" proved="true">
+ <goal name="M.CO.Total" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="WP_parameter   Map  CO compare" expl="VC for   Map  CO compare" proved="true">
+ <goal name="M.WP_parameter   Map  CO compare" expl="VC for   Map  CO compare" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.06" steps="5"/></proof>
  </goal>
- <goal name="balancing_positive" proved="true">
+ <goal name="S.balancing_positive" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.06" steps="1"/></proof>
  </goal>
- <goal name="Refl" proved="true">
+ <goal name="S.CO.Refl" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="1"/></proof>
  </goal>
- <goal name="Trans" proved="true">
+ <goal name="S.CO.Trans" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="3"/></proof>
  </goal>
- <goal name="eq_def" proved="true">
+ <goal name="S.CO.eq_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
  </goal>
- <goal name="lt_def" proved="true">
+ <goal name="S.CO.lt_def" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="2"/></proof>
  </goal>
- <goal name="Total" proved="true">
+ <goal name="S.CO.Total" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.05" steps="1"/></proof>
  </goal>
- <goal name="WP_parameter   Set  CO compare" expl="VC for   Set  CO compare" proved="true">
+ <goal name="S.WP_parameter   Set  CO compare" expl="VC for   Set  CO compare" proved="true">
  <proof prover="1" timelimit="3"><result status="valid" time="0.08" steps="8"/></proof>
  </goal>
 </theory>
