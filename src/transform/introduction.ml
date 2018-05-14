@@ -109,5 +109,5 @@ let split_vc =
   Trans.compose_l Split_goal.split_goal_right (Trans.singleton simplify_intros)
 
 let () = Trans.register_transform_l
-           "split_vcp" split_vc
+           "split_vc" split_vc
            ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ by@ simplify_trivial_quantifications@ followed@ by@ introduce_premises)."
