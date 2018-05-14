@@ -246,8 +246,7 @@ let rec goal_latex2_stat s fmt prov depth depth_max subgoal g =
     begin
       List.iter
         (fun tr ->
-         let name = (get_transf_name s tr) ^
-                      (String.concat "" (get_transf_args s tr)) in
+         let name = get_transf_string s tr in
          style_2_row fmt ~transf:true (depth+1) prov subgoal
                      (protect name);
 	 fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\@."
