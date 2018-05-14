@@ -152,9 +152,7 @@ let rec num_lines s acc tr =
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (tn_proved s tr)
       (max_depth - depth + 1);
-    let name = (get_transf_name s tr) ^
-                 (String.concat "" (get_transf_args s tr)) in
-    fprintf fmt "%s</td>" name ;
+    fprintf fmt "%s</td>" (get_transf_string s tr);
     for _i=1 to List.length provers do
       fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
@@ -263,10 +261,8 @@ struct
       print_proof_status pa.proof_state
 
   let rec print_transf s fmt tr =
-    let name = (get_transf_name s tr) ^
-                 (String.concat "" (get_transf_args s tr)) in
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      name
+      (get_transf_string s tr)
       (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =

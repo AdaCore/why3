@@ -182,8 +182,7 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
     end
 
 and stats_of_transf prefix_name stats ses transf =
-  let prefix_name = prefix_name ^ (get_transf_name ses transf) ^
-                    (String.concat "" (get_transf_args ses transf)) ^ " / " in
+  let prefix_name = prefix_name ^ (get_transf_string ses transf) ^ " / " in
   List.iter (stats_of_goal ~root:false prefix_name stats ses) (get_sub_tasks ses transf)
 
 let stats_of_theory file stats ses theory =
@@ -262,9 +261,7 @@ let rec print_goal_stats ~time depth ses (g,l) =
 
 and print_transf_stats ~time depth ses (tr,l) =
   for _i=1 to depth do printf "  " done;
-  let name = (get_transf_name ses tr) ^
-               (String.concat "" (get_transf_args ses tr)) in
-  printf "+-- transformation %s@\n" name;
+  printf "+-- transformation %s@\n" (get_transf_string ses tr);
   List.iter (print_goal_stats ~time (depth+1) ses) l
 
 let stats2_of_theory ~nb_proofs ses th =

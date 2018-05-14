@@ -330,6 +330,8 @@ let get_used_provers session =
      session;
   !sprover
 
+let get_transf_string s tr =
+  String.concat " " (Session_itp.get_transf_name s tr :: Session_itp.get_transf_args s tr)
 
 let rec transf_depth s tr =
   List.fold_left
