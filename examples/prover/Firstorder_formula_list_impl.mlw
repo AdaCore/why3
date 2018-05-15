@@ -488,6 +488,7 @@ module Impl
     requires { bound_depth_of_symbol_in_fo_formula_list t <= i + 1 }
     requires { correct_indexes_symbol x }
     requires { bound_depth_of_symbol_in_symbol x = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_symbol_in_fo_formula_list result <= i }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result =
@@ -563,6 +564,7 @@ module Impl
     requires { correct_indexes_fo_term x }
     requires { bound_depth_of_symbol_in_fo_term x = 0 }
     requires { bound_depth_of_fo_term_in_fo_term x = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
     ensures { bound_depth_of_fo_term_in_fo_formula_list result <= i }
     ensures { bound_depth_of_symbol_in_fo_formula_list result =
@@ -657,6 +659,7 @@ module Impl
     requires { correct_indexes_fo_formula_list t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
      ensures { bound_depth_of_symbol_in_fo_formula_list result =
        bound_depth_of_symbol_in_fo_formula_list t }
@@ -732,6 +735,7 @@ module Impl
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
+    variant { nlsize_fo_formula_list t }
     ensures { correct_indexes_fo_formula_list result }
      ensures { bound_depth_of_symbol_in_fo_formula_list result =
        bound_depth_of_symbol_in_fo_formula_list t }
@@ -1192,8 +1196,8 @@ module Impl
                   (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
-          let mrv0 = rename_fo_formula mv0 identity identity in
-          let mrv1 = rename_fo_formula_list mv1 identity identity in
+          let ghost mrv0 = rename_fo_formula mv0 identity identity in
+          let ghost mrv1 = rename_fo_formula_list mv1 identity identity in
           let resv0 =
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;

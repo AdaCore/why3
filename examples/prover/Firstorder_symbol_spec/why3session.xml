@@ -6,12 +6,14 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Firstorder_symbol_spec.mlw" proved="true">
-<theory name="Spec" proved="true">
+<file name="../Firstorder_symbol_spec.mlw">
+<theory name="Spec">
  <goal name="VC size_positive_lemma_symbol" expl="VC for size_positive_lemma_symbol" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+ </goal>
+ <goal name="VC rename_symbol" expl="VC for rename_symbol">
  </goal>
  <goal name="VC renaming_composition_lemma_symbol" expl="VC for renaming_composition_lemma_symbol" proved="true">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
