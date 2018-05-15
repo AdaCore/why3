@@ -30,22 +30,22 @@ fi
 run () {
     printf "  $2 ($1)... "
     f="$2_$1"
-    $dir/../bin/why3prove.opt -P "$1,counterexamples" --timelimit 1 -a split_intros_goal_wp "$2.mlw" | \
+    $dir/../bin/why3prove.opt -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' > "$f.out"
     if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
-     echo "ok"
-  else
-     if $updateoracle; then
-        echo "Updating oracle for $2, prover $1"
-        mv "$f.out" "$f.oracle"
-     else
-       echo "FAILED!"
-       echo "diff is the following:"
-       diff "$f.oracle" "$f.out"
-     fi
-  fi
+        echo "ok"
+    else
+        if $updateoracle; then
+            echo "Updating oracle for $2, prover $1"
+            mv "$f.out" "$f.oracle"
+        else
+            echo "FAILED!"
+            echo "diff is the following:"
+            diff "$f.oracle" "$f.out"
+        fi
+    fi
 }
 
 
