@@ -26,20 +26,22 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  let is_keyword1 = make_table [ "as"; "axiom"; "clone"; "coinductive";
-    "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
-    "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
-    "lemma"; "let"; "match"; "meta"; "not"; "predicate"; "prop";
-    "scope"; "then"; "theory"; "true"; "type"; "use"; "with";
-    (* programs *) "abstract"; "any";
-    "begin"; "do"; "done"; "downto"; "exception";
-    "for"; "fun"; "ghost"; "loop"; "model"; "module";
-    "mutable"; "private"; "raise"; "rec";
+  let is_keyword1 = make_table [ "as"; "axiom"; "by";
+    "clone"; "coinductive"; "constant";
+    "else"; "end"; "epsilon"; "exists"; "export";
+    "false"; "float"; "forall"; "function";
+    "goal"; "if"; "import"; "in"; "inductive";
+    "lemma"; "let"; "match"; "meta"; "not"; "predicate";
+    "range"; "scope"; "so"; "then"; "theory"; "true"; "type"; "use"; "with";
+    (* programs *) "abstract"; "any"; "at";
+    "begin"; "break"; "continue"; "do"; "done"; "downto"; "exception";
+    "for"; "fun"; "ghost"; "label"; "module"; "mutable";
+    "old"; "private"; "pure"; "raise"; "rec"; "return";
     "to"; "try"; "val"; "while"; ]
 
   let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
-    "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
-    "returns"; "variant"; "writes"; "diverges"; ]
+    "check"; "diverges"; "ensures"; "invariant";
+    "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)

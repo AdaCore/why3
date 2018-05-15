@@ -20,12 +20,10 @@
         "alias", ALIAS;
         "as", AS;
         "axiom", AXIOM;
-        "break", BREAK;
         "by", BY;
         "clone", CLONE;
         "coinductive", COINDUCTIVE;
         "constant", CONSTANT;
-        "continue", CONTINUE;
         "else", ELSE;
         "end", END;
         "epsilon", EPSILON;
@@ -63,7 +61,9 @@
         "assume", ASSUME;
         "at", AT;
         "begin", BEGIN;
+        "break", BREAK;
         "check", CHECK;
+        "continue", CONTINUE;
         "diverges", DIVERGES;
         "do", DO;
         "done", DONE;
