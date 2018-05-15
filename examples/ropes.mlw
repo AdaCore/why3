@@ -249,7 +249,7 @@ module Balance
     ensures { 2 <= result }
 
   function string_of_array (q: Array.array rope) (l u: int) : string
-    (** q[u-1] + q[u-2] + ... + q[l] *)
+    (** [q[u-1] + q[u-2] + ... + q[l]] *)
 
   axiom string_of_array_empty:
     forall q: Array.array rope, l: int.

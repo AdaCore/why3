@@ -239,8 +239,8 @@ function size_c (c:cont) : int =
 
 lemma size_c_pos: forall c: cont. size_c c >= 0
 
-(** WhyML programs (declared with "let" instead of "function"),
-   mutually recursive, resulting from de-functionalization *)
+(** WhyML programs (declared with [let] instead of [function]),
+    mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int
   variant { size_c c }
@@ -349,7 +349,7 @@ function size_c (c:cont) (acc:nat) : nat =
   | A2 _ k -> S (size_c k acc)
   end
 
-(** WhyML programs (declared with "let" instead of "function"),
+(** WhyML programs (declared with [let] instead of [function]),
    mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int

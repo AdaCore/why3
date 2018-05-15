@@ -48,7 +48,7 @@ module Puzzle8
   use import Roberval
   use import array.Array
 
-  (** All values in [balls(lo..hi-1)] are equal to [w], apart from balls[lb]
+  (** All values in [balls(lo..hi-1)] are equal to [w], apart from [balls[lb]]
      which is smaller. *)
   predicate spec (balls: array int) (lo hi: int) (lb w: int) =
     0 <= lo <= lb < hi <= length balls &&
