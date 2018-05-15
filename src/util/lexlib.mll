@@ -10,25 +10,7 @@
 (********************************************************************)
 
 {
-  open Format
   open Lexing
-
-  (* lexical errors *)
-
-  exception UnterminatedComment
-  exception UnterminatedString
-  exception IllegalCharacter of string
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
-    | UnterminatedString -> fprintf fmt "unterminated string"
-    | IllegalCharacter s -> fprintf fmt "illegal character %s" s
-    | _ -> raise e)
-
-  let string_start_loc = ref Loc.dummy_position
-  let string_buf = Buffer.create 1024
-
-  let comment_start_loc = ref Loc.dummy_position
 
   let char_for_backslash = function
     | 'n' -> '\n'
@@ -57,36 +39,55 @@ and comment = parse
   | newline
       { new_line lexbuf; comment lexbuf }
   | eof
-      { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
+      { raise Not_found }
   | _
       { comment lexbuf }
 
-and string = parse
+and string buf = parse
   | "\""
-      { let s = Buffer.contents string_buf in
-        Buffer.clear string_buf;
-        s }
+      { Buffer.contents buf }
   | "\\" newline
-      { new_line lexbuf; string_skip_spaces lexbuf }
+      { new_line lexbuf;
+        string_skip_spaces buf lexbuf }
   | "\\" (_ as c)
-      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { Buffer.add_char buf (char_for_backslash c);
+        string buf lexbuf }
   | newline
-      { new_line lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
+      { new_line lexbuf;
+        Buffer.add_char buf '\n';
+        string buf lexbuf }
   | eof
-      { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
+      { raise Not_found }
   | _ as c
-      { Buffer.add_char string_buf c; string lexbuf }
+      { Buffer.add_char buf c;
+        string buf lexbuf }
 
-and string_skip_spaces = parse
+and string_skip_spaces buf = parse
   | [' ' '\t']*
-      { string lexbuf }
+      { string buf lexbuf }
 
 {
+  exception UnterminatedComment
+  exception UnterminatedString
+  exception IllegalCharacter of string
+
+  let () = Exn_printer.register (fun fmt e -> match e with
+    | UnterminatedComment -> Format.fprintf fmt "unterminated comment"
+    | UnterminatedString -> Format.fprintf fmt "unterminated string"
+    | IllegalCharacter s -> Format.fprintf fmt "illegal character %s" s
+    | _ -> raise e)
+
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
 
-  let comment lexbuf = comment_start_loc := loc lexbuf; comment lexbuf
+  let comment lexbuf =
+    let start = loc lexbuf in
+    try comment lexbuf
+    with Not_found -> raise (Loc.Located (start, UnterminatedComment))
 
-  let string lexbuf = string_start_loc := loc lexbuf; string lexbuf
+  let string lexbuf =
+    let start = loc lexbuf in
+    try string (Buffer.create 128) lexbuf
+    with Not_found -> raise (Loc.Located (start, UnterminatedString))
 
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
