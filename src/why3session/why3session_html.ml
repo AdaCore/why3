@@ -247,10 +247,15 @@ struct
       print_prover pa.prover
       print_proof_status pa.proof_state
 
+  let print_ul print =
+    let start_ul fmt () = pp_print_string fmt " : <ul>" in
+    let stop_ul  fmt () = pp_print_string fmt "</ul>" in
+    Pp.print_list_delim ~start:start_ul ~sep:Pp.newline ~stop:stop_ul print
+
   let rec print_transf s fmt tr =
-    fprintf fmt "<li>%a : <ul>%a</ul></li>"
+    fprintf fmt "<li>%a%a</li>"
       Pp.html_string (get_transf_string s tr)
-      (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
+      (print_ul (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =
     fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
@@ -262,14 +267,14 @@ struct
       (get_transformations s g)
 
   let print_theory s fmt th =
-    fprintf fmt "<li>%s : <ul>%a</ul></li>"
+    fprintf fmt "<li>%s%a</li>"
       (theory_name th).Ident.id_string
-      (Pp.print_list Pp.newline (print_goal s)) (theory_goals th)
+      (print_ul (print_goal s)) (theory_goals th)
 
   let print_file s fmt f =
-    fprintf fmt "<li>%s : <ul>%a</ul></li>"
+    fprintf fmt "<li>%s%a</li>"
       (file_name f)
-      (Pp.print_list Pp.newline (print_theory s)) (file_theories f)
+      (print_ul (print_theory s)) (file_theories f)
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
