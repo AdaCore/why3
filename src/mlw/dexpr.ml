@@ -1107,8 +1107,11 @@ let cty_of_spec env bl mask dsp dity =
 (** Expressions *)
 
 let warn_unused s loc =
-  if s = "" || s.[0] <> '_' then
-  Warning.emit ?loc "unused variable %s" s
+  if Debug.test_noflag Dterm.debug_ignore_unused_var then
+    begin
+     if s = "" || s.[0] <> '_' then
+     Warning.emit ?loc "unused variable %s" s
+    end
 
 let check_used_pv e pv = if not (Spv.mem pv e.e_effect.eff_reads) then
   warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
