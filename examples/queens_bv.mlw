@@ -6,8 +6,8 @@
 Verification of the following 2-lines C program solving the N-queens problem:
 
 {h <pre>
-   t(a,b,c){int d=0,e=a&~b&~c,f=1;if(a)for(f=0;d=(e-=d)&-e;f+=t(a-d,(b+d)*2,(
-   c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
+   t(a,b,c){int d=0,e=a&amp;~b&amp;~c,f=1;if(a)for(f=0;d=(e-=d)&amp;-e;f+=t(a-d,(b+d)*2,(
+   c+d)/2));return f;}main(q){scanf("%d",&amp;q);printf("%d\n",t(~(~0&lt;&lt;q),0,0));}
 </pre>}
 
 *)
@@ -46,7 +46,7 @@ theory Solution
 
   type solution = map int int
 
-  (** solutions [t] and [u] have the same prefix [[0..i[] *)
+  (** solutions [t] and [u] have the same prefix [\[0..i\[] *)
   predicate eq_prefix (t u: map int 'a) (i: int) =
     forall k: int. 0 <= k < i -> t[k] = u[k]
 
@@ -71,7 +71,7 @@ theory Solution
 
   type solutions = map int solution
 
-  (** [s[a..b[] is sorted for [lt_sol] *)
+  (** [s\[a..b\[] is sorted for [lt_sol] *)
   predicate sorted (s: solutions) (a b: int) =
     forall i j: int. a <= i < j < b -> lt_sol s[i] s[j]
 
