@@ -64,7 +64,7 @@ module Func
   =
     assert { extensionalEqual (const x) (compose (const x) f) }
 
-  let lemma const_compose_right (f:'a -> 'b) (x:'a) : unit
+  let lemma const_compose_right (f:'a -> 'b) (x:'a) (_:'c) : unit
     ensures { compose f (const x) = (const (f x): 'c -> 'b) }
   =
     assert { extensionalEqual (const (f x) : 'c -> 'b) (compose f (const x)) }

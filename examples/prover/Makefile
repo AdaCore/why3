@@ -65,7 +65,9 @@ $(ML):
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:extract%=extract)" "extract"
+ifneq "$(MAKECMDGOALS:extract%=replay)" "replay"
 include .depend
+endif
 endif
 endif
 

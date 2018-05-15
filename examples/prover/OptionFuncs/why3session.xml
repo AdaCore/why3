@@ -3,43 +3,43 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../OptionFuncs.mlw">
-<theory name="Funcs">
- <goal name="ocase_some" expl="">
+<file name="../OptionFuncs.mlw" proved="true">
+<theory name="Funcs" proved="true">
+ <goal name="ocase_some" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="ocase_none" expl="">
+ <goal name="ocase_none" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter compose_ocase_some" expl="VC for compose_ocase_some">
+ <goal name="VC compose_ocase_some" expl="VC for compose_ocase_some" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
  </goal>
- <goal name="olift_def" expl="">
+ <goal name="olift_def" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
- <goal name="olift_none" expl="">
+ <goal name="olift_none" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="olift_some" expl="">
+ <goal name="olift_some" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
- <goal name="olift_none_inversion" expl="">
+ <goal name="olift_none_inversion" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
  </goal>
- <goal name="WP_parameter olift_some_inversion" expl="VC for olift_some_inversion">
- <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
+ <goal name="VC olift_some_inversion" expl="VC for olift_some_inversion" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="83"/></proof>
  </goal>
- <goal name="WP_parameter olift_identity" expl="VC for olift_identity">
+ <goal name="VC olift_identity" expl="VC for olift_identity" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="72"/></proof>
  </goal>
- <goal name="WP_parameter olift_composition" expl="VC for olift_composition">
+ <goal name="VC olift_composition" expl="VC for olift_composition" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="128"/></proof>
  </goal>
- <goal name="olift_some_commutation" expl="">
- <proof prover="1"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="olift_some_commutation" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
- <goal name="WP_parameter olift_update" expl="VC for olift_update">
- <proof prover="1"><result status="valid" time="0.04" steps="253"/></proof>
+ <goal name="VC olift_update" expl="VC for olift_update" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="251"/></proof>
  </goal>
 </theory>
 </file>

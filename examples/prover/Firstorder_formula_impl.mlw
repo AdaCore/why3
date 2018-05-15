@@ -23,23 +23,23 @@ module Types
     | NL_FTrue
     | NL_FFalse
     | NL_PApp (nl_symbol 'b0) (nl_fo_term_list 'b0 'b1)
-
-
+    
+  
   type nlimpl_fo_formula =
     { nlrepr_fo_formula_field : nl_fo_formula int int ;
       nlfree_var_symbol_set_abstraction_fo_formula_field : int ;
       nlfree_var_fo_term_set_abstraction_fo_formula_field : int ;
       ghost model_fo_formula_field : fo_formula int int ;
     }
-
+  
   type cons_fo_formula = | NLC_Forall (int) (nlimpl_fo_formula)
     | NLC_Exists (int) (nlimpl_fo_formula)
     | NLC_And (nlimpl_fo_formula) (nlimpl_fo_formula)
     | NLC_Or (nlimpl_fo_formula) (nlimpl_fo_formula)
     | NLC_Not (nlimpl_fo_formula) | NLC_FTrue | NLC_FFalse
     | NLC_PApp (nlimpl_symbol) (nlimpl_fo_term_list)
-
-
+  
+  
 end
 
 module Logic
@@ -78,7 +78,7 @@ module Logic
         let s = one_nat in let s = add_nat (nat_nlsize_fo_term_list v1) s in
           let s = add_nat (nat_nlsize_symbol v0) s in s
     end
-
+  
   with nlsize_fo_formula (t:nl_fo_formula 'b0 'b1) : int =
     match t with
       | NL_Forall v0 -> let s = 1 in let s = nlsize_fo_formula v0 + s in s
@@ -95,7 +95,7 @@ module Logic
         let s = 1 in let s = nlsize_fo_term_list v1 + s in
           let s = nlsize_symbol v0 + s in s
     end
-
+  
   let rec lemma nlsize_positive_lemma_fo_formula (t:nl_fo_formula 'b0 'b1) :
     unit ensures { nlsize_fo_formula t > 0 }
     variant { nat_to_int (nat_nlsize_fo_formula t) } =
@@ -113,10 +113,10 @@ module Logic
         nlsize_positive_lemma_symbol v0 ;
           nlsize_positive_lemma_fo_term_list v1 ; ()
     end
-
+  
   function nlmodel_fo_formula (t:nl_fo_formula 'b0 'b1)
-    (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
-    (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1)) :
+    (fr0:'b0 -> (symbol 'c0)) (bnd0: int -> (symbol 'c0))
+    (fr1:'b1 -> (fo_term 'c0 'c1)) (bnd1: int -> (fo_term 'c0 'c1)) :
     fo_formula 'c0 'c1 =
     match t with
       | NL_Forall v0 ->
@@ -167,12 +167,12 @@ module Logic
             ((rename_subst_fo_term fr1 identity identity))
             ((rename_subst_fo_term bnd1 identity identity)))
     end
-
+  
   let rec lemma nlmodel_subst_commutation_lemma_fo_formula
-    (t:nl_fo_formula 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
-    (bnd0:func int (symbol 'c0)) (s0:func 'c0 (symbol 'd0))
-    (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1))
-    (s1:func 'c1 (fo_term 'd0 'd1)) : unit
+    (t:nl_fo_formula 'b0 'b1) (fr0:'b0 -> (symbol 'c0))
+    (bnd0: int -> (symbol 'c0)) (s0:'c0 -> (symbol 'd0))
+    (fr1:'b1 -> (fo_term 'c0 'c1)) (bnd1: int -> (fo_term 'c0 'c1))
+    (s1:'c1 -> (fo_term 'd0 'd1)) : unit
     ensures {
       nlmodel_fo_formula t (subst_compose_symbol fr0 s0)
         (subst_compose_symbol bnd0 s0) (subst_compose_fo_term fr1 s0 s1)
@@ -193,7 +193,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -208,7 +208,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term (shiftb_fo_term bnd1) identity identity)
+              (rename_subst_fo_term (shiftb_fo_term bnd1) identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term (olifts_fo_term s1) identity identity))
             =
@@ -230,7 +230,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -245,7 +245,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term (shiftb_fo_term bnd1) identity identity)
+              (rename_subst_fo_term (shiftb_fo_term bnd1) identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term (olifts_fo_term s1) identity identity))
             =
@@ -267,7 +267,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -282,7 +282,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -301,7 +301,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -316,7 +316,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -337,7 +337,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -352,7 +352,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -371,7 +371,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -386,7 +386,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -407,7 +407,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -422,7 +422,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -441,7 +441,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -457,7 +457,7 @@ module Logic
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol fr0 s0) identity) } ;
           assert {
-            subst_compose_symbol (rename_subst_symbol bnd0 identity)
+            subst_compose_symbol (rename_subst_symbol bnd0 identity) 
               ((rename_subst_symbol s0 identity))
             = (rename_subst_symbol (subst_compose_symbol bnd0  s0) identity)
             } ;
@@ -472,7 +472,7 @@ module Logic
             } ;
           assert {
             subst_compose_fo_term
-              (rename_subst_fo_term bnd1 identity identity)
+              (rename_subst_fo_term bnd1 identity identity) 
               ((rename_subst_symbol s0 identity))
               ((rename_subst_fo_term s1 identity identity))
             =
@@ -481,12 +481,12 @@ module Logic
             } ;
           ()
     end
-
+  
   let lemma nlmodel_rename_commutation_lemma_fo_formula
-    (t:nl_fo_formula 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
-    (bnd0:func int (symbol 'c0)) (s0:func 'c0 'd0)
-    (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1))
-    (s1:func 'c1 'd1) : unit
+    (t:nl_fo_formula 'b0 'b1) (fr0:'b0 -> (symbol 'c0))
+    (bnd0: int -> (symbol 'c0)) (s0:'c0 -> 'd0)
+    (fr1:'b1 -> (fo_term 'c0 'c1)) (bnd1: int -> (fo_term 'c0 'c1))
+    (s1:'c1 -> 'd1) : unit
     ensures {
       nlmodel_fo_formula t (rename_subst_symbol fr0 s0)
         (rename_subst_symbol bnd0 s0) (rename_subst_fo_term fr1 s0 s1)
@@ -495,7 +495,7 @@ module Logic
     =
     nlmodel_subst_commutation_lemma_fo_formula t fr0 bnd0
       (subst_of_rename_symbol s0) fr1 bnd1 (subst_of_rename_fo_term s1)
-
+  
   predicate correct_indexes_fo_formula (t:nl_fo_formula 'b0 'b1) =
     match t with | NL_Forall v0 -> correct_indexes_fo_formula v0
       | NL_Exists v0 -> correct_indexes_fo_formula v0
@@ -508,7 +508,7 @@ module Logic
       | NL_PApp v0 v1 ->
         correct_indexes_symbol v0 /\ correct_indexes_fo_term_list v1
     end
-
+  
   function bound_depth_of_symbol_in_fo_formula (t:nl_fo_formula 'b0 'b1) :
     int =
     match t with
@@ -532,7 +532,7 @@ module Logic
           let b = bound_depth_of_symbol_in_fo_term_list v1 in
           let a = if a > b then a else b in a
     end
-
+  
   with bound_depth_of_fo_term_in_fo_formula (t:nl_fo_formula 'b0 'b1) : int =
     match t with
       | NL_Forall v0 ->
@@ -555,7 +555,7 @@ module Logic
       | NL_PApp v0 v1 ->
         let b = bound_depth_of_fo_term_in_fo_term_list v1 in let a = b in a
     end
-
+  
   let rec lemma bound_depth_of_symbol_in_fo_formula_nonnegative
     (t:nl_fo_formula 'b0 'b1) : unit
     requires { correct_indexes_fo_formula t }
@@ -578,7 +578,7 @@ module Logic
         bound_depth_of_symbol_in_symbol_nonnegative v0 ;
           bound_depth_of_symbol_in_fo_term_list_nonnegative v1 ; ()
     end
-
+  
   with lemma bound_depth_of_fo_term_in_fo_formula_nonnegative
     (t:nl_fo_formula 'b0 'b1) : unit
     requires { correct_indexes_fo_formula t }
@@ -600,20 +600,20 @@ module Logic
       | NL_PApp v0 v1 ->
         () ; bound_depth_of_fo_term_in_fo_term_list_nonnegative v1 ; ()
     end
-
+  
   let rec lemma model_equal_fo_formula (t:nl_fo_formula 'b0 'b1)
-    (fr10:func 'b0 (symbol 'c0)) (fr20:func 'b0 (symbol 'c0))
-    (bnd10:func int (symbol 'c0)) (bnd20:func int (symbol 'c0))
-    (fr11:func 'b1 (fo_term 'c0 'c1)) (fr21:func 'b1 (fo_term 'c0 'c1))
-    (bnd11:func int (fo_term 'c0 'c1)) (bnd21:func int (fo_term 'c0 'c1)) :
+    (fr10: 'b0 -> (symbol 'c0)) (fr20: 'b0 -> (symbol 'c0))
+    (bnd10: int -> (symbol 'c0)) (bnd20: int -> (symbol 'c0))
+    (fr11: 'b1 -> (fo_term 'c0 'c1)) (fr21: 'b1 -> (fo_term 'c0 'c1))
+    (bnd11: int -> (fo_term 'c0 'c1)) (bnd21: int -> (fo_term 'c0 'c1)) :
     unit
     requires {
-      forall i:int. 0 <= i < bound_depth_of_symbol_in_fo_formula t ->
+      forall i:int. 0 <= i < bound_depth_of_symbol_in_fo_formula t -> 
         bnd10 i = bnd20 i
       }
     requires { fr10 = fr20 }
     requires {
-      forall i:int. 0 <= i < bound_depth_of_fo_term_in_fo_formula t ->
+      forall i:int. 0 <= i < bound_depth_of_fo_term_in_fo_formula t -> 
         bnd11 i = bnd21 i
       }
     requires { fr11 = fr21 } requires { correct_indexes_fo_formula t }
@@ -702,7 +702,7 @@ module Logic
             ((rename_subst_fo_term bnd21 identity identity)) ;
           ()
     end
-
+  
   predicate nlimpl_fo_formula_ok (t:nlimpl_fo_formula) =
     nlmodel_fo_formula t.nlrepr_fo_formula_field subst_id_symbol
       (const (Var_symbol ((-1)))) subst_id_fo_term
@@ -717,7 +717,7 @@ module Logic
     (forall x:int.
        is_fo_term_free_var_in_fo_formula x t.model_fo_formula_field -> (x) <
        (t.nlfree_var_fo_term_set_abstraction_fo_formula_field))
-
+  
   predicate cons_ok_fo_formula (c:cons_fo_formula) =
     match c with | NLC_Forall v0 v1 -> nlimpl_fo_formula_ok v1
       | NLC_Exists v0 v1 -> nlimpl_fo_formula_ok v1
@@ -727,7 +727,7 @@ module Logic
       | NLC_FFalse -> true
       | NLC_PApp v0 v1 -> nlimpl_symbol_ok v0 /\ nlimpl_fo_term_list_ok v1
     end
-
+  
   predicate cons_rel_fo_formula (c:cons_fo_formula) (t:nlimpl_fo_formula) =
     match c with
       | NLC_Forall v0 v1 -> t.model_fo_formula_field =
@@ -752,7 +752,7 @@ module Logic
         PApp (rename_symbol v0.model_symbol_field identity)
           (rename_fo_term_list v1.model_fo_term_list_field identity identity)
     end
-
+  
   predicate cons_open_rel_fo_formula (c:cons_fo_formula)
     (t:nlimpl_fo_formula) =
     match c with
@@ -825,8 +825,8 @@ module Logic
                 (rename_fo_term_list w1 identity identity)
         end
     end
-
-
+  
+  
 end
 
 module Impl
@@ -848,12 +848,11 @@ module Impl
   use import Types
   use import Logic
   let rec bind_var_symbol_in_fo_formula (t:nl_fo_formula int int) (x:int)
-    (i:int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
+    (i:int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd0: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd1: int -> (fo_term 'b0 'b1)) : nl_fo_formula int int
     requires { correct_indexes_fo_formula t }
     requires { bound_depth_of_symbol_in_fo_formula t <= i }
-    variant { nlsize_fo_formula t }
     ensures { bound_depth_of_symbol_in_fo_formula result <= i + 1 }
     ensures { correct_indexes_fo_formula result }
     ensures { bound_depth_of_fo_term_in_fo_formula t =
@@ -1029,14 +1028,13 @@ module Impl
                ((rename_subst_fo_term fr1 identity identity))
                ((rename_subst_fo_term bnd1 identity identity)))
     end
-
+  
   with bind_var_fo_term_in_fo_formula (t:nl_fo_formula int int) (x:int)
-    (i:int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd0:func int (symbol 'b0)) (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
+    (i:int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd0: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd1: int -> (fo_term 'b0 'b1)) : nl_fo_formula int int
     requires { correct_indexes_fo_formula t }
     requires { bound_depth_of_fo_term_in_fo_formula t <= i }
-    variant { nlsize_fo_formula t }
     ensures { bound_depth_of_fo_term_in_fo_formula result <= i + 1 }
     ensures { correct_indexes_fo_formula result }
     ensures { bound_depth_of_symbol_in_fo_formula t =
@@ -1245,18 +1243,16 @@ module Impl
                ((rename_subst_fo_term fr1 identity identity))
                ((rename_subst_fo_term bnd1 identity identity)))
     end
-
+  
   let rec unbind_var_symbol_in_fo_formula (t:nl_fo_formula int int) (i:int)
-    (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0)) : nl_fo_formula int int
+    (x:nl_symbol int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0)) : nl_fo_formula int int
     requires { i >= 0 } requires { correct_indexes_fo_formula t }
     requires { bound_depth_of_symbol_in_fo_formula t <= i + 1 }
     requires { correct_indexes_symbol x }
     requires { bound_depth_of_symbol_in_symbol x = 0 }
-    variant { nlsize_fo_formula t }
     ensures { correct_indexes_fo_formula result }
     ensures { bound_depth_of_symbol_in_fo_formula result <= i }
     ensures { bound_depth_of_fo_term_in_fo_formula result =
@@ -1506,20 +1502,18 @@ module Impl
                ((rename_subst_fo_term bnd11 identity identity))
                ((rename_subst_symbol bnd20 identity)))
     end
-
+  
   with unbind_var_fo_term_in_fo_formula (t:nl_fo_formula int int) (i:int)
-    (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0))
-    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
+    (x:nl_fo_term int int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0))
+    (ghost bnd21: int -> (fo_term 'b0 'b1)) : nl_fo_formula int int
     requires { i >= 0 } requires { correct_indexes_fo_formula t }
     requires { bound_depth_of_fo_term_in_fo_formula t <= i + 1 }
     requires { correct_indexes_fo_term x }
     requires { bound_depth_of_symbol_in_fo_term x = 0 }
     requires { bound_depth_of_fo_term_in_fo_term x = 0 }
-    variant { nlsize_fo_formula t }
     ensures { correct_indexes_fo_formula result }
     ensures { bound_depth_of_fo_term_in_fo_formula result <= i }
     ensures { bound_depth_of_symbol_in_fo_formula result =
@@ -1881,17 +1875,15 @@ module Impl
                ((rename_subst_symbol bnd20 identity))
                ((rename_subst_fo_term bnd21 identity identity)))
     end
-
+  
   let rec subst_base_symbol_in_fo_formula (t:nl_fo_formula int int) (x:int)
-    (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0)) : nl_fo_formula int int
+    (u:nl_symbol int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0)) : nl_fo_formula int int
     requires { correct_indexes_fo_formula t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
-    variant { nlsize_fo_formula t }
     ensures { correct_indexes_fo_formula result }
      ensures { bound_depth_of_symbol_in_fo_formula result =
        bound_depth_of_symbol_in_fo_formula t }
@@ -2142,19 +2134,17 @@ module Impl
                ((rename_subst_fo_term bnd11 identity identity))
                ((rename_subst_symbol bnd20 identity)))
     end
-
+  
   with subst_base_fo_term_in_fo_formula (t:nl_fo_formula int int) (x:int)
-    (u:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0))
-    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_fo_formula int int
+    (u:nl_fo_term int int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0))
+    (ghost bnd21: int -> (fo_term 'b0 'b1)) : nl_fo_formula int int
     requires { correct_indexes_fo_formula t }
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
-    variant { nlsize_fo_formula t }
     ensures { correct_indexes_fo_formula result }
      ensures { bound_depth_of_symbol_in_fo_formula result =
        bound_depth_of_symbol_in_fo_formula t }
@@ -2507,7 +2497,7 @@ module Impl
                ((rename_subst_symbol bnd20 identity))
                ((rename_subst_fo_term bnd21 identity identity)))
     end
-
+  
   let construct_fo_formula (c:cons_fo_formula) : nlimpl_fo_formula
     requires { cons_ok_fo_formula c } ensures { nlimpl_fo_formula_ok result }
     ensures { cons_rel_fo_formula c result }
@@ -2523,15 +2513,14 @@ module Impl
                       bind_var_fo_term_in_fo_formula v1 v0 0
                         (ghost
                            (rename_subst_symbol
-                              (subst_id_symbol:func (int) (symbol (int)))
+                              (subst_id_symbol:(int)->(symbol (int)))
                               identity))
                         (ghost
                            (rename_subst_symbol (const (Var_symbol (-1)))
                              identity))
                         (ghost
                            (rename_subst_fo_term
-                              (subst_id_fo_term:func (int) (fo_term (int)
-                                                              (int)))
+                              (subst_id_fo_term:(int)->(fo_term (int) (int)))
                               identity (compose some identity)))
                         (ghost
                            (rename_subst_fo_term
@@ -2556,7 +2545,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -2600,11 +2589,11 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
@@ -2613,8 +2602,8 @@ module Impl
                (update (compose some identity) v0 None))
             ((update
                 (rename_subst_fo_term
-                   (subst_id_fo_term:func (int) (fo_term (int) (int)))
-                   identity (compose some identity))
+                   (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
+                   (compose some identity))
                 v0 (Var_fo_term None)))
           } ;
         assert {
@@ -2623,7 +2612,7 @@ module Impl
           =
           (update
              (rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 (compose some identity))
              v0 (Var_fo_term None))
           } ;
@@ -2642,20 +2631,20 @@ module Impl
              (update (compose some identity) v0 None)) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual
               (rcompose ((update (compose some identity) v0 None))
                  ((ocase identity v0)))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
         assert {
           rcompose ((update (compose some identity) v0 None))
             ((ocase identity v0))
-          = (identity : func (int) (int)) } ;*)
+          = (identity : (int) -> (int)) } ;*)
         res
       | NLC_Exists v0 v1 -> assert { nlimpl_fo_formula_ok v1 } ;
         let res =
@@ -2667,15 +2656,14 @@ module Impl
                       bind_var_fo_term_in_fo_formula v1 v0 0
                         (ghost
                            (rename_subst_symbol
-                              (subst_id_symbol:func (int) (symbol (int)))
+                              (subst_id_symbol:(int)->(symbol (int)))
                               identity))
                         (ghost
                            (rename_subst_symbol (const (Var_symbol (-1)))
                              identity))
                         (ghost
                            (rename_subst_fo_term
-                              (subst_id_fo_term:func (int) (fo_term (int)
-                                                              (int)))
+                              (subst_id_fo_term:(int)->(fo_term (int) (int)))
                               identity (compose some identity)))
                         (ghost
                            (rename_subst_fo_term
@@ -2700,7 +2688,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -2744,11 +2732,11 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
@@ -2757,8 +2745,8 @@ module Impl
                (update (compose some identity) v0 None))
             ((update
                 (rename_subst_fo_term
-                   (subst_id_fo_term:func (int) (fo_term (int) (int)))
-                   identity (compose some identity))
+                   (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
+                   (compose some identity))
                 v0 (Var_fo_term None)))
           } ;
         assert {
@@ -2767,7 +2755,7 @@ module Impl
           =
           (update
              (rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 (compose some identity))
              v0 (Var_fo_term None))
           } ;
@@ -2786,20 +2774,20 @@ module Impl
              (update (compose some identity) v0 None)) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual
               (rcompose ((update (compose some identity) v0 None))
                  ((ocase identity v0)))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
         assert {
           rcompose ((update (compose some identity) v0 None))
             ((ocase identity v0))
-          = (identity : func (int) (int)) } ;*)
+          = (identity : (int) -> (int)) } ;*)
         res
       | NLC_And v0 v1 -> assert { nlimpl_fo_formula_ok v0 } ;
         assert { nlimpl_fo_formula_ok v1 } ;
@@ -2835,7 +2823,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -2849,7 +2837,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -2864,7 +2852,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -2878,7 +2866,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -2911,23 +2899,23 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v0.nlrepr_fo_formula_field
@@ -2942,35 +2930,35 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v1.nlrepr_fo_formula_field
@@ -2985,16 +2973,16 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         res
       | NLC_Or v0 v1 -> assert { nlimpl_fo_formula_ok v0 } ;
         assert { nlimpl_fo_formula_ok v1 } ;
@@ -3030,7 +3018,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -3044,7 +3032,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -3059,7 +3047,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -3073,7 +3061,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v1.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v1.model_fo_formula_field
@@ -3106,23 +3094,23 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v0.nlrepr_fo_formula_field
@@ -3137,35 +3125,35 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v1.nlrepr_fo_formula_field
@@ -3180,16 +3168,16 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         res
       | NLC_Not v0 -> assert { nlimpl_fo_formula_ok v0 } ;
         let res =
@@ -3213,7 +3201,7 @@ module Impl
             ->
             (forall y:int.
                (is_symbol_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_symbol_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -3227,7 +3215,7 @@ module Impl
             ->
             (forall y:int.
                (is_fo_term_free_var_in_fo_formula y v0.model_fo_formula_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field)
             && is_fo_term_free_var_in_fo_formula x v0.model_fo_formula_field
@@ -3252,23 +3240,23 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v0.nlrepr_fo_formula_field
@@ -3283,16 +3271,16 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         res
       | NLC_FTrue ->
         let res =
@@ -3379,7 +3367,7 @@ module Impl
             (forall y:int.
                (is_symbol_free_var_in_fo_term_list y
                   v1.model_fo_term_list_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_symbol_free_var_in_fo_term_list x
                  v1.model_fo_term_list_field)
@@ -3398,7 +3386,7 @@ module Impl
             (forall y:int.
                (is_fo_term_free_var_in_fo_term_list y
                   v1.model_fo_term_list_field
-               /\ eval (identity) y = x) -> x = eval (identity) y &&
+               /\ eval (identity) y = x) -> x = eval (identity) y && 
                x = y &&
                is_fo_term_free_var_in_fo_term_list x
                  v1.model_fo_term_list_field)
@@ -3429,11 +3417,11 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         model_equal_symbol v0.nlrepr_symbol_field
@@ -3443,29 +3431,29 @@ module Impl
           (rename_subst_symbol (const (Var_symbol (-1))) identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_term_list v1.nlrepr_fo_term_list_field
@@ -3480,19 +3468,19 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         res
     end
-
+  
   let destruct_fo_formula (t:nlimpl_fo_formula) : cons_fo_formula
     requires { nlimpl_fo_formula_ok t } ensures { cons_ok_fo_formula result }
     ensures { cons_rel_fo_formula result t }
@@ -3512,13 +3500,12 @@ module Impl
               (nlmodel_fo_formula v0
                  (rename_subst_symbol subst_id_symbol identity)
                  (rename_subst_symbol
-                   (const (Var_symbol (-1)) : func int (symbol int))
-                   identity)
+                   (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                  (rename_subst_fo_term subst_id_fo_term identity
                    (compose some identity))
                  (rename_subst_fo_term
                    (shiftb_fo_term
-                     (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                     (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                    identity identity))
             } ;
           let (mv0) =
@@ -3532,12 +3519,12 @@ module Impl
             nlmodel_fo_formula v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity
                  (compose some identity)))
               ((rename_subst_fo_term
                  (shiftb_fo_term
-                   (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                   (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_fo_formula v0 <= 0 } ;
@@ -3559,9 +3546,8 @@ module Impl
             } ;
           assert {
             eval
-              ((update
-                  (const (Var_fo_term (-1)) : func int (fo_term int int)) 0
-                  (Var_fo_term w0)))
+              ((update (const (Var_fo_term (-1)) : int -> (fo_term int int))
+                  0 (Var_fo_term w0)))
               0
             =
             (rename_fo_term (Var_fo_term None) (identity)
@@ -3571,7 +3557,7 @@ module Impl
               (rename_subst_fo_term
                  ((rename_subst_fo_term
                     (shiftb_fo_term
-                      (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                      (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                     identity identity))
                  (identity) ((ocase identity w0)))
               0
@@ -3579,10 +3565,10 @@ module Impl
           model_equal_fo_formula v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
@@ -3591,30 +3577,30 @@ module Impl
                (identity) ((ocase identity w0))) ((update
                                                      (const
                                                         (Var_fo_term (-1)) :
-                                                        func int
-                                                          (fo_term int int))
+                                                        int
+                                                          -> (fo_term int int))
                                                      0 (Var_fo_term w0)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
                   (shiftb_fo_term
-                    (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                    (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                   identity identity))
                (identity) ((ocase identity w0))) ;
           let mrv0 = rename_fo_formula mv0 identity (ocase identity w0) in
           let v0 =
             unbind_var_fo_term_in_fo_formula v0 0 (NLFVar_fo_term w0)
               (ghost subst_id_symbol)
-              (ghost (const (Var_symbol (-1)) : func int (symbol int)))
+              (ghost (const (Var_symbol (-1)) : int -> (symbol int)))
               (ghost subst_id_fo_term)
-              (ghost (const (Var_fo_term (-1)) : func int (fo_term int int)))
-              (ghost (const (Var_symbol (-1)) : func int (symbol int)))
-              (ghost (const (Var_fo_term (-1)) : func int (fo_term int int)))
+              (ghost (const (Var_fo_term (-1)) : int -> (fo_term int int)))
+              (ghost (const (Var_symbol (-1)) : int -> (symbol int)))
+              (ghost (const (Var_fo_term (-1)) : int -> (fo_term int int)))
           in
           let resv0 =
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ;
+              model_fo_formula_field = ghost mrv0 ; 
             }
           in let res = NLC_Forall w0 resv0 in
           assert {
@@ -3675,13 +3661,12 @@ module Impl
               (nlmodel_fo_formula v0
                  (rename_subst_symbol subst_id_symbol identity)
                  (rename_subst_symbol
-                   (const (Var_symbol (-1)) : func int (symbol int))
-                   identity)
+                   (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                  (rename_subst_fo_term subst_id_fo_term identity
                    (compose some identity))
                  (rename_subst_fo_term
                    (shiftb_fo_term
-                     (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                     (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                    identity identity))
             } ;
           let (mv0) =
@@ -3695,12 +3680,12 @@ module Impl
             nlmodel_fo_formula v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity
                  (compose some identity)))
               ((rename_subst_fo_term
                  (shiftb_fo_term
-                   (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                   (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_fo_formula v0 <= 0 } ;
@@ -3722,9 +3707,8 @@ module Impl
             } ;
           assert {
             eval
-              ((update
-                  (const (Var_fo_term (-1)) : func int (fo_term int int)) 0
-                  (Var_fo_term w0)))
+              ((update (const (Var_fo_term (-1)) : int -> (fo_term int int))
+                  0 (Var_fo_term w0)))
               0
             =
             (rename_fo_term (Var_fo_term None) (identity)
@@ -3734,7 +3718,7 @@ module Impl
               (rename_subst_fo_term
                  ((rename_subst_fo_term
                     (shiftb_fo_term
-                      (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                      (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                     identity identity))
                  (identity) ((ocase identity w0)))
               0
@@ -3742,10 +3726,10 @@ module Impl
           model_equal_fo_formula v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
@@ -3754,30 +3738,30 @@ module Impl
                (identity) ((ocase identity w0))) ((update
                                                      (const
                                                         (Var_fo_term (-1)) :
-                                                        func int
-                                                          (fo_term int int))
+                                                        int
+                                                          -> (fo_term int int))
                                                      0 (Var_fo_term w0)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
                   (shiftb_fo_term
-                    (const (Var_fo_term (-1)) : func int (fo_term int int)))
+                    (const (Var_fo_term (-1)) : int -> (fo_term int int)))
                   identity identity))
                (identity) ((ocase identity w0))) ;
           let mrv0 = rename_fo_formula mv0 identity (ocase identity w0) in
           let v0 =
             unbind_var_fo_term_in_fo_formula v0 0 (NLFVar_fo_term w0)
               (ghost subst_id_symbol)
-              (ghost (const (Var_symbol (-1)) : func int (symbol int)))
+              (ghost (const (Var_symbol (-1)) : int -> (symbol int)))
               (ghost subst_id_fo_term)
-              (ghost (const (Var_fo_term (-1)) : func int (fo_term int int)))
-              (ghost (const (Var_symbol (-1)) : func int (symbol int)))
-              (ghost (const (Var_fo_term (-1)) : func int (fo_term int int)))
+              (ghost (const (Var_fo_term (-1)) : int -> (fo_term int int)))
+              (ghost (const (Var_symbol (-1)) : int -> (symbol int)))
+              (ghost (const (Var_fo_term (-1)) : int -> (fo_term int int)))
           in
           let resv0 =
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ;
+              model_fo_formula_field = ghost mrv0 ; 
             }
           in let res = NLC_Exists w0 resv0 in
           assert {
@@ -3832,18 +3816,18 @@ module Impl
             (nlmodel_fo_formula v0
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             (nlmodel_fo_formula v1
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
           } ;
           let (mv0 , mv1) =
@@ -3857,20 +3841,20 @@ module Impl
             nlmodel_fo_formula v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { mv1 =
             nlmodel_fo_formula v1
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_fo_formula v0 <= 0 } ;
@@ -3900,37 +3884,37 @@ module Impl
           model_equal_fo_formula v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           model_equal_fo_formula v1 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           let mrv0 = rename_fo_formula mv0 identity identity in
@@ -3939,14 +3923,14 @@ module Impl
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ;
+              model_fo_formula_field = ghost mrv0 ; 
             }
           in
           let resv1 =
             { nlrepr_fo_formula_field = v1 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv1 ;
+              model_fo_formula_field = ghost mrv1 ; 
             }
           in let res = NLC_And resv0 resv1 in
           free_var_equivalence_of_rename_fo_formula mv0 (identity)
@@ -4002,18 +3986,18 @@ module Impl
             (nlmodel_fo_formula v0
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             (nlmodel_fo_formula v1
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
           } ;
           let (mv0 , mv1) =
@@ -4027,20 +4011,20 @@ module Impl
             nlmodel_fo_formula v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { mv1 =
             nlmodel_fo_formula v1
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_fo_formula v0 <= 0 } ;
@@ -4070,37 +4054,37 @@ module Impl
           model_equal_fo_formula v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           model_equal_fo_formula v1 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           let mrv0 = rename_fo_formula mv0 identity identity in
@@ -4109,14 +4093,14 @@ module Impl
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ;
+              model_fo_formula_field = ghost mrv0 ; 
             }
           in
           let resv1 =
             { nlrepr_fo_formula_field = v1 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv1 ;
+              model_fo_formula_field = ghost mrv1 ; 
             }
           in let res = NLC_Or resv0 resv1 in
           free_var_equivalence_of_rename_fo_formula mv0 (identity)
@@ -4172,10 +4156,10 @@ module Impl
             (nlmodel_fo_formula v0
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
           } ;
           let (mv0) =
@@ -4189,10 +4173,10 @@ module Impl
             nlmodel_fo_formula v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_fo_formula v0 <= 0 } ;
@@ -4210,19 +4194,19 @@ module Impl
           model_equal_fo_formula v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           let mrv0 = rename_fo_formula mv0 identity identity in
@@ -4230,7 +4214,7 @@ module Impl
             { nlrepr_fo_formula_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_formula_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_formula_field = fv1 ;
-              model_fo_formula_field = ghost mrv0 ;
+              model_fo_formula_field = ghost mrv0 ; 
             }
           in let res = NLC_Not resv0 in
           free_var_equivalence_of_rename_fo_formula mv0 (identity)
@@ -4280,14 +4264,14 @@ module Impl
           PApp
             (nlmodel_symbol v0 (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
             (nlmodel_fo_term_list v1
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
           } ;
           let (mv0 , mv1) =
@@ -4301,16 +4285,16 @@ module Impl
             nlmodel_symbol v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
             } ;
           assert { mv1 =
             nlmodel_fo_term_list v1
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_symbol v0 <= 0 } ;
@@ -4334,27 +4318,27 @@ module Impl
           model_equal_symbol v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity)) ;
           model_equal_fo_term_list v1 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           let mrv0 = rename_symbol mv0 identity in
@@ -4362,14 +4346,14 @@ module Impl
           let resv0 =
             { nlrepr_symbol_field = v0 ;
               nlfree_var_symbol_set_abstraction_symbol_field = fv0 ;
-              model_symbol_field = ghost mrv0 ;
+              model_symbol_field = ghost mrv0 ; 
             }
           in
           let resv1 =
             { nlrepr_fo_term_list_field = v1 ;
               nlfree_var_symbol_set_abstraction_fo_term_list_field = fv0 ;
               nlfree_var_fo_term_set_abstraction_fo_term_list_field = fv1 ;
-              model_fo_term_list_field = ghost mrv1 ;
+              model_fo_term_list_field = ghost mrv1 ; 
             }
           in let res = NLC_PApp resv0 resv1 in
           free_var_equivalence_of_rename_symbol mv0 (identity)
@@ -4408,36 +4392,36 @@ module Impl
             } ;
           res
     end
-
+  
   let nlsubst_symbol_in_fo_formula (t:nlimpl_fo_formula) (x:int)
     (u:nlimpl_symbol) : nlimpl_fo_formula requires { nlimpl_fo_formula_ok t }
     requires { nlimpl_symbol_ok u } ensures { nlimpl_fo_formula_ok result }
     ensures { result.model_fo_formula_field =
       subst_fo_formula t.model_fo_formula_field
-        (update (subst_id_symbol: func (int) (symbol (int))) x
+        (update (subst_id_symbol: (int) -> (symbol (int))) x
            u.model_symbol_field)
-        (subst_id_fo_term: func (int) (fo_term (int) (int)))
+        (subst_id_fo_term: (int) -> (fo_term (int) (int)))
       }
     =
     model_equal_fo_formula t.nlrepr_fo_formula_field
       (subst_compose_symbol subst_id_symbol
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field)))
-      ((update (subst_id_symbol: func (int) (symbol (int))) x
+      ((update (subst_id_symbol: (int) -> (symbol (int))) x
           u.model_symbol_field))
       (subst_compose_symbol (const (Var_symbol (-1)))
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field)))
       ((const (Var_symbol (-1))))
       (subst_compose_fo_term subst_id_fo_term
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field))
-         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
-      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+         ((subst_id_fo_term: (int) -> (fo_term (int) (int)))))
+      ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
       (subst_compose_fo_term (const (Var_fo_term (-1)))
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field))
-         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
+         ((subst_id_fo_term: (int) -> (fo_term (int) (int)))))
       ((const (Var_fo_term (-1))));
     let res =
       {
@@ -4456,9 +4440,9 @@ module Impl
           t.nlfree_var_fo_term_set_abstraction_fo_formula_field ;
         model_fo_formula_field = ghost
           subst_fo_formula t.model_fo_formula_field
-            (update (subst_id_symbol: func (int) (symbol (int))) x
+            (update (subst_id_symbol: (int) -> (symbol (int))) x
                u.model_symbol_field)
-            (subst_id_fo_term: func (int) (fo_term (int) (int))) ;
+            (subst_id_fo_term: (int) -> (fo_term (int) (int))) ;
       }
     in
     assert {
@@ -4469,7 +4453,7 @@ module Impl
               (is_symbol_free_var_in_fo_formula y t.model_fo_formula_field /\
                  is_symbol_free_var_in_symbol x2
                    (eval
-                      ((update (subst_id_symbol: func (int) (symbol (int))) x
+                      ((update (subst_id_symbol: (int) -> (symbol (int))) x
                           u.model_symbol_field))
                       y))
               ->
@@ -4485,8 +4469,7 @@ module Impl
               (is_fo_term_free_var_in_fo_formula y t.model_fo_formula_field
                  /\
                  is_symbol_free_var_in_fo_term x2
-                   (eval
-                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                   (eval ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
                       y))
               -> false))
         && (x2) < (res.nlfree_var_symbol_set_abstraction_fo_formula_field)
@@ -4499,42 +4482,41 @@ module Impl
               (is_fo_term_free_var_in_fo_formula y t.model_fo_formula_field
                  /\
                  is_fo_term_free_var_in_fo_term x2
-                   (eval
-                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                   (eval ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
                       y))
               -> x2 = y && (x2) <
               (res.nlfree_var_fo_term_set_abstraction_fo_formula_field)))
         && (x2) < (res.nlfree_var_fo_term_set_abstraction_fo_formula_field)
       } ;
     res
-
+  
   let nlsubst_fo_term_in_fo_formula (t:nlimpl_fo_formula) (x:int)
     (u:nlimpl_fo_term) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok t } requires { nlimpl_fo_term_ok u }
     ensures { nlimpl_fo_formula_ok result }
     ensures { result.model_fo_formula_field =
       subst_fo_formula t.model_fo_formula_field
-        (subst_id_symbol: func (int) (symbol (int)))
-        (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+        (subst_id_symbol: (int) -> (symbol (int)))
+        (update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
            u.model_fo_term_field)
       }
     =
     model_equal_fo_formula t.nlrepr_fo_formula_field
       (subst_compose_symbol subst_id_symbol
-         ((subst_id_symbol: func (int) (symbol (int)))))
-      ((subst_id_symbol: func (int) (symbol (int))))
+         ((subst_id_symbol: (int) -> (symbol (int)))))
+      ((subst_id_symbol: (int) -> (symbol (int))))
       (subst_compose_symbol (const (Var_symbol (-1)))
-         ((subst_id_symbol: func (int) (symbol (int)))))
+         ((subst_id_symbol: (int) -> (symbol (int)))))
       ((const (Var_symbol (-1))))
       (subst_compose_fo_term subst_id_fo_term
-         ((subst_id_symbol: func (int) (symbol (int))))
-         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+         ((subst_id_symbol: (int) -> (symbol (int))))
+         ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
              u.model_fo_term_field)))
-      ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+      ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
           u.model_fo_term_field))
       (subst_compose_fo_term (const (Var_fo_term (-1)))
-         ((subst_id_symbol: func (int) (symbol (int))))
-         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+         ((subst_id_symbol: (int) -> (symbol (int))))
+         ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
              u.model_fo_term_field)))
       ((const (Var_fo_term (-1))));
     let res =
@@ -4559,8 +4541,8 @@ module Impl
                (u.nlfree_var_fo_term_set_abstraction_fo_term_field)) ;
         model_fo_formula_field = ghost
           subst_fo_formula t.model_fo_formula_field
-            (subst_id_symbol: func (int) (symbol (int)))
-            (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+            (subst_id_symbol: (int) -> (symbol (int)))
+            (update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
                u.model_fo_term_field) ;
       }
     in
@@ -4571,7 +4553,7 @@ module Impl
            (forall y:int.
               (is_symbol_free_var_in_fo_formula y t.model_fo_formula_field /\
                  is_symbol_free_var_in_symbol x2
-                   (eval ((subst_id_symbol: func (int) (symbol (int)))) y))
+                   (eval ((subst_id_symbol: (int) -> (symbol (int)))) y))
               -> x2 = y && (x2) <
               (res.nlfree_var_symbol_set_abstraction_fo_formula_field))
            /\
@@ -4581,7 +4563,7 @@ module Impl
                  is_symbol_free_var_in_fo_term x2
                    (eval
                       ((update
-                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          (subst_id_fo_term: (int) -> (fo_term (int) (int)))
                           x u.model_fo_term_field))
                       y))
               ->
@@ -4601,7 +4583,7 @@ module Impl
                  is_fo_term_free_var_in_fo_term x2
                    (eval
                       ((update
-                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          (subst_id_fo_term: (int) -> (fo_term (int) (int)))
                           x u.model_fo_term_field))
                       y))
               ->
@@ -4615,6 +4597,8 @@ module Impl
         && (x2) < (res.nlfree_var_fo_term_set_abstraction_fo_formula_field)
       } ;
     res
-
-
+  
+  
 end
+
+

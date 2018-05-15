@@ -26,7 +26,7 @@ module Types
   type timestamp 'a = {
     time : int ;
     size : int ;
-    ghost table : func int (list 'a) ;
+    ghost table : int -> list 'a ;
   }
 
   type t 'a = {
@@ -36,7 +36,7 @@ module Types
     mutable current_time : int ;
     mutable buffer : array (list 'a) ;
     (* Invariant of stored data. *)
-    ghost inv : pred 'a ;
+    ghost inv : 'a -> bool ;
   }
 
 end
@@ -52,18 +52,18 @@ module Logic
   use import Functions.Func
   use import Choice.Choice
 
-  function func_of_array (a:array ~'a) (def:'a) : func int 'a
+  function func_of_array (a:array 'a) (def:'a) : int -> 'a
   axiom func_of_array_def : forall a:array 'a,def:'a,x:int.
     func_of_array a def x = if (0 <= x < a.length)
     then M.get a.elts x
     else def
 
-  function current_timestamp (x:t ~'a) : timestamp 'a =
+  function current_timestamp (x:t 'a) : timestamp 'a =
     { time = x.current_time ;
       size = x.buffer.length ;
       table = func_of_array x.buffer Nil ; }
 
-  predicate correct_table (sz:int) (b:func int (list 'a)) =
+  predicate correct_table (sz:int) (b: int -> list 'a) =
     forall x:int. x >= sz \/ x < 0 -> b x = Nil
 
   function pop (l:list 'a) : list 'a = match l with
@@ -71,7 +71,7 @@ module Logic
     | Cons _x q -> q
   end
 
-  function unroll (tm:int) (t0:int) (h:list int) (b:func int (list 'a))
+  function unroll (tm:int) (t0:int) (h:list int) (b:int -> list 'a)
     (sz:int) : timestamp 'a =
     if tm = 0
     then { time = t0 ; size = sz ; table = b }
@@ -82,7 +82,7 @@ module Logic
         else unroll (tm-1) t0 q (b[x <- pop (b x)]) sz
       end
 
-  predicate unroll_correct (tm:int) (h:list int) (b:func int (list 'a)) (sz:int)
+  predicate unroll_correct (tm:int) (h:list int) (b:int -> list 'a) (sz:int)
     = match h with
       | Nil -> tm = 0
       | Cons x q -> if x = (-1)
@@ -104,7 +104,7 @@ module Logic
   predicate before (t1 t2:timestamp 'a) =
     t1.time <= t2.time
 
-  predicate list_forall (p:pred 'a) (l:list 'a) = match l with
+  predicate list_forall (p:'a -> bool) (l:list 'a) = match l with
     | Nil -> true
     | Cons x q -> p x /\ list_forall p q
   end
@@ -152,7 +152,7 @@ module Impl
   constant one : int = 1
   constant two : int = 2
 
-  let create (ghost p:pred ~'a) : t 'a
+  let create (ghost p: 'a -> bool) : t 'a
     ensures { forall t:timestamp 'a.
       past_time t result ->  t.table = const Nil }
     ensures { past_time (current_timestamp result) result }
@@ -181,7 +181,7 @@ module Impl
 
 
   (* Internal utility. *)
-  let resize_for (x:int) (tb:t ~'a) : unit
+  let resize_for (x:int) (tb:t 'a) : unit
     writes { tb }
     requires { correct tb }
     requires { x >= tb.buffer.length }
@@ -219,7 +219,7 @@ module Impl
       ensures { result >= size }
       ensures { precede (old tbc) tbc }
     =
-      'AuxInit:
+      label AuxInit in
       assert { past_time (current_timestamp tbc) tbc } ;
       add_event mone tb ;
       add_event mone tbc ;
@@ -229,9 +229,9 @@ module Impl
       blit buf1 zero buf2 zero size ;
       tbc.buffer <- buf2 ;
       assert { extensionalEqual (func_of_array tbc.buffer Nil)
-        (func_of_array (at tbc 'AuxInit).buffer Nil) } ;
+        (func_of_array (tbc at AuxInit).buffer Nil) } ;
       assert { forall t:timestamp 'a.
-        (past_time t (at tbc 'AuxInit) \/ t = current_timestamp tbc) <-> past_time t tbc } ;
+        (past_time t (tbc at AuxInit) \/ t = current_timestamp tbc) <-> past_time t tbc } ;
       if size2 > x
       then size2
       else aux size2 in
@@ -272,7 +272,7 @@ module Impl
       past_time t tb <-> past_time t (at tb 'Init) \/ t = current_timestamp tb } ;
     assert { precede (at tb 'Init) tb }
 
-  let add (x:int) (b:'a) (tb:t ~'a) : unit
+  let add (x:int) (b:'a) (tb:t 'a) : unit
     writes { tb, tb.buffer.elts }
     requires { correct tb }
     requires { x >= 0 }
@@ -417,10 +417,10 @@ module Impl
     assert { extensionalEqual (func_of_array tb.buffer Nil)
       (func_of_array tbc.buffer Nil) }
 
-  val ghost hack_func_of_array (a:array ~'a) (def:'a) : func int 'a
+  val ghost hack_func_of_array (a:array 'a) (def:'a) : func int 'a
     ensures { result = func_of_array a def }
 
-  let stamp (tb:t ~'a) : timestamp 'a
+  let stamp (tb:t 'a) : timestamp 'a
     requires { correct tb }
     ensures { result = current_timestamp tb }
   =

@@ -8,23 +8,23 @@ open Format
 
 module Printer = functor (P:PrintParameters) ->
   functor (NLP:NLParameters) -> struct
-  
+
   open P.P
   open P.H
   open NLP
-  
+
   let nltype_app_printer b tn fmt =
     fprintf fmt "%t%t%t%t@]" indent << nltype_name tn
       << params_printer << list_printer (fun tn fmt ->
           fprintf fmt "@ '%t%t" << b << tindex_printer tn
         ) (binder_vars dm tn)
-  
+
   let nlrtype_app_printer tn fmt =
     fprintf fmt "%t%t%t%t@]" indent << nltype_name tn
       << params_printer << list_printer (fun tn fmt ->
         fprintf fmt "@ %t" << nlfree_var_type_name tn
       ) (binder_vars dm tn)
-  
+
   (*let nlcons_case_printer ?(vbase=string_printer "v") case (cn,bl,tl) fmt =
     fprintf fmt "%t| %t%t" indent indent << nlcons_name cn ;
     let process_type blevels (vars,cnt) ty =
@@ -39,7 +39,7 @@ module Printer = functor (P:PrintParameters) ->
         (vars,nblevels,cnt) ) ( [] , TMap.empty , 0 ) bl in
     let (vars,_) = process_types blevels (vars,cnt) tl in
     fprintf fmt "@] ->@ %t%t@]@]" << indent << case (List.rev vars)*)
-  
+
   let nlcons_case_printer ?(vbase=string_printer "v") case (cn,bl,tl) fmt =
     fprintf fmt "%t| %t%t" indent indent << nlcons_name cn ;
     let process_type (vars,cnt) ty =
@@ -55,13 +55,13 @@ module Printer = functor (P:PrintParameters) ->
     let (vars0,_) = process_types ([],cnt) tl in
     let v0 = (List.rev vars,(blevels,List.rev vars0)) in
     fprintf fmt "@] ->@ %t%t@]@]" << indent << case v0
-  
+
   let flatten (v1,(blv,v2)) =
     let add blv l = List.map (fun (x,ty) -> (x,blv,ty)) l in
     let v = List.fold_left (fun acc (blv,_,vars) ->
       List.rev_append (add blv vars) acc) [] v1 in
     List.rev (List.rev_append (add blv v2) v)
-  
+
   let nlvar_case_printer ?(vbase=string_printer "v") fcase bcase tn fmt =
     let vname fmt = fprintf fmt "%t0" vbase in
     fprintf fmt "%t| %t%t@ %t0@] ->@ %t%t@]@]@ \
@@ -69,7 +69,7 @@ module Printer = functor (P:PrintParameters) ->
       << free_variable_name tn << vbase << indent << fcase vname
       << indent << indent << bound_variable_name tn << vbase
       << indent << bcase vname
-  
+
   let nlmatch_printer ?(vbase=string_printer "v") tn
     fvcase bvcase ccase mt fmt =
     match type_def dm tn with
@@ -83,14 +83,14 @@ module Printer = functor (P:PrintParameters) ->
           << list_printer (fun cs fmt ->
             fprintf fmt "@ %t%t@]" indent
               << nlcons_case_printer ~vbase ( ccase cs ) cs) c.cons_list
-  
+
   let env_type_printer ?(blevels=TMap.empty) inp b tn fmt =
-    fprintf fmt "%tfunc %t (%t)@]"
+    fprintf fmt "%t %t -> (%t)@]"
       indent inp << type_app_printer ~blevels b tn
-  
+
   let nlbenv_type_printer ?(blevels=TMap.empty) b tn fmt =
     env_type_printer ~blevels (string_printer "int") b tn fmt
-  
+
   let benv_lift_printer sp blevels tn fmt =
     let lift = shift_name tn in
     let middle = rpapply_printer lift sp << level tn blevels in
@@ -101,14 +101,14 @@ module Printer = functor (P:PrintParameters) ->
          else fprintf fmt "@ %t"
            (csomes_printer << level tn' blevels))
          (binder_vars dm tn)
-  
+
   let frenv_lift_printer sp blevels tn fmt =
     fprintf fmt "%t(%t@ %t%t)@]" indent << rename_subst_name tn
       << sp
       << list_printer (fun tn fmt ->
         fprintf fmt "@ %t" (csomes_printer << level tn blevels))
         (binder_vars dm tn)
-  
+
   let full_reconstruct_cons_case case (cn,_,_) vars fmt =
     let vars = flatten vars in
     fprintf fmt "%t%s%t@]" indent << cons_name dm cn
@@ -117,7 +117,7 @@ module Printer = functor (P:PrintParameters) ->
             | ITVar _ -> fprintf fmt "@ %t" vname
             | ITDecl tn -> fprintf fmt "@ %t(%t)@]" indent
                 << case vname blevels tn ) vars
-  
+
   let nlrecons_case case (cn,_,_) vars fmt =
     let vars = flatten vars in
     fprintf fmt "%t%t%t@]" indent << nlcons_name cn
@@ -128,7 +128,7 @@ module Printer = functor (P:PrintParameters) ->
               | [] -> fprintf fmt "@ %t" vname
               | _ -> fprintf fmt "@ %t(%t)@]" indent
                 << case vname blevels tn ) vars
-  
+
   let type_defs_printer fmt =
     List.iter (fun scc ->
       let tp = rec_type_printer () in
@@ -151,7 +151,7 @@ module Printer = functor (P:PrintParameters) ->
                  << list_printer internal tl) c.cons_list
       ) scc
     ) dm.sccg
-  
+
   let size_defs_printer fmt =
     let pr = rec_fun_printer () in
     let print_decl is_nat tn _ _ =
@@ -178,7 +178,7 @@ module Printer = functor (P:PrintParameters) ->
         << nlmatch_printer tn vcase vcase cons_case (string_printer "t") in
     make_for_defs << print_decl true ;
     make_for_defs << print_decl false
-  
+
   let size_lemma_printer fmt =
     let pr = rec_val_printer () in
     let print_decl tn _ _ =
@@ -197,9 +197,9 @@ module Printer = functor (P:PrintParameters) ->
         << indent << indent << nat_nlsize_name tn
         << nlmatch_printer tn vcase vcase cons_case (string_printer "t") in
     make_for_defs print_decl
-  
+
   (* Shifting *)
-  
+
   let shift_defs_printer fmt =
     let b = string_printer "b" in
     let print_decl tn _ v =
@@ -229,9 +229,9 @@ module Printer = functor (P:PrintParameters) ->
         << indent << shift_name tn << pr
     in
     make_for_vdefs print_decl
-  
+
   (* shift composition. *)
-  
+
   let shift_lemma_printer fmt =
     let b,c = string_printer "b",string_printer "c" in
     let print_decl tn _ v =
@@ -268,9 +268,9 @@ module Printer = functor (P:PrintParameters) ->
         << indent << p2 << indent << indent << p1 << p2
     in
     make_for_vdefs print_decl
-  
+
   (* model. *)
-  
+
   let model_defs_printer fmt =
     let b,c = string_printer "b",string_printer "c" in
     let pr = rec_fun_printer () in
@@ -298,7 +298,7 @@ module Printer = functor (P:PrintParameters) ->
         << nlmatch_printer tn fvcase bvcase ccase (string_printer "t")
     in
     make_for_defs print_decl
-  
+
   let model_commutation_prelude sub pr tn v fmt =
     let b,c,d = string_printer "b",string_printer "c",string_printer "d" in
     let variant = if sub
@@ -332,7 +332,7 @@ module Printer = functor (P:PrintParameters) ->
       << list_printer (fun tn fmt ->
         fprintf fmt "@ s%t" << tindex_printer tn) v
       << variant
-  
+
   let model_subst_commutation_lemma_printer fmt =
     let pr = rec_val_printer () in
     let print_decl tn _ v =
@@ -372,9 +372,9 @@ module Printer = functor (P:PrintParameters) ->
         << nlmatch_printer tn vcase vcase ccase (string_printer "t")
     in
     make_for_bdefs print_decl
-  
+
   (* Derive immediately from subst commutation. *)
-  
+
   let model_rename_commutation_lemma_printer fmt =
     let pr fmt = fprintf fmt "let" in
     let print_decl tn _ v =
@@ -387,7 +387,7 @@ module Printer = functor (P:PrintParameters) ->
           fprintf fmt "@ fr%t@ bnd%t@ (%t%t@ s%t@])"
             ti ti indent << subst_of_rename_name tn << ti) v in
     make_for_bdefs print_decl
-  
+
   let correct_indexes_printer fmt =
     let pr = make_first_case_printer << string_printer "predicate"
       << string_printer "with" in
@@ -417,7 +417,7 @@ module Printer = functor (P:PrintParameters) ->
         << nltype_app_printer (string_printer "b") tn
         << nlmatch_printer tn fvcase bvcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let bound_depth_printer fmt =
     let pr = rec_fun_printer () in
     let print_decl tnv tn _ _ =
@@ -454,7 +454,7 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let bound_depth_lemma_printer fmt =
     let pr = rec_val_printer () in
     let print_decl tnv tn _ v =
@@ -480,7 +480,7 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let model_equal_lemma_printer fmt =
     let pr = rec_val_printer () in
     let b,c = string_printer "b",string_printer "c" in
@@ -535,7 +535,7 @@ module Printer = functor (P:PrintParameters) ->
         << indent << indent << nlsize_name tn
         << nlmatch_printer tn vcase vcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let bind_var_printer fmt =
     let pr = rec_val_printer () in
     let b = string_printer "b" in
@@ -636,7 +636,7 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let unbind_var_printer fmt =
     let pr = rec_val_printer () in
     let b = string_printer "b" in
@@ -758,8 +758,8 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
-  
+
+
   let subst_base_printer fmt =
     let pr = rec_val_printer () in
     let b = string_printer "b" in
@@ -877,10 +877,10 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
-  
-  
-  
+
+
+
+
   let implementation_type_printer fmt =
     let print_decl tn _ v =
       fprintf fmt "%ttype@ %t%t@ =@ %t{@ \
@@ -897,7 +897,7 @@ module Printer = functor (P:PrintParameters) ->
           fprintf fmt "@ %t" << nlfree_var_type_name tn) v
     in
     make_for_defs print_decl
-  
+
   let invariant_printer fmt =
     let print_decl tn _ v =
       let correct_indexes fmt = match v with
@@ -927,9 +927,9 @@ module Printer = functor (P:PrintParameters) ->
               fprintf fmt "t.%t" << varset_field_name tnv tn)) v
     in
     make_for_defs print_decl
-  
+
   (* Time to go for explicit construction/destruction ! *)
-  
+
   let constructor_type_printer fmt =
     let print_decl tn c v =
       fprintf fmt "%ttype@ %t%t@ =" indent << constructor_type_name tn
@@ -948,12 +948,12 @@ module Printer = functor (P:PrintParameters) ->
               << pf tl) bl << pf tl
       ) c.cons_list in
     make_for_defs print_decl
-  
+
   let env_list tn elv = try TMap.find tn elv with Not_found -> []
-  
+
   let add_to_env tn vp elv =
     TMap.add tn (vp::env_list tn elv) elv
-  
+
   let cons_match_variables ?(vbase=string_printer "v") (cn,bl,tl) =
     let process_type blevels elv (vars,cnt) ty =
       let vprinter fmt = fprintf fmt "%t%d" vbase cnt in
@@ -969,7 +969,7 @@ module Printer = functor (P:PrintParameters) ->
       ) ( [] , TMap.empty , TMap.empty , 0 ) bl in
     let (ivars,_) = process_types blevels elv ([],cnt) tl in
     List.rev vars,List.rev ivars
-  
+
   let cons_match_printer tn vcase ccase v fmt =
     let c = match type_def dm tn with
       | ITypeDef (c,_) -> c
@@ -989,7 +989,7 @@ module Printer = functor (P:PrintParameters) ->
           << list_printer (fun (vp,_,_,_,tl) fmt ->
             fprintf fmt "@ %t%t" vp << p tl) bl
           << p tl << ccase cs bl tl) c.cons_list
-  
+
   let constructor_invariant_printer fmt =
     let print_decl tn _ v =
       let vcase _ fmt = fprintf fmt "true" in
@@ -1012,7 +1012,7 @@ module Printer = functor (P:PrintParameters) ->
         << indent << constructor_type_name tn << params_printer
         << cons_match_printer tn vcase ccase (string_printer "c") in
     make_for_defs print_decl
-  
+
   let closure_renaming tn blv elv fmt =
     let l = env_list tn elv in
     (*let lv = level tn blv in*)
@@ -1022,7 +1022,7 @@ module Printer = functor (P:PrintParameters) ->
         indent << aux (n+1) l << vp
         << somes_printer (string_printer "None") n in
     aux 0 l fmt
-  
+
   let open_renaming tn elv fmt =
     let l = env_list tn elv in
     let rec aux l fmt = match l with
@@ -1030,7 +1030,7 @@ module Printer = functor (P:PrintParameters) ->
       | vp :: l -> fprintf fmt "(%tocase@ %t@ %t@])"
         indent << aux l << vp in
     aux l fmt
-  
+
   let constructor_relation_printer fmt =
     let print_decl tn _ v =
       let vcase vname fmt = fprintf fmt "t.%t@ =@ %t%t@ %t@]"
@@ -1059,7 +1059,7 @@ module Printer = functor (P:PrintParameters) ->
         << impl_type_name tn << params_printer
         << cons_match_printer tn vcase ccase (string_printer "c") in
     make_for_defs print_decl
-  
+
   let constructor_open_relation_printer fmt =
     let print_decl tn _ v =
       let vcase vname fmt = fprintf fmt "t.%t@ =@ %t%t@ %t@]"
@@ -1109,7 +1109,7 @@ module Printer = functor (P:PrintParameters) ->
         << impl_type_name tn << params_printer
         << cons_match_printer tn vcase ccase (string_printer "c") in
     make_for_defs print_decl
-  
+
   let construction_operator_printer fmt =
     let print_decl tn _ v =
       let vcase vname fmt =
@@ -1138,7 +1138,7 @@ module Printer = functor (P:PrintParameters) ->
               indent indent << variable_name tn << default_variable_value tn)
           blv tn fmt in
         let upd blv tn fmt =
-          fprintf fmt "(%t%t@ (%t:func (%t) (%t%s%t%t@]))%t@])" indent
+          fprintf fmt "(%t%t@ (%t:(%t)->(%t%s%t%t@]))%t@])" indent
             << rename_subst_name tn
             << subst_identity_name tn << nlfree_var_type_name tn
             << indent << type_name dm tn
@@ -1177,7 +1177,7 @@ module Printer = functor (P:PrintParameters) ->
             << list_printer (fun (_,_,_,_,tl) fmt ->
               print_nl_elements tl fmt) bl
             << print_nl_elements tl in
-        
+
         let print_renaming vp blv elv tn fmt =
           fprintf fmt "(%t%t@ %t.%t%t@])" indent
             << rename_name tn << vp << model_field_name tn
@@ -1196,7 +1196,7 @@ module Printer = functor (P:PrintParameters) ->
           fprintf fmt "%t%t"
             << list_printer (fun (_,_,_,_,tl) fmt -> print_l_elements tl fmt) bl
             << print_l_elements tl in
-        
+
         let rec print_join tnv a l = match l with
           | [] -> a
           | (vp,_,_,ty) :: l -> match ty with
@@ -1213,7 +1213,7 @@ module Printer = functor (P:PrintParameters) ->
           match print_join tnv a tl with
             | None -> varset_empty tnv fmt
             | Some a -> a fmt in
-        
+
         let print_fv_assertion vp blv elv tnv tn2 fmt =
           fprintf fmt "%tassert {@ %tforall@ x:%t.@ \
             %t%t@ %t@ %t@]@ ->@ (%tforall@ y:%t.@ \
@@ -1279,7 +1279,7 @@ module Printer = functor (P:PrintParameters) ->
                   (fun fmt -> fprintf fmt "res.%t" << varset_field_name tnv tn)
             ) v
         in
-        
+
         let print_model_assertion vp blv elv tn2 fmt =
           let update_list = TMap.fold (fun tnv l acc ->
               let l,_ = List.fold_left (fun (acc,n) bvp ->
@@ -1297,7 +1297,7 @@ module Printer = functor (P:PrintParameters) ->
             fprintf fmt "%trcompose@ (%t)@ (%t)@]" indent
               << closure_renaming tnv blv elv
               << open_renaming tnv elv in
-          let p3 tnv fmt = fprintf fmt "(%tidentity :@ %tfunc@ (%t)@ (%t)@]@])"
+          let p3 tnv fmt = fprintf fmt "(%tidentity :@ %t(%t)@ -> (%t)@]@])"
             indent indent << nlfree_var_type_name tnv
             << nlfree_var_type_name tnv in
           List.iter (fun tnv ->
@@ -1335,7 +1335,7 @@ module Printer = functor (P:PrintParameters) ->
             << list_printer (fun (_,_,_,_,tl) fmt ->
               print_model_assertion tl fmt) bl
             << print_model_assertion tl in
-        
+
         let print_ok_assertion (vp,blv,elv,ty) fmt = match ty with
           | ITVar _ -> ()
           | ITDecl tn ->
@@ -1348,7 +1348,7 @@ module Printer = functor (P:PrintParameters) ->
             << list_printer (fun (_,_,_,_,tl) fmt ->
               print_ok_assertion tl fmt) bl
             << print_ok_assertion tl in
-        
+
         fprintf fmt "%t%tlet@ res@ =@ %t{@ \
           %t%t@ =@ (%t%t%t@]) ;@]%t@ \
           %t%t@ =@ ghost@ (%t%s%t@]) ;@]@]@ }@]@ in@ %t%tres"
@@ -1365,7 +1365,7 @@ module Printer = functor (P:PrintParameters) ->
           << print_l_elements
           << print_fv_assertion
           << print_model_assertion in
-      
+
       fprintf fmt "%tlet@ %t@ (c:%t%t%t@]) :@ %t%t%t@]@ \
         %trequires {@ %t%t@ c@]@ }@]@ \
         %tensures {@ %t%t@ result@]@ }@]@ \
@@ -1381,7 +1381,7 @@ module Printer = functor (P:PrintParameters) ->
         << indent << indent << constructor_open_relation_name tn
         << cons_match_printer tn vcase ccase (string_printer "c") in
     make_for_defs print_decl
-  
+
   let destruction_operator_printer fmt =
     let print_decl tn _ v =
       let bvcase _ fmt = fprintf fmt "absurd" in
@@ -1390,7 +1390,7 @@ module Printer = functor (P:PrintParameters) ->
       let ccase (cn,_,_) (bvars,(blvf,vf)) fmt =
         (* Update utility. *)
         let upd tn fmt =
-          fprintf fmt "(%tconst@ (%t%t@ %t@]) :@ %tfunc@ int@ (%t%s%t%t@])@]@])"
+          fprintf fmt "(%tconst@ (%t%t@ %t@]) :@ %tint@ -> (%t%s%t%t@])@]@])"
             indent indent << variable_name tn << default_variable_value tn
             << indent << indent << type_name dm tn << params_printer
             << list_printer (fun tnv fmt ->
@@ -1682,7 +1682,7 @@ module Printer = functor (P:PrintParameters) ->
         fprintf fmt "%t%t" << list_printer (fun (blv,elv,_,_,vrs) fmt ->
           pv blv elv vrs fmt) bvars << pv blvf elvf vf ;
         fprintf fmt "res" in
-      
+
       fprintf fmt "%tlet@ %t@ (t:%t%t%t@]) :@ %t%t%t@]@ \
         %trequires {@ %t%t@ t@]@ }@]@ \
         %tensures {@ %t%t@ result@]@ }@]@ \
@@ -1702,12 +1702,12 @@ module Printer = functor (P:PrintParameters) ->
         << nlmatch_printer tn fvcase bvcase ccase (fun fmt ->
           fprintf fmt "t.%t" << data_field_name tn) in
     make_for_defs print_decl
-  
+
   let subst_operator_printer fmt =
     let print_decl tnv tn c v =
       let vv = binder_vars dm tnv in
       let sid tn fmt =
-        fprintf fmt "(%t%t:@ %tfunc@ (%t)@ (%t%s%t%t@])@]@])"
+        fprintf fmt "(%t%t:@ %t(%t)@ -> (%t%s%t%t@])@]@])"
           indent << subst_identity_name tn
           << indent << nlfree_var_type_name tn
           << indent << type_name dm tn << params_printer
@@ -1814,12 +1814,12 @@ module Printer = functor (P:PrintParameters) ->
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let types_defs_printer fmt =
     type_defs_printer fmt ;
     implementation_type_printer fmt ;
     constructor_type_printer fmt
-  
+
   let logics_defs_printer fmt =
     size_defs_printer fmt ;
     size_lemma_printer fmt ;
@@ -1836,7 +1836,7 @@ module Printer = functor (P:PrintParameters) ->
     constructor_invariant_printer fmt ;
     constructor_relation_printer fmt ;
     constructor_open_relation_printer fmt
-  
+
   let impls_defs_printer fmt =
     bind_var_printer fmt ;
     unbind_var_printer fmt ;
@@ -1844,7 +1844,5 @@ module Printer = functor (P:PrintParameters) ->
     construction_operator_printer fmt ;
     destruction_operator_printer fmt ;
     subst_operator_printer fmt
-  
+
 end
-
-
