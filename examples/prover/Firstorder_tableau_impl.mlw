@@ -807,6 +807,7 @@ module Impl
     requires { correct_indexes_tableau t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
      ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
@@ -907,6 +908,7 @@ module Impl
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
+    variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
      ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
@@ -1518,9 +1520,9 @@ module Impl
                   (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
-          let mrv0 = rename_tableau mv0 identity identity in
-          let mrv1 = rename_fo_formula mv1 identity identity in
-          let mrv2 = rename_fo_formula_list mv2 identity identity in
+          let ghost mrv0 = rename_tableau mv0 identity identity in
+          let ghost mrv1 = rename_fo_formula mv1 identity identity in
+          let ghost mrv2 = rename_fo_formula_list mv2 identity identity in
           let resv0 =
             { nlrepr_tableau_field = v0 ;
               nlfree_var_symbol_set_abstraction_tableau_field = fv0 ;
