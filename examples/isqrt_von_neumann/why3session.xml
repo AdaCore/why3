@@ -471,7 +471,7 @@
      <goal name="VC isqrt64.40.0.0.0" expl="VC for isqrt64" proved="true">
      <transf name="assert" proved="true" arg1="(x = add (sqr res_g) num)">
       <goal name="VC isqrt64.40.0.0.0.0" proved="true">
-      <proof prover="3" timelimit="5"><result status="valid" time="0.58"/></proof>
+      <proof prover="3" timelimit="5"><result status="valid" time="0.42"/></proof>
       </goal>
       <goal name="VC isqrt64.40.0.0.0.1" expl="VC for isqrt64" proved="true">
       <transf name="unfold" proved="true" arg1="sqr">
@@ -522,14 +522,14 @@
                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0" expl="true case" proved="true">
                 <transf name="unfold" proved="true" arg1="sqr" arg2="in" arg3="h">
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0.0" expl="true case" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.14"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="1.98"/></proof>
                  </goal>
                 </transf>
                 </goal>
                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1" expl="false case" proved="true">
                 <transf name="case" proved="true" arg1="(res_g = (0:t))">
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.0" expl="false case (true case)" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.69"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="2.82"/></proof>
                  </goal>
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1" expl="false case" proved="true">
                  <transf name="rewrite" proved="true" arg1="to_uint_sub_bounded">
@@ -601,7 +601,7 @@
                              <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.80" steps="571"/></proof>
                              </goal>
                              <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" proved="true">
-                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.78"/></proof>
+                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.88"/></proof>
                              </goal>
                             </transf>
                             </goal>
@@ -625,7 +625,7 @@
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.1" proved="true">
-                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.44"/></proof>
+                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.96"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -664,7 +664,7 @@
                               </transf>
                               </goal>
                               <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.1" proved="true">
-                              <proof prover="3" timelimit="5"><result status="valid" time="2.76"/></proof>
+                              <proof prover="3" timelimit="5"><result status="valid" time="1.84"/></proof>
                               </goal>
                              </transf>
                              </goal>
@@ -688,12 +688,12 @@
                         </transf>
                         </goal>
                         <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.1" proved="true">
-                        <proof prover="3" timelimit="5"><result status="valid" time="1.74"/></proof>
+                        <proof prover="3" timelimit="5"><result status="valid" time="1.21"/></proof>
                         </goal>
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.1" proved="true">
-                       <proof prover="3" timelimit="5"><result status="valid" time="2.68"/></proof>
+                       <proof prover="3" timelimit="5"><result status="valid" time="1.85"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -717,7 +717,7 @@
                    <proof prover="1"><result status="valid" time="0.02" steps="124"/></proof>
                    </goal>
                    <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.1" proved="true">
-                   <proof prover="3" timelimit="5"><result status="valid" time="0.64"/></proof>
+                   <proof prover="3" timelimit="5"><result status="valid" time="0.47"/></proof>
                    </goal>
                   </transf>
                   </goal>
