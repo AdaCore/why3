@@ -176,6 +176,10 @@ and scan_embedded fmt depth = parse
               pp_print_char fmt ']';
               scan_embedded fmt (depth - 1) lexbuf
             end }
+  | "\\[" { pp_print_char fmt '[';
+            scan_embedded fmt depth lexbuf }
+  | "\\]" { pp_print_char fmt ']';
+            scan_embedded fmt depth lexbuf }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
   | ident as s
