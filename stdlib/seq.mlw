@@ -415,8 +415,9 @@ module Occ
   use int.NumOf as N
   use import Seq
 
-  function occ (x: 'a) (s: seq 'a) (l u: int) : int =
-    N.numof (fun i -> s[i] = x) l u
+  function iseq (x: 'a) (s: seq 'a) : int->bool = fun i -> s[i] = x
+
+  function occ (x: 'a) (s: seq 'a) (l u: int) : int = N.numof (iseq x s) l u
 
   (* TODO: lemmas for cons, snoc, etc. *)
 
