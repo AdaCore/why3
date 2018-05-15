@@ -63,12 +63,7 @@ let spec =
 
 open Session_itp
 
-type context =
-    (string ->
-     (formatter -> session -> unit) -> session
-     -> unit, formatter, unit) format
-
-let run_file (context : context) print_session fname =
+let run_file print_session fname =
   let ses,_ = read_session fname in
   let project_dir = get_dir ses in
   let output_dir =
@@ -80,9 +75,20 @@ let run_file (context : context) print_session fname =
       open_out (Filename.concat output_dir ("why3session.html"))
   in
   let fmt = formatter_of_out_channel cout in
-  if !opt_context
-  then fprintf fmt context basename (print_session basename) ses
-  else print_session basename fmt ses;
+  if !opt_context then
+    fprintf fmt
+      "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
+         \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+     \n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+     \n<head>\
+     \n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+     \n  <title>Why3 session of %s</title>\
+     \n</head>\
+     \n<body>\
+     \n" basename;
+  print_session basename fmt ses;
+  if !opt_context then
+    pp_print_string fmt "\n</body>\n</html>\n";
   pp_print_flush fmt ();
   if output_dir <> "-" then close_out cout
 
@@ -224,26 +230,7 @@ let rec num_lines s acc tr =
       (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
-
-  let context : context = "<!DOCTYPE html \
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-\n<head>\
-\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
-\n  <title>Why3 session of %s</title>\
-\n</head>\
-\n<body>\
-\n%a\
-\n</body>\
-\n</html>\
-\n"
-
-  let run_one = run_file context print_session
-
 end
-
-
 
 module Simple =
 struct
@@ -289,23 +276,6 @@ struct
       (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
-
-  let context : context = "<!DOCTYPE html \
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-\n<head>\
-\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
-\n  <title>Why3 session of %s</title>\
-\n</head>\
-\n<body>\
-\n%a\
-\n</body>\
-\n</html>\
-\n"
-
-  let run_one = run_file context print_session
-
 end
 
 
@@ -313,8 +283,8 @@ let run () =
   let _,_,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
   match !opt_style with
-    | Table -> iter_files Table.run_one
-    | SimpleTree -> iter_files Simple.run_one
+    | Table -> iter_files (run_file Table.print_session)
+    | SimpleTree -> iter_files (run_file Simple.print_session)
 
 let cmd =
   { cmd_spec = spec;
