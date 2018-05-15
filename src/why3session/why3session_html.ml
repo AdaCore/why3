@@ -267,8 +267,8 @@ struct
       (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =
-    fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
-      (get_proof_name s g).Ident.id_string
+    fprintf fmt "<li>%a : <ul>%a%a</ul></li>"
+      Pp.html_string (get_proof_name s g).Ident.id_string
       (Pp.print_iter2 Hprover.iter Pp.newline Pp.nothing
          Pp.nothing (print_proof_attempt s))
       (get_proof_attempt_ids s g)
