@@ -147,10 +147,10 @@ module Impl
 
   (* extraction trick to speedup integer operations with
      constants. *)
-  constant mone : int = -1
-  constant zero : int = 0
-  constant one : int = 1
-  constant two : int = 2
+  let constant mone : int = -1
+  let constant zero : int = 0
+  let constant one : int = 1
+  let constant two : int = 2
 
   let create (ghost p: 'a -> bool) : t 'a
     ensures { forall t:timestamp 'a.
@@ -258,19 +258,19 @@ module Impl
     ensures { let tb0 = (current_timestamp (old tb)).table in
       (current_timestamp tb).table = tb0[x <- Cons b (tb0 x)] }
   =
-    'Init:
+    label Init in
     let buf = tb.buffer in
     buf[x]<- Cons b (buf[x]) ;
     add_event x tb ;
-    assert { let tb0 = (current_timestamp (at tb 'Init)).table in
+    assert { let tb0 = (current_timestamp (tb at Init)).table in
       extensionalEqual ((current_timestamp tb).table) (tb0[x <- Cons b (tb0 x)]) } ;
-    assert { let tb0 = (current_timestamp (at tb 'Init)).table in
+    assert { let tb0 = (current_timestamp (tb at Init)).table in
       let tb1 = (current_timestamp tb).table in
       extensionalEqual (tb1[x <- pop (tb1 x)]) tb0 } ;
     assert { past_time (current_timestamp tb) tb } ;
     assert { forall t:timestamp 'a.
-      past_time t tb <-> past_time t (at tb 'Init) \/ t = current_timestamp tb } ;
-    assert { precede (at tb 'Init) tb }
+      past_time t tb <-> past_time t (tb at Init) \/ t = current_timestamp tb } ;
+    assert { precede (tb at Init) tb }
 
   let add (x:int) (b:'a) (tb:t 'a) : unit
     writes { tb, tb.buffer.elts }
@@ -339,7 +339,7 @@ module Impl
       ensures { forall t2:timestamp 'a. before t2 t /\ past_time t2 (old tbc) ->
         past_time t2 tbc }
     =
-      'UInit:
+      label UInit in
       if delta <> zero
       then begin
         match tb.history with
@@ -358,14 +358,14 @@ module Impl
               tbc.buffer <- buf2 ;
               assert { let t0 = { time = tbc.current_time ;
                   size = len2 ;
-                  table = func_of_array (at tbc 'UInit).buffer Nil
+                  table = func_of_array (tbc at UInit).buffer Nil
                 } in
                 let t1 = { t0 with table = func_of_array tbc.buffer Nil } in
-                past_time t0 (at tbc 'UInit) &&
+                past_time t0 (tbc at UInit) &&
                 extensionalEqual t0.table t1.table && t0 = t1 } ;
               assert { extensionalEqual (func_of_array tbc.buffer Nil)
-                (func_of_array (at tbc 'UInit).buffer Nil) } ;
-              assert { precede tbc (at tbc 'UInit) } ;
+                (func_of_array (tbc at UInit).buffer Nil) } ;
+              assert { precede tbc (tbc at UInit) } ;
               unroll (delta - one)
             end else begin
               assert { 0 <= x < tbc.buffer.length } ;
@@ -377,10 +377,10 @@ module Impl
                   | Cons _ q -> tb.buffer[x]<- q ;
                     tbc.buffer[x]<- q ;
                     assert {
-                      let tb0 = func_of_array (at tbc 'UInit).buffer Nil in
+                      let tb0 = func_of_array (tbc at UInit).buffer Nil in
                       extensionalEqual (tb0[x <- pop (tb0 x)])
                         (func_of_array tbc.buffer Nil) } ;
-                    assert { precede tbc (at tbc 'UInit) } ;
+                    assert { precede tbc (tbc at UInit) } ;
                     unroll (delta - one)
                 end
               end
@@ -390,10 +390,10 @@ module Impl
                   | Nil -> absurd
                   | Cons _ q -> tbc.buffer[x]<- q
                 end ;
-                assert { let tb0 = func_of_array (at tbc 'UInit).buffer Nil in
+                assert { let tb0 = func_of_array (tbc at UInit).buffer Nil in
                   extensionalEqual (tb0[x <- pop (tb0 x)])
                   (func_of_array tbc.buffer Nil) } ;
-                assert { precede tbc (at tbc 'UInit) } ;
+                assert { precede tbc (tbc at UInit) } ;
                 (* nothing to do on non-ghost side. *)
                 unroll (delta - one)
               end
@@ -417,7 +417,7 @@ module Impl
     assert { extensionalEqual (func_of_array tb.buffer Nil)
       (func_of_array tbc.buffer Nil) }
 
-  val ghost hack_func_of_array (a:array 'a) (def:'a) : func int 'a
+  val ghost hack_func_of_array (a:array 'a) (def:'a) : int -> 'a
     ensures { result = func_of_array a def }
 
   let stamp (tb:t 'a) : timestamp 'a
