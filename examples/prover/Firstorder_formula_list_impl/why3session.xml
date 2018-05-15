@@ -2,97 +2,96 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../Firstorder_formula_list_impl.mlw" proved="true">
 <theory name="Logic" proved="true">
  <goal name="VC nlsize_positive_lemma_fo_formula_list" expl="VC for nlsize_positive_lemma_fo_formula_list" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.26" steps="134"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="164"/></proof>
  </goal>
  <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list" expl="VC for nlmodel_subst_commutation_lemma_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="60"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="15"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="62"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="53"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="17"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="55"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="18"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.4" expl="variant decrease" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="18"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="59"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="15"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.6" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="15"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.7" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="14"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="15"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.8" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="14"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="15"/></proof>
   </goal>
   <goal name="VC nlmodel_subst_commutation_lemma_fo_formula_list.9" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.46" steps="80"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="89"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC nlmodel_rename_commutation_lemma_fo_formula_list" expl="VC for nlmodel_rename_commutation_lemma_fo_formula_list" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="32"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="27"/></proof>
  </goal>
  <goal name="VC bound_depth_of_symbol_in_fo_formula_list_nonnegative" expl="VC for bound_depth_of_symbol_in_fo_formula_list_nonnegative" proved="true">
- <proof prover="4"><result status="valid" time="0.13" steps="106"/></proof>
+ <proof prover="0"><result status="valid" time="0.13" steps="100"/></proof>
  </goal>
  <goal name="VC bound_depth_of_fo_term_in_fo_formula_list_nonnegative" expl="VC for bound_depth_of_fo_term_in_fo_formula_list_nonnegative" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="99"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="97"/></proof>
  </goal>
  <goal name="VC model_equal_fo_formula_list" expl="VC for model_equal_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC model_equal_fo_formula_list.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.22" steps="54"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="52"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="12"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="57"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="12"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="39"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="40"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.5" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="51"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.22" steps="82"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="58"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="12"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="73"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="58"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="52"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="40"/></proof>
   </goal>
   <goal name="VC model_equal_fo_formula_list.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="33"/></proof>
   </goal>
  </transf>
  </goal>
@@ -101,635 +100,634 @@
  <goal name="VC bind_var_symbol_in_fo_formula_list" expl="VC for bind_var_symbol_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC bind_var_symbol_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="12"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="22"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="18"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="47"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="37"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="37"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="47"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="47"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="55"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="55"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="78"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="78"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="161"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="214"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.12" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="84"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="83"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="95"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="89"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_formula_list.14" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="35"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="49"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC bind_var_fo_term_in_fo_formula_list" expl="VC for bind_var_fo_term_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC bind_var_fo_term_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="13"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="12"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="26"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="22"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="13"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="13"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="13"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="13"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="14"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="18"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="47"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.16" steps="37"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.16" steps="37"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.15" steps="44"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="44"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.17" steps="54"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.17" steps="54"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.30" steps="125"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="83"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.11" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.22" steps="165"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.22" steps="215"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.12" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="85"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="84"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.27" steps="92"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="97"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_formula_list.14" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="35"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="49"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC unbind_var_symbol_in_fo_formula_list" expl="VC for unbind_var_symbol_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC unbind_var_symbol_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="15"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="29"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="25"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="17"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="21"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="52"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="17"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="43"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="43"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="52"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="52"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="20"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="20"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="21"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="61"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="83"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="83"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.15" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="24"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="24"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.17" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="87"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.18" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="92"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="115"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.19" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="100"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="94"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_formula_list.20" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="39"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="54"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC unbind_var_fo_term_in_fo_formula_list" expl="VC for unbind_var_fo_term_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="15"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="16"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="30"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="26"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="22"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="52"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="43"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="43"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="49"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="49"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="21"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.11" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="20"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="21"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.12" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="20"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="21"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.13" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.15" steps="21"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="22"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.14" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="59"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="59"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.15" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="80"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="80"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="24"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="25"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.17" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="24"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="25"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.18" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="24"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="25"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.19" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="88"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="87"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.20" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.26" steps="94"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="112"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.21" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="96"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="101"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_formula_list.22" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.23" steps="39"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="53"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC subst_base_symbol_in_fo_formula_list" expl="VC for subst_base_symbol_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC subst_base_symbol_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="12"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="13"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="39"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="22"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="15"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="15"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="15"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="15"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="49"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="39"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="39"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.21" steps="58"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="58"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="20"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="20"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="88"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.14" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="96"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="101"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.15" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="95"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_formula_list.16" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="37"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="52"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC subst_base_fo_term_in_fo_formula_list" expl="VC for subst_base_fo_term_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC subst_base_fo_term_in_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="23"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="16"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="49"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="39"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="39"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="17"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="56"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="56"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.13" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="21"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.15" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="87"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="86"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.16" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="94"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="99"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.17" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="99"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="93"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_formula_list.18" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="37"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="51"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC construct_fo_formula_list" expl="VC for construct_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC construct_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="10"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="11"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="11"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="31"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="31"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="45"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="44"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="25"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="31"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.5" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="27"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="33"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.6" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.23" steps="46"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.23" steps="122"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.7" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.22" steps="46"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="122"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.8" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.21" steps="36"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.21" steps="75"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.9" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="75"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.10" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.15" steps="124"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="211"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.11" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="124"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="211"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.12" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="17"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.13" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.14" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="18"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.15" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.16" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.17" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.18" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.19" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.20" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="23"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="19"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.21" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="17"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="18"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.22" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.26" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.23" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="18"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.24" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.25" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.26" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.27" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.28" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="8"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.29" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="19"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.30" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.39" steps="332"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.22" steps="761"/></proof>
   </goal>
   <goal name="VC construct_fo_formula_list.31" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="86"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="170"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC destruct_fo_formula_list" expl="VC for destruct_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC destruct_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="21"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="22"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.1" expl="unreachable point" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="22"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="24"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="15"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="19"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.3" expl="unreachable point" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="29"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="23"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.4" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="27"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="21"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="26"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="22"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.6" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="81"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="85"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.7" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="22"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="26"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.8" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.21" steps="81"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.21" steps="96"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.9" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="27"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.10" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="64"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="68"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.11" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="26"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="29"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.12" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="65"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="69"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.13" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="30"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.14" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="18"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="18"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.15" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="92"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="31"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="19"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.17" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="82"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.18" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="83"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="87"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.19" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="19"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="19"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.20" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="76"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.21" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="20"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="20"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.22" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="62"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="31"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.23" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="81"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="85"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.24" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="25"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="30"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.25" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="25"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="30"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.26" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="31"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.27" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="31"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.28" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.13" steps="74"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="123"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.29" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.18" steps="74"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.18" steps="123"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.30" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.22" steps="54"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="123"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.31" expl="assertion" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.21" steps="54"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.21" steps="123"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.32" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.48" steps="1185"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.48" steps="1185"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.33" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.17" steps="152"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.17" steps="222"/></proof>
   </goal>
   <goal name="VC destruct_fo_formula_list.34" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.18" steps="163"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.18" steps="339"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC nlsubst_symbol_in_fo_formula_list" expl="VC for nlsubst_symbol_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC nlsubst_symbol_in_fo_formula_list.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="13"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="18"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="25"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="14"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="18"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="26"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="13"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="23"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="14"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="17"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="15"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="16"/></proof>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.9" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.14" steps="95"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="95"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.42" steps="108"/></proof>
+   <proof prover="0"><result status="valid" time="0.23" steps="285"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.18" steps="53"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="60"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.3" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.59"/></proof>
+   <proof prover="1"><result status="valid" time="0.42"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.4" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.87"/></proof>
+   <proof prover="1"><result status="valid" time="1.09"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.9.5" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.15" steps="122"/></proof>
-   <proof prover="6"><undone/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="122"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.10" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_symbol_in_fo_formula_list.10.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.25" steps="102"/></proof>
+   <proof prover="0"><result status="valid" time="0.25" steps="99"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.10.1" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.65"/></proof>
    </goal>
    <goal name="VC nlsubst_symbol_in_fo_formula_list.10.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.15" steps="97"/></proof>
+   <proof prover="0"><result status="valid" time="0.15" steps="90"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC nlsubst_symbol_in_fo_formula_list.11" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_symbol_in_fo_formula_list.11.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.18" steps="78"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="103"/></proof>
    </goal>
   </transf>
   </goal>
@@ -741,19 +739,19 @@
  <goal name="VC nlsubst_fo_term_in_fo_formula_list" expl="VC for nlsubst_fo_term_in_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.0" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="14"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="13"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.1" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="18"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="27"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="14"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.3" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="19"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="28"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.14" steps="13"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.5" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -761,70 +759,70 @@
    <proof prover="6"><result status="valid" time="0.62"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.5.1" expl="VC for nlsubst_fo_term_in_fo_formula_list" proved="true">
-   <proof prover="4"><result status="valid" time="0.18" steps="21"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="28"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.6" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="26"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="32"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.7" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="16"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="16"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.8" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.13" steps="20"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="17"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.9" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.12" steps="21"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="18"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.10" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="22"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="19"/></proof>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.11" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.0" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.80"/></proof>
+   <proof prover="7"><result status="valid" time="0.56"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.17" steps="55"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="63"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.20" steps="85"/></proof>
+   <proof prover="0"><result status="valid" time="0.20" steps="95"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.3" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.17" steps="99"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.17" steps="99"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.4" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.59"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.11.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.37" steps="112"/></proof>
+   <proof prover="0"><result status="valid" time="0.12" steps="148"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.12" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.12.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.19" steps="84"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="94"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.12.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="1.24" steps="288"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="212"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.12.2" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.60"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.44"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.12.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.16" steps="23"/></proof>
+   <proof prover="0"><result status="valid" time="0.16" steps="24"/></proof>
    </goal>
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.12.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.21" steps="83"/></proof>
+   <proof prover="0"><result status="valid" time="0.21" steps="89"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC nlsubst_fo_term_in_fo_formula_list.13" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC nlsubst_fo_term_in_fo_formula_list.13.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.13" steps="79"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="104"/></proof>
    </goal>
   </transf>
   </goal>

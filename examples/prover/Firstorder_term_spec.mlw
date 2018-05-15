@@ -62,19 +62,15 @@ module Spec
           ()
     end
 
-  let rec function rename_fo_term_list (t:fo_term_list 'b0 'b3) (s0:'b0 -> 'c0)
-    (s3:'b3 -> 'c3) : fo_term_list 'c0 'c3
-    variant { t }
-    =
+  function rename_fo_term_list (t:fo_term_list 'b0 'b3) (s0:'b0 -> 'c0)
+    (s3:'b3 -> 'c3) : fo_term_list 'c0 'c3 =
     match t with | FONil -> FONil
       | FOCons v0 v1 ->
         FOCons (rename_fo_term v0 s0 s3) (rename_fo_term_list v1 s0 s3)
     end
 
-  with function rename_fo_term (t:fo_term 'b0 'b3) (s0:'b0 -> 'c0) (s3:'b3 -> 'c3) :
-    fo_term 'c0 'c3
-    variant { t }
-    =
+  with rename_fo_term (t:fo_term 'b0 'b3) (s0:'b0 -> 'c0) (s3:'b3 -> 'c3) :
+    fo_term 'c0 'c3 =
     match t with | Var_fo_term v0 -> Var_fo_term (s3 v0)
       | App v0 v1 -> App (rename_symbol v0 s0) (rename_fo_term_list v1 s0 s3)
     end

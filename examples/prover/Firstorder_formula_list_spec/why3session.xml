@@ -2,140 +2,140 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../Firstorder_formula_list_spec.mlw" proved="true">
 <theory name="Spec" proved="true">
  <goal name="VC size_positive_lemma_fo_formula_list" expl="VC for size_positive_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.10" steps="62"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="92"/></proof>
  </goal>
  <goal name="VC renaming_composition_lemma_fo_formula_list" expl="VC for renaming_composition_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="61"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="98"/></proof>
  </goal>
  <goal name="VC renaming_identity_lemma_fo_formula_list" expl="VC for renaming_identity_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="45"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="114"/></proof>
  </goal>
  <goal name="VC rename_then_subst_composition_lemma_fo_formula_list" expl="VC for rename_then_subst_composition_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.22" steps="158"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.22" steps="269"/></proof>
  </goal>
  <goal name="VC subst_then_rename_composition_lemma_fo_formula_list" expl="VC for subst_then_rename_composition_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="238"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="271"/></proof>
  </goal>
  <goal name="VC subst_composition_lemma_fo_formula_list" expl="VC for subst_composition_lemma_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC subst_composition_lemma_fo_formula_list.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="35"/></proof>
   </goal>
   <goal name="VC subst_composition_lemma_fo_formula_list.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="64"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="66"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC subst_identity_lemma_fo_formula_list" expl="VC for subst_identity_lemma_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.11" steps="85"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="119"/></proof>
  </goal>
  <goal name="VC renaming_preserve_size_fo_formula_list" expl="VC for renaming_preserve_size_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="55"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="87"/></proof>
  </goal>
  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_formula_list" expl="VC for rename_free_var_constructive_inversion_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.12" steps="138"/></proof>
+ <proof prover="0"><result status="valid" time="0.12" steps="187"/></proof>
  </goal>
  <goal name="VC rename_free_var_inversion_symbol_fo_formula_list" expl="VC for rename_free_var_inversion_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.08" steps="9"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
  </goal>
  <goal name="VC rename_free_var_constructive_inversion_fo_term_fo_formula_list" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.09" steps="138"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.09" steps="187"/></proof>
  </goal>
  <goal name="VC rename_free_var_inversion_fo_term_fo_formula_list" expl="VC for rename_free_var_inversion_fo_term_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="9"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="10"/></proof>
  </goal>
  <goal name="VC rename_free_var_propagation_symbol_fo_formula_list" expl="VC for rename_free_var_propagation_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.14" steps="168"/></proof>
+ <proof prover="0"><result status="valid" time="0.14" steps="213"/></proof>
  </goal>
  <goal name="VC rename_free_var_propagation_fo_term_fo_formula_list" expl="VC for rename_free_var_propagation_fo_term_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.11" steps="168"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="213"/></proof>
  </goal>
  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_formula_list" expl="VC for subst_free_var_constructive_inversion_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.34" steps="857"/></proof>
+ <proof prover="0"><result status="valid" time="0.34" steps="1720"/></proof>
  </goal>
  <goal name="VC subst_free_var_inversion_symbol_fo_formula_list" expl="VC for subst_free_var_inversion_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.09" steps="35"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="26"/></proof>
  </goal>
  <goal name="VC subst_free_var_constructive_inversion_fo_term_fo_formula_list" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.14" steps="390"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="603"/></proof>
  </goal>
  <goal name="VC subst_free_var_inversion_fo_term_fo_formula_list" expl="VC for subst_free_var_inversion_fo_term_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="9"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="10"/></proof>
  </goal>
  <goal name="VC subst_free_var_propagation_symbol_symbol_fo_formula_list" expl="VC for subst_free_var_propagation_symbol_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="1.11" steps="950"/></proof>
+ <proof prover="0"><result status="valid" time="0.26" steps="796"/></proof>
  </goal>
  <goal name="VC subst_free_var_propagation_fo_term_symbol_fo_formula_list" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_formula_list" proved="true">
- <proof prover="2"><result status="valid" time="0.93" steps="815"/></proof>
+ <proof prover="0"><result status="valid" time="0.22" steps="578"/></proof>
  </goal>
  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_formula_list" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_formula_list.0" expl="assertion" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="8"/></proof>
   </goal>
   <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_formula_list.1" expl="variant decrease" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="11"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="21"/></proof>
   </goal>
   <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.04" steps="7"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_formula_list.3" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="222"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="268"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC free_var_equivalence_of_subst_fo_formula_list" expl="VC for free_var_equivalence_of_subst_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.11" steps="408"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.11" steps="656"/></proof>
  </goal>
  <goal name="VC free_var_equivalence_of_rename_fo_formula_list" expl="VC for free_var_equivalence_of_rename_fo_formula_list" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.08" steps="280"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="116"/></proof>
  </goal>
  <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list" expl="VC for free_var_derive_equivalence_of_subst_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.46" steps="140"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="75"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.18" steps="63"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="108"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.17" steps="71"/></proof>
+  <proof prover="0"><result status="valid" time="0.17" steps="118"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.3" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="23"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.4" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.31" steps="131"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="58"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.5" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="65"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="107"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.6" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.18" steps="71"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="117"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.7" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="39"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_subst_fo_formula_list.8" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC free_var_derive_equivalence_of_rename_fo_formula_list" expl="VC for free_var_derive_equivalence_of_rename_fo_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC free_var_derive_equivalence_of_rename_fo_formula_list.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="6"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_rename_fo_formula_list.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="25"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="22"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_rename_fo_formula_list.2" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="38"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
   </goal>
   <goal name="VC free_var_derive_equivalence_of_rename_fo_formula_list.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.74"/></proof>

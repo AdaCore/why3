@@ -2018,8 +2018,8 @@ module Impl
                   (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
-          let mrv0 = rename_fo_term mv0 identity identity in
-          let mrv1 = rename_fo_term_list mv1 identity identity in
+          let ghost mrv0 = rename_fo_term mv0 identity identity in
+          let ghost mrv1 = rename_fo_term_list mv1 identity identity in
           let resv0 =
             { nlrepr_fo_term_field = v0 ;
               nlfree_var_symbol_set_abstraction_fo_term_field = fv0 ;
@@ -2176,8 +2176,8 @@ module Impl
                   (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
-          let mrv0 = rename_symbol mv0 identity in
-          let mrv1 = rename_fo_term_list mv1 identity identity in
+          let ghost mrv0 = rename_symbol mv0 identity in
+          let ghost mrv1 = rename_fo_term_list mv1 identity identity in
           let resv0 =
             { nlrepr_symbol_field = v0 ;
               nlfree_var_symbol_set_abstraction_symbol_field = fv0 ;
