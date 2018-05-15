@@ -36,28 +36,28 @@ module Impl
   use import set.Set as S
   use import BacktrackArray.Impl as BA
 
-  val ghost sdata_inv_hack (u:unit) : pred sdata
+  val ghost sdata_inv_hack (u:unit) : sdata -> bool
     ensures { result = sdata_inv }
 
-  let main (base:nlimpl_fo_formula_list) (gnum:int) : int
+  let main (base:nlimpl_fo_formula_list) (gnum:int) (ghost st:'st): int
     requires { nlimpl_fo_formula_list_ok base }
     diverges
-    ensures { forall m:model int 'st,rho:func int 'st.
+    ensures { forall m:model int 'st,rho:int -> 'st.
       not(formula_list_conj_semantic base.model_fo_formula_list_field m rho) }
-    raises { Sat -> forall m:model int 'st,rho:func int 'st.
+    raises { Sat -> forall m:model int 'st,rho:int -> 'st.
       formula_list_conj_semantic base.model_fo_formula_list_field m rho }
   =
     let root = construct_tableau NLC_Root in
-    try let phip = preprocessing base gnum in
+    try let phip = preprocessing base gnum st in
       let phip0 = (phip:preprocessing_return 'st).preprocessed in
       let phip0m = phip0.model_fo_formula_list_field in
       assert { root.model_tableau_field  = Root } ;
       let gnum = phip.final_goals_number in
       let gnum = if gnum <= 0 then (-1) else gnum in
-      let rec aux (n:int) : (int, prover_return)
+      let rec aux (n:int) (ghost st:'st) : (int, prover_return)
         diverges
         returns { (_,{ contradictory_assignment = s }) ->
-        forall m:model int 'st,rho:func int 'st.
+        forall m:model int 'st,rho:int -> 'st.
           let rhos = semantic_subst s m rho in
           not(formula_list_conj_semantic phip0.model_fo_formula_list_field m rhos) }
       =
@@ -71,15 +71,15 @@ module Impl
           (subst_id_fo_term) &&
           (smodel (BA.current_timestamp unifb)) = subst_id_fo_term } ;
         assert { forall x:int. unassigned (BA.current_timestamp unifb) x } ;
-        try (n,extend_branch phip0 root unifb unif 0 n gnum)
-        with Failure -> aux (n+1)
+        try (n,extend_branch phip0 root unifb unif 0 n gnum st)
+        with Failure -> aux (n+1) st
         end
       in
-      let n,r = aux 0 in
+      let n,r = aux 0 st in
       let s = r.contradictory_assignment in
       let basem = base.model_fo_formula_list_field in
       let tr = phip.model_transf in
-      assert { forall m:model int 'st,rho:func int 'st.
+      assert { forall m:model int 'st,rho:int -> 'st.
         let m' = { interp_fun = (tr m).interp_fun ;
           interp_pred = (tr m).interp_pred } in
         let rhos = semantic_subst s m' rho in

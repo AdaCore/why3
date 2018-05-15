@@ -324,7 +324,7 @@ module Impl
 
   use import FormulaTransformations.Impl as F
 
-  let test () : unit
+  let test (ghost st:'st) : unit
     diverges
     raises { F.Sat -> true }
     =
@@ -350,7 +350,7 @@ module Impl
     let nphi1 = construct_fo_formula (NLC_Not phi1) in
     let fl1 = construct_fo_formula_list (NLC_FOFCons nphi1 fonil) in
     let fl2 = construct_fo_formula_list (NLC_FOFCons phi0 fl1) in*)
-    let _ = main (zenon10 2) 1 in
+    let _ = main (zenon10 2) 1 st in
     ()
 
 end
