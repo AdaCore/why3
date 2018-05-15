@@ -2,453 +2,429 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Firstorder_term_spec.mlw">
-<theory name="Spec">
- <goal name="WP_parameter size_positive_lemma_fo_term_list" expl="VC for size_positive_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.03" steps="81"/></proof>
+<file name="../Firstorder_term_spec.mlw" proved="true">
+<theory name="Spec" proved="true">
+ <goal name="VC size_positive_lemma_fo_term_list" expl="VC for size_positive_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="79"/></proof>
  </goal>
- <goal name="WP_parameter size_positive_lemma_fo_term" expl="VC for size_positive_lemma_fo_term">
+ <goal name="VC size_positive_lemma_fo_term" expl="VC for size_positive_lemma_fo_term" proved="true">
  <proof prover="3"><result status="valid" time="0.03" steps="49"/></proof>
  </goal>
- <goal name="WP_parameter renaming_composition_lemma_fo_term_list" expl="VC for renaming_composition_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.04" steps="70"/></proof>
+ <goal name="VC renaming_composition_lemma_fo_term_list" expl="VC for renaming_composition_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="61"/></proof>
  </goal>
- <goal name="WP_parameter renaming_composition_lemma_fo_term" expl="VC for renaming_composition_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="89"/></proof>
+ <goal name="VC renaming_composition_lemma_fo_term" expl="VC for renaming_composition_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="78"/></proof>
  </goal>
- <goal name="WP_parameter renaming_identity_lemma_fo_term_list" expl="VC for renaming_identity_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.03" steps="53"/></proof>
+ <goal name="VC renaming_identity_lemma_fo_term_list" expl="VC for renaming_identity_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="47"/></proof>
  </goal>
- <goal name="WP_parameter renaming_identity_lemma_fo_term" expl="VC for renaming_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="74"/></proof>
+ <goal name="VC renaming_identity_lemma_fo_term" expl="VC for renaming_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="65"/></proof>
  </goal>
- <goal name="WP_parameter associativity_subst_rename_rename_lemma_fo_term" expl="VC for associativity_subst_rename_rename_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+ <goal name="VC associativity_subst_rename_rename_lemma_fo_term" expl="VC for associativity_subst_rename_rename_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter associativity_rename_subst_rename_lemma_fo_term" expl="VC for associativity_rename_subst_rename_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+ <goal name="VC associativity_rename_subst_rename_lemma_fo_term" expl="VC for associativity_rename_subst_rename_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter right_rename_subst_by_identity_lemma_fo_term" expl="VC for right_rename_subst_by_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="23"/></proof>
+ <goal name="VC right_rename_subst_by_identity_lemma_fo_term" expl="VC for right_rename_subst_by_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="24"/></proof>
  </goal>
- <goal name="WP_parameter olifts_composition_lemma_rename_subst_fo_term" expl="VC for olifts_composition_lemma_rename_subst_fo_term">
- <proof prover="3"><result status="valid" time="0.07" steps="326"/></proof>
+ <goal name="VC olifts_composition_lemma_rename_subst_fo_term" expl="VC for olifts_composition_lemma_rename_subst_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.60" steps="435"/></proof>
  </goal>
- <goal name="WP_parameter olifts_composition_lemma_subst_rename_fo_term" expl="VC for olifts_composition_lemma_subst_rename_fo_term">
- <proof prover="3"><result status="valid" time="0.49" steps="707"/></proof>
+ <goal name="VC olifts_composition_lemma_subst_rename_fo_term" expl="VC for olifts_composition_lemma_subst_rename_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="4.19" steps="926"/></proof>
  </goal>
- <goal name="WP_parameter rename_then_subst_composition_lemma_fo_term_list" expl="VC for rename_then_subst_composition_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.05" steps="126"/></proof>
+ <goal name="VC rename_then_subst_composition_lemma_fo_term_list" expl="VC for rename_then_subst_composition_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.05" steps="130"/></proof>
  </goal>
- <goal name="WP_parameter rename_then_subst_composition_lemma_fo_term" expl="VC for rename_then_subst_composition_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.07" steps="192"/></proof>
+ <goal name="VC rename_then_subst_composition_lemma_fo_term" expl="VC for rename_then_subst_composition_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.07" steps="169"/></proof>
  </goal>
- <goal name="WP_parameter subst_then_rename_composition_lemma_fo_term_list" expl="VC for subst_then_rename_composition_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.06" steps="162"/></proof>
+ <goal name="VC subst_then_rename_composition_lemma_fo_term_list" expl="VC for subst_then_rename_composition_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="157"/></proof>
  </goal>
- <goal name="WP_parameter subst_then_rename_composition_lemma_fo_term" expl="VC for subst_then_rename_composition_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.06" steps="190"/></proof>
+ <goal name="VC subst_then_rename_composition_lemma_fo_term" expl="VC for subst_then_rename_composition_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="207"/></proof>
  </goal>
- <goal name="WP_parameter associativity_rename_subst_subst_lemma_fo_term" expl="VC for associativity_rename_subst_subst_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="17"/></proof>
+ <goal name="VC associativity_rename_subst_subst_lemma_fo_term" expl="VC for associativity_rename_subst_subst_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter associativity_subst_rename_subst_lemma_fo_term" expl="VC for associativity_subst_rename_subst_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="17"/></proof>
+ <goal name="VC associativity_subst_rename_subst_lemma_fo_term" expl="VC for associativity_subst_rename_subst_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter associativity_subst_subst_rename_lemma_fo_term" expl="VC for associativity_subst_subst_rename_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="17"/></proof>
+ <goal name="VC associativity_subst_subst_rename_lemma_fo_term" expl="VC for associativity_subst_subst_rename_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter olifts_composition_lemma_subst_subst_fo_term" expl="VC for olifts_composition_lemma_subst_subst_fo_term">
- <proof prover="3"><result status="valid" time="1.11" steps="961"/></proof>
- </goal>
- <goal name="WP_parameter subst_composition_lemma_fo_term_list" expl="VC for subst_composition_lemma_fo_term_list">
- <transf name="split_goal_right">
-  <goal name="WP_parameter subst_composition_lemma_fo_term_list.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="7"/></proof>
+ <goal name="VC olifts_composition_lemma_subst_subst_fo_term" expl="VC for olifts_composition_lemma_subst_subst_fo_term" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC olifts_composition_lemma_subst_subst_fo_term.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="340"/></proof>
   </goal>
-  <goal name="WP_parameter subst_composition_lemma_fo_term_list.2" expl="variant decrease">
+  <goal name="VC olifts_composition_lemma_subst_subst_fo_term.1" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="105"/></proof>
+  </goal>
+  <goal name="VC olifts_composition_lemma_subst_subst_fo_term.2" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.26"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC subst_composition_lemma_fo_term_list" expl="VC for subst_composition_lemma_fo_term_list" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC subst_composition_lemma_fo_term_list.0" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter subst_composition_lemma_fo_term_list.3" expl="variant decrease">
+  <goal name="VC subst_composition_lemma_fo_term_list.1" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter subst_composition_lemma_fo_term_list.4" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="39"/></proof>
+  <goal name="VC subst_composition_lemma_fo_term_list.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="71"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter subst_composition_lemma_fo_term" expl="VC for subst_composition_lemma_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter subst_composition_lemma_fo_term.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_composition_lemma_fo_term.2" expl="variant decrease">
+ <goal name="VC subst_composition_lemma_fo_term" expl="VC for subst_composition_lemma_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC subst_composition_lemma_fo_term.0" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter subst_composition_lemma_fo_term.3" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="44"/></proof>
+  <goal name="VC subst_composition_lemma_fo_term.1" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter associativity_subst_subst_subst_lemma_fo_term" expl="VC for associativity_subst_subst_subst_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="17"/></proof>
+ <goal name="VC associativity_subst_subst_subst_lemma_fo_term" expl="VC for associativity_subst_subst_subst_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter olifts_identity_fo_term" expl="VC for olifts_identity_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter olifts_identity_fo_term.1" expl="assertion">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter olifts_identity_fo_term.1.1" expl="assertion">
+ <goal name="VC olifts_identity_fo_term" expl="VC for olifts_identity_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC olifts_identity_fo_term.0" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC olifts_identity_fo_term.0.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="18"/></proof>
    </goal>
-   <goal name="WP_parameter olifts_identity_fo_term.1.2" expl="assertion">
+   <goal name="VC olifts_identity_fo_term.0.1" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="83"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter olifts_identity_fo_term.2" expl="assertion">
+  <goal name="VC olifts_identity_fo_term.1" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter olifts_identity_fo_term.3" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="12"/></proof>
+  <goal name="VC olifts_identity_fo_term.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter left_rename_subst_identity_lemma_fo_term" expl="VC for left_rename_subst_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="56"/></proof>
+ <goal name="VC left_rename_subst_identity_lemma_fo_term" expl="VC for left_rename_subst_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="60"/></proof>
  </goal>
- <goal name="WP_parameter subst_identity_lemma_fo_term_list" expl="VC for subst_identity_lemma_fo_term_list">
- <proof prover="3"><result status="valid" time="0.05" steps="118"/></proof>
+ <goal name="VC subst_identity_lemma_fo_term_list" expl="VC for subst_identity_lemma_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.05" steps="95"/></proof>
  </goal>
- <goal name="WP_parameter subst_identity_lemma_fo_term" expl="VC for subst_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="89"/></proof>
+ <goal name="VC subst_identity_lemma_fo_term" expl="VC for subst_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="104"/></proof>
  </goal>
- <goal name="WP_parameter left_subst_subst_identity_lemma_fo_term" expl="VC for left_subst_subst_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="38"/></proof>
+ <goal name="VC left_subst_subst_identity_lemma_fo_term" expl="VC for left_subst_subst_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="40"/></proof>
  </goal>
- <goal name="WP_parameter right_subst_subst_by_identity_lemma_fo_term" expl="VC for right_subst_subst_by_identity_lemma_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="21"/></proof>
+ <goal name="VC right_subst_subst_by_identity_lemma_fo_term" expl="VC for right_subst_subst_by_identity_lemma_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="22"/></proof>
  </goal>
- <goal name="WP_parameter renaming_preserve_size_fo_term_list" expl="VC for renaming_preserve_size_fo_term_list">
- <proof prover="3"><result status="valid" time="0.04" steps="62"/></proof>
+ <goal name="VC renaming_preserve_size_fo_term_list" expl="VC for renaming_preserve_size_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="67"/></proof>
  </goal>
- <goal name="WP_parameter renaming_preserve_size_fo_term" expl="VC for renaming_preserve_size_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="58"/></proof>
+ <goal name="VC renaming_preserve_size_fo_term" expl="VC for renaming_preserve_size_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="57"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list" expl="VC for rename_free_var_constructive_inversion_symbol_fo_term_list">
- <transf name="split_goal_right">
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.1" expl="unreachable point">
+ <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list" expl="VC for rename_free_var_constructive_inversion_symbol_fo_term_list" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.0" expl="unreachable point" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.2" expl="variant decrease">
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.1" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.3" expl="precondition">
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.2" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.4" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.5" expl="variant decrease">
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.3" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.6" expl="precondition">
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.7" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term_list.8" expl="unreachable point">
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.5" expl="unreachable point" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="37"/></proof>
   </goal>
+  <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term_list.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
  </transf>
  </goal>
- <goal name="WP_parameter rename_free_var_inversion_symbol_fo_term_list" expl="VC for rename_free_var_inversion_symbol_fo_term_list">
+ <goal name="VC rename_free_var_inversion_symbol_fo_term_list" expl="VC for rename_free_var_inversion_symbol_fo_term_list" proved="true">
  <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_constructive_inversion_fo_term_fo_term_list" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_term_list">
- <proof prover="3"><result status="valid" time="0.06" steps="135"/></proof>
+ <goal name="VC rename_free_var_constructive_inversion_fo_term_fo_term_list" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="137"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_inversion_fo_term_fo_term_list" expl="VC for rename_free_var_inversion_fo_term_fo_term_list">
+ <goal name="VC rename_free_var_inversion_fo_term_fo_term_list" expl="VC for rename_free_var_inversion_fo_term_fo_term_list" proved="true">
  <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_constructive_inversion_symbol_fo_term" expl="VC for rename_free_var_constructive_inversion_symbol_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="139"/></proof>
+ <goal name="VC rename_free_var_constructive_inversion_symbol_fo_term" expl="VC for rename_free_var_constructive_inversion_symbol_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="137"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_inversion_symbol_fo_term" expl="VC for rename_free_var_inversion_symbol_fo_term">
+ <goal name="VC rename_free_var_inversion_symbol_fo_term" expl="VC for rename_free_var_inversion_symbol_fo_term" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_constructive_inversion_fo_term_fo_term" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_term">
- <proof prover="3"><result status="valid" time="0.06" steps="114"/></proof>
+ <goal name="VC rename_free_var_constructive_inversion_fo_term_fo_term" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="131"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_inversion_fo_term_fo_term" expl="VC for rename_free_var_inversion_fo_term_fo_term">
+ <goal name="VC rename_free_var_inversion_fo_term_fo_term" expl="VC for rename_free_var_inversion_fo_term_fo_term" proved="true">
  <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_propagation_symbol_fo_term_list" expl="VC for rename_free_var_propagation_symbol_fo_term_list">
- <proof prover="3"><result status="valid" time="0.06" steps="147"/></proof>
+ <goal name="VC rename_free_var_propagation_symbol_fo_term_list" expl="VC for rename_free_var_propagation_symbol_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="165"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_propagation_fo_term_fo_term_list" expl="VC for rename_free_var_propagation_fo_term_fo_term_list">
- <proof prover="3"><result status="valid" time="0.05" steps="147"/></proof>
+ <goal name="VC rename_free_var_propagation_fo_term_fo_term_list" expl="VC for rename_free_var_propagation_fo_term_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.05" steps="165"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_propagation_symbol_fo_term" expl="VC for rename_free_var_propagation_symbol_fo_term">
- <proof prover="3"><result status="valid" time="0.07" steps="159"/></proof>
+ <goal name="VC rename_free_var_propagation_symbol_fo_term" expl="VC for rename_free_var_propagation_symbol_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.07" steps="202"/></proof>
  </goal>
- <goal name="WP_parameter rename_free_var_propagation_fo_term_fo_term" expl="VC for rename_free_var_propagation_fo_term_fo_term">
- <proof prover="3"><result status="valid" time="0.05" steps="99"/></proof>
+ <goal name="VC rename_free_var_propagation_fo_term_fo_term" expl="VC for rename_free_var_propagation_fo_term_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.05" steps="126"/></proof>
  </goal>
- <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term_list" expl="VC for subst_free_var_constructive_inversion_symbol_fo_term_list">
- <proof prover="3"><result status="valid" time="0.16" steps="645"/></proof>
+ <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term_list" expl="VC for subst_free_var_constructive_inversion_symbol_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.16" steps="856"/></proof>
  </goal>
- <goal name="WP_parameter subst_free_var_inversion_symbol_fo_term_list" expl="VC for subst_free_var_inversion_symbol_fo_term_list">
- <proof prover="3"><result status="valid" time="0.04" steps="50"/></proof>
+ <goal name="VC subst_free_var_inversion_symbol_fo_term_list" expl="VC for subst_free_var_inversion_symbol_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="35"/></proof>
  </goal>
- <goal name="WP_parameter subst_free_var_constructive_inversion_fo_term_fo_term_list" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_term_list">
- <proof prover="3"><result status="valid" time="0.10" steps="395"/></proof>
+ <goal name="VC subst_free_var_constructive_inversion_fo_term_fo_term_list" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.10" steps="398"/></proof>
  </goal>
- <goal name="WP_parameter subst_free_var_inversion_fo_term_fo_term_list" expl="VC for subst_free_var_inversion_fo_term_fo_term_list">
+ <goal name="VC subst_free_var_inversion_fo_term_fo_term_list" expl="VC for subst_free_var_inversion_fo_term_fo_term_list" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
  </goal>
- <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term" expl="VC for subst_free_var_constructive_inversion_symbol_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
+ <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term" expl="VC for subst_free_var_constructive_inversion_symbol_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.2" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.3" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.4" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.5" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.6" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.03" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.7" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.8" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="65"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.9" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="66"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.10" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="81"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.11" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.12" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.05" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.13" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="64"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_constructive_inversion_symbol_fo_term.14" expl="unreachable point">
-  <proof prover="3"><result status="valid" time="0.10" steps="207"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter subst_free_var_inversion_symbol_fo_term" expl="VC for subst_free_var_inversion_symbol_fo_term">
- <proof prover="3"><result status="valid" time="0.04" steps="50"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_constructive_inversion_fo_term_fo_term" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_term">
- <proof prover="3"><result status="valid" time="0.08" steps="228"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_inversion_fo_term_fo_term" expl="VC for subst_free_var_inversion_fo_term_fo_term">
- <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_fo_term_list" expl="VC for subst_free_var_propagation_symbol_symbol_fo_term_list">
- <proof prover="3"><result status="valid" time="0.22" steps="563"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_fo_term_list" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_term_list">
- <proof prover="3"><result status="valid" time="0.18" steps="543"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_term_list">
- <transf name="split_goal_right">
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.2" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.3" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.4" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.5" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term_list.6" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="125"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_symbol_symbol_fo_term" expl="VC for subst_free_var_propagation_symbol_symbol_fo_term">
- <proof prover="3"><result status="valid" time="0.32" steps="1019"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_fo_term_symbol_fo_term" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_term">
- <proof prover="3"><result status="valid" time="0.10" steps="322"/></proof>
- </goal>
- <goal name="WP_parameter subst_free_var_propagation_fo_term_fo_term_fo_term" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_term">
- <proof prover="3"><result status="valid" time="0.13" steps="320"/></proof>
- </goal>
- <goal name="WP_parameter free_var_equivalence_of_subst_fo_term_list" expl="VC for free_var_equivalence_of_subst_fo_term_list">
- <proof prover="3"><result status="valid" time="0.10" steps="388"/></proof>
- </goal>
- <goal name="WP_parameter free_var_equivalence_of_subst_fo_term" expl="VC for free_var_equivalence_of_subst_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.2" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.3" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.17" steps="163"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.4" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.5" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.6" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.7" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="41"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.8" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="43"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_equivalence_of_subst_fo_term.9" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="20"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter free_var_equivalence_of_rename_fo_term_list" expl="VC for free_var_equivalence_of_rename_fo_term_list">
- <proof prover="3"><result status="valid" time="0.06" steps="231"/></proof>
- </goal>
- <goal name="WP_parameter free_var_equivalence_of_rename_fo_term" expl="VC for free_var_equivalence_of_rename_fo_term">
- <proof prover="3"><result status="valid" time="0.06" steps="251"/></proof>
- </goal>
- <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list" expl="VC for free_var_derive_equivalence_of_subst_fo_term_list">
- <transf name="split_goal_right">
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.2" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.3" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.4" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.10" steps="145"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.5" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.05" steps="138"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.6" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.06" steps="120"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.7" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.8" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.07" steps="69"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.9" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.07" steps="144"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.10" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.07" steps="126"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.11" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term_list.12" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="34"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term" expl="VC for free_var_derive_equivalence_of_subst_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.1" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.2" expl="postcondition">
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.2" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.3" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.07" steps="62"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.4" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.05" steps="96"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.5" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.04" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.6" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.07" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.7" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.06" steps="164"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.8" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.06" steps="136"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.9" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="63"/></proof>
-  </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_subst_fo_term.10" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="35"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list" expl="VC for free_var_derive_equivalence_of_rename_fo_term_list">
- <transf name="split_goal_right">
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list.1" expl="precondition">
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list.2" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="25"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="87"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list.3" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.04" steps="45"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.6" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list.4" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.38"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="61"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term_list.5" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.39"/></proof>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.8" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="56"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.9" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="100"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_constructive_inversion_symbol_fo_term.10" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="417"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term" expl="VC for free_var_derive_equivalence_of_rename_fo_term">
- <transf name="split_goal_right">
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term.1" expl="precondition">
+ <goal name="VC subst_free_var_inversion_symbol_fo_term" expl="VC for subst_free_var_inversion_symbol_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="35"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_constructive_inversion_fo_term_fo_term" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.08" steps="259"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_inversion_fo_term_fo_term" expl="VC for subst_free_var_inversion_fo_term_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="9"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_propagation_symbol_symbol_fo_term_list" expl="VC for subst_free_var_propagation_symbol_symbol_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.96" steps="916"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_propagation_fo_term_symbol_fo_term_list" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.36" steps="707"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_term_list" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list.2" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list.3" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term_list.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="196"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC subst_free_var_propagation_symbol_symbol_fo_term" expl="VC for subst_free_var_propagation_symbol_symbol_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="1.60" steps="821"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_propagation_fo_term_symbol_fo_term" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.24" steps="497"/></proof>
+ </goal>
+ <goal name="VC subst_free_var_propagation_fo_term_fo_term_fo_term" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.13" steps="420"/></proof>
+ </goal>
+ <goal name="VC free_var_equivalence_of_subst_fo_term_list" expl="VC for free_var_equivalence_of_subst_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.10" steps="381"/></proof>
+ </goal>
+ <goal name="VC free_var_equivalence_of_subst_fo_term" expl="VC for free_var_equivalence_of_subst_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC free_var_equivalence_of_subst_fo_term.0" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="6"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.3" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="34"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="44"/></proof>
+  </goal>
+  <goal name="VC free_var_equivalence_of_subst_fo_term.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="33"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC free_var_equivalence_of_rename_fo_term_list" expl="VC for free_var_equivalence_of_rename_fo_term_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="280"/></proof>
+ </goal>
+ <goal name="VC free_var_equivalence_of_rename_fo_term" expl="VC for free_var_equivalence_of_rename_fo_term" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="280"/></proof>
+ </goal>
+ <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list" expl="VC for free_var_derive_equivalence_of_subst_fo_term_list" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.28" steps="153"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="63"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.3" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="69"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.32" steps="153"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.6" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="63"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.7" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="69"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="27"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term_list.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC free_var_derive_equivalence_of_subst_fo_term" expl="VC for free_var_derive_equivalence_of_subst_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="82"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="63"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.2" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.35" steps="147"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.4" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="63"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.5" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="69"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_subst_fo_term.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list" expl="VC for free_var_derive_equivalence_of_rename_fo_term_list" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="25"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list.3" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term_list.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.54"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC free_var_derive_equivalence_of_rename_fo_term" expl="VC for free_var_derive_equivalence_of_rename_fo_term" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term.0" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term.2" expl="assertion">
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term.1" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.08" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term.3" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.07" steps="45"/></proof>
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term.4" expl="postcondition">
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term.3" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.41"/></proof>
   </goal>
-  <goal name="WP_parameter free_var_derive_equivalence_of_rename_fo_term.5" expl="postcondition">
+  <goal name="VC free_var_derive_equivalence_of_rename_fo_term.4" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.40"/></proof>
   </goal>
  </transf>
