@@ -18,8 +18,13 @@ function f int : int
 
 goal g3: forall x:int.
   forall z. z = x+1 ->
-  forall y. y = z ->
+  forall y. y+1 = z ->
   x = f y -> y = f y + 1
+
+predicate p int
+predicate q int
+
+goal g2: forall x. p x -> forall y:int. x = y -> q x
 
 end
 

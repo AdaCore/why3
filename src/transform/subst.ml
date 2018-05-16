@@ -47,7 +47,7 @@ let subst_in_def sigma ls (d:ls_defn) =
    appearing in the left-hand-side
 
  *)
-let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
+let _apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
   Trans.decl
     (fun d ->
      match d.d_node with
@@ -78,6 +78,84 @@ let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
      | Dtype _ | Ddata _ -> [d])
     None
 
+
+let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : Task.task =
+  let rec aux tdl tuc postponed =
+    match tdl with
+    | [] -> assert false
+    | td :: rem ->
+       match td.Theory.td_node with
+       | Theory.Decl d ->
+          begin
+            match d.d_node with
+            | Dprop(Pgoal,pr,t) ->
+               begin match postponed with
+                     | [] ->
+                        let d = create_prop_decl Pgoal pr (subst_in_term sigma t) in
+                        let td = Theory.create_decl d in
+Task.add_tdecl tuc td
+                     | _ -> raise (Arg_trans "apply_subst failed")
+               end
+            | Dprop(_k,pr,_t) when Spr.mem pr prs ->
+               aux rem tuc postponed
+            | Dprop(k,pr,t) ->
+               let d = create_prop_decl k pr (subst_in_term sigma t) in
+               let td = Theory.create_decl d in
+               begin
+                 match Task.add_tdecl tuc td with
+                 | tuc ->
+                     aux rem tuc postponed
+                 | exception _ ->
+                   aux rem tuc (td::postponed)
+               end
+            | Dparam ls ->
+               if Mls.mem ls sigma then aux rem tuc postponed
+               else let tuc = Task.add_decl tuc d in
+                    aux (List.rev_append postponed rem) tuc []
+          | Dlogic ld ->
+             let ld' =
+               List.fold_right
+                 (fun (ls,ld) acc ->
+                  if Mls.mem ls sigma then acc
+                  else (subst_in_def sigma ls ld)::acc)
+                 ld
+                 []
+             in
+             begin
+               match ld' with
+               | [] -> aux rem tuc postponed
+               | _ ->
+                  let d = Theory.create_decl (create_logic_decl ld') in
+                  begin
+                    match Task.add_tdecl tuc d with
+                    | tuc ->
+                        aux (List.rev_append postponed rem) tuc []
+                    | exception _ ->
+                                aux rem tuc (d::postponed)
+                  end
+             end
+          | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
+             let ind_list =
+               List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
+                         let idl = List.map (fun (pr, t) -> (pr, subst_in_term sigma t)) idl in
+                         (ls, idl)) ind_list
+             in
+             let d = create_ind_decl is ind_list in
+             let td = Theory.create_decl d in
+             begin
+               try let tuc = Task.add_tdecl tuc td in
+                   aux (List.rev_append postponed rem) tuc []
+               with _ -> aux rem tuc (td::postponed)
+             end
+          | Dtype _
+          | Ddata _ ->
+             let tuc = Task.add_decl tuc d in
+             aux (List.rev_append postponed rem) tuc []
+
+        end
+     | _ -> aux rem (Task.add_tdecl tuc td) postponed
+  in
+  aux tdl None []
 
 let rec occurs_in_term ls t =
   match t.t_node with
@@ -116,6 +194,8 @@ let find_equalities filter =
                   else
                     let () = Debug.dprintf debug_subst "selected: %a -> %a@."
                                            Pretty.print_ls ls Pretty.print_term t2' in
+                    let sigma' = Mls.add ls t2' Mls.empty in
+                    let sigma = Mls.map (subst_in_term sigma') sigma in
                     (Spr.add pr prs, Mls.add ls t2' sigma)
                | _ -> raise Exit
                with Exit ->
@@ -128,6 +208,8 @@ let find_equalities filter =
                        else
                          let () = Debug.dprintf debug_subst "selected: %a -> %a@."
                                                 Pretty.print_ls ls Pretty.print_term t1' in
+                         let sigma' = Mls.add ls t1' Mls.empty in
+                         let sigma = Mls.map (subst_in_term sigma') sigma in
                          (Spr.add pr prs, Mls.add ls t1' sigma)
                     | _ -> acc
              end
@@ -148,9 +230,15 @@ let find_equalities filter =
      | Ddata _ | Dtype _ | Dparam _ | Dind _ -> acc)
     (Spr.empty, Mls.empty)
 
+let get_decls =
+  Trans.fold (fun th acc -> th.Task.task_decl :: acc) []
+
+let apply_subst x t =
+  apply_subst x (List.rev (Trans.apply get_decls t))
 
 let subst_all =
-  Trans.bind (find_equalities (fun _ -> true)) apply_subst
+  Trans.bind (find_equalities (fun _ -> true))
+             (fun x -> Trans.store (apply_subst x))
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities between a constant and a term"
@@ -165,7 +253,8 @@ let subst tl =
        | Tapp (ls, []) -> Sls.add ls acc
        | _ -> raise (Arg_trans "subst: %a is not a constant")) Sls.empty tl
   in
-  Trans.bind (find_equalities (fun ls -> Sls.mem ls to_subst)) apply_subst
+  Trans.bind (find_equalities (fun ls -> Sls.mem ls to_subst))
+             (fun x -> Trans.store (apply_subst x))
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities involving one of the given constants"
