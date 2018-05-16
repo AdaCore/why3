@@ -420,34 +420,39 @@ if test "$enable_emacs_compilation" = yes ; then
 fi
 
 # checking for Num
+DIR=
 if test "$USEOCAMLFIND" = yes; then
-   NUMINCLUDE=$(ocamlfind query num)
+   DIR=$(ocamlfind query num)
+   if test -n "$DIR"; then
+      echo "ocamlfind found num in $DIR"
+   fi
 fi
-if test -n "$NUMINCLUDE"; then
-   echo "ocamlfind found num in $NUMINCLUDE"
-else
-   AC_CHECK_FILE($OCAMLLIB/nums.cma,,found_num=no)
-      if test "$found_num" = no; then
-         AC_MSG_ERROR([Library Num not found.])
-      fi
+DIR="$OCAMLLIB"
+AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
+AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
+if test "$found_num" = no; then
+   AC_MSG_ERROR([Library Num not found.])
 fi
 
 # checking for Zarith
 if test "$enable_zarith" = yes; then
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      BIGINTINCLUDE=$(ocamlfind query zarith)
-   fi
-   if test -n "$BIGINTINCLUDE"; then
-      echo "ocamlfind found zarith in $BIGINTINCLUDE"
-      BIGINTINCLUDE="-I $BIGINTINCLUDE"
-   else
-      AC_CHECK_FILE($OCAMLLIB/zarith/zarith.cma,,enable_zarith=no)
-      if test "$enable_zarith" = no; then
-         AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
-         reason_zarith=" (zarith not found)"
-      else
-         BIGINTINCLUDE="-I +zarith"
+      DIR=$(ocamlfind query zarith)
+      if test -n "$DIR"; then
+         echo "ocamlfind found zarith in $DIR"
+         BIGINTINCLUDE="-I $DIR"
       fi
+   fi
+   if test -z "$DIR"; then
+      BIGINTINCLUDE="-I +zarith"
+      DIR="$OCAMLLIB/zarith"
+      AC_CHECK_FILE($DIR/zarith.cma,,enable_zarith=no)
+   fi
+   AC_CHECK_FILE($DIR/z.cmi,,enable_zarith=no)
+   if test "$enable_zarith" = no; then
+      AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
+      reason_zarith=" (zarith not found)"
    fi
 fi
 
@@ -457,24 +462,28 @@ if test "$enable_zarith" = yes; then
 else
    BIGINTLIB=nums
    BIGINTPKG=num
+   BIGINTINCLUDE=
 fi
 
 # checking for camlzip
 if test "$enable_zip" = yes; then
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      ZIPINCLUDE=$(ocamlfind query zip)
-   fi
-   if test -n "$ZIPINCLUDE"; then
-      echo "ocamlfind found camlzip in $ZIPINCLUDE"
-      ZIPINCLUDE="-I $ZIPINCLUDE"
-   else
-      AC_CHECK_FILE($OCAMLLIB/zip/zip.cma,,enable_zip=no)
-      if test "$enable_zip" = no; then
-         AC_MSG_WARN([Lib camlzip not found, sessions files will not be compressed.])
-         reason_zip=" (camlzip not found)"
-      else
-         ZIPINCLUDE="-I +zip"
+      DIR=$(ocamlfind query zip)
+      if test -n "DIR"; then
+         echo "ocamlfind found camlzip in $DIR"
+         ZIPINCLUDE="-I $DIR"
       fi
+   fi
+   if test -z "$DIR"; then
+      ZIPINCLUDE="-I +zip"
+      DIR="$OCAMLLIB/zip"
+      AC_CHECK_FILE($DIR/zip.cma,,enable_zip=no)
+   fi
+   AC_CHECK_FILE($DIR/zip.cmi,,enable_zip=no)
+   if test "$enable_zip" = no; then
+      AC_MSG_WARN([Lib camlzip not found, sessions files will not be compressed.])
+      reason_zip=" (camlzip not found)"
    fi
 fi
 
@@ -482,23 +491,28 @@ if test "$enable_zip" = yes; then
    ZIPLIB=zip
 else
    ZIPLIB=
+   ZIPINCLUDE=
 fi
 
+# checking for menhirlib
 if test "$enable_menhirLib" = yes; then
-  if test "$USEOCAMLFIND" = yes; then
-     MENHIRINCLUDE=$(ocamlfind query menhirLib)
-  fi
-  if test -n "$MENHIRINCLUDE"; then
-     echo "ocamlfind found menhirLib in $MENHIRINCLUDE"
-     MENHIRINCLUDE="-I $MENHIRINCLUDE"
-  else
-     AC_CHECK_FILE($OCAMLLIB/menhirLib/menhirLib.cmx,,enable_menhirLib=no)
-     if test "$enable_menhirLib" = no; then
-        AC_MSG_WARN([Lib menhirLib not found, parser source files will be bigger.])
-        reason_menhirLib=" (menhirLib not found)"
-     else
-        MENHIRINCLUDE="-I +menhirLib"
-     fi
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query menhirLib)
+      if test -n "$DIR"; then
+         echo "ocamlfind found menhirLib in $DIR"
+         MENHIRINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      MENHIRINCLUDE="-I +menhirLib"
+      DIR="$OCAMLLIB/menhirLib"
+      AC_CHECK_FILE($DIR/menhirLib.cmx,,enable_menhirLib=no)
+   fi
+   AC_CHECK_FILE($DIR/menhirLib.cmi,,enable_menhirLib=no)
+   if test "$enable_menhirLib" = no; then
+      AC_MSG_WARN([Lib menhirLib not found, parser source files will be bigger.])
+      reason_menhirLib=" (menhirLib not found)"
    fi
 fi
 
@@ -506,55 +520,96 @@ if test "$enable_menhirLib" = yes; then
    MENHIRLIB=menhirLib
 else
    MENHIRLIB=
+   MENHIRINCLUDE=
 fi
 
 # checking for lablgtk2
 if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
 else
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTK2LIB=$(ocamlfind query lablgtk2)
-   fi
-   if test -n "$LABLGTK2LIB";then
-      echo "ocamlfind found lablgtk2 in $LABLGTK2LIB"
-   else
-      LABLGTK2LIB="+lablgtk2"
-      AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
-      if test "$enable_ide" = no; then
-         AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
-         reason_ide=" (lablgtk2 not found)"
+      DIR=$(ocamlfind query lablgtk2)
+      if test -n "$DIR"; then
+         echo "ocamlfind found lablgtk2 in $DIR"
+         LABLGTK2LIB="$DIR"
       fi
+   fi
+   if test -z "$DIR"; then
+      LABLGTK2LIB="+lablgtk2"
+      DIR="$OCAMLLIB/lablgtk2"
+      AC_CHECK_FILE($DIR/lablgtk.cma,,enable_ide=no)
+   fi
+   AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
+   if test "$enable_ide" = no; then
+      AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
+      reason_ide=" (lablgtk2 not found)"
    fi
 fi
 
 # checking for lablgtksourceview2
 if test "$enable_ide" = yes ; then
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTKSV2LIB=$(ocamlfind query lablgtk2.sourceview2)
-      if test -z "$LABLGTKSV2LIB"; then
-         LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      DIR=$(ocamlfind query lablgtk2.sourceview2)
+      if test -z "$DIR"; then
+         DIR=$(ocamlfind query lablgtksourceview2)
+      fi
+      if test -n "$DIR";then
+         echo "ocamlfind found lablgtksourceview2 in $DIR"
+         LABLGTKSV2LIB="$DIR"
       fi
    fi
-   if test -n "$LABLGTKSV2LIB";then
-      echo "ocamlfind found lablgtksourceview2 in $LABLGTKSV2LIB"
-   else
-      AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
-      if test "$enable_ide" = no; then
-         AC_MSG_WARN([Lib lablgtksourceview2 not found, IDE disabled.])
-         reason_ide=" (lablgtksourceview2 not found)"
-      fi
+   if test -z "$DIR"; then
+      DIR="$OCAMLLIB/lablgtk2"
+      AC_CHECK_FILE($DIR/lablgtksourceview2.cma,,enable_ide=no)
+   fi
+   AC_CHECK_FILE($DIR/gSourceView2.cmi,,enable_ide=no)
+   if test "$enable_ide" = no; then
+      AC_MSG_WARN([Lib lablgtksourceview2 not found, IDE disabled.])
+      reason_ide=" (lablgtksourceview2 not found)"
    fi
 fi
 
 if test "$enable_ide" = yes ; then
-  LABLGTK2PKG="lablgtk2 lablgtk2.init lablgtk2.sourceview2"
+   LABLGTK2PKG="lablgtk2 lablgtk2.init lablgtk2.sourceview2"
 else
-  LABLGTK2PKG=
+   LABLGTK2PKG=
+   LABLGTK2LIB=
 fi
 
 dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
+
+# checking for ocamlgraph
+if test "$enable_hypothesis_selection" = yes; then
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query ocamlgraph)
+      if test -n "$DIR"; then
+         echo "ocamlfind found ocamlgraph in $DIR"
+         OCAMLGRAPHLIB="$DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      OCAMLGRAPHLIB="+ocamlgraph"
+      DIR="$OCAMLLIB/ocamlgraph"
+      AC_CHECK_FILE($DIR/graph.cma,,enable_hypothesis_selection=no)
+   fi
+   AC_CHECK_FILE($DIR/graph.cmi,,enable_hypothesis_selection=no)
+   if test "$enable_hypothesis_selection" = no; then
+      reason_hypothesis_selection=" (ocamlgraph not found)"
+      AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
+   fi
+fi
+
+if test "$enable_hypothesis_selection" = yes; then
+   META_OCAMLGRAPH="ocamlgraph"
+else
+   META_OCAMLGRAPH=
+   OCAMLGRAPHLIB=
+fi
 
 # checking for js_of_ocaml
 if test "$enable_js_of_ocaml" != yes; then
@@ -805,24 +860,6 @@ if test "$enable_pvs_libs" = yes; then
    AC_MSG_RESULT($enable_pvs_libs)
 fi
 
-# hypothesis_selection
-
-if test "$enable_hypothesis_selection" = yes; then
-   if test "$USEOCAMLFIND" = yes; then
-     OCAMLGRAPHLIB=$(ocamlfind query ocamlgraph)
-   fi
-   if test -n "$OCAMLGRAPHLIB"; then
-     echo "ocamlfind found ocamlgraph in $OCAMLGRAPHLIB"
-   else
-     OCAMLGRAPHLIB="+ocamlgraph"
-     AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
-     if test "$enable_hypothesis_selection" = no; then
-       reason_hypothesis_selection=" (ocamlgraph not found)"
-       AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
-     fi
-   fi
-fi
-
 #check frama-c
 FRAMAC_SUPPORTED=Aluminium
 if test "$enable_frama_c" = yes ; then
@@ -845,13 +882,6 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_SHARE=`$FRAMAC -print-path`
       FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
    fi
-fi
-
-#For the META
-if test "$enable_hypothesis_selection" = yes; then
-   META_OCAMLGRAPH="ocamlgraph"
-else
-   META_OCAMLGRAPH=""
 fi
 
 #Viewer for ps and pdf
