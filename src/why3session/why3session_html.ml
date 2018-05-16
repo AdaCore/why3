@@ -174,13 +174,16 @@ let rec num_lines acc tr =
       fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
+    let nl = num_lines 0 tr in
+    if nl > 0 then begin
+    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" nl;
     let (_:bool) = List.fold_left
       (fun needs_tr g ->
         print_goal fmt needs_tr (depth+1) max_depth provers g;
         true)
       false tr.transf_goals
     in ()
+    end
 
   and print_goal fmt needs_tr depth max_depth provers g =
     if needs_tr then fprintf fmt "<tr>";
