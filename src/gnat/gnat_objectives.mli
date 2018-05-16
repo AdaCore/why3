@@ -121,6 +121,22 @@ val get_session_dir: unit -> string
 (* Return the session_dir guessed by gnat tools (it is then passed to the
    Server_utils function which really get the session). *)
 
+module GoalSet : sig
+   (* module to provide mutable sets on goals *)
+   type t
+   val empty    : unit -> t
+   val is_empty : t -> bool
+   val add      : t -> goal_id -> unit
+   val remove   : t -> goal_id -> unit
+   val choose   : t -> goal_id
+   val mem      : t -> goal_id -> bool
+   val count    : t -> int
+   val reset    : t -> unit
+   val iter     : (goal_id -> unit) -> t -> unit
+   val exists   : (goal_id -> bool) -> t -> bool
+   val for_all  : (goal_id -> bool) -> t -> bool
+end
+
 module Make (S: Controller_itp.Scheduler) : sig
 
 

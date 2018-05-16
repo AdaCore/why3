@@ -31,21 +31,7 @@ end
 
 module GoalMap = Session_itp.Hpn
 
-module GoalSet : sig
-   (* module to provide mutable sets on goals *)
-   type t
-   val empty    : unit -> t
-   val is_empty : t -> bool
-   val add      : t -> goal_id -> unit
-   val remove   : t -> goal_id -> unit
-   val choose   : t -> goal_id
-   val mem      : t -> goal_id -> bool
-   val count    : t -> int
-   val reset    : t -> unit
-   val iter     : (goal_id -> unit) -> t -> unit
-   val exists   : (goal_id -> bool) -> t -> bool
-   val for_all  : (goal_id -> bool) -> t -> bool
-end =
+module GoalSet =
 struct
    (* We use an ordered set instead of a hashed set here so that we have
       predictable order of iteration. *)

@@ -9,11 +9,11 @@ let rec elim_quant pol f =
     try
       t_map_sign elim_quant pol f
     with
-      Failure m -> f
+      Failure _ -> f
 
 let elim_less (d:decl) =
   match d.d_node with
-  | Dprop (Paxiom,v,t) ->
+  | Dprop (Paxiom,_,t) ->
     let t = elim_quant true t in
     if t_equal t t_true then []
     else

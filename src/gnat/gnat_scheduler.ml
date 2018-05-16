@@ -37,6 +37,7 @@ module Gnat_scheduler = struct
        transformations to be executed directly, thats why we use wait_for_idle.
     *)
     let idle ~(prio:int) f =
+      let _unused = prio in
       insert_idle_handler f;
       wait_for_idle ()
 

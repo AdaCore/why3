@@ -36,7 +36,7 @@ let is_builtin_prover =
   let builtin_provers_set =
     List.fold_left (fun acc x -> Sstr.add x acc) Sstr.empty builtin_provers in
   (fun s ->
-    let s = String.lowercase s in
+    let s = String.lowercase_ascii s in
     Sstr.mem s builtin_provers_set)
 
 let opt_timeout : int option ref = ref None
@@ -596,7 +596,7 @@ end = struct
   let starts_with a b =
     if String.length a > String.length b then false
     else
-      a = String.sub (String.lowercase b) 0 (String.length a)
+      a = String.sub (String.lowercase_ascii b) 0 (String.length a)
 
   let num_convert conv c =
     conv.add + conv.mult * c
