@@ -1940,6 +1940,7 @@ Lemma nth_bit_pred_high :
     to_uint i < size ->
     to_uint i < Z.of_nat n ->
     nth_bv (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) i = true.
+Proof.
   induction n;intros.
   assert (Z.of_nat 0 <= to_uint i) by apply to_uint_bounds.
   omega.
@@ -1955,8 +1956,8 @@ Lemma nth_bit_pred_high :
   case (Z_lt_le_dec (to_uint i) 1); intro.
   right.
   assert (to_uint i = 0).
-  pose (to_uint_bounds i).
-  auto with zarith.
+    assert (H' := to_uint_bounds i).
+    omega.
   rewrite H1; apply nth_zeros_is_hd.
 
   left.
@@ -2044,10 +2045,11 @@ Lemma mask_correctness :
     forall (j:Z),
       (j < size -> (to_uint i) <= j -> j < (to_uint i + to_uint n)%Z -> nth mask j = true)
    /\ (j < to_uint i \/ j >= to_uint i + to_uint n -> nth mask j = false).
+Proof.
   split;intros.
   rewrite lsl_bv_is_lsl.
-  pose (to_uint_bounds i).
-  pose (size_in_range).
+  assert (a := to_uint_bounds i).
+  assert (u := size_in_range).
   rewrite uint_in_range_power in u.
   rewrite Lsl_nth_high; auto with zarith.
   assert (j - to_uint i = to_uint (sub (of_int j) i)).
@@ -2066,8 +2068,8 @@ Lemma mask_correctness :
   apply Lsl_nth_low; auto with zarith.
 
   rewrite lsl_bv_is_lsl.
-  pose (to_uint_bounds i) as u.
-  pose (to_uint_bounds n) as v.
+  assert (u := to_uint_bounds i).
+  assert (v := to_uint_bounds n).
   pose size_in_range as w; rewrite uint_in_range_power in w.
   assert (0 <= j) by auto with zarith.
 
@@ -2095,6 +2097,7 @@ Qed.
 Lemma eq_sub_equiv :
   forall (a:t) (b:t) (i:t) (n:t),
   (eq_sub a b (to_uint i) (to_uint n)) <-> (eq_sub_bv a b i n).
+Proof.
   intros a b i n.
   unfold eq_sub, eq_sub_bv.
   transitivity (eq_aux (bw_and b (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))
@@ -2119,7 +2122,7 @@ Lemma eq_sub_equiv :
 
   case (Z_lt_ge_dec j size); intro.
 
-  pose (to_uint_bounds i) as u; unfold uint_in_range in u.
+  assert (u := to_uint_bounds i); unfold uint_in_range in u.
   assert (0 <= j < Z.of_nat size_nat) by auto with zarith.
   pose (H j H1).
   fold nth in e; rewrite Nth_bw_and, Nth_bw_and in e by auto.
