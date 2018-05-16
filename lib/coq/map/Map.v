@@ -50,7 +50,7 @@ intros f x v y.
 unfold set.
 case why_decidable_eq.
 intros <-.
-easy.
+split ; try easy ; intros H ; now elim H. (* TODO: replace by easy after 8.4 *)
 intros H.
 split ; intros H'.
 now elim H.

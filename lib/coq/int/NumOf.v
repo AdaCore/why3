@@ -43,7 +43,7 @@ split ; intros h1.
 - assert (Z.to_nat (b - a) = 0).
   revert h1.
   rewrite <-Z.le_sub_0.
-  now destruct (b - a)%Z.
+  destruct (b - a)%Z ; try easy ; intros H ; now elim H. (* TODO: replace by now after 8.4 *)
   now rewrite H.
 - rewrite S_pred with (m := 0) (n := Z.to_nat (b - a)).
   2: apply (Z2Nat.inj_lt 0); omega.
@@ -307,6 +307,6 @@ Lemma numof_change_equiv :
 Proof.
 intros p1 p2 a b h1.
 apply le_ge_eq.
-split; apply numof_change_any; apply h1.
+split; apply numof_change_any; intros; now apply h1.
 Qed.
 
