@@ -549,6 +549,11 @@ if test "$enable_coq_support" = yes; then
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
+      8.8*)
+         coq_compat_version="COQ88"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
       *)
          enable_coq_support=no
          AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
