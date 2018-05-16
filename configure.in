@@ -614,9 +614,8 @@ if test "$enable_coq_support" = yes; then
    COQVERSION=[`$COQC -v | sed -n -e 's|.*version *\([^ ]*\) .*$|\1|p'`]
 
    #Even if the name of the variable is CAMLP4 the value can be camlp5
-   CAMLP4BIN=`$COQC -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
-   CAMLP4=`$COQC -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
-   COQCAMLPLIB=`$COQC -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
+   COQCAMLP=[`$COQC -config | sed -n -e 's/CAMLP[45]O=\(.*\)$/\1/p'`]
+   COQCAMLPLIB=[`$COQC -config | sed -n -e 's/CAMLP[45]LIB=\(.*\)$/\1/p'`]
 
    case $COQVERSION in
       8.4*)
@@ -647,6 +646,10 @@ if test "$enable_coq_support" = yes; then
          coq_compat_version="COQ88"
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
+         if test "$enable_coq_tactic" = yes; then
+            enable_coq_tactic=no
+            reason_coq_tactic=" (coq <= 8.7 not found)"
+         fi
          ;;
       *)
          enable_coq_support=no
@@ -679,8 +682,7 @@ if test "$enable_coq_tactic" = yes; then
 fi
 
 if test "$enable_coq_tactic" = yes; then
-   AC_PATH_PROG(COQCAMLP,${CAMLP4}o,no,$CAMLP4BIN)
-   if test "$COQCAMLP" = no; then
+   if test -z "$COQCAMLP"; then
       enable_coq_tactic=no
       AC_MSG_WARN(Cannot find camlpXo.)
       reason_coq_tactic=" (camlpXo not found)"
