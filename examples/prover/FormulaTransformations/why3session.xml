@@ -7,10 +7,11 @@
 <prover id="2" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../FormulaTransformations.mlw">
+<file name="../FormulaTransformations.mlw" proved="true">
 <theory name="Logic" proved="true">
  <goal name="VC is_nnf_subst" expl="VC for is_nnf_subst" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -217,7 +218,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl">
+<theory name="Impl" proved="true">
  <goal name="VC smart_and" expl="VC for smart_and" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC smart_and.0" expl="precondition" proved="true">
@@ -379,8 +380,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC smart_forall" expl="VC for smart_forall">
- <transf name="split_goal_right" >
+ <goal name="VC smart_forall" expl="VC for smart_forall" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC smart_forall.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.38" steps="10"/></proof>
   </goal>
@@ -409,12 +410,13 @@
   <goal name="VC smart_forall.6" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.29" steps="686"/></proof>
   </goal>
-  <goal name="VC smart_forall.7" expl="postcondition">
-  <transf name="split_all_full" >
+  <goal name="VC smart_forall.7" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
    <goal name="VC smart_forall.7.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="1.60"/></proof>
    </goal>
-   <goal name="VC smart_forall.7.1" expl="postcondition">
+   <goal name="VC smart_forall.7.1" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC smart_forall.7.2" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="1.77"/></proof>
@@ -476,12 +478,38 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC smart_forall.10" expl="postcondition">
+  <goal name="VC smart_forall.10" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC smart_forall.10.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.72"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.71"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.2" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.87" steps="2551"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.3" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.87" steps="2552"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.44"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.5" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.44"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.6" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.86" steps="2537"/></proof>
+   </goal>
+   <goal name="VC smart_forall.10.7" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.43"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="VC smart_exists" expl="VC for smart_exists">
- <transf name="split_goal_right" >
+ <goal name="VC smart_exists" expl="VC for smart_exists" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC smart_exists.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.13" steps="10"/></proof>
   </goal>
@@ -503,15 +531,16 @@
   <goal name="VC smart_exists.6" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.25" steps="697"/></proof>
   </goal>
-  <goal name="VC smart_exists.7" expl="postcondition">
-  <transf name="split_all_full" >
+  <goal name="VC smart_exists.7" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
    <goal name="VC smart_exists.7.0" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="1.06"/></proof>
    </goal>
    <goal name="VC smart_exists.7.1" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="1.05"/></proof>
    </goal>
-   <goal name="VC smart_exists.7.2" expl="postcondition">
+   <goal name="VC smart_exists.7.2" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC smart_exists.7.3" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="1.80"/></proof>
@@ -826,8 +855,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC nnf_neg_simpl" expl="VC for nnf_neg_simpl">
- <transf name="split_goal_right" >
+ <goal name="VC nnf_neg_simpl" expl="VC for nnf_neg_simpl" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC nnf_neg_simpl.0" expl="precondition" proved="true">
   <proof prover="4" timelimit="20"><result status="valid" time="0.22" steps="9"/></proof>
   </goal>
@@ -1044,7 +1073,64 @@
   <goal name="VC nnf_neg_simpl.50" expl="postcondition" proved="true">
   <proof prover="4" timelimit="20"><result status="valid" time="0.35" steps="1207"/></proof>
   </goal>
-  <goal name="VC nnf_neg_simpl.51" expl="postcondition">
+  <goal name="VC nnf_neg_simpl.51" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC nnf_neg_simpl.51.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.64"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.64"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.2" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.66"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.3" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.71"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.4" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.72"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.5" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.78"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.6" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.73"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.7" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.77"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.8" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.53"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.9" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.52"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.10" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.52"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.11" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.49"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.12" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.20" steps="432"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.13" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.14" steps="338"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.14" expl="postcondition" proved="true">
+   <proof prover="4" timelimit="1"><result status="valid" time="0.33" steps="952"/></proof>
+   </goal>
+   <goal name="VC nnf_neg_simpl.51.15" expl="postcondition" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="VC nnf_neg_simpl.51.15.0" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.85"/></proof>
+    </goal>
+    <goal name="VC nnf_neg_simpl.51.15.1" expl="postcondition" proved="true">
+    <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="2.43"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC nnf_neg_simpl.52" expl="postcondition" proved="true">
   <proof prover="4" timelimit="20"><result status="valid" time="0.77" steps="2224"/></proof>
@@ -1276,8 +1362,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC skolemize" expl="VC for skolemize">
- <transf name="split_goal_right" >
+ <goal name="VC skolemize" expl="VC for skolemize" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC skolemize.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="12"/></proof>
   </goal>
@@ -1959,7 +2045,8 @@
   <goal name="VC skolemize.129" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.46" steps="646"/></proof>
   </goal>
-  <goal name="VC skolemize.130" expl="postcondition">
+  <goal name="VC skolemize.130" expl="postcondition" proved="true">
+  <proof prover="4" timelimit="1"><result status="valid" time="0.73" steps="4468"/></proof>
   </goal>
   <goal name="VC skolemize.131" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.20" steps="45"/></proof>
@@ -2146,8 +2233,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC collect_free_var_formula" expl="VC for collect_free_var_formula">
- <transf name="split_goal_right" >
+ <goal name="VC collect_free_var_formula" expl="VC for collect_free_var_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC collect_free_var_formula.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.17" steps="10"/></proof>
   </goal>
@@ -2257,7 +2344,33 @@
   <goal name="VC collect_free_var_formula.30" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.47" steps="31"/></proof>
   </goal>
-  <goal name="VC collect_free_var_formula.31" expl="postcondition">
+  <goal name="VC collect_free_var_formula.31" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC collect_free_var_formula.31.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.64"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.56"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.2" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.67"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.3" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.66"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.4" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.43"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.5" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.43"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.6" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.50"/></proof>
+   </goal>
+   <goal name="VC collect_free_var_formula.31.7" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.46"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC collect_free_var_formula.32" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="2.13" steps="4331"/></proof>
