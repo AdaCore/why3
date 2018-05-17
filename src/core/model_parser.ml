@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Format
 open Term
 open Ident
@@ -133,28 +133,28 @@ let array_add_element ~array ~index ~value =
 let convert_float_value f =
   match f with
   | Plus_infinity ->
-      let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
       Json_base.Record m
   | Minus_infinity ->
-      let m = Mstr.add "cons" (Json_base.String "Minus_infinity") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Minus_infinity") Mstr.empty in
       Json_base.Record m
   | Plus_zero ->
-      let m = Mstr.add "cons" (Json_base.String "Plus_zero") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Plus_zero") Mstr.empty in
       Json_base.Record m
   | Minus_zero ->
-      let m = Mstr.add "cons" (Json_base.String "Minus_zero") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Minus_zero") Mstr.empty in
       Json_base.Record m
   | Not_a_number ->
-      let m = Mstr.add "cons" (Json_base.String "Not_a_number") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
       Json_base.Record m
   | Float_value (b, eb, sb) ->
-      let m = Mstr.add "cons" (Json_base.String "Float_value") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
       let m = Mstr.add "sign" (Json_base.String b) m in
       let m = Mstr.add "exponent" (Json_base.String eb) m in
       let m = Mstr.add "significand" (Json_base.String sb) m in
       Json_base.Record m
   | Float_hexa(s,f) ->
-      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Stdlib.Mstr.empty in
+      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Mstr.empty in
       let m = Mstr.add "str_hexa" (Json_base.String s) m in
       let m = Mstr.add "value" (Json_base.Float f) m in
       Json_base.Record m
@@ -162,46 +162,46 @@ let convert_float_value f =
 let rec convert_model_value value : Json_base.json =
   match value with
   | Integer s ->
-      let m = Mstr.add "type" (Json_base.String "Integer") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
   | Float f ->
-      let m = Mstr.add "type" (Json_base.String "Float") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Float") Mstr.empty in
       let m = Mstr.add "val" (convert_float_value f) m in
       Json_base.Record m
   | Decimal (int_part, fract_part) ->
-      let m = Mstr.add "type" (Json_base.String "Decimal") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Decimal") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String (int_part^"."^fract_part)) m in
       Json_base.Record m
   | Fraction (num, den) ->
-      let m = Mstr.add "type" (Json_base.String "Fraction") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Fraction") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String (num^"/"^den)) m in
       Json_base.Record m
   | Unparsed s ->
-      let m = Mstr.add "type" (Json_base.String "Unparsed") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Unparsed") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
   | Bitvector v ->
-      let m = Mstr.add "type" (Json_base.String "Bv") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Bv") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String v) m in
       Json_base.Record m
   | Boolean b ->
-      let m = Mstr.add "type" (Json_base.String "Boolean") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Boolean") Mstr.empty in
       let m = Mstr.add "val" (Json_base.Bool b) m in
       Json_base.Record m
   | Array a ->
       let l = convert_array a in
-      let m = Mstr.add "type" (Json_base.String "Array") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Array") Mstr.empty in
       let m = Mstr.add "val" (Json_base.List l) m in
       Json_base.Record m
   | Apply (s, lt) ->
       let lt = List.map convert_model_value lt in
       let slt =
-        let m = Mstr.add "list" (Json_base.List lt) Stdlib.Mstr.empty in
+        let m = Mstr.add "list" (Json_base.List lt) Mstr.empty in
         let m = Mstr.add "apply" (Json_base.String s) m in
         Json_base.Record m
       in
-      let m = Mstr.add "type" (Json_base.String "Apply") Stdlib.Mstr.empty in
+      let m = Mstr.add "type" (Json_base.String "Apply") Mstr.empty in
       let m = Mstr.add "val" slt m in
       Json_base.Record m
   | Record r ->
@@ -209,21 +209,21 @@ let rec convert_model_value value : Json_base.json =
 
 and convert_array a =
   let m_others =
-    Mstr.add "others" (convert_model_value a.arr_others)  Stdlib.Mstr.empty in
+    Mstr.add "others" (convert_model_value a.arr_others) Mstr.empty in
   convert_indices a.arr_indices @ [Json_base.Record m_others]
 
 and convert_indices indices =
   match indices with
   | [] -> []
   | index :: tail ->
-    let m = Mstr.add "indice" (Json_base.String index.arr_index_key) Stdlib.Mstr.empty in
+    let m = Mstr.add "indice" (Json_base.String index.arr_index_key) Mstr.empty in
     let m = Mstr.add "value" (convert_model_value index.arr_index_value) m in
     Json_base.Record m :: convert_indices tail
 
 and convert_record r =
-  let m = Mstr.add "type" (Json_base.String "Record") Stdlib.Mstr.empty in
+  let m = Mstr.add "type" (Json_base.String "Record") Mstr.empty in
   let fields = convert_fields r in
-  let m_field = Mstr.add "Field" fields Stdlib.Mstr.empty in
+  let m_field = Mstr.add "Field" fields Mstr.empty in
   let m = Mstr.add "val" (Json_base.Record m_field) m in
   Json_base.Record m
 
@@ -231,7 +231,7 @@ and convert_fields fields =
   Json_base.List
     (List.map
        (fun (f, v) ->
-         let m = Mstr.add "field" (Json_base.String f) Stdlib.Mstr.empty in
+         let m = Mstr.add "field" (Json_base.String f) Mstr.empty in
          let m = Mstr.add "value" (convert_model_value v) m in
          Json_base.Record m)
        fields)
@@ -357,8 +357,8 @@ let print_location fmt m_element =
 **  Model definitions
 ***************************************************************
 *)
-module IntMap = Stdlib.Mint
-module StringMap = Stdlib.Mstr
+module IntMap = Mint
+module StringMap = Mstr
 
 type model_file = model_element list IntMap.t
 type model_files = model_file StringMap.t
@@ -379,7 +379,7 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+  Sstr.t -> ((string * string) list) Mstr.t ->
     string -> model_element list
 
 (*

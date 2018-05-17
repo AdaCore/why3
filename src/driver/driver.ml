@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Decl

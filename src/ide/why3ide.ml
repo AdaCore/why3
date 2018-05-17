@@ -12,7 +12,7 @@
 open Why3
 open Format
 open Gconfig
-open Stdlib
+open Wstdlib
 open Ide_utils
 open History
 open Itp_communication

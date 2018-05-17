@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -28,12 +29,12 @@ type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
   (* The position of the term that triggers the VC *)
-  queried_terms : Term.term Stdlib.Mstr.t;
+  queried_terms : Term.term Mstr.t;
   (* The list of terms that were queried for the counter-example
      by the printer *)
-  list_projections: Stdlib.Sstr.t;
+  list_projections: Sstr.t;
   (* List of projections as printed in the model *)
-  list_records: ((string * string) list) Stdlib.Mstr.t;
+  list_records: ((string * string) list) Mstr.t;
 }
 
 type printer_args = {

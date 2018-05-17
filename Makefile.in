@@ -196,7 +196,7 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer \
+	   hashcons wstdlib exn_printer \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
@@ -2022,7 +2022,7 @@ endif
 MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
-	util/weakhtbl util/stdlib util/rc util/debug \
+	util/weakhtbl util/wstdlib util/rc util/debug \
 	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \

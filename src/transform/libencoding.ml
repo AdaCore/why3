@@ -99,7 +99,7 @@ let ls_of_const_format = Number.({
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
   Hty.memo 3 (fun ty_base ->
-    let cst = Stdlib.Hstr.memo 63 (fun s ->
+    let cst = Wstdlib.Hstr.memo 63 (fun s ->
       let s = "const_" ^ s in
       create_fsymbol (id_fresh s) [] ty_base) in
     Hterm.memo 63 (fun t ->
@@ -208,7 +208,7 @@ let d_monomorph ty_base kept lsmap d =
   let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
 
-module OHTyl = Stdlib.OrderedHashedList(struct
+module OHTyl = Wstdlib.OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)

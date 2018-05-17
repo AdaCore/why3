@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Stdlib
+open Wstdlib
 
 let usage_msg = sprintf
   "Usage: %s [options] file module.ident..."

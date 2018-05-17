@@ -11,6 +11,7 @@
 
 open Format
 open Why3
+open Wstdlib
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
@@ -227,7 +228,7 @@ let rec num_lines s acc tr =
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
     fprintf fmt "%a"
-      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 end
@@ -278,7 +279,7 @@ struct
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 end

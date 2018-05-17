@@ -301,7 +301,7 @@ let why3_prove_all () =
 
 let why3_parse_theories theories =
   let theories =
-    Stdlib.Mstr.fold
+    Wstdlib.Mstr.fold
       (fun thname th acc ->
        let loc =
          Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
@@ -360,7 +360,7 @@ let execute_symbol m fmt ps =
 let why3_execute (modules,_theories) =
   let result =
     let mods =
-      Stdlib.Mstr.fold
+      Wstdlib.Mstr.fold
 	(fun _k m acc ->
          let th = m.Mlw_module.mod_theory in
          let modname = th.Theory.th_name.Ident.id_string in

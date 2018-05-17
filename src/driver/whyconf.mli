@@ -11,7 +11,7 @@
 
 (** Managing the configuration of Why3 *)
 
-open Stdlib
+open Wstdlib
 
 (** {2 General configuration} *)
 

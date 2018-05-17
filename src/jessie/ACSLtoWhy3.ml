@@ -192,7 +192,7 @@ let mach_int_modules, _mach_int_theories =
 let int32_module : Pmodule.modul =
   try
     Self.result "Looking up module mach.int.Int32";
-    Stdlib.Mstr.find "Int32" mach_int_modules
+    Wstdlib.Mstr.find "Int32" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int32 not found"
 *)
@@ -240,7 +240,7 @@ let bv32ofint_fun : Expr.rsymbol = find_rs bv32_module "int_check"
 let int64_module : Pmodule.modul =
   try
     Self.result "Looking up module mach.int.Int64";
-    Stdlib.Mstr.find "Int64" mach_int_modules
+    Wstdlib.Mstr.find "Int64" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int64 not found"
 *)

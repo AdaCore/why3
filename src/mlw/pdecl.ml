@@ -592,7 +592,7 @@ let pd_bool = match bool_theory.th_decls with
       mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] [] []]) [db]
   | _ -> assert false
 
-let pd_tuple = Stdlib.Hint.memo 17 (fun n ->
+let pd_tuple = Wstdlib.Hint.memo 17 (fun n ->
   match (tuple_theory n).th_decls with
   | [{td_node = Decl dt}] ->
       mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] [] []]) [dt]

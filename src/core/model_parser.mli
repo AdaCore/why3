@@ -316,7 +316,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
 *)
 
 type raw_model_parser =
-  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+  Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
     string -> model_element list
 (** Parses the input string into model elements. It contains the list of
     projections and a map associating the name of printed projections to the

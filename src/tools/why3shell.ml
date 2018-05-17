@@ -163,7 +163,7 @@ let root_node = {
   node_detached = false
 }
 
-open Stdlib
+open Wstdlib
 open Format
 
 module Hnode = Hint

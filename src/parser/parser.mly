@@ -190,7 +190,7 @@
 
 (* Entry points *)
 
-%start <Pmodule.pmodule Stdlib.Mstr.t> mlw_file
+%start <Pmodule.pmodule Wstdlib.Mstr.t> mlw_file
 %start <Ptree.term> term_eof
 %start <Ptree.qualid> qualid_eof
 %start <Ptree.qualid list> qualid_comma_list_eof

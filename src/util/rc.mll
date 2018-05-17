@@ -12,7 +12,7 @@
 {
 open Lexing
 open Format
-open Stdlib
+open Wstdlib
 
 let get_home_dir () =
   try Sys.getenv "HOME"

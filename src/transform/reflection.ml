@@ -592,7 +592,7 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
 
 open Expr
 open Ity
-open Stdlib
+open Wstdlib
 open Mlinterp
 
 exception ReductionFail of reify_env

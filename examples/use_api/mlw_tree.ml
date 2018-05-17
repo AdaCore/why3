@@ -236,7 +236,7 @@ let () =
 
 (* BEGIN{closemodule} *)
 let () = Typing.close_module Loc.dummy_position
-let mods : Pmodule.pmodule Stdlib.Mstr.t = Typing.close_file ()
+let mods : Pmodule.pmodule Wstdlib.Mstr.t = Typing.close_file ()
 (* END{closemodule} *)
 
 (* Checking the VCs *)
@@ -244,7 +244,7 @@ let mods : Pmodule.pmodule Stdlib.Mstr.t = Typing.close_file ()
 (* BEGIN{checkingvcs} *)
 let my_tasks : Task.task list =
   let mods =
-    Stdlib.Mstr.fold
+    Wstdlib.Mstr.fold
       (fun _ m acc ->
        List.rev_append (Task.split_theory m.Pmodule.mod_theory None None) acc)
       mods []

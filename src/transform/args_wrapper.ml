@@ -37,7 +37,7 @@ let () = Exn_printer.register
           Format.fprintf fmt "Argument expected of type %s. None were given." s
       | _ -> raise e)
 
-open Stdlib
+open Wstdlib
 
 (* Use symb to encapsulate ids into correct categories of symbols *)
 type symb =

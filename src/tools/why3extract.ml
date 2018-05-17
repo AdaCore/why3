@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Stdlib
+open Wstdlib
 open Pmodule
 open Compile
 

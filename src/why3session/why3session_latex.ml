@@ -11,6 +11,7 @@
 
 open Format
 open Why3
+open Wstdlib
 open Session_itp
 open Why3session_lib
 
@@ -422,7 +423,7 @@ let element_latex_stat files n s table dir e =
     | [] -> ()
     | f :: r ->
       let found = ref false in
-      Stdlib.Hstr.iter
+      Hstr.iter
         (fun fname file ->
           let fname = Filename.basename fname in
           let fname = List.hd (Strings.split '.' fname) in
@@ -439,7 +440,7 @@ let print_latex_statistics n table dir session =
   let files = get_files session in
   match !opt_elements with
     | None ->
-      Stdlib.Hstr.iter (fun _ f -> file_latex_stat n session table dir f) files
+      Hstr.iter (fun _ f -> file_latex_stat n session table dir f) files
     | Some l ->
       List.iter (element_latex_stat files n session table dir) l
 

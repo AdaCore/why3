@@ -15,7 +15,7 @@ val debug_type_only : Debug.flag
 
 val open_file : Env.env -> Env.pathname -> unit
 
-val close_file : unit -> Pmodule.pmodule Stdlib.Mstr.t
+val close_file : unit -> Pmodule.pmodule Wstdlib.Mstr.t
 
 val open_module : Ptree.ident -> unit
 

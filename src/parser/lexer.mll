@@ -296,7 +296,7 @@ rule token = parse
     in
     I.loop_handle succeed fail supplier checkpoint
 
-  open Stdlib
+  open Wstdlib
   open Ident
   open Theory
   open Pmodule

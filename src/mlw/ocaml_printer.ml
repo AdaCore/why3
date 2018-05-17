@@ -21,7 +21,7 @@ open Expr
 open Ty
 open Theory
 open Pmodule
-open Stdlib
+open Wstdlib
 open Pdecl
 open Printer
 

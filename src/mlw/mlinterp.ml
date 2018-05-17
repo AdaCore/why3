@@ -5,7 +5,7 @@ open Ident
 open Mltree
 open Expr
 open Ity
-open Stdlib
+open Wstdlib
 
 let debug_interp = Debug.register_info_flag
                      ~desc:"Program interpretation"
@@ -86,8 +86,6 @@ and print_matrix fmt m =
 let field_get f = match f with
   | Fimmutable v -> v
   | Fmutable v -> !v
-
-open Stdlib
 
 let find_module_path env mm path m =
   Debug.dprintf debug_interp "find_module_path path %a m %s@."

@@ -11,7 +11,7 @@
 
 (** {1 Environments} *)
 
-open Stdlib
+open Wstdlib
 
 (** Local type aliases *)
 
