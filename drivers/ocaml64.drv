@@ -359,6 +359,14 @@ module mach.array.Array63
   syntax val  blit   "Array.blit %1 %2 %3 %4 %5"
   syntax val  self_blit "Array.blit %1 %2 %1 %3 %4"
 end
+module mach.array.ArrayInt63
+  syntax type array63 "(int array)"
+  syntax val  make   "Array.make %1 %2"
+  syntax val  ([])   "%1.(%2)"
+  syntax val  ([]<-) "%1.(%2) <- %3"
+  syntax val  length "Array.length %1"
+  syntax val  copy   "Array.copy %1"
+end
 
 module mach.matrix.Matrix63
   syntax type matrix "(%1 array array)"

@@ -395,3 +395,51 @@ module Array63Permut
 
 end
 
+(** {2 Arrays of 63-bit integers}
+
+    Here the model is simply a sequence of integers (of type [int]),
+    instead of being a sequence of values of type [int63].
+
+    As a consequence, we have to provide the additional information
+    that each of the element fits within the bounds of 63-bit integers.
+
+    Caveat: type [array63] below is not compatible with type
+    [Array63.array int63].
+*)
+
+module ArrayInt63
+
+  use import int.Int
+  use import mach.int.Int63
+  use import seq.Seq
+
+  type array63 = private {
+    mutable ghost elts: seq int;
+            ghost size: int;
+  } invariant { 0 <= size = length elts <= max_int }
+    invariant { forall i. 0 <= i < length elts -> in_bounds elts[i] }
+
+  meta coercion function elts
+
+  val length (a: array63) : int63
+    ensures { to_int result = a.length }
+
+  val ([]) (a: array63) (i: int63) : int63
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { to_int result = a[i] }
+
+  val ([]<-) (a: array63) (i: int63) (v: int63) : unit
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    writes   { a }
+    ensures  { a.elts = (old a.elts)[i <- to_int v] }
+
+  val make (n: int63) (v: int63) : array63
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i. 0 <= i < n -> result[i] = to_int v }
+    ensures  { result.length = n }
+
+  val copy (a: array63) : array63
+    ensures  { result.length = a.length }
+    ensures  { forall i. 0 <= i < result.length -> result[i] = a[i] }
+
+end
