@@ -194,7 +194,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   let final_callback found_upgraded_prover report =
     Debug.dprintf debug "@.";
     let files,n,m =
-      Stdlib.Hstr.fold (file_statistics session)
+      Wstdlib.Hstr.fold (file_statistics session)
         (S.get_files session) ([],0,0)
     in
     let report =

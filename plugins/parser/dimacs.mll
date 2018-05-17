@@ -34,7 +34,7 @@
 
 {
 open Why3
-open Stdlib
+open Wstdlib
 
 type vars = Term.term array
 let get_indice i =

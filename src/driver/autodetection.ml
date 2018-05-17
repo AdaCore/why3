@@ -40,7 +40,7 @@ The regexp must start with ^.
 *)
 
 open Format
-open Stdlib
+open Wstdlib
 open Whyconf
 module Wc = Whyconf
 open Rc

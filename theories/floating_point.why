@@ -612,6 +612,7 @@ theory SingleFull
 
   clone export GenFloatSpecFull with
     type t = single,
+    constant min = min_single,
     constant max = max_single,
     constant max_representable_integer = max_int
 
@@ -627,6 +628,7 @@ theory DoubleFull
 
   clone export GenFloatSpecFull with
     type t = double,
+    constant min = min_double,
     constant max = max_double,
     constant max_representable_integer = max_int
 

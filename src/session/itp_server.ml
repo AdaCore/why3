@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Session_itp
 open Controller_itp
 open Server_utils
@@ -284,9 +284,9 @@ let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
 let interrupt_query _cont _args = C.interrupt (); "interrupted"
 
-let commands_table = Stdlib.Hstr.create 17
+let commands_table = Hstr.create 17
 
-let register_command c d f = Stdlib.Hstr.add commands_table c (d,f)
+let register_command c d f = Hstr.add commands_table c (d,f)
 
 let () =
   List.iter (fun (c,d,f) -> register_command c d f)
@@ -794,7 +794,7 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
-    Stdlib.Hstr.iter
+    Hstr.iter
       (fun _ file ->
        on_file file;
        iter_subtree_from_file on_subtree file)

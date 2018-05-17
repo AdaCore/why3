@@ -88,7 +88,7 @@ type controller = private
     controller_config : Whyconf.config;
     mutable controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Wstdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 

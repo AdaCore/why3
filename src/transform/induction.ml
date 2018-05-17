@@ -71,7 +71,7 @@ type vlex =
 
   This definitions and methods using them are without use if some induction tags
   are provided in the goal by user.*)
-module VsList = Stdlib.OrderedHashedList(struct
+module VsList = Wstdlib.OrderedHashedList(struct
   type t = vsymbol
   let tag = vs_hash
 end)

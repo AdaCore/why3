@@ -53,7 +53,7 @@ type notifier = any -> unit
 (** Session *)
 
 (* Get all the files in the session *)
-val get_files : session -> file Stdlib.Hstr.t
+val get_files : session -> file Wstdlib.Hstr.t
 (* Get a single file in the session using its name *)
 val get_file: session -> string -> file
 (* Get directory containing the session *)

@@ -13,6 +13,7 @@
 
 open Format
 open Pp
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -44,7 +45,7 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
-  mutable list_projs: Stdlib.Sstr.t;
+  mutable list_projs: Sstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -92,7 +93,7 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -395,9 +396,9 @@ let print_info_model info =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
 	  let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+	  Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in ();
+	Mstr.empty in ();
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -405,7 +406,7 @@ let print_info_model info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Mstr.empty
 
 let print_prop_decl vc_loc args info fmt k pr f =
   match k with
@@ -418,7 +419,7 @@ let print_prop_decl vc_loc args info fmt k pr f =
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
                                 list_projections = info.list_projs;
-                                list_records = Stdlib.Mstr.empty};
+                                list_records = Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma| Pskip -> assert false
@@ -477,7 +478,7 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Stdlib.Sstr.empty;
+    list_projs = Sstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in

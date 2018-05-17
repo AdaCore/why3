@@ -13,7 +13,7 @@
 
 
 
-open Stdlib
+open Wstdlib
 
 module Hprover = Whyconf.Hprover
 
@@ -718,7 +718,7 @@ let update_file_node notification s f =
     in
     if proved <> file_proved s f then
       begin
-        Stdlib.Hstr.replace s.file_state f.file_name proved;
+        Hstr.replace s.file_state f.file_name proved;
         notification (AFile f);
       end
 
@@ -1605,7 +1605,7 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~file_is_detached ~env
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
-    Stdlib.Mstr.fold
+    Mstr.fold
       (fun name th acc ->
         (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
         let th_name =
@@ -1639,7 +1639,7 @@ let merge_file  ~use_shapes env (ses : session) (old_ses : session) file =
 
 let merge_files ~use_shapes env (ses:session)  (old_ses : session) =
   let errors =
-    Stdlib.Hstr.fold
+    Hstr.fold
       (fun _ f acc ->
        match merge_file ~use_shapes env ses old_ses f with
        | None -> acc

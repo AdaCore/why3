@@ -13,6 +13,7 @@
 
 open Format
 open Pp
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -129,9 +130,9 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
-  mutable list_projs : Stdlib.Sstr.t;
+  mutable list_projs : Sstr.t;
   meta_model_projection : Sls.t;
-  mutable list_records : ((string * string) list) Stdlib.Mstr.t;
+  mutable list_records : ((string * string) list) Mstr.t;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
@@ -185,7 +186,7 @@ let print_var_list info fmt vsl =
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
   if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
   Slab.mem Ident.model_projected_label ls.ls_name.id_label) then
     let t = t_app ls [] ls.ls_value in
@@ -491,9 +492,9 @@ let print_info_model info =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
           let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+	  Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in
+	Mstr.empty in
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -501,7 +502,7 @@ let print_info_model info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Mstr.empty
 
 (* TODO factor out print_prop ? *)
 let print_prop info fmt pr f =
@@ -608,7 +609,7 @@ let print_constructor_decl info fmt (ls,args) =
 
   if Strings.has_prefix "mk " ls.ls_name.id_string then
     begin
-      info.list_records <- Stdlib.Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+      info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
     end
 
 let print_data_decl info fmt (ts,cl) =
@@ -672,9 +673,9 @@ let print_task args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
-    list_projs = Stdlib.Sstr.empty;
+    list_projs = Sstr.empty;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
-    list_records = Stdlib.Mstr.empty;
+    list_records = Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;

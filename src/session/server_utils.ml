@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
+
 let debug = Debug.register_flag ~desc:"ITP server" "itp_server"
 
 let has_extension f =
@@ -89,7 +91,7 @@ let load_strategies cont =
   let config = cont.Controller_itp.controller_config in
   let env = cont.Controller_itp.controller_env in
   let strategies = Whyconf.get_strategies config in
-  Stdlib.Mstr.iter
+  Mstr.iter
     (fun _ st ->
      let name = st.Whyconf.strategy_name in
      try
@@ -97,7 +99,7 @@ let load_strategies cont =
        let code = Strategy_parser.parse env config code in
        let shortcut = st.Whyconf.strategy_shortcut in
        Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
-       Stdlib.Hstr.add cont.Controller_itp.controller_strategies name
+       Hstr.add cont.Controller_itp.controller_strategies name
                        (name, shortcut, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
        Format.eprintf "Fatal: loading strategy '%s' failed: %s \nSolve this problem in your why3.conf file and retry.@." name msg;
@@ -105,7 +107,7 @@ let load_strategies cont =
     strategies
 
 let list_strategies cont =
-  Stdlib.Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
+  Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
 
 
 let symbol_name s =
@@ -215,7 +217,7 @@ type query =
 
 
 let help_on_queries fmt commands =
-  let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
+  let l = Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
@@ -353,7 +355,7 @@ let help_message commands_table =
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   (* We first try to apply a command from commands_table (itp_server.ml) *)
-  match Stdlib.Hstr.find commands_table cmd with
+  match Hstr.find commands_table cmd with
   | (_, f) ->
     begin
       match f,id with
@@ -401,7 +403,7 @@ let interp commands_table cont id s =
           | Bad_Arguments prover ->
               QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
           | Not_Prover ->
-             if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
+             if Hstr.mem cont.Controller_itp.controller_strategies cmd then
                Strategies cmd
              else
                match cmd, args with

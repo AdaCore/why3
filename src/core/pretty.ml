@@ -11,7 +11,7 @@
 
 open Format
 open Pp
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
