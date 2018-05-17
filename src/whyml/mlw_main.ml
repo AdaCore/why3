@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Mlw_module
 
 let debug = Debug.register_info_flag "print_modules"

@@ -11,7 +11,7 @@
 
 (** {1 Program Expressions} *)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Mlw_ty

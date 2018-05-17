@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Smt2_model_defs
 open Strings
 

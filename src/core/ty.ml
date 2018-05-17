@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 
 (** Types *)
@@ -18,7 +18,7 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = Stdlib.MakeMSHW (struct
+module Tvar = Wstdlib.MakeMSHW (struct
   type t = tvsymbol
   let tag tv = tv.tv_name.id_tag
 end)
@@ -63,7 +63,7 @@ and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Tsym = Stdlib.MakeMSHW (struct
+module Tsym = Wstdlib.MakeMSHW (struct
   type t = tysymbol
   let tag ts = ts.ts_name.id_tag
 end)

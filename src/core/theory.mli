@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 
 (** Theories and Namespaces *)
 

@@ -11,7 +11,7 @@
 
 (** {1 Program modules} *)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term

@@ -17,7 +17,7 @@
     Use session_scheduler if you want to queue operations.
 *)
 
-open Stdlib
+open Wstdlib
 
 val debug : Debug.flag
 (** The debug flag "session" *)
@@ -228,7 +228,7 @@ type 'a env_session = private
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
-      mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
+      mutable files : Theory.theory Wstdlib.Mstr.t Wstdlib.Mstr.t;
       session : 'a session}
 
 val update_env_session_config : 'a env_session -> Whyconf.config -> unit

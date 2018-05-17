@@ -11,7 +11,7 @@
 
 (** Typing environments *)
 
-open Stdlib
+open Wstdlib
 open Term
 open Theory
 

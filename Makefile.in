@@ -165,7 +165,7 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp json debug loc lexlib print_tree \
+	   hashcons wstdlib exn_printer pp json debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
@@ -1759,7 +1759,7 @@ endif
 MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
-	util/weakhtbl util/stdlib util/rc util/debug \
+	util/weakhtbl util/wstdlib util/rc util/debug \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/call_provers driver/driver \

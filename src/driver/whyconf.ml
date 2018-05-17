@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Rc
 
 (* magicnumber for the configuration :

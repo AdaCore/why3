@@ -138,7 +138,7 @@ let ref_modules, ref_theories =
     Self.fatal "Exception raised while loading ref module:@ %a"
       Exn_printer.exn_printer e
 
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
+let ref_module : Mlw_module.modul = Wstdlib.Mstr.find "Ref" ref_modules
 *)
 let ref_module : Mlw_module.modul =
   Mlw_module.read_module env ["ref"] "Ref"
@@ -169,7 +169,7 @@ let mach_int_modules, _mach_int_theories =
 let int32_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int32";
-    Stdlib.Mstr.find "Int32" mach_int_modules
+    Wstdlib.Mstr.find "Int32" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int32 not found"
 *)
@@ -215,7 +215,7 @@ let uint32ofint_fun : Mlw_expr.psymbol = find_ps uint32_module "int_check"
 let int64_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int64";
-    Stdlib.Mstr.find "Int64" mach_int_modules
+    Wstdlib.Mstr.find "Int64" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int64 not found"
 *)
@@ -245,7 +245,7 @@ let int64ofint_fun : Mlw_expr.psymbol = find_ps int64_module "of_int"
 let array_modules, array_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
 
-let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
+let array_module : Mlw_module.modul = Wstdlib.Mstr.find "Array" array_modules
 *)
 
 (*

@@ -15,7 +15,7 @@ open Format
 open Why3
 open Whyconf
 open Gconfig
-open Stdlib
+open Wstdlib
 open Debug
 
 module C = Whyconf

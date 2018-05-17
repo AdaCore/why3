@@ -388,9 +388,9 @@ let print_info_model cntexample info =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
 	  let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+	  Wstdlib.Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in ();
+	Wstdlib.Mstr.empty in ();
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -398,7 +398,7 @@ let print_info_model cntexample info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Wstdlib.Mstr.empty
 
 let print_prop_decl vc_loc cntexample args info fmt k pr f =
   match k with

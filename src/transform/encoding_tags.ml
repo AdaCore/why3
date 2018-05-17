@@ -153,5 +153,5 @@ let tags =
   let info = mk_info kept infts margs in
   Trans.decl (decl info) expl_init)))
 
-let () = Stdlib.Hstr.replace Encoding.ft_enco_poly "tags" (fun _ ->
+let () = Wstdlib.Hstr.replace Encoding.ft_enco_poly "tags" (fun _ ->
   Trans.compose tags monomorphise_task)

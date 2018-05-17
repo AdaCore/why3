@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ty
 open Term
 open Decl

@@ -55,6 +55,6 @@ type json =
   | Bool of bool
   | String of string
   | List of json list
-  | Record of json Stdlib.Mstr.t
+  | Record of json Wstdlib.Mstr.t
 
 val print_json : Format.formatter -> json -> unit

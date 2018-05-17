@@ -40,12 +40,12 @@ let do_parsing model =
     Warning.emit
       ~loc:(get_position lexbuf)
       "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected character";
-    Stdlib.Mstr.empty
+    Wstdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
     begin
       let loc = get_position lexbuf in
       Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model";
-      Stdlib.Mstr.empty
+      Wstdlib.Mstr.empty
     end
 
 let do_parsing model =

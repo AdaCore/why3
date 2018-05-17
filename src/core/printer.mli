@@ -30,7 +30,7 @@ type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
   (* The position of the term that triggers the VC *)
-  queried_terms : Term.term Stdlib.Mstr.t;
+  queried_terms : Term.term Wstdlib.Mstr.t;
   (* The list of terms that were queried for the counter-example
      by the printer *)
 }

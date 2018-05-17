@@ -52,11 +52,11 @@
 
 
 output:
-| EOF { Stdlib.Mstr.empty }
+| EOF { Wstdlib.Mstr.empty }
 | LPAREN ps MODEL ps list_decls RPAREN { $5 }
 
 list_decls:
-| LPAREN decl RPAREN ps { Smt2_model_defs.add_element $2 Stdlib.Mstr.empty false}
+| LPAREN decl RPAREN ps { Smt2_model_defs.add_element $2 Wstdlib.Mstr.empty false}
 | LPAREN decl RPAREN ps list_decls { Smt2_model_defs.add_element $2 $5 false }
 | COMMENT ps list_decls  { $3 } (* Lines beginning with ';' are ignored *)
 

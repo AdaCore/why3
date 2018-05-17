@@ -181,7 +181,7 @@ val set_stringl : ?default:string list ->
 (*       raise Bad_value_type *)
 (*   *\) *)
 
-val check_exhaustive : section -> Stdlib.Sstr.t -> unit
+val check_exhaustive : section -> Wstdlib.Sstr.t -> unit
 (** [check_exhaustive section keys] check that only the keys in [keys]
     appear inside the section [section]
 

@@ -152,5 +152,5 @@ let guards =
   let info = mk_info kept infts margs in
   Trans.decl (decl info) expl_init)))
 
-let () = Stdlib.Hstr.replace Encoding.ft_enco_poly "guards" (fun _ ->
+let () = Wstdlib.Hstr.replace Encoding.ft_enco_poly "guards" (fun _ ->
   Trans.compose guards monomorphise_task)

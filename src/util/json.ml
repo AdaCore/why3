@@ -51,7 +51,7 @@ type json =
   | Bool of bool
   | String of string
   | List of json list
-  | Record of json Stdlib.Mstr.t
+  | Record of json Wstdlib.Mstr.t
 
 let rec print_json fmt j =
   match j with
@@ -61,4 +61,4 @@ let rec print_json fmt j =
   | String s -> string fmt s
   | List l -> list print_json fmt l
   | Record r ->
-    map_bindings (fun x -> x) print_json fmt (Stdlib.Mstr.bindings r)
+    map_bindings (fun x -> x) print_json fmt (Wstdlib.Mstr.bindings r)

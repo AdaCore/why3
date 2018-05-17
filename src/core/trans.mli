@@ -14,7 +14,7 @@ open Term
 open Decl
 open Theory
 open Task
-open Stdlib
+open Wstdlib
 
 (** Task transformation *)
 

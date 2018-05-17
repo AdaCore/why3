@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ty
 open Ident
 open Decl
@@ -238,7 +238,7 @@ type 'a env_session =
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
-      mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
+      mutable files : Theory.theory Wstdlib.Mstr.t Wstdlib.Mstr.t;
       session : 'a session}
 
 let goal_key g = g.goal_key

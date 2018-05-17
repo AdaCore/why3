@@ -12,7 +12,7 @@
 open Format
 open Pp
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -31,7 +31,7 @@ type 'a pp = Pp.formatter -> 'a -> unit
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
-  queried_terms : Term.term Stdlib.Mstr.t;
+  queried_terms : Term.term Wstdlib.Mstr.t;
 }
 
 type printer_args = {
@@ -54,7 +54,7 @@ exception UnknownPrinter of string
 let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
-  queried_terms = Stdlib.Mstr.empty;
+  queried_terms = Wstdlib.Mstr.empty;
 }
 
 let register_printer ~desc s p =
@@ -224,9 +224,9 @@ let get_type_arguments t = match t.t_node with
       let m = oty_match Mtv.empty ls.ls_value t.t_ty in
       let m = List.fold_left2
         (fun m ty t -> oty_match m (Some ty) t.t_ty) m ls.ls_args tl in
-      let name tv = Stdlib.Mstr.add tv.tv_name.id_string in
-      let m = Mtv.fold name m Stdlib.Mstr.empty in
-      Array.of_list (Stdlib.Mstr.values m)
+      let name tv = Wstdlib.Mstr.add tv.tv_name.id_string in
+      let m = Mtv.fold name m Wstdlib.Mstr.empty in
+      Array.of_list (Wstdlib.Mstr.values m)
   | _ ->
       [||]
 
