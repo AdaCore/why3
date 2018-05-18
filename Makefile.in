@@ -652,6 +652,9 @@ install_no_local::
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 	cp -f bin/gnat_server.@OCAMLBEST@ $(BINDIR)/gnat_server$(EXE)
 
+# ??? these shouldn't be necessary, but without, the gnat_server.cmi file is
+# out of date
+src/gnat/gnat_server.cmx: src/gnat/gnat_server.cmo
 
 include .depend.gnat
 $(GNATCMX): lib/why3/why3.cmxa
