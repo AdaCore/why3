@@ -1307,7 +1307,7 @@ let found_detached = ref false
 let save_detached_proof s parent old_pa_n =
   let old_pa = old_pa_n in
   ignore (add_proof_attempt s old_pa.prover old_pa.limit
-                            old_pa.proof_state ~obsolete:false old_pa.proof_script
+                            old_pa.proof_state ~obsolete:old_pa.proof_obsolete old_pa.proof_script
                             parent)
 
 let rec save_detached_goal old_s s parent detached_goal_id id =
