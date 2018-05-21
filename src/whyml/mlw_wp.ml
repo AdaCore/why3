@@ -1799,12 +1799,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { ne = t_false; s = wp1.post.s };
         exn = xne }
   | Etry (e1, handlers) ->
-      (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
-      (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
-      (* EX(x): if x is captured in handlers
-          (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
-      (* EX(x): if x is not captured in handlers
-          ex(e1)(x) \/ (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
       let handlers =
         List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
            Mexn.empty handlers in
@@ -1813,30 +1807,99 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          Mexn.fold (fun ex (pv,_) acc ->
             Mexn.add ex pv.pv_vs acc) handlers xresult in
       let wp1 = fast_wp_expr env s (result,xresult') e1 in
-      let result =
-        Mexn.fold (fun ex post acc -> try
-          let _, e2 = Mexn.find ex handlers in
-          let wp2 = fast_wp_expr env post.s r e2 in
-	  let md = create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "try" in
-          let s,f1,f2 = Subst.merge md s wp1.post.s wp2.post.s in
-          let ne =
-             wp_or
-                (t_and_simp acc.post.ne f1)
-                (t_and_simp_l [post.ne; wp2.post.ne; f2]) in
-          { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);
-            post = { s = s; ne = ne; };
-            exn = Mexn.fold Mexn.add wp2.exn acc.exn
-          }
-        with Not_found ->
-          { acc with exn = Mexn.add ex post acc.exn }
-        )
-        wp1.exn
-        { ok = wp1.ok;
-          post = wp1.post;
-          exn = Mexn.empty
-        }
-      in
-      result
+      let md =
+        create_model_data_opt ~loc:e1.e_loc ~context_labels:e1.e_label "try" in
+      (* compute the wp for all handlers, starting from the state expressed in
+         the corresponding EX post *)
+      let wp2 =
+        Mexn.fold (fun ex (_, e2) acc ->
+          try
+            let post = Mexn.find ex wp1.exn in
+            Mexn.add ex (fast_wp_expr env post.s r e2) acc
+          with Not_found -> acc)
+        handlers Mexn.empty in
+      (* compute normal exit: merge of ne of e1, plus the exceptional paths
+         caught by the handlers *)
+      let post =
+        (* s - new state
+         * ns - equations for normal exit of wp1
+         * sm - map from exceptions to equations for path going through this
+                handler *)
+        let s, ns, sm =
+          let exl, sl =
+            Mexn.fold (fun ex wp (exl, sl) ->
+              (ex :: exl, wp.post.s :: sl)) wp2 ([],[]) in
+          (* here we build a list of all poststates, first state being the
+             poststate of wp1 ... *)
+          let sl = wp1.post.s :: sl in
+          (* ... then merge these states ... *)
+          let s, fl = Subst.merge_l md s sl in
+          (* ... and extract the first element of the result again,
+             which corresponds to wp1. *)
+          let ns, rest = List.hd fl, List.tl fl in
+          (* finally we build the map from exceptions to equations *)
+          s, ns, List.fold_left2 (fun acc ex s ->
+            Mexn.add ex s acc) Mexn.empty exl rest
+        in
+        { s = s;
+          ne =
+        (* we build the disjunction for the normal exit *)
+        (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
+        Mexn.fold (fun ex wp2 acc ->
+          let post = Mexn.find ex wp1.exn in
+          wp_or acc (t_and_simp_l [post.ne; wp2.post.ne; Mexn.find ex sm])
+        ) wp2 (t_and_simp wp1.post.ne ns) } in
+      (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
+      let ok =
+        Mexn.fold (fun ex wp2 acc ->
+          let post = Mexn.find ex wp1.exn in
+          t_and_simp acc (t_implies_simp post.ne wp2.ok))
+        wp2 wp1.ok in
+      (* EX(x): if x is captured in handlers
+          (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
+      (* EX(x): if x is not captured in handlers
+          ex(e1)(x) \/ (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
+      let exn =
+        let set_add k _ acc = Sexn.add k acc in
+        let allexns =
+          Mexn.fold
+            (fun _ wp2 acc ->
+              Mexn.fold set_add wp2.exn acc)
+          wp2 (Mexn.fold set_add wp1.exn Sexn.empty) in
+        Mexn.mapi_filter (fun x () ->
+          let bigor, states =
+            (* (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
+            Sexn.fold (fun y (bigor, states)  ->
+              try
+                (* all of these find can raise Not_found, it means the path
+                   can't happen *)
+                let wp1exn = Mexn.find y wp1.exn in
+                let wp2 = Mexn.find y wp2 in
+                let h_exn = Mexn.find x wp2.exn in
+                t_and_simp_l [wp1exn.ne; h_exn.ne] :: bigor,
+                h_exn.s :: states
+              with Not_found -> (bigor, states)) allexns ([],[]) in
+          (* now add (or not) e1 to the bigor *)
+          let bigor, states =
+            if Mexn.mem x handlers then bigor, states
+            else
+              try
+                let wp1 = Mexn.find x wp1.exn in
+                wp1.ne :: bigor, wp1.s :: states
+              with Not_found -> bigor, states
+          in
+          (* merge states and build disjunction *)
+          match bigor, states with
+          | [], [] -> None
+          | [ne], [s] -> Some {s ; ne}
+          | _ ->
+            let s, ne =
+              let s, fl = Subst.merge_l md s states in
+              s,
+              List.fold_left2 (fun acc f eq ->
+                wp_or acc (t_and_simp f eq)) t_false bigor fl in
+            Some { s ; ne } ) allexns in
+      { ok; post ; exn }
   | Eabstr (e1, spec) ->
       (* OK: spec.pre /\ ok(e1) /\ (ne(e1) => spec.post)
              /\ (forall x. ex(e1)(x) => spec.xpost(x) *)
