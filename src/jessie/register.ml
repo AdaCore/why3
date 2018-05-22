@@ -70,11 +70,13 @@ let process () =
       List.fold_left
         (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
         []
-        [ "Z432", "Z3,4.3.2,";
+        [ (*"Z432", "Z3,4.3.2,";
           "Z440", "Z3,4.4.0,";
           "C241", "CVC3,2.4.1,";
           "C414", "CVC4,1.4,";
-          "A991", "Alt-Ergo,0.99.1,";
+          "A991", "Alt-Ergo,0.99.1,";*)
+          "Z460", "Z3,4.6.0,";
+          "A220", "Alt-Ergo,2.2.0,";
         ]
     with e ->
       ACSLtoWhy3.Self.fatal "Exception raised when loading prover drivers:@ %a"

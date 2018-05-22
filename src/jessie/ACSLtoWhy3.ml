@@ -184,7 +184,7 @@ let uint32_module =
 let uint32_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts uint32_module.Mlw_module.mod_export ["t"]
 
-let uint32_to_int : Term.lsymbol = find_ls uint32_module "to_uint"
+let uint32_to_int : Term.lsymbol = find_ls uint32_module "t'int"
 
 let uadd32_fun : Mlw_expr.psymbol = find_ps uint32_module "add_check"
 
