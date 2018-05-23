@@ -231,6 +231,14 @@ module ZipperBased
        forest_depths ((d1,t1) :: l) <> depths d t + s
      whenever d < d1 (see the corresponding Coq file) *)
 
+  lemma depths_length: forall t d. length (depths d t) >= 1
+  lemma forest_depths_length: forall l. length (forest_depths l) >= 0
+  lemma g_tail: forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l2
+
+  lemma key_lemma : forall t l d d1 t1 s. d < d1 ->
+    1 <= length l -> g (reverse (Cons (d1, t1) l)) ->
+    not (forest_depths (Cons (d1, t1) l) = (depths d t) ++ s)
+
   lemma right_nil:
     forall l: list (int, tree). length l >= 2 -> g l ->
     forall t: tree, d: int.
