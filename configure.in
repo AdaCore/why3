@@ -299,8 +299,8 @@ if test "$MENHIR" = no ; then
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
-AX_VERSION_GE([$MENHIRVERSION], 20150629, [],
-  [AC_MSG_ERROR(You need Menhir 20150629 or higher.)])
+AX_VERSION_GE([$MENHIRVERSION], 20160303, [],
+  [AC_MSG_ERROR(You need Menhir 20160303 or higher.)])
 
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
