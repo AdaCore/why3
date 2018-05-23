@@ -1,0 +1,460 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 3: Array-Based Queuing Lock}
+
+Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
+*)
+
+module ABQL
+
+use import array.Array
+use import int.Int
+use import ref.Refint
+use import int.EuclideanDivision
+use import option.Option
+
+val constant n : int
+axiom N_val: 2 <= n
+
+val constant k : int
+axiom K_val: 2 <= k
+
+type tick =
+  { b : int;                         (* ticket number *)
+    ghost v : int;                   (* unbounded ticket number *) }
+  invariant { 0 <= v /\ 0 <= b < k*n /\ b = mod v (k*n) }
+  by { b = 0; v = 0 }
+
+let fetch_and_add (r:ref tick)
+  ensures { !r.v = old !r.v + 1 }
+  ensures { result = old !r }
+=
+  let res = !r in
+  assert { mod (res.b + 1) (k*n) = mod (res.v + 1) (k*n)
+           by let a = div res.v (k*n) in
+              res.v = (k*n) * a + mod res.v (k*n)
+           so mod res.v (k*n) = res.b
+           so mod (res.v+1) (k*n) = mod ((k*n) * a + (res.b + 1)) (k*n)
+              = mod (res.b+1) (k*n) };
+  r := { v = res.v + 1; b = mod (res.b + 1) (k*n) };
+  res
+
+predicate lt (tick1 tick2: tick) = tick1.v < tick2.v
+
+use relations.Transitive
+use import list.List
+use import list.HdTl
+use import list.Append
+clone import list.Sorted with type t = tick, predicate le = lt, lemma Transitive.Trans
+
+inductive consecutive (l:list tick) =
+  | Consecutive_Nil : consecutive Nil
+  | Consecutive_One : forall t. consecutive (Cons t Nil)
+  | Consecutive_Two : forall t1 t2 l.
+                      t2.v = t1.v + 1 -> consecutive (Cons t2 l)
+                                      -> consecutive (Cons t1 (Cons t2 l))
+
+function last (l:list tick) : option tick
+= match l with
+  | Nil -> None
+  | Cons x Nil -> Some x
+  | Cons _ l -> last l
+  end
+
+let rec lemma last_push (l: list tick) (x:tick)
+  ensures { last (l ++ (Cons x Nil)) = Some x }
+  variant { l }
+= match l with
+  | Nil -> ()
+  | Cons _ l -> last_push l x
+  end
+
+let rec lemma consecutive_last_push (l: list tick) (x:tick)
+  requires { consecutive l }
+  requires { match last l with
+             | None -> true
+             | Some y -> x.v = y.v + 1 end }
+  ensures  { consecutive (l ++ (Cons x Nil)) }
+  variant  { l }
+= match l with
+  | Nil -> ()
+  | Cons _ l -> consecutive_last_push l x
+  end
+
+lemma hd_push: forall l,x:tick. hd l = None \/ hd (l ++ (Cons x Nil)) = hd l
+
+let rec lemma consecutive_implies_sorted (l:list tick)
+  requires { consecutive l }
+  ensures  { sorted l }
+  variant  { l }
+= match l with
+  | Nil -> ()
+  | Cons _ t -> consecutive_implies_sorted t
+  end
+
+(*
+  we associate a program counter to each thread
+
+  I: idle
+  function acquire
+    A1: var my_ticket = fetch_and_add (next,1)
+    A2: while not pass[my_ticket] do () done;
+    A3: return my_ticket
+
+  W: working (with lock)
+  function release(my_ticket)
+    R1: pass[my_ticket] = false
+    R2: pass[my_ticket+1 mod N] = true
+*)
+
+type pc = A1 | A2 | A3 | R1 | R2 | I | W
+
+predicate has_ticket (pc:pc) =
+  match pc with
+    | A1 | I -> false
+    | _ -> true
+  end
+
+predicate has_lock (pc:pc) =
+  match pc with
+    | A3 | W | R1 | R2 -> true
+    | _ -> false
+  end
+
+type nondet_source
+type rng = abstract { mutable source : nondet_source }
+val random : rng
+
+val scheduler () : int
+  ensures { 0 <= result < n }
+  writes  { random }
+
+use import array.NumOfEq
+use import queue.Queue
+use import list.NumOcc
+use import list.Mem
+
+
+let lemma numof_equiv (a1 a2: array 'a) (v:'a) (l u: int)
+  requires { forall i. l <= i < u -> a1[i]=v <-> a2[i]=v }
+  ensures  { numof a1 v l u = numof a2 v l u }
+= ()
+
+let lemma numof_add (a: array 'a) (v:'a) (l u: int) (i:int)
+  requires { l <= i < u }
+  requires { a[i] <> v }
+  ensures  { numof a[i <- v] v l u = numof a v l u + 1 }
+= assert { numof a[i<-v] v l i = numof a v l i };
+  assert { numof a[i<-v] v i (i+1) = 1 + numof a v i (i+1) };
+  assert { numof a[i<-v] v (i+1) u = numof a v (i+1) u }
+
+lemma mod_diff:
+  forall a b c:int. c > 0 -> mod a c = mod b c -> mod (a-b) c = 0
+         by a = c * (div a c) + mod a c
+         so b = c * (div b c) + mod b c
+         so a - b = c * (div a c - div b c) + 0
+         so mod (a-b) c = mod 0 c = 0
+
+let main () : unit
+  diverges
+=
+  let pass = Array.make (k*n) false in
+  pass[0] <- true;
+  let next = ref { v = 0; b = 0 } in
+  let pcs = Array.make n I in
+  let memo : array (option tick) = Array.make n None in
+      (* value of my_ticket if set *)
+  let owners : array (option int) = Array.make (k*n) None in
+      (* who owns which ticket *)
+  let ghost lock_holder : ref int = ref (-1) in
+  let ghost waiting_list = Queue.create () in
+  let ghost active_tick = ref None in
+  while true do
+    invariant { [@expl:safety]
+                forall th. 0 <= th < n -> th <> !lock_holder ->
+                not has_lock (pcs[th]) }
+    invariant { -1 <= !lock_holder < n }
+    invariant { forall b. 0 <= b < k*n ->
+                       match owners[b] with
+                          | None -> true
+                          | Some th -> 0 <= th < n
+                                       /\ match memo[th] with
+                                          | None -> false
+                                          | Some tick -> tick.b = b end
+                       end }
+    invariant { forall tick. pass[tick.b] ->
+                  match owners[tick.b] with
+                    | None -> !lock_holder = -1
+                    | Some th ->  !lock_holder = -1 \/ !lock_holder = th end }
+    invariant { 0 <= !lock_holder < n ->
+                match pcs[!lock_holder] with
+                | A3 | W | R1 ->
+                  match memo[!lock_holder] with
+                    | None -> false
+                    | Some tick -> pass[tick.b] end
+                | R2 -> forall b. 0 <= b < k * n -> not pass[b]
+                | _ -> false end }
+    invariant { forall b1 b2. 0 <= b1 < k*n -> 0 <= b2 < k*n ->
+                       pass[b1] = true /\ pass[b2] = true ->
+                       b1 = b2 }
+    invariant { 0 <= !lock_holder < n ->
+                  has_lock (pcs[!lock_holder]) /\
+                  match memo[!lock_holder] with
+                    | None -> false
+                    | Some tick -> !active_tick = Some tick end }
+    invariant { forall th. 0 <= th < n ->
+                       match memo[th] with
+                         | Some tick -> owners[tick.b] = Some th
+                         | None -> true end }
+    invariant { forall th. 0 <= th < n ->
+                          (memo[th] <> None <->
+                          has_ticket (pcs[th])) }
+    invariant { forall tick. mem tick waiting_list.elts ->
+                       match owners[tick.b] with
+                         | None -> false
+                         | Some th -> pcs[th] = A2
+                                      /\ memo[th] = Some tick end }
+    invariant { forall th. 0 <= th < n ->
+                       match memo[th] with
+                         | Some tick -> mem tick waiting_list.elts
+                                        \/ !active_tick = Some tick
+                         | None -> true end }
+    invariant { forall th. 0 <= th < n -> not has_lock pcs[th] ->
+                       match memo[th] with
+                         | None -> pcs[th] <> A2
+                         | Some tick -> mem tick waiting_list.elts end }
+    invariant { consecutive waiting_list.elts } (* also implies unicity *)
+    invariant { length waiting_list = numof pcs A2 0 n }
+    invariant { forall tick. mem tick waiting_list.elts ->
+                       !next.v - length waiting_list <= tick.v < !next.v }
+    invariant { match last waiting_list.elts with
+                      | None -> true
+                      | Some t -> t.v = !next.v - 1 end}
+    invariant { match hd waiting_list.elts with
+                      | None -> true
+                      | Some t -> t.v = !next.v - length waiting_list end }
+    invariant { match !active_tick with
+                      | None -> !lock_holder = -1
+                      | Some tick ->
+                          (match hd waiting_list.elts with
+                             | None -> !next.v = tick.v + 1
+                             | Some t -> t.v = tick.v + 1 end)
+                          /\ tick.v = !next.v - length waiting_list - 1
+                          /\ 0 <= !lock_holder < n
+                          /\ memo[!lock_holder] = Some tick end }
+    invariant { 0 <= length waiting_list <= n }
+   (* invariant { length waiting_list = n \/ owners[!next.b] = None } *)
+    invariant { [@expl:liveness]
+              !lock_holder = - 1 ->
+                 (* someone is in the critical section... *)
+                 ((match waiting_list.elts with
+                   | Nil -> false
+                   | Cons tick _ -> pass[tick.b] = true end)
+                 (* ...or someone has a ticket to the critical section... *)
+              \/ (exists th. 0 <= th < n /\ memo[th] = None
+                                         /\ pass[!next.b] = true)
+                                         /\ waiting_list.elts = Nil)
+                 (* ...or someone can take one *) }
+    let th = scheduler () in (*choose a thread*)
+    (* make it progress by 1 step *)
+    label Step in
+    match pcs[th] with
+      | I ->
+          pcs[th] <- A1
+      | A1 ->
+          let tick = fetch_and_add next in
+          assert { is_none owners[tick.b]
+                   by length waiting_list <= n < 2*n - 1 <= k*n - 1
+                   so ((forall tick'. mem tick' waiting_list.elts
+                                    -> (tick'.b <> tick.b)
+                                    by 0 < tick.v - tick'.v < k*n
+                                    so mod (tick.v - tick'.v) (k*n) <> 0
+                                    so mod tick.v (k*n) <> mod tick'.v (k*n)))
+                   so forall th'. owners[tick.b] = Some th' -> false
+                                 by match memo[th'] with
+                                   | None -> false
+                                   | Some tick' -> false
+                                       by tick'.b = tick.b
+                                       so not mem tick' waiting_list.elts
+                                       so !active_tick = Some tick'
+                                       so 0 < tick.v - tick'.v < k*n
+                                       so mod (tick.v - tick'.v) (k*n) <> 0
+                                       so mod tick.v (k*n) <> mod tick'.v (k*n)
+                                       end };
+          assert { forall th. 0 <= th < n -> memo[th] <> Some tick };
+          owners[tick.b] <- Some th;
+          memo[th] <- Some tick;
+          pcs[th] <- A2;
+          assert { numof pcs A2 0 n = numof pcs A2 0 n at Step + 1 };
+          assert { !lock_holder = !lock_holder at Step <> th };
+          assert { forall tick'. mem tick' waiting_list.elts ->
+                          tick'.b <> tick.b /\ owners[tick'.b] <> Some th };
+          assert { forall tick'. mem tick' waiting_list.elts ->
+                          match owners[tick'.b] with
+                            | None -> false
+                            | Some th' ->
+                                pcs[th'] = A2
+                                /\ memo[th'] = Some tick'
+                              by th <> th'
+                              so pcs[th'] = pcs[th'] at Step
+                              so memo[th'] = memo[th'] at Step end };
+          push tick waiting_list;
+          assert { consecutive waiting_list.elts
+                   by waiting_list.elts
+                      = waiting_list.elts at Step ++ (Cons tick Nil) };
+          assert { match !active_tick with
+                      | None -> !lock_holder = -1
+                      | Some tick' ->
+                          (match hd waiting_list.elts with
+                             | None -> false
+                             | Some t ->
+                               t.v = tick'.v + 1
+                               by match hd waiting_list.elts at Step with
+                               | None -> t = tick
+                                         so
+                                         tick.v = !next.v at Step = tick'.v + 1
+                               | Some t -> t.v = tick'.v + 1
+                                           /\ hd waiting_list.elts = Some t end
+                           end)
+                   end };
+           assert { !lock_holder = -1 ->
+                     match waiting_list.elts with
+                      | Nil -> false
+                      | Cons t1 _ ->
+                         pass[t1.b]
+                         by
+                         match waiting_list.elts at Step with
+                         | Nil -> pass[t1.b]
+                                  by (t1 = tick /\
+                                  pass[tick.b] by pass[!next.b at Step])
+                         | Cons t _ -> pass[t1.b] by t=t1 so pass[t.b] end
+                     end };
+           assert { match hd waiting_list.elts with
+                    | None -> true
+                    | Some t ->
+                        if t = tick
+                        then t.v = !next.v - length waiting_list
+                             by waiting_list.elts at Step = Nil
+                             so length waiting_list = 1
+                        else t.v = !next.v - length waiting_list
+                             by hd waiting_list.elts at Step = Some t
+                             so t.v = !next.v - length waiting_list at Step
+                    end };
+      | A2 ->
+          match memo[th] with
+          | None -> absurd
+          | Some tick ->
+             if pass[tick.b]
+             then begin
+               active_tick := Some tick;
+               assert { !lock_holder = - 1 };
+               lock_holder := th;
+               pcs[th] <- A3; (* progress only with lock *)
+               let ghost tick' = safe_pop waiting_list in
+               assert { pass[tick'.b] };
+               assert { [@expl:fairness] tick=tick'
+                        by tick.b = tick'.b
+                        so mem tick waiting_list.elts at Step
+                        so mem tick' waiting_list.elts at Step };
+               assert { not mem tick waiting_list.elts
+                        by waiting_list.elts at Step
+                           = Cons tick waiting_list.elts
+                        so consecutive waiting_list.elts at Step
+                        so (forall t. mem t waiting_list.elts -> tick.v < t.v)
+                        so consecutive waiting_list.elts
+                        so match waiting_list.elts with
+                           | Nil -> not mem tick waiting_list.elts
+                           | Cons x l -> not mem tick waiting_list.elts
+                                         by tick.v < x.v
+                                         so (forall t. mem t l -> x.v < t.v)
+                                          end };
+              assert { forall tick1 tick2. mem tick1 waiting_list.elts at Step
+                                        -> mem tick2 waiting_list.elts at Step
+                                        -> tick1.v < tick2.v
+                                        -> tick1.b <> tick2.b
+                       by length waiting_list at Step <= n < 2*n - 1 <= k*n - 1
+                       so 0 < tick2.v - tick1.v < k*n
+                       so mod (tick2.v - tick1.v) (k*n) <> 0
+                       so mod tick1.v (k*n) <> mod tick2.v (k*n) };
+              assert { forall t. mem t waiting_list.elts ->
+                          match owners[t.b] with
+                            | None -> false
+                            | Some n ->
+                                (pcs[n] = A2
+                                /\ memo[n] = Some t)
+                              by t <> tick
+                              so t.b <> tick.b
+                              so th <> n
+                              so pcs[n] = pcs[n] at Step
+                              so memo[n] = memo[n] at Step end };
+              assert { numof pcs A2 0 n at Step = numof pcs A2 0 n + 1
+                       by numof pcs A2 0 n at Step
+                          = numof pcs[th <- A2] A2 0 n };
+              assert { forall t. mem t waiting_list.elts ->
+                       !next.v - length waiting_list <= t.v
+                       by mem t waiting_list.elts at Step
+                       so t <> tick
+                       so waiting_list.elts at Step
+                          = Cons tick waiting_list.elts
+                       so !next.v - length waiting_list at Step = tick.v
+                       so !next.v - length waiting_list at Step < t.v };
+              assert { match waiting_list.elts with
+                       | Nil -> true
+                       | Cons t l ->
+                         hd waiting_list.elts = Some t
+                         /\ t.v = !next.v - waiting_list.length
+                         by waiting_list.elts at Step
+                            = Cons tick (Cons t l)
+                         so consecutive waiting_list.elts at Step
+                         so t.v = tick.v + 1 end };
+               end
+          end
+      | A3 -> pcs[th] <- W
+      | W -> pcs[th] <- R1 (* move to release *)
+      | R1 ->
+          match memo[th] with
+            | None -> absurd
+            | Some tick ->
+                assert { forall b'. 0 <= b' < k*n -> pass[b'] -> b' = tick.b };
+                pass[tick.b] <- false;
+                pcs[th] <- R2
+          end
+      | R2 ->
+          match memo[th] with
+            | None -> absurd
+            | Some tick ->
+                let nt = mod (tick.b + 1) (k*n) in
+                assert { forall b. 0 <= b < k*n -> not pass[b]
+                         by !active_tick = Some tick };
+                lock_holder := -1;
+                pass[nt] <- true;
+                assert { forall b. 0 <= b < k*n -> pass[b] -> b = nt };
+                memo[th] <- None;
+                assert { owners[tick.b] = Some th };
+                owners[tick.b] <- None;
+                active_tick := None;
+                pcs[th] <- I;
+                assert { nt = mod (tick.v + 1) (k*n)
+                         by let d = div tick.v (k*n) in
+                            tick.v = (k*n) * d + tick.b
+                         so mod (tick.v + 1) (k*n)
+                            = mod ((k*n) * d + (tick.b + 1)) (k*n)
+                            = mod (tick.b + 1) (k*n) = nt };
+                assert { match waiting_list.elts with
+                         | Nil -> pass[!next.b] = true
+                                  by !next.v = tick.v + 1
+                                  so !next.b = nt
+                                  /\
+                                  exists th. memo[th] = None
+                         | Cons x _ -> pass[x.b]
+                                       by x.v = tick.v + 1
+                                       so x.b = nt
+                         end };
+          end
+      end
+  done
+
+
+
+end
