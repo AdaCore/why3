@@ -12,7 +12,6 @@ why3 [general options...] <command> [specific options...]
 
 The following commands are available:
 \begin{description}
-\item[\texttt{bench}] produces benchmarks.
 \item[\texttt{config}] manages the user's configuration,
   including the detection of installed provers.
 \item[\texttt{doc}] produces HTML versions of \why source codes.
@@ -56,8 +55,23 @@ particular, option \verb|--help| displays the usage and options.
   reads additional configuration from the given file.
   \index{extra-config@\verb+--extra-config+}
 \item[\texttt{-{}-list-debug-flags}]
-  lists known debug flags.
+    list known debug flags.
   \index{list-debug-flags@\verb+--list-debug-flags+}
+\item[\texttt{-{}-list-transforms}]
+    list known transformations.
+  \index{list-transforms@\verb+--list-transforms+}
+\item[\texttt{-{}-list-printers}]
+  list known printers.
+  \index{list-printers@\verb+--list-printers+}
+\item[\texttt{-{}-list-provers}]
+  list known provers
+  \index{list-provers@\verb+--list-provers+}
+\item[\texttt{-{}-list-formats}]
+  list known input formats
+  \index{list-formats@\verb+--list-formats+}
+\item[\texttt{-{}-list-metas}]
+  list known metas
+  \index{list-metas@\verb+--list-metas+}
 \item[\texttt{-{}-debug-all}]
   sets all debug flags (except flags which change the behavior).
   \index{debug-all@\verb+--debug-all+}
@@ -128,7 +142,7 @@ can be obtained by the option \verb|--list-prover-ids|.
 
 \why is primarily used to call provers on goals contained in an
 input file. By default, such a file must be written either in \why language
-(extension \texttt{.why}) or in \whyml language (extension \texttt{.mlw}).
+(extension \texttt{.mlw}).
 However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg TPTP or SMT-LIB.
@@ -611,82 +625,6 @@ The \texttt{ide} command also accepts the following options described for the co
 \item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
 \end{description}
 
-
-\section{The \texttt{bench} Command}
-
-The \texttt{bench} command adds a scheduler on top of the \why
-library. It is designed to compare various components
-of automatic proofs: automatic provers, transformations, definitions
-of a theory. For that purpose, it tries to prove predefined goals using
-each component to compare. Various formats can be used as outputs:
-\begin{description}
-\item[\texttt{csv}] the simpler and more informative format; the results are
-  represented in an array; the rows correspond to the
-  compared components, the columns correspond to the result
-  (Valid, Unknown, Timeout, Failure, Invalid) and the CPU time taken in seconds.
-\item[\texttt{average}] it summarizes the number of the five different answers
-  for each component. It also gives the average time taken.
-\item[\texttt{timeline}] for each component, it gives the number of valid goals
-  along the time (10 slices between 0 and the longest time a component
-  takes to prove a goal)
-\end{description}
-
-The compared components can be defined in an \emph{rc-file};
-\texttt{examples/misc/prgbench.rc} is an example of such a file. More
-generally, a bench configuration file looks like
-\begin{verbatim}
-[probs "myprobs"]
-   file = "examples/mygoal.why" #relatives to the rc file
-   file = "examples/myprogram.mlw"
-   theory = "myprogram.T"
-   goal = "mygoal.T.G"
-
-   transform = "split_goal" #applied in this order
-   transform = "..."
-   transform = "..."
-
-[tools "mytools"]
-   prover = cvc3
-   prover = altergo
-   #or only one
-   driver = "..."
-   command = "..."
-
-   loadpath = "..." #added to the one in why3.conf
-   loadpath = "..."
-
-   timelimit = 30
-   memlimit = 300
-
-   use = "toto.T" #use the theory toto (allow to add metas)
-
-   transform = "simplify_array" #only 1 to 1 transformation
-
-[bench "mybench"]
-   tools = "mytools"
-   tools = ...
-   probs = "myprobs"
-   probs = ...
-   timeline = "prgbench.time"
-   average = "prgbench.avg"
-   csv = "prgbench.csv"
-\end{verbatim}
-
-Such a file can define three families \texttt{tools}, \texttt{probs},
-\texttt{bench}. A \texttt{tools} section defines a set of components to
-compare. A \texttt{probs} section defines a set of goals on which to compare some
-components. A \texttt{bench} section defines which components to
-compare using which goals. It refers by name to some sections
-\texttt{tools} and \texttt{probs} defined in the same file. The order
-of the definitions is irrelevant. Notice that one can use
-\texttt{loadpath} in a \texttt{tools} section to compare different
-axiomatizations.
-
-One can run all the bench given in one bench configuration file with
-\begin{verbatim}
-why3 bench -B path_to_my_bench.rc
-\end{verbatim}
-
 \section{The \texttt{replay} Command}
 \label{sec:why3replayer}
 
@@ -1074,86 +1012,6 @@ Specific options for this command are as follows.
     -{}-no-index -{}-html -o \%o \%i" .html}
 
 \end{description}
-
-\subsection{Commands modifying the proof attempts}
-
-The commands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
-and \texttt{rm}, share the same set of options for selecting the proof
-attempts to work on:
-\begin{description}
-\item[\texttt{-{}-filter-prover \textsl{<prover>}}] selects only the proof attempt with
-  the given prover. This option can be specified multiple times in order
-  to select all the proofs that corresponds to any of the given
-  provers.
-\item[\texttt{-{}-filter-verified yes}] selects only
-  the proofs that are valid and not obsolete, while option
-  \verb|--filter-verified no| selects the ones that are not verified.
-  \verb|--filter-verified all|, the default, does not perform such a selection.
-\item[\texttt{-{}-filter-verified-goal yes}] restricts the selection
-  to the proofs of verified goals (that does not mean that the proof is
-  verified). Same for the other cases \verb|no| and \verb|all|.
-\item[\texttt{-{}-filter-archived yes}] restricts the selection
-  to the proofs that are archived.
-  Same for the other cases \verb|no|
-  and \verb|all| except the default is \verb|no|.
-\end{description}
-
-\noindent
-The commands \texttt{mod}, \texttt{copy}, and \texttt{copy-archive},
-share the same set of options to specify the modification. The
-command \texttt{mod} modifies directly the proof attempt,
-\texttt{copy} copies the proof attempt before doing the modification,
-\texttt{copy-archive} marks the original proof attempt as
-archived.
-The options are:
-\begin{description}
-\item[\texttt{-{}-set-obsolete}] marks the selected proofs as
-  obsolete.
-\item[\texttt{-{}-set-archived}] marks the selected proofs as archived.
-\item[\texttt{-{}-unset-archived}] removes the archived attribute
-  from the selected proofs.
-\item[\texttt{-{}-to-prover \textsl{<prover>}}] modifies the prover, for example
-  \texttt{-{}-to-prover Alt-Ergo,0.94}. A conflict arises if a proof
-  with this prover already exists. In this case, you can choose between four
-  behaviors:
-\begin{itemize}
-\item replace the proof (\verb|-f|, \verb|--force|);
-\item do not replace the proof (\verb|-n|, \verb|--never|);
-\item replace the proof unless it is verified (valid and not
-  obsolete) (\verb|-c|, \verb|--conservative|); this is the default;
-\item ask the user each time the case arises (\verb|-i|, \verb|--interactive|).
-\end{itemize}
-\end{description}
-
-The command \texttt{rm} removes the selected proof
-attempts. The options \verb|--interactive|, \verb|--force|, and
-\verb|--conservative|, can also be used to respectively ask before
-each suppression, suppress all the selected proofs (default), and remove
-only the proofs that are not verified. The macro option \verb|--clean|
-corresponds to \verb|--filter-verified-goal --conservative| and
-removes the proof attempts that are not verified but which correspond
-to verified goals.
-
-The commands of this section do not accept by default to modify an
-obsolete session (as defined in \ref{sec:idref:session}). You need to
-add the option \verb|-F| to force this behavior.
-
-
-% pour l'instant on ne documente pas parce que commenté dans le code
-% \todo{A adapter en fonction de la decision sur l'upgrade de prover}
-
-% If you just want to update one session with updated provers you can
-% use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
-% \begin{verbatim}
-% why3session copy  --convert-unknown
-% \end{verbatim}
-% For each proof attempt associated to an unknown prover (a prover not in
-% \verb|.why3.conf|) and not archived, it will try to find a known prover
-% with the same name. If it finds one, the proof attempt is copied to this
-% prover and the old proof is set to archived. The corresponding edited
-% files, if any, are copied and regenerated for the new prover An archived
-% proof is not replayed by why3replayer.
-
 
 
 \section{The \texttt{doc} Command}
