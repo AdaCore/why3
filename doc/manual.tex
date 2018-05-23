@@ -290,10 +290,19 @@ egalite sur les type algebriques ? engendrees automatiquement ?
 
 \subsection{Syntax Changes}
 
+Logical symbols can no longer be used in non-ghost code;
+in particular, there is no polymorphic equality in programs any more,
+so equality functions must be declared/defined on a per-type basis
+(already done for type \texttt{int} in the standard library). The CHANGES
+file contains other potential incompatibility.
+
 \begin{center}
 \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
 \hline
 \textbf{version 0.87} & \textbf{version 0.90} \\
+\hline
+\texttt{function f ...} & \texttt{let function f ...} if called in
+                          programs \\
 \hline
 \texttt{'L:} & \texttt{label L in} \\
 \hline

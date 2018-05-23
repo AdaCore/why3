@@ -25,6 +25,7 @@ Language
     Flanagan-Saxe-like VC generation
   * support for type coercions in logic using `meta coercion`
   * deprecated `theory`; use `module` instead
+  * term on the left of sequence `;` must be of type `unit` :x:
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
