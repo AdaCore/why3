@@ -604,20 +604,22 @@ clean::
 # GNATWhy3
 ########
 
-
 GNAT_FILES := gnat_counterexamples gnat_util gnat_loc gnat_expl gnat_config \
 	      gnat_scheduler gnat_manual gnat_report gnat_objectives gnat_main \
 	      gnat_server
 
 GNATMODULES := $(addprefix src/gnat/, $(GNAT_FILES))
-GNATDEP = $(addsuffix .dep, $(GNATMODULES))
-GNATCMO = $(addsuffix .cmo, $(GNATMODULES))
-GNATCMX = $(addsuffix .cmx, $(GNATMODULES))
-$(GNATCMO) $(GNATCMX): INCLUDES += -I src/gnat -I src/util
-$(GNATDEP): DEPFLAGS += -I src/gnat
 
-depend: $(GNATDEP)
-CLEANDIRS += src/gnat
+GNATML  = $(addsuffix .ml,  $(GNATMODULES))
+GNATMLI = $(addsuffix .mli, $(filter-out %gnat_main %gnat_server, $(GNATMODULES)))
+GNATCMI = $(addsuffix .cmi, $(filter-out %gnat_main %gnat_server, $(GNATMODULES)))
+GNATCMO = $(addsuffix .cmo, $(filter-out %gnat_server, $(GNATMODULES)))
+GNATCMX = $(addsuffix .cmx, $(filter-out %gnat_server, $(GNATMODULES)))
+GNATSERVCMO = $(addsuffix .cmo, $(filter-out %gnat_main, $(GNATMODULES)))
+GNATSERVCMX = $(addsuffix .cmx, $(filter-out %gnat_main, $(GNATMODULES)))
+$(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
+$(GNATSERVCMO) $(GNATSERVCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
+$(GNATCMX): $(GNATCMO)
 
 # build targets
 
@@ -625,22 +627,49 @@ byte: bin/gnatwhy3.byte bin/gnat_server.byte
 opt:  bin/gnatwhy3.opt bin/gnat_server.opt
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
-bin/gnat_server.opt: lib/why3/why3.cmxa $(GNATCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+
+bin/gnat_server.opt: lib/why3/why3.cmxa $(GNATSERVCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
 bin/gnatwhy3.byte: lib/why3/why3.cma $(GNATCMO)
-bin/gnat_server.byte: lib/why3/why3.cma $(GNATCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/gnat_server.byte: lib/why3/why3.cma $(GNATSERVCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/gnatwhy3: bin/gnatwhy3.@OCAMLBEST@
+	ln -sf gnatwhy3.@OCAMLBEST@ $@
+
+bin/gnat_server: bin/gnat_server.@OCAMLBEST@
+	ln -sf gnat_server.@OCAMLBEST@ $@
 
 install_no_local::
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 	cp -f bin/gnat_server.@OCAMLBEST@ $(BINDIR)/gnat_server$(EXE)
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(GNATDEP)
-endif
+# ??? these shouldn't be necessary, but without, the gnat_server.cmi file is
+# out of date
+src/gnat/gnat_server.cmx: src/gnat/gnat_server.cmo
+
+include .depend.gnat
+$(GNATCMX): lib/why3/why3.cmxa
+
+.depend.gnat:
+	$(OCAMLDEP) -slash -I lib/why3 -I src -I src/util -I src/gnat $(GNATML) $(GNATMLI) > $@
+
+depend: .depend.gnat
 
 clean::
+	rm -f src/gnat/*.cm[iox] src/gnat/*.o
+	rm -f src/gnat/*.annot src/gnat/*~
 	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3
 	rm -f bin/gnat_server.byte bin/gnat_server.opt bin/gnat_server
+	rm -f .depend.gnat
 
 ##############
 # Why3server #
