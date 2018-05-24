@@ -491,7 +491,7 @@ module Permut
   use import Length
 
   lemma Permut_length:
-    forall l1 l2: list 'a. permut l1 l2 -> length l1 = length l2
+    forall l1 [@induction] l2: list 'a. permut l1 l2 -> length l1 = length l2
 
 end
 

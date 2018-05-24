@@ -2,18 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../../../stdlib/list.mlw" proved="true">
-<theory name="List" proved="true" sum="0837e0e504ae2d2a2dc07ff388fab3e5">
+<theory name="List" proved="true">
  <goal name="VC is_nil" expl="VC for is_nil" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
 </theory>
-<theory name="Length" proved="true" sum="905c13f3b9a1d5b3685ef4b619a14b01">
+<theory name="Length" proved="true">
  <goal name="VC length" expl="VC for length" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -36,7 +37,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Quant" proved="true" sum="cbe49ff1e6c76878e96cfcfaac826ecd">
+<theory name="Quant" proved="true">
  <goal name="VC for_all" expl="VC for for_all" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -47,9 +48,7 @@
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Mem" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="Elements" proved="true" sum="bafb86c9c17211367a70c46cfeab34af">
+<theory name="Elements" proved="true">
  <goal name="elements_mem" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="elements_mem.0" proved="true">
@@ -58,14 +57,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="Nth" proved="true" sum="89ead29d253e40980e405711b3bd3eb0">
+<theory name="Nth" proved="true">
  <goal name="VC nth" expl="VC for nth" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="NthNoOpt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="NthLength" proved="true" sum="42dfb805196b03e25377b2c3e6c00a32">
+<theory name="NthLength" proved="true">
  <goal name="nth_none_1" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="nth_none_1.0" proved="true">
@@ -88,7 +85,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HdTl" proved="true" sum="6a7bb36d89529a0f0ca85a317461a161">
+<theory name="HdTl" proved="true">
  <goal name="VC hd" expl="VC for hd" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -96,9 +93,7 @@
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="HdTlNoOpt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="NthHdTl" proved="true" sum="766fb30d8551f2889072f5e06361ef9e">
+<theory name="NthHdTl" proved="true">
  <goal name="Nth_tl" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
@@ -106,7 +101,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Append" proved="true" sum="8b0fff794e6413ab8a5089b3e2554084">
+<theory name="Append" proved="true">
  <goal name="VC infix ++" expl="VC for infix ++" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -160,7 +155,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NthLengthAppend" proved="true" sum="bed742aff2cd233b49310681fa413394">
+<theory name="NthLengthAppend" proved="true">
  <goal name="nth_append_1" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="nth_append_1.0" proved="true">
@@ -176,7 +171,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Reverse" proved="true" sum="858eb8666f3cd57b232b01c6443f2a9c">
+<theory name="Reverse" proved="true">
  <goal name="VC reverse" expl="VC for reverse" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -219,7 +214,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="RevAppend" proved="true" sum="36f85557bbc717b5b32f39741cfb6f20">
+<theory name="RevAppend" proved="true">
  <goal name="VC rev_append" expl="VC for rev_append" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -248,12 +243,12 @@
  <proof prover="6"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
 </theory>
-<theory name="Combine" proved="true" sum="fd1c76819779fd0bd76baa52457d5ac3">
+<theory name="Combine" proved="true">
  <goal name="VC combine" expl="VC for combine" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Sorted" proved="true" sum="80571a008a6734ad8ebd9e35ecb9c0f3">
+<theory name="Sorted" proved="true">
  <goal name="sorted_mem" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="sorted_mem.0" proved="true">
@@ -310,12 +305,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SortedInt" proved="true" sum="420fd9523aa8f4e7f3fc4144239e8ace">
+<theory name="SortedInt" proved="true">
  <goal name="Transitive.Trans" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="RevSorted" proved="true" sum="d990cfc38eff35d4b5ee6eeea2be6a44">
+<theory name="RevSorted" proved="true">
  <goal name="Incr.Transitive.Trans" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
@@ -387,7 +382,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="NumOcc" proved="true" sum="e5f20933ce7d0d92ce5290373d639f03">
+<theory name="NumOcc" proved="true">
  <goal name="Num_Occ_NonNeg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="Num_Occ_NonNeg.0" proved="true">
@@ -430,7 +425,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Permut" proved="true" sum="be179f9416f3dbffd7c5989459df9e5d">
+<theory name="Permut" proved="true">
  <goal name="Permut_refl" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
@@ -462,10 +457,72 @@
  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="Permut_length" proved="true">
- <proof prover="1" edited="list_Permut_Permut_length_2.v"><result status="valid" time="1.48"/></proof>
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="Permut_length.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="Permut_length.0.0" proved="true">
+   <transf name="destruct_alg" proved="true" arg1="l2">
+    <goal name="Permut_length.0.0.0" proved="true">
+    <proof prover="5"><result status="valid" time="0.01"/></proof>
+    </goal>
+    <goal name="Permut_length.0.0.1" proved="true">
+    <proof prover="0"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="Permut_length.0.1" proved="true">
+   <transf name="unfold" proved="true" arg1="permut" arg2="in" arg3="H">
+    <goal name="Permut_length.0.1.0" proved="true">
+    <transf name="assert" proved="true" arg1="(num_occ x1 l1 &gt;= 1)">
+     <goal name="Permut_length.0.1.0.0" proved="true">
+     <proof prover="5"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="Permut_length.0.1.0.1" proved="true">
+     <transf name="assert" proved="true" arg1="(mem x1 l2)">
+      <goal name="Permut_length.0.1.0.1.0" proved="true">
+      <proof prover="5"><result status="valid" time="0.02"/></proof>
+      </goal>
+      <goal name="Permut_length.0.1.0.1.1" proved="true">
+      <transf name="instantiate" proved="true" arg1="mem_decomp" arg2="x1,l2">
+       <goal name="Permut_length.0.1.0.1.1.0" proved="true">
+       <transf name="destruct" proved="true" arg1="Hinst">
+        <goal name="Permut_length.0.1.0.1.1.0.0" proved="true">
+        <proof prover="5"><result status="valid" time="0.01"/></proof>
+        </goal>
+        <goal name="Permut_length.0.1.0.1.1.0.1" proved="true">
+        <transf name="destruct" proved="true" arg1="Hinst">
+         <goal name="Permut_length.0.1.0.1.1.0.1.0" proved="true">
+         <transf name="destruct" proved="true" arg1="Hinst">
+          <goal name="Permut_length.0.1.0.1.1.0.1.0.0" proved="true">
+          <transf name="assert" proved="true" arg1="(permut x (l1 ++ l2))">
+           <goal name="Permut_length.0.1.0.1.1.0.1.0.0.0" proved="true">
+           <proof prover="5"><result status="valid" time="0.22"/></proof>
+           </goal>
+           <goal name="Permut_length.0.1.0.1.1.0.1.0.0.1" proved="true">
+           <proof prover="5"><result status="valid" time="0.19"/></proof>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
-<theory name="Distinct" proved="true" sum="2d43c8315958770c1d8477e3b5e70cae">
+<theory name="Distinct" proved="true">
  <goal name="distinct_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="distinct_append.0" proved="true">
@@ -481,19 +538,17 @@
  </transf>
  </goal>
 </theory>
-<theory name="Prefix" proved="true" sum="5915981e098f39d20fd1e5fbf18b376d">
+<theory name="Prefix" proved="true">
  <goal name="VC prefix" expl="VC for prefix" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Sum" proved="true" sum="5915981e098f39d20fd1e5fbf18b376d">
+<theory name="Sum" proved="true">
  <goal name="VC sum" expl="VC for sum" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="Map" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="FoldLeft" proved="true" sum="661a0a492e1d321d242ee343d62bb649">
+<theory name="FoldLeft" proved="true">
  <goal name="fold_left_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="fold_left_append.0" proved="true">
@@ -502,7 +557,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="FoldRight" proved="true" sum="9487d024f4d395375d20c6e19d6d450a">
+<theory name="FoldRight" proved="true">
  <goal name="fold_right_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="fold_right_append.0" proved="true">
@@ -510,8 +565,6 @@
   </goal>
  </transf>
  </goal>
-</theory>
-<theory name="ListRich" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 </file>
 </why3session>
