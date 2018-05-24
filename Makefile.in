@@ -1167,7 +1167,7 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/int.mlw
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done
