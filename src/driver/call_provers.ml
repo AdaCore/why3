@@ -394,9 +394,11 @@ let read_and_delete_file fn =
   if Debug.test_noflag debug then Sys.remove fn;
   out
 
+open Prove_client
+
 let handle_answer answer =
   match answer with
-  | Prove_client.(Finished { id; time; timeout; out_file; exit_code }) ->
+  | Finished { id; time; timeout; out_file; exit_code } ->
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
       let keep_vcs =
@@ -413,11 +415,11 @@ let handle_answer answer =
       let ans = parse_prover_run save.res_parser
           timeout time out ret save.limit ~printer_mapping in
       id, Some ans
-  | Prove_client.Started id ->
+  | Started id ->
       id, None
 
 let wait_for_server_result ~blocking =
-  List.map handle_answer (Prove_client.read_answers ~blocking)
+  List.map handle_answer (read_answers ~blocking)
 
 type prover_call =
   | ServerCall of server_id
@@ -442,7 +444,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
-  Prove_client.send_request ~use_stdin ~id
+  send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
                             ~cmd;
