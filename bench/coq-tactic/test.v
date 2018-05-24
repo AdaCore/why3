@@ -313,7 +313,6 @@ Qed.
 Definition wgt (k:(nat * Z)%type) := match k with
   | (_, p) => p
   end.
-Implicit Arguments wgt.
 
 Goal wgt (S O, 3) = 3.
 ae.
