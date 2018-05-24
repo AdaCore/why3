@@ -53,6 +53,7 @@ Tools
 
 Provers
   * deprecated the `why3` Coq tactic
+  * dropped support for Coq 8.4 :x:
 
 Version 0.88.3, January 11, 2018
 --------------------------------
@@ -125,10 +126,10 @@ Plugins
 
 Provers
   * support for Isabelle 2017 (released Oct 2017)
-  * discarded support for Isabelle 2016 (2016-1 still supported) :x:
+  * dropped support for Isabelle 2016 (2016-1 still supported) :x:
   * support for Coq 8.6.1 (released Jul 25, 2017)
   * tentative support for Coq 8.7
-  * discarded tactic support for Coq 8.4 (proofs still supported) :x:
+  * dropped tactic support for Coq 8.4 (proofs still supported) :x:
   * support for CVC4 1.5 (released Jul 10, 2017)
   * support for E 2.0 (released Jul 4, 2017)
   * support for E 1.9.1 (release Aug 31, 2016)
@@ -144,7 +145,7 @@ Provers
   * support for Alt-Ergo 1.30 (released Nov 21, 2016)
   * support for Coq 8.6 (released Dec 8, 2016)
   * support for Gappa 1.3 (released Jul 20, 2016)
-  * discarded support for Isabelle 2015 :x:
+  * dropped support for Isabelle 2015 :x:
   * support for Isabelle 2016-1 (released Dec 2016)
   * support for Z3 4.5.0 (released Nov 8, 2016)
 
@@ -194,13 +195,13 @@ Encoding
     format is direct :x:
 
 Provers
-  * discarded support for Alt-Ergo versions older than 0.95.2 :x:
+  * dropped support for Alt-Ergo versions older than 0.95.2 :x:
   * support for Alt-Ergo 1.01 (released Feb 16, 2016) and
     non-free versions 1.10 and 1.20
   * support for Coq 8.4pl6 (released Apr 9, 2015)
   * support for Coq 8.5 (released Jan 21, 2016)
   * support for Gappa 1.2.0 (released May 19, 2015)
-  * discarded support for Isabelle 2014 :x:
+  * dropped support for Isabelle 2014 :x:
   * support for Isabelle 2015 (released May 25, 2015) and
     Isabelle 2016 (released Feb 17, 2016)
   * support for Z3 4.4.0 (released Apr 29, 2015) and
@@ -378,7 +379,7 @@ Provers
   * new version of prover: Coq 8.4pl3
   * new version of prover: Gappa 1.1.0
   * new version of prover: E prover 1.8
-  * Coq 8.3 is no longer supported :x:
+  * dropped support for Coq 8.3 :x:
   * improved support for Isabelle2013-2
   * fixed Coq printer (former Coq proofs may have to be updated, with
     extra qualification of imported symbols) :x:

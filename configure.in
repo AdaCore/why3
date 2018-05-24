@@ -667,40 +667,25 @@ if test "$enable_coq_support" = yes; then
    COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
    AC_MSG_CHECKING(Coq version)
    COQVERSION=[`$COQC -v | sed -n -e 's|.*version *\([^ ]*\) .*$|\1|p'`]
+   AC_MSG_RESULT($COQVERSION)
 
    #Even if the name of the variable is CAMLP4 the value can be camlp5
    COQCAMLP=[`$COQC -config | sed -n -e 's/CAMLP[45]O=\(.*\)$/\1/p'`]
    COQCAMLPLIB=[`$COQC -config | sed -n -e 's/CAMLP[45]LIB=\(.*\)$/\1/p'`]
+   COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
 
    case $COQVERSION in
-      8.4*)
-         coq_compat_version="COQ84"
-         COQPPLIBS="$COQLIB/parsing/grammar.cma"
-         AC_MSG_RESULT($COQVERSION)
-         if test "$enable_coq_tactic" = yes; then
-            enable_coq_tactic=no
-            reason_coq_tactic=" (coq >= 8.5 not found)"
-         fi
-         ;;
       8.5*)
          coq_compat_version="COQ85"
-         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
-         AC_MSG_RESULT($COQVERSION)
          ;;
       8.6*)
          coq_compat_version="COQ86"
-         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
-         AC_MSG_RESULT($COQVERSION)
          ;;
       8.7*)
          coq_compat_version="COQ87"
-         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
-         AC_MSG_RESULT($COQVERSION)
          ;;
       8.8*)
          coq_compat_version="COQ88"
-         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
-         AC_MSG_RESULT($COQVERSION)
          if test "$enable_coq_tactic" = yes; then
             enable_coq_tactic=no
             reason_coq_tactic=" (coq <= 8.7 not found)"
@@ -708,8 +693,8 @@ if test "$enable_coq_support" = yes; then
          ;;
       *)
          enable_coq_support=no
-         AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
-         reason_coq_support=" (version is $COQVERSION but need version 8.4 or later)"
+         AC_MSG_WARN(You need Coq 8.5 or later; Coq discarded)
+         reason_coq_support=" (version is $COQVERSION but need version 8.5 or later)"
          ;;
    esac
 fi
