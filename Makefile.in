@@ -1664,36 +1664,79 @@ endif
 ALTERGODIR=src/trywhy3/alt-ergo
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
-        -package ocplib-simplex -syntax camlp4o -I src/trywhy3 \
-	-I $(ALTERGODIR)/src/util \
-	-I $(ALTERGODIR)/src/structures \
-	-I $(ALTERGODIR)/src/parsing \
-	-I $(ALTERGODIR)/src/preprocess \
-	-I $(ALTERGODIR)/src/theories \
-	-I $(ALTERGODIR)/src/instances \
-	-I $(ALTERGODIR)/src/sat \
-	-I $(ALTERGODIR)/src/main
+        -package ocplib-simplex -I src/trywhy3 \
+	-I $(ALTERGODIR)/lib/util \
+	-I $(ALTERGODIR)/lib/structures \
+	-I $(ALTERGODIR)/lib/parsing \
+	-I $(ALTERGODIR)/lib/frontend \
+	-I $(ALTERGODIR)/lib/reasoners \
+	-I $(ALTERGODIR)/parsers/why
 
-ALTERGOMODS=util/config util/version util/emap util/myUnix util/myDynlink \
-	util/myZip util/util util/lists util/numsNumbers util/numbers \
-	util/timers util/options util/gc_debug util/loc util/hashcons \
+ALTERGOLIBS = \
+	util/config \
+	util/version \
+	util/emap \
+	util/myUnix \
+	util/myDynlink \
+	util/myZip \
+	util/util \
+	util/lists \
+	util/numsNumbers \
+	util/numbers \
+	util/options \
+	util/cmdline_parser \
+	util/timers \
+	util/gc_debug \
+	util/loc \
+	util/hconsing \
 	util/hstring \
-	structures/exception structures/symbols structures/ty \
-	structures/parsed structures/typed structures/term structures/literal \
-	structures/formula structures/explanation structures/errors \
-	util/profiling_default util/profiling \
-	parsing/why_parser parsing/why_lexer \
-	preprocess/existantial preprocess/triggers preprocess/why_typing \
-	preprocess/cnf \
-	instances/matching instances/instances \
-	theories/polynome theories/ac theories/uf theories/use \
-	theories/intervals theories/inequalities theories/intervalCalculus \
-	theories/arith theories/records theories/bitv theories/arrays \
-	theories/sum theories/combine theories/ccx theories/theory \
-	sat/sat_solvers \
-	main/frontend
+	structures/exception \
+	structures/symbols \
+	structures/ty \
+	structures/parsed \
+	structures/errors \
+	structures/typed \
+	structures/term \
+	structures/fpa_rounding \
+	structures/literal \
+	structures/formula \
+	structures/explanation \
+	structures/commands \
+	structures/profiling \
+	reasoners/matching \
+	reasoners/instances \
+	reasoners/polynome \
+	reasoners/ac \
+	reasoners/uf \
+	reasoners/use \
+	reasoners/intervals \
+	reasoners/inequalities \
+	reasoners/intervalCalculus \
+	reasoners/arith \
+	reasoners/records \
+	reasoners/bitv \
+	reasoners/arrays \
+	reasoners/sum \
+	reasoners/combine \
+	reasoners/ccx \
+	reasoners/theory \
+	reasoners/fun_sat \
+	reasoners/sat_solver \
+	frontend/triggers \
+	frontend/typechecker \
+	frontend/cnf \
+	frontend/parsed_interface \
+	frontend/frontend \
+	frontend/parsers
 
-ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+ALTERGOPARSERS = \
+	why/why_parser \
+	why/why_lexer
+
+ALTERGOCMO = \
+	$(addprefix $(ALTERGODIR)/lib/, $(addsuffix .cmo,$(ALTERGOLIBS))) \
+	$(addprefix $(ALTERGODIR)/parsers/, $(addsuffix .cmo,$(ALTERGOPARSERS)))
+
 TRYWHY3CMO=lib/why3/why3.cma
 TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	README examples/ \
@@ -1720,7 +1763,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
-src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
+src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 		`find stdlib \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
@@ -1744,6 +1787,10 @@ src/trywhy3/%.cmo: src/trywhy3/%.ml
 
 src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
+
+src/trywhy3/%.cmo: BFLAGS += -w -48
+
+src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo: BFLAGS += -syntax camlp4o
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
