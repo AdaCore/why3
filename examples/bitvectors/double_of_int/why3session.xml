@@ -9,6 +9,8 @@
 <prover id="5" name="Coq" version="8.7.1" timelimit="60" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="4000"/>
+<prover id="11" name="CVC4" version="1.5" timelimit="30" steplimit="0" memlimit="4000"/>
 <file name="../double_of_int.why" proved="true">
 <theory name="DoubleOfInt" proved="true">
  <goal name="nth_j1" proved="true">
@@ -86,7 +88,7 @@
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="exp_const" proved="true">
- <proof prover="5" timelimit="30" edited="double_of_int_DoubleOfInt_exp_const_1.v"><result status="valid" time="0.61"/></proof>
+ <proof prover="5" timelimit="30" edited="double_of_int_DoubleOfInt_exp_const_1.v"><result status="valid" time="0.80"/></proof>
  </goal>
  <goal name="to_nat_mantissa_1" proved="true">
  <proof prover="1"><result status="valid" time="0.05" steps="91"/></proof>
@@ -165,7 +167,11 @@
  <proof prover="5" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_pos_1.v"><result status="valid" time="1.76"/></proof>
  </goal>
  <goal name="lemma1_pos" proved="true">
- <proof prover="5" timelimit="6" edited="double_of_int_DoubleOfInt_lemma1_pos_1.v"><result status="valid" time="1.44"/></proof>
+ <transf name="split_all_full" proved="true" >
+  <goal name="lemma1_pos.0" proved="true">
+  <proof prover="10" timelimit="10"><result status="valid" time="7.14" steps="1022"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="jpxorx_neg" proved="true">
  <proof prover="2"><result status="valid" time="0.07"/></proof>
@@ -174,10 +180,14 @@
  <proof prover="8"><result status="valid" time="0.19"/></proof>
  </goal>
  <goal name="from_int2c_to_nat_sub_neg" proved="true">
- <proof prover="5" timelimit="5" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"><result status="valid" time="2.06"/></proof>
+ <proof prover="5" timelimit="5" edited="double_of_int_DoubleOfInt_from_int2c_to_nat_sub_neg_1.v"><result status="valid" time="2.50"/></proof>
  </goal>
  <goal name="lemma1_neg" proved="true">
- <proof prover="5" timelimit="10" edited="double_of_int_DoubleOfInt_lemma1_neg_1.v"><result status="valid" time="0.52"/></proof>
+ <transf name="split_all_full" proved="true" >
+  <goal name="lemma1_neg.0" proved="true">
+  <proof prover="10" timelimit="10"><result status="valid" time="5.21" steps="827"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="lemma1" proved="true">
  <proof prover="1"><result status="valid" time="0.06" steps="95"/></proof>
@@ -190,7 +200,18 @@
  <proof prover="4" timelimit="10"><result status="valid" time="3.24"/></proof>
  </goal>
  <goal name="to_nat_bv32_bv64_aux" proved="true">
- <proof prover="5" timelimit="5" edited="double_of_int_DoubleOfInt_to_nat_bv32_bv64_aux_1.v"><result status="valid" time="2.08"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="to_nat_bv32_bv64_aux.0" proved="true">
+  <transf name="induction" proved="true" arg1="j">
+   <goal name="to_nat_bv32_bv64_aux.0.0" expl="base case" proved="true">
+   <proof prover="10" memlimit="1000"><result status="valid" time="0.58" steps="333"/></proof>
+   </goal>
+   <goal name="to_nat_bv32_bv64_aux.0.1" expl="recursive case" proved="true">
+   <proof prover="10" memlimit="1000"><result status="valid" time="0.62" steps="305"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="to_nat_bv32_bv64" proved="true">
  <proof prover="1"><result status="valid" time="0.06" steps="90"/></proof>
@@ -213,7 +234,19 @@
  <proof prover="8"><result status="valid" time="0.88"/></proof>
  </goal>
  <goal name="lemma2" proved="true">
- <proof prover="5" edited="double_of_int_DoubleOfInt_lemma2_1.v"><result status="valid" time="18.68"/></proof>
+ <transf name="split_all_full" proved="true" >
+  <goal name="lemma2.0" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="lemma2.0.0" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="lemma2.0.0.0" proved="true">
+    <proof prover="11"><result status="valid" time="6.26"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="nth_var4" proved="true">
  <proof prover="1"><result status="valid" time="1.18" steps="148"/></proof>
@@ -267,7 +300,7 @@
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="var_value0" proved="true">
- <proof prover="5" timelimit="30" edited="double_of_int_DoubleOfInt_var_value0_1.v"><result status="valid" time="3.19"/></proof>
+ <proof prover="5" timelimit="0" memlimit="0" edited="double_of_int_DoubleOfInt_var_value0_1.v"><result status="valid" time="4.20"/></proof>
  </goal>
  <goal name="from_int_sum" proved="true">
  <proof prover="1"><result status="valid" time="0.05" steps="92"/></proof>
