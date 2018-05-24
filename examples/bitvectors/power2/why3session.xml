@@ -6,9 +6,9 @@
 <prover id="1" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../power2.why" proved="true">
@@ -20,10 +20,50 @@
  <proof prover="10"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="Power_sum" proved="true">
- <proof prover="4" edited="power2_Pow2int_Power_sum_1.v"><result status="valid" time="0.71"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="Power_sum.0" proved="true">
+  <transf name="induction" proved="true" arg1="n">
+   <goal name="Power_sum.0.0" expl="base case" proved="true">
+   <proof prover="7"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+   <goal name="Power_sum.0.1" expl="recursive case" proved="true">
+   <transf name="replace" proved="true" arg1="(n+m)" arg2="((n-1)+(m+1))">
+    <goal name="Power_sum.0.1.0" expl="recursive case" proved="true">
+    <transf name="instantiate" proved="true" arg1="Hrec" arg2="(n-1)">
+     <goal name="Power_sum.0.1.0.0" expl="recursive case" proved="true">
+     <proof prover="7"><result status="valid" time="0.01" steps="15"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="Power_sum.0.1.1" proved="true">
+    <proof prover="5"><result status="valid" time="0.00"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="pow2pos" proved="true">
- <proof prover="4" edited="power2_Pow2int_pow2pos_1.v"><result status="valid" time="0.73"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="pow2pos.0" proved="true">
+  <transf name="induction" proved="true" arg1="i">
+   <goal name="pow2pos.0.0" expl="base case" proved="true">
+   <proof prover="5"><result status="valid" time="0.00"/></proof>
+   </goal>
+   <goal name="pow2pos.0.1" expl="recursive case" proved="true">
+   <transf name="replace" proved="true" arg1="i" arg2="((i-1)+1)">
+    <goal name="pow2pos.0.1.0" expl="recursive case" proved="true">
+    <proof prover="7"><result status="valid" time="0.00" steps="10"/></proof>
+    </goal>
+    <goal name="pow2pos.0.1.1" proved="true">
+    <proof prover="5"><result status="valid" time="0.00"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="pow2_0" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
@@ -433,7 +473,32 @@
  <proof prover="10"><result status="valid" time="0.24" steps="99"/></proof>
  </goal>
  <goal name="Mod_pow2_gen" proved="true">
- <proof prover="4" edited="power2_Pow2int_Mod_pow2_gen_1.v"><result status="valid" time="0.86"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="Mod_pow2_gen.0" proved="true">
+  <transf name="replace" proved="true" arg1="(x+pow2 i)" arg2="(pow2 k*pow2(i-k)+x)">
+   <goal name="Mod_pow2_gen.0.0" proved="true">
+   <transf name="rewrite" proved="true" arg1="Div_mult">
+    <goal name="Mod_pow2_gen.0.0.0" proved="true">
+    <transf name="replace" proved="true" arg1="(pow2 (i-k))" arg2="(2*pow2(i-k-1))">
+     <goal name="Mod_pow2_gen.0.0.0.0" proved="true">
+     <proof prover="5"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="Mod_pow2_gen.0.0.0.1" proved="true">
+     <proof prover="5"><result status="valid" time="0.05"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="Mod_pow2_gen.0.0.1" proved="true">
+    <proof prover="5"><result status="valid" time="0.04"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="Mod_pow2_gen.0.1" proved="true">
+   <proof prover="5"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 <theory name="Pow2real" proved="true">
@@ -483,7 +548,18 @@
  </transf>
  </goal>
  <goal name="Power_neg_aux" proved="true">
- <proof prover="4" edited="power2_Pow2real_Power_neg_aux_1.v"><result status="valid" time="0.85"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="Power_neg_aux.0" proved="true">
+  <transf name="induction" proved="true" arg1="n">
+   <goal name="Power_neg_aux.0.0" expl="base case" proved="true">
+   <proof prover="7"><result status="valid" time="0.00" steps="7"/></proof>
+   </goal>
+   <goal name="Power_neg_aux.0.1" expl="recursive case" proved="true">
+   <proof prover="7"><result status="valid" time="0.03" steps="62"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="Power_non_null" proved="true">
  <proof prover="5"><result status="valid" time="0.02"/></proof>
@@ -492,13 +568,42 @@
  <proof prover="10"><result status="valid" time="0.02" steps="42"/></proof>
  </goal>
  <goal name="Power_sum_aux" proved="true">
- <proof prover="4" edited="power2_Pow2real_Power_sum_aux_1.v"><result status="valid" time="0.82"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="Power_sum_aux.0" proved="true">
+  <transf name="induction" proved="true" arg1="m">
+   <goal name="Power_sum_aux.0.0" expl="base case" proved="true">
+   <proof prover="7"><result status="valid" time="0.00" steps="7"/></proof>
+   </goal>
+   <goal name="Power_sum_aux.0.1" expl="recursive case" proved="true">
+   <proof prover="7"><result status="valid" time="0.53" steps="191"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="Power_sum" proved="true">
  <proof prover="1"><result status="valid" time="3.43"/></proof>
  </goal>
  <goal name="Pow2_int_real" proved="true">
- <proof prover="4" edited="power2_Pow2real_Pow2_int_real_1.v"><result status="valid" time="0.68"/></proof>
+ <transf name="introduce_premises" proved="true" >
+  <goal name="Pow2_int_real.0" proved="true">
+  <transf name="induction" proved="true" arg1="x">
+   <goal name="Pow2_int_real.0.0" expl="base case" proved="true">
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="Pow2_int_real.0.1" expl="recursive case" proved="true">
+   <transf name="replace" proved="true" arg1="x" arg2="((x-^1)+^1)">
+    <goal name="Pow2_int_real.0.1.0" expl="recursive case" proved="true">
+    <proof prover="7"><result status="valid" time="0.12" steps="135"/></proof>
+    </goal>
+    <goal name="Pow2_int_real.0.1.1" proved="true">
+    <proof prover="5"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

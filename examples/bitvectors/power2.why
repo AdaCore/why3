@@ -139,7 +139,7 @@ theory Pow2real
 
   lemma Power_neg : forall n:int. pow2 (-n) = 1.0 /. pow2 n
 
-  lemma Power_sum_aux : forall n m: int. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m
+  lemma Power_sum_aux : forall m n. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m
 
   lemma Power_sum : forall n m: int. pow2 (n+m) = pow2 n *. pow2 m
 
