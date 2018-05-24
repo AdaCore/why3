@@ -270,7 +270,7 @@ let analyse_result res_parser printer_mapping out =
 let backup_file f = f ^ ".save"
 
 
-let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
+let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
@@ -278,6 +278,7 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
   let ans, model =
+    if signaled then HighFailure, None else
     try List.assoc int_exitcode res_parser.prp_exitcodes, None
     with Not_found -> analyse_result res_parser printer_mapping out
       (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
@@ -324,7 +325,7 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
   in
    ***)
   { pr_answer = ans;
-    pr_status = Unix.WEXITED int_exitcode;
+    pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
@@ -412,8 +413,7 @@ let read_and_delete_file fn =
 
 let handle_answer answer =
   match answer with
-  | Prove_client.Finished answer ->
-      let id = answer.Prove_client.id in
+  | Prove_client.(Finished { id; time; timeout; out_file; exit_code }) ->
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
       let keep_vcs =
@@ -424,11 +424,11 @@ let handle_answer answer =
         Sys.remove save.vc_file;
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
-      let out = read_and_delete_file answer.Prove_client.out_file in
-      let ret = answer.Prove_client.exit_code in
+      let out = read_and_delete_file out_file in
+      let ret = exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-          answer.Prove_client.time out ret save.limit ~printer_mapping in
+          timeout time out ret save.limit ~printer_mapping in
       id, Some ans
   | Prove_client.Started id ->
       id, None
