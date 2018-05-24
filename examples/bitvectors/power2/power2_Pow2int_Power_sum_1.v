@@ -8,8 +8,8 @@ Parameter pow2: Z -> Z.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%Z).
 
-Axiom Power_s : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
+Axiom Power_s :
+  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
 
 Axiom Power_1 : ((pow2 1%Z) = 2%Z).
 
@@ -17,7 +17,8 @@ Open Scope Z_scope.
 Require Import Why3.
 
 (* Why3 goal *)
-Theorem Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
+Theorem Power_sum :
+  forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
 (* Why3 intros n m (h1,h2). *)
 intros n m (Hn & Hm).

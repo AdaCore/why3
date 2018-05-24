@@ -10,16 +10,17 @@ Parameter pow2: Z -> R.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%R).
 
-Axiom Power_s : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
+Axiom Power_s :
+  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
 
-Axiom Power_p : forall (n:Z), (n <= 0%Z)%Z ->
+Axiom Power_p :
+  forall (n:Z), (n <= 0%Z)%Z ->
   ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
 
 Axiom Power_s_all : forall (n:Z), ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
 
-Axiom Power_p_all : forall (n:Z),
-  ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
+Axiom Power_p_all :
+  forall (n:Z), ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
 
 Axiom Power_1_2 : ((05 / 10)%R = (1%R / 2%R)%R).
 
@@ -34,8 +35,8 @@ Ltac ae := why3 "alt-ergo" timelimit 2; admit.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Theorem Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (-n)%Z) = (1%R / (pow2 n))%R).
+Theorem Power_neg_aux :
+  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (-n)%Z) = (1%R / (pow2 n))%R).
 (* Why3 intros n h1. *)
 intros n Hn.
 generalize Hn.

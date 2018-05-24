@@ -10,12 +10,13 @@ Parameter pow2: Z -> Z.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%Z).
 
-Axiom Power_s : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
+Axiom Power_s :
+  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
 
 Axiom Power_1 : ((pow2 1%Z) = 2%Z).
 
-Axiom Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
+Axiom Power_sum :
+  forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
 
 Axiom pow2pos : forall (i:Z), (0%Z <= i)%Z -> (0%Z < (pow2 i))%Z.
@@ -148,24 +149,29 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
-Axiom Div_mult_inst : forall (x:Z) (z:Z), (0%Z < x)%Z ->
-  ((int.EuclideanDivision.div ((x * 1%Z)%Z + z)%Z
-  x) = (1%Z + (int.EuclideanDivision.div z x))%Z).
+Axiom Div_mult_inst :
+  forall (x:Z) (z:Z), (0%Z < x)%Z ->
+  ((int.EuclideanDivision.div ((x * 1%Z)%Z + z)%Z x) =
+   (1%Z + (int.EuclideanDivision.div z x))%Z).
 
-Axiom Div_double : forall (x:Z) (y:Z), ((0%Z < y)%Z /\ ((y <= x)%Z /\
-  (x < (2%Z * y)%Z)%Z)) -> ((int.EuclideanDivision.div x y) = 1%Z).
+Axiom Div_double :
+  forall (x:Z) (y:Z), ((0%Z < y)%Z /\ ((y <= x)%Z /\ (x < (2%Z * y)%Z)%Z)) ->
+  ((int.EuclideanDivision.div x y) = 1%Z).
 
-Axiom Div_pow : forall (x:Z) (i:Z), (0%Z < i)%Z ->
-  ((((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x < (pow2 i))%Z) ->
-  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z)).
+Axiom Div_pow :
+  forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  (((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x < (pow2 i))%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z).
 
-Axiom Div_double_neg : forall (x:Z) (y:Z), ((((-2%Z)%Z * y)%Z <= x)%Z /\
-  ((x < (-y)%Z)%Z /\ ((-y)%Z < 0%Z)%Z)) -> ((int.EuclideanDivision.div x
-  y) = (-2%Z)%Z).
+Axiom Div_double_neg :
+  forall (x:Z) (y:Z),
+  ((((-2%Z)%Z * y)%Z <= x)%Z /\ ((x < (-y)%Z)%Z /\ ((-y)%Z < 0%Z)%Z)) ->
+  ((int.EuclideanDivision.div x y) = (-2%Z)%Z).
 
-Axiom Div_pow2 : forall (x:Z) (i:Z), (0%Z < i)%Z ->
-  ((((-(pow2 i))%Z <= x)%Z /\ (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) ->
-  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z)).
+Axiom Div_pow2 :
+  forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  (((-(pow2 i))%Z <= x)%Z /\ (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
 
 Open Scope Z_scope.
 
@@ -174,11 +180,11 @@ Ltac ae := why3 "alt-ergo" timelimit 3; admit.
 
 
 (* Why3 goal *)
-Theorem Mod_pow2_gen : forall (x:Z) (i:Z) (k:Z), ((0%Z <= k)%Z /\
-  (k < i)%Z) ->
-  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div (x + (pow2 i))%Z
-  (pow2 k)) 2%Z) = (int.EuclideanDivision.mod1 (int.EuclideanDivision.div x
-  (pow2 k)) 2%Z)).
+Theorem Mod_pow2_gen :
+  forall (x:Z) (i:Z) (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) ->
+  ((int.EuclideanDivision.mod1
+    (int.EuclideanDivision.div (x + (pow2 i))%Z (pow2 k)) 2%Z)
+   = (int.EuclideanDivision.mod1 (int.EuclideanDivision.div x (pow2 k)) 2%Z)).
 (* Why3 intros x i k (h1,h2). *)
 (* intros x i k (h1,h2). *)
 intros x i k (h1,h2).
