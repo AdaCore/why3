@@ -34,6 +34,7 @@ Standard library
 Extraction
   * improved extraction to OCaml
   * added partial extraction to C using the memory model of `mach.c`
+  * added extraction to CakeML (using 'why3 extract -D cakeml ...')
 
 Transformations
   * transformations can now have arguments
