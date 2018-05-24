@@ -30,6 +30,10 @@ why3_vc even_2k by simp
 
 why3_vc odd_2k1 by simp
 
+why3_vc even_mod2
+  apply (simp add: even_def cmod_def)
+  by (metis abs_mult abs_mult_sgn abs_numeral mult.assoc mult_zero_right zmod_eq_0_iff)
+
 why3_end
 
 
@@ -37,7 +41,8 @@ section {* Divisibility *}
 
 why3_open "number/Divisibility.xml"
 
-why3_vc divides_def by (simp add: dvd_def mult.commute)
+why3_vc divides_def
+  by (metis ComputerDivision.facts.Div_mod abs_mult add.right_neutral cmod_def dvd_0_left_iff dvd_def mult_zero_right zmod_eq_0_iff)
 
 why3_vc divides_refl by simp
 
@@ -101,6 +106,9 @@ why3_vc divides_mod_computer
 why3_vc even_divides ..
 
 why3_vc odd_divides ..
+
+why3_vc divides_spec
+  by (metis divides_factorl dvd_div_mult_self)
 
 why3_end
 

@@ -6,25 +6,24 @@ section {* Generic Maps *}
 
 why3_open "map/Map.xml"
 
-why3_vc Select_eq
-  using assms
-  by simp
-
-why3_vc Select_neq
-  using assms
-  by simp
+why3_vc set_def by auto
 
 why3_end
 
 
 section {* Constant Maps *}
 
-why3_open "map/Const.xml"
+definition abs_const :: "'a \<Rightarrow> ('b \<Rightarrow> 'a)" where
+  "abs_const v y = v"
 
-why3_vc Const by simp
+why3_open "map/Const.xml"
+  constants
+    const=abs_const
+
+why3_vc const_def
+  by (simp add: abs_const_def)
 
 why3_end
-
 
 section {* Number of occurrences *}
 
@@ -92,8 +91,44 @@ proof -
   then show ?thesis by (simp add: occ_def)
 qed
 
-why3_end
+(* We use occ_append to decompose into {l..<i} {i} {i+1..<j} {j} {j+1..<u} and this complete the
+   proof
+*)
+lemma occ_exchange2:
+  assumes "l \<le> i \<and> i < u \<and> l \<le> j \<and> j < u \<and> i < j"
+  shows "occ z (m(i := x, j := y)) l u = occ z (m(i := y, j := x)) l u"
+proof -
+  from assms have h1: 
+    "occ z (m (i := x, j := y)) l i + occ z (m (i := x, j := y)) i (i+1) + occ z (m (i := x, j := y)) (i+1) j + 
+     occ z (m (i := x, j := y)) j (j+1) + occ z (m (i := x, j := y)) (j+1) u =
+       occ z (m (i := x, j := y)) l u"
+    by (smt occ_append)
+  from assms have h2:
+    "occ z (m (i := y, j := x)) l i + occ z (m (i := y, j := x)) i (i+1) + occ z (m (i := y, j := x)) (i+1) j + 
+     occ z (m (i := y, j := x)) j (j+1) + occ z (m (i := y, j := x)) (j+1) u =
+       occ z (m (i := y, j := x)) l u"
+    by (smt occ_append)
+  show ?thesis
+    by (smt h1 h2 assms facts.set_def occ_bounds(1) occ_eq occ_exists occ_right_add)
+qed
 
+why3_vc occ_exchange
+  using assms
+  by (smt fun_upd_twist occ_exchange2)
+
+why3_vc occ_left_add
+proof -
+  from assms have "{l..<u} = {l} \<union> {l + 1..<u}" by auto
+  with assms show ?thesis by (simp add: occ_def)
+qed
+
+why3_vc occ_left_no_add
+proof -
+  from assms have "{l..<u} = {l} \<union> {l + 1..<u}" by auto
+  with assms show ?thesis by (simp add: occ_def)
+qed
+
+why3_end
 
 why3_open "map/MapPermut.xml"
 

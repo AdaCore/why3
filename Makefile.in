@@ -1503,6 +1503,7 @@ endif
 
 install-isabelle: $(GENERATED_PREFIX_ISABELLE)/last_build
 
+install_local:: install-isabelle
 install:: install-isabelle
 
 clean::
