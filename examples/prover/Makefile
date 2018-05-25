@@ -89,5 +89,5 @@ depend: .depend
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
-	rm -f $(BD)/*__*.ml
+	rm -f $(BD)*.ml
 	rm -f *~ *.o *.cmi *.cmx build/prover

@@ -309,8 +309,10 @@ let e_app rs pvl =
 let e_fun args e = mk_expr (Efun (args, e))
 
 let e_ignore e =
-  if is_unit e.e_ity then e
-  else mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_label
+  (* TODO : avoid ignore around a unit type expresson *)
+  (* if is_unit e.e_ity then begin Format.eprintf "hit!@."; e end
+   * else *)
+  mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_label
 
 let e_if e1 e2 e3 =
   mk_expr (Eif (e1, e2, e3)) e2.e_ity

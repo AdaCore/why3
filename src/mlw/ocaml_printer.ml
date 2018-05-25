@@ -352,12 +352,11 @@ module Print = struct
                 (print_expr ~paren:true info) t
           | [], tl ->
               fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-                (print_list comma (print_expr info)) tl
-          | pjl, tl ->
-              let equal fmt () = fprintf fmt " = " in
-              fprintf fmt "@[<hov 2>{ @[%a@] }@]"
-                (print_list2 semi equal (print_rs info) (print_expr info))
-                (pjl, tl) end
+                (print_list comma (print_expr ~paren:true info)) tl
+          | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
+              fprintf fmt "@[<hov 2>{ %a }@]"
+                (print_list2 semi equal (print_rs info)
+                   (print_expr ~paren:true info)) (pjl, tl) end
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
     | _, _, tl ->
@@ -586,7 +585,7 @@ module Print = struct
       | l -> fprintf fmt "@[<hov 4>| %a of %a@]" (print_uident info) id
                (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
-      fprintf fmt "%s%a: %a;" (if is_mutable then "mutable " else "")
+      fprintf fmt "%s%a: @[%a@];" (if is_mutable then "mutable " else "")
         (print_lident info) id (print_ty ~paren:false info) ty in
     let print_def fmt = function
       | None ->
