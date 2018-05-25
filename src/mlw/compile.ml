@@ -266,7 +266,7 @@ module Translate = struct
     | Elet (LDvar (pv, e1), e2)
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
         if eff_pure e1.e_effect then expr info svar mask e2
-        else let e1 = ML.e_ignore (expr info svar MaskGhost e1) in
+        else let e1 = ML.e_ignore e1.e_ity (expr info svar MaskGhost e1) in
           ML.e_seq e1 (expr info svar mask e2) (ML.I e.e_ity) mask eff lbl
     | Elet (LDvar (pv, e1), e2) ->
         Debug.dprintf debug_compile "compiling local definition of %s@."
