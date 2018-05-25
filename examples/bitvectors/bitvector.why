@@ -198,14 +198,16 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. size > j /\ i >= 0 ->
+    forall b:bv, j i:int. size > j /\ i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
-  lemma to_nat_of_one:
-    forall b:bv, i j:int. size > j >= i >= 0 ->
-      (forall k:int. j >= k >= i -> nth b k = True) ->
-      to_nat_sub b j i = pow2 (j-i+1) - 1
+  let rec lemma to_nat_of_one (b: bv) i j
+    requires { size > j >= i >= 0 }
+    requires { forall k:int. j >= k >= i -> nth b k = True }
+    ensures  { to_nat_sub b j i = pow2 (j-i+1) - 1 }
+    variant  { j - i }
+  = if j > i then to_nat_of_one b i (j-1)
 
   lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int. size > j /\ i >=0 ->
     (forall k:int. i <= k <= j -> nth b1 k = nth b2 k) ->
