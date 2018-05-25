@@ -7,13 +7,22 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 var Why3HighlightRules = function() {
 
     var keywords = (
-      "abstract|axiom|by|clone|coinductive|constant|end|exception|" +
-      "export|function|goal|ghost|import|inductive|lemma|meta|mutable|" +
-      "module|namespace|predicate|private|so|theory|type|use|val|with|" +
-      "begin|do|done|downto|else|exists|for|forall|if|in|let|loop|match|" +
-      "raise|rec|then|to|try|while|absurd|assert|assume|diverges|ensures|" +
-      "check|invariant|raises|reads|requires|result|returns|self|variant|" +
-      "writes"
+        "as|axiom|by|clone|coinductive|constant|" +
+        "else|end|epsilon|exists|export|" +
+        "false|float|forall|function|" +
+        "goal|if|import|in|inductive|" +
+        "lemma|let|match|meta|not|predicate|" +
+        "range|scope|so|then|theory|true|type|use|with|" +
+        // programs
+        "abstract|any|at|" +
+        "begin|break|continue|do|done|downto|exception|" +
+        "for|fun|ghost|label|module|mutable|" +
+        "old|private|pure|raise|rec|return|" +
+        "to|try|val|while|" +
+        // specification
+        "absurd|alias|assert|assume|" +
+        "check|diverges|ensures|invariant|" +
+        "raises|reads|requires|returns|variant|writes"
     );
 
     var builtinConstants = ("true|false");
@@ -77,10 +86,6 @@ var Why3HighlightRules = function() {
                 token : "string", // " string
                 regex : '"',
                 next  : "qstring"
-            },
-            {
-                token : "constant.numeric", // imaginary
-                regex : "(?:" + floatNumber + "|\\d+)[jJ]\\b"
             },
             {
                 token : "constant.numeric", // float
