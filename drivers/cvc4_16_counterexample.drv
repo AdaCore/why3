@@ -1,13 +1,14 @@
 (** Why3 driver for CVC4 >= 1.5 *)
 
-prelude ";; produced by cvc4_15.drv ;;"
+prelude ";; produced by cvc4_16_counterexample.drv ;;"
 prelude "(set-info :smt-lib-version 2.5)"
-prelude "(set-logic AUFBVDTNIRA)"
+prelude "(set-logic AUFBVFPDTNIRA)"
 
 (*
     A    : Array
     UF   : Uninterpreted Function
     BV   : BitVectors
+    FP   : FloatingPoint
     DT   : Datatypes
     NIRA : NonLinear Integer+Real Arithmetic
 *)
@@ -21,6 +22,7 @@ model_parser "smtv2"
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
 import "cvc4_bv.gen"
+import "smt-libv2-floats.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -53,25 +55,6 @@ Unfortunately, there is no specific output message when CVC4 reaches its resourc
 steplimitexceeded "??"
 *)
 
-(** Extra theories supported by CVC4 *)
-
-(* CVC4 division seems to be the Euclidean one, not the Computer one *)
-theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
+theory BuiltIn
+  meta "get_counterexmp" ""
 end
-
-(*
-theory int.ComputerDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
-*)

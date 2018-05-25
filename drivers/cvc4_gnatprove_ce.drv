@@ -1,5 +1,7 @@
-import "cvc4_15_counterexample.drv"
+import "cvc4_16_counterexample.drv"
 import "smt-libv2-gnatprove.gen"
+import "smt-libv2-floats-gnatprove.gen"
+import "smt-libv2-floats-int_via_real.gen"
 
 theory ieee_float.GenericFloat
  remove prop le_special
@@ -19,3 +21,18 @@ end
 theory real.Square
  remove allprops
 end
+
+(*
+  Disabled because this triggers counterexamples regression in mod vs rem inside
+  riposte_viktor__divmod* test.
+
+theory int.ComputerDivision
+  prelude "(define-fun __cdiv ((x Int) (y Int)) Int (ite (>= x 0) (div x y) (- (div (- x) y))))"
+  prelude "(define-fun __cmod ((x Int) (y Int)) Int (ite (>= x 0) (mod x y) (- (mod (- x) y))))"
+
+  syntax function div "(__cdiv %1 %2)"
+  syntax function mod "(__cmod %1 %2)"
+
+  remove allprops
+end
+*)
