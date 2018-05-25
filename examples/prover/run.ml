@@ -1,10 +1,6 @@
 
-open Firstorder_symbol_impl__Types
-open Firstorder_term_impl__Types
-open Firstorder_formula_impl__Types
-open Firstorder_formula_list_impl__Types
-
 open Format
+open Prover
 
 let pr_symbol fmt s =
   match s with
@@ -73,35 +69,35 @@ let run_test name l =
   Format.printf "Running the test '%s'@." name;
   Format.printf "Formulas: %a@." pr_formula_list_impl l;
   let t = Unix.gettimeofday () in
-  let n = ProverMain__Impl.main l (n 1) in
+  let n = Prover.main l (n 1) in
   let t = Unix.gettimeofday () -. t in
   Format.printf "Unsat (time = %.02f, depth=%s)@.@." t
                 (Why3extract.Why3__BigInt.to_string n)
 
 let run_all_tests () =
-  run_test "drinker" (ProverTest__Impl.drinker ());
-  run_test "group" (ProverTest__Impl.group ());
-  run_test "bidon1" (ProverTest__Impl.bidon1 ());
-  run_test "bidon2" (ProverTest__Impl.bidon2 ());
-  run_test "bidon3" (ProverTest__Impl.bidon3 ());
-  run_test "bidon4" (ProverTest__Impl.bidon4 ());
-  run_test "pierce" (ProverTest__Impl.pierce ());
-  run_test "zenon5" (ProverTest__Impl.zenon5 ());
+  run_test "drinker" (Prover.drinker ());
+  run_test "group" (Prover.group ());
+  run_test "bidon1" (Prover.bidon1 ());
+  run_test "bidon2" (Prover.bidon2 ());
+  run_test "bidon3" (Prover.bidon3 ());
+  run_test "bidon4" (Prover.bidon4 ());
+  run_test "pierce" (Prover.pierce ());
+  run_test "zenon5" (Prover.zenon5 ());
 (* too long -> sat ?
-  run_test "zenon6" (ProverTest__Impl.zenon6 ());
+  run_test "zenon6" (Prover.zenon6 ());
 *)
-  run_test "zenon10 2" (ProverTest__Impl.zenon10 (n 2));
+  run_test "zenon10 2" (Prover.zenon10 (n 2));
 (* too long -> sat !
-  run_test "zenon10 3" (ProverTest__Impl.zenon10 (n 3))
+  run_test "zenon10 3" (Prover.zenon10 (n 3))
 *)
-  run_test "zenon10 4" (ProverTest__Impl.zenon10 (n 4));
-  run_test "zenon10 6" (ProverTest__Impl.zenon10 (n 6));
-  run_test "zenon10 8" (ProverTest__Impl.zenon10 (n 8));
-  run_test "zenon10 10" (ProverTest__Impl.zenon10 (n 10));
-  run_test "zenon10 12" (ProverTest__Impl.zenon10 (n 12));
+  run_test "zenon10 4" (Prover.zenon10 (n 4));
+  run_test "zenon10 6" (Prover.zenon10 (n 6));
+  run_test "zenon10 8" (Prover.zenon10 (n 8));
+  run_test "zenon10 10" (Prover.zenon10 (n 10));
+  run_test "zenon10 12" (Prover.zenon10 (n 12));
 (* warning: the following needs around 6 minutes *)
 (*
-  run_test "zenon10 14" (ProverTest__Impl.zenon10 (n 14));
+  run_test "zenon10 14" (Prover.zenon10 (n 14));
 *)
   printf "End of tests.@."
 
@@ -116,8 +112,7 @@ exception Ill_Typed of string
 let ill_typed s = raise (Ill_Typed s)
 
 let mk_not f =
-  let o = Firstorder_formula_impl__Types.NLC_Not f in
-  Firstorder_formula_impl__Impl.construct_fo_formula o
+  let o = NLC_Not f in construct_fo_formula o
 
 type env =
   { cnf : bool;
@@ -165,49 +160,45 @@ let rec tr_term env e =
   | Eequ(e1,e2) -> ill_typed "'equ' in term"
   | Eapp(w,el) ->
     let fotnil =
-      let o = Firstorder_term_impl__Types.NLC_FONil in
-      Firstorder_term_impl__Impl.construct_fo_term_list o
+      let o = NLC_FONil in construct_fo_term_list o
     in
     let env,tl =
       List.fold_right
         (fun e (env,acc) ->
           let env,t = tr_term env e in
-          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
-          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+          let o = NLC_FOCons (t, acc) in
+          (env,construct_fo_term_list o))
         el
         (env,fotnil)
     in
     let env,sym = find_sym env w in
-    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
-    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
-    let o = Firstorder_term_impl__Types.NLC_App (sym, tl) in
-    env,Firstorder_term_impl__Impl.construct_fo_term o
+    let o = NLCVar_symbol sym in
+    let sym = construct_symbol o in
+    let o = NLC_App (sym, tl) in
+    env,construct_fo_term o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
   | Evar v ->
     let env,v = find_var env v in
     let o =
-      Firstorder_term_impl__Types.NLCVar_fo_term v
+      NLCVar_fo_term v
     in
-    env,Firstorder_term_impl__Impl.construct_fo_term o
+    env,construct_fo_term o
 
 let rec mk_bin_op op phi1 phi2 =
   let phi =
     match op with
     | BOequ -> unsupported "BOequ"
     | BOnequ -> unsupported "BOnequ"
-    | BOimp ->
-      Firstorder_formula_impl__Types.NLC_Or (mk_not phi1, phi2)
+    | BOimp -> NLC_Or (mk_not phi1, phi2)
     | BOpmi -> unsupported "BOpmi"
-    | BOand ->  Firstorder_formula_impl__Types.NLC_And (phi1, phi2)
-    | BOor -> Firstorder_formula_impl__Types.NLC_Or (phi1, phi2)
-    | BOnand ->
-      Firstorder_formula_impl__Types.NLC_Not (mk_bin_op BOand phi1 phi2)
-    | BOnor ->
-      Firstorder_formula_impl__Types.NLC_Not (mk_bin_op BOor phi1 phi2)
+    | BOand -> NLC_And (phi1, phi2)
+    | BOor -> NLC_Or (phi1, phi2)
+    | BOnand -> NLC_Not (mk_bin_op BOand phi1 phi2)
+    | BOnor -> NLC_Not (mk_bin_op BOor phi1 phi2)
   in
-  Firstorder_formula_impl__Impl.construct_fo_formula phi
+  construct_fo_formula phi
 
 let rec tr_fmla env e =
   match e.e_node with
@@ -231,17 +222,17 @@ let rec tr_fmla env e =
         List.fold_right
           (fun n phi ->
             let o =
-              Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+              NLC_Forall (n,phi)
             in
-            Firstorder_formula_impl__Impl.construct_fo_formula o)
+            construct_fo_formula o)
           nl phi
       | Qexists ->
         List.fold_right
           (fun n phi ->
             let o =
-              Firstorder_formula_impl__Types.NLC_Exists (n,phi)
+              NLC_Exists (n,phi)
             in
-            Firstorder_formula_impl__Impl.construct_fo_formula o)
+            construct_fo_formula o)
           nl phi
     in env, phi
   | Ebin(op,e1,e2) ->
@@ -254,28 +245,28 @@ let rec tr_fmla env e =
   | Eequ(e1,e2) -> unsupported "equ"
   | Eapp(w,el) ->
     let fotnil =
-      let o = Firstorder_term_impl__Types.NLC_FONil in
-      Firstorder_term_impl__Impl.construct_fo_term_list o
+      let o = NLC_FONil in
+      construct_fo_term_list o
     in
     let env,tl =
       List.fold_right
         (fun e (env,acc) ->
           let env,t = tr_term env e in
-          let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
-          (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+          let o = NLC_FOCons (t, acc) in
+          (env,construct_fo_term_list o))
         el
         (env,fotnil)
     in
     let env,sym = find_sym env w in
-    let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
-    let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
-    let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
-    env,Firstorder_formula_impl__Impl.construct_fo_formula o
+    let o = NLCVar_symbol sym in
+    let sym = construct_symbol o in
+    let o = NLC_PApp (sym, tl) in
+    env,construct_fo_formula o
   | Edef(DP(DPfalse),[]) ->
      let o =
-      Firstorder_formula_impl__Types.NLC_FFalse
+      NLC_FFalse
     in
-    env,Firstorder_formula_impl__Impl.construct_fo_formula o
+    env,construct_fo_formula o
   | Edef(w,el) -> unsupported "def"
   | Edob d -> unsupported "dob"
   | Enum n -> unsupported "num"
@@ -297,23 +288,23 @@ let tr_cnf env e =
     | Eequ(e1,e2) -> unsupported "equ"
     | Eapp(w,el) ->
       let fotnil =
-        let o = Firstorder_term_impl__Types.NLC_FONil in
-        Firstorder_term_impl__Impl.construct_fo_term_list o
+        let o = NLC_FONil in
+        construct_fo_term_list o
       in
       let env,tl =
         List.fold_right
           (fun e (env,acc) ->
             let env,t = tr_term env e in
-            let o = Firstorder_term_impl__Types.NLC_FOCons (t, acc) in
-            (env,Firstorder_term_impl__Impl.construct_fo_term_list o))
+            let o = NLC_FOCons (t, acc) in
+            (env,construct_fo_term_list o))
           el
           (env,fotnil)
       in
       let env,sym = find_sym env w in
-      let o = Firstorder_symbol_impl__Types.NLCVar_symbol sym in
-      let sym = Firstorder_symbol_impl__Impl.construct_symbol o in
-      let o = Firstorder_formula_impl__Types.NLC_PApp (sym, tl) in
-      env,Firstorder_formula_impl__Impl.construct_fo_formula o
+      let o = NLCVar_symbol sym in
+      let sym = construct_symbol o in
+      let o = NLC_PApp (sym, tl) in
+      env,construct_fo_formula o
     | Edef(w,el) -> unsupported "def in cnf"
     | Edob d -> unsupported "dob in cnf"
     | Enum n -> unsupported "num in cnf"
@@ -324,9 +315,9 @@ let tr_cnf env e =
     List.fold_right
       (fun (_,n) phi ->
         let o =
-          Firstorder_formula_impl__Types.NLC_Forall (n,phi)
+          NLC_Forall (n,phi)
         in
-        Firstorder_formula_impl__Impl.construct_fo_formula o)
+        construct_fo_formula o)
       env.var_assoc phi
   in
   { env with
@@ -372,14 +363,14 @@ let tr_decl (env,acc) d =
   | Formula(CNF,_,role,top_formula,_) -> unsupported "CNF"
   | Formula(kind,_,role,top_formula,_) ->
     let env,phi = tr_top_formula env kind role top_formula in
-    let o = Firstorder_formula_list_impl__Types.NLC_FOFCons (phi, acc) in
-    let acc = Firstorder_formula_list_impl__Impl.construct_fo_formula_list o in
+    let o = NLC_FOFCons (phi, acc) in
+    let acc = construct_fo_formula_list o in
     env,acc
 
 let tr_file a =
   let fonil =
-    let o = Firstorder_formula_list_impl__Types.NLC_FOFNil in
-    Firstorder_formula_list_impl__Impl.construct_fo_formula_list o
+    let o = NLC_FOFNil in
+    construct_fo_formula_list o
   in
   List.fold_left tr_decl (empty_env (),fonil) a
 

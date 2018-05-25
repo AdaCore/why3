@@ -20,26 +20,10 @@ ifeq ($(BENCH),yes)
 endif
 
 
-MLWUTIL=Nat
-
-MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
-	Firstorder_formula_impl Firstorder_formula_list_impl \
-	Firstorder_tableau_impl Unification FormulaTransformations \
-	Prover
-
-MLWIMPL=$(MLWTYPES) ProverMain ProverTest
-
 BD=prover
-#MLUTIL=$(patsubst %,$(BD)/%__Nat,$(MLWUTIL))
-#MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLWTYPES))
-#MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLWIMPL))
-#MLALL=$(MLUTIL) $(MLTYPES) $(MLIMPL)
-#ML=$(patsubst %,%.ml,$(MLALL))
-#CMX=$(patsubst %,%.cmx,$(MLALL))
 OCAMLC=ocamlopt.opt
-INCLUDES=-I $(BD) $(INCLUDEALL) -I ../../plugins/tptp
+INCLUDES=$(INCLUDEALL) -I ../../plugins/tptp
 LIBS=unix.cmxa nums.cmxa $(BIGINTLIB).cmxa dynlink.cmxa str.cmxa menhirLib.cmx zip.cmxa why3.cmxa why3extract.cmxa tptp_ast.cmx tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
-LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
 WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
