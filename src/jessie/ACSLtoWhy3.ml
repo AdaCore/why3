@@ -75,7 +75,7 @@ let () =
 
 open Cil_types
 open Why3
-
+open Wstdlib
 
 
 
@@ -207,7 +207,7 @@ let bv32_module =
 let bv32_type : Why3.Ity.itysymbol =
   Pmodule.ns_find_its bv32_module.Pmodule.mod_export ["t"]
 
-let bv32_to_int : Term.lsymbol = find bv32_module "to_uint"
+let bv32_to_int : Term.lsymbol = find bv32_module "t'int"
 
 let bv32_to_int_fun : Expr.rsymbol = find_rs bv32_module "to_uint"
 
@@ -385,11 +385,13 @@ let rec logic_type ty =
 let logic_constant c =
   match c with
     | Integer(_value,Some s) ->
-      let c = Literals.integer s in Number.(ConstInt { ic_negative = false; ic_abs = c})
+      let c = Literals.integer s in
+      Term.t_const (Number.(ConstInt {ic_negative = false; ic_abs = c})) Ty.ty_int
     | Integer(_value,None) ->
       Self.not_yet_implemented "logic_constant Integer None"
     | LReal { r_literal = s } ->
-      let c = Literals.floating_point s in Number.(ConstReal {rc_negative = false; rc_abs = c})
+      let c = Literals.floating_point s in
+      Term.t_const (Number.(ConstReal {rc_negative = false; rc_abs = c})) Ty.ty_real
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "logic_constant"
 
@@ -441,9 +443,7 @@ let bound_vars = Hashtbl.create 257
 let create_lvar v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
-(*
   Self.result "create logic variable %d" v.lv_id;
-*)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
 
@@ -456,11 +456,22 @@ let get_lvar lv =
 
 let program_vars = Hashtbl.create 257
 
+(*
 let create_var v is_mutable =
 (* *)
   Self.result "create local program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
  (* *)
   Hashtbl.add program_vars v.vid is_mutable
+ *)
+
+let create_var_full v =
+  Self.result "create program variable %s (%d)" v.vname v.vid;
+  let id = Ident.id_fresh v.vname in
+  let ty,def = ctype_and_default v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [def] in
+  let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
+  Hashtbl.add program_vars v.vid (vs,true,ty);
+  let_defn,vs
 
 let global_vars : (int,Ity.pvsymbol) Hashtbl.t = Hashtbl.create 257
 
@@ -608,6 +619,10 @@ let rec term_node ~label t lvm old =
     | TLval lv -> tlval ~label lv lvm old
     | TBinOp (op, t1, t2) -> bin (term ~label t1 lvm old) op (term ~label t2 lvm old)
     | TUnOp (op, t) -> unary op (term ~label t lvm old)
+    | TConst cst -> logic_constant cst
+    | TLval lv -> tlval ~label lv
+    | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
+    | TUnOp (op, t) -> unary op (term ~label t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | Tapp (li, labels, args) ->
       begin
@@ -629,11 +644,12 @@ let rec term_node ~label t lvm old =
     | Tat (t, lab) ->
       begin
         match lab with
-          | LogicLabel(None, "Here") -> snd (term ~label:Here t lvm old)
-          | LogicLabel(None, "Old") -> snd (term ~label:Old t lvm old)
-          | LogicLabel(None, lab) -> snd (term ~label:(At lab) t lvm old)
-          | LogicLabel(Some _, _lab) ->
-            Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
+          | BuiltinLabel Cil_types.Here -> snd (term ~label:Here t lvm old)
+          | BuiltinLabel Cil_types.Old -> snd (term ~label:Old t lvm old)
+          | BuiltinLabel _ ->
+            Self.not_yet_implemented "term_node Tat/BuiltinLabel/other"
+          | FormalLabel _ ->
+            Self.not_yet_implemented "term_node Tat/FormalLabel"
           | StmtLabel _ ->
             Self.not_yet_implemented "term_node Tat/StmtLabel"
       end
@@ -897,6 +913,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
       let targs =
         List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params
       in
+(*
       begin
         match lt.lt_def with
         | None ->
@@ -907,6 +924,30 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
            (theories,d::decls)
         | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
       end
+||||||| merged common ancestors
+      let tdef = match lt.lt_def with
+          | None -> None
+          | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
+      in
+      let ts =
+        Ty.create_tysymbol
+          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef
+      in
+      Hashtbl.add logic_types lt.lt_name ts;
+      let d = Decl.create_ty_decl ts in
+      (theories,d::decls)
+ *)
+      let tdef = match lt.lt_def with
+          | None -> Ty.NoDef
+          | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
+      in
+      let ts =
+        Ty.create_tysymbol
+          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef
+      in
+      Hashtbl.add logic_types lt.lt_name ts;
+      let d = Decl.create_ty_decl ts in
+      (theories,d::decls)
     | Dfun_or_pred (li, _loc) ->
       begin
         match li.l_labels with
@@ -931,7 +972,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
           | _ ->
             Self.not_yet_implemented "Dfun_or_pred with labels"
       end
-    | Dlemma(name,is_axiom,labels,vars,p,loc) ->
+    | Dlemma(name,is_axiom,labels,vars,p,attrs,loc) ->
       begin
         match labels,vars with
           | [],[] ->
@@ -948,7 +989,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
           | _ ->
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
-    | Daxiomatic (name, decls', loc) ->
+    | Daxiomatic (name, decls', attrs, loc) ->
       let theories =
         add_decls_as_module theories
           (Ident.id_fresh global_logic_decls_theory_name) decls
@@ -964,15 +1005,14 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
         add_decls_as_module theories (Ident.id_user name (Loc.extract loc)) decls''
       in
       (theories,[])
-    | Dvolatile (_, _, _, _)
+    | Dvolatile (_, _, _, _, _)
     | Dinvariant (_, _)
     | Dtype_annot (_, _)
     | Dmodel_annot (_, _)
-    | Dcustom_annot (_, _, _)
+    | Dcustom_annot (_, _, _, _)
         -> Self.not_yet_implemented "logic_decl"
 
-let identified_proposition p =
-  { name = p.ip_name; loc = p.ip_loc; content = p.ip_content }
+let identified_proposition p = p.ip_content
 
 
 
@@ -1011,6 +1051,8 @@ let annot a e =
     Self.not_yet_implemented "annot AAllocation"
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
+  | AExtended _ ->
+    Self.not_yet_implemented "annot AExtended"
 
 let loop_annot a =
   let inv,var =
@@ -1036,8 +1078,10 @@ let loop_annot a =
       | AAllocation _ ->
         Self.not_yet_implemented "loop_annot AAllocation"
       | APragma _ ->
-        Self.not_yet_implemented "loop_annot APragma")
-    ([], []) a
+        Self.not_yet_implemented "loop_annot APragma"
+      | AExtended _ ->
+        Self.not_yet_implemented "loop_annot AExtended")
+      ([], []) a
   in
   (fun lvm old ->
    List.rev_map
@@ -1254,6 +1298,8 @@ let instr denv i =
   | Skip _loc -> e_void
   | Code_annot (_, _) ->
     Self.not_yet_implemented "instr Code_annot"
+  | Local_init _ ->
+    Self.not_yet_implemented "instr Local_init"
 
 let exc_break =
   Ity.create_xsymbol (Ident.id_fresh "Break") Ity.ity_unit

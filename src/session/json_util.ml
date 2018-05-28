@@ -16,11 +16,13 @@ open Json_base
 
 (* TODO match exceptions and complete some cases *)
 
-let convert_prover_to_json (p: Whyconf.prover) =
-  Record (convert_record
-    ["prover_name", String p.Whyconf.prover_name;
-     "prover_version", String p.Whyconf.prover_version;
-     "prover_altern", String p.Whyconf.prover_altern])
+let convert_prover (prefix:string) (p: Whyconf.prover) =
+  [prefix ^ "name", String p.Whyconf.prover_name;
+   prefix ^ "version", String p.Whyconf.prover_version;
+   prefix ^ "altern", String p.Whyconf.prover_altern]
+let convert_prover_to_json (prefix:string) (p: Whyconf.prover) =
+
+  Record (convert_record (convert_prover prefix p))
 
 let convert_infos (i: global_information) =
   let convert_prover (s,h,p) =
@@ -101,10 +103,10 @@ let convert_proof_attempt (pas: proof_attempt_status) =
                       "exception", String (Pp.string_of Exn_printer.exn_printer e)]
   | Uninstalled p ->
       convert_record ["proof_attempt", String "Uninstalled";
-                      "prover", convert_prover_to_json p]
+                      "prover", convert_prover_to_json "prover_" p]
   | UpgradeProver p ->
       convert_record ["proof_attempt", String "UpgradeProver";
-                      "prover", convert_prover_to_json p])
+                      "prover", convert_prover_to_json "prover_" p])
 
 let convert_update u =
   Record (match u with
@@ -154,6 +156,7 @@ let convert_request_constructor (r: ide_request) =
   | Add_file_req _            -> String "Add_file_req"
   | Save_file_req _           -> String "Save_file_req"
   | Set_config_param _        -> String "Set_config_param"
+  | Set_prover_policy _       -> String "Set_prover_policy"
   | Get_file_contents _       -> String "Get_file_contents"
   | Get_task _                -> String "Get_task"
   | Remove_subtree _          -> String "Remove_subtree"
@@ -164,6 +167,16 @@ let convert_request_constructor (r: ide_request) =
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
   | Get_global_infos          -> String "Get_global_infos"
+
+open Whyconf
+
+let convert_policy u =
+  match u with
+  | CPU_keep -> ["policy", String "keep"]
+  | CPU_upgrade p ->
+     ["policy", String "upgrade"] @ convert_prover "target_" p
+  | CPU_duplicate p ->
+     ["policy", String "duplicate"] @ convert_prover "target_" p
 
 let print_request_to_json (r: ide_request): Json_base.json =
   let cc = convert_request_constructor in
@@ -182,6 +195,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Set_config_param(s,n) ->
       convert_record ["ide_request", cc r;
            "param", String s; "value", Int n]
+  | Set_prover_policy(p,u) ->
+     convert_record (["ide_request", cc r] @
+                       convert_prover "" p @ convert_policy u)
   | Get_task(n,b,loc) ->
       convert_record ["ide_request", cc r;
            "node_ID", Int n; "full_context", Bool b ; "loc", Bool loc]
@@ -394,11 +410,11 @@ let print_list_request fmt (rl: ide_request list) =
 
 exception NotProver
 
-let parse_prover_from_json (j: json) =
+let parse_prover_from_json (prefix:string) (j: json) =
   try
-    let pn = get_string (get_field j "prover_name") in
-    let pv = get_string (get_field j "prover_version") in
-    let pa = get_string (get_field j "prover_altern") in
+    let pn = get_string (get_field j (prefix ^ "name")) in
+    let pv = get_string (get_field j (prefix ^ "version")) in
+    let pa = get_string (get_field j (prefix ^ "altern")) in
     {Whyconf.prover_name = pn; prover_version = pv; prover_altern = pa}
   with Not_found -> raise NotProver
 
@@ -433,6 +449,21 @@ let parse_request (constr: string) j =
     let s = get_string (get_field j "param") in
     let n = get_int (get_field j "value") in
     Set_config_param(s,n)
+
+  | "Set_prover_policy" ->
+    let p = parse_prover_from_json "" j in
+    let u = get_string (get_field j "policy") in
+    begin match u with
+          | "keep" -> Set_prover_policy(p,CPU_keep)
+          | "upgrade" ->
+             let p' = parse_prover_from_json "target_" j in
+             Set_prover_policy(p,CPU_upgrade p')
+          | "duplicate" ->
+             let p' = parse_prover_from_json "target_" j in
+             Set_prover_policy(p,CPU_duplicate p')
+          | _ -> raise (NotRequest "")
+    end
+
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in
@@ -554,10 +585,10 @@ let parse_proof_attempt j =
     raise NotProofAttempt (* TODO *)
   | "Uninstalled" ->
     let p = get_field j "prover" in
-    Uninstalled (parse_prover_from_json p)
+    Uninstalled (parse_prover_from_json "prover_" p)
   | "UpgradeProver" ->
     let p = get_field j "prover" in
-    UpgradeProver (parse_prover_from_json p)
+    UpgradeProver (parse_prover_from_json "prover_" p)
   | _ -> raise NotProofAttempt
 
 exception NotUpdate

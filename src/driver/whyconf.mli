@@ -174,6 +174,8 @@ type prover_upgrade_policy =
   | CPU_upgrade of prover
   | CPU_duplicate of prover
 
+val print_prover_upgrade_policy : Format.formatter -> prover_upgrade_policy -> unit
+
 val set_prover_upgrade_policy :
   config -> prover -> prover_upgrade_policy -> config
 (** [set_prover_upgrade c p cpu] sets or updates the policy to follow if the

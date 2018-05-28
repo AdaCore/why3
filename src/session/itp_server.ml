@@ -1296,8 +1296,8 @@ end
    let request_is_valid r =
      match r with
      | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
-     | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
-     | Get_global_infos -> true
+     | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
+     | Exit_req | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1417,6 +1417,9 @@ end
          | "memlimit" -> Server_utils.set_session_memlimit i
          | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
        end
+    | Set_prover_policy(p,u)   ->
+       let c = d.cont in
+       Controller_itp.set_session_prover_upgrade_policy c p u
     | Exit_req                -> exit 0
      )
     with

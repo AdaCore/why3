@@ -78,7 +78,7 @@ let print_strategy_status fmt st =
 
 type controller =
   { mutable controller_session: Session_itp.session;
-    controller_config : Whyconf.config;
+    mutable controller_config : Whyconf.config;
     mutable controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
@@ -91,6 +91,9 @@ let session_max_tasks = ref 1
 let set_session_max_tasks n =
   session_max_tasks := n;
   Prove_client.set_max_running_provers n
+
+let set_session_prover_upgrade_policy c p u =
+  c.controller_config <- Whyconf.set_prover_upgrade_policy c.controller_config p u
 
 let load_drivers c =
   let env = c.controller_env in

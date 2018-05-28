@@ -2193,9 +2193,13 @@ let check_uninstalled_prover =
   let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
   fun p ->
   if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
-  then begin
+  then
+    begin
       Whyconf.Hprover.add uninstalled_prover_seen p ();
-      uninstalled_prover_dialog gconfig p
+      let callback p u =
+        send_request (Set_prover_policy(p,u))
+      in
+      uninstalled_prover_dialog ~callback gconfig p
     end
 
 let treat_notification n =

@@ -846,7 +846,7 @@ if test "$enable_pvs_libs" = yes; then
 fi
 
 #check frama-c
-FRAMAC_SUPPORTED=Aluminium
+FRAMAC_SUPPORTED=Sulfur
 if test "$enable_frama_c" = yes ; then
    AC_CHECK_PROG(FRAMAC,frama-c,frama-c,no)
    if test "$FRAMAC" = no ; then
@@ -855,18 +855,22 @@ if test "$enable_frama_c" = yes ; then
         reason_frama_c=" (frama-c not found)"
    else
       AC_MSG_CHECKING(Frama-C version)
-      FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|\(Version: \)\?\(.*\)$|\2|p' `
+      FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|\(Version: \)\?\(.*\)$|\2|p'`
       AC_MSG_RESULT($FRAMAC_VERSION)
       case $FRAMAC_VERSION in
          $FRAMAC_SUPPORTED-*) ;;
-         *) AC_MSG_WARN(Version $FRAMAC_VERSION not supported, version $FRAMAC_SUPPORTED required.)
+         *) AC_MSG_WARN(Version $FRAMAC_SUPPORTED required.)
             enable_frama_c=no
-            reason_frama_c=" (version Sodium required)"
+            reason_frama_c=" (version $FRAMAC_SUPPORTED required)"
             ;;
       esac
-      FRAMAC_SHARE=`$FRAMAC -print-path`
-      FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
    fi
+fi
+
+if test "$enable_frama_c" = yes; then
+   FRAMAC_SHARE=`$FRAMAC -print-path`
+   FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
+   FRAMAC_INCLUDE="-I $FRAMAC_LIBDIR"
 fi
 
 #Viewer for ps and pdf
@@ -968,6 +972,7 @@ AC_SUBST(FRAMAC)
 AC_SUBST(FRAMAC_VERSION)
 AC_SUBST(FRAMAC_SHARE)
 AC_SUBST(FRAMAC_LIBDIR)
+AC_SUBST(FRAMAC_INCLUDE)
 
 AC_SUBST(enable_local)
 AC_SUBST(LOCALDIR)
@@ -982,16 +987,20 @@ dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
 
 # Finally create the Makefile from Makefile.in
-AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
+AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(src/config.sh doc/version.tex)
 AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(.merlin)
 AC_CONFIG_FILES(src/jessie/Makefile)
+AC_CONFIG_FILES(src/jessie/.merlin)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
 AC_CONFIG_COMMANDS([chmod],
-chmod a-w Makefile src/config.sh doc/version.tex;
+chmod a-w Makefile src/jessie/Makefile;
+chmod a-w src/config.sh doc/version.tex;
 chmod a-w lib/why3/META;
 chmod a-w .merlin;
 chmod a-w src/jessie/Makefile;
+chmod a-w src/jessie/.merlin;
 chmod a-w lib/coq/version lib/pvs/version;
 chmod u+x src/config.sh)
 

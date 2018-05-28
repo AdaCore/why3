@@ -2345,16 +2345,16 @@ headers:
 # myself
 #########
 
-Makefile: Makefile.in config.status
-	./config.status chmod --file $@
+AUTOCONF_FILES = \
+	Makefile \
+	src/jessie/Makefile \
+	src/config.sh \
+	.merlin \
+	src/jessie/.merlin \
+	lib/why3/META \
+	doc/version.tex
 
-src/jessie/Makefile: src/jessie/Makefile.in config.status
-	./config.status chmod --file $@
-
-src/config.sh: src/config.sh.in config.status
-	./config.status chmod --file $@
-
-.merlin: .merlin.in config.status
+$(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@
 
 src/util/config.ml share/Makefile.config: src/config.sh
@@ -2364,16 +2364,8 @@ src/util/config.ml share/Makefile.config: src/config.sh
 clean::
 	rm -f share/Makefile.config
 
-doc/version.tex: doc/version.tex.in config.status
-	./config.status chmod --file $@
-
 config.status: configure
 	./config.status --recheck
-
-all: lib/why3/META .merlin
-
-lib/why3/META: lib/why3/META.in config.status
-	./config.status chmod --file $@
 
 configure: configure.in Version
 	autoconf -f
@@ -2385,9 +2377,8 @@ configure: configure.in Version
 .PHONY: distclean
 
 distclean: clean
-	rm -f config.status config.cache config.log .merlin \
-	    Makefile src/util/config.ml doc/version.tex \
-	    src/jessie/Makefile src/config.sh lib/why3/META
+	rm -f config.status config.cache config.log \
+	    src/util/config.ml $(AUTOCONF_FILES)
 
 depend:
 	rm -f $^
