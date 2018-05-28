@@ -145,3 +145,15 @@ let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
     hypothesis@ including@ by@ declared@ rewrite@ rules"
     "compute_hyp"
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp None)
+
+let normalize_hyp_few step_limit pr_norm env =
+  let p = { compute_defs = false;
+            compute_builtin = true;
+            compute_def_set = Term.Mls.empty;
+          } in
+  normalize_goal_transf ?pr_norm ?step_limit p env
+
+let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
+    hypothesis@ using@ specified@ rules"
+    "compute_hyp_specified"
+    (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp_few None)

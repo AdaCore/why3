@@ -85,6 +85,8 @@ function interp (e:expr) (y:vars) (z:C.cvars) : C.a
   | Cst c -> C.interp c z
   end
 
+meta rewrite_def function interp
+
 use import bool.Bool
 use import list.List
 
@@ -126,11 +128,15 @@ let rec lemma ctx_bound_w (l:context) (b1 b2:int)
 function interp_eq (g:equality) (y:vars) (z:C.cvars) : bool
   = match g with (g1, g2) -> interp g1 y z = interp g2 y z end
 
+meta rewrite_def function interp_eq
+
 function interp_ctx (l: context) (g: equality) (y: vars) (z:C.cvars) : bool
 = match l with
   | Nil -> interp_eq g y z
   | Cons h t -> (interp_eq h y z) -> (interp_ctx t g y z)
   end
+
+meta rewrite_def function interp_ctx
 
 use import mach.int.Int63
 use import seq.Seq
@@ -728,6 +734,8 @@ function interp_c (e:cprod) (y:vars) (z:C.cvars) : C.a
   | Times e1 e2 -> C.(*) (interp_c e1 y z) (interp_c e2 y z)
   end
 
+meta rewrite_def function interp_c
+
 function interp' (e:expr') (y:vars) (z:C.cvars) : C.a
 = match e with
   | Sum e1 e2 -> C.(+) (interp' e1 y z) (interp' e2 y z)
@@ -738,6 +746,8 @@ function interp' (e:expr') (y:vars) (z:C.cvars) : C.a
   | Coeff c -> C.interp c z
   end
 
+meta rewrite_def function interp'
+
 (*exception NonLinear*)
 
 type equality' = (expr', expr')
@@ -746,11 +756,15 @@ type context' = list equality'
 function interp_eq' (g:equality') (y:vars) (z:C.cvars) : bool
 = match g with (g1, g2) -> interp' g1 y z = interp' g2 y z end
 
+meta rewrite_def function interp_eq'
+
 function interp_ctx' (l: context') (g: equality') (y: vars) (z:C.cvars) : bool
 = match l with
   | Nil -> interp_eq' g y z
   | Cons h t -> (interp_eq' h y z) -> (interp_ctx' t g y z)
   end
+
+meta rewrite_def function interp_ctx'
 
 let rec predicate valid_expr' (e:expr')
   variant { e }
@@ -801,6 +815,7 @@ let simp_eq (eq:equality') : equality
 let rec simp_ctx (ctx: context') (g:equality') : (context, equality)
   returns { (rc, rg) ->
             (valid_ctx' ctx -> valid_eq' g -> valid_ctx rc /\ valid_eq rg) /\
+            length rc = length ctx /\
             forall y z. interp_ctx rc rg y z = interp_ctx' ctx g y z }
   raises  { (*NonLinear -> true | *) C.Unknown -> true }
   variant { ctx }
@@ -813,6 +828,7 @@ let rec simp_ctx (ctx: context') (g:equality') : (context, equality)
 let decision (l:context') (g:equality')
   requires { valid_ctx' l }
   requires { valid_eq' g }
+  requires { length l < 100000 }
   ensures { forall y z. result -> interp_ctx' l g y z }
   raises  { (* NonLinear -> true | *) C.Unknown -> true | Failure -> true }
 = let sl, sg = simp_ctx l g in
@@ -841,6 +857,8 @@ function rinterp (t:t) (v:rvars) : real
 = match t with
   | (n,d) ->  from_int n /. from_int d
   end
+
+meta rewrite_def function rinterp
 
 let lemma prod_compat_eq (a b c:real)
   requires { c <> 0.0 }
@@ -998,6 +1016,8 @@ function interp_id (t:t') (v:int -> int) : int
   | Error -> 0 (* never created *)
   end
 
+meta rewrite_def function interp_id
+
 let constant izero = IC 0
 
 let constant ione = IC 1
@@ -1039,6 +1059,8 @@ let ghost function m_y (y:int -> int): (int -> real)
   ensures { forall i. result i = from_int (y i) }
 = fun i -> from_int (y i)
 
+meta rewrite_def function m_y
+
 let m (t:t') : (int, int)
   ensures { forall z. rinterp result (m_y z) = from_int (interp_id t z) }
   raises  { NError -> true }
@@ -1072,6 +1094,7 @@ let rec m_expr (e:expr') : R.expr'
   | ProdR c e -> R.ProdR (m_cprod c) (m_expr e)
   end
 
+use import list.Length
 use import debug.Debug
 
 let m_eq (eq:equality') : R.equality'
@@ -1085,6 +1108,7 @@ let rec m_ctx (ctx:context') (g:equality') : (R.context', R.equality')
   returns { c',g' -> forall y z. R.interp_ctx' c' g' (m_y y) (m_y z) <->
                         interp_ctx' ctx g y z }
   returns { c', _ -> valid_ctx' ctx -> R.valid_ctx' c' }
+  returns { c', _ -> length c' = length ctx }
   returns { _, g' -> valid_eq' g -> R.valid_eq' g' }
   raises  { NError -> true }
   variant { ctx }
@@ -1098,6 +1122,7 @@ let rec m_ctx (ctx:context') (g:equality') : (R.context', R.equality')
 let int_decision (l: context') (g: equality') : bool
   requires { valid_ctx' l }
   requires { valid_eq' g }
+  requires { length l < 100000 }
   ensures { forall y z. result -> interp_ctx' l g y z }
   raises  { R.Failure -> true | QError -> true | NError -> true }
 = let l',g' = m_ctx l g in
@@ -1162,6 +1187,8 @@ constant rradix: real = from_int (M.radix)
 function qinterp (q:Q.t) : real
 = match q with (n,d) -> from_int n /. from_int d end
 
+meta rewrite_def function qinterp
+
 lemma qinterp_def: forall q v. qinterp q = Q.rinterp q v
 
 function interp_exp (e:exp) (y:evars) : int
@@ -1172,18 +1199,16 @@ function interp_exp (e:exp) (y:evars) : int
   | Sub e1 e2 -> interp_exp e1 y - interp_exp e2 y
   | Minus e' -> - (interp_exp e' y)
   end
-(*
-function interp_pow (n:int) : real
-= if n >= 0 then from_int (power M.radix n)
-  else inv (from_int (power M.radix (-n)))
 
-lemma Pow_sum: forall m n: int. interp_pow (m+n) = interp_pow m *. interp_pow n
-*)
+meta rewrite_def function interp_exp
+
 function minterp (t:t) (y:evars) : real
 = match t with
   (q,e) ->
   qinterp q *. pow rradix (from_int (interp_exp e y))
   end
+
+meta rewrite_def function minterp
 
 exception MPError
 
@@ -1422,6 +1447,8 @@ function mpinterp (t:t) (y:evars) : int
   | R -> M.radix
   end
 
+meta rewrite_def function mpinterp
+
 (* TODO restructure stuff so that expr, eq, ctx, valid_ can be imported without having to implement these *)
 
 let mpadd (a b:t) : t
@@ -1497,6 +1524,8 @@ let rec function m (t:t) : R.coeff
   | R -> ((1,1), Lit 1) (* or ((radix, 1), Lit 0) ? *)
   end
 
+meta rewrite_def function m
+
 let ghost function m_y (y:int->int): (int -> real)
   ensures { forall i. result i = from_int (y i) }
 = fun i -> from_int (y i)
@@ -1508,6 +1537,8 @@ let rec function m_cprod (e:cprod) : R.cprod
   | C c -> R.C (m c)
   | Times c1 c2 -> R.Times (m_cprod c1) (m_cprod c2)
   end
+
+meta rewrite_def function m_cprod
 
 let rec function m_expr (e:expr') : R.expr'
   ensures { forall y z. pos_expr' e z -> R.interp' result (m_y y) z
@@ -1522,16 +1553,23 @@ let rec function m_expr (e:expr') : R.expr'
   | ProdR c e -> R.ProdR (m_cprod c) (m_expr e)
   end
 
+meta rewrite_def function m_expr
+
 let function m_eq (eq:equality') : R.equality'
   ensures { forall y z. pos_eq' eq z -> (R.interp_eq' result (m_y y) z
                                       <-> interp_eq' eq y z) }
   ensures { valid_eq' eq -> R.valid_eq' result }
 = match eq with (e1,e2) -> (m_expr e1, m_expr e2) end
 
+meta rewrite_def function m_eq
+
+use import list.Length
+
 let rec function m_ctx (ctx:context') : R.context'
   ensures { forall y z g. pos_ctx' ctx z -> pos_eq' g z ->
                    (R.interp_ctx' result (m_eq g) (m_y y) z
                     <-> interp_ctx' ctx g y z) }
+  ensures { length result = length ctx }
   ensures { valid_ctx' ctx -> R.valid_ctx' result }
   variant { ctx }
 = match ctx with
@@ -1541,9 +1579,12 @@ let rec function m_ctx (ctx:context') : R.context'
     r
     end
 
+meta rewrite_def function m_ctx
+
 let mp_decision (l: context') (g: equality') : bool
   requires { valid_ctx' l }
   requires { valid_eq' g }
+  requires { length l < 100000 }
   ensures  { forall y z. result -> pos_ctx' l z -> pos_eq' g z
              -> interp_ctx' l g y z }
   raises  { R.Failure -> true | MPError -> true | Q.QError -> true }
@@ -1746,10 +1787,12 @@ predicate is_eq_tbl (a:array (option E.exp)) (l:context')
   end
 use import int.NumOf
 use import array.NumOfEq
+use import list.Length
 
 let prop_ctx (l:context') (g:equality') : (context', equality')
   requires { valid_ctx' l }
   requires { valid_eq' g }
+  returns  { rl, _ -> length rl = length l }
   returns { rl, rg -> valid_ctx' rl /\ valid_eq' rg
                    /\ forall y z. y=z -> interp_ctx' rl rg y z
                    -> interp_ctx' l g y z }
@@ -1931,6 +1974,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     ensures { ctx_bound' result m }
     requires { ctx_impl_ctx' l acc }
     ensures { ctx_impl_ctx' l result }
+    ensures { length result = length acc }
     variant { acc }
     requires { valid_ctx' acc }
     ensures  { valid_ctx' result }
@@ -1952,6 +1996,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   let prop_mp_decision (l:context') (g:equality') : bool
     requires { valid_ctx' l }
     requires { valid_eq' g }
+    requires { length l < 100000 }
     ensures { forall y z. result ->  pos_ctx' l z -> pos_eq' g z
                           -> y = z -> interp_ctx' l g y z }
     raises { | OutOfBounds -> true | E.MPError -> true
@@ -2027,14 +2072,20 @@ function interp_term (t:term) (b:int->value) : value =
   | Add t1 t2 -> add (interp_term t1 b) (interp_term t2 b)
   end
 
+meta rewrite_def function interp_term
+
 function interp_fmla (f:fmla) (l:int) (b:int->value) : bool =
   match f with
   | Foo t -> foo (interp_term t b)
   | Forall f -> forall v. interp_fmla f (l-1) b[l <- v]
   end
 
+meta rewrite_def function interp_fmla
+
 function interp (f:fmla) (b: int -> value) : bool =
   interp_fmla f (-1) b
+
+meta rewrite_def function interp
 
 let f (f:fmla) : bool
   ensures { result -> forall b. interp f b }

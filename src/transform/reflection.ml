@@ -535,7 +535,7 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
   Debug.dprintf debug_refl "building cut indication rt %a g %a@."
     Pretty.print_term rt Pretty.print_term g;
-  let compute_hyp pr = Compute.normalize_hyp None (Some pr) env in
+  let compute_hyp_few pr = Compute.normalize_hyp_few None (Some pr) env in
   let compute_in_goal = Compute.normalize_goal_transf_all env in
   let ltask_r =
     try let ci =
@@ -556,7 +556,7 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
          Debug.dprintf debug_refl "no cut found@.";
          if do_trans
          then
-           let t = Trans.apply (compute_hyp hr) task_r in
+           let t = Trans.apply (compute_hyp_few hr) task_r in
            match t with
            | [t] ->
               let rewrite = Apply.rewrite_list None false true
