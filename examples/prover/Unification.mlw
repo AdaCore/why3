@@ -445,6 +445,7 @@ module Impl
     let rhoi = rho.unifier in
     let ghost stm = st tm rhoi in
     (*let n0 = rho.iteration in*)
+    bottomvar rhob rho z;
     assert { rho0 z = Var_fo_term z } ;
     assert { rhoi z = Var_fo_term z } ;
     (*assert { forall s:int -> (fo_term int int).
