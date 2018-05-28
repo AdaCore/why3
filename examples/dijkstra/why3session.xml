@@ -5,11 +5,10 @@
 <prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="8" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../dijkstra.mlw" proved="true">
 <theory name="DijkstraShortestPath" proved="true">
  <goal name="VC relax" expl="VC for relax" proved="true">
@@ -92,7 +91,7 @@
  <goal name="VC shortest_path_code" expl="VC for shortest_path_code" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC shortest_path_code.0" expl="loop invariant init" proved="true">
-  <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="290"/></proof>
+  <proof prover="8"><result status="valid" time="0.05" steps="290"/></proof>
   </goal>
   <goal name="VC shortest_path_code.1" expl="loop invariant init" proved="true">
   <proof prover="7"><result status="valid" time="0.06"/></proof>
@@ -124,10 +123,10 @@
    <goal name="VC shortest_path_code.9.0" expl="assertion" proved="true">
    <transf name="destruct" proved="true" arg1="H">
     <goal name="VC shortest_path_code.9.0.0" expl="assertion" proved="true">
-    <proof prover="6"><result status="valid" time="0.10"/></proof>
+    <proof prover="1"><result status="valid" time="0.08"/></proof>
     </goal>
     <goal name="VC shortest_path_code.9.0.1" expl="assertion" proved="true">
-    <proof prover="4" timelimit="1"><result status="valid" time="0.02" steps="107"/></proof>
+    <proof prover="8"><result status="valid" time="0.02" steps="121"/></proof>
     </goal>
    </transf>
    </goal>
@@ -147,7 +146,7 @@
     <proof prover="7"><result status="valid" time="0.12"/></proof>
     </goal>
     <goal name="VC shortest_path_code.12.0.1" expl="VC for shortest_path_code" proved="true">
-    <proof prover="8" timelimit="1" memlimit="1000"><result status="valid" time="0.56" steps="1316"/></proof>
+    <proof prover="8"><result status="valid" time="0.56" steps="1316"/></proof>
     </goal>
     <goal name="VC shortest_path_code.12.0.2" expl="VC for shortest_path_code" proved="true">
     <proof prover="7"><result status="valid" time="0.02"/></proof>
@@ -159,15 +158,15 @@
     <proof prover="7"><result status="valid" time="0.06"/></proof>
     </goal>
     <goal name="VC shortest_path_code.12.0.5" expl="VC for shortest_path_code" proved="true">
-    <proof prover="8"><result status="valid" time="1.44" steps="2783"/></proof>
+    <proof prover="8" timelimit="10" memlimit="4000"><result status="valid" time="1.44" steps="2783"/></proof>
     </goal>
     <goal name="VC shortest_path_code.12.0.6" expl="VC for shortest_path_code" proved="true">
     <transf name="case" proved="true" arg1="(v = v1)">
      <goal name="VC shortest_path_code.12.0.6.0" expl="true case" proved="true">
-     <proof prover="4" memlimit="2000"><result status="valid" time="1.79" steps="2672"/></proof>
+     <proof prover="4"><result status="valid" time="1.79" steps="2672"/></proof>
      </goal>
      <goal name="VC shortest_path_code.12.0.6.1" expl="false case" proved="true">
-     <proof prover="8"><result status="valid" time="0.96" steps="2031"/></proof>
+     <proof prover="8" timelimit="10" memlimit="4000"><result status="valid" time="0.96" steps="2031"/></proof>
      </goal>
     </transf>
     </goal>
