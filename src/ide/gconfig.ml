@@ -1005,7 +1005,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   in
   let remove button p () =
     button#destroy ();
-    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config));
   in
   let iter p policy =
     let label =
@@ -1170,7 +1170,7 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-let uninstalled_prover_dialog c unknown =
+let uninstalled_prover_dialog ~callback c unknown =
   let others,names,versions =
     Whyconf.unknown_to_known_provers
       (Whyconf.get_provers c.config) unknown
@@ -1194,12 +1194,25 @@ let uninstalled_prover_dialog c unknown =
     (* header *)
     let hb = GPack.hbox ~packing:vbox#add () in
     let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
-    let _ =
+    let (_:GMisc.label) =
       let text =
         Pp.sprintf "The prover %a is not installed"
-          Whyconf.print_prover unknown
+                   Whyconf.print_prover unknown
       in
       GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
+    in
+    let (_:GMisc.label) =
+      let text =
+        "WARNING: this policy will not be taken into account immediately \
+         but only if you replay again the proofs."
+      in
+      GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
+    in
+    let (_:GMisc.label) =
+      let text =
+        "WARNING: do not forget to save preferences to keep this policy in future sessions"
+      in
+      GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
     in
     (* choices *)
     let vbox_pack =
@@ -1277,6 +1290,7 @@ let uninstalled_prover_dialog c unknown =
         | _ -> assert false
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
+    let () = callback unknown policy in
     ()
 
 

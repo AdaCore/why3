@@ -116,6 +116,7 @@ val show_about_window : unit -> unit
 val preferences : t -> unit
 
 val uninstalled_prover_dialog :
+  callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
   t -> Whyconf.prover -> unit
 
 

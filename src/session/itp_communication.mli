@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-type prover = string
+
 (* Name and description *)
 type transformation = (string * string)
 type strategy = string
@@ -121,6 +121,7 @@ type ide_request =
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
   | Set_config_param        of string * int
+  | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
   (** [Get_task(id,b,loc)] requests for the text of the task in node

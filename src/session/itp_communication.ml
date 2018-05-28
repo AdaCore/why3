@@ -10,7 +10,6 @@
 (********************************************************************)
 
 (* Information that the IDE may want to have *)
-type prover = string
 type transformation = (string * string)
 type strategy = string
 
@@ -109,6 +108,7 @@ type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
   | Set_config_param        of string * int
+  | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
   | Remove_subtree          of node_ID
@@ -127,7 +127,7 @@ let modify_session (r: ide_request) =
   | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
   | Reload_req -> true
 
-  | Set_config_param _ | Get_file_contents _
+  | Set_config_param _ | Set_prover_policy _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
   | Save_req | Exit_req | Get_global_infos
   | Interrupt_req -> false
@@ -142,6 +142,9 @@ let print_request fmt r =
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
+  | Set_prover_policy(p1,p2)        ->
+     fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
+             Whyconf.print_prover_upgrade_policy p2
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
   | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
