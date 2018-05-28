@@ -853,7 +853,8 @@ assert (h:(i=0 \/ 0 < i)) by omega.
 destruct h.
 
 (* case i = 0 *)
-ae.
+rewrite to_nat_sub_high.
+subst i; simpl in Hj. rewrite pow2_0 in Hj. omega. omega.
 
 (* case i > 0 *)
 
@@ -874,8 +875,10 @@ rewrite to_nat_sub_one; auto with zarith.
 rewrite to_nat_sub_footprint with 
   (b2 := (from_int2c (j - pow2 (i-1)))); auto with zarith.
 rewrite Hind; auto with zarith.
-ae.
-ae.
+replace (i-1-0) with (i-1); omega.
+assert (pow2 ((i-1)+1) = 2 * pow2 (i-1)).
+rewrite (Power_s (i-1)); omega.
+replace (i-1+1) with i in H1; omega.
 intros k Hk.
 replace j with (j - pow2 (i - 1) + pow2 (i - 1)) by omega.
 replace (j - pow2 (i - 1) + pow2 (i - 1) - pow2 (i - 1)) 
