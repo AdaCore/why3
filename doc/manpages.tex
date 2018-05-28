@@ -231,8 +231,8 @@ The provers can give the following output:
 \label{sec:proveoptions}
 
 \begin{description}
-\item[\texttt{-{}-get-ce}] activates the generation of a potential
-counter-example when a proof does not succeed (experimental).
+%\item[\texttt{-{}-get-ce}] activates the generation of a potential
+%counter-example when a proof does not succeed (experimental).
 \item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}] specifies
   \textsl{s} as an additional prefix for labels that denotes VC
   explanations. The option can be used several times to specify
@@ -241,6 +241,8 @@ counter-example when a proof does not succeed (experimental).
 
 \section{The \texttt{ide} Command}
 \label{sec:ideref}
+
+\todo{Claude: mettre a jour}
 
 The basic usage of the GUI is described by the tutorial of
 Section~\ref{sec:gui}. There are no specific command-line options,
@@ -501,8 +503,8 @@ Counter-example.
 The counterexample is displayed with the original Why3 code in comments.
 Counterexample values for Why3 source code elements at given line are
 displayed in a comment at the line below.
-An alternative way how to display a counterexample is to use the option
-\texttt{-{}-get-ce} of the \texttt{prove} command.
+%An alternative way how to display a counterexample is to use the option
+%\texttt{-{}-get-ce} of the \texttt{prove} command.
 
 Why3 source code elements that should be a part of counterexample must be
 explicitly marked with \texttt{"model"} label. The following example shows a
