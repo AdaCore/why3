@@ -90,9 +90,24 @@ Axiom g_append :
   forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
   (g (Init.Datatypes.app l1 l2)) -> g l1.
 
-Require Import Why3. 
-Ltac z := why3 "Z3,4.4.1," timelimit 5; admit.
-Ltac ae := why3 "Alt-Ergo,2.0.0,"; admit.
+Axiom depths_length :
+  forall (t:tree) (d:Z), (1%Z <= (list.Length.length (depths d t)))%Z.
+
+Axiom forest_depths_length :
+  forall (l:(list (Z* tree)%type)),
+  (0%Z <= (list.Length.length (forest_depths l)))%Z.
+
+Axiom g_tail :
+  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
+  (g (Init.Datatypes.app l1 l2)) -> g l2.
+
+Axiom key_lemma :
+  forall (t:tree) (l:(list (Z* tree)%type)) (d:Z) (d1:Z) (t1:tree)
+    (s:(list Z)),
+  (d < d1)%Z -> (1%Z <= (list.Length.length l))%Z ->
+  (g (Lists.List.rev (Init.Datatypes.cons (d1, t1) l))) ->
+  ~ ((forest_depths (Init.Datatypes.cons (d1, t1) l)) =
+     (Init.Datatypes.app (depths d t) s)).
 
 (* Why3 goal *)
 Theorem right_nil :
@@ -101,36 +116,43 @@ Theorem right_nil :
   ~ ((forest_depths (Lists.List.rev l)) = (depths d t)).
 (* Why3 intros l h1 h2 t d. *)
 intros l H hg.
-replace l with (List.rev (List.rev l)) in H, hg by z.
+replace l with (List.rev (List.rev l)) in H, hg. 2:apply Reverse.reverse_reverse.
 generalize H; clear H. generalize hg; clear hg.
 generalize (List.rev l). clear l.
 
 destruct l.
 (* l = Nil => contradiction *)
-intros; ae.
+intros.
+simpl in H. omega.
 (* l = Cons *)
 intros. destruct p as (d1, t1).
 intros eq.
 assert (d < d1)%Z.
   simpl in eq.
-  assert (d <= d1)%Z by z.
+  assert (d <= d1)%Z. apply (depths_subtree _ _ _ _ _ eq).
   assert (d <> d1)%Z. intro.
   subst.
-  assert (depths d1 t = app (depths d1 t) nil) by z.
-  assert (t = t1) by z.
+  assert (depths d1 t = app (depths d1 t) nil). auto with *.
+  assert (t = t1). rewrite H1 in eq. generalize (depths_unique _ _ _ _ _ eq).
+   intuition.
   subst.
-  assert (forest_depths l = nil) by z.
+  assert (forest_depths l = nil). rewrite H1 in eq at 2.
+    generalize (depths_unique _ _ _ _ _ eq). intuition.
   simpl in H.
-  destruct l. ae.
+  destruct l. simpl in H. omega.
   assert (cons p l = nil).
   destruct (cons p l); auto.
-  simpl in H2. destruct p0. z.
+  simpl in H2. destruct p0. 
+    generalize (depths_head t z). destruct (depths z t). intuition.
+    simpl in H2. discriminate H2.
   discriminate H3.
   omega.
 generalize eq; clear eq.
-replace (depths d t) with (app (depths d t) nil) by z.
+replace (depths d t) with (app (depths d t) nil).
+   2:rewrite Append.Append_l_nil; trivial.
 apply key_lemma; auto.
-simpl in H.
-ae.
-Admitted.
-
+simpl in H. 
+rewrite Append.Append_length in H.
+rewrite Reverse.Reverse_length in H. simpl in H.
+omega.
+Qed.
