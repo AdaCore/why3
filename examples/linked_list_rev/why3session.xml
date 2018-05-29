@@ -6,6 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="4000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linked_list_rev.mlw" proved="true">
 <theory name="InPlaceRev" proved="true">
@@ -383,7 +384,8 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC list_seg_no_repet.9" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="1.64"/></proof>
+  <proof prover="2" timelimit="10"><result status="valid" time="1.73"/></proof>
+  <proof prover="4"><result status="valid" time="7.98"/></proof>
   </goal>
   <goal name="VC list_seg_no_repet.10" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.20"/></proof>
