@@ -68,6 +68,14 @@ bench-4.06.0:
     COMPILER: 4.06.0
   <<: *bench_definition
 
+full:
+  stage: test
+  variables:
+    COMPILER: system
+    PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx
+  script:
+    - misc/ci-docker.sh misc/ci-local.sh bench
+
 opam:
   stage: build
   variables:
