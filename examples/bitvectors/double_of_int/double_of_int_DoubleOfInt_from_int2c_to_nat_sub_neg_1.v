@@ -216,7 +216,7 @@ Axiom Power_non_null : forall (n:Z), ~ ((pow21 n) = 0%R).
 Axiom Power_neg : forall (n:Z), ((pow21 (-n)%Z) = (1%R / (pow21 n))%R).
 
 Axiom Power_sum_aux :
-  forall (n:Z) (m:Z), (0%Z <= m)%Z ->
+  forall (m:Z) (n:Z), (0%Z <= m)%Z ->
   ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
 
 Axiom Power_sum1 :
@@ -352,7 +352,7 @@ Axiom to_nat_of_zero2 :
   ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z)).
 
 Axiom to_nat_of_zero :
-  forall (b:bv) (i:Z) (j:Z), ((j < 32%Z)%Z /\ (0%Z <= i)%Z) ->
+  forall (b:bv) (j:Z) (i:Z), ((j < 32%Z)%Z /\ (0%Z <= i)%Z) ->
   (forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b k) = false)) ->
   ((to_nat_sub b j i) = 0%Z).
 
@@ -562,7 +562,7 @@ Axiom to_nat_of_zero21 :
   ((to_nat_sub1 b j 0%Z) = (to_nat_sub1 b i 0%Z)).
 
 Axiom to_nat_of_zero1 :
-  forall (b:bv1) (i:Z) (j:Z), ((j < 64%Z)%Z /\ (0%Z <= i)%Z) ->
+  forall (b:bv1) (j:Z) (i:Z), ((j < 64%Z)%Z /\ (0%Z <= i)%Z) ->
   (forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b k) = false)) ->
   ((to_nat_sub1 b j i) = 0%Z).
 
@@ -847,8 +847,6 @@ Axiom jpxorx_neg :
   ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = false).
 
 Open Scope Z_scope.
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem from_int2c_to_nat_sub_neg :
@@ -864,7 +862,8 @@ intros i Hind Hi_pos Hi j Hj.
 assert (h:(i=0 \/ 0 < i)) by omega.
 destruct h.
 (* case i = 0 *)
-ae.
+rewrite to_nat_sub_high.
+subst i; simpl in Hj. rewrite pow2_0 in *. omega. omega.
 
 (* case i > 0 *)
 
@@ -876,7 +875,10 @@ destruct h.
 
 rewrite to_nat_sub_one; auto with zarith.
 rewrite Hind with (x:= j)(y:=i-1);auto with zarith.
-ae.
+replace (i-1-0) with (i-1) by omega.
+replace i with ((i-1)+1) at 3.
+rewrite (Power_s (i-1)). omega.
+omega. omega.
 
 apply nth_from_int2c_high_odd; 
    split; auto with zarith.
@@ -894,16 +896,22 @@ rewrite to_nat_sub_zero; auto with zarith.
 rewrite to_nat_sub_footprint with 
   (b2 := (from_int2c (j + pow2 (i-1)))); auto with zarith.
 rewrite Hind; auto with zarith.
-ae.
+replace i with ((i-1)+1) at 3.
+rewrite (Power_s (i-1)). omega.
+omega. omega.
 
-ae.
+assert (pow2 i = 2 * pow2 (i-1)).
+replace i with ((i-1)+1) at 1. rewrite (Power_s (i-1)); omega.
+omega. omega.
 
-ae.
+intros.
+symmetry. apply nth_from_int2c_plus_pow2. omega.
+
 
 rewrite nth_from_int2c_high_even; auto with zarith.
 
 split;auto with zarith.
 rewrite Div_pow2; auto.
 
-Admitted.
+Qed.
 

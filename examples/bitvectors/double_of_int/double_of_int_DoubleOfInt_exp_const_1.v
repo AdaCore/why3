@@ -216,7 +216,7 @@ Axiom Power_non_null : forall (n:Z), ~ ((pow21 n) = 0%R).
 Axiom Power_neg : forall (n:Z), ((pow21 (-n)%Z) = (1%R / (pow21 n))%R).
 
 Axiom Power_sum_aux :
-  forall (n:Z) (m:Z), (0%Z <= m)%Z ->
+  forall (m:Z) (n:Z), (0%Z <= m)%Z ->
   ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
 
 Axiom Power_sum1 :
@@ -352,7 +352,7 @@ Axiom to_nat_of_zero2 :
   ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z)).
 
 Axiom to_nat_of_zero :
-  forall (b:bv) (i:Z) (j:Z), ((j < 32%Z)%Z /\ (0%Z <= i)%Z) ->
+  forall (b:bv) (j:Z) (i:Z), ((j < 32%Z)%Z /\ (0%Z <= i)%Z) ->
   (forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b k) = false)) ->
   ((to_nat_sub b j i) = 0%Z).
 
@@ -562,7 +562,7 @@ Axiom to_nat_of_zero21 :
   ((to_nat_sub1 b j 0%Z) = (to_nat_sub1 b i 0%Z)).
 
 Axiom to_nat_of_zero1 :
-  forall (b:bv1) (i:Z) (j:Z), ((j < 64%Z)%Z /\ (0%Z <= i)%Z) ->
+  forall (b:bv1) (j:Z) (i:Z), ((j < 64%Z)%Z /\ (0%Z <= i)%Z) ->
   (forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b k) = false)) ->
   ((to_nat_sub1 b j i) = 0%Z).
 

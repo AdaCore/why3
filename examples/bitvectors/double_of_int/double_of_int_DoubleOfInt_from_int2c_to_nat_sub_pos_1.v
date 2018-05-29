@@ -834,8 +834,6 @@ Axiom jpxorx_pos :
   ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = true).
 
 Open Scope Z_scope.
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem from_int2c_to_nat_sub_pos :
@@ -883,13 +881,13 @@ intros k Hk.
 replace j with (j - pow2 (i - 1) + pow2 (i - 1)) by omega.
 replace (j - pow2 (i - 1) + pow2 (i - 1) - pow2 (i - 1)) 
             with (j - pow2 (i - 1)) by omega.
-ae.
+apply nth_from_int2c_plus_pow2. omega.
 
 rewrite nth_from_int2c_high_odd;auto.
 split.
 split;auto with zarith.
 rewrite Div_pow; auto with zarith.
 rewrite EuclideanDivision.Mod_1_left;omega.
+Qed.
 
-Admitted.
 
