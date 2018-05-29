@@ -182,6 +182,10 @@ module array.Array
   syntax val blit          "Array.blit %1 (Z.to_int %2) %3 (Z.to_int %4) (Z.to_int %5)"
 end
 
+module array.Init
+  syntax val init "Array.init (Z.to_int %1) %2"
+end
+
 module matrix.Matrix
   syntax type matrix "%1 array array"
 
