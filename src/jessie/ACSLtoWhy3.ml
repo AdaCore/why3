@@ -470,7 +470,7 @@ let create_var_full v =
   let ty,def = ctype_and_default v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [def] in
   let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
-  Hashtbl.add program_vars v.vid (vs,true,ty);
+  Hashtbl.add program_vars v.vid true (*(vs,true,ty)*);
   let_defn,vs
 
 let global_vars : (int,Ity.pvsymbol) Hashtbl.t = Hashtbl.create 257
@@ -484,7 +484,7 @@ let create_global_var v pvs =
 
 let pr_de fmt e =
   match e with
-    | Dexpr.DEpv pvs ->
+    | Dexpr.DEpv_pure pvs ->
        Format.fprintf fmt "DEpv(%s)" pvs.Ity.pv_vs.Term.vs_name.Ident.id_string
     | Dexpr.DEvar (s,_) ->
        Format.fprintf fmt "DEvar(%s)" s
@@ -505,7 +505,7 @@ let get_var denv v =
         | Dexpr.DEvar _ ->
            begin try
                let v = Hashtbl.find global_vars v.vid in
-               Dexpr.DEpv v
+               Dexpr.DEpv_pure v
              with Not_found -> ev
            end
         | _ -> ev
@@ -513,7 +513,7 @@ let get_var denv v =
       ev, is_mutable
     with Not_found ->
       let l =
-        Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
+        Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
       in
       Self.result "denv contains @[[%a]@]"
                   (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -615,14 +615,10 @@ let coerce_to_int ty t =
 
 let rec term_node ~label t lvm old =
   match t with
-    | TConst cst -> Term.t_const (logic_constant cst)
+    | TConst cst -> logic_constant cst
     | TLval lv -> tlval ~label lv lvm old
     | TBinOp (op, t1, t2) -> bin (term ~label t1 lvm old) op (term ~label t2 lvm old)
     | TUnOp (op, t) -> unary op (term ~label t lvm old)
-    | TConst cst -> logic_constant cst
-    | TLval lv -> tlval ~label lv
-    | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
-    | TUnOp (op, t) -> unary op (term ~label t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | Tapp (li, labels, args) ->
       begin
@@ -715,7 +711,7 @@ and tlval ~label (host,offset) lvm old =
            try
              let pvs =
                try
-                 Stdlib.Mstr.find v.vname lvm
+                 Mstr.find v.vname lvm
                with Not_found ->
                  Hashtbl.find global_vars v.vid
              in
@@ -862,7 +858,7 @@ let rec predicate ~label p lvm old =
     | Pvalid_function _ ->
         Self.not_yet_implemented "predicate"
 
-and predicate_named ~label p lvm old = predicate ~label p.content lvm old
+and predicate_named ~label p lvm old = predicate ~label p.pred_content lvm old
 
 
 
@@ -960,7 +956,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                   Decl.create_param_decl ls
                 | LBterm d ->
                   let ls,args = create_lsymbol li in
-                  let _ty,d = term ~label:Here d Stdlib.Mstr.empty (fun v _ -> v) in
+                  let _ty,d = term ~label:Here d Mstr.empty (fun v _ -> v) in
                   let def = Decl.make_ls_defn ls args d in
                   Decl.create_logic_decl [def]
                 | _ ->
@@ -983,7 +979,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
               in
               Decl.create_prop_decl
                 (if is_axiom then Decl.Paxiom else Decl.Plemma)
-                pr (predicate_named ~label:Here p Stdlib.Mstr.empty (fun v _ -> v))
+                pr (predicate_named ~label:Here p Mstr.empty (fun v _ -> v))
             in
             (theories,(Pdecl.create_pure_decl d)::decls)
           | _ ->
@@ -1182,7 +1178,7 @@ and lval denv (host,offset) =
           get_var denv v
         with e ->
           let l =
-            Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
+            Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
           in
           Self.result "denv contains @[[%a]@]"
                 (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -1498,7 +1494,7 @@ let fundecl denv_global fdec =
           List.map (fun t -> predicate_named ~label:Here t lvm old) pre;
         Dexpr.ds_post =
           List.map (fun t -> (result,predicate_named ~label:Here t lvm old)) post;
-        Dexpr.ds_xpost = Ity.Mexn.empty;
+        Dexpr.ds_xpost = Ity.Mxs.empty;
         Dexpr.ds_reads = [];
         Dexpr.ds_writes = [];
         Dexpr.ds_diverge = false;
@@ -1587,7 +1583,7 @@ let global (theories,lemmas,denv,functions) g =
      let later _lvm _old _ity =
        { Dexpr.ds_pre     = [];
          Dexpr.ds_post    = [];
-         Dexpr.ds_xpost   = Ity.Mexn.empty;
+         Dexpr.ds_xpost   = Ity.Mxs.empty;
          Dexpr.ds_reads  = [];
          Dexpr.ds_writes  = [];
          Dexpr.ds_diverge = false;
@@ -1607,7 +1603,7 @@ let global (theories,lemmas,denv,functions) g =
      let denv = Dexpr.denv_add_let denv dlet_defn in
      Self.result "global var %s done" vi.vname;
      let l =
-       Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
+       Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
      in
      Self.result "denv contains @[[%a]@]"
                  (Pp.print_list Pp.semi Format.pp_print_string) l;
