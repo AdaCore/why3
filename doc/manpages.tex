@@ -293,7 +293,7 @@ Additionally, a proof attempt can have the following attributes:
   attempt, \ie run the prover with the current task of the proof
   attempt, in order to update the answer of the prover and remove this
   attribute.
-\item[archived]\index{archived!proof attempt} The proof attempt is not useful
+\item[archived]\index{archived!proof attempt} \todo{obsolete} The proof attempt is not useful
   anymore; it is kept for history; no \why tools will select it by
   default. Section \ref{sec:uninstalledprovers} shows an example
   of this usage.
@@ -748,7 +748,7 @@ The available subcommands are as follows:
 \item[\texttt{html}] outputs session contents in HTML format.
 \item[\texttt{mod}] modifies some of the proofs, selected by a filter.
 \item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
-\item[\texttt{copy-archive}] same as copy but also archives the
+\item[\texttt{copy-archive}] \todo{obsolete} same as copy but also archives the
   original proofs\index{archived!proof attempt}.
 \item[\texttt{rm}] removes some of the proofs, selected by a filter.
 \end{description}
@@ -801,7 +801,7 @@ the one hand if the proof suffers from an internal failure we mark it
 with an exclamation mark \verb|!|, otherwise if it is not valid we
 mark it with a question mark \verb|?|, finally if it is valid we add
 nothing. On the other hand if the proof is obsolete we mark it with an
-\verb|O| and if it is archived we mark it with an \verb|A|.
+\verb|O| and if it is \todo{obsolete} archived we mark it with an \verb|A|.
 
 For example, here are the session tree produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
