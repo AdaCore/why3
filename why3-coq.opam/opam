@@ -30,10 +30,10 @@ build: [
    "--disable-frama-c"
    "--disable-ide"
    "--disable-js-of-ocaml"]
-  [make "-j%{jobs}%" "coq" "coq-tactic"]
+  [make "-j%{jobs}%" "coq"]
 ]
 
-install: [make "install-coq" "install-coq-tactic"]
+install: [make "install-coq"]
 
 remove: ["rm" "-rf" "%{lib}%/why3/coq"]
 
@@ -42,7 +42,7 @@ flags: [ light-uninstall ]
 depends: [
   "ocamlfind" {build}
   "why3"
-  "coq" {>= "8.4" & < "8.8~"}
+  "coq" {>= "8.5" & < "8.9~"}
 ]
 
 depopts: [

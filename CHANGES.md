@@ -53,7 +53,7 @@ Tools
   * deprecated `.why` file extension; use `.mlw` instead
 
 Provers
-  * deprecated the `why3` Coq tactic
+  * removed the `why3` Coq tactic :x:
   * dropped support for Coq 8.4 :x:
 
 Version 0.88.3, January 11, 2018

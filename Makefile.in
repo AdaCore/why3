@@ -54,8 +54,6 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-COQCAMLP  = @COQCAMLP@
-COQCAMLPLIB = @COQCAMLPLIB@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
 ifeq (@enable_menhirLib@,yes)
@@ -166,7 +164,6 @@ endif
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
 .PHONY: ide install-ide uninstall-ide
 .PHONY: coq install-coq uninstall-coq
-.PHONY: coq-tactic install-coq-tactic uninstall-coq-tactic
 .PHONY: pvs install-pvs uninstall-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
@@ -327,10 +324,6 @@ src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
 src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
 src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
 endif
-
-# hide warning 'no cmx file was found in path for module ..., and its interface was not compiled with -opaque' for the coq tactic
-
-src/coq-tactic/why3tac.cmx: WARNINGS:=$(WARNINGS)-58
 
 # build targets
 
@@ -965,92 +958,6 @@ install-bin::
 
 install_local:: bin/why3shell
 
-
-##############
-# Coq plugin
-##############
-
-ifeq (@enable_coq_tactic@,yes)
-
-COQPGENERATED = src/coq-tactic/why3tac.ml
-
-COQP_FILES = why3tac
-
-COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
-
-COQPDEP = $(addsuffix .dep, $(COQPMODULES))
-COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
-COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
-
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
-COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
-
-$(COQPDEP): DEPFLAGS += -I src/coq-tactic
-$(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
-$(COQPCMO) $(COQPCMX): BFLAGS += -rectypes
-$(COQPCMX): OFLAGS += -rectypes
-
-$(COQPDEP): $(COQPGENERATED)
-
-byte: lib/coq-tactic/why3tac.cma
-opt:  lib/coq-tactic/why3tac.cmxs
-
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@ @WHY3LIB@)
-
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@ @WHY3LIB@)
-
-lib/coq-tactic/why3tac.cmxs: $(WHY3CMXA) $(COQPCMX)
-lib/coq-tactic/why3tac.cma: $(WHY3CMA) $(COQPCMO)
-
-src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
-	$(SHOW) 'Camlp    $<'
-	$(HIDE)$(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
-
-COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3 -I lib/coq-tactic
-
-ifeq "$(OCAMLBEST)" "opt"
-COQTACEXT = cmxs
-else
-COQTACEXT = cma
-COQRTAC += -byte
-endif
-
-lib/coq-tactic/Why3.vo: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.$(COQTACEXT)
-	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) $(COQRTAC) $<
-
-coq-tactic: lib/coq-tactic/Why3.vo
-
-all: coq-tactic
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(COQPDEP)
-endif
-
-depend: $(COQPDEP)
-
-CLEANDIRS += src/coq-tactic
-CLEANLIBS += lib/coq-tactic/why3tac
-GENERATED += $(COQPGENERATED)
-
-clean::
-	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
-
-uninstall-coq-tactic:
-	rm -rf $(LIBDIR)/why3/coq-tactic
-
-install-coq-tactic:
-	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
-	$(INSTALL_DATA) lib/coq-tactic/Why3.vo lib/coq-tactic/why3tac.$(COQTACEXT) $(LIBDIR)/why3/coq-tactic
-
-install:: install-coq-tactic
-
-endif
-
 ####################
 # Coq realizations
 ####################
@@ -1101,11 +1008,7 @@ COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
 COQLIBS_OPTION_FILES = Option
 COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 
-ifeq (@coq_compat_version@,COQ84)
-COQLIBS_BV_FILES = Pow2int
-else
 COQLIBS_BV_FILES = Pow2int BV_Gen
-endif
 COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
@@ -1836,10 +1739,6 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 # desactivé car requiert findlib
 # if test -d examples/runstrat ; then \
 #  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
-	@if test "@enable_coq_tactic@" = "yes"; then \
-	   echo ; \
-	   echo "=== Checking the Coq tactic ==="; \
-	   $(MAKE) test-coq-tactic; fi
 
 bench-api:
 	@echo ""
@@ -1928,9 +1827,6 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
-test-coq-tactic: lib/coq-tactic/Why3.vo
-	$(COQC) $(COQRTAC) bench/coq-tactic/test.v
-
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
@@ -2015,7 +1911,7 @@ OCAMLCODE = $(addprefix doc/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
-      itp pvs coq coq_tactic isabelle
+      itp pvs coq isabelle
 
 DOCTEX = $(DOC:%=doc/%.tex)
 
@@ -2336,7 +2232,7 @@ headers:
 		Makefile.in configure.in \
 		src/*/*.ml src/*/*.ml[iyl4] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
-		lib/coq-tactic/*.v lib/coq/*.v lib/coq/*/*.v \
+		lib/coq/*.v lib/coq/*/*.v \
 		src/server/*.c src/server/*.h \
 		src/ide/resetgc.c \
 		examples/use_api/*.ml
