@@ -11,7 +11,7 @@ WORKDIR /home/why3/why3
 
 RUN eval `opam config env` && \
     ./configure && \
-    make -j2
+    make
 
 USER root
 
