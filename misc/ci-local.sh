@@ -18,7 +18,7 @@ set -e
 eval `opam config env`
 
 ./configure --enable-local
-make -j2
+make
 
 if test "$1" = bench; then
 bin/why3config --detect-provers

@@ -11,8 +11,8 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 ARG compiler=system
-RUN opam init -a -y -j2 --compiler=$compiler
-RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip
+RUN opam init -a -y -j1 --compiler=$compiler
+RUN opam repository add coq-released https://coq.inria.fr/opam/released
 
-# Alt-Ergo
-RUN opam install alt-ergo.1.30
+ARG packages
+RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo $packages
