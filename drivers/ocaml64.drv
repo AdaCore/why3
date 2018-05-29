@@ -183,7 +183,7 @@ module array.Array
 end
 
 module array.Init
-  syntax val init "Array.init (Z.to_int %1) %2"
+  syntax val init "Array.init (Z.to_int %1) (fun i -> %2 (Z.of_int i))"
 end
 
 module matrix.Matrix
