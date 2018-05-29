@@ -71,12 +71,14 @@ let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
 let mk_tconst s =
   mk_term
     (Tconst
-       Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
+       Number.(ConstInt { ic_negative = false ;
+                          ic_abs = int_literal_dec s }))
 
 let mk_econst s =
   mk_expr
     (Econst
-       Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
+       Number.(ConstInt { ic_negative = false ;
+                          ic_abs = int_literal_dec s }))
 
 let mk_tapp f l = mk_term (Tidapp(f,l))
 
@@ -118,7 +120,9 @@ let d1 : decl =
   }
   in
   let body = mk_eapp mul_int [mk_evar id_x; mk_econst "7"] in
-  let f1 = Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body) in
+  let f1 =
+    Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body)
+  in
   Dlet(mk_ident "f1",false,Expr.RKnone, mk_expr f1)
 
 let () =
@@ -246,7 +250,8 @@ let my_tasks : Task.task list =
   let mods =
     Wstdlib.Mstr.fold
       (fun _ m acc ->
-       List.rev_append (Task.split_theory m.Pmodule.mod_theory None None) acc)
+       List.rev_append
+         (Task.split_theory m.Pmodule.mod_theory None None) acc)
       mods []
   in List.rev mods
 
