@@ -68,8 +68,8 @@ contains one theory, itself containing three goals.
 \end{figure}
 In Figure~\ref{fig:gui2}, we clicked on the row corresponding to
 goal $G_1$. The \emph{task} associated with this goal is then
-displayed on the top right, and the corresponding part of the input
-file is shown on the bottom right part.
+displayed on the top-right pane. The corresponding part of the input
+file is shown when clicking the rightmost tab of that pane.
 
 
 \subsection{Calling provers on goals}
@@ -92,7 +92,7 @@ or the parent file.
 Let us now select the theory ``HelloProof'' and
 run the Alt-Ergo prover. After a short time, you should
 get the display of Figure~\ref{fig:gui3}.
-%EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;snap -crop 1024x384+0+0 doc/gui-3.png" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;type next;snap -crop 1024x384+0+0 doc/gui-3.png" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
 \includegraphics[width=\textwidth]{gui-3.png}
@@ -110,7 +110,7 @@ obvious here it will not succeed.
 
 Instead of calling a prover on a goal, you can apply a transformation
 to it.  Since $G_2$ is a conjunction, a possibility is to split it
-into subgoals. You can do that by selecting \textsf{Split} in the
+into subgoals. You can do that by selecting \textsf{Split VC} in the
 \texttt{Strategies} sub-menu of the context menu. Now you have two
 subgoals, and you can try again a prover on them, for example
 Alt-Ergo. We already have a lot of goals and proof attempts, so it is
@@ -119,7 +119,7 @@ be done by the menu \textsf{View/Collapse proved goals}, or even
 better by its shortcut ``Ctrl-C''.  You should see now what is
 displayed on Figure~\ref{fig:gui4}.
 
-%EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_goal_wp;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
+%EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
 \begin{figure}[tbp]
 %HEVEA\centering
  \includegraphics[width=\textwidth]{gui-4.png}
