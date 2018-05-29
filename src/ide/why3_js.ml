@@ -538,7 +538,7 @@ let remove_node n =
 end
 
 let interpNotif (n: notification) =
-  Format.kasprintf PE.log_print_msg "interpNotif: %a@\n@." Itp_communication.print_notify n;
+  PE.log_print_msg (Format.asprintf "interpNotif: %a@\n@." Itp_communication.print_notify n);
   match n with
   | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->

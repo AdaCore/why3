@@ -420,16 +420,25 @@ if test "$enable_emacs_compilation" = yes ; then
 fi
 
 # checking for Num
-DIR=
+# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
+found_num=no
 if test "$USEOCAMLFIND" = yes; then
    DIR=$(ocamlfind query num)
    if test -n "$DIR"; then
       echo "ocamlfind found num in $DIR"
+      NUMINCLUDE="-I $DIR"
+      found_num=yes
+      AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
+      AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
    fi
 fi
-DIR="$OCAMLLIB"
-AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
-AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
+if test "$found_num" = no; then
+   DIR="$OCAMLLIB"
+   NUMINCLUDE=
+   found_num=yes
+   AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
+   AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
+fi
 if test "$found_num" = no; then
    AC_MSG_ERROR([Library Num not found.])
 fi
@@ -462,7 +471,7 @@ if test "$enable_zarith" = yes; then
 else
    BIGINTLIB=nums
    BIGINTPKG=num
-   BIGINTINCLUDE=
+   BIGINTINCLUDE="$NUMINCLUDE"
 fi
 
 # checking for camlzip
@@ -920,6 +929,8 @@ AC_SUBST(META_OCAMLGRAPH)
 AC_SUBST(enable_compiler_plugins)
 AC_SUBST(COMPILERLIBS)
 AC_SUBST(COMPILERLIBSPKG)
+
+AC_SUBST(NUMINCLUDE)
 
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
