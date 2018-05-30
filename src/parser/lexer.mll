@@ -132,13 +132,13 @@ let op_char_1234 = op_char_1 | op_char_234
 let op_char_pref = ['!' '?']
 
 rule token = parse
-  | "##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
-    space* (dec+ as line) space* (dec+ as char) space* "##"
+  | "[##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
+    space* (dec+ as line) space* (dec+ as char) space* "]"
       { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
         token lexbuf }
-  | "#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
+  | "[#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
     space* (dec+ as line) space* (dec+ as bchar) space*
-    (dec+ as echar) space* "#"
+    (dec+ as echar) space* "]"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
