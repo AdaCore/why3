@@ -242,19 +242,22 @@ The provers can give the following output:
 \section{The \texttt{ide} Command}
 \label{sec:ideref}
 
-\todo{Claude: mettre a jour}
-
 The basic usage of the GUI is described by the tutorial of
-Section~\ref{sec:gui}. There are no specific command-line options,
-apart from the common options detailed in introduction to this
-chapter. However at least one anonymous argument must be specified on
-the command line. More precisely, the first anonymous argument must be
-the directory of the session. If the directory does not exist, it is
+Section~\ref{sec:gui}. The command-line options are the common options
+detailed in introduction to this chapter, plus the specific option
+already described for the command \texttt{prove} in
+Section~\ref{sec:proveoptions}.
+\begin{description}
+\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
+\end{description}
+At least one anonymous argument must be specified on the command
+line. More precisely, the first anonymous argument must be the
+directory of the session. If the directory does not exist, it is
 created. The other arguments should be existing files that are going
-to be added to the session. For convenience,
-if there is only one anonymous argument, it can be an existing file and
-in this case the session directory is obtained by removing the extension
-from the file name.
+to be added to the session. For convenience, if there is only one
+anonymous argument, it can be an existing file and in this case the
+session directory is obtained by removing the extension from the file
+name.
 
 We describe the actions of the various menus and buttons of the
 interface.
@@ -293,10 +296,14 @@ Additionally, a proof attempt can have the following attributes:
   attempt, \ie run the prover with the current task of the proof
   attempt, in order to update the answer of the prover and remove this
   attribute.
-\item[archived]\index{archived!proof attempt} \todo{obsolete} The proof attempt is not useful
-  anymore; it is kept for history; no \why tools will select it by
-  default. Section \ref{sec:uninstalledprovers} shows an example
-  of this usage.
+\item[detached]\index{detached!proof attempt} The proof attempt is not
+  associated to a proof task anymore. The reason might be that a proof
+  goal disappeared, or that there is a syntax or typing error in the
+  current file, that makes all nodes temporarily detached until the
+  parsing error is fixed. Detached nodes of the session tree are kept
+  until they are explicitly removed, either using a remove command or
+  the clean command. They can be reused, as any other nodes, using the
+  copy/paste operation.
 \end{description}
 
 Generally, proof attempts are marked obsolete just after
@@ -308,23 +315,31 @@ transformations have changed (new version of \why), \why will detect
 that. Since the provers might answer differently on these new
 proof obligations, the corresponding proof attempts are marked obsolete.
 
-% non
-% We say that a session is obsolete if new
-% goals are made obsolete by this method during start-up.
 
-% Claude: Alors la je ne vois pas pourquoi
-% A session can
-% be not obsolete even if it contains obsolete goals.
-
-\subsection{Left toolbar actions}
+\subsection{Menus}
 
 \begin{description}
-\item[Context] presents the context in which the other tools below will
-  apply. If ``only unproved goals'' is selected, no action will ever
-  be applied to an already proved goal.  If ``all goals'', then
-  actions are performed even if the goal is already proved. The second
-  choice allows to compare provers on the same goal.
+\item[Menu \textsf{File}]\emptyitem
+\begin{description}
+\item[Add File] adds a file in the GUI.
+%\item[Detect provers] runs provers auto-detection
+]\item[Preferences] opens a window for modifying preferred
+  configuration parameters, see details below.
+\item[Reload] reloads the input files from disk, and update the session state accordingly.
+\item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
+\item[Quit] exits the GUI.
+\end{description}
 
+\item[Menu \textsf{View}]\emptyitem
+\begin{description}
+\item[Expand All] expands all the rows of the tree view.
+\item[Collapse proved goals] closes all the rows of the tree view
+  that are proved.
+% \item[Hide proved goals] completely hides the proved rows of the tree
+%   view [EXPERIMENTAL]
+\end{description}
+
+\item[Menu \textsf{Tools}]
 \item[Strategies] section provides a set of actions that are
   performed on the selected goal(s):
   \begin{description}
@@ -377,36 +392,7 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 
 \item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
-\end{description}
 
-\end{description}
-
-\subsection{Menus}
-
-\begin{description}
-\item[Menu \textsf{File}]\emptyitem
-\begin{description}
-\item[Add File] adds a file in the GUI.
-%\item[Detect provers] runs provers auto-detection
-]\item[Preferences] opens a window for modifying preferred
-  configuration parameters, see details below.
-\item[Reload] reloads the input files from disk, and update the session state accordingly.
-\item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
-\item[Quit] exits the GUI.
-\end{description}
-
-\item[Menu \textsf{View}]\emptyitem
-\begin{description}
-\item[Expand All] expands all the rows of the tree view.
-\item[Collapse proved goals] closes all the rows of the tree view
-  that are proved.
-% \item[Hide proved goals] completely hides the proved rows of the tree
-%   view [EXPERIMENTAL]
-\end{description}
-
-\item[Menu \textsf{Tools}]
-A copy of the tools already available in the left toolbar, plus:
-\begin{description}
 \item[Mark as obsolete] marks all the proof as
   obsolete.
   This allows to replay every proof.
@@ -620,12 +606,7 @@ in~\cite{hauzar16sefm}.
 %
 % example
 
-\subsection{Additional Command-Line Options}
 
-The \texttt{ide} command also accepts the following options described for the command \texttt{prove} in Section~\ref{sec:proveoptions}.
-\begin{description}
-\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
-\end{description}
 
 \section{The \texttt{replay} Command}
 \label{sec:why3replayer}
