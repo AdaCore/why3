@@ -407,106 +407,108 @@ let check_support_library data ver =
     if support_ver = ver then true
     else begin
       eprintf
-        "Found prover %s version %s, but Why3 was compiled with support for version %s@."
+        "Found prover %s version %s, but the compiled Why3 library supports only version %s@."
         data.prover_name ver support_ver;
       false
     end
   with Sys_error _ | Not_found ->
     eprintf
-      "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
+      "Found prover %s version %s, but no Why3 libraries were compiled for it@."
       data.prover_name ver;
     false
 
-let detect_exec env data acc exec_name =
+exception Skip    (* prover is ignored *)
+exception Discard (* prover is recognized, but unusable *)
+
+let detect_exec env data exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
-  match s with
-  | None -> acc
-  | Some s ->
+  let s =
+    match s with
+    | None -> raise Skip
+    | Some s -> s in
   let re = Str.regexp data.version_regexp in
   let ver =
     try
       ignore (Str.search_forward re s 0);
       Str.matched_group 1 s
     with Not_found ->
-      begin
-        Debug.dprintf debug "Warning: found prover %s but name/version not \
+      Debug.dprintf debug "Warning: found prover %s but name/version not \
                        recognized by regexp `%s'@."
-          data.prover_name data.version_regexp;
-        Debug.dprintf debug "Answer was `%s'@." s;
-        ""
-      end
+        data.prover_name data.version_regexp;
+      Debug.dprintf debug "Answer was `%s'@." s;
+      ""
   in
-  (* bad mean here not good, it's not the same thing than a version
+  (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
   let bad = List.exists (check_version ver) data.versions_bad in
-  if bad then (known_version env exec_name; acc)
-  else
-    (* check if this prover needs compile-time support *)
-    let missing_compile_time_support =
-      data.support_library <> "" && not (check_support_library data ver)
-    in
-    if missing_compile_time_support then
-      (known_version env exec_name; acc)
-    else
-    let good = List.exists (check_version ver) data.versions_ok in
-    let old  = List.exists (check_version ver) data.versions_old in
+  if bad then raise Discard;
+  let good = List.exists (check_version ver) data.versions_ok in
+  let old  = List.exists (check_version ver) data.versions_old in
+  let prover_command =
     match data.prover_command with
     | None ->
-      (* Empty prover *)
-      if good || old then begin (* Known version with error *)
-        known_version env exec_name;
-        eprintf "Found prover %s version %s%s@."
-          data.prover_name ver
-          (Opt.get_def
-             ". This version of the prover is known to have problems."
-             data.message);
-        acc
-      end
-      else (* it's not a known bad version *) acc
-
-    | Some prover_command ->
-    (* create the prover config *)
-    let c = make_command exec_name prover_command in
-    let c_steps = (match data.prover_command_steps with
-      | None -> None
-      | Some prover_command_steps ->
-	Some (make_command exec_name prover_command_steps)) in
-    let prover = {Wc.prover_name = data.prover_name;
-                  prover_version      = ver;
-                  prover_altern       = data.prover_altern} in
-    let prover_config =
-      {prover  = prover;
-       command = c;
-       command_steps = c_steps;
-       driver  = data.prover_driver;
-       editor  = data.prover_editor;
-       in_place  = data.prover_in_place;
-       interactive   = (match data.kind with ITP -> true | ATP -> false);
-       extra_options = [];
-       extra_drivers = [] } in
-
-    let priority = next_priority () in
-    if good || old then begin
+      (* empty prover: a matching version means known problems *)
+      if not (good || old) then raise Skip;
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
         (Opt.get_def
-	   (if old then
-	      " (old version, please consider upgrading)."
-	    else
-	      if data.prover_altern <> "" then
-		" (alternative: " ^ data.prover_altern ^ ")"
-	      else
-		", OK.")
+           ". This version of the prover is known to have problems."
            data.message);
-      known_version env exec_name;
-      add_prover_shortcuts env prover;
-      add_id_prover_shortcut env data.prover_id prover priority;
-      let level = data.use_at_auto_level in
-      if level > 0 then record_prover_for_auto_mode prover level;
-      add_prover_with_uniq_id prover_config acc
-    end
-    else (unknown_version env exec_name data.prover_id prover_config data priority;
-          acc)
+      raise Discard
+    | Some prover_command -> prover_command
+  in
+  (* create the prover config *)
+  let c = make_command exec_name prover_command in
+  let c_steps = Opt.map (make_command exec_name) data.prover_command_steps in
+  let prover =
+    { Wc.prover_name = data.prover_name;
+      prover_version = ver;
+      prover_altern = data.prover_altern } in
+  let prover_config =
+    { prover = prover;
+      command = c;
+      command_steps = c_steps;
+      driver = data.prover_driver;
+      editor = data.prover_editor;
+      in_place = data.prover_in_place;
+      interactive = (match data.kind with ITP -> true | ATP -> false);
+      extra_options = [];
+      extra_drivers = [] } in
+  (* if unknown, temporarily put the prover away *)
+  if not (good || old) then begin
+    let priority = next_priority () in
+    unknown_version env exec_name data.prover_id prover_config data priority;
+    raise Skip
+  end;
+  (* check if this prover needs compile-time support *)
+  if data.support_library <> "" && not (check_support_library data ver) then
+    raise Discard;
+  let priority = next_priority () in
+  eprintf "Found prover %s version %s%s@."
+    data.prover_name ver
+    (Opt.get_def
+       (if old then
+	   " (old version, please consider upgrading)."
+	else
+	   if data.prover_altern <> "" then
+	     " (alternative: " ^ data.prover_altern ^ ")"
+	   else
+	     ", OK.")
+       data.message);
+  add_prover_shortcuts env prover;
+  add_id_prover_shortcut env data.prover_id prover priority;
+  let level = data.use_at_auto_level in
+  if level > 0 then record_prover_for_auto_mode prover level;
+  prover_config
+
+let detect_exec env data acc exec_name =
+  try
+    let prover_config = detect_exec env data exec_name in
+    known_version env exec_name;
+    add_prover_with_uniq_id prover_config acc
+  with
+  | Skip -> acc
+  | Discard -> known_version env exec_name; acc
 
 let detect_prover env acc data =
   List.fold_left (detect_exec env data) acc data.execs
@@ -515,25 +517,27 @@ let pp_versions =
   Pp.print_list Pp.comma
                 (Pp.print_pair_delim Pp.nothing Pp.nothing Pp.nothing Pp.string Pp.nothing)
 
-(** add the prover unknown *)
+let detect_unknown env pc =
+  let (data,priority,prover_id,prover_config) =
+    match pc with
+    | None -> raise Skip
+    | Some pc -> pc in
+  let prover = prover_config.prover in
+  let ver = prover.prover_version in
+  if data.support_library <> "" && not (check_support_library data ver) then raise Skip;
+  Warning.emit "@[Prover %s version %s is not known to be supported.@\n\
+                Known versions for this prover:@ %a@\n\
+                Known old versions for this prover:@ %a@]@."
+    prover.Wc.prover_name ver
+    pp_versions data.versions_ok
+    pp_versions data.versions_old;
+  add_id_prover_shortcut env prover_id prover priority;
+  prover_config
+
 let detect_unknown env detected =
   Hstr.fold (fun _ pc acc ->
-    match pc with
-    | None -> acc
-    | Some (prover_data,priority,prover_id,prover_config) ->
-      let prover = prover_config.prover in
-      Warning.emit "@[Prover %s version %s is not known to be supported.@\n\
-                    Known versions for this prover:@ %a@\n\
-                    Known old versions for this prover:@ %a@]@."
-                   prover.Wc.prover_name prover.prover_version
-                   pp_versions prover_data.versions_ok
-                   pp_versions prover_data.versions_old;
-      (* Pb: Even if it match the first prover section (normally
-         highest priority) since it is unknown it has the lower
-         priority for its id as shortcut. Perhaps we don't want
-         that. *)
-      add_id_prover_shortcut env prover_id prover priority;
-      add_prover_with_uniq_id prover_config acc)
+    try add_prover_with_uniq_id (detect_unknown env pc) acc
+    with Skip -> acc)
     env.prover_unknown_version detected
 
 let convert_shortcuts env =
@@ -545,13 +549,15 @@ let run_auto_detection config =
   let main = get_main config in
   let l,env = read_auto_detection_data main in
   let detected = List.fold_left (detect_prover env) Mprover.empty l in
-  let length_detected = Mprover.cardinal detected in
+  let length_recognized = Mprover.cardinal detected in
   let detected = detect_unknown env detected in
-  let length_unsupported_version =
-    Mprover.cardinal detected - length_detected in
-  eprintf
-    "%d provers detected and %d provers detected with unsupported version@."
-    length_detected length_unsupported_version;
+  let length_detected = Mprover.cardinal detected in
+  if length_detected > length_recognized then
+    eprintf
+      "%d prover(s) added (including %d prover(s) with an unrecognized version)@."
+      length_detected (length_detected - length_recognized)
+  else
+    eprintf "%d prover(s) added@." length_detected;
   let shortcuts = convert_shortcuts env in
   let config = generate_auto_strategies config in
   let config = set_editors config (read_editors main) in
