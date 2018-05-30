@@ -2,83 +2,93 @@
 \label{chap:syntaxref}
 %HEVEA\cutname{syntaxref.html}
 
-This chapter gives the grammar and semantics for \why and \whyml input files.
+In this chapter, we describe the syntax and semantics of \whyml.
 
 \section{Lexical Conventions}
 
-Lexical conventions are common to \why and \whyml.
-
-% TODO: blanks
-
-\subsection{Comments}
-
+%Lexical conventions of \whyml are similar to those of OCaml.
+%
+Blank characters are space, horizontal tab, carriage return,
+and line feed. Blanks separate lexemes but are otherwise ignored.
+%
 Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
-
-\subsection{Strings}
+Note that \texttt{(*)} does not start a comment.
 
 Strings are enclosed in double quotes (\verb!"!). Double quotes can be
 escaped in strings using the backslash character (\verb!\!).
 The other special sequences are \verb!\n! for line feed and \verb!\t!
 for horizontal tab.
 In the following, strings are referred to with the non-terminal
-\nonterm{string}{}.
+\nonterm{string}{}\spacefalse.
 
-\subsection{Identifiers}
-
-Identifiers are non-empty sequences of characters among letters,
-digits, the underscore character and the quote character. They cannot
-start with a digit or a quote.
-
-\begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
-
-The syntax distinguishes identifiers that start with a lowercase or an
-uppercase letter (resp. \nonterm{lident}{} and \nonterm{uident}{}), and
-similarly, lowercase and uppercase qualified identifiers.
-
-The restricted classes of identifiers denoted by \nonterm{lident-nq}{}
-and \nonterm{uident-nq}{} correspond to identifiers where the quote
-character cannot be followed by a letter. Identifiers where a quote is
-followed by a letter are reserved and cannot be used as identifier for
-declarations introduced by the user (see Section~\ref{sec:rangetypes}).
-
-
-\subsection{Constants}
-The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
+%\subsection{Constants}
+The syntax for numerical constants is given by the following rules:
+%\begin{figure}[ht]
+\begin{center}\input{./constant_bnf.tex}\end{center}
+%\caption{Syntax for numerical constants.}
+%\label{fig:bnf:constant}
+%\end{figure}
+%in Figure~\ref{fig:bnf:constant}.
 Integer and real constants have arbitrary precision.
-Integer constants may be given in base 16, 10, 8 or 2.
-Real constants may be given in base 16 or 10.
+Integer constants can be given in base 10, 16, 8 or 2.
+Real constants can be given in base 10 or 16.
+Notice that the exponent in hexadecimal real constants is written in base 10.
 
-\begin{figure}
-\begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
-  \caption{Syntax for constants.}
-\label{fig:bnf:constant}
-\end{figure}
+%\subsection{Identifiers}
+Identifiers are composed of letters, digits, the underscore character,
+and the quote character. %, as shown in Figure~\ref{fig:bnf:ident}.
+The syntax distinguishes identifiers that start with a lowercase letter
+or an underscore (\nonterm{lident}{}\spacefalse) and identifiers that
+start with an uppercase letter (\nonterm{uident}{}\spacefalse):
+%\begin{figure}[ht]
+\begin{center}\input{./ident_bnf.tex}\end{center}
+%\caption{Syntax for identifiers.}
+%\label{fig:bnf:ident}
+%\end{figure}
+Identifiers that contain a quote followed by a letter,
+such as \texttt{int32'max}, are reserved for symbols
+introduced by \why transformations and cannot be used
+for user-defined symbols.
 
-\subsection{Operators}
-
+%\subsection{Operators}
 Prefix and infix operators are built from characters organized in four
-categories (\textsl{op-char-1} to \textsl{op-char-4}).
-\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
-Infix operators are classified into 4 categories, according to the
-characters they are built from:
-\begin{itemize}
-\item level 4: operators containing only characters from
-\textit{op-char-4};
-\item level 3: those containing
- characters from \textit{op-char-3} or \textit{op-char-4};
-\item level 2: those containing
- characters from \textit{op-char-2}, \textit{op-char-3} or
- \textit{op-char-4};
-\item level 1: all other operators (non-terminal \textit{infix-op-1}).
-\end{itemize}
+precedence groups (\textsl{op-char-1} to \textsl{op-char-4}):
+%as shown in Figure~\ref{fig:bnf:operator}.
+%\begin{figure}[ht]
+\begin{center}\input{./operator_bnf.tex}\end{center}
+%\caption{Syntax for operators.}
+%\label{fig:bnf:operator}
+%\end{figure}
+The infix operators from a high-numbered group bind stronger
+than the infix operators from a low-numbered group,
+and prefix operators bind stronger than infix operators.
+For example, the infix operator \texttt{.*.} (from \textsl{infix-op-3})
+would have a higher precedence than the infix operator \texttt{->-}
+(from \textsl{infix-op-1}).
+The so-called ``bang operators'' are prefix operators that have even
+higher precedence than the juxtaposition (application) operator,
+allowing us to write expressions like \texttt{inv !x}.
+Infix operators from the groups 2-4 are left-associative.
+Infix operators from the group 1 are non-associative and
+may instead be chained, as explained below.
 
-\subsection{Labels}
+An operator inside parenthesis can act as a lowercase identifier.
+Qualified identifiers are prefixed with a sequence of uppercase
+identifiers, e.g., \texttt{App.S.get}:
+%\begin{figure}[ht]
+\begin{center}\input{./qualid_bnf.tex}\end{center}
+%\caption{Syntax for qualified identifiers.}
+%\label{fig:bnf:qualid}
+%\end{figure}
 
-Identifiers, terms, formulas, program expressions
-can all be labeled, either with a string, or with a location tag.
-\begin{center}\framebox{\input{./label_bnf.tex}}\end{center}
-A location tag consists of a file name, a line number, and starting
-and ending characters.
+Finally, any identifier, term, formula, or expression
+in a \whyml program can be tagged, either with a generic tag
+or a location tag:
+\begin{center}\input{./tag_bnf.tex}\end{center}
+A generic tag cannot contain newlines or closing square brackets;
+leading and trailing spaces are ignored.
+A location tag consists of a file name in double quotes,
+a line number, and starting and ending character positions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

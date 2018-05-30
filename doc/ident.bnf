@@ -1,0 +1,7 @@
+\begin{syntax}
+  suffix ::= "a" - "z" | "A" - "Z" | "0" - "9" | "'" | "_"
+  \
+  lident ::= ("a" - "z") suffix* | "_" suffix+
+  \
+  uident ::= ("A" - "Z") suffix* %
+\end{syntax}

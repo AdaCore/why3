@@ -1,33 +1,9 @@
 \begin{syntax}
-  lalpha ::= "a"-"z" | "_"
+  lident-ext ::= lident | "(" op-char-1234+ ")"
   \
-  ualpha ::= "A"-"Z"
+  qualid ::= (uident ".")* (lident-ext | uident)
   \
-  alpha ::= lalpha | ualpha
+  lqualid ::= (uident ".")* lident
   \
-  suffix ::= (alpha | digit | "'")*
-  \
-  lident ::= lalpha suffix
-  \
-  uident ::= ualpha suffix
-  \
-  ident ::= lident | uident
-  \
-  lqualid ::= lident | uqualid "." lident
-  \
-  uqualid ::= uident | uqualid "." uident
-  \
-  qualid ::= ident | uqualid "." ident
-  \
-  digit-or-us ::= "0"-"9" | "_"
-  \
-  alpha-no-us ::= "a"-"z" | "A"-"Z"
-  \
-  suffix-nq ::= (alpha-no-us | "'"* digit-or-us)* "'"*
-  \
-  lident-nq ::= lalpha suffix-nq
-  \
-  uident-nq ::= ualpha suffix-nq
-  \
-  ident-nq ::= lident-nq | uident-nq  ;%
+  uqualid ::= (uident ".")* uident %
 \end{syntax}

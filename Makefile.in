@@ -1857,7 +1857,7 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/manual.pdf doc/html/index.html
 
-BNF = qualid label constant operator term type formula theory theory2 \
+BNF = ident qualid tag constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(BNF:%=doc/%_bnf.tex)
 

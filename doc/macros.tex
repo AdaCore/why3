@@ -19,13 +19,14 @@
 \newcommand{\indexttbs}[1]{\index{#1@\protect\keywordbs{#1}}}
 \newif\ifspace
 \newif\ifnewentry
-\newcommand{\addspace}{\ifspace \: \spacefalse \fi}
+\newcommand{\addspace}{\ifspace\:\:\spacefalse\fi}
 \newcommand{\term}[2]{\addspace\mbox{\lstinline|#1|%
 \ifthenelse{\equal{#2}{}}{}{\indexttbase{#2}{#1}}}\spacetrue}
 \newcommand{\nonterm}[2]{%
   \ifthenelse{\equal{#2}{}}%
              {\addspace\mbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
              {\addspace\mbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
+\newcommand{\interval}{\addspace--\spacetrue}
 \newcommand{\repetstar}{$^*$\spacetrue}
 \newcommand{\repetplus}{$^+$\spacetrue}
 \newcommand{\repetone}{$^?$\spacetrue}
