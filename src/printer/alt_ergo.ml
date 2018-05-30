@@ -174,28 +174,32 @@ let rec print_term info fmt t =
       Number.print number_format fmt c
   | Tvar { vs_name = id } ->
       print_ident info fmt id
-  | Tapp (ls, tl) -> begin
-      (match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None ->
+  | Tapp (ls, tl) ->
+     begin
+       match query_syntax info.info_syn ls.ls_name with
+       | Some s -> syntax_arguments s (print_term info) fmt tl
+       | None ->
 	  begin
 	    if (tl = []) then
 	      begin
 		let vc_term_info = info.info_vc_term in
-		if vc_term_info.vc_inside then begin
-		  match vc_term_info.vc_loc with
-		  | None -> ()
-		  | Some loc ->
-		      let labels = match vc_term_info.vc_func_name with
-		      | None ->
-			  ls.ls_name.id_label
-		      | Some _ ->
-			  model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
-		      let _t_check_pos = t_label ~loc labels t in
-		      (* TODO: temporarily disable collecting variables inside the term triggering VC *)
-		      (*info.info_model <- add_model_element t_check_pos info.info_model;*)
-		      ()
-		end
+		if vc_term_info.vc_inside then
+                  begin
+		    match vc_term_info.vc_loc with
+		    | None -> ()
+		    | Some loc ->
+		       let labels = (*match vc_term_info.vc_func_name with
+		         | None ->*)
+			    ls.ls_name.id_label
+		         (*| Some _ ->
+			    model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term
+                          *)
+                       in
+		       let _t_check_pos = t_label ~loc labels t in
+		       (* TODO: temporarily disable collecting variables inside the term triggering VC *)
+		       (*info.info_model <- add_model_element t_check_pos info.info_model;*)
+		       ()
+		  end
 	      end;
 	  end;
 	  if (Mls.mem ls info.info_csm) then
@@ -218,7 +222,7 @@ let rec print_term info fmt t =
 	      fprintf fmt "(%a%a : %a)" (print_ident info) ls.ls_name
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
-      ) end
+     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo : you must eliminate let in term"
   | Tif _ -> unsupportedTerm t
