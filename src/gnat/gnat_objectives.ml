@@ -995,9 +995,7 @@ let run_goal ?save_to ?limit ~callback c prover g =
 (* TODO we should pass the type prover not a string here ? *)
       | None -> Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn
       | Some x -> x in
-    if config_prover.Whyconf.interactive then () else
-    C.schedule_proof_attempt ?save_to ~limit ~callback
-      ~notification c g prover
+    C.schedule_proof_attempt ?save_to ~limit ~callback ~notification c g prover
 
 let goal_has_splits session (goal: goal_id) =
   let goal_transformations = Session_itp.get_transformations session goal in
