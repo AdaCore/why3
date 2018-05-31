@@ -371,7 +371,8 @@ type_case:
 
 constant_decl:
 | labels(lident_rich) cast preceded(EQUAL,term)?
-  { { ld_ident = $1; ld_params = []; ld_type = Some $2;
+  { { ld_ident = add_model_trace_label $1;
+      ld_params = []; ld_type = Some $2;
       ld_def = $3; ld_loc = floc $startpos $endpos } }
 
 function_decl:

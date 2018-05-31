@@ -1,0 +1,23 @@
+
+module M
+
+  use import int.Int
+  use import ref.Ref
+
+  val a : ref int
+
+  let p1 (b : ref int) : int
+    requires { 0 <= !a <= 10 /\ 3 <= !b <= 17 }
+    ensures  { 17 <= !a + result <= 42 }
+  = a := !a + !b;
+    !a + 1
+
+
+let f (a [@model] [@model_trace:A]: ref int)
+  requires { !a = 42 }
+  ensures { !a = 2 + old !a + result } =
+  a := 0;
+  a := 1;
+  !a+1
+
+end

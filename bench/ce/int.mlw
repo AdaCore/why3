@@ -2,16 +2,15 @@ theory T
 
   use import int.Int
 
-  goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
+  goal g_lab : forall x [@model] :int. x >= 42 -> x + 3 <= 50
 
-  goal g_lab0 : forall x:int. (x >= 42) ->
-    (x + 3 <= 50)
+  goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
 
   constant g : int
 
   goal g2_lab : forall x:int. (g >= x)
 
-  goal newgoal : forall x1 [@model_trace:X] x2 x3 x4 x5 x6 x7 x8.
+  goal newgoal : forall x1 [@model] [@model_trace:X] x2 x3 x4 x5 x6 x7 x8.
   (x1 + 1 = 2) ->
   (x2 + 1 = 2) ->
   (x3 + 1 = 2) ->

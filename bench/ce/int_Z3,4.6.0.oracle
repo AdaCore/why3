@@ -1,10 +1,10 @@
-bench/ce/int.mlw T g_no_lab: Unknown (other)
+bench/ce/int.mlw T g_lab: Unknown (other)
 Counter-example model:File int.mlw:
 Line 5:
 x = {"type" : "Integer" ,
 "val" : "48" }
 
-bench/ce/int.mlw T g_lab0: Unknown (other)
+bench/ce/int.mlw T g_no_lab: Unknown (other)
 Counter-example model:File int.mlw:
 Line 7:
 x = {"type" : "Integer" ,
@@ -12,14 +12,18 @@ x = {"type" : "Integer" ,
 
 bench/ce/int.mlw T g2_lab: Unknown (other)
 Counter-example model:File int.mlw:
-Line 12:
+Line 9:
+g = {"type" : "Integer" , "val" : "0" }
+Line 11:
 x = {"type" : "Integer" ,
 "val" : "1" }
 
 bench/ce/int.mlw T newgoal: Unknown (other)
 Counter-example model:File int.mlw:
-Line 14:
-x2 = {"type" : "Integer" , "val" : "1" }
+Line 13:
+X = {"type" : "Integer" , "val" : "1" }
+x2 = {"type" : "Integer" ,
+"val" : "1" }
 x3 = {"type" : "Integer" ,
 "val" : "1" }
 x4 = {"type" : "Integer" ,
