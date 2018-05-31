@@ -16,6 +16,9 @@
 #include "options.h"
 #include "logging.h"
 
+// Global pointers are initialized with NULL by C semantics
+pqueue queue;
+
 //count the semicolons in <buf>, up to <len>
 int count_semicolons(char* buf, int len);
 
@@ -143,4 +146,22 @@ void free_request(prequest r) {
   }
   free(r->args);
   free(r);
+}
+
+void init_request_queue () {
+  queue = init_queue(100);
+}
+
+void remove_from_queue(char *id) {
+  // inefficient, but what else?
+  pqueue tmp = init_queue(queue->capacity);
+  while (!queue_is_empty(queue)) {
+    prequest r = queue_pop(queue);
+    if (strcmp(r->id,id)) queue_push(tmp, r);
+  }
+  while (!queue_is_empty(tmp)) {
+    prequest r = queue_pop(tmp);
+    queue_push(queue, r);
+  }
+  free_queue(tmp);
 }
