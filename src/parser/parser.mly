@@ -44,12 +44,6 @@
       (loc, Some (add_model_trace_label id), ghost, ty)
     | _ -> b
 
-  let add_model_vc_label t =
-    {t with term_desc = Tnamed (Lstr Ident.model_vc_label, t)}
-
-  let add_model_vc_post_label t =
-    {t with term_desc = Tnamed (Lstr Ident.model_vc_post_label, t)}
-
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
   let mk_int_const neg lit =
@@ -900,8 +894,7 @@ single_expr_:
 | GHOST single_expr
     { Eghost $2 }
 | assertion_kind LEFTBRC term RIGHTBRC
-    { let t = add_model_vc_label $3 in
-      Eassert ($1, t) }
+    { Eassert ($1, $3) }
 | label single_expr %prec prec_named
     { Enamed ($1, $2) }
 | single_expr cast
@@ -997,13 +990,11 @@ spec:
 
 single_spec:
 | REQUIRES LEFTBRC term RIGHTBRC
-    { let t = add_model_vc_label $3 in
-      { empty_spec with sp_pre = [t] } }
+    { { empty_spec with sp_pre = [$3] } }
 | ENSURES LEFTBRC ensures RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
-    { let l = List.map (fun (x, t) -> x, add_model_vc_post_label t) $3 in
-      { empty_spec with sp_post = [floc $startpos($3) $endpos($3), l] } }
+    { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | READS  LEFTBRC comma_list0(lqualid) RIGHTBRC
@@ -1025,22 +1016,19 @@ alias:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      let t = add_model_vc_post_label $1 in
-      [mk_pat (Pvar (id,false)) $startpos $endpos, t] }
+      [mk_pat (Pvar (id,false)) $startpos $endpos, $1] }
 
 raises:
 | uqualid ARROW term
-    { let t = add_model_vc_post_label $3 in
-      $1, Some (mk_pat (Ptuple []) $startpos($1) $endpos($1), t) }
+    { $1, Some (mk_pat (Ptuple []) $startpos($1) $endpos($1), $3) }
 | uqualid pat_arg ARROW term
-    { let t = add_model_vc_post_label $4 in
-      $1, Some ($2, t) }
+    { $1, Some ($2, $4) }
 
 xsymbol:
 | uqualid { $1, None }
 
 invariant:
-| INVARIANT LEFTBRC term RIGHTBRC { add_model_vc_label $3 }
+| INVARIANT LEFTBRC term RIGHTBRC { $3 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }

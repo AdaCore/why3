@@ -141,14 +141,14 @@ val id_unique_label :
 (** Do the same as id_unique except that it tries first to
    use the "name:" label to generate the name instead of id.id_string *)
 
-
-
 (** {2 labels for handling counterexamples} *)
 
 val model_label : label
 val model_projected_label : label
+
 val model_vc_label : label
 val model_vc_post_label : label
+val model_vc_havoc_label : label
 
 val has_a_model_label : ident -> bool
 (** [true] when [ident] has one of the labels above. *)

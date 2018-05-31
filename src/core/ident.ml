@@ -261,13 +261,13 @@ let sanitizer' head rest last n =
 let sanitizer head rest n = sanitizer' head rest rest n
 
 
-
 (** {2 functions for working with counterexample model labels} *)
 
 let model_label = create_label "model"
 let model_projected_label = create_label "model_projected"
 let model_vc_label = create_label "model_vc"
 let model_vc_post_label = create_label "model_vc_post"
+let model_vc_havoc_label = create_label "model_vc_havoc"
 
 let create_model_trace_label s = create_label ("model_trace:" ^ s)
 

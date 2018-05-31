@@ -35,8 +35,13 @@ let no_eval = Debug.register_flag "vc_no_eval"
 let case_split = Ident.create_label "case_split"
 let add_case t = t_label_add case_split t
 
-let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
-let clone_pv v = clone_vs v.pv_vs
+let clone_pv loc {pv_vs = {vs_name = id; vs_ty = ty}} =
+  (* we do not preserve the location of the initial pv
+     in the new variable for SP, because we do not want
+     to require a model for it and rely on "model_vc_*"
+     labels to produce new, correctly located, variables *)
+  let id = id_fresh ~label:id.id_label ?loc id.id_string in
+  create_vsymbol id ty
 
 let pv_is_unit v = ity_equal v.pv_ity ity_unit
 
@@ -119,6 +124,9 @@ let lab_has_expl lab =
   Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
 
 let annot_labels = Slab.add stop_split (Slab.singleton annot_label)
+
+(* TODO: remove this line, and use "annot_label" instead *)
+let annot_labels = Slab.add Ident.model_vc_label annot_labels
 
 let vc_expl loc lab expl f =
   let lab = Slab.union annot_labels (Slab.union lab f.t_label) in
@@ -330,7 +338,8 @@ type kode =
   | Kpar   of kode * kode                 (* non-deterministic choice *)
   | Kif    of pvsymbol * kode * kode          (* deterministic choice *)
   | Kcase  of pvsymbol * (pattern * kode) list    (* pattern matching *)
-  | Khavoc of pvsymbol option Mpv.t Mreg.t  (* writes and assignments *)
+  | Khavoc of pvsymbol option Mpv.t Mreg.t *
+              Loc.position option           (* writes and assignments *)
   | Klet   of pvsymbol * term * term         (* let v = t such that f *)
   | Kval   of pvsymbol list * term        (* let vl = any such that f *)
   | Kcut   of term                        (* assert: check and assume *)
@@ -362,7 +371,7 @@ let rec k_print fmt k = match k with
         "@[<hov 4>| %a ->@ %a@]" Pretty.print_pat p k_print k in
       Format.fprintf fmt "@[CASE %a\n@[%a@]@]"
         Ity.print_pv v (Pp.print_list Pp.newline branch) bl
-  | Khavoc _wr -> Format.fprintf fmt "HAVOC" (* TODO *)
+  | Khavoc _ -> Format.fprintf fmt "HAVOC" (* TODO *)
   | Klet (v, t, {t_node = Ttrue}) -> Format.fprintf fmt
       "@[<hov 4>LET %a = %a@]" Ity.print_pv v Pretty.print_term t
   | Klet (v,t,f) -> Format.fprintf fmt
@@ -434,10 +443,10 @@ let k_unit res = Kval ([res], t_true)
 let bind_oldies o2v k = Mpv.fold (fun o v k ->
   Kseq (Klet (o, t_var v.pv_vs, t_true), 0, k)) o2v k
 
-let k_havoc eff k =
+let k_havoc loc eff k =
   if Sreg.is_empty eff.eff_covers then k else
   let conv wr = Mpv.map (fun () -> None) wr in
-  Kseq (Khavoc (Mreg.map conv eff.eff_writes), 0, k)
+  Kseq (Khavoc (Mreg.map conv eff.eff_writes, loc), 0, k)
 
 (* missing exceptional postconditions are set to True,
    unless we skip them altogether and let the exception
@@ -582,7 +591,7 @@ let rec k_expr env lps e res xmap =
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
-        let k = bind_oldies oldies (k_havoc e.e_effect k) in
+        let k = bind_oldies oldies (k_havoc loc e.e_effect k) in
         let k = if pre = [] then k else
           if Slab.mem kp_label e.e_label
             then Kseq (Kcut p, 0, k)
@@ -624,7 +633,7 @@ let rec k_expr env lps e res xmap =
         let add_write r wfs acc =
           try Mreg.add (Mreg.find r t2f) (Mpv.map (fun v -> Some v) wfs) acc
           with Not_found -> acc in
-        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty), 0, k_unit res)
+        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty, loc), 0, k_unit res)
     | Elet (LDvar (v, e0), e1) ->
         let k = k_expr env lps e1 res xmap in
         Kseq (k_expr env lps e0 v xmap, 0, k)
@@ -640,9 +649,9 @@ let rec k_expr env lps e res xmap =
         let add_axiom cty q k = if can_simp q then k else
           let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
-          Kseq (Kaxiom (k_havoc eff ax), 0, k) in
+          Kseq (Kaxiom (k_havoc loc eff ax), 0, k) in
         let add_axiom cty q k =
-          let pinv = inv_of_pvs env e.e_loc (cty_reads cty) in
+          let pinv = inv_of_pvs env loc (cty_reads cty) in
           List.fold_right assert_inv pinv (add_axiom cty q k) in
         let add_rs sm s c (vl,k) = match s.rs_logic with
           | RLls _ -> assert false (* not applicable *)
@@ -674,9 +683,9 @@ let rec k_expr env lps e res xmap =
               let rec k_par = function
                 | [k] -> k | [] -> assert false
                 | k::kl -> Kpar (k, k_par kl) in
-              Kpar (k_havoc eff (k_par (k_rec env lps rdl)), k)
+              Kpar (k_havoc loc eff (k_par (k_rec env lps rdl)), k)
           | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
-              Kpar (k_havoc eff (k_fun env lps cty e), k)
+              Kpar (k_havoc loc eff (k_fun env lps cty e), k)
           | _ -> k end
     | Eif (e0, e1, e2) ->
         (* with both branches pure, switch to SP to avoid splitting *)
@@ -785,7 +794,7 @@ let rec k_expr env lps e res xmap =
         let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
-        Kpar (j, k_havoc e.e_effect k)
+        Kpar (j, k_havoc loc e.e_effect k)
     | Efor (vx, (a, d, b), vi, invl, e1) ->
         let int_of_pv = match vx.pv_vs.vs_ty.ty_node with
           | Tyapp (s,_) when ts_equal s ts_int ->
@@ -825,7 +834,7 @@ let rec k_expr env lps e res xmap =
         in
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
-        let k = Kpar (j, k_havoc e.e_effect k) in
+        let k = Kpar (j, k_havoc loc e.e_effect k) in
         (* [ ASSUME a <= b+1 ;
              [ STOP inv[a]
              | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
@@ -1004,10 +1013,10 @@ let reflow vc_wp k =
 (* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
-let dst_of_wp wr wp =
+let dst_of_wp loc wr wp =
   if Mreg.is_empty wr then Mpv.empty else
   let clone_affected v _ =
-    if pv_affected wr v then Some (clone_pv v) else None in
+    if pv_affected wr v then Some (clone_pv loc v) else None in
   Mpv.mapi_filter clone_affected (t_freepvs Spv.empty wp)
 
 let adjustment dst = Mpv.fold (fun o n sbs ->
@@ -1217,9 +1226,9 @@ let rec sp_expr kn k rdm dst = match k with
          and for every variable read by k2 that is not in dst *)
       let get_wr _ (_, w) m = Mpv.set_union w m in
       let wr2 = Mint.fold get_wr sp2 Mpv.empty in
-      let fresh_wr2 v _ = clone_pv v in
+      let fresh_wr2 v _ = clone_pv None v in
       let fresh_rd2 v _ = if v.pv_ity.ity_pure then None
-                          else Some (clone_pv v) in
+                          else Some (clone_pv None v) in
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
@@ -1305,7 +1314,7 @@ let rec sp_expr kn k rdm dst = match k with
         Mint.merge (join p) sp spm) spl spm in
       let sp_case (bl, wr) = sp_case t bl, wr in
       wp_case t wpl, Mint.map sp_case spm, Spv.add v rds
-  | Khavoc wr ->
+  | Khavoc (wr, loc) ->
       let rd = Mint.find 0 rdm in
       let dst = Mpv.set_inter dst (pvs_affected wr rd) in
       if Mpv.is_empty dst then sp_expr kn (Kcont 0) rdm dst else
@@ -1319,6 +1328,9 @@ let rec sp_expr kn k rdm dst = match k with
         sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
+      let lab = Ident.model_vc_havoc_label in
+      let lab = Slab.add lab sp.t_label in
+      let sp = t_label ?loc lab sp in
       let add_rhs _ rhs rd = match rhs with
         | Some v -> Spv.add v rd | None -> rd in
       let add_rhs _ = Mpv.fold add_rhs in
@@ -1369,9 +1381,9 @@ and wp_expr kn k q = match k with
   | Kcase ({pv_vs = v}, bl) ->
       let branch (p,k) = t_close_branch p (wp_expr kn k q) in
       wp_case (t_var v) (List.map branch bl)
-  | Khavoc wr ->
+  | Khavoc (wr, loc) ->
       let q = Mint.find 0 q in
-      let dst = dst_of_wp wr q in
+      let dst = dst_of_wp loc wr q in
       if Mpv.is_empty dst then q else
       let regs = name_regions kn wr dst in
       let () = print_dst dst; print_regs regs in
