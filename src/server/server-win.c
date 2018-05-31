@@ -32,6 +32,7 @@
 #include "writebuf.h"
 #include "arraylist.h"
 #include "logging.h"
+#include "proc.h"
 
 #define READ_ONCE 1024
 #define BUFSIZE 4096
@@ -62,14 +63,6 @@ typedef struct {
    pwritebuf   writebuf;
 } t_client, *pclient;
 
-typedef struct {
-   HANDLE handle;
-   HANDLE job;
-   int client_key;
-   char* id;
-   char* outfile;
-} t_proc, *pproc;
-
 // AFAIU, there is no connection queue or something like that, so we need to
 // create several socket instances to be able to process several clients that
 // would connect almost at the same time. The two variables below will be
@@ -79,7 +72,6 @@ pserver* server_socket;
 int* server_key;
 
 plist clients;
-plist processes;
 char current_dir[MAX_PATH];
 
 int gen_key = 1;
@@ -109,7 +101,6 @@ HANDLE completion_port;
 void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
-  pproc proc;
   if (completion_port != NULL) {
     CloseHandle (completion_port);
   }
@@ -125,9 +116,7 @@ void shutdown_with_msg(char* msg) {
   }
   if (processes != NULL) {
      for (int i = 0; i < list_length(processes); i++) {
-       proc = processes->data[i];
-       CloseHandle(proc->handle);
-       CloseHandle(proc->job);
+       free_process(processes->data[i]);
      }
   }
   logging_shutdown(msg);
@@ -430,7 +419,7 @@ void run_request (prequest r) {
    proc = (pproc) malloc(sizeof(t_proc));
    proc->handle     = pi.hProcess;
    proc->job        = ghJob;
-   proc->id         = r->id;
+   proc->task_id    = r->id;
    proc->client_key = r->key;
    proc->outfile    = outfile;
    key              = keygen();
@@ -469,7 +458,10 @@ void handle_msg(pclient client, int key) {
         break;
       case REQ_INTERRUPT:
         remove_from_queue(r->id);
-        // TODO: remove r from the queue if still there, or kill the process r->id;
+        kill_processes(r->id);
+        // no need to clean up the list of processes and free the memory for
+        // processes, this will be done when we get notified of the end of the
+        // child process
         free_request(r);
         break;
       }
@@ -500,14 +492,6 @@ void accept_client(int key, int socket_num) {
    create_server_socket(socket_num);
    list_append(clients, key, (void*)client);
    do_read(client);
-}
-
-void free_process(pproc proc) {
-   CloseHandle(proc->handle);
-   CloseHandle(proc->job);
-   free(proc->id);
-   free(proc->outfile);
-   free(proc);
 }
 
 void send_started_msg_to_client(pclient client,
@@ -621,7 +605,7 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
          timeout = (exitcode == ERROR_NOT_ENOUGH_QUOTA) ||
                    (exitcode == STATUS_QUOTA_EXCEEDED);
          send_msg_to_client(client,
-                            child->id,
+                            child->task_id,
                             exitcode,
                             cpu_time,
                             timeout,
@@ -648,7 +632,7 @@ void init() {
 
    init_request_queue();
    clients = init_list(parallel);
-   processes = init_list(parallel);
+   init_process_list();
 
    server_socket = (pserver*) malloc(parallel * sizeof(pserver));
    server_key = (int*) malloc(parallel * sizeof(int));
