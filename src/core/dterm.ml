@@ -221,45 +221,10 @@ and dterm_node =
   | DTuloc of dterm * Loc.position
   | DTlabel of dterm * Slab.t
 
-(** Environment *)
-
-type denv = dterm_node Mstr.t
+(** Unification tools *)
 
 exception TermExpected
 exception FmlaExpected
-exception DuplicateVar of string
-exception UnboundVar of string
-
-let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
-
-let denv_get_opt denv n = Mstr.find_opt n denv
-
-let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
-
-let denv_empty = Mstr.empty
-
-let denv_add_var denv {pre_name = n} dty =
-  Mstr.add n (DTvar (n, dty)) denv
-
-let denv_add_let denv dt {pre_name = n} =
-  Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
-
-let denv_add_quant denv vl =
-  let add acc (id,dty,_) = match id with
-    | Some ({pre_name = n} as id) ->
-        let exn = match id.pre_loc with
-          | Some loc -> Loc.Located (loc, DuplicateVar n)
-          | None     -> DuplicateVar n in
-        Mstr.add_new exn n (DTvar (n,dty)) acc
-    | None -> acc in
-  let s = List.fold_left add Mstr.empty vl in
-  Mstr.set_union s denv
-
-let denv_add_pat denv dp =
-  let s = Mstr.mapi (fun n dty -> DTvar (n, dty)) dp.dp_vars in
-  Mstr.set_union s denv
-
-(** Unification tools *)
 
 let dty_unify_app ls unify (l1: 'a list) (l2: dty list) =
   try List.iter2 unify l1 l2 with Invalid_argument _ ->
@@ -293,6 +258,46 @@ let dfmla_expected_type dt = match dt.dt_dty with
 let dexpr_expected_type dt dty = match dty with
   | Some dty -> dterm_expected_type dt dty
   | None -> dfmla_expected_type dt
+
+(** Environment *)
+
+type denv = dterm_node Mstr.t
+
+exception DuplicateVar of string
+exception UnboundVar of string
+
+let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
+
+let denv_get_opt denv n = Mstr.find_opt n denv
+
+let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
+
+let denv_empty = Mstr.empty
+
+let denv_add_var denv {pre_name = n} dty =
+  Mstr.add n (DTvar (n, dty)) denv
+
+let denv_add_let denv dt {pre_name = n} =
+  Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
+
+let denv_add_quant denv vl =
+  let add acc (id,dty,_) = match id with
+    | Some ({pre_name = n} as id) ->
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n (DTvar (n,dty)) acc
+    | None -> acc in
+  let s = List.fold_left add Mstr.empty vl in
+  Mstr.set_union s denv
+
+let denv_add_pat denv dp dty =
+  dpat_expected_type dp dty;
+  let s = Mstr.mapi (fun n dty -> DTvar (n, dty)) dp.dp_vars in
+  Mstr.set_union s denv
+
+let denv_add_term_pat denv dp dt =
+  denv_add_pat denv dp (Opt.get_def dty_bool dt.dt_dty)
 
 (** Constructors *)
 
@@ -455,11 +460,8 @@ let dterm crcmap ?loc node =
         mk_dty df.dt_dty
     | DTcase (_,[]) ->
         raise EmptyCase
-    | DTcase (dt,(dp1,df1)::bl) ->
-        dterm_expected_type dt dp1.dp_dty;
-        let check (dp,df) =
-          dpat_expected_type dp dp1.dp_dty;
-          dexpr_expected_type df df1.dt_dty in
+    | DTcase (_,(_,df1)::bl) ->
+        let check (_,df) = dexpr_expected_type df df1.dt_dty in
         List.iter check bl;
         let is_fmla (_,df) = df.dt_dty = None in
         if List.exists is_fmla bl then mk_dty None else mk_dty df1.dt_dty

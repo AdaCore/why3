@@ -294,7 +294,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let e1 = dterm ns km crcmap gvars at denv e1 in
       let branch (p, e) =
         let p = dpattern ns km p in
-        let denv = denv_add_pat denv p in
+        let denv = denv_add_term_pat denv p e1 in
         p, dterm ns km crcmap gvars at denv e in
       DTcase (e1, List.map branch bl)
   | Ptree.Tif (e1, e2, e3) ->
@@ -834,7 +834,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let e1 = dexpr muc denv e1 in
       let rbranch (pp, e) =
         let pp = dpattern muc pp in
-        let denv = denv_add_pat denv pp in
+        let denv = denv_add_expr_pat denv pp e1 in
         pp, dexpr muc denv e in
       let xbranch (q, pp, e) =
         let xs = find_dxsymbol q in
@@ -845,7 +845,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
           | Some pp -> dpattern muc pp
           | None when mb_unit -> Dexpr.dpattern ~loc (DPapp (rs_void, []))
           | _ -> Loc.errorm ~loc "exception argument expected" in
-        let denv = denv_add_pat denv pp in
+        let denv = denv_add_exn_pat denv pp xs in
         let e = dexpr muc denv e in
         xs, pp, e in
       DEmatch (e1, List.map rbranch bl, List.map xbranch xl)

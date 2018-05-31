@@ -339,6 +339,14 @@ let specialize_ls {ls_args = args; ls_value = res} =
   let spec_arg ty = dity_sim (spec_val () ty) in
   List.map spec_arg args, Opt.fold spec_val dity_bool res
 
+type dxsymbol =
+  | DElexn of string * dity
+  | DEgexn of xsymbol
+
+let specialize_dxs = function
+  | DEgexn xs -> specialize_single xs.xs_ity
+  | DElexn (_,dity) -> dity
+
 (** Patterns *)
 
 type dpattern = {
@@ -391,10 +399,6 @@ let old_mark = "'Old"
 
 type dinvariant = term list
 
-type dxsymbol =
-  | DElexn of string * dity
-  | DEgexn of xsymbol
-
 type dexpr = {
   de_node : dexpr_node;
   de_dvty : dvty;
@@ -445,6 +449,29 @@ and drec_defn = { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind * dbinder list *
   dity * mask * dspec later * variant list later * dexpr
+
+(** Unification tools *)
+
+let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
+  try List.iter2 fn l1 l2 with Invalid_argument _ ->
+    raise (BadArity (ls, List.length l1))
+
+let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
+  try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
+    "This pattern has type %a,@ but is expected to have type %a"
+    print_dity dp_dity print_dity dity
+
+let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
+  try dity_unify res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
+
+let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
+  try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
 
 (** Environment *)
 
@@ -537,10 +564,17 @@ let denv_add_args { frozen = fz; locals = ls; excpts = xs } bl =
   let s = List.fold_left add Mstr.empty bl in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
-let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp =
+let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp dity =
+  dpat_expected_type dp dity;
   let l = Mstr.fold (fun _ t l -> t::l) dp.dp_vars fz in
   let s = Mstr.map (fun t -> false, None, ([], t)) dp.dp_vars in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
+
+let denv_add_expr_pat denv dp de =
+  denv_add_pat denv dp (dity_of_dvty de.de_dvty)
+
+let denv_add_exn_pat denv dp dxs =
+  denv_add_pat denv dp (specialize_dxs dxs)
 
 let mk_node n = function
   | _, Some tvs, dvty -> DEvar (n, specialize_scheme tvs dvty)
@@ -590,29 +624,6 @@ let denv_pure denv get_dty =
   let fnI i = try Hint.find hi i with Not_found ->
     let d = dity_fresh () in Hint.add hi i d; d in
   dity_pur (Dterm.dty_fold fnS fnV fnI dty)
-
-(** Unification tools *)
-
-let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
-  try List.iter2 fn l1 l2 with Invalid_argument _ ->
-    raise (BadArity (ls, List.length l1))
-
-let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
-  try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
-    "This pattern has type %a,@ but is expected to have type %a"
-    print_dity dp_dity print_dity dity
-
-let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
-  let res = dity_of_dvty dvty in
-  try dity_unify res dity with Exit -> Loc.errorm ?loc
-    "This expression has type %a,@ but is expected to have type %a"
-    print_dity res print_dity dity
-
-let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
-  let res = dity_of_dvty dvty in
-  try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
-    "This expression has type %a,@ but is expected to have type %a"
-    print_dity res print_dity dity
 
 (** Generation of letrec blocks *)
 
@@ -688,10 +699,6 @@ let dpattern ?loc node =
   in
   Loc.try1 ?loc dpat node
 
-let specialize_dxs = function
-  | DEgexn xs -> specialize_single xs.xs_ity
-  | DElexn (_,dity) -> dity
-
 let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
@@ -763,15 +770,9 @@ let dexpr ?loc node =
         invalid_arg "Dexpr.dexpr: empty branch list in DEmatch"
     | DEmatch (de,bl,xl) ->
         let res = dity_fresh () in
-        let ety = if bl = [] then
-          res else dity_fresh () in
-        dexpr_expected_type de ety;
-        List.iter (fun (dp,de) ->
-          dpat_expected_type dp ety;
-          dexpr_expected_type de res) bl;
-        List.iter (fun (xs,dp,de) ->
-          dpat_expected_type dp (specialize_dxs xs);
-          dexpr_expected_type de res) xl;
+        if bl = [] then dexpr_expected_type de res;
+        List.iter (fun (_,de) -> dexpr_expected_type de res) bl;
+        List.iter (fun (_,_,de) -> dexpr_expected_type de res) xl;
         [], res
     | DEassign al ->
         List.iter (fun (de1,rs,de2) ->

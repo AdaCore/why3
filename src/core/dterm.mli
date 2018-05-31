@@ -102,7 +102,8 @@ val denv_add_let : denv -> dterm -> preid -> denv
 
 val denv_add_quant : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dty -> denv
+val denv_add_term_pat : denv -> dpattern -> dterm -> denv
 
 val denv_get : denv -> string -> dterm_node (** raises UnboundVar *)
 
