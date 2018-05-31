@@ -313,6 +313,17 @@ module Array63
       ofs2 <= i < ofs2 + len ->
       a[i] = (old a)[ofs1 + i - ofs2] }
 
+  let init (n: int63) (f: int63 -> 'a) : array 'a
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i: int63. 0 <= i < n -> result[i] = f i }
+    ensures  { length result = n }
+  = let a = make n (f 0) in
+    for i = 1 to n - 1 do
+      invariant { forall j: int63. 0 <= j < i -> a[j] = f j }
+      a[i] <- f i
+    done;
+    a
+
 end
 
 module Array63Exchange
@@ -441,5 +452,15 @@ module ArrayInt63
   val copy (a: array63) : array63
     ensures  { result.length = a.length }
     ensures  { forall i. 0 <= i < result.length -> result[i] = a[i] }
+
+  use import seq.Exchange
+
+  let swap (a:array63) (i j:int63) : unit
+    requires { 0 <= i < length a /\ 0 <= j < length a }
+    writes   { a }
+    ensures  { exchange (old a) a i j }
+  = let v = a[i] in
+    a[i] <- a[j];
+    a[j] <- v
 
 end
