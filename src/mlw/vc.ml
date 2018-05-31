@@ -78,9 +78,10 @@ type vc_env = {
   fs_int_pl : lsymbol;
   fs_int_mn : lsymbol;
   exn_count : int ref;
+  ps_wf_acc : lsymbol;
 }
 
-let mk_env {Theory.th_export = ns} kn tuc = {
+let mk_env {Theory.th_export = ns} {Theory.th_export = ns2} kn tuc = {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
   ps_int_le = Theory.ns_find_ls ns ["infix <="];
@@ -90,7 +91,16 @@ let mk_env {Theory.th_export = ns} kn tuc = {
   fs_int_pl = Theory.ns_find_ls ns ["infix +"];
   fs_int_mn = Theory.ns_find_ls ns ["infix -"];
   exn_count = ref 0;
+  ps_wf_acc = Theory.ns_find_ls ns2 ["acc"];
 }
+
+let acc env r t =
+  let ps = env.ps_wf_acc in
+  if not (Mid.mem ps.ls_name env.known_map) then
+    Loc.errorm ?loc:t.t_loc "please import relations.WellFounded";
+  let ty = t_type t in
+  let r = t_closure r [ty; ty] None in
+  ps_app ps [r; t]
 
 (* every exception-catching clause is represented by
    a unique integer, so that we can move code inside
@@ -100,7 +110,10 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
 (* FIXME: cannot verify int.why because of a cyclic dependency.
    int.Int is used for the "for" loops and for integer variants.
    We should be able to extract the necessary lsymbols from kn. *)
-let mk_env env kn tuc = mk_env (Env.read_theory env ["int"] "Int") kn tuc
+let mk_env env kn tuc =
+  let th_int = Env.read_theory env ["int"] "Int" in
+  let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
+  mk_env th_int th_wf kn tuc
 
 (* explanation labels *)
 
@@ -245,7 +258,7 @@ let decrease env loc lab expl olds news =
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news
       when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
-        let dt = ps_app r [t; old_t] in
+        let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news
       when oty_equal old_t.t_ty t.t_ty ->

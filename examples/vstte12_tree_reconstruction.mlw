@@ -76,6 +76,7 @@ module TreeReconstruction
 
   use export Tree
   use import list.Length
+  use import relations.WellFounded
 
   (* termination of build_rec (below) requires a lexicographic order *)
   predicate lex (x1 x2: (list int, int)) =
@@ -87,6 +88,8 @@ module TreeReconstruction
       | Cons h1 _, Cons h2 _ -> d2 < d1 <= h1 = h2
       | _ -> false
       end
+
+  axiom wflex: well_founded lex
 
   exception Failure
     (* used to signal the algorithm's failure i.e. there is no tree *)

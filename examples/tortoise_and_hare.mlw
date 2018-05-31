@@ -8,7 +8,6 @@ module TortoiseAndHare
   use import int.Int
   use int.Iter
 
-
   type t
   val predicate eq (x y : t)
     ensures { result <-> x = y }
@@ -56,6 +55,7 @@ module TortoiseAndHare
      Actually, we even prove that the code runs in time O(lambda + mu). *)
 
   use import ref.Ref
+  use import relations.WellFounded
 
   (* the minimal distance between x i and x j *)
   function dist int int : int
@@ -69,6 +69,8 @@ module TortoiseAndHare
   predicate rel (t2 t1: t) =
     exists i: int. t1 = x i /\ t2 = x (i+1) /\ 1 <= i <= mu + lambda /\
                    (i >= mu -> dist (2*i+2) (i+1) < dist (2*i) i)
+
+  axiom wfrel: well_founded rel
 
   let tortoise_hare () =
     let tortoise = ref (f x0) in
