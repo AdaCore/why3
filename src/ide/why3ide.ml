@@ -1113,7 +1113,7 @@ let command_entry_completion : GEdit.entry_completion =
 let add_completion_entry (s,desc) =
   let row = completion_model#append () in
   completion_model#set ~row ~column:completion_col s;
-  completion_model#set ~row ~column:completion_desc ("("^desc^")")
+  completion_model#set ~row ~column:completion_desc desc
 
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
@@ -1122,7 +1122,7 @@ let match_function s iter =
     true
   with Not_found -> false
 
-(* see also init_compeltion below *)
+(* see also init_completion below *)
 
 (*********************)
 (* Terminal history  *)
