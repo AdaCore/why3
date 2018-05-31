@@ -979,7 +979,9 @@ end
          (s,n,p) :: acc) (Whyconf.get_provers config) []
     in
     load_strategies c;
-    let transformation_list = List.map (fun (a, b) -> (a, Format.sprintf "%( %)" b)) (list_transforms ()) in
+    let transformation_list = List.map
+      (fun (a, b) -> (a, Format.sprintf "@[%(%)@]" b))
+      (list_transforms ()) in
     let strategies_list = list_strategies c in
     let infos =
       {
