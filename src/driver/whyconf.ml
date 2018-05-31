@@ -594,8 +594,8 @@ let read_config conf_file =
   try
     get_config filenamerc
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    Format.fprintf str_formatter "%a" Exn_printer.exn_printer e;
-    raise (ConfigFailure (fst filenamerc, flush_str_formatter ()))
+    let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+    raise (ConfigFailure (fst filenamerc, s))
 
 (** filter prover *)
 type regexp_desc = { reg : Str.regexp; desc : string}

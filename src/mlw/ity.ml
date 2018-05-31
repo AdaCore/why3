@@ -1662,8 +1662,7 @@ let print_spec args pre post xpost oldies eff fmt ity =
     fprintf fmt "@\nold { %a -> %a }" print_pv o print_pv v in
   let print_post fmt q =
     let v, q = open_post q in
-    fprintf str_formatter "%a" print_vs v;
-    let n = flush_str_formatter () in
+    let n = asprintf "%a" print_vs v in
     if n = "result" || t_v_occurs v q = 0 then
       fprintf fmt "@\nensures  { @[%a@] }" print_term q else
       fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q;

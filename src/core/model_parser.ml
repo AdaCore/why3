@@ -441,8 +441,7 @@ let print_model ?(me_name_trans = why_name_trans)
 let model_to_string
     ?(me_name_trans = why_name_trans)
     model =
-  print_model ~me_name_trans str_formatter model;
-  flush_str_formatter ()
+  Format.asprintf "%a" (print_model ~me_name_trans) model
 
 let get_model_file model filename =
   try
@@ -474,8 +473,7 @@ let model_vc_term_to_string
     ?(me_name_trans = why_name_trans)
     ?(sep = "\n")
     model =
-  print_model_vc_term ~me_name_trans ~sep str_formatter model;
-  flush_str_formatter ()
+  Format.asprintf "%a" (print_model_vc_term ~me_name_trans ~sep) model
 
 let get_padding line =
   try
@@ -523,10 +521,12 @@ let interleave_line
   let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
-    print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
-     (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
-    in
+      asprintf "%s%s%a%s"
+        (get_padding line)
+        start_comment
+        (print_model_elements ~sep:"; " print_model_value_human me_name_trans) model_elements
+        end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -648,8 +648,7 @@ let model_to_string_json
     ?(me_name_trans = why_name_trans)
     ?(vc_line_trans = (fun i -> string_of_int i))
     model =
-  print_model_json str_formatter ~me_name_trans ~vc_line_trans model;
-  flush_str_formatter ()
+  asprintf "%a" (print_model_json ~me_name_trans ~vc_line_trans) model
 
 
 (*

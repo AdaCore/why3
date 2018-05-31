@@ -146,9 +146,7 @@ module Task =
       |  _ -> []
 
     let task_to_string t =
-      ignore (flush_str_formatter ());
-      Driver.print_task alt_ergo_driver str_formatter t;
-      flush_str_formatter ()
+      Format.asprintf "%a" (Driver.print_task alt_ergo_driver) t
 
     let gen_id =
       let c = ref 0 in

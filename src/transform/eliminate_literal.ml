@@ -96,10 +96,8 @@ let elim le_int le_real neg_real type_kept kn
       let emax = BigInt.pow_int_pos_bigint 2 (BigInt.pred eb) in
       let m = BigInt.pred (BigInt.pow_int_pos_bigint 2 sb) in
       let e = BigInt.sub emax sb in
-      Number.print_in_base 16 None Format.str_formatter m;
-      let m_string = Format.flush_str_formatter () in
-      Number.print_in_base 10 None Format.str_formatter e;
-      let e_string = Format.flush_str_formatter () in
+      let m_string = Format.asprintf "%a" (Number.print_in_base 16 None) m in
+      let e_string = Format.asprintf "%a" (Number.print_in_base 10 None) e in
       let e_val = Number.real_const_hex m_string "" (Some e_string) in
       let max_term = t_const
           Number.(ConstReal { rc_negative = false ; rc_abs = e_val })

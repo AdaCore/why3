@@ -154,8 +154,7 @@ and scan_isolated fmt empty in_pre delayed = parse
           { comment fmt false lexbuf;
             scan_isolated fmt empty in_pre delayed lexbuf }
   | space* "(**"
-          { doc str_formatter false [] lexbuf;
-            let d = delayed ^ flush_str_formatter () in
+          { let d = asprintf "%s%a" delayed (fun fmt -> doc fmt false []) lexbuf in
             scan_isolated fmt false in_pre d lexbuf }
   | eof   { if in_pre then pp_print_string fmt "</pre>\n";
             if delayed <> "" then pp_print_string fmt delayed }

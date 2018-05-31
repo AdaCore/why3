@@ -497,8 +497,7 @@ let print_info_model info =
     begin
       let model_map =
 	S.fold (fun f acc ->
-          fprintf str_formatter "%a" (print_fmla info) f;
-          let s = flush_str_formatter () in
+          let s = asprintf "%a" (print_fmla info) f in
 	  Mstr.add s f acc)
 	info_model
 	Mstr.empty in

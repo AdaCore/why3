@@ -987,6 +987,7 @@ let clear_message_zone () =
 
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
+  (* TODO: use kasprintf once OCaml 4.03 is used *)
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               let s = try_convert s in
@@ -1005,37 +1006,30 @@ let print_message ~kind ~notif_kind fmt =
     str_formatter
     fmt
 
-let display_warnings () =
-  if Queue.is_empty warnings then () else
-    begin
-      let nwarn = ref 0 in
-      begin try
-      Queue.iter
-        (fun (loc,msg) ->
-         if !nwarn = 4 then
-           begin
-             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
-             raise Exit
-           end
-         else
-           begin
-             incr nwarn;
-             match loc with
-             | None ->
-                Format.fprintf Format.str_formatter "%s@\n@\n" msg
-             | Some l ->
-                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
-                               Loc.gen_report_position l msg
-           end) warnings;
-        with Exit -> ();
+let display_warnings fmt warnings =
+  let nwarn = ref 0 in
+  try
+    Queue.iter (fun (loc,msg) ->
+      if !nwarn = 4 then begin
+        Format.fprintf fmt "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+        raise Exit
       end;
-      Queue.clear warnings;
-      let msg =
-        Format.flush_str_formatter ()
-      in
-      print_message ~kind:1 ~notif_kind:"warning" "%s" msg
-    end
+      incr nwarn;
+      match loc with
+      | None ->
+        Format.fprintf fmt "%s@\n@\n" msg
+      | Some l ->
+        (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+        Format.fprintf fmt "%a: %s@\n@\n" Loc.gen_report_position l msg
+    ) warnings;
+  with Exit -> ()
+
+let display_warnings () =
+  if Queue.is_empty warnings then ()
+  else begin
+    print_message ~kind:1 ~notif_kind:"warning" "%a" display_warnings warnings;
+    Queue.clear warnings;
+  end
 
 let print_message ~kind ~notif_kind fmt =
   display_warnings (); print_message ~kind ~notif_kind fmt

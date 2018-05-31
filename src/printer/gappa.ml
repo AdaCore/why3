@@ -164,12 +164,10 @@ type constant = Enum of term * int | Value of term | Varying
 let rec constant_value defs t =
   match t.t_node with
   | Tconst c ->
-      fprintf str_formatter "%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "%a" (Number.print number_format) c
   | Tapp (ls, [{ t_node = Tconst c}])
       when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-      fprintf str_formatter "-%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "-%a" (Number.print number_format) c
   | Tapp (ls, []) ->
     begin
       match Hid.find defs ls.ls_name with
