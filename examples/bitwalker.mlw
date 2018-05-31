@@ -142,7 +142,7 @@ module Bitwalker
     let i = ref BV32.zeros in
     let lstart = BV32.sub_check (BV32.of_int 64) len in
 
-    while BV32.ult !i len do variant{ !i with BV32.ugt }
+    while BV32.ult !i len do variant{ BV32.t'int len - BV32.t'int !i }
     invariant {0 <= BV32.t'int !i <= BV32.t'int len}
     invariant {forall j:int. BV32.t'int len - BV32.t'int !i <= j < BV32.t'int len ->
                  BV64.nth !retval j
@@ -255,7 +255,7 @@ module Bitwalker
     let i = ref BV32.zeros in
 
     label Init in
-    while BV32.ult !i len do variant { !i with BV32.ugt }
+    while BV32.ult !i len do variant { BV32.t'int len - BV32.t'int !i }
     invariant {0 <= BV32.t'int !i <= BV32.t'int len}
     invariant {forall j:int. 0 <= j < BV32.t'int start ->
                  nth8_stream (addr at Init) j

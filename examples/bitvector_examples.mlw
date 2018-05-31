@@ -51,7 +51,7 @@ module Test_proofinuse
     let two = 2:t in
 
     while uge !i two do
-    variant{ !i with ult }
+    variant{ t'int !i }
       i := lsr_bv !i two
     done
 
