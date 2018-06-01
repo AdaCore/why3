@@ -1446,8 +1446,12 @@ let t_closure ls tyl ty =
 
 let t_app_partial ls tl tyl ty =
   if tyl = [] then t_app ls tl ty else
-  let tyl = List.fold_right (fun t tyl -> t_type t :: tyl) tl tyl in
-  t_func_app_l (t_closure ls tyl ty) tl
+  match tl with
+  | [t] when ls_equal ls fs_func_app -> t
+  | _ ->
+      let cons t tyl = t_type t :: tyl in
+      let tyl = List.fold_right cons tl tyl in
+      t_func_app_l (t_closure ls tyl ty) tl
 
 let rec t_app_beta_l lam tl =
   if tl = [] then lam else
