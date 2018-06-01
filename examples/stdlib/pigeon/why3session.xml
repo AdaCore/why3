@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="16" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../../../stdlib/pigeon.mlw">
+<theory name="Pigeonhole" proved="true">
+ <goal name="VC pigeonhole" expl="VC for pigeonhole" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC pigeonhole.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.3" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.4" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.8" expl="VC for pigeonhole" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.9" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.10" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.13" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.14" expl="VC for pigeonhole" proved="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="ListAndSet">
+ <goal name="corner">
+ </goal>
+ <goal name="pigeon_0">
+ </goal>
+ <goal name="pigeon_1">
+ </goal>
+ <goal name="pigeon_2">
+ </goal>
+ <goal name="pigeonhole">
+ </goal>
+</theory>
+</file>
+</why3session>
