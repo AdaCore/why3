@@ -14,6 +14,8 @@ end
 
 theory _gnatprove_standard_th.Boolean_Func
    syntax function bool_eq "(= %1 %2)"
+   syntax function to_int "(ite %1 1 0)"
+   syntax function of_int "(distinct %1 0)"
    remove allprops
 end
 

@@ -1,15 +1,13 @@
 (** Why3 driver for CVC4 >= 1.5 *)
 
+prelude ";; produced by cvc4_15.drv ;;"
 prelude "(set-logic AUFBVDTNIRA)"
 (*
-    A  : Array
-    UF : Uninterpreted Function
-    BV : BitVectors
-    DT : Datatypes
-    NIRA : NonLinear Integer Reals Arithmetic
-*)
-(* prelude "(set-logic ALL_SUPPORTED)"
-   does not seem to include DT
+    A    : Array
+    UF   : Uninterpreted Function
+    BV   : BitVectors
+    DT   : Datatypes
+    NIRA : NonLinear Integer+Real Arithmetic
 *)
 
 (* Counterexamples: set model parser *)
