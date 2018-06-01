@@ -647,8 +647,8 @@ void init() {
    strcat(pipe_name, my_pipe_name);
 
    init_request_queue();
-   clients = init_list(16);
-   processes = init_list(16);
+   clients = init_list(parallel);
+   processes = init_list(parallel);
 
    server_socket = (pserver*) malloc(parallel * sizeof(pserver));
    server_key = (int*) malloc(parallel * sizeof(int));
