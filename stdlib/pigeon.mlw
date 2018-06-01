@@ -6,10 +6,23 @@ module Pigeonhole
   use import int.Int
   use import map.Map
 
-  val lemma pigeonhole (n m: int) (f: int -> int)
+  let rec lemma pigeonhole (n m: int) (f: int -> int)
     requires { 0 <= m < n }
     requires { forall i. 0 <= i < n -> 0 <= f i < m }
     ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }
+    variant  { m }
+  = for i = 0 to n - 1 do
+      invariant { forall k. 0 <= k < i -> f k < m - 1 }
+      if f i = m - 1 then begin
+        for j = i + 1 to n - 1 do
+          invariant { forall k. i < k < j -> f k < m - 1 }
+          if f j = m - 1 then return
+        done;
+        let function g k = if k < i then f k else f (k - 1) in
+        pigeonhole (n - 1) (m - 1) g;
+        return end
+    done;
+    pigeonhole n (m - 1) f
 
 end
 
