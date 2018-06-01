@@ -1,0 +1,49 @@
+
+(* {1 Minimum excludant, aka mex}
+
+   Given a finite set of integers, find the smallest nonnegative integer
+   that does not belong to this set.
+*)
+
+module MexArray
+
+  use import int.Int
+  use import map.Map
+  use import array.Array
+  use import ref.Refint
+  use import pigeon.Pigeonhole
+
+  predicate mem (x: int) (a: array int) =
+    exists i. 0 <= i < length a && a[i] = x
+
+  let mex (a: array int) : int
+    ensures { 0 <= result <= length a }
+    ensures { not (mem result a) }
+    ensures { forall x. 0 <= x < result -> mem x a }
+  = let n = length a in
+    let used = make n false in
+    let ghost idx = ref (fun i -> i) in
+    for i = 0 to n - 1 do
+      invariant { forall x. 0 <= x < n -> used[x] ->
+                    mem x a && 0 <= !idx x < n && a[!idx x] = x }
+      invariant { forall j. 0 <= j < i -> 0 <= a[j] < n ->
+                    used[a[j]] && 0 <= !idx a[j] < n && a[!idx a[j]] = a[j] }
+      let x = a[i] in
+      if 0 <= x && x < n then begin used[x] <- true; idx := set !idx x i end
+    done;
+    let r = ref 0 in
+    let ghost posn = ref (-1) in
+    while !r < n && used[!r] do
+      invariant { 0 <= !r <= n }
+      invariant { forall j. 0 <= j < !r -> used[j] && 0 <= !idx j < n }
+      invariant { if !posn >= 0 then 0 <= !posn < n && a[!posn] = n
+                                else forall j. 0 <= j < !r -> a[j] <> n }
+      variant   { n - !r }
+      if a[!r] = n then posn := !r;
+      incr r
+    done;
+    if !r = n && !posn >= 0 then pigeonhole (n+1) n (set !idx n !posn);
+    !r
+
+end
+
