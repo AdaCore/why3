@@ -50,6 +50,7 @@
 
 output:
 | EOF { Wstdlib.Mstr.empty }
+| LPAREN MODEL RPAREN { Wstdlib.Mstr.empty }
 | LPAREN MODEL list_decls RPAREN { $3 }
 
 list_decls:
