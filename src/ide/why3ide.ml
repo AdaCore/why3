@@ -1527,7 +1527,6 @@ let on_selected_row r =
     let typ = get_node_type id in
     match typ with
     | NGoal ->
-        let _b = gconfig.intro_premises in
         let c = gconfig.show_full_context in
         send_request (Get_task(id,c,true))
     | NProofAttempt ->
@@ -1555,11 +1554,9 @@ let on_selected_row r =
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
        counterexample_view#scroll_to_mark `INSERT;
-       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
        send_request (Get_task(id,c,true))
     | _ ->
-       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
        send_request (Get_task(id,c,true))
   with

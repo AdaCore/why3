@@ -37,7 +37,6 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable intro_premises : bool;
       mutable show_full_context : bool;
       mutable show_labels : bool;
       mutable show_coercions : bool;
@@ -74,7 +73,6 @@ type ide = {
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
-  ide_intro_premises : bool;
   ide_show_full_context : bool;
   ide_show_labels : bool;
   ide_show_coercions : bool;
@@ -101,7 +99,6 @@ let default_ide =
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
-    ide_intro_premises = true;
     ide_show_full_context = false;
     ide_show_labels = false;
     ide_show_coercions = true;
@@ -134,9 +131,6 @@ let load_ide section =
       get_int section ~default:default_ide.ide_font_size "font_size";
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
-    ide_intro_premises =
-      get_bool section ~default:default_ide.ide_intro_premises
-        "intro_premises";
     ide_show_full_context =
       get_bool section ~default:default_ide.ide_show_full_context
         "show_full_context";
@@ -209,7 +203,6 @@ let load_config config original_config =
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
-    intro_premises= ide.ide_intro_premises ;
     show_full_context= ide.ide_show_full_context ;
     show_labels   = ide.ide_show_labels ;
     show_coercions = ide.ide_show_coercions ;
@@ -255,7 +248,6 @@ let save_config t =
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
-  let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "show_full_context" t.show_full_context in
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_coercions" t.show_coercions in
@@ -804,15 +796,6 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
   let display_options_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:vb#add ()
-  in
-  let intropremises =
-    GButton.check_button ~label:"introduce premises"
-      ~packing:display_options_box#add ()
-      ~active:c.intro_premises
-  in
-  let (_ : GtkSignal.id) =
-    intropremises#connect#toggled ~callback:
-      (fun () -> c.intro_premises <- not c.intro_premises)
   in
   let showfullcontext =
     GButton.check_button ~label:"show full task context"
