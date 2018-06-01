@@ -579,10 +579,12 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
   Debug.dprintf debug_refl "start@.";
-  let d = Apply.find_hypothesis pr.pr_name prev in
-  if d = None then raise (Exit "lemma not found");
-  let d = Opt.get d in
-  let l = Apply.term_decl d in
+  let l =
+    let kn' = task_known prev in (* TODO Do we want kn here ? *)
+    match find_prop_decl kn' pr with
+    | (_, t) -> t
+    | exception Not_found -> raise (Exit "lemma not found")
+  in
   let (lp, lv, rt) = Apply.intros l in
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in

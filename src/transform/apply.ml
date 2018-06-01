@@ -43,20 +43,6 @@ let term_decl d =
   | Decl ({d_node = Dprop (_pk, _pr, t)}) -> t
   | _ -> raise (Arg_trans "term_decl")
 
-let pr_prsymbol pr =
-  match pr with
-  | Decl {d_node = Dprop (_pk, pr, _t)} -> Some pr
-  | _ -> None
-
-(* Looks for the hypothesis name and return it. If not found return None *)
-let find_hypothesis (name:Ident.ident) task =
-  let ndecl = ref None in
-  let _ = task_iter (fun x -> if (
-    match (pr_prsymbol x.td_node) with
-    | None -> false
-    | Some pr -> Ident.id_equal pr.pr_name name) then ndecl := Some x) task in
-  !ndecl
-
 (* [with_terms subst_ty subst lv wt]: Takes the list of variables in lv that are
    not part of the substitution and try to match them with the list of values
    from wt (ordered). *)
@@ -156,13 +142,14 @@ let matching_with_terms ~trans_name slv lv left_term right_term withed_terms =
       with values found in 2).
  *)
 let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
-  let name = pr.pr_name in
+  let kn = task_known task in
   let g, task = Task.task_separate_goal task in
   let g = term_decl g in
-  let d = find_hypothesis name task in
-  if d = None then raise (Arg_error "apply");
-  let d = Opt.get d in
-  let t = term_decl d in
+  let t =
+    match find_prop_decl kn pr with
+    | (_, t) -> t
+    | exception Not_found -> raise (Arg_pr_not_found pr)
+  in
   let (lp, lv, nt) = intros t in
   let slv = List.fold_left (fun acc v -> Svs.add v acc) Svs.empty lv in
   match matching_with_terms ~trans_name:"apply" slv lv nt g withed_terms with
