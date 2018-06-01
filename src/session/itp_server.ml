@@ -277,6 +277,8 @@ module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
+let debug_labels = Debug.register_info_flag "print_labels"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 
 (****************)
 (* Command list *)
@@ -835,13 +837,13 @@ end
     in
     task_text, loc_color_list
 
-  let create_ce_tab s res any list_loc =
+  let create_ce_tab ~print_labels s res any list_loc =
     let f = get_encapsulating_file s any in
     let filename = Sysutil.absolutize_filename
       (Session_itp.get_dir s) (file_name f)
     in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+    Model_parser.interleave_with_source ~print_labels ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
       ~source_code:source_code ~locations:list_loc
 
@@ -875,6 +877,7 @@ end
       | ATh t ->
           P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
       | APa pid ->
+          let print_labels = Debug.test_flag debug_labels in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
@@ -889,7 +892,7 @@ end
                     res.Call_provers.pr_answer
                 in
                 let ce_result =
-                  Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                  Pp.string_of (Model_parser.print_model_human ~print_labels ?me_name_trans:None)
                   res.Call_provers.pr_model
                 in
                 if ce_result = "" then
@@ -903,7 +906,7 @@ end
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
                     let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session res any old_list_loc
+                      create_ce_tab d.cont.controller_session ~print_labels res any old_list_loc
                     in
                     P.notify (Source_and_ce (source_result, list_loc));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
@@ -1361,7 +1364,7 @@ end
         read_and_send f
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b,loc)         -> send_task nid b loc
+    | Get_task(nid,b,loc)          -> send_task nid b loc
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin

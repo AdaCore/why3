@@ -303,6 +303,8 @@ type model_element_kind =
 type model_element_name = {
   men_name   : string;
   men_kind   : model_element_kind;
+  (* Labels associated to the id of the men *)
+  men_labels : Slab.t;
 }
 
 type model_element = {
@@ -329,6 +331,7 @@ let create_model_element ~name ~value ?location ?term () =
   let me_name = {
     men_name = name;
     men_kind = me_kind;
+    men_labels = match term with | None -> Slab.empty | Some t -> t.t_label;
   } in
   {
     me_name = me_name;
@@ -337,13 +340,13 @@ let create_model_element ~name ~value ?location ?term () =
     me_term = term;
   }
 
-let construct_name (name: string): model_element_name =
+let construct_name (name: string) labels : model_element_name =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
   | "result" -> Result
   | "old" -> Old
   | _ -> Other in
-  {men_name = name; men_kind = me_kind}
+  {men_name = name; men_kind = me_kind; men_labels = labels}
 
 (*
 let print_location fmt m_element =
@@ -387,19 +390,27 @@ type raw_model_parser =
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element print_model_value me_name_trans fmt m_element =
+let print_model_element ~print_labels print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
     let me_name = me_name_trans m_element.me_name in
-    fprintf fmt  "%s = %a"
-      me_name print_model_value m_element.me_value
+    if print_labels then
+      fprintf fmt  "%s, [%a] = %a"
+        me_name
+        (Pp.print_list Pp.comma Pretty.print_label)
+        (Slab.elements m_element.me_name.men_labels)
+        print_model_value m_element.me_value
+    else
+      fprintf fmt  "%s = %a"
+        me_name
+        print_model_value m_element.me_value
 
-let print_model_elements ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element print_model_value me_name_trans) fmt m_elements
+let print_model_elements ~print_labels ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element ~print_labels print_model_value me_name_trans) fmt m_elements
 
-let print_model_file ~print_model_value fmt me_name_trans filename model_file =
+let print_model_file ~print_labels ~print_model_value fmt me_name_trans filename model_file =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -407,7 +418,7 @@ let print_model_file ~print_model_value fmt me_name_trans filename model_file =
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements print_model_value me_name_trans fmt m_elements)
+      print_model_elements ~print_labels print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -418,6 +429,7 @@ let why_name_trans me_name =
   | _  -> me_name.men_name
 
 let print_model
+    ~print_labels
     ?(me_name_trans = why_name_trans)
     ~print_model_value
     fmt
@@ -426,22 +438,23 @@ let print_model
    FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
    *)
   let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file ~print_model_value fmt me_name_trans k e) l
+  List.iter (fun (k, e) -> print_model_file ~print_labels ~print_model_value fmt me_name_trans k e) l
 
 let print_model_human
     ?(me_name_trans = why_name_trans)
     fmt
     model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
-
 let print_model ?(me_name_trans = why_name_trans)
+    ~print_labels
     fmt
-    model = print_model ~me_name_trans ~print_model_value fmt model
+    model = print_model ~print_labels ~me_name_trans ~print_model_value fmt model
 
 let model_to_string
+    ~print_labels
     ?(me_name_trans = why_name_trans)
     model =
-  print_model ~me_name_trans str_formatter model;
+  print_model ~print_labels ~me_name_trans str_formatter model;
   flush_str_formatter ()
 
 let get_model_file model filename =
@@ -456,7 +469,9 @@ let get_elements model_file line_number =
   with Not_found ->
     []
 
+(* TODO unused
 let print_model_vc_term
+    ~print_labels
     ?(me_name_trans = why_name_trans)
     ?(sep = "\n")
     fmt
@@ -468,14 +483,16 @@ let print_model_vc_term
       let (filename, line_number, _, _) = Loc.get pos in
       let model_file = get_model_file model.model_files filename in
       let model_elements = get_elements model_file line_number in
-      print_model_elements ~sep print_model_value me_name_trans fmt model_elements
+      print_model_elements ~print_labels ~sep print_model_value me_name_trans fmt model_elements
 
 let model_vc_term_to_string
+    ~print_labels
     ?(me_name_trans = why_name_trans)
     ?(sep = "\n")
     model =
-  print_model_vc_term ~me_name_trans ~sep str_formatter model;
+  print_model_vc_term ~print_labels ~me_name_trans ~sep str_formatter model;
   flush_str_formatter ()
+*)
 
 let get_padding line =
   try
@@ -511,6 +528,7 @@ let add_offset off (loc, a) =
   (Loc.user_position f (l + off) fc lc, a)
 
 let interleave_line
+    ~print_labels
     start_comment
     end_comment
     me_name_trans
@@ -523,7 +541,7 @@ let interleave_line
   let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
-    print_model_elements print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
+    print_model_elements ~print_labels print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
      (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
     in
@@ -540,6 +558,7 @@ let interleave_line
 
 
 let interleave_with_source
+    ~print_labels
     ?(start_comment="(* ")
     ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
@@ -567,7 +586,7 @@ let interleave_with_source
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
-        (interleave_line
+        (interleave_line ~print_labels
            start_comment end_comment me_name_trans model_file)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file)
@@ -576,6 +595,8 @@ let interleave_with_source
   with Not_found ->
     source_code, locations
 
+let print_labels_json (me: model_element_name) fmt =
+  Json_base.list Pretty.print_label fmt (Slab.elements me.men_labels)
 
 (*
 **  Quering the model - json
@@ -591,6 +612,8 @@ let print_model_element_json me_name_to_str fmt me =
     | Other -> fprintf fmt "%a" Json_base.string "other" in
   let print_name fmt =
     Json_base.string fmt (me_name_to_str me) in
+  let print_json_labels fmt =
+    print_labels_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer =
     printer fmt in
   Json_base.map_bindings
@@ -598,6 +621,7 @@ let print_model_element_json me_name_to_str fmt me =
     print_value_or_kind_or_name
     fmt
     [("name", print_name);
+     ("labels", print_json_labels);
      ("value", print_value);
      ("kind", print_kind)]
 
@@ -675,7 +699,9 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
     try
       (
        let t = Mstr.find raw_element_name term_map in
-       let real_model_trace = construct_name (get_model_trace_string ~labels:t.t_label) in
+       let real_model_trace =
+         construct_name (get_model_trace_string ~labels:t.t_label) t.t_label
+       in
        let model_element = {
 	 me_name = real_model_trace;
 	 me_value = raw_element.me_value;
@@ -710,6 +736,7 @@ let handle_contradictory_vc model_files vc_term_loc =
 	let me_name = {
 	  men_name = "the check fails with all inputs";
 	  men_kind = Error_message;
+          men_labels = Slab.empty;
 	} in
 	let me = {
 	  me_name = me_name;

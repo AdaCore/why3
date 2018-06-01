@@ -304,8 +304,6 @@ let create_model_data ?loc ?context_labels append_to_model_trace =
 
    @param context_labels : The labels of an element that represents the context in that
    the variable is created.
-   Used in SPARK branch - the SPARK locations are kept in labels and when a new
-   variable is created, these location labels are copied from md_context_labels.
 
    @param append_to_model_trace : The string that will be appended to the end of
    "model_trace:" label. It is used to specify the reason why the variable is created. *)
@@ -328,7 +326,15 @@ let mk_var id ty md =
       let new_labels = Ident.remove_model_labels ~labels:id.id_label in
       (new_labels, None)
     | Some md -> begin
-      (append_to_model_trace_label ~labels:id.id_label ~to_append:("@"^md.md_append_to_model_trace), md.md_loc)
+        let new_labels =
+          append_to_model_trace_label ~labels:id.id_label
+            ~to_append:("@"^md.md_append_to_model_trace)
+        in
+        let new_labels = match md.md_context_labels with
+          | None -> new_labels
+          | Some s -> Slab.union s new_labels
+        in
+        (new_labels, md.md_loc)
     end
   in
 
