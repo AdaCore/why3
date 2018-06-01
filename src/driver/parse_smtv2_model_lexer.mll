@@ -64,7 +64,7 @@ rule token = parse
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
   | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
   | "(_" space+ "int2bv" space+ num ")" as s { INT_TO_BV s}
-
+  | "(_" space+ "FloatingPoint" space+ (num as exp) space+ (num as mantissa)")" { FLOAT_TYPE (exp, mantissa) }
   | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
   | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }
   | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_infinity }

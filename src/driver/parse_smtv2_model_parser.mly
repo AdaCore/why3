@@ -39,6 +39,7 @@
 %token <string> BITVECTOR_EXTRACT
 %token <string> INT_TO_BV
 %token BITVECTOR_TYPE
+%token <string * string> FLOAT_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
 %token <string * string> DEC_STR
@@ -172,6 +173,7 @@ name:
 (* Should not happen in relevant part of the model (ad hoc) *)
 | BITVECTOR_TYPE { "" }
 | BITVECTOR_EXTRACT { $1 }
+| FLOAT_TYPE { "" }
 
 (* Z3 specific boolean expression. This should maybe be used in the future as
    it may give some information on the counterexample. *)
