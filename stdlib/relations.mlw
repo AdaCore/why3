@@ -169,26 +169,3 @@ module WellFounded
 
 end
 
-(* the following module introduces a circular dependency *)
-(*
-module WFltof
-  use import int.Int
-  use import WellFounded
-
-  type t
-  function f t : int
-
-  axiom f_nonneg: forall x. 0 <= f x
-
-  predicate ltof (x y: t) = f x < f y
-
-  let rec lemma acc_ltof (n: int)
-    requires { 0 <= n }
-    ensures  { forall x. f x < n -> acc ltof x }
-    variant  { n }
-  = if n > 0 then acc_ltof (n-1)
-
-  lemma wf_ltof: well_founded ltof
-
-end
-*)
