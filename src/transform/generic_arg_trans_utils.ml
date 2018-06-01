@@ -25,12 +25,12 @@ exception Unnecessary_terms of term list
 
 let gen_ident = Ident.id_fresh
 
-let rec t_replace_nt_nl t1 t2 t =
-  if t_equal_nt_nl t t1 then t2 else t_map (t_replace_nt_nl t1 t2) t
+let rec t_replace_nt_na t1 t2 t =
+  if t_equal_nt_na t t1 then t2 else t_map (t_replace_nt_na t1 t2) t
 
 (* Replace all occurences of f1 by f2 in t *)
-let replace_in_term = t_replace_nt_nl
-(* TODO be careful with label copy in t_map *)
+let replace_in_term = t_replace_nt_na
+(* TODO be careful with attribute copy in t_map *)
 
 let subst_quant c tq x : term =
   let (vsl, tr, te) = t_open_quant tq in
@@ -155,9 +155,9 @@ let sort =
   Trans.bind get_local sort
 
 
-(* Add a label to a goal (useful to add an expl for example) *)
-let add_goal_label_trans label =
-  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_label_add label g)])
+(* Add an attribute to a goal (useful to add an expl for example) *)
+let add_goal_attr_trans attr =
+  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_attr_add attr g)])
 
 
 (****************************)
@@ -173,7 +173,7 @@ type term_subst = term Mterm.t
 let replace_subst (subst: term_subst) t =
   (* TODO improve efficiency of this ? *)
   Mterm.fold (fun t_from t_to acc ->
-    t_replace_nt_nl t_from t_to acc) subst t
+    t_replace_nt_na t_from t_to acc) subst t
 
 let replace_decl (subst: term_subst) (d: decl) =
   decl_map (replace_subst subst) d

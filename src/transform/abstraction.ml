@@ -26,7 +26,7 @@ let abstraction (keep : lsymbol -> bool) =
     | Tnot _ | Tbinop _ ->
         t_map abstract t
     | _ ->
-        let t = t_label Slab.empty t in
+        let t = t_attr_set Sattr.empty t in
         let (ls, tabs) = try Hterm.find term_table t with Not_found ->
           let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
           let tabs = t_app ls [] t.t_ty in

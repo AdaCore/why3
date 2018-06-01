@@ -111,7 +111,7 @@ let branch_map fn env t1 bl =
 
 let rec dive_to_constructor fn env t =
   let dive env t = dive_to_constructor fn env t in
-  t_label_copy t (match t.t_node with
+  t_attr_copy t (match t.t_node with
     | Tvar x -> dive env (Mvs.find_exn Exit x env)
     | Tlet (t1,tb) -> let_map dive env t1 tb
     | Tcase (t1,bl) -> branch_map dive env t1 bl
@@ -136,9 +136,9 @@ let flat_case t bl =
 
 let rec eval_match kn stop env t =
   let stop = stop || t.t_ty <> None ||
-             Slab.mem Ity.annot_label t.t_label in
+             Sattr.mem Ity.annot_attr t.t_attrs in
   let eval env t = eval_match kn stop env t in
-  t_label_copy t (match t.t_node with
+  t_attr_copy t (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
         cs_equ env (eval env t1) (eval env t2)
     | Tnot { t_node = Tapp (ls, [t1;t2]) } when ls_equal ls ps_equ ->

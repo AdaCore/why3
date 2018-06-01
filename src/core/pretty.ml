@@ -26,7 +26,7 @@ let why3_keywords =
    "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
    "let"; "in"; "match"; "with"; "as"; "epsilon" ]
 
-let label_coercion = create_label "coercion"
+let coercion_attr = create_attribute "coercion"
 
 module type Printer = sig
 
@@ -34,7 +34,7 @@ module type Printer = sig
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
     val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
-    val print_id_labels : formatter -> ident -> unit  (* labels and location *)
+    val print_id_attrs : formatter -> ident -> unit   (* attributes and location *)
 
     val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
     val print_vs : formatter -> vsymbol -> unit       (* variable *)
@@ -53,7 +53,7 @@ module type Printer = sig
     val print_pat : formatter -> pattern -> unit      (* pattern *)
     val print_term : formatter -> term -> unit        (* term *)
 
-    val print_label : formatter -> label -> unit
+    val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
@@ -82,10 +82,10 @@ module type Printer = sig
   end
 
 
-let debug_print_labels =
+let debug_print_attrs =
   Debug.register_info_flag
-    "print_labels"
-    ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+    "print_attributes"
+    ~desc:"Print@ attributes@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
@@ -106,17 +106,17 @@ let forget_all () =
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
 
-let print_label fmt l = fprintf fmt "[@%s]" l.lab_string
-let print_labels = print_iter1 Slab.iter space print_label
+let print_attr fmt a = fprintf fmt "[@%s]" a.attr_string
+let print_attrs = print_iter1 Sattr.iter space print_attr
 
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
 
-let print_id_labels fmt id =
-  if Debug.test_flag debug_print_labels &&
-      not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label;
+let print_id_attrs fmt id =
+  if Debug.test_flag debug_print_attrs &&
+      not (Sattr.is_empty id.id_attrs) then
+    fprintf fmt "@ %a" print_attrs id.id_attrs;
   if Debug.test_flag debug_print_locs then
     Opt.iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
@@ -194,7 +194,7 @@ let print_ty fmt ty = print_ty_node 0 fmt ty
 
 let print_vsty fmt v =
   fprintf fmt "%a%a:@,%a" print_vs v
-    print_id_labels v.vs_name print_ty v.vs_ty
+    print_id_attrs v.vs_name print_ty v.vs_ty
 
 let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
@@ -219,10 +219,10 @@ let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
       fprintf fmt "_"
   | Pvar v ->
-      print_vs fmt v; print_id_labels fmt v.vs_name
+      print_vs fmt v; print_id_attrs fmt v.vs_name
   | Pas (p, v) ->
       fprintf fmt (protect_on (pri > 1) "%a as %a%a")
-        (print_pat_node 1) p print_vs v print_id_labels v.vs_name
+        (print_pat_node 1) p print_vs v print_id_attrs v.vs_name
   | Por (p, q) ->
       fprintf fmt (protect_on (pri > 0) "%a | %a")
         (print_pat_node 0) p (print_pat_node 0) q
@@ -259,16 +259,16 @@ let prio_binop = function
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  let print_tlab pri fmt t =
-    if Debug.test_flag debug_print_labels && not (Slab.is_empty t.t_label)
+  let print_tattr pri fmt t =
+    if Debug.test_flag debug_print_attrs && not (Sattr.is_empty t.t_attrs)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      print_labels t.t_label (print_tnode 0) t
+      print_attrs t.t_attrs (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (print_option print_loc) t.t_loc (print_tlab 0) t
-    else print_tlab pri fmt t in
+      (print_option print_loc) t.t_loc (print_tattr 0) t
+    else print_tattr pri fmt t in
   print_tloc pri fmt t
 
 and print_app pri ls fmt tl =
@@ -317,9 +317,9 @@ and print_tnode pri fmt t = match t.t_node with
                             print_ty ty
        | None -> assert false
      end
-  | Tapp (_, [t1]) when Slab.mem label_coercion t.t_label &&
+  | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
                         Debug.test_noflag debug_print_coercions ->
-      print_lterm pri fmt (t_label t1.t_label t1)
+      print_lterm pri fmt (t_attr_set t1.t_attrs t1)
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
@@ -334,7 +334,7 @@ and print_tnode pri fmt t = match t.t_node with
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0)
                               "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
-        print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
+        print_vs v print_id_attrs v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
@@ -361,15 +361,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when Slab.mem Term.asym_split f2.t_label ->
+    when Sattr.mem Term.asym_split f2.t_attrs ->
       fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
         (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
-    when Slab.mem Term.asym_split f2.t_label ->
+    when Sattr.mem Term.asym_split f2.t_attrs ->
       fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
         (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_split f1.t_label in
+      let asym = Sattr.mem Term.asym_split f1.t_attrs in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -394,7 +394,7 @@ let print_constr fmt (cs,pjl) =
     | None -> print_ty_arg fmt ty
   in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
-    print_id_labels cs.ls_name
+    print_id_attrs cs.ls_name
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
@@ -406,7 +406,7 @@ let print_ty_decl fmt ts =
     | Float _  -> fprintf fmt " =@ <float ...>" (* TODO *)
   in
   fprintf fmt "@[<hov 2>type %a%a%a%a@]"
-    print_ts ts print_id_labels ts.ts_name
+    print_ts ts print_id_attrs ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     print_def ts.ts_def;
   forget_tvs ()
@@ -414,7 +414,7 @@ let print_ty_decl fmt ts =
 let print_data_decl fst fmt (ts,csl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
     (if fst then "type" else "with") print_ts ts
-    print_id_labels ts.ts_name
+    print_id_attrs ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     (print_list newline print_constr) csl;
   forget_tvs ()
@@ -428,7 +428,7 @@ let ls_kind ls =
 let print_param_decl fmt ls =
   fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
     (ls_kind ls) print_ls ls
-    print_id_labels ls.ls_name
+    print_id_attrs ls.ls_name
     (print_list nothing print_ty_arg) ls.ls_args
     (print_option print_ls_type) ls.ls_value;
   forget_tvs ()
@@ -437,7 +437,7 @@ let print_logic_decl fst fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
     (if fst then ls_kind ls else "with") print_ls ls
-    print_id_labels ls.ls_name
+    print_id_attrs ls.ls_name
     (print_list nothing print_vs_arg) vl
     (print_option print_ls_type) ls.ls_value print_term e;
   List.iter forget_var vl;
@@ -445,7 +445,7 @@ let print_logic_decl fst fmt (ls,ld) =
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
-    print_pr pr print_id_labels pr.pr_name print_term f
+    print_pr pr print_id_attrs pr.pr_name print_term f
 
 let ind_sign = function
   | Ind   -> "inductive"
@@ -454,7 +454,7 @@ let ind_sign = function
 let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]"
     (if fst then ind_sign s else "with") print_ls ps
-    print_id_labels ps.ls_name
+    print_id_attrs ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl;
   forget_tvs ()
@@ -468,7 +468,7 @@ let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
-    print_pr pr print_id_labels pr.pr_name print_term f;
+    print_pr pr print_id_attrs pr.pr_name print_term f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function
@@ -549,7 +549,7 @@ let print_tdecl fmt td = match td.td_node with
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
-    print_th th print_id_labels th.th_name
+    print_th th print_id_attrs th.th_name
     (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =

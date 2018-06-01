@@ -751,7 +751,7 @@ let clone_ppat cl sm pp mask =
   let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
   Svs.fold save pp.pp_pat.pat_vars sm, pp'
 
-let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
+let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
   | Econst c -> e_const c e.e_ity
   | Eexec (c,_) -> e_exec (clone_cexp cl sm c)
@@ -995,8 +995,8 @@ let clone_type_decl inst cl tdl kn =
 
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
-  let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 

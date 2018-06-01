@@ -218,7 +218,7 @@ type binop =
 type term = {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : Slab.t;
+  t_attrs : Sattr.t;
   t_loc   : Loc.position option;
 }
 
@@ -275,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare trigger label t1 t2 =
+let t_compare trigger attr t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -320,7 +320,7 @@ let t_compare trigger label t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      if label then comp_raise (Slab.compare t1.t_label t2.t_label) else ();
+      if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs) else ();
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -404,7 +404,7 @@ let t_compare trigger label t1 t2 =
 
 let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
 
-let t_equal_nt_nl t1 t2 = (t_compare false false t1 t2 = 0)
+let t_equal_nt_na t1 t2 = (t_compare false false t1 t2 = 0)
 
 let t_compare = t_compare true true
 
@@ -448,8 +448,8 @@ let t_hash t =
         bnd + 1, Mvs.add v bnd bv, Hashcons.combine hp (bnd + 1)
   in
   let rec t_hash bnd vml t =
-    let comb l h = Hashcons.combine (lab_hash l) h in
-    let h = Slab.fold comb t.t_label (oty_hash t.t_ty) in
+    let comb l h = Hashcons.combine (attr_hash l) h in
+    let h = Sattr.fold comb t.t_attrs (oty_hash t.t_ty) in
     Hashcons.combine h
       begin match descend vml t with
       | Bnd i -> i + 1
@@ -578,7 +578,7 @@ module Hterm = Exthtbl.Make(TermOHT)
 
 let mk_term n ty = {
   t_node  = n;
-  t_label = Slab.empty;
+  t_attrs = Sattr.empty;
   t_loc   = None;
   t_ty    = ty;
 }
@@ -596,24 +596,24 @@ let t_not f         = mk_term (Tnot f) None
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 
-let t_label ?loc l t = { t with t_label = l; t_loc = loc }
+let t_attr_set ?loc l t = { t with t_attrs = l; t_loc = loc }
 
-let t_label_add l t = { t with t_label = Slab.add l t.t_label }
+let t_attr_add l t = { t with t_attrs = Sattr.add l t.t_attrs }
 
-let t_label_remove l t = { t with t_label = Slab.remove l t.t_label }
+let t_attr_remove l t = { t with t_attrs = Sattr.remove l t.t_attrs }
 
-let t_label_copy s t =
+let t_attr_copy s t =
   if s == t then s else
-  if t_similar s t && Slab.is_empty t.t_label && t.t_loc = None then s else
-  let lab = Slab.union s.t_label t.t_label in
+  if t_similar s t && Sattr.is_empty t.t_attrs && t.t_loc = None then s else
+  let attrs = Sattr.union s.t_attrs t.t_attrs in
   let loc = if t.t_loc = None then s.t_loc else t.t_loc in
-  { t with t_label = lab; t_loc = loc }
+  { t with t_attrs = attrs; t_loc = loc }
 
 (* unsafe map *)
 
 let bound_map fn (u,b,e) = (u, bnd_map fn b, fn e)
 
-let t_map_unsafe fn t = t_label_copy t (match t.t_node with
+let t_map_unsafe fn t = t_attr_copy t (match t.t_node with
   | Tvar _ | Tconst _ -> t
   | Tapp (f,tl) -> t_app f (List.map fn tl) t.t_ty
   | Tif (f,t1,t2) -> t_if (fn f) (fn t1) (fn t2)
@@ -653,35 +653,35 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
       acc, t
   | Tapp (f,tl) ->
       let acc,sl = Lists.map_fold_left fn acc tl in
-      acc, t_label_copy t (t_app f sl t.t_ty)
+      acc, t_attr_copy t (t_app f sl t.t_ty)
   | Tif (f,t1,t2) ->
       let acc, g  = fn acc f in
       let acc, s1 = fn acc t1 in
       let acc, s2 = fn acc t2 in
-      acc, t_label_copy t (t_if g s1 s2)
+      acc, t_attr_copy t (t_if g s1 s2)
   | Tlet (e,b) ->
       let acc, e = fn acc e in
       let acc, b = bound_map_fold fn acc b in
-      acc, t_label_copy t (t_let e b t.t_ty)
+      acc, t_attr_copy t (t_let e b t.t_ty)
   | Tcase (e,bl) ->
       let acc, e = fn acc e in
       let acc, bl = Lists.map_fold_left (bound_map_fold fn) acc bl in
-      acc, t_label_copy t (t_case e bl t.t_ty)
+      acc, t_attr_copy t (t_case e bl t.t_ty)
   | Teps b ->
       let acc, b = bound_map_fold fn acc b in
-      acc, t_label_copy t (t_eps b t.t_ty)
+      acc, t_attr_copy t (t_eps b t.t_ty)
   | Tquant (q,(vl,b,tl,f1)) ->
       let acc, b = bnd_map_fold fn acc b in
       let acc, tl = tr_map_fold fn acc tl in
       let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (t_quant q (vl,b,tl,f1))
+      acc, t_attr_copy t (t_quant q (vl,b,tl,f1))
   | Tbinop (op,f1,f2) ->
       let acc, g1 = fn acc f1 in
       let acc, g2 = fn acc f2 in
-      acc, t_label_copy t (t_binary op g1 g2)
+      acc, t_attr_copy t (t_binary op g1 g2)
   | Tnot f1 ->
       let acc, g1 = fn acc f1 in
-      acc, t_label_copy t (t_not g1)
+      acc, t_attr_copy t (t_not g1)
   | Ttrue | Tfalse ->
       acc, t
 
@@ -694,21 +694,21 @@ let rec t_subst_unsafe m t =
     (u, bv_subst_unsafe m b, e) in
   match t.t_node with
   | Tvar u ->
-      t_label_copy t (Mvs.find_def t u m)
+      t_attr_copy t (Mvs.find_def t u m)
   | Tlet (e, bt) ->
       let d = t_subst e in
-      t_label_copy t (t_let d (b_subst bt) t.t_ty)
+      t_attr_copy t (t_let d (b_subst bt) t.t_ty)
   | Tcase (e, bl) ->
       let d = t_subst e in
       let bl = List.map b_subst bl in
-      t_label_copy t (t_case d bl t.t_ty)
+      t_attr_copy t (t_case d bl t.t_ty)
   | Teps bf ->
-      t_label_copy t (t_eps (b_subst bf) t.t_ty)
+      t_attr_copy t (t_eps (b_subst bf) t.t_ty)
   | Tquant (q, (vl,b,tl,f1 as bq)) ->
       let bq =
         if Mvs.set_disjoint m b.bv_vars then bq else
         (vl,bv_subst_unsafe m b,tl,f1) in
-      t_label_copy t (t_quant q bq)
+      t_attr_copy t (t_quant q bq)
   | _ ->
       t_map_unsafe t_subst t
 
@@ -915,11 +915,11 @@ let rec t_or_l = function
   | [f] -> f
   | f::fl -> t_or f (t_or_l fl)
 
-let asym_split = create_label "asym_split"
-let stop_split = create_label "stop_split"
+let asym_split = create_attribute "asym_split"
+let stop_split = create_attribute "stop_split"
 
-let t_and_asym t1 t2 = t_and (t_label_add asym_split t1) t2
-let t_or_asym  t1 t2 = t_or  (t_label_add asym_split t1) t2
+let t_and_asym t1 t2 = t_and (t_attr_add asym_split t1) t2
+let t_or_asym  t1 t2 = t_or  (t_attr_add asym_split t1) t2
 
 let rec t_and_asym_l = function
   | [] -> t_true
@@ -1024,7 +1024,7 @@ let gen_bnd_rename fnT fnE h b =
 
 let rec t_gen_map fnT fnL m t =
   let fn = t_gen_map fnT fnL m in
-  t_label_copy t (match t.t_node with
+  t_attr_copy t (match t.t_node with
     | Tvar v ->
         let u = Mvs.find_def v v m in
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
@@ -1127,7 +1127,7 @@ let rec t_app_map fn t =
   match t.t_node with
     | Tapp (ls,tl) ->
         let ls = fn ls (List.map t_type tl) t.t_ty in
-        t_label_copy t (t_app ls tl t.t_ty)
+        t_attr_copy t (t_app ls tl t.t_ty)
     | _ -> t
 
 let rec t_app_fold fn acc t =
@@ -1144,8 +1144,8 @@ let t_map fn t = match t.t_node with
       let s1 = fn t1 and s2 = fn t2 in
       if s2 == t2
         then if s1 == t1 then t
-          else t_label_copy t (t_let s1 b)
-        else t_label_copy t (t_let_close u s1 s2)
+          else t_attr_copy t (t_let s1 b)
+        else t_attr_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
       let s1 = fn t1 in
       let brn same b =
@@ -1156,17 +1156,17 @@ let t_map fn t = match t.t_node with
       in
       let same, bl = Lists.map_fold_left brn true bl in
       if s1 == t1 && same then t
-        else t_label_copy t (t_case s1 bl)
+        else t_attr_copy t (t_case s1 bl)
   | Teps b ->
       let u,t1 = t_open_bound b in
       let s1 = fn t1 in
       if s1 == t1 then t
-        else t_label_copy t (t_eps_close u s1)
+        else t_attr_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
       let vl,tl,f1 = t_open_quant b in
       let g1 = fn f1 and sl = tr_map fn tl in
       if g1 == f1 && List.for_all2 (List.for_all2 (==)) sl tl then t
-        else t_label_copy t (t_quant_close q vl sl g1)
+        else t_attr_copy t (t_quant_close q vl sl g1)
   | _ ->
       t_map_unsafe fn t
 
@@ -1201,8 +1201,8 @@ let t_map_fold fn acc t = match t.t_node with
       let acc, s2 = fn acc t2 in
       acc, if s2 == t2
         then if s1 == t1 then t
-          else t_label_copy t (t_let s1 b)
-        else t_label_copy t (t_let_close u s1 s2)
+          else t_attr_copy t (t_let s1 b)
+        else t_attr_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
       let acc, s1 = fn acc t1 in
       let brn (acc,same) b =
@@ -1213,18 +1213,18 @@ let t_map_fold fn acc t = match t.t_node with
       in
       let (acc,same), bl = Lists.map_fold_left brn (acc,true) bl in
       acc, if s1 == t1 && same then t
-        else t_label_copy t (t_case s1 bl)
+        else t_attr_copy t (t_case s1 bl)
   | Teps b ->
       let u,t1 = t_open_bound b in
       let acc, s1 = fn acc t1 in
       acc, if s1 == t1 then t
-        else t_label_copy t (t_eps_close u s1)
+        else t_attr_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
       let vl,tl,f1 = t_open_quant b in
       let acc, sl = tr_map_fold fn acc tl in
       let acc, g1 = fn acc f1 in
       acc, if g1 == f1 && List.for_all2 (List.for_all2 (==)) sl tl
-        then t else t_label_copy t (t_quant_close q vl sl g1)
+        then t else t_attr_copy t (t_quant_close q vl sl g1)
   | _ -> t_map_fold_unsafe fn acc t
 
 let t_map_fold fn = t_map_fold (fun acc t ->
@@ -1232,7 +1232,7 @@ let t_map_fold fn = t_map_fold (fun acc t ->
 
 (* polarity map *)
 
-let t_map_sign fn sign f = t_label_copy f (match f.t_node with
+let t_map_sign fn sign f = t_attr_copy f (match f.t_node with
   | Tbinop (Timplies, f1, f2) ->
       t_implies (fn (not sign) f1) (fn sign f2)
   | Tbinop (Tiff, f1, f2) ->
@@ -1265,7 +1265,7 @@ let rec list_map_cont fnL contL = function
       contL []
 
 let t_map_cont fn contT t =
-  let contT e = contT (t_label_copy t e) in
+  let contT e = contT (t_attr_copy t e) in
   match t.t_node with
   | Tvar _ | Tconst _ -> contT t
   | Tapp (fs, tl) ->
@@ -1380,9 +1380,9 @@ let t_lambda vl trl t =
   let ty = List.fold_right add_ty vl ty in
   let fc = create_vsymbol (id_fresh "fc") ty in
   let copy_loc e = if t.t_loc = None then e
-    else t_label ?loc:t.t_loc e.t_label e in
+    else t_attr_set ?loc:t.t_loc e.t_attrs e in
   let mk_t_var v = if v.vs_name.id_loc = None then t_var v
-    else t_label ?loc:v.vs_name.id_loc Slab.empty (t_var v) in
+    else t_attr_set ?loc:v.vs_name.id_loc Sattr.empty (t_var v) in
   let add_arg h v = copy_loc (t_func_app h (mk_t_var v)) in
   let h = List.fold_left add_arg (mk_t_var fc) vl in
   let f = match t.t_ty with
@@ -1394,7 +1394,7 @@ let t_lambda vl trl t =
   let t = match t.t_node with
     | Tapp (ps,[l;{t_node = Tapp (fs,[])}])
       when ls_equal ps ps_equ && ls_equal fs fs_bool_true ->
-        t_label_copy t l
+        t_attr_copy t l
     | _ -> t in
   if vl <> [] then t_lambda vl trl t
   else if t.t_ty <> None then t
@@ -1481,15 +1481,15 @@ let t_pred_app_beta lam t = t_pred_app_beta_l lam [t]
 (* constructors with propositional simplification *)
 
 let t_not_simp f = match f.t_node with
-  | Ttrue  -> t_label_copy f t_false
-  | Tfalse -> t_label_copy f t_true
-  | Tnot g -> t_label_copy f g
+  | Ttrue  -> t_attr_copy f t_false
+  | Tfalse -> t_attr_copy f t_true
+  | Tnot g -> t_attr_copy f g
   | _      -> t_not f
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
-  | _, Ttrue  -> t_label_remove asym_split f1
-  | Tfalse, _ -> t_label_remove asym_split f1
+  | _, Ttrue  -> t_attr_remove asym_split f1
+  | Tfalse, _ -> t_attr_remove asym_split f1
   | _, Tfalse -> f2
   | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_and f1 f2
@@ -1497,10 +1497,10 @@ let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
 let t_and_simp_l l = List.fold_right t_and_simp l t_true
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> t_label_remove asym_split f1
+  | Ttrue, _  -> t_attr_remove asym_split f1
   | _, Ttrue  -> f2
   | Tfalse, _ -> f2
-  | _, Tfalse -> t_label_remove asym_split f1
+  | _, Tfalse -> t_attr_remove asym_split f1
   | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_or f1 f2
 
@@ -1508,8 +1508,8 @@ let t_or_simp_l l = List.fold_right t_or_simp l t_false
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
-  | _, Ttrue  -> t_label_remove asym_split f1
-  | Tfalse, _ -> t_label_remove asym_split f1
+  | _, Ttrue  -> t_attr_remove asym_split f1
+  | Tfalse, _ -> t_attr_remove asym_split f1
   | _, Tfalse -> f2
   | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_and_asym f1 f2
@@ -1517,10 +1517,10 @@ let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
 let t_and_asym_simp_l l = List.fold_right t_and_asym_simp l t_true
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> t_label_remove asym_split f1
+  | Ttrue, _  -> t_attr_remove asym_split f1
   | _, Ttrue  -> f2
   | Tfalse, _ -> f2
-  | _, Tfalse -> t_label_remove asym_split f1
+  | _, Tfalse -> t_attr_remove asym_split f1
   | _, _ when t_equal f1 f2 -> f1
   | _, _ -> t_or_asym f1 f2
 
@@ -1529,9 +1529,9 @@ let t_or_asym_simp_l l = List.fold_right t_or_asym_simp l t_false
 let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
   | _, Ttrue  -> f2
-  | Tfalse, _ -> t_label_copy f1 t_true
+  | Tfalse, _ -> t_attr_copy f1 t_true
   | _, Tfalse -> t_not_simp f1
-  | _, _ when t_equal f1 f2 -> t_label_copy f1 t_true
+  | _, _ when t_equal f1 f2 -> t_attr_copy f1 t_true
   | _, _ -> t_implies f1 f2
 
 let t_iff_simp f1 f2 = match f1.t_node, f2.t_node with
@@ -1539,7 +1539,7 @@ let t_iff_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, Ttrue  -> f1
   | Tfalse, _ -> t_not_simp f2
   | _, Tfalse -> t_not_simp f1
-  | _, _ when t_equal f1 f2 -> t_label_copy f1 t_true
+  | _, _ when t_equal f1 f2 -> t_attr_copy f1 t_true
   | _, _ -> t_iff f1 f2
 
 let t_binary_simp op = match op with
@@ -1661,7 +1661,7 @@ let t_exists_close_merge vs f = match f.t_node with
       t_exists_close (vs@vs') trs f
   | _ -> t_exists_close vs [] f
 
-let t_map_simp fn f = t_label_copy f (match f.t_node with
+let t_map_simp fn f = t_attr_copy f (match f.t_node with
   | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
       t_equ_simp (fn t1) (fn t2)
   | Tif (f1, f2, f3) ->

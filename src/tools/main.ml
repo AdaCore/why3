@@ -23,7 +23,7 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
-let opt_list_labels = ref false
+let opt_list_attrs = ref false
 
 let option_list = [
   "--list-transforms", Arg.Set opt_list_transforms,
@@ -36,7 +36,7 @@ let option_list = [
       " list known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " list known metas";
-  "--list-labels", Arg.Set opt_list_labels, "list used labels";
+  "--list-attributes", Arg.Set opt_list_attrs, "list used attributes";
   "--print-libdir",
       Arg.Unit (fun _ -> printf "%s@." Config.libdir; exit 0),
       " print location of binary components (plugins, etc)";
@@ -153,9 +153,9 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;
-  if !opt_list_labels then begin
+  if !opt_list_attrs then begin
     opt_list := true;
-    let l = List.sort String.compare (Ident.list_label ()) in
+    let l = List.sort String.compare (Ident.list_attributes ()) in
     List.iter (fun x -> Format.eprintf "%s@." x) l
   end;
   if !opt_list then exit 0;
@@ -165,9 +165,3 @@ let () = try
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)

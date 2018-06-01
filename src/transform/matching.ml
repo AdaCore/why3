@@ -11,10 +11,10 @@ exception NoMatch of term * term
    (matching is done modulo those) *)
 let rec remove_bp = function
   | {t_node = Tapp(ls,[t;tt])}
-    when ls_equal ls ps_equ && t_equal_nt_nl tt t_bool_true -> remove_bp t
+    when ls_equal ls ps_equ && t_equal_nt_na tt t_bool_true -> remove_bp t
   | {t_node = Tif (t,tt,tf)}
-    when t_equal_nt_nl tt t_bool_true
-      && t_equal_nt_nl tf t_bool_false -> remove_bp t
+    when t_equal_nt_na tt t_bool_true
+      && t_equal_nt_na tf t_bool_false -> remove_bp t
   | t -> t
 
 
@@ -36,9 +36,9 @@ let rec matching bnd mty mv tp tm =
     | None -> t_if tm t_bool_true t_bool_false
     in
     begin match Mvs.find vp mv with
-    (* FIXME? If term have distinct labels/triggers,
-       only the labels/triggers coming from the first match are kept. *)
-    | tb -> if t_equal_nt_nl (remove_bp tb) tm then mty, mv else fail ()
+    (* FIXME? If term have distinct attributes/triggers,
+       only the attributes/triggers coming from the first match are kept. *)
+    | tb -> if t_equal_nt_na (remove_bp tb) tm then mty, mv else fail ()
     | exception Not_found -> match oty_match mty tp.t_ty tmf.t_ty with
     | mty ->
       if Mvs.set_disjoint bnd (t_vars tm)
@@ -47,7 +47,7 @@ let rec matching bnd mty mv tp tm =
       else fail ()
     | exception TypeMismatch _ -> fail ()
     end
-  | (Tconst _ | Ttrue | Tfalse), _ when t_equal_nt_nl tp tm ->
+  | (Tconst _ | Ttrue | Tfalse), _ when t_equal_nt_na tp tm ->
     mty, mv
   | Tapp (lsp,lp), Tapp (lsm,lm) when ls_equal lsp lsm ->
     let mty = try oty_match mty tp.t_ty tm.t_ty
@@ -151,10 +151,10 @@ module C = struct
     | Cbound n1, Cbound n2 | Ccase n1, Ccase n2 -> n1 -- n2
     | Cconst t1, Cconst t2 ->
       (* FIXME? is there a better way to achieve
-         label-independent comparison ?
+         attribute-independent comparison ?
          (Note that terms are not nested here, so that
           code actually works) *)
-      t_compare (t_label Slab.empty t1) (t_label Slab.empty t2)
+      t_compare (t_attr_set Sattr.empty t1) (t_attr_set Sattr.empty t2)
     | Capp ls1, Capp ls2 -> ls_compare ls1 ls2
     | Cquant (q1,n1), Cquant (q2,n2) ->
       let c = q1 -- q2 in if c <> 0 then c else n1 -- n2
@@ -466,7 +466,7 @@ let instr ms = function
       | exception Not_found -> false
       end
     | (Tconst _ | Ttrue | Tfalse), Cconst tp
-      when t_equal (t_label Slab.empty t) (t_label Slab.empty tp) ->
+      when t_equal (t_attr_set Sattr.empty t) (t_attr_set Sattr.empty tp) ->
       add_dty ms t l; true
     | Tapp (lsm,tl), Capp lsp when ls_equal lsm lsp ->
       ms.term_stack <- List.rev_append tl ms.term_stack;
@@ -555,7 +555,7 @@ let instr ms = function
       | None -> t_if t t_bool_true t_bool_false
     in
     begin match Mvs.find vs ms.term_match with
-    | t0 -> t_equal_nt_nl t t0
+    | t0 -> t_equal_nt_na t t0
     | exception Not_found ->
       ms.term_match <- Mvs.add vs t ms.term_match; true
     end
@@ -1159,7 +1159,7 @@ let compile id rigid_tv rigid_vs tp =
     let rec unfold_term t = match t.t_node with
       | Tquant (_,tq) -> let vl,_,tq = t_open_quant tq in
         List.iter (fun vs ->
-          if Slab.mem (create_label "rigid") vs.vs_name.id_label
+          if Sattr.mem (create_attribute "rigid") vs.vs_name.id_attrs
           then begin mv := Mvs.add vs (t_var vs) !mv;
             mty := Stv.fold (fun tv mty ->
               Mtv.add tv (ty_var tv) mty

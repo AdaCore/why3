@@ -18,33 +18,33 @@
 
   let floc s e = Loc.extract (s,e)
 
-  let debug_auto_model =
-    Debug.register_flag ~desc:"When set, model labels are not added during parsing"
-      "no_auto_model"
+  let debug_auto_model = Debug.register_flag
+    ~desc:"When set, model attributes are not added during parsing"
+    "no_auto_model"
 
-  let add_lab id l =
-    { id with id_lab = l }
+  let add_attr id l =
+    { id with id_ats = l }
 
-  let add_model_trace_label id =
+  let add_model_trace_attr id =
     if Debug.test_flag debug_auto_model then id else
-    let is_model_trace_label l =
+    let is_model_trace_attr l =
       match l with
-      | Lpos _ -> false
-      | Lstr lab -> Ident.is_model_trace_label lab
+      | ATpos _ -> false
+      | ATstr attr -> Ident.is_model_trace_attr attr
     in
-    if List.exists is_model_trace_label id.id_lab then id else
+    if List.exists is_model_trace_attr id.id_ats then id else
       let l =
-        (Lstr (Ident.create_model_trace_label id.id_str))
-        ::(Lstr Ident.model_label) :: id.id_lab in
-      { id with id_lab = l }
+        (ATstr (Ident.create_model_trace_attr id.id_str))
+        ::(ATstr Ident.model_attr) :: id.id_ats in
+      { id with id_ats = l }
 
-  let add_model_labels (b : binder) =
+  let add_model_attrs (b : binder) =
     match b with
     | (loc, Some id, ghost, ty) ->
-      (loc, Some (add_model_trace_label id), ghost, ty)
+      (loc, Some (add_model_trace_attr id), ghost, ty)
     | _ -> b
 
-  let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
+  let id_anonymous loc = { id_str = "_"; id_ats = []; id_loc = loc }
 
   let mk_int_const neg lit =
     Number.{ ic_negative = neg ; ic_abs = lit}
@@ -52,7 +52,7 @@
   let mk_real_const neg lit =
     Number.{ rc_negative = neg ; rc_abs = lit}
 
-  let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
+  let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
 
   let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
   let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
@@ -166,7 +166,7 @@
 %nonassoc below_COMMA
 %nonassoc COMMA
 %nonassoc GHOST
-%nonassoc prec_named
+%nonassoc prec_attr
 %nonassoc COLON (* weaker than -> because of t: a -> b *)
 %right ARROW LRARROW BY SO
 %right OR BARBAR
@@ -212,8 +212,8 @@ mlw_module:
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
-| THEORY labels(uident_nq)  { Typing.open_module $2 }
-| MODULE labels(uident_nq)  { Typing.open_module $2 }
+| THEORY attrs(uident_nq)  { Typing.open_module $2 }
+| MODULE attrs(uident_nq)  { Typing.open_module $2 }
 
 scope_head:
 | SCOPE boption(IMPORT) uident
@@ -292,14 +292,14 @@ pure_decl:
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
 | INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
 | COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM labels(ident_nq) COLON term         { Dprop (Decl.Paxiom, $2, $4) }
-| LEMMA labels(ident_nq) COLON term         { Dprop (Decl.Plemma, $2, $4) }
-| GOAL  labels(ident_nq) COLON term         { Dprop (Decl.Pgoal, $2, $4) }
+| AXIOM attrs(ident_nq) COLON term          { Dprop (Decl.Paxiom, $2, $4) }
+| LEMMA attrs(ident_nq) COLON term          { Dprop (Decl.Plemma, $2, $4) }
+| GOAL  attrs(ident_nq) COLON term          { Dprop (Decl.Pgoal, $2, $4) }
 
 (* Type declarations *)
 
 type_decl:
-| labels(lident_nq) ty_var* typedefn invariant* type_witness
+| attrs(lident_nq) ty_var* typedefn invariant* type_witness
   { let (vis, mut), def = $3 in
     { td_ident = $1; td_params = $2;
       td_vis = vis; td_mut = mut;
@@ -311,7 +311,7 @@ type_witness:
 | BY LEFTBRC field_list1(expr) RIGHTBRC   { $3 }
 
 ty_var:
-| labels(quote_lident) { $1 }
+| attrs(quote_lident) { $1 }
 
 typedefn:
 | (* epsilon *)
@@ -345,10 +345,10 @@ abstract:
 | ABSTRACT          { Abstract }
 
 type_field:
-| labels(lident_nq) cast
+| attrs(lident_nq) cast
   { { f_ident = $1; f_mutable = false; f_ghost = false;
       f_pty = $2; f_loc = floc $startpos $endpos } }
-| field_modifiers labels(lident_nq) cast
+| field_modifiers attrs(lident_nq) cast
   { { f_ident = $2; f_mutable = fst $1; f_ghost = snd $1;
       f_pty = $3; f_loc = floc $startpos $endpos } }
 
@@ -359,35 +359,35 @@ field_modifiers:
 | MUTABLE GHOST { true,  true  }
 
 type_case:
-| labels(uident_nq) params { floc $startpos $endpos, $1, $2 }
+| attrs(uident_nq) params { floc $startpos $endpos, $1, $2 }
 
 (* Logic declarations *)
 
 constant_decl:
-| labels(lident_rich) cast preceded(EQUAL,term)?
-  { { ld_ident = add_model_trace_label $1;
+| attrs(lident_rich) cast preceded(EQUAL,term)?
+  { { ld_ident = add_model_trace_attr $1;
       ld_params = []; ld_type = Some $2;
       ld_def = $3; ld_loc = floc $startpos $endpos } }
 
 function_decl:
-| labels(lident_rich) params cast preceded(EQUAL,term)?
+| attrs(lident_rich) params cast preceded(EQUAL,term)?
   { { ld_ident = $1; ld_params = $2; ld_type = Some $3;
       ld_def = $4; ld_loc = floc $startpos $endpos } }
 
 predicate_decl:
-| labels(lident_rich) params preceded(EQUAL,term)?
+| attrs(lident_rich) params preceded(EQUAL,term)?
   { { ld_ident = $1; ld_params = $2; ld_type = None;
       ld_def = $3; ld_loc = floc $startpos $endpos } }
 
 with_logic_decl:
-| WITH labels(lident_rich) params cast? preceded(EQUAL,term)?
+| WITH attrs(lident_rich) params cast? preceded(EQUAL,term)?
   { { ld_ident = $2; ld_params = $3; ld_type = $4;
       ld_def = $5; ld_loc = floc $startpos $endpos } }
 
 (* Inductive declarations *)
 
 inductive_decl:
-| labels(lident_rich) params ind_defn
+| attrs(lident_rich) params ind_defn
   { { in_ident = $1; in_params = $2;
       in_def = $3; in_loc = floc $startpos $endpos } }
 
@@ -396,7 +396,7 @@ ind_defn:
 | EQUAL bar_list1(ind_case) { $2 }
 
 ind_case:
-| labels(ident_nq) COLON term  { floc $startpos $endpos, $1, $3 }
+| attrs(ident_nq) COLON term  { floc $startpos $endpos, $1, $3 }
 
 (* Type expressions *)
 
@@ -435,7 +435,7 @@ param:
     { [floc $startpos $endpos, None, false, $1] }
 | LEFTPAR GHOST ty RIGHTPAR
     { [floc $startpos $endpos, None, true, $3] }
-| ty_arg label label*
+| ty_arg attr attr*
     { match $1 with
       | PTtyapp (Qident _, []) ->
              error_param (floc $startpos $endpos)
@@ -465,10 +465,10 @@ binder:
       | PTtyapp (Qident id, []) ->
              [floc $startpos $endpos, Some id, true, None]
       | _ -> [floc $startpos $endpos, None, true, Some $3] }
-| ty_arg label label*
+| ty_arg attr attr*
     { match $1 with
       | PTtyapp (Qident id, []) ->
-             let id = add_lab id ($2::$3) in
+             let id = add_attr id ($2::$3) in
              [floc $startpos $endpos, Some id, false, None]
       | _ -> error_loc (floc $startpos($2) $endpos($2)) }
 | LEFTPAR binder_vars_rest RIGHTPAR
@@ -487,11 +487,11 @@ binder_vars:
 | binder_vars_rest  { $1 }
 
 binder_vars_rest:
-| binder_vars_head label label* binder_var*
+| binder_vars_head attr attr* binder_var*
     { List.rev_append (match $1 with
         | (l, Some id) :: bl ->
             let l3 = floc $startpos($3) $endpos($3) in
-            (Loc.join l l3, Some (add_lab id ($2::$3))) :: bl
+            (Loc.join l l3, Some (add_attr id ($2::$3))) :: bl
         | _ -> assert false) $4 }
 | binder_vars_head anon_binder binder_var*
     { List.rev_append $1 ($2 :: $3) }
@@ -509,7 +509,7 @@ binder_vars_head:
       | _ -> Loc.error ~loc:(floc $startpos $endpos) Error }
 
 binder_var:
-| labels(lident_nq) { floc $startpos $endpos, Some $1 }
+| attrs(lident_nq)  { floc $startpos $endpos, Some $1 }
 | anon_binder       { $1 }
 
 anon_binder:
@@ -539,7 +539,7 @@ single_term_:
 | NOT single_term
     { Tnot $2 }
 | OLD single_term
-    { Tat ($2, mk_id Dexpr.old_mark $startpos($1) $endpos($1)) }
+    { Tat ($2, mk_id Dexpr.old_label $startpos($1) $endpos($1)) }
 | single_term AT uident
     { Tat ($1, $3) }
 | prefix_op single_term %prec prec_prefix_op
@@ -569,23 +569,23 @@ single_term_:
       | Pvar (id,false) -> Tlet (id, def, $6)
       | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
       | _ -> Tcase (def, [pat, $6]) }
-| LET labels(lident_op_id) EQUAL term IN term
+| LET attrs(lident_op_id) EQUAL term IN term
     { Tlet ($2, $4, $6) }
-| LET labels(lident_nq) mk_term(lam_defn) IN term
+| LET attrs(lident_nq) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
-| LET labels(lident_op_id) mk_term(lam_defn) IN term
+| LET attrs(lident_op_id) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
 | MATCH term WITH match_cases(term) END
     { Tcase ($2, $4) }
 | quant comma_list1(quant_vars) triggers DOT term
-    { let l = List.map add_model_labels (List.concat $2) in
+    { let l = List.map add_model_attrs (List.concat $2) in
       Tquant ($1, l, $3, $5) }
 | FUN binders ARROW term
     { Tquant (Dterm.DTlambda, $2, [], $4) }
 | EPSILON
     { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
-| label single_term %prec prec_named
-    { Tnamed ($1, $2) }
+| attr single_term %prec prec_attr
+    { Tattr ($1, $2) }
 | single_term cast
     { Tcast ($1, $2) }
 
@@ -668,12 +668,12 @@ numeral:
 (* Program declarations *)
 
 prog_decl:
-| VAL ghost kind labels(lident_rich) mk_expr(val_defn) { Dlet (add_model_trace_label $4, $2, $3, $5) }
-| LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
-| LET ghost kind labels(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
-| LET REC with_list1(rec_defn)                         { Drec $3 }
-| EXCEPTION labels(uident_nq)         { Dexn ($2, PTtuple [], Ity.MaskVisible) }
-| EXCEPTION labels(uident_nq) return  { Dexn ($2, fst $3, snd $3) }
+| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) { Dlet (add_model_trace_attr $4, $2, $3, $5) }
+| LET ghost kind attrs(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
+| LET ghost kind attrs(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
+| LET REC with_list1(rec_defn)                        { Drec $3 }
+| EXCEPTION attrs(uident_nq)        { Dexn ($2, PTtuple [], Ity.MaskVisible) }
+| EXCEPTION attrs(uident_nq) return { Dexn ($2, fst $3, snd $3) }
 
 ghost:
 | (* epsilon *) { false }
@@ -689,7 +689,7 @@ kind:
 (* Function definitions *)
 
 rec_defn:
-| ghost kind labels(lident_rich) binders ret_opt spec EQUAL spec seq_expr
+| ghost kind attrs(lident_rich) binders ret_opt spec EQUAL spec seq_expr
     { let id = mk_id return_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id, snd $5, $9) } in
       $3, $1, $2, $4, fst $5, snd $5, spec_union $6 $8, e }
@@ -698,7 +698,7 @@ fun_defn:
 | binders ret_opt spec EQUAL spec seq_expr
     { let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, snd $2, $6) } in
-      Efun (List.map add_model_labels $1, fst $2, snd $2, spec_union $3 $5, e) }
+      Efun (List.map add_model_attrs $1, fst $2, snd $2, spec_union $3 $5, e) }
 
 val_defn:
 | params ret_opt spec
@@ -722,7 +722,7 @@ contract_expr:
 | assign_expr %prec prec_no_spec  { $1 }
 | assign_expr single_spec spec
     { let d = Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $1) in
-      let d = Enamed (Lstr Vc.wb_label, mk_expr d $startpos $endpos) in
+      let d = Eattr (ATstr Vc.wb_attr, mk_expr d $startpos $endpos) in
       mk_expr d $startpos $endpos }
 
 assign_expr:
@@ -809,15 +809,15 @@ single_expr_:
         | _ -> pat, $6 in
       match pat.pat_desc with
       | Pvar (id, gh) ->
-        let id = add_model_trace_label id in
+        let id = add_model_trace_attr id in
         Elet (id, gh, kind, def, $8)
       | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
       | _ -> Ematch (def, [pat, $8], []) }
-| LET ghost kind labels(lident_op_id) EQUAL seq_expr IN seq_expr
+| LET ghost kind attrs(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
-| LET ghost kind labels(lident_nq) mk_expr(fun_defn) IN seq_expr
+| LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
-| LET ghost kind labels(lident_op_id) mk_expr(fun_defn) IN seq_expr
+| LET ghost kind attrs(lident_op_id) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
@@ -827,22 +827,22 @@ single_expr_:
       Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
 | ANY return spec
     { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
-| VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
+| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH ext_match_cases END
     { let bl, xl = $4 in Ematch ($2, bl, xl) }
-| EXCEPTION labels(uident) IN seq_expr
+| EXCEPTION attrs(uident) IN seq_expr
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
-| EXCEPTION labels(uident) return IN seq_expr
+| EXCEPTION attrs(uident) return IN seq_expr
     { Eexn ($2, fst $3, snd $3, $5) }
-| LABEL id = labels(uident) IN e = seq_expr
+| LABEL id = attrs(uident) IN e = seq_expr
     { let cont e =
         let id = { id with id_str = id.id_str ^ continue_id } in
         { e with expr_desc = Eoptexn (id, Ity.MaskVisible, e) } in
       let rec over_loop e = { e with expr_desc = over_loop_desc e }
       and over_loop_desc e = match e.expr_desc with
         | Escope (q, e1) -> Escope (q, over_loop e1)
-        | Enamed (l, e1) -> Enamed (l, over_loop e1)
+        | Eattr (l, e1) -> Eattr (l, over_loop e1)
         | Ecast (e1, t) -> Ecast (over_loop e1, t)
         | Eghost e1 -> Eghost (over_loop e1)
         | Esequence (e1, e2) -> Esequence (over_loop e1, e2)
@@ -856,7 +856,7 @@ single_expr_:
             let id = { id with id_str = id.id_str ^ break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
-      Emark (id, over_loop e) }
+      Elabel (id, over_loop e) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { let id_b = mk_id break_id $startpos($3) $endpos($3) in
       let id_c = mk_id continue_id $startpos($3) $endpos($3) in
@@ -867,7 +867,7 @@ single_expr_:
     { let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
-      let id = add_model_trace_label $2 in
+      let id = add_model_trace_attr $2 in
       let e = mk_expr (Efor (id, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | ABSURD
@@ -895,8 +895,8 @@ single_expr_:
     { Eghost $2 }
 | assertion_kind LEFTBRC term RIGHTBRC
     { Eassert ($1, $3) }
-| label single_expr %prec prec_named
-    { Enamed ($1, $2) }
+| attr single_expr %prec prec_attr
+    { Eattr ($1, $2) }
 | single_expr cast
     { Ecast ($1, $2) }
 
@@ -1079,17 +1079,17 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS ghost labels(lident_nq)
-    { let id = add_model_trace_label $4 in
+| mk_pat(pat_uni_) AS ghost attrs(lident_nq)
+    { let id = add_model_trace_attr $4 in
       Pas ($1,id,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
 | pat_arg_shared_                       { $1 }
-| labels(lident_nq)
-    { let id = add_model_trace_label $1 in
+| attrs(lident_nq)
+    { let id = add_model_trace_attr $1 in
       Pvar (id, false) }
-| GHOST labels(lident_nq)               { Pvar ($2,true) }
+| GHOST attrs(lident_nq)               { Pvar ($2,true) }
 
 pat_arg_shared_:
 | UNDERSCORE                            { Pwild }
@@ -1114,13 +1114,13 @@ let_pat_conj_:
 let_pat_uni_:
 | let_pat_arg_                          { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(let_pat_uni_) AS ghost labels(lident_nq)
+| mk_pat(let_pat_uni_) AS ghost attrs(lident_nq)
                                         { Pas ($1,$4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
 
 let_pat_arg_:
-| pat_arg_shared_ { $1 }
-| labels(lident_nq)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
+| pat_arg_shared_   { $1 }
+| attrs(lident_nq)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
 
 (* Idents *)
 
@@ -1249,13 +1249,13 @@ sident:
 | ident   { $1 }
 | STRING  { mk_id $1 $startpos $endpos }
 
-(* Labels and position markers *)
+(* Attributes and position markers *)
 
-labels(X): X label* { add_lab $1 $2 }
+attrs(X): X attr* { add_attr $1 $2 }
 
-label:
-| ATTRIBUTE { Lstr (Ident.create_label $1) }
-| POSITION  { Lpos $1 }
+attr:
+| ATTRIBUTE { ATstr (Ident.create_attribute $1) }
+| POSITION  { ATpos $1 }
 
 (* Miscellaneous *)
 

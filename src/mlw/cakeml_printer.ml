@@ -26,11 +26,11 @@ module Print = struct
 
   open Mltree
 
-  (* extraction labels *)
-  let sml_remove = create_label "sml:remove"
+  (* extraction attributes *)
+  let sml_remove = create_attribute "sml:remove"
 
-  let is_sml_remove ~labels =
-    Ident.Slab.mem sml_remove labels
+  let is_sml_remove ~attrs =
+    Ident.Sattr.mem sml_remove attrs
 
   include MLPrinter(struct
     let keywords =
@@ -415,8 +415,8 @@ module Print = struct
           fprintf fmt " =@ int"
       | Some (Dfloat _) ->
           assert false (*TODO*) in
-    let labels = its.its_name.id_label in
-    if not (is_sml_remove ~labels) then
+    let attrs = its.its_name.id_attrs in
+    if not (is_sml_remove ~attrs) then
       fprintf fmt "@[<hov 2>@[%a@]@[%a@]@]" print_tv_args its.its_args
         (print_def info its.its_name) its.its_def
 

@@ -311,7 +311,7 @@ type expr = {
   e_ity    : ity;
   e_mask   : mask;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
 }
 
@@ -361,27 +361,27 @@ and rec_defn = {
 
 (* basic tools *)
 
-let e_label ?loc l e = { e with e_label = l; e_loc = loc }
+let e_attr_set ?loc l e = { e with e_attrs = l; e_loc = loc }
 
-let e_label_add l e = { e with e_label = Slab.add l e.e_label }
+let e_attr_add l e = { e with e_attrs = Sattr.add l e.e_attrs }
 
-let e_label_copy { e_label = lab; e_loc = loc } e =
-  let lab = Slab.union lab e.e_label in
+let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
+  let attrs = Sattr.union attrs e.e_attrs in
   let loc = if e.e_loc = None then loc else e.e_loc in
-  { e with e_label = lab; e_loc = loc }
+  { e with e_attrs = attrs; e_loc = loc }
 
-let proxy_label = create_label "whyml_proxy_symbol"
-let proxy_labels = Slab.singleton proxy_label
+let proxy_attr = create_attribute "whyml_proxy_symbol"
+let proxy_attrs = Sattr.singleton proxy_attr
 
-let rec e_label_push ?loc l e = match e.e_node with
+let rec e_attr_push ?loc l e = match e.e_node with
   | (Elet (LDvar ({pv_vs = {vs_name = id}},_) as ld, e1)
   |  Elet (LDsym ({rs_name = id},_) as ld, e1))
-    when Slab.mem proxy_label id.id_label ->
-      let e1 = e_label_push ?loc l e1 in
+    when Sattr.mem proxy_attr id.id_attrs ->
+      let e1 = e_attr_push ?loc l e1 in
       { e with e_node = Elet (ld, e1); e_loc = loc }
   | _ ->
-      let l = Slab.union l e.e_label in
-      { e with e_label = l; e_loc = loc }
+      let l = Sattr.union l e.e_attrs in
+      { e with e_attrs = l; e_loc = loc }
 
 let e_ghost e = e.e_effect.eff_ghost
 let c_ghost c = c.c_cty.cty_effect.eff_ghost
@@ -470,7 +470,7 @@ let mk_expr node ity mask eff = {
   e_ity    = ity;
   e_mask   = mask_adjust eff ity mask;
   e_effect = eff;
-  e_label  = Slab.empty;
+  e_attrs  = Sattr.empty;
   e_loc    = None;
 }
 
@@ -519,24 +519,25 @@ let t_void = t_tuple []
 let is_rlpv s = match s.rs_logic with
   | RLpv _ -> true | _ -> false
 
-let copy_labels e t =
-  if e.e_loc = None && Slab.is_empty e.e_label then t else
+let copy_attrs e t =
+  if e.e_loc = None && Sattr.is_empty e.e_attrs then t else
   let loc = if t.t_loc = None then e.e_loc else t.t_loc in
-  t_label ?loc (Slab.union e.e_label t.t_label) t
+  t_attr_set ?loc (Sattr.union e.e_attrs t.t_attrs) t
 
 let term_of_fmla f = match f.t_node with
   | _ when f.t_ty <> None -> f
   | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
     when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
-  | _ -> t_label ?loc:f.t_loc Slab.empty (t_if_simp f t_bool_true t_bool_false)
+  | _ -> t_attr_set ?loc:f.t_loc Sattr.empty
+      (t_if_simp f t_bool_true t_bool_false)
 
 let fmla_of_term t = match t.t_node with
   | _ when t.t_ty = None -> t
   | Tif (f, {t_node = Tapp (fs1,[])}, {t_node = Tapp (fs2,[])})
     when ls_equal fs1 fs_bool_true && ls_equal fs2 fs_bool_false -> f
-  | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_label_copy t t_true
-  | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_label_copy t t_false
-  | _ -> t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
+  | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_attr_copy t t_true
+  | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_attr_copy t t_false
+  | _ -> t_attr_set ?loc:t.t_loc Sattr.empty (t_equ_simp t t_bool_true)
 
 let rec pure_of_post prop v h = match h.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t])
@@ -549,12 +550,12 @@ let rec pure_of_post prop v h = match h.t_node with
       (if prop then f else term_of_fmla f), t_true
   | Tbinop (Tand, f, g) ->
       let t, f = pure_of_post prop v f in
-      t, t_label_copy h (t_and_simp f g)
+      t, t_attr_copy h (t_and_simp f g)
   | _ -> raise Exit
 
 let pure_of_post prop v h = match v.vs_ty.ty_node, h.t_node with
   | Tyapp (ts,_), Tquant (Tforall,_) when ts_equal ts ts_func ->
-      let t = t_label_copy h (t_eps_close v h) in
+      let t = t_attr_copy h (t_eps_close v h) in
       if not (t_is_lambda t) then raise Exit else
       (if prop then fmla_of_term t else t), t_true
   | _ -> pure_of_post prop v h
@@ -603,7 +604,7 @@ let rec raw_of_expr prop e = match e.e_node with
       t_case (pure_of_expr false d) (List.map conv bl)
   | Ematch _ | Eraise _ | Eabsurd -> raise Exit
 
-and pure_of_expr prop e = match copy_labels e (raw_of_expr prop e) with
+and pure_of_expr prop e = match copy_attrs e (raw_of_expr prop e) with
   | {t_ty = Some _} as t when prop -> fmla_of_term t
   | {t_ty = None} as f when not prop -> term_of_fmla f
   | t -> t
@@ -613,7 +614,7 @@ let term_of_expr ~prop e =
   try Some (pure_of_expr prop e) with Exit -> None
 
 let post_of_term res t =
-  let loca f = t_label ?loc:t.t_loc Slab.empty f in
+  let loca f = t_attr_set ?loc:t.t_loc Sattr.empty f in
   let f_of_t t = loca (t_equ_simp t t_bool_true) in
   match res.t_ty, t.t_ty with
   | Some _, Some _ -> loca (t_equ_simp res t)
@@ -637,18 +638,18 @@ let rec post_of_expr res e = match e.e_node with
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->
       let conv q = open_post_with res q in
-      copy_labels e (t_and_l (List.map conv c.cty_post))
+      copy_attrs e (t_and_l (List.map conv c.cty_post))
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
-      copy_labels e (t_subst_single v.pv_vs t_void (post_of_expr res e))
+      copy_attrs e (t_subst_single v.pv_vs t_void (post_of_expr res e))
   | Elet (LDvar (v,d),e) ->
-      copy_labels e (t_let_close_simp v.pv_vs
+      copy_attrs e (t_let_close_simp v.pv_vs
         (pure_of_expr false d) (post_of_expr res e))
   | Elet (LDsym (s,_),e) ->
       if is_rlpv s then raise Exit;
-      copy_labels e (post_of_expr res e)
+      copy_attrs e (post_of_expr res e)
   | Elet (LDrec rdl,e) ->
       if List.exists (fun rd -> is_rlpv rd.rec_sym) rdl then raise Exit;
-      copy_labels e (post_of_expr res e)
+      copy_attrs e (post_of_expr res e)
   | Eif (_,e1,e2) when is_e_true e1 || is_e_false e2 ||
                       (is_e_false e1 && is_e_true e2) ->
       post_of_term res (pure_of_expr true e)
@@ -659,7 +660,7 @@ let rec post_of_expr res e = match e.e_node with
       let conv (p,e) = t_close_branch p.pp_pat (post_of_expr res e) in
       t_case (pure_of_expr false d) (List.map conv bl)
   | Ematch _ | Eraise _ -> raise Exit
-  | Eabsurd -> copy_labels e t_false
+  | Eabsurd -> copy_attrs e t_false
 
 let local_post_of_expr e =
   if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then [] else
@@ -790,9 +791,9 @@ let c_pur s vl ityl ity =
   mk_cexp (Cpur (s,vl)) cty
 
 let mk_proxy ghost e hd = match e.e_node with
-  | Evar v when Slab.is_empty e.e_label -> hd, v
+  | Evar v when Sattr.is_empty e.e_attrs -> hd, v
   | _ ->
-      let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+      let id = id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o" in
       let ld, v = let_var ~ghost id e in ld::hd, v
 
 let add_proxy ghost e (hd,vl) =
@@ -1025,7 +1026,7 @@ let e_absurd ity = mk_expr Eabsurd ity MaskVisible eff_empty
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
   cty_read_pre (List.fold_left add Spv.empty varl) d.c_cty
 
-let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
+let rec e_rs_subst sm e = e_attr_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
   | Eexn (xs,e) -> e_exn xs (e_rs_subst sm e)
   | Eghost e -> e_ghostify true (e_rs_subst sm e)
@@ -1206,7 +1207,7 @@ let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
     | RLls {ls_value = None} -> "predicate "
     | RLls _ -> "function "
     | RLlemma -> "lemma ")
-  print_rs s print_id_labels (id_of_rs s)
+  print_rs s print_id_attrs (id_of_rs s)
 
 let print_invariant fmt fl =
   let print_inv fmt f = fprintf fmt "@\ninvariant@ { %a }" print_term f in
@@ -1225,8 +1226,8 @@ let print_variant fmt varl =
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let debug_print_labels = Debug.register_info_flag "print_labels"
-  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let debug_print_attrs = Debug.register_info_flag "print_attributes"
+  ~desc:"Print@ attributes@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
@@ -1300,17 +1301,17 @@ let print_cpur pri ({ls_name = id} as s) fmt vl =
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
-  let print_elab pri fmt e =
-    if Debug.test_flag debug_print_labels && not (Slab.is_empty e.e_label)
+  let print_eattr pri fmt e =
+    if Debug.test_flag debug_print_attrs && not (Sattr.is_empty e.e_attrs)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (Pp.print_iter1 Slab.iter Pp.space print_label) e.e_label
+      (Pp.print_iter1 Sattr.iter Pp.space print_attr) e.e_attrs
       (print_enode 0) e
     else print_enode pri fmt e in
   let print_eloc pri fmt e =
     if Debug.test_flag debug_print_locs && e.e_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (Pp.print_option print_loc) e.e_loc (print_elab 0) e
-    else print_elab pri fmt e in
+      (Pp.print_option print_loc) e.e_loc (print_eattr 0) e
+    else print_eattr pri fmt e in
   print_eloc pri fmt e
 
 and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
@@ -1443,7 +1444,7 @@ and print_let_defn fmt = function
   | LDvar (v,e) ->
       fprintf fmt "@[<hov 2>let %s%a%a =@ %a@]"
         (if v.pv_ghost then "ghost " else "")
-        print_pv v print_id_labels v.pv_vs.vs_name
+        print_pv v print_id_attrs v.pv_vs.vs_name
         (print_lexpr 0 (*4*)) e
   | LDsym (s,{c_node = Cfun e; c_cty = ({cty_args = _::_} as c)}) ->
       fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"

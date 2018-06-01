@@ -195,12 +195,12 @@ module Translate = struct
       filter_ghost_params pv_not_ghost def ca in
     let args =
       let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) mv
-        eff_empty Slab.empty in
+        eff_empty Sattr.empty in
       let args = filter_ghost_params pv_not_ghost def pvl in
       let extra_args = List.map def ca in args @ extra_args in
     let eapp = ML.mk_expr (ML.Eapp (rs, args)) (ML.C c) mv
-      ce Slab.empty in
-    ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C c) mv ce Slab.empty
+      ce Sattr.empty in
+    ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C c) mv ce Sattr.empty
 
   (* function arguments *)
   let filter_params args =
@@ -221,7 +221,7 @@ module Translate = struct
 
   let app pvl cty_args f_zero =
     let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) MaskVisible
-      eff_empty Slab.empty in
+      eff_empty Sattr.empty in
     let args = filter_params_cty pv_not_ghost def pvl cty_args in
     f_zero args
 
@@ -232,7 +232,7 @@ module Translate = struct
         List.fold_left add_tvar acc tyl
 
   (* expressions *)
-  let rec expr info svar mask ({e_effect = eff; e_label = lbl} as e) =
+  let rec expr info svar mask ({e_effect = eff; e_attrs = attrs} as e) =
     assert (not (e_ghost e));
     assert (not (mask_spill e.e_mask mask));
     let pv_list_of_mask pvl mask =
@@ -254,10 +254,10 @@ module Translate = struct
         ML.e_unit
     | Econst c -> Debug.dprintf debug_compile "compiling constant@.";
         let c = match c with Number.ConstInt c -> c | _ -> assert false in
-        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) mask eff lbl
+        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) mask eff attrs
     | Evar pv ->
         Debug.dprintf debug_compile "compiling variable %a@." print_pv pv;
-        ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) mask eff lbl
+        ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) mask eff attrs
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
         expr info svar mask e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
@@ -267,12 +267,12 @@ module Translate = struct
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
         if eff_pure e1.e_effect then expr info svar mask e2
         else let e1 = ML.e_ignore e1.e_ity (expr info svar MaskGhost e1) in
-          ML.e_seq e1 (expr info svar mask e2) (ML.I e.e_ity) mask eff lbl
+          ML.e_seq e1 (expr info svar mask e2) (ML.I e.e_ity) mask eff attrs
     | Elet (LDvar (pv, e1), e2) ->
         Debug.dprintf debug_compile "compiling local definition of %s@."
           (pv_name pv).id_string;
         let ld = ML.var_defn pv (expr info svar MaskVisible e1) in
-        ML.e_let ld (expr info svar mask e2) (ML.I e.e_ity) mask eff lbl
+        ML.e_let ld (expr info svar mask e2) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, _), ein) when rs_ghost rs ->
         expr info svar mask ein
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
@@ -281,7 +281,7 @@ module Translate = struct
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let ld = ML.sym_defn rs res args (expr info svar cty.cty_mask ef) in
-        ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff lbl
+        ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app -> (* partial application of constructor *)
         let eta_app = mk_eta_expansion rs_app pvl cty in
@@ -290,7 +290,7 @@ module Translate = struct
         let res = mlty_of_ity cty.cty_mask func in
         let ld = ML.sym_defn rs res [] eta_app in
         let ein = expr info svar mask ein in
-        ML.e_let ld ein (ML.I e.e_ity) mask eff lbl
+        ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
         (* partial application *) (* FIXME -> zero arguments functions *)
         Debug.dprintf debug_compile "compiling partial application of %s@."
@@ -298,11 +298,11 @@ module Translate = struct
         let cmk = cty.cty_mask in
         let ceff = cty.cty_effect in
         let pvl = app pvl rs_app.rs_cty.cty_args (fun x -> x) in
-        let eapp = ML.e_app rs_app pvl (ML.C cty) cmk ceff Slab.empty in
+        let eapp = ML.e_app rs_app pvl (ML.C cty) cmk ceff Sattr.empty in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let ld = ML.sym_defn rsf res (params cty.cty_args) eapp in
         let ein = expr info svar mask ein in
-        ML.e_let ld ein (ML.I e.e_ity) mask eff lbl
+        ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
     | Elet (LDrec rdefl, ein) ->
         let rdefl = filter_out_ghost_rdef rdefl in
         let def = function
@@ -324,7 +324,7 @@ module Translate = struct
         if rdefl <> [] then
           let ein = expr info svar mask ein in
           let ml_letrec = ML.Elet (ML.Lrec rdefl, ein) in
-          ML.mk_expr ml_letrec (ML.I e.e_ity) mask e.e_effect lbl
+          ML.mk_expr ml_letrec (ML.I e.e_ity) mask e.e_effect attrs
         else expr info svar mask ein
     | Eexec ({c_node = Capp (rs, [])}, _)  when is_rs_tuple rs ->
         ML.e_unit
@@ -332,7 +332,7 @@ module Translate = struct
         let pvl = pv_list_of_mask pvl mask in
         let res_ity = ity_tuple (List.map (fun v -> v.pv_ity) pvl) in
         let pvl = ML.var_list_of_pv_list pvl in
-        ML.e_app rs pvl (ML.I res_ity) mask eff lbl
+        ML.e_app rs pvl (ML.I res_ity) mask eff attrs
     | Eexec ({c_node = Capp (rs, _)}, _) when is_empty_record info rs ->
         ML.e_unit
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
@@ -351,7 +351,7 @@ module Translate = struct
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
-          | _ -> ML.e_app rs pvl (ML.I e.e_ity) mask eff lbl end
+          | _ -> ML.e_app rs pvl (ML.I e.e_ity) mask eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
         Debug.dprintf debug_compile "compiling abstract block@.";
@@ -360,11 +360,11 @@ module Translate = struct
         (* is it the case that every argument here is non-ghost ? *)
         Debug.dprintf debug_compile "compiling a lambda expression@.";
         let ef = expr info svar e.e_mask ef in
-        ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff lbl
+        ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff attrs
     | Eexec ({c_node = Cany}, _) ->
         ML.mk_hole
     | Eabsurd ->
-        ML.e_absurd (ML.I e.e_ity) mask eff lbl
+        ML.e_absurd (ML.I e.e_ity) mask eff attrs
     | Eassert _ ->
         ML.e_unit
     | Eif (e1, e2, e3) when e_ghost e1 ->
@@ -375,32 +375,32 @@ module Translate = struct
     | Eif (e1, e2, e3) when e_ghost e3 ->
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
-        ML.e_if e1 e2 ML.e_unit mask eff lbl
+        ML.e_if e1 e2 ML.e_unit mask eff attrs
     | Eif (e1, e2, e3) when e_ghost e2 ->
         let e1 = expr info svar e1.e_mask e1 in
         let e3 = expr info svar mask e3 in
-        ML.e_if e1 ML.e_unit e3 mask eff lbl
+        ML.e_if e1 ML.e_unit e3 mask eff attrs
     | Eif (e1, e2, e3) -> Debug.dprintf debug_compile "compiling if block@.";
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar mask e2 in
         let e3 = expr info svar mask e3 in
-        ML.e_if e1 e2 e3 mask eff lbl
+        ML.e_if e1 e2 e3 mask eff attrs
     | Ewhile (e1, _, _, e2) ->
         Debug.dprintf debug_compile "compiling while block@.";
         let e1 = expr info svar e1.e_mask e1 in
         let e2 = expr info svar e2.e_mask e2 in
-        ML.e_while e1 e2 mask eff lbl
+        ML.e_while e1 e2 mask eff attrs
     | Efor (pv1, (pv2, dir, pv3), _, _, efor) ->
         Debug.dprintf debug_compile "compiling for block@.";
         let dir = for_direction dir in
         let efor = expr info svar efor.e_mask efor in
-        ML.e_for pv1 pv2 dir pv3 efor mask eff lbl
+        ML.e_for pv1 pv2 dir pv3 efor mask eff attrs
     | Eghost _ | Epure _ ->
         assert false
     | Eassign al ->
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
-        ML.e_assign al (ML.I e.e_ity) mask eff lbl
+        ML.e_assign al (ML.I e.e_ity) mask eff attrs
     | Ematch (e1, [], xl) when Mxs.is_empty xl ->
         expr info svar e1.e_mask e1
     | Ematch (e1, bl, xl) when e_ghost e1 ->
@@ -415,18 +415,18 @@ module Translate = struct
         let mk_xl (xs, (pvl, e)) = let pvl = pv_list_of_mask pvl xs.xs_mask in
           (xs, pvl, expr info svar mask e) in
         let xl = List.map mk_xl (Mxs.bindings xl) in
-        ML.e_match e1 bl xl (ML.I e.e_ity) mask eff lbl
+        ML.e_match e1 bl xl (ML.I e.e_ity) mask eff attrs
     | Eraise (xs, ex) -> let ex = match expr info svar xs.xs_mask ex with
         | {ML.e_node = ML.Eblock []} -> None
         | e -> Some e in
-        ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) mask eff lbl
+        ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) mask eff attrs
     | Eexn (xs, e1) ->
         if mask_ghost e1.e_mask then ML.mk_expr
-          (ML.Eexn (xs, None, ML.e_unit)) (ML.I e.e_ity) mask eff lbl
+          (ML.Eexn (xs, None, ML.e_unit)) (ML.I e.e_ity) mask eff attrs
         else let e1 = expr info svar xs.xs_mask e1 in
           let ty = if ity_equal xs.xs_ity ity_unit then None
             else Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
-        ML.mk_expr (ML.Eexn (xs, ty, e1)) (ML.I e.e_ity) mask eff lbl
+        ML.mk_expr (ML.Eexn (xs, ty, e1)) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
     | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
 
@@ -610,7 +610,7 @@ module Transform = struct
     | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
         with Not_found -> e, Spv.empty end
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
-      when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label &&
+      when Sattr.mem Expr.proxy_attr pv.pv_vs.vs_name.id_attrs &&
            eff_pure eff1 &&
            no_reads_writes_conflict eff1.eff_reads eff2.eff_writes ->
         let e1, s1 = expr info subst e1 in

@@ -58,7 +58,7 @@ type dbinder = preid option * ghost * dity
 
 exception UnboundLabel of string
 
-val old_mark : string
+val old_label : string
 
 type register_old = string -> pvsymbol -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
@@ -128,10 +128,10 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
+  | DElabel of preid * dexpr
   | DEcast of dexpr * dity
-  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
-  | DElabel of dexpr * Slab.t
+  | DEattr of dexpr * Sattr.t
 
 and dreg_branch = dpattern * dexpr
 

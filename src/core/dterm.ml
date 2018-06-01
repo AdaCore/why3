@@ -219,7 +219,7 @@ and dterm_node =
   | DTfalse
   | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
-  | DTlabel of dterm * Slab.t
+  | DTattr of dterm * Sattr.t
 
 (** Unification tools *)
 
@@ -330,14 +330,14 @@ let dpattern ?loc node =
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
-let slab_coercion = Slab.singleton Pretty.label_coercion
+let coercion_attrs = Sattr.singleton Pretty.coercion_attr
 
 let apply_coercion l ({dt_loc = loc} as dt) =
   let apply dt ls =
     let dtyl, dty = specialize_ls ls in
     dterm_expected_type dt (List.hd dtyl);
     let dt = { dt_node = DTapp (ls, [dt]); dt_dty = dty; dt_loc = loc } in
-    { dt with dt_node = DTlabel (dt, slab_coercion) } in
+    { dt with dt_node = DTattr (dt, coercion_attrs) } in
   List.fold_left apply dt l
 
 (* coercions using just head tysymbols without type arguments: *)
@@ -491,7 +491,7 @@ let dterm crcmap ?loc node =
     | DTcast (dt,dty) ->
         dterm_expected_dterm crcmap dt dty
     | DTuloc (dt,_)
-    | DTlabel (dt,_) ->
+    | DTattr (dt,_) ->
         mk_dty (dt.dt_dty)
   in Loc.try1 ?loc (dterm_node loc) node
 
@@ -569,32 +569,32 @@ let check_used_var t vs =
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
-    when Slab.mem Term.asym_split f.t_label -> ()
+    when Sattr.mem Term.asym_split f.t_attrs -> ()
   | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let t_label loc labs t =
-  if loc = None && Slab.is_empty labs
-  then t else t_label ?loc labs t
+let t_attr_set loc attrs t =
+  if loc = None && Sattr.is_empty attrs
+  then t else t_attr_set ?loc attrs t
 
-let rec strip uloc labs dt = match dt.dt_node with
-  | DTcast (dt,_) -> strip uloc labs dt
-  | DTuloc (dt,loc) -> strip (Some loc) labs dt
-  | DTlabel (dt,s) -> strip uloc (Slab.union labs s) dt
-  | _ -> uloc, labs, dt
+let rec strip uloc attrs dt = match dt.dt_node with
+  | DTcast (dt,_) -> strip uloc attrs dt
+  | DTuloc (dt,loc) -> strip (Some loc) attrs dt
+  | DTattr (dt,s) -> strip uloc (Sattr.union attrs s) dt
+  | _ -> uloc, attrs, dt
 
 let rec term ~strict ~keep_loc uloc env prop dt =
-  let uloc, labs, dt = strip uloc Slab.empty dt in
+  let uloc, attrs, dt = strip uloc Sattr.empty dt in
   let tloc = if keep_loc then dt.dt_loc else None in
   let tloc = if uloc <> None then uloc else tloc in
   let t = Loc.try7 ?loc:dt.dt_loc
     try_term strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
-  let t = t_label tloc labs t in
+  let t = t_attr_set tloc attrs t in
   match t.t_ty with
-  | Some _ when prop -> t_label tloc Slab.empty
+  | Some _ when prop -> t_attr_set tloc Sattr.empty
       (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
-  | None when not prop -> t_label tloc Slab.empty
+  | None when not prop -> t_attr_set tloc Sattr.empty
       (t_if t t_bool_true t_bool_false)
   | _ -> t
 
@@ -677,13 +677,13 @@ and try_term strict keep_loc uloc env prop dty node =
       t_iff (get env true df1) (get env true df2)
   | DTbinop (DTby,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_label t2.t_loc Slab.empty t_true in
-      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
       t_implies t2 (get env true df1)
   | DTbinop (DTso,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_label t2.t_loc Slab.empty t_true in
-      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
       t_and (get env true df1) t2
   | DTnot df ->
       t_not (get env true df)
@@ -691,7 +691,7 @@ and try_term strict keep_loc uloc env prop dty node =
       if prop then t_true else t_bool_true
   | DTfalse ->
       if prop then t_false else t_bool_false
-  | DTcast _ | DTuloc _ | DTlabel _ ->
+  | DTcast _ | DTuloc _ | DTattr _ ->
       assert false (* already stripped *)
 
 let fmla ?(strict=true) ?(keep_loc=true) dt =

@@ -42,19 +42,19 @@ module Print = struct
 
   open Mltree
 
-  (* extraction labels *)
-  let optional_arg = create_label "ocaml:optional"
-  let named_arg = create_label "ocaml:named"
-  let ocaml_remove = create_label "ocaml:remove"
+  (* extraction attributes *)
+  let optional_arg = create_attribute "ocaml:optional"
+  let named_arg = create_attribute "ocaml:named"
+  let ocaml_remove = create_attribute "ocaml:remove"
 
-  let is_optional ~labels =
-    Slab.mem optional_arg labels
+  let is_optional ~attrs =
+    Sattr.mem optional_arg attrs
 
-  let is_named ~labels =
-    Slab.mem named_arg labels
+  let is_named ~attrs =
+    Sattr.mem named_arg attrs
 
-  let is_ocaml_remove ~labels =
-    Ident.Slab.mem ocaml_remove labels
+  let is_ocaml_remove ~attrs =
+    Ident.Sattr.mem ocaml_remove attrs
 
   let ocaml_keywords =
     ["and"; "as"; "assert"; "asr"; "begin";
@@ -205,9 +205,9 @@ module Print = struct
       (print_ty ~paren:false info) ty
 
   let print_vsty info fmt (id, ty, _) =
-    let labels = id.id_label in
-    if is_optional ~labels then print_vsty_opt info fmt id ty
-    else if is_named ~labels then print_vsty_named info fmt id ty
+    let attrs = id.id_attrs in
+    if is_optional ~attrs then print_vsty_opt info fmt id ty
+    else if is_named ~attrs then print_vsty_named info fmt id ty
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
         (print_ty ~paren:false info) ty
 
@@ -302,13 +302,13 @@ module Print = struct
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
-        if is_optional ~labels:(pv_name pv).id_label then
+        if is_optional ~attrs:(pv_name pv).id_attrs then
           begin match expr.e_node with
             | Eapp (rs, _)
               when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
             | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
                      (print_expr ~paren:true info) expr end
-        else if is_named ~labels:(pv_name pv).id_label then
+        else if is_named ~attrs:(pv_name pv).id_attrs then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
             (print_expr ~paren:true info) expr
         else fprintf fmt "%a" (print_expr ~paren:true info) expr;
@@ -603,8 +603,8 @@ module Print = struct
       | Some (Dfloat _) ->
           assert false (*TODO*)
     in
-    let labels = its.its_name.id_label in
-    if not (is_ocaml_remove ~labels) then
+    let attrs = its.its_name.id_attrs in
+    if not (is_ocaml_remove ~attrs) then
       fprintf fmt "@[<hov 2>@[%s %a%a@]%a@]"
         (if fst then "type" else "and") print_tv_args its.its_args
         (print_lident info) its.its_name print_def its.its_def

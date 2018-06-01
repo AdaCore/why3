@@ -34,15 +34,15 @@ let meta_begin_compute_context =
            transformation@ 'compute_in_context'."
 *)
 
-let rule_label = Ident.create_label "rewrite"
+let rule_attr = Ident.create_attribute "rewrite"
 
 let collect_rules p env km prs t =
   let acc = Task.task_fold
     (fun acc td -> match td.Theory.td_node with
       | Theory.Decl { d_node = Dprop((Plemma|Paxiom), pr, t) }
         when Decl.Spr.mem pr prs ||
-           Ident.Slab.mem rule_label pr.pr_name.Ident.id_label ||
-             Ident.Slab.mem rule_label t.t_label ->
+           Ident.Sattr.mem rule_attr pr.pr_name.Ident.id_attrs ||
+             Ident.Sattr.mem rule_attr t.t_attrs ->
           (pr,t) :: acc
       | _ -> acc)
     [] t

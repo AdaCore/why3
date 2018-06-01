@@ -11,7 +11,7 @@
 
 (** Pretty-printing various objects from Why3's core logic *)
 
-val label_coercion: Ident.label
+val coercion_attr : Ident.attribute
 
 (*
 val forget_all : unit -> unit     (* flush id_unique *)
@@ -35,7 +35,7 @@ module type Printer = sig
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
     val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
-    val print_id_labels : formatter -> ident -> unit  (* labels and location *)
+    val print_id_attrs : formatter -> ident -> unit   (* attributes and location *)
 
     val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
     val print_vs : formatter -> vsymbol -> unit       (* variable *)
@@ -54,7 +54,7 @@ module type Printer = sig
     val print_pat : formatter -> pattern -> unit      (* pattern *)
     val print_term : formatter -> term -> unit        (* term *)
 
-    val print_label : formatter -> label -> unit
+    val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit

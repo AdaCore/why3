@@ -16,7 +16,7 @@ let debug_refl = Debug.register_info_flag
                      ~desc:"Reflection transformations"
                      "reflection"
 
-let expl_reification_check = Ident.create_label "expl:reification check"
+let expl_reification_check = Ident.create_attribute "expl:reification check"
 
 type reify_env = { kn: known_map;
                    store: (vsymbol * int) Mterm.t;
@@ -103,7 +103,7 @@ let rec reify_term renv t rt =
     if is_eq_true f && not (is_eq_true t)
     then invert_nonvar_pat vl renv (p, lhs_eq_true f) t else
     match p.pat_node, f.t_node, t.t_node with
-    | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_nl f t ->
+    | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_na f t ->
        Debug.dprintf debug_reification "case equal@.";
        renv, t
     | Papp (cs, pl), _,_
@@ -250,10 +250,10 @@ let rec reify_term renv t rt =
            | Ttrue | Tfalse -> t
            | _ -> t (* FIXME some cases missing *)
          in
-         t_label ?loc:t.t_loc Slab.empty t
+         t_attr_set ?loc:t.t_loc Sattr.empty t
        in
        let t = rm t in
-       (* remove labels to identify terms that are equal modulo labels *)
+       (* remove attributes to identify terms modulo attributes *)
        if Mterm.mem t renv.store
        then
          begin
@@ -530,7 +530,7 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
   let d_r = create_prop_decl Paxiom hr inst_rt in
   let pr = create_prsymbol
              (id_fresh "GR"
-                       ~label:(Slab.singleton expl_reification_check)) in
+                       ~attrs:(Sattr.singleton expl_reification_check)) in
   let d = create_prop_decl Pgoal pr g in
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
   Debug.dprintf debug_refl "building cut indication rt %a g %a@."

@@ -29,13 +29,13 @@ let case t name =
   in
   let h = Decl.create_prsymbol (gen_ident name) in
   let hnot = Decl.create_prsymbol (gen_ident name) in
-  let lab_true = create_label "expl:true case" in
-  let lab_false = create_label "expl:false case" in
+  let attr_true = create_attribute "expl:true case" in
+  let attr_false = create_attribute "expl:false case" in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
-  let left_trans = Trans.compose (add_goal_label_trans lab_true)
+  let left_trans = Trans.compose (add_goal_attr_trans attr_true)
       (Trans.add_decls [t_decl]) in
-  let right_trans = Trans.compose (add_goal_label_trans lab_false)
+  let right_trans = Trans.compose (add_goal_attr_trans attr_false)
       (Trans.add_decls [t_not_decl]) in
   Trans.par [left_trans; right_trans]
 
@@ -71,8 +71,8 @@ let rec intros list_name pr f =
   if list_name = [] then [create_prop_decl Pgoal pr f] else
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
-      (* f is going to be removed, preserve its labels and location in f2  *)
-      let f2 = t_label_copy f f2 in
+      (* f is going to be removed, preserve its attributes and location in f2 *)
+      let f2 = t_attr_copy f f2 in
       let name, tl =
         match list_name with
         | [] -> assert false
@@ -106,7 +106,7 @@ let rec intros list_name pr f =
 
       let subst, decls, vsl, list_name = subst_decls (Mvs.empty, []) list_name vsl in
       if vsl = [] then
-        let f = t_label_copy f (t_subst subst f_t) in
+        let f = t_attr_copy f (t_subst subst f_t) in
         (List.rev decls) @ intros list_name pr f
       else
         let f = t_quant Tforall

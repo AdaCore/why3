@@ -62,7 +62,7 @@ let add_unsafe (s: string) (id: symb) (tables: naming_table) : naming_table =
         namespace = {tables.namespace with ns_pr = Mstr.add s pr tables.namespace.ns_pr};
 }
 
-let id_unique tables id = id_unique_label tables.printer id
+let id_unique tables id = id_unique_attr tables.printer id
 
 (* Adds symbols that are introduced to a constructor *)
 let constructor_add (cl: constructor list) tables : naming_table =

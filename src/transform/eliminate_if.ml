@@ -20,7 +20,7 @@ let rec has_if t = match t.t_node with
   | _ -> TermTF.t_any has_if Util.ffalse t
 
 let rec elim_t contT t =
-  let contTl e = contT (t_label_copy t e) in
+  let contTl e = contT (t_attr_copy t e) in
   match t.t_node with
   | Tlet (t1,tb) ->
       let u,t2,close = t_open_bound_cb tb in

@@ -674,7 +674,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
     try
       (
        let t = Mstr.find raw_element_name term_map in
-       let real_model_trace = construct_name (get_model_trace_string ~labels:t.t_label) in
+       let real_model_trace = construct_name (get_model_trace_string ~attrs:t.t_attrs) in
        let model_element = {
 	 me_name = real_model_trace;
 	 me_value = raw_element.me_value;

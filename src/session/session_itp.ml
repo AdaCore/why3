@@ -970,14 +970,14 @@ let load_option attr g =
 
 let load_ident elt =
   let name = string_attribute "name" elt in
-  let label = List.fold_left
+  let attrs = List.fold_left
       (fun acc label ->
          match label with
          | {Xml.name = "label"} ->
-           let lab = string_attribute "name" label in
-           Ident.Slab.add (Ident.create_label lab) acc
+           let name = string_attribute "name" label in
+           Ident.Sattr.add (Ident.create_attribute name) acc
          | _ -> acc
-      ) Ident.Slab.empty elt.Xml.elements in
+      ) Ident.Sattr.empty elt.Xml.elements in
   let preid =
     try
       let load_exn attr g = List.assoc attr g.Xml.attributes in
@@ -986,9 +986,9 @@ let load_ident elt =
       let cnumb = int_of_string (load_exn "loccnumb" elt) in
       let cnume = int_of_string (load_exn "loccnume" elt) in
       let pos = Loc.user_position file lnum cnumb cnume in
-      Ident.id_user ~label name pos
+      Ident.id_user ~attrs name pos
     with Not_found | Invalid_argument _ ->
-      Ident.id_fresh ~label name in
+      Ident.id_fresh ~attrs name in
   Ident.id_register preid
 
 (* [load_goal s op p g id] loads the goal of parent [p] from the xml

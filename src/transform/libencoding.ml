@@ -110,14 +110,14 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label = Ident.create_label "encoding:unprotected"
-let unprotecting_label = Ident.create_label "encoding:unprotecting"
+let unprotected_attr = Ident.create_attribute "encoding:unprotected"
+let unprotecting_attr = Ident.create_attribute "encoding:unprotecting"
 
-let id_unprotected n = id_fresh ~label:(Slab.singleton unprotected_label) n
-let id_unprotecting n = id_fresh ~label:(Slab.singleton unprotecting_label) n
+let id_unprotected n = id_fresh ~attrs:(Sattr.singleton unprotected_attr) n
+let id_unprotecting n = id_fresh ~attrs:(Sattr.singleton unprotecting_attr) n
 
-let is_protected_id id = not (Slab.mem unprotected_label id.id_label)
-let is_protecting_id id = not (Slab.mem unprotecting_label id.id_label)
+let is_protected_id id = not (Sattr.mem unprotected_attr id.id_attrs)
+let is_protecting_id id = not (Sattr.mem unprotecting_attr id.id_attrs)
 
 let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
@@ -132,7 +132,7 @@ let vs_monomorph ty_base kept vs =
   then vs else create_vsymbol (id_clone vs.vs_name) ty_base
 
 let t_monomorph ty_base kept lsmap consts vmap t =
-  let rec t_mono vmap t = t_label_copy t (match t.t_node with
+  let rec t_mono vmap t = t_attr_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
     | Tconst _ when ty_equal (t_type t) ty_base ||

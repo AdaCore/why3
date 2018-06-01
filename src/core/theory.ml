@@ -468,11 +468,11 @@ let warn_dubious_axiom uc k p syms =
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
     with Exit -> ()
 
-let lab_w_non_conservative_extension_no =
-  Ident.create_label "W:non_conservative_extension:N"
+let attr_w_non_conservative_extension_no =
+  Ident.create_attribute "W:non_conservative_extension:N"
 
 let should_be_conservative id =
-  not (Slab.mem lab_w_non_conservative_extension_no id.id_label)
+  not (Sattr.mem attr_w_non_conservative_extension_no id.id_attrs)
 
 let add_decl ?(warn=true) uc d =
   let uc = add_tdecl uc (create_decl d) in

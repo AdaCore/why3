@@ -19,7 +19,7 @@
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
-  let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
+  let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }

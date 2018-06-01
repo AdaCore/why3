@@ -44,7 +44,7 @@ type expr = {
   e_node   : expr_node;
   e_ity    : ity;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
 }
 
 and expr_node =
@@ -269,8 +269,8 @@ let ity_of_mask ity mask =
       I (ity_tuple tl)
   | _ -> ity (* FIXME ? *)
 
-let mk_expr e_node e_ity mask e_effect e_label =
-  { e_node; e_ity = ity_of_mask e_ity mask; e_effect; e_label; }
+let mk_expr e_node e_ity mask e_effect e_attrs =
+  { e_node; e_ity = ity_of_mask e_ity mask; e_effect; e_attrs; }
 
 let tunit = Ttuple []
 
@@ -281,7 +281,7 @@ let is_unit = function
 let enope = Eblock []
 
 let mk_hole =
-  mk_expr Ehole (I Ity.ity_unit) MaskVisible Ity.eff_empty Slab.empty
+  mk_expr Ehole (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
 
 let mk_var id ty ghost = (id, ty, ghost)
 
@@ -293,7 +293,7 @@ let mk_its_defn its_name its_args its_private its_def =
 
 (* smart constructors *)
 let e_unit =
-  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Slab.empty
+  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
 
 let var_defn pv e =
   Lvar (pv, e)
@@ -311,7 +311,7 @@ let e_fun args e = mk_expr (Efun (args, e))
 let e_ignore e_ity e =
   (* TODO : avoid ignore around a unit type expresson *)
   if ity_equal e_ity Ity.ity_unit then e
-  else mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_label
+  else mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_attrs
 
 let e_if e1 e2 e3 =
   mk_expr (Eif (e1, e2, e3)) e2.e_ity
@@ -332,8 +332,8 @@ let e_match e bl xl =
     mk_expr (Etry (e, true, xl))
 *)
 
-let e_assign al ity mask eff lbl =
-  if al = [] then e_unit else mk_expr (Eassign al) ity mask eff lbl
+let e_assign al ity mask eff attrs =
+  if al = [] then e_unit else mk_expr (Eassign al) ity mask eff attrs
 
 let e_absurd =
   mk_expr Eabsurd
@@ -349,5 +349,5 @@ let e_seq e1 e2 =
 
 let var_list_of_pv_list pvl =
   let mk_var pv = mk_expr (Evar pv) (I pv.pv_ity)
-      MaskVisible eff_empty Slab.empty in
+      MaskVisible eff_empty Sattr.empty in
   List.map mk_var pvl

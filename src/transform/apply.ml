@@ -95,7 +95,7 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
       in
       let subst =
         Mvs.union (fun _x y z ->
-          if Term.t_equal_nt_nl y z then
+          if Term.t_equal_nt_na y z then
             Some y
           else
             raise (Arg_trans_term2 (trans_name ^ ": ", y, z)))
@@ -156,7 +156,7 @@ let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
   | exception e -> raise e
   | subst_ty, subst ->
       let inst_nt = t_ty_subst subst_ty subst nt in
-      if (Term.t_equal_nt_nl inst_nt g) then
+      if (Term.t_equal_nt_na inst_nt g) then
         let nlp = List.map (t_ty_subst subst_ty subst) lp in
         List.map (fun ng -> Task.add_decl task
               (create_prop_decl Pgoal (create_prsymbol (gen_ident "G")) ng)) nlp
@@ -195,7 +195,7 @@ let replace_subst lp lv f1 f2 withed_terms t =
                 is_replaced t
         | subst_ty, subst ->
               let sf1 = t_ty_subst subst_ty subst f1 in
-              if (Term.t_equal_nt_nl sf1 t) then
+              if (Term.t_equal_nt_na sf1 t) then
                 Some (subst_ty, subst), t_ty_subst subst_ty subst f2
               else
                 t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t)

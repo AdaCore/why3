@@ -11,23 +11,23 @@
 
 (** Identifiers *)
 
-(** {2 Labels} *)
+(** {2 Attributes} *)
 
-type label = private {
-  lab_string : string;
-  lab_tag    : int;
+type attribute = private {
+  attr_string : string;
+  attr_tag    : int;
 }
 
-module Mlab : Extmap.S with type key = label
-module Slab : Extset.S with module M = Mlab
+module Mattr : Extmap.S with type key = attribute
+module Sattr : Extset.S with module M = Mattr
 
-val lab_compare : label -> label -> int
-val lab_equal : label -> label -> bool
-val lab_hash : label -> int
+val attr_compare : attribute -> attribute -> int
+val attr_equal : attribute -> attribute -> bool
+val attr_hash : attribute -> int
 
-val create_label : string -> label
+val create_attribute : string -> attribute
 
-val list_label: unit -> string list
+val list_attributes : unit -> string list
 
 (** {2 Naming convention } *)
 
@@ -49,7 +49,7 @@ val kind_of_fix: string -> [ `None
 
 type ident = private {
   id_string : string;               (** non-unique name *)
-  id_label  : Slab.t;               (** identifier labels *)
+  id_attrs  : Sattr.t;              (** identifier attributes *)
   id_loc    : Loc.position option;  (** optional location *)
   id_tag    : Weakhtbl.tag;         (** unique magical tag *)
 }
@@ -66,7 +66,7 @@ val id_hash : ident -> int
 (** a user-created type of unregistered identifiers *)
 type preid = {
   pre_name  : string;
-  pre_label : Slab.t;
+  pre_attrs : Sattr.t;
   pre_loc   : Loc.position option;
 }
 
@@ -74,19 +74,19 @@ type preid = {
 val id_register : preid -> ident
 
 (** create a fresh pre-ident *)
-val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
+val id_fresh : ?attrs:Sattr.t -> ?loc:Loc.position -> string -> preid
 
 (** create a localized pre-ident *)
-val id_user : ?label:Slab.t -> string -> Loc.position -> preid
+val id_user : ?attrs:Sattr.t -> string -> Loc.position -> preid
 
-(** create a duplicate pre-ident with given labels *)
-val id_lab : Slab.t -> ident -> preid
+(** create a duplicate pre-ident with given attributes *)
+val id_attr : ident -> Sattr.t -> preid
 
 (** create a duplicate pre-ident *)
-val id_clone : ?label:Slab.t -> ident -> preid
+val id_clone : ?attrs:Sattr.t -> ident -> preid
 
-(** create a derived pre-ident (inherit labels and location) *)
-val id_derive : ?label:Slab.t -> string -> ident -> preid
+(** create a derived pre-ident (inherit attributes and location) *)
+val id_derive : ?attrs:Sattr.t -> string -> ident -> preid
 
 (* DEPRECATED : retrieve preid name without registering *)
 val preid_name : preid -> string
@@ -136,54 +136,51 @@ val char_to_lalnumus : char -> string
 
 (** {2 Name handling for ITP} *)
 
-val id_unique_label :
+(* TODO: integrate this functionality into id_unique *)
+val id_unique_attr :
   ident_printer -> ?sanitizer : (string -> string) -> ident -> string
-(** Do the same as id_unique except that it tries first to
-   use the "name:" label to generate the name instead of id.id_string *)
+(** Do the same as id_unique except that it tries first to use
+    the "name:" attribute to generate the name instead of id.id_string *)
 
-(** {2 labels for handling counterexamples} *)
+(** {2 Attributes for handling counterexamples} *)
 
-val model_label : label
-val model_projected_label : label
+val model_attr : attribute
+val model_projected_attr : attribute
 
-val model_vc_label : label
-val model_vc_post_label : label
-val model_vc_havoc_label : label
+val model_vc_attr : attribute
+val model_vc_post_attr : attribute
+val model_vc_havoc_attr : attribute
 
-val has_a_model_label : ident -> bool
-(** [true] when [ident] has one of the labels above. *)
+val has_a_model_attr : ident -> bool
+(** [true] when [ident] has one of the attributes above *)
 
-val remove_model_labels : labels : Slab.t -> Slab.t
-(** Returns a copy of labels without [model_label] and [model_projected_label]. *)
+val remove_model_attrs : attrs:Sattr.t -> Sattr.t
+(** Remove the counter-example attributes from an attribute set *)
 
-val create_model_trace_label : string -> label
+val create_model_trace_attr : string -> attribute
 
-val is_model_trace_label : label -> bool
+val is_model_trace_attr : attribute -> bool
 
-val append_to_model_trace_label : labels : Slab.t ->
-  to_append : string ->
-  Slab.t
-(** The returned set of labels will contain the same set of labels
-    as argument labels except that a label of the form ["model_trace:*"]
+val append_to_model_trace_attr : attrs:Sattr.t -> to_append:string -> Sattr.t
+(** The returned set of attributes will contain the same set of attributes
+    as argument attrs except that an attribute of the form ["model_trace:*"]
     will be ["model_trace:*to_append"]. *)
 
-val append_to_model_element_name : labels : Slab.t ->
-  to_append : string ->
-  Slab.t
-(** The returned set of labels will contain the same set of labels
-    as argument labels except that a label of the form ["model_trace:*@*"]
+val append_to_model_element_name : attrs:Sattr.t -> to_append:string -> Sattr.t
+(** The returned set of attributes will contain the same set of attributes
+    as argument attrs except that an attribute of the form ["model_trace:*@*"]
     will be ["model_trace:*to_append@*"]. *)
 
-val get_model_element_name : labels : Slab.t -> string
-(** If labels contain a label of the form ["model_trace:name@*"],
-    return ["name"].
-    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
+val get_model_element_name : attrs:Sattr.t -> string
+(** If attributes contain an attribute of the form ["model_trace:name@*"],
+    return ["name"]. Raises [Not_found] if there is no attribute of
+    the form ["model_trace:*"]. *)
 
-val get_model_trace_string : labels : Slab.t -> string
-(** If labels contain a label of the form ["model_trace:mt_string"],
-    return ["mt_string"].
-    Throws [Not_found] if there is no label of the form ["model_trace:*"]. *)
+val get_model_trace_string : attrs:Sattr.t -> string
+(** If attrs contain an attribute of the form ["model_trace:mt_string"],
+    return ["mt_string"]. Raises [Not_found] if there is no attribute of
+    the form ["model_trace:*"]. *)
 
-val get_model_trace_label : labels : Slab.t -> Slab.elt
-(** Return a label of the form ["model_trace:*"].
-    Throws [Not_found] if there is no such label. *)
+val get_model_trace_attr : attrs:Sattr.t -> attribute
+(** Return an attribute of the form ["model_trace:*"].
+    Raises [Not_found] if there is no such attribute. *)

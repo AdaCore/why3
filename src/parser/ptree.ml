@@ -11,13 +11,13 @@
 
 (*s Parse trees. *)
 
-type label =
-  | Lstr of Ident.label
-  | Lpos of Loc.position
+type attr =
+  | ATstr of Ident.attribute
+  | ATpos of Loc.position
 
 type ident = {
   id_str : string;
-  id_lab : label list;
+  id_ats : attr list;
   id_loc : Loc.position;
 }
 
@@ -78,7 +78,7 @@ and term_desc =
   | Tnot of term
   | Tif of term * term * term
   | Tquant of Dterm.dquant * binder list * term list list * term
-  | Tnamed of label * term
+  | Tattr of attr * term
   | Tlet of ident * term * term
   | Tcase of term * (pattern * term) list
   | Tcast of term * pty
@@ -149,11 +149,11 @@ and expr_desc =
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of Expr.assertion_kind * term
-  | Emark of ident * expr
+  | Escope of qualid * expr
+  | Elabel of ident * expr
   | Ecast of expr * pty
   | Eghost of expr
-  | Enamed of label * expr
-  | Escope of qualid * expr
+  | Eattr of attr * expr
 
 and reg_branch = pattern * expr
 

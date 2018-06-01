@@ -20,12 +20,12 @@ open Ty
 open Term
 open Decl
 
-let stop f = Slab.mem Term.stop_split f.t_label
+let stop f = Sattr.mem Term.stop_split f.t_attrs
 
-let case_split = Ident.create_label "case_split"
-let case f = Slab.mem case_split f.t_label
+let case_split = Ident.create_attribute "case_split"
+let case f = Sattr.mem case_split f.t_attrs
 
-let rec dequant pos f = t_label_copy f (match f.t_node with
+let rec dequant pos f = t_attr_copy f (match f.t_node with
   | _ when stop f -> f
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) })
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) },f1) ->
@@ -75,12 +75,12 @@ let rec intros kn pr f =
   match f.t_node with
   (* (f2 \/ True) => _ *)
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
-      when Slab.mem Term.asym_split f2.t_label ->
+      when Sattr.mem Term.asym_split f2.t_attrs ->
         [create_prop_decl Pgoal pr f]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
-      (* f is going to be removed, preserve its labels and location in f2  *)
-      let f2 = t_label_copy f f2 in
+      (* f is going to be removed, preserve its attributes and location in f2 *)
+      let f2 = t_attr_copy f f2 in
       let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
       let add (subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
@@ -95,8 +95,8 @@ let rec intros kn pr f =
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
-      (* preserve labels and location of f  *)
-      let f = t_label_copy f (t_subst subst f_t) in
+      (* preserve attributes and location of f  *)
+      let f = t_attr_copy f (t_subst subst f_t) in
       dl @ intros kn pr f
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
@@ -139,7 +139,7 @@ let rec eliminate_exists_aux pr t =
      in
      let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
      let t' = t_subst subst t' in
-     let t = t_label_copy t t' in
+     let t = t_attr_copy t t' in
      dl @ eliminate_exists_aux pr t
   | _ ->
      [create_prop_decl Paxiom pr t]

@@ -195,12 +195,12 @@ let print_var_list info fmt vsl =
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
-  Slab.mem Ident.model_projected_label ls.ls_name.id_label) then
+  if ls.ls_args = [] && (Sattr.mem model_attr ls.ls_name.id_attrs ||
+  Sattr.mem Ident.model_projected_attr ls.ls_name.id_attrs) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 let number_format = {
   Number.long_int_support = true;
@@ -223,7 +223,7 @@ let number_format = {
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
 
-  if Slab.mem model_label t.t_label then
+  if Sattr.mem model_attr t.t_attrs then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -271,12 +271,12 @@ let rec print_term info fmt t =
 	      match vc_term_info.vc_loc with
 	      | None -> ()
 	      | Some loc ->
-		let labels = match vc_term_info.vc_func_name with
+		let attrs = match vc_term_info.vc_func_name with
 		  | None ->
-		    ls.ls_name.id_label
+		    ls.ls_name.id_attrs
 		  | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
-		let _t_check_pos = t_label ~loc labels t in
+		    model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term in
+		let _t_check_pos = t_attr_set ~loc attrs t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
@@ -320,7 +320,7 @@ let rec print_term info fmt t =
 
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
-  if Slab.mem model_label f.t_label then
+  if Sattr.mem model_attr f.t_attrs then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
@@ -594,9 +594,10 @@ let print_constructor_decl info fmt (ls,args) =
                   fprintf fmt "(%s" field_name;
                   let trace_name =
                     try
-                      let lab = Slab.choose (Slab.filter (fun x ->
-                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
-                      Strings.remove_prefix "model_trace:" lab.lab_string
+                      let attr = Sattr.choose (Sattr.filter (fun l ->
+                        Strings.has_prefix "model_trace:" l.attr_string)
+                        pr.ls_name.id_attrs) in
+                      Strings.remove_prefix "model_trace:" attr.attr_string
                     with
                       Not_found -> ""
                   in

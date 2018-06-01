@@ -171,7 +171,7 @@ val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_sign -> ind_decl list -> theory_uc
 val add_prop_decl : ?warn:bool -> theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
 
-val lab_w_non_conservative_extension_no : Ident.label
+val attr_w_non_conservative_extension_no : Ident.attribute
 
 (** {2 Use} *)
 

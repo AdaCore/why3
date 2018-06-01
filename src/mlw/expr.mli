@@ -118,7 +118,7 @@ type expr = private {
   e_ity    : ity;
   e_mask   : mask;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
 }
 
@@ -168,10 +168,10 @@ and rec_defn = private {
 
 (** {2 Expressions} *)
 
-val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
-val e_label_push : ?loc:Loc.position -> Slab.t -> expr -> expr
-val e_label_add : label -> expr -> expr
-val e_label_copy : expr -> expr -> expr
+val e_attr_set : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_push : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_add : attribute -> expr -> expr
+val e_attr_copy : expr -> expr -> expr
 
 (** {2 Definitions} *)
 
@@ -258,7 +258,7 @@ val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
 (** [e_locate_effect pr e] looks for a minimal sub-expression of
     [e] whose effect satisfies [pr] and returns its location *)
 
-val proxy_label : label
+val proxy_attr : attribute
 
 val e_rs_subst : rsymbol Mrs.t -> expr -> expr
 val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp

@@ -22,19 +22,19 @@ let arg_extra_expl_prefix =
    Arg.String (fun s -> expl_prefixes := s :: !expl_prefixes),
    "<s> register s as an additional prefix for VC explanations")
 
-let collect_expls lab =
-  Ident.Slab.fold
-    (fun lab acc ->
-       let lab = lab.Ident.lab_string in
+let collect_expls attr =
+  Ident.Sattr.fold
+    (fun attr acc ->
+       let attr = attr.Ident.attr_string in
        let rec aux l =
          match l with
            | [] -> acc
            | p :: r ->
               try
-                let s = Strings.remove_prefix p lab in s :: acc
+                let s = Strings.remove_prefix p attr in s :: acc
               with Not_found -> aux r
        in aux !expl_prefixes)
-    lab
+    attr
     []
 
 let concat_expls = function
@@ -42,12 +42,12 @@ let concat_expls = function
   | [l] -> Some l
   | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-let search_labels callback =
+let search_attrs callback =
   let rec aux acc f =
     if f.t_ty <> None then acc
-    else if Ident.Slab.mem Term.stop_split f.Term.t_label then acc
+    else if Ident.Sattr.mem Term.stop_split f.Term.t_attrs then acc
     else
-      let res = callback f.Term.t_label in
+      let res = callback f.Term.t_attrs in
       if res = [] then match f.t_node with
         | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
         | Term.Tbinop (Term.Timplies, _, f) -> aux acc f
@@ -60,7 +60,7 @@ let search_labels callback =
   aux []
 
 let get_expls_fmla =
-  let search = search_labels collect_expls in
+  let search = search_attrs collect_expls in
   fun f -> try search f with Exit -> []
 
 let goal_expl_task ~root task =
@@ -70,7 +70,7 @@ let goal_expl_task ~root task =
     concat_expls
       (if res <> [] && not root
        then res
-       else collect_expls gid.Ident.id_label)
+       else collect_expls gid.Ident.id_attrs)
   in
   let info =
     match info with

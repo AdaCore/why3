@@ -17,13 +17,13 @@ open Theory
 open Task
 open Args_wrapper
 
-let lab_ind = create_label "induction"
-let lab_inv = create_label "inversion"
+let attr_ind = create_attribute "induction"
+let attr_inv = create_attribute "inversion"
 
 type context = {
- c_node : context_node;
- c_label: Slab.t;
- c_loc:   Loc.position option }
+ c_node  : context_node;
+ c_attrs : Sattr.t;
+ c_loc   : Loc.position option }
 
 and context_node =
  | Hole
@@ -36,14 +36,14 @@ and context_node =
 exception Ind_not_found
 
 let make_context node term =
- { c_node = node; c_label = term.t_label; c_loc = term.t_loc }
+ { c_node = node; c_attrs = term.t_attrs; c_loc = term.t_loc }
 
 
 let make_context_ctx node context =
- { c_node = node; c_label = context.c_label; c_loc = context.c_loc }
+ { c_node = node; c_attrs = context.c_attrs; c_loc = context.c_loc }
 
 (* Locate induction term in [t]: either leftmost inductive on
-   the implication chain, or the one labeled with [label].
+   the implication chain, or the one tagged with [attr].
    If found, return [ctx, (ls,argl,cl), rhs] where:
      [ctx] is the context in which term is found
        (leftmost part of the context at top, e.g term with hole)
@@ -54,7 +54,7 @@ let make_context_ctx node context =
      [rhs] is the part of the term 'right' to the induction term
      ([t] is decomposed as ctx[ls(argl) -> rhs])
    If not found, raise Ind_not_found *)
-let locate kn label t =
+let locate kn attr t =
   let rec locate_inductive find_any t = match t.t_node with
     | Tlet (t1, tb) ->
       let vs,t2 = t_open_bound tb in
@@ -68,8 +68,8 @@ let locate kn label t =
       let locate_rhs find_any =
         let ctx, ind, goal = locate_inductive find_any rhs in
         make_context (Cimplies (lhs, ctx)) t, ind, goal in
-      let slab () = Slab.mem label lhs.t_label
-      in if find_any || (slab ())
+      let has_attr () = Sattr.mem attr lhs.t_attrs
+      in if find_any || (has_attr ())
         then
           match lhs.t_node with
             | Tapp (ls, argl) ->
@@ -77,15 +77,15 @@ let locate kn label t =
                 match (Mid.find ls.ls_name kn).d_node with
                 | Dind (Ind, dl) ->
                   let cl = List.assq ls dl in
-                  if find_any && not (slab ()) then
-                    (* take first labeled inductive in rhs if any.
+                  if find_any && not (has_attr ()) then
+                    (* take first tagged inductive in rhs if any.
                        Otherwise, take lhs *)
                     try
                       locate_rhs false
                     with Ind_not_found ->
                       make_context Hole t, (ls, argl, cl), rhs
                   else
-                    (* here a label has been found *)
+                    (* here attr has been found *)
                     make_context Hole t, (ls, argl, cl), rhs
                 | Dind _ | Dlogic _ | Dparam _ | Ddata _ -> locate_rhs find_any
                 | Dtype _ | Dprop _ -> assert false
@@ -172,13 +172,12 @@ let introduce_equalities vsi paraml argl goal =
 (* Zip term within context. *)
 let rec zip ctx goal = match ctx.c_node with
   | Hole -> goal
-  | Cimplies (t, ctx2)  ->
-    zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_implies t goal))
-  | Cforall (vsl, ctx2) ->
-    zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_forall_close vsl [] goal))
-  | Clet (vs, t, ctx2)  ->
-    zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_let_close vs t goal))
-
+  | Cimplies (t, ctx2)  -> zip ctx2
+      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_implies t goal))
+  | Cforall (vsl, ctx2) -> zip ctx2
+      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_forall_close vsl [] goal))
+  | Clet (vs, t, ctx2)  -> zip ctx2
+      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_let_close vs t goal))
 
 (* Replace clause by the associated inductive case. *)
 let substitute_clause induct vsi ls argl goal c =
@@ -198,19 +197,17 @@ let substitute_clause induct vsi ls argl goal c =
   let rec aux t = match t.t_node with
     | Tlet (t1, tb) ->
       let vs, t2, cb = t_open_bound_cb tb in
-      t_label_copy t (t_let t1 (cb vs (aux t2)))
+      t_attr_copy t (t_let t1 (cb vs (aux t2)))
     | Tquant(Tforall, tq) ->
       let vsl, tr, t1, cb = t_open_quant_cb tq in
-      t_label_copy t (t_forall (cb vsl tr (aux t1)))
+      t_attr_copy t (t_forall (cb vsl tr (aux t1)))
     | Tbinop (Timplies, lhs, rhs) ->
-      t_label_copy t (t_implies (subst true lhs) (aux rhs))
+      t_attr_copy t (t_implies (subst true lhs) (aux rhs))
     | _ -> subst false t
   in aux c
 
-
-
-let induction_l label induct kn t =
-  let (ctx, (ls, argl, cl), goal) = locate kn label t in
+let induction_l attr induct kn t =
+  let (ctx, (ls, argl, cl), goal) = locate kn attr t in
   let fold vsi p t = if p then vsi else t_freevars vsi t in
   let vsi = List.fold_left2 fold Mvs.empty (parameters ls cl) argl in
   let cindep, cdep = partition ctx vsi in
@@ -218,35 +215,34 @@ let induction_l label induct kn t =
   List.map (fun (_,c) ->
     zip cindep (substitute_clause induct vsi ls argl goal c)) cl
 
-
-let induction_l label induct task = match task with
+let induction_l attr induct task = match task with
   | Some { task_decl ={ td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = kn } ->
-    begin try List.map (add_prop_decl prev Pgoal pr) (induction_l label induct kn f)
+    begin try List.map (add_prop_decl prev Pgoal pr) (induction_l attr induct kn f)
     with Ind_not_found -> [task] end
   | _ -> assert false
 
-let induction_on_hyp lab b h =
+let induction_on_hyp attr b h =
   Trans.compose (Ind_itp.revert_tr_symbol [Tsprsymbol h])
-    (Trans.store (induction_l lab b))
+    (Trans.store (induction_l attr b))
 
 let () = wrap_and_register
     ~desc:"induction_arg_pr <pr> performs induction_pr on pr."
     "induction_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp lab_ind true)
+    (Tprsymbol Ttrans_l) (induction_on_hyp attr_ind true)
 
 let () = wrap_and_register
     ~desc:"induction_arg_pr <pr> performs inversion_pr on pr."
     "inversion_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp lab_inv false)
+    (Tprsymbol Ttrans_l) (induction_on_hyp attr_inv false)
 
 let () =
-  Trans.register_transform_l "induction_pr" (Trans.store (induction_l lab_ind true))
+  Trans.register_transform_l "induction_pr" (Trans.store (induction_l attr_ind true))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ inductive@ predicates."
 
 let () =
-  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l lab_inv false))
+  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l attr_inv false))
     ~desc:"Invert@ inductive@ predicate."
 
 
