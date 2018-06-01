@@ -254,7 +254,7 @@ let create_colors v =
   let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
+      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
@@ -954,7 +954,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND gconfig.error_color]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
 
 (**** Message-zone printing functions *****)
 

@@ -50,6 +50,7 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_color_bg : string;
       mutable error_line_color : string;
       mutable iconset : string;
       (** colors *)
@@ -83,6 +84,7 @@ type ide = {
   ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_error_color_bg : string;
   ide_error_line_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
@@ -107,6 +109,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
+    ide_error_color_bg = "yellow";
     ide_error_color = "red";
     ide_error_line_color = "yellow";
     ide_iconset = "fatcow";
@@ -158,6 +161,9 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_error_color_bg =
+      get_string section ~default:default_ide.ide_error_color_bg
+        "error_color_bg";
     ide_error_line_color =
       get_string section ~default:default_ide.ide_error_line_color
         "error_line_color";
@@ -210,6 +216,7 @@ let load_config config original_config =
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    error_color_bg = ide.ide_error_color_bg;
     error_line_color = ide.ide_error_line_color;
     iconset = ide.ide_iconset;
     config         = config;
@@ -254,6 +261,7 @@ let save_config t =
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
   let config = Whyconf.set_section config "ide" ide in
