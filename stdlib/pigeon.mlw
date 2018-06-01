@@ -1,9 +1,23 @@
 
-(** {1 Pigeon hole principle}
-
-    Contributed by Yuto Takei (University of Tokyo) *)
+(** {1 Pigeon hole principle} *)
 
 module Pigeonhole
+
+  use import int.Int
+  use import map.Map
+
+  val lemma pigeonhole (n m: int) (f: int -> int)
+    requires { 0 <= m < n }
+    requires { forall i. 0 <= i < n -> 0 <= f i < m }
+    ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }
+
+end
+
+(* An instance where a list is included into a set with fewer elements.
+
+   Contributed by Yuto Takei (University of Tokyo) *)
+
+module ListAndSet
 
   use import int.Int
   use import list.List

@@ -61,7 +61,7 @@ theory Graph
        Two cases depending on l3=[] (and thus u=v) conclude the proof. Qed.
   *)
 
-  clone pigeon.Pigeonhole with type t = vertex
+  clone pigeon.ListAndSet with type t = vertex
 
   predicate cyc_decomp (v: vertex) (l: list vertex)
                        (vi: vertex) (l1 l2 l3: list vertex) =
