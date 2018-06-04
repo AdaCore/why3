@@ -20,7 +20,7 @@ type t =
       mutable current_tab : int;
       mutable verbose : int;
       mutable show_full_context : bool;
-      mutable show_labels : bool;
+      mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;

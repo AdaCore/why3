@@ -38,7 +38,7 @@ type t =
       mutable current_tab : int;
       mutable verbose : int;
       mutable show_full_context : bool;
-      mutable show_labels : bool;
+      mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -73,7 +73,7 @@ type ide = {
   ide_current_tab : int;
   ide_verbose : int;
   ide_show_full_context : bool;
-  ide_show_labels : bool;
+  ide_show_attributes : bool;
   ide_show_coercions : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
@@ -99,7 +99,7 @@ let default_ide =
     ide_current_tab = 0;
     ide_verbose = 0;
     ide_show_full_context = false;
-    ide_show_labels = false;
+    ide_show_attributes = false;
     ide_show_coercions = true;
     ide_show_locs = false;
     ide_show_time_limit = false;
@@ -133,10 +133,10 @@ let load_ide section =
     ide_show_full_context =
       get_bool section ~default:default_ide.ide_show_full_context
         "show_full_context";
-    ide_show_labels =
-      get_bool section ~default:default_ide.ide_show_labels "print_labels";
+    ide_show_attributes =
+      get_bool section ~default:default_ide.ide_show_attributes "print_attributes";
     ide_show_coercions =
-      get_bool section ~default:default_ide.ide_show_labels "print_coercions";
+      get_bool section ~default:default_ide.ide_show_attributes "print_coercions";
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_show_time_limit =
@@ -173,8 +173,8 @@ let load_ide section =
   }
 
 
-let set_labels_flag =
-  let fl = Debug.lookup_flag "print_labels" in
+let set_attr_flag =
+  let fl = Debug.lookup_flag "print_attributes" in
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
@@ -194,7 +194,7 @@ let load_config config original_config =
     | None -> default_ide
     | Some s -> load_ide s
   in
-  set_labels_flag ide.ide_show_labels;
+  set_attr_flag ide.ide_show_attributes;
   set_coercions_flag ide.ide_show_coercions;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
@@ -205,7 +205,7 @@ let load_config config original_config =
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     show_full_context= ide.ide_show_full_context ;
-    show_labels   = ide.ide_show_labels ;
+    show_attributes   = ide.ide_show_attributes ;
     show_coercions = ide.ide_show_coercions ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
@@ -250,7 +250,7 @@ let save_config t =
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "show_full_context" t.show_full_context in
-  let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_attributes" t.show_attributes in
   let ide = set_bool ide "print_coercions" t.show_coercions in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
@@ -808,17 +808,17 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     showfullcontext#connect#toggled ~callback:
       (fun () -> c.show_full_context <- not c.show_full_context)
   in
-  let showlabels =
+  let showattrs =
     GButton.check_button
-      ~label:"show labels in formulas"
+      ~label:"show attributes in formulas"
       ~packing:display_options_box#add ()
-      ~active:c.show_labels
+      ~active:c.show_attributes
   in
   let (_ : GtkSignal.id) =
-    showlabels#connect#toggled ~callback:
+    showattrs#connect#toggled ~callback:
       (fun () ->
-         c.show_labels <- not c.show_labels;
-         set_labels_flag c.show_labels)
+         c.show_attributes <- not c.show_attributes;
+         set_attr_flag c.show_attributes)
   in
   let showcoercions =
     GButton.check_button
