@@ -1179,7 +1179,7 @@ lident_op:
 | MINUS     UNDERSCORE    { Ident.prefix "-" }
 | EQUAL                   { Ident.infix "=" }
 | MINUS                   { Ident.infix "-" }
-| OPPREF                  { Ident.prefix $1 }
+| OPPREF UNDERSCORE?      { Ident.prefix $1 }
 | LEFTSQ RIGHTSQ          { Ident.mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { Ident.mixfix "[<-]" }
 | LEFTSQ RIGHTSQ LARROW   { Ident.mixfix "[]<-" }

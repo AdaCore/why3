@@ -1,7 +1,9 @@
 \begin{syntax}
   type ::= lqualid type*     ; type symbol
        | "'" lident          ; type variable
-       | "()"		     ; empty tuple type
+       | type "->" type      ; mapping type
+       | "()"		     ; unit type
        | "(" type ("," type)+ ")" ; tuple type
+       | "{" type "}"        ; snapshot type
        | "(" type ")"        ; parentheses %
 \end{syntax}

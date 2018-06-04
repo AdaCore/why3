@@ -5,6 +5,7 @@
 In this chapter, we describe the syntax and semantics of \whyml.
 
 \section{Lexical Conventions}
+\label{sec:lexer}
 
 %Lexical conventions of \whyml are similar to those of OCaml.
 %
@@ -15,7 +16,7 @@ Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
 Note that \texttt{(*)} does not start a comment.
 
 Strings are enclosed in double quotes (\verb!"!). Double quotes can be
-escaped in strings using the backslash character (\verb!\!).
+escaped inside strings using the backslash character (\verb!\!).
 The other special sequences are \verb!\n! for line feed and \verb!\t!
 for horizontal tab.
 In the following, strings are referred to with the non-terminal
@@ -68,27 +69,156 @@ would have a higher precedence than the infix operator \texttt{->-}
 The so-called ``bang operators'' are prefix operators that have even
 higher precedence than the juxtaposition (application) operator,
 allowing us to write expressions like \texttt{inv !x}.
-Infix operators from the groups 2-4 are left-associative.
-Infix operators from the group 1 are non-associative and
-may instead be chained, as explained below.
+An operator from \textsl{infix-op-4} or \textsl{prefix-op}
+cannot start with \texttt{!} or \texttt{?}: such operators
+are always recognized as bang operators.
+%Infix operators from groups 2-4 are left-associative.
+%Infix operators from group 1 are non-associative and
+%may instead be chained, as explained in Section~\ref{sec:terms}.
 
-An operator inside parenthesis can act as a lowercase identifier.
-Qualified identifiers are prefixed with a sequence of uppercase
-identifiers, e.g., \texttt{App.S.get}:
+%An operator inside parenthesis can act as a lowercase identifier.
+%Qualified identifiers are prefixed with a sequence of uppercase
+%identifiers, e.g., \texttt{App.S.get}:
 %\begin{figure}[ht]
-\begin{center}\input{./qualid_bnf.tex}\end{center}
+%\begin{center}\input{./qualid_bnf.tex}\end{center}
 %\caption{Syntax for qualified identifiers.}
 %\label{fig:bnf:qualid}
 %\end{figure}
 
 Finally, any identifier, term, formula, or expression
-in a \whyml program can be tagged, either with a generic tag
-or a location tag:
-\begin{center}\input{./tag_bnf.tex}\end{center}
-A generic tag cannot contain newlines or closing square brackets;
+in a \whyml source can be tagged either with a string
+\textit{attribute} or a location:
+\begin{center}\input{./attribute_bnf.tex}\end{center}
+An attribute cannot contain newlines or closing square brackets;
 leading and trailing spaces are ignored.
-A location tag consists of a file name in double quotes,
+A location consists of a file name in double quotes,
 a line number, and starting and ending character positions.
+
+\section{Type expressions}
+\label{sec:types}
+
+\whyml features an ML-style type system with polymorphic types,
+variants (sum types), and records that can have mutable fields.
+The syntax for type expressions is the following:
+\begin{center}\input{./type_bnf.tex}\end{center}
+Built-in types are \texttt{int} (arbitrary precision integers),
+\texttt{real} (real numbers), \texttt{bool}, the arrow type
+(also called the \textit{mapping type}, right-associative),
+and the tuple types.
+The empty tuple type is also called the \textit{unit type}
+and can be written as \texttt{unit}.
+
+Note that the syntax for type expressions notably differs from
+the usual ML syntax. In particular, the type of polymorphic lists
+is written \texttt{list 'a}, and not \texttt{'a list}.
+
+\textit{Snapshot types} are specific to \whyml, they denote
+the types of ghost values produced by pure logical functions in
+\whyml programs. A snapshot of an immutable type is the type
+itself: thus, \texttt{\{int\}} is the same as \texttt{int} and
+\texttt{\{list 'a\}} is the same as \texttt{list 'a}.
+A snapshot of a mutable type, however, represents a snapshot
+value which cannot be modified anymore. Thus, a snapshot array
+\texttt{a} of type \texttt{\{array int\}} can be read from
+(\texttt{a[42]} is accepted) but not written into
+(\texttt{a[42] <- 0} is rejected). Generally speaking,
+a program function that expects an argument of a mutable type
+will accept an argument of the corresponding snapshot type
+as long as it is not modified by the function.
+
+\section{Logical expressions: terms and formulas}
+\label{sec:types}
+
+A significant part of a typical \whyml source file is occupied
+by non-executable logical content intended for specification
+and proof: function contracts, assertions, definitions of
+logical functions and predicates, axioms, lemmas, etc.
+
+Logical expressions are called \textit{terms}. Boolean
+terms are called \textit{formulas}. Internally, \why distinguishes
+the proper formulas (produced by predicate symbols, propositional
+connectives and quantifiers) and the terms of type \texttt{bool}
+(produced by Boolean variables and logical functions that return
+\texttt{bool}). However, this distinction is not enforced on the
+syntactical level, and \why will perform the necessary conversions
+behind the scenes.
+
+\begin{figure}[ht]
+\begin{center}\input{./term1_bnf.tex}\end{center}
+\caption{\whyml terms (part I).}
+\label{fig:bnf:term1}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}\input{./term2_bnf.tex}\end{center}
+\caption{\whyml terms (part II).}
+\label{fig:bnf:term2}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}\input{./term3_bnf.tex}\end{center}
+\caption{\whyml terms (part III).}
+\label{fig:bnf:term3}
+\end{figure}
+
+The syntax of \whyml terms is given in
+Figures~\ref{fig:bnf:term1}-\ref{fig:bnf:term3}.
+The constructions are listed in the order of
+decreasing precedence.
+For example, as was mentioned in the previous section,
+bang operators have the highest precedence of all operators,
+so that \texttt{-p.x} is parsed as the negation of the
+record field \texttt{p.x}, whereas \texttt{!p.x} is
+parsed as the field \texttt{x} of a record stored
+in the reference \texttt{p}.
+
+An operator inside parentheses can act as an identifier
+referring to that operator, for example, in a definition.
+To distinguish between prefix and infix operators, an
+underscore symbol is appended at the end: for example,
+\texttt{(-)} refers to the binary subtraction and
+\texttt{(-\_)} to the unary negation.
+Bang operators cannot be used as infix operators,
+and thus do not require disambiguation.
+
+In addition to prefix and infix operators, \whyml
+supports several mixfix bracket operators to
+manipulate various collection types: dictionaries,
+arrays, sequences, etc. Bracket operators do not have
+any predefined meaning and may be used to denote access
+and update operations for various user-defined collection types.
+Notice that the in-place update operator (\texttt{a[i] <- v})
+cannot be used inside logical terms: all effectful operations
+are restricted to program expressions. To represent the result
+of a collection update, we should use a pure logical update
+operator (\texttt{a[i <- v]}) instead.
+
+The \texttt{at} and \texttt{old} operators are used inside
+post-conditions and assertions to refer to the value of
+a mutable program variable at some past moment of execution
+(see the next section for details).
+These operators have higher precedence than the infix
+operators from group 1 (\textsl{infix-op-1}): \texttt{old i > j}
+is parsed as \texttt{(old i) > j} and not as \texttt{old (i > j)}.
+
+Infix operators from groups 2-4 are left-associative.
+Infix operators from group 1 are non-associative and
+can be chained. For example, the term \texttt{0 <= i < j < length a}
+is parsed as the conjunction of three inequalities \texttt{0 <= i},
+\texttt{i < j}, and \texttt{j < length a}.
+
+In order to refer to symbols introduced in different namespaces
+(\textit{scopes}), we can put a dot-separated
+``qualifier prefix'' in front of an identifier
+(e.g.~\texttt{Map.S.get m i}) or a term in parentheses
+(e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
+if the term is a record or a record update). This notation allows
+us to use the symbol \texttt{get} or the collection access operator
+\texttt{([])} from the scope \texttt{Map.S} without importing
+them in the current namespace.
+
+
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -121,22 +251,6 @@ associativities, from lowest to greatest priority:
 
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
-
-\begin{figure}
-  \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
-  \caption{Syntax for terms.}
-\label{fig:bnf:term}
-\end{figure}
-
-\subsection{Type Expressions}
-
-The syntax for type expressions is the following:
-\begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
-Built-in types are \texttt{int}, \texttt{real}, and tuple types.
-Note that the syntax for type
-expressions notably differs from the usual ML syntax (\eg the
-type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
-
 
 \subsection{Formulas}
 
