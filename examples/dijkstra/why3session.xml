@@ -2,12 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.7.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../dijkstra.mlw" expanded="true">
 <theory name="DijkstraShortestPath" sum="20ec7a75a06b6a173b67eb381a54961e" expanded="true">
  <goal name="WP_parameter relax" expl="VC for relax">
@@ -42,9 +42,9 @@
  <goal name="Path_shortest_path" expl="">
  <proof prover="1" timelimit="5" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="0.88"/></proof>
  </goal>
- <goal name="Main_lemma" expl="">
+ <goal name="Main_lemma" expl="" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="205"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.08"/></proof>
- <proof prover="9"><result status="valid" time="0.38" steps="937"/></proof>
  </goal>
  <goal name="Completeness_lemma" expl="">
  <transf name="induction_pr">

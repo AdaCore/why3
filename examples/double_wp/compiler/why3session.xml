@@ -7,8 +7,8 @@
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../compiler.mlw" expanded="true">
 <theory name="Compile_aexpr" sum="411273fbd1fd074bd85d168f5a46d8fc" expanded="true">
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr">
@@ -682,14 +682,15 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter compile_bexpr_natural" expl="VC for compile_bexpr_natural">
- <transf name="split_goal_wp">
+ <goal name="WP_parameter compile_bexpr_natural" expl="VC for compile_bexpr_natural" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter compile_bexpr_natural.1" expl="assertion">
   <proof prover="2"><result status="valid" time="0.05" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter compile_bexpr_natural.2" expl="postcondition">
+  <goal name="WP_parameter compile_bexpr_natural.2" expl="postcondition" expanded="true">
   <proof prover="1"><result status="valid" time="0.13"/></proof>
-  <metas>
+  <metas
+   expanded="true">
    <ts_pos name="real" arity="0" id="2"
     ip_theory="BuiltIn">
     <ip_library name="why3"/>
@@ -1727,13 +1728,13 @@
    <meta name="remove_type">
     <meta_arg_ts id="6652"/>
    </meta>
-   <goal name="WP_parameter compile_bexpr_natural.2" expl="postcondition">
-   <transf name="eliminate_builtin">
-    <goal name="WP_parameter compile_bexpr_natural.2.1" expl="postcondition">
+   <goal name="WP_parameter compile_bexpr_natural.2" expl="postcondition" expanded="true">
+   <transf name="eliminate_builtin" expanded="true">
+    <goal name="WP_parameter compile_bexpr_natural.2.1" expl="postcondition" expanded="true">
     <proof prover="0" timelimit="5"><result status="valid" time="0.03"/></proof>
     <proof prover="1"><result status="valid" time="0.13"/></proof>
-    <proof prover="5"><result status="valid" time="0.06" steps="60"/></proof>
     <proof prover="6"><result status="valid" time="0.02"/></proof>
+    <proof prover="7"><result status="valid" time="0.06" steps="67"/></proof>
     </goal>
    </transf>
    </goal>

@@ -4,16 +4,15 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.10.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="4.5.0" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../bitwalker.mlw" expanded="true">
-<theory name="Bitwalker" sum="d3739287c7b8602c11979aa2d5921b7f" expanded="true">
+<prover id="10" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../bitwalker.mlw">
+<theory name="Bitwalker" sum="d3739287c7b8602c11979aa2d5921b7f">
  <goal name="nth64" expl="">
  <proof prover="0"><result status="valid" time="0.10" steps="93"/></proof>
  </goal>
@@ -165,8 +164,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter peek" expl="VC for peek" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter peek" expl="VC for peek">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter peek.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.11" steps="114"/></proof>
   <proof prover="3"><result status="valid" time="0.13"/></proof>
@@ -196,10 +195,10 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter peek.7" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.03" steps="92"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.06"/></proof>
+  <proof prover="10"><result status="valid" time="0.03" steps="93"/></proof>
   </goal>
   <goal name="WP_parameter peek.8" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.03" steps="92"/></proof>
@@ -220,7 +219,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="116"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter peek.13" expl="precondition" expanded="true">
+  <goal name="WP_parameter peek.13" expl="precondition">
   <proof prover="3"><result status="valid" time="2.14"/></proof>
   <proof prover="6"><result status="valid" time="0.09"/></proof>
   <proof prover="9"><result status="valid" time="0.12"/></proof>
@@ -239,7 +238,7 @@
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter peek.17" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="3.08" steps="710"/></proof>
+  <proof prover="10"><result status="valid" time="1.92" steps="1224"/></proof>
   </goal>
   <goal name="WP_parameter peek.18" expl="loop invariant preservation">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
@@ -383,9 +382,9 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter poke" expl="VC for poke" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter poke.1" expl="precondition" expanded="true">
+ <goal name="WP_parameter poke" expl="VC for poke">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter poke.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.05" steps="114"/></proof>
   <proof prover="3"><result status="valid" time="0.15"/></proof>
   <proof prover="6"><result status="valid" time="0.08"/></proof>
@@ -401,13 +400,13 @@
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter poke.4" expl="postcondition" expanded="true">
+  <goal name="WP_parameter poke.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="87"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   <proof prover="6"><result status="valid" time="0.07"/></proof>
   <proof prover="9"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter poke.5" expl="postcondition" expanded="true">
+  <goal name="WP_parameter poke.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="87"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   <proof prover="6"><result status="valid" time="0.08"/></proof>
@@ -456,7 +455,7 @@
   <goal name="WP_parameter poke.15" expl="precondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter poke.16" expl="precondition" expanded="true">
+  <goal name="WP_parameter poke.16" expl="precondition">
   <proof prover="3"><result status="valid" time="1.70"/></proof>
   <proof prover="6"><result status="valid" time="0.09"/></proof>
   <proof prover="9"><result status="valid" time="0.13"/></proof>
@@ -480,7 +479,7 @@
   </goal>
   <goal name="WP_parameter poke.21" expl="assertion">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
-  <proof prover="4"><result status="valid" time="0.82" steps="323"/></proof>
+  <proof prover="10"><result status="valid" time="0.49" steps="500"/></proof>
   </goal>
   <goal name="WP_parameter poke.22" expl="assertion">
   <transf name="split_goal_wp">

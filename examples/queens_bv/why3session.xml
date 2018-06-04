@@ -6,9 +6,9 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.10.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../queens_bv.mlw" expanded="true">
 <theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
@@ -36,10 +36,10 @@
  <goal name="WP_parameter add_singleton" expl="VC for add_singleton">
  <proof prover="6"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter mul2" expl="VC for mul2" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter mul2.1" expl="type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter mul2" expl="VC for mul2">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter mul2.1" expl="type invariant">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter mul2.1.1" expl="type invariant">
    <proof prover="0"><result status="valid" time="0.20" steps="196"/></proof>
    </goal>
@@ -49,9 +49,9 @@
    <goal name="WP_parameter mul2.1.3" expl="type invariant">
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="WP_parameter mul2.1.4" expl="type invariant" expanded="true">
-   <proof prover="4"><result status="valid" time="0.48" steps="537"/></proof>
+   <goal name="WP_parameter mul2.1.4" expl="type invariant">
    <proof prover="6"><result status="valid" time="0.14"/></proof>
+   <proof prover="7"><result status="valid" time="0.21" steps="365"/></proof>
    </goal>
   </transf>
   </goal>
