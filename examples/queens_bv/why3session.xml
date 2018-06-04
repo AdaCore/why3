@@ -6,12 +6,10 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.10.prv" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../queens_bv.mlw" proved="true">
-<theory name="S" proved="true">
-</theory>
 <theory name="Solution" proved="true">
  <goal name="partial_solution_eq_prefix" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="44"/></proof>
@@ -20,8 +18,6 @@
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
-</theory>
-<theory name="BitsSpec" proved="true">
 </theory>
 <theory name="Bits" proved="true">
  <goal name="WP_parameter empty" expl="VC for empty" proved="true">
@@ -50,8 +46,8 @@
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="WP_parameter mul2.0.3" expl="type invariant" proved="true">
-   <proof prover="4"><result status="valid" time="0.48" steps="537"/></proof>
    <proof prover="6"><result status="valid" time="0.14"/></proof>
+   <proof prover="7"><result status="valid" time="0.21" steps="365"/></proof>
    </goal>
   </transf>
   </goal>

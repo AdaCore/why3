@@ -5,8 +5,8 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="3000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="60" steplimit="0" memlimit="3000"/>
-<prover id="3" name="Alt-Ergo" version="1.00.prv" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="3500"/>
+<prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <file name="../schorr_waite.mlw" proved="true">
 <theory name="SchorrWaite" proved="true">
  <goal name="WP_parameter tl_stackNodes" expl="VC for tl_stackNodes" proved="true">
@@ -50,7 +50,7 @@
   <goal name="WP_parameter trans_path.3" expl="postcondition" proved="true">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.61" steps="598"/></proof>
   <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="0.51"/></proof>
-  <proof prover="3"><result status="valid" time="0.07" steps="297"/></proof>
+  <proof prover="5"><result status="valid" time="0.07" steps="393"/></proof>
   </goal>
   <goal name="WP_parameter trans_path.4" expl="postcondition" proved="true">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.66" steps="475"/></proof>
