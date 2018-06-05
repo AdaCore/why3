@@ -11,6 +11,7 @@
 
 open Format
 open Why3
+open Wstdlib
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
@@ -149,35 +150,31 @@ let rec num_lines s acc tr =
 
   let rec print_transf fmt s depth max_depth provers tr =
     fprintf fmt "<tr>";
-    for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (tn_proved s tr)
       (max_depth - depth + 1);
-    (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    let name = (get_transf_name s tr) ^
-                 (String.concat "" (get_transf_args s tr)) in
-    fprintf fmt "%s</td>" name ;
-    for _i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
+    fprintf fmt "%a</td>" Pp.html_string (get_transf_string s tr);
+    for _i=1 to List.length provers do
       fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines s 0 tr);
+    let nl = num_lines s 0 tr in
+    if nl > 0 then begin
+    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" nl;
     let (_:bool) = List.fold_left
       (fun needs_tr g ->
         print_goal fmt s needs_tr (depth+1) max_depth provers g;
         true)
       false (get_sub_tasks s tr)
     in ()
+    end
 
   and print_goal fmt s needs_tr depth max_depth provers g =
     if needs_tr then fprintf fmt "<tr>";
-    (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (pn_proved s g)
       (max_depth - depth + 1);
-    (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    fprintf fmt "%s</td>" (get_proof_name s g).Ident.id_string;
-(*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
+    fprintf fmt "%a</td>" Pp.html_string (get_proof_name s g).Ident.id_string;
     print_results fmt s provers (get_proof_attempt_ids s g);
     fprintf fmt "</tr>@\n";
     List.iter
@@ -186,7 +183,7 @@ let rec num_lines s acc tr =
 
   let print_theory s fn fmt th =
     let depth = theory_depth s th in
-    if depth > 0 then
+    if depth > 0 then begin
     let provers = get_used_provers_theory s th in
     let provers =
       Whyconf.Sprover.fold (fun pr acc -> pr :: acc) provers []
@@ -207,13 +204,13 @@ let rec num_lines s acc tr =
     fprintf fmt "</span></h2>@\n";
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
-    (* fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>"; *)
     List.iter
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
     fprintf fmt "</tr>@\n";
     List.iter (print_goal fmt s true 1 depth provers) (theory_goals th);
     fprintf fmt "</table>@\n"
+    end
 
   let print_file s fmt f =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
@@ -225,7 +222,7 @@ let rec num_lines s acc tr =
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
     fprintf fmt "%a"
-      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 
@@ -265,15 +262,13 @@ struct
       print_proof_status pa.proof_state
 
   let rec print_transf s fmt tr =
-    let name = (get_transf_name s tr) ^
-                 (String.concat "" (get_transf_args s tr)) in
-    fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      name
+    fprintf fmt "<li>%a : <ul>%a</ul></li>"
+      Pp.html_string (get_transf_string s tr)
       (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =
-    fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
-      (get_proof_name s g).Ident.id_string
+    fprintf fmt "<li>%a : <ul>%a%a</ul></li>"
+      Pp.html_string (get_proof_name s g).Ident.id_string
       (Pp.print_iter2 Hprover.iter Pp.newline Pp.nothing
          Pp.nothing (print_proof_attempt s))
       (get_proof_attempt_ids s g)
@@ -292,7 +287,7 @@ struct
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 

@@ -7,10 +7,6 @@
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../BacktrackArray.mlw" proved="true">
-<theory name="Types" proved="true">
-</theory>
-<theory name="Logic" proved="true">
-</theory>
 <theory name="Impl" proved="true">
  <goal name="WP_parameter create" expl="VC for create" proved="true">
  <proof prover="4"><result status="valid" time="0.11" steps="82"/></proof>
@@ -19,7 +15,7 @@
  <proof prover="4"><result status="valid" time="0.03" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter resize_for" expl="VC for resize_for" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter resize_for.0" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="20"/></proof>
   </goal>
@@ -44,7 +40,7 @@
   <goal name="WP_parameter resize_for.7" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter resize_for.7.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter resize_for.7.0.0" expl="VC for resize_for" proved="true">
     <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
@@ -88,7 +84,7 @@
   <goal name="WP_parameter resize_for.16" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter resize_for.16.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter resize_for.16.0.0" expl="VC for resize_for" proved="true">
     <proof prover="6"><result status="valid" time="0.05"/></proof>
     </goal>
@@ -166,7 +162,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.37" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.85" steps="94"/></proof>
+  <proof prover="4"><result status="valid" time="0.66" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.38" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.23" steps="106"/></proof>
@@ -177,7 +173,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter iadd" expl="VC for iadd" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter iadd.0" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -201,7 +197,7 @@
    <goal name="WP_parameter iadd.6.0" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter iadd.6.0.0" expl="assertion" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter iadd.6.0.0.0" expl="VC for iadd" proved="true">
      <proof prover="1"><result status="valid" time="0.42"/></proof>
      </goal>
@@ -226,7 +222,7 @@
   <goal name="WP_parameter iadd.9" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter iadd.9.0" expl="postcondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter iadd.9.0.0" expl="VC for iadd" proved="true">
     <proof prover="1"><result status="valid" time="0.10"/></proof>
     </goal>
@@ -237,7 +233,7 @@
     <proof prover="1"><result status="valid" time="0.23"/></proof>
     </goal>
     <goal name="WP_parameter iadd.9.0.3" expl="VC for iadd" proved="true">
-    <proof prover="1"><result status="valid" time="0.72"/></proof>
+    <proof prover="1"><result status="valid" time="0.54"/></proof>
     </goal>
    </transf>
    </goal>
@@ -252,7 +248,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter add.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
@@ -304,7 +300,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter get" expl="VC for get" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter get.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
@@ -326,7 +322,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter backtrack" expl="VC for backtrack" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter backtrack.0" expl="unreachable point" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
@@ -340,7 +336,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.4" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter backtrack.4.0" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.44"/></proof>
    </goal>
@@ -435,7 +431,7 @@
   <goal name="WP_parameter backtrack.31" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter backtrack.31.0" expl="precondition" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter backtrack.31.0.0" expl="VC for backtrack" proved="true">
     <proof prover="4"><result status="valid" time="0.13" steps="44"/></proof>
     </goal>

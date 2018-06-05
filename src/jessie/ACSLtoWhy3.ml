@@ -41,7 +41,7 @@ module Enabled =
 
 open Cil_types
 open Why3
-
+open Wstdlib
 
 
 
@@ -138,7 +138,7 @@ let ref_modules, ref_theories =
     Self.fatal "Exception raised while loading ref module:@ %a"
       Exn_printer.exn_printer e
 
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
+let ref_module : Mlw_module.modul = Wstdlib.Mstr.find "Ref" ref_modules
 *)
 let ref_module : Mlw_module.modul =
   Mlw_module.read_module env ["ref"] "Ref"
@@ -169,7 +169,7 @@ let mach_int_modules, _mach_int_theories =
 let int32_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int32";
-    Stdlib.Mstr.find "Int32" mach_int_modules
+    Wstdlib.Mstr.find "Int32" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int32 not found"
 *)
@@ -184,7 +184,7 @@ let uint32_module =
 let uint32_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts uint32_module.Mlw_module.mod_export ["t"]
 
-let uint32_to_int : Term.lsymbol = find_ls uint32_module "to_uint"
+let uint32_to_int : Term.lsymbol = find_ls uint32_module "t'int"
 
 let uadd32_fun : Mlw_expr.psymbol = find_ps uint32_module "add_check"
 
@@ -215,7 +215,7 @@ let uint32ofint_fun : Mlw_expr.psymbol = find_ps uint32_module "int_check"
 let int64_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int64";
-    Stdlib.Mstr.find "Int64" mach_int_modules
+    Wstdlib.Mstr.find "Int64" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int64 not found"
 *)
@@ -245,7 +245,7 @@ let int64ofint_fun : Mlw_expr.psymbol = find_ps int64_module "of_int"
 let array_modules, array_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
 
-let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
+let array_module : Mlw_module.modul = Wstdlib.Mstr.find "Array" array_modules
 *)
 
 (*
@@ -271,12 +271,12 @@ let rec ctype_and_default ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit, Mlw_expr.e_void
     | TInt (IInt, _attr) ->
-      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let n = Mlw_expr.e_const (Number.const_of_int 0) Mlw_ty.ity_int in
       mlw_uint32_type,
       Mlw_expr.e_app
         (Mlw_expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
     | TInt (ILong, _attr) ->
-      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let n = Mlw_expr.e_const (Number.const_of_int 0) Mlw_ty.ity_int in
       mlw_int64_type,
       Mlw_expr.e_app
         (Mlw_expr.e_arrow int64ofint_fun [mlw_int_type] mlw_int64_type) [n]
@@ -365,11 +365,13 @@ let mk_set ref_ty ty =
 let logic_constant c =
   match c with
     | Integer(_value,Some s) ->
-      let c = Literals.integer s in Number.ConstInt c
+      let c = Literals.integer s in
+      Term.t_const (Number.(ConstInt {ic_negative = false; ic_abs = c})) Ty.ty_int
     | Integer(_value,None) ->
       Self.not_yet_implemented "logic_constant Integer None"
     | LReal { r_literal = s } ->
-      let c = Literals.floating_point s in Number.ConstReal c
+      let c = Literals.floating_point s in
+      Term.t_const (Number.(ConstReal {rc_negative = false; rc_abs = c})) Ty.ty_real
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "logic_constant"
 
@@ -421,9 +423,7 @@ let bound_vars = Hashtbl.create 257
 let create_lvar v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
-(**)
   Self.result "create logic variable %d" v.lv_id;
-(**)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
 
@@ -437,9 +437,7 @@ let get_lvar lv =
 let program_vars = Hashtbl.create 257
 
 let create_var_full v =
-(**)
- Self.result "create program variable %s (%d)" v.vname v.vid;
-(**)
+  Self.result "create program variable %s (%d)" v.vname v.vid;
   let id = Ident.id_fresh v.vname in
   let ty,def = ctype_and_default v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [def] in
@@ -524,7 +522,7 @@ let coerce_to_int ty t =
 
 let rec term_node ~label t =
   match t with
-    | TConst cst -> Term.t_const (logic_constant cst)
+    | TConst cst -> logic_constant cst
     | TLval lv -> tlval ~label lv
     | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
     | TUnOp (op, t) -> unary op (term ~label t)
@@ -549,11 +547,12 @@ let rec term_node ~label t =
     | Tat (t, lab) ->
       begin
         match lab with
-          | LogicLabel(None, "Here") -> snd (term ~label:Here t)
-          | LogicLabel(None, "Old") -> snd (term ~label:Old t)
-          | LogicLabel(None, lab) -> snd (term ~label:(At lab) t)
-          | LogicLabel(Some _, _lab) ->
-            Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
+          | BuiltinLabel Cil_types.Here -> snd (term ~label:Here t)
+          | BuiltinLabel Cil_types.Old -> snd (term ~label:Old t)
+          | BuiltinLabel _ ->
+            Self.not_yet_implemented "term_node Tat/BuiltinLabel/other"
+          | FormalLabel _ ->
+            Self.not_yet_implemented "term_node Tat/FormalLabel"
           | StmtLabel _ ->
             Self.not_yet_implemented "term_node Tat/StmtLabel"
       end
@@ -738,10 +737,11 @@ let rec predicate ~label p =
     | Pallocable (_, _)
     | Pfreeable (_, _)
     | Pfresh (_, _, _, _)
-    | Psubtype (_, _) ->
+    | Psubtype (_, _)
+    | Pvalid_function _ ->
         Self.not_yet_implemented "predicate"
 
-and predicate_named ~label p = predicate ~label p.content
+and predicate_named ~label p = predicate ~label p.pred_content
 
 
 
@@ -784,7 +784,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
         List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params
       in
       let tdef = match lt.lt_def with
-          | None -> None
+          | None -> Ty.NoDef
           | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
       in
       let ts =
@@ -818,7 +818,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
           | _ ->
             Self.not_yet_implemented "Dfun_or_pred with labels"
       end
-    | Dlemma(name,is_axiom,labels,vars,p,loc) ->
+    | Dlemma(name,is_axiom,labels,vars,p,attrs,loc) ->
       begin
         match labels,vars with
           | [],[] ->
@@ -835,7 +835,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
           | _ ->
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
-    | Daxiomatic (name, decls', loc) ->
+    | Daxiomatic (name, decls', attrs, loc) ->
       let theories =
         add_decls_as_theory theories
           (Ident.id_fresh global_logic_decls_theory_name) decls
@@ -851,15 +851,14 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
         add_decls_as_theory theories (Ident.id_user name (Loc.extract loc)) decls''
       in
       (theories,[])
-    | Dvolatile (_, _, _, _)
+    | Dvolatile (_, _, _, _, _)
     | Dinvariant (_, _)
     | Dtype_annot (_, _)
     | Dmodel_annot (_, _)
-    | Dcustom_annot (_, _, _)
+    | Dcustom_annot (_, _, _, _)
         -> Self.not_yet_implemented "logic_decl"
 
-let identified_proposition p =
-  { name = p.ip_name; loc = p.ip_loc; content = p.ip_content }
+let identified_proposition p = p.ip_content
 
 
 
@@ -897,6 +896,8 @@ let annot a e =
     Self.not_yet_implemented "annot AAllocation"
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
+  | AExtended _ ->
+    Self.not_yet_implemented "annot AExtended"
 
 let loop_annot a =
   List.fold_left (fun (inv,var) a ->
@@ -920,7 +921,9 @@ let loop_annot a =
       | AAllocation _ ->
         Self.not_yet_implemented "loop_annot AAllocation"
       | APragma _ ->
-        Self.not_yet_implemented "loop_annot APragma")
+        Self.not_yet_implemented "loop_annot APragma"
+      | AExtended _ ->
+        Self.not_yet_implemented "loop_annot AExtended")
     (Term.t_true, []) a
 
 let binop op e1 e2 =
@@ -967,7 +970,7 @@ let constant c =
         | Some s -> s
         | None -> Integer.to_string t
     in
-    let n = Mlw_expr.e_const (Number.ConstInt (Literals.integer s)) in
+    let n = Mlw_expr.e_const (Number.(ConstInt {ic_negative = false; ic_abs = Literals.integer s})) Mlw_ty.ity_int in
     Mlw_expr.e_app
       (Mlw_expr.e_arrow uint32ofint_fun [mlw_int_type] mlw_uint32_type) [n]
   | CInt64(_t,_ikind, _) ->
@@ -1093,6 +1096,8 @@ let instr i =
     Mlw_expr.e_void
   | Code_annot (_, _) ->
     Self.not_yet_implemented "instr Code_annot"
+  | Local_init _ ->
+    Self.not_yet_implemented "instr Local_init"
 
 let exc_break =
   Mlw_ty.create_xsymbol (Ident.id_fresh "Break") Mlw_ty.ity_unit

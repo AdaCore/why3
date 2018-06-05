@@ -46,7 +46,7 @@
  <goal name="WP_parameter query" expl="VC for query" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter query.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -178,7 +178,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter update_aux" expl="VC for update_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter update_aux.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -237,7 +237,7 @@
  <proof prover="1"><result status="valid" time="0.32" steps="437"/></proof>
  </goal>
  <goal name="WP_parameter update_aux_complexity" expl="VC for update_aux_complexity" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter update_aux_complexity.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -298,7 +298,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter query_aux_complexity" expl="VC for query_aux_complexity" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter query_aux_complexity.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>

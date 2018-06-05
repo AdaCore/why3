@@ -6,7 +6,7 @@
 <file name="../algo64.mlw">
 <theory name="Algo64">
  <goal name="WP_parameter quicksort" expl="VC for quicksort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter quicksort.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -43,7 +43,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter qs" expl="VC for qs">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter qs.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>

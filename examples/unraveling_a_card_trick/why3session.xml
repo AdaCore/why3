@@ -46,7 +46,7 @@
 </theory>
 <theory name="GilbreathCardTrick">
  <goal name="WP_parameter shuffle" expl="VC for shuffle">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter shuffle.1" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
@@ -206,12 +206,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter card_trick" expl="VC for card_trick">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter card_trick.1" expl="assertion">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.2" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter card_trick.2.1" expl="VC for card_trick">
    <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
    </goal>
@@ -227,7 +227,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.5" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter card_trick.5.1" expl="VC for card_trick">
    <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
    </goal>
@@ -243,7 +243,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.7" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter card_trick.7.1" expl="VC for card_trick">
    <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
    </goal>

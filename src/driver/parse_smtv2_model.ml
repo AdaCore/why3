@@ -46,7 +46,7 @@ let do_parsing model =
        ~loc:(get_position lexbuf)
        "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected text '%s'"
        l;
-     Stdlib.Mstr.empty
+     Wstdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
      let l = Lexing.lexeme lexbuf in
      Debug.dprintf debug "smtv2 model parser: Error on lexeme '%s'@." l;
@@ -55,7 +55,7 @@ let do_parsing model =
        ~loc:loc
        "Error@ during@ parsing@ of@ smtlib@ model:  unexpected text '%s'"
        l;
-     Stdlib.Mstr.empty
+     Wstdlib.Mstr.empty
 
 let do_parsing list_proj list_records model =
   let m = do_parsing model in

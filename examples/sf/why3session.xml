@@ -58,7 +58,7 @@
  <proof prover="8"><result status="valid" time="0.03" steps="47"/></proof>
  </goal>
  <goal name="WP_parameter list_member" expl="VC for list_member">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter list_member.1" expl="loop invariant init">
   <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
@@ -69,7 +69,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter list_member.4" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter list_member.4.1" expl="VC for list_member">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -88,7 +88,7 @@
   <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter list_member.7" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter list_member.7.1" expl="VC for list_member">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>

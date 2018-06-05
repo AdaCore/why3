@@ -27,12 +27,13 @@ let () = Debug.set_flag Call_provers.debug
 *)
 
 let run_on_task fmt prover prover_driver t =
+  let limit = { Call_provers.empty_limit with Call_provers.limit_time = 3 } in
   let result =
     Call_provers.wait_on_call
       (Why3.Driver.prove_task
          ~command:prover.Whyconf.command
-         ~timelimit:3
-         prover_driver t ()) ()
+         ~limit
+         prover_driver t)
   in
   Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer;
   match result.Call_provers.pr_answer with
@@ -53,7 +54,7 @@ let get_prover config env acc (short, name) =
   (* loading the driver *)
   let driver : Why3.Driver.driver =
     try
-      Why3.Driver.load_driver env prover.Whyconf.driver []
+      Why3.Whyconf.load_driver (Why3.Whyconf.get_main config) env prover.Whyconf.driver []
     with e ->
       ACSLtoWhy3.Self.fatal "Failed to load driver for %s: %a@." name
         Exn_printer.exn_printer e
@@ -69,11 +70,13 @@ let process () =
       List.fold_left
         (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
         []
-        [ "Z432", "Z3,4.3.2,";
+        [ (*"Z432", "Z3,4.3.2,";
           "Z440", "Z3,4.4.0,";
           "C241", "CVC3,2.4.1,";
           "C414", "CVC4,1.4,";
-          "A991", "Alt-Ergo,0.99.1,";
+          "A991", "Alt-Ergo,0.99.1,";*)
+          "Z460", "Z3,4.6.0,";
+          "A220", "Alt-Ergo,2.2.0,";
         ]
     with e ->
       ACSLtoWhy3.Self.fatal "Exception raised when loading prover drivers:@ %a"

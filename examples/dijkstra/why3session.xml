@@ -74,7 +74,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter shortest_path_code" expl="VC for shortest_path_code" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter shortest_path_code.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="164"/></proof>
   </goal>
@@ -117,7 +117,7 @@
   <goal name="WP_parameter shortest_path_code.11" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="WP_parameter shortest_path_code.11.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="WP_parameter shortest_path_code.11.0.0" expl="VC for shortest_path_code" proved="true">
     <proof prover="1"><result status="valid" time="0.02" steps="64"/></proof>
     </goal>

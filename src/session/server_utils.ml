@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
+
 let debug = Debug.register_flag ~desc:"ITP server" "itp_server"
 
 let has_extension f =
@@ -89,7 +91,7 @@ let load_strategies cont =
   let config = cont.Controller_itp.controller_config in
   let env = cont.Controller_itp.controller_env in
   let strategies = Whyconf.get_strategies config in
-  Stdlib.Mstr.iter
+  Mstr.iter
     (fun _ st ->
      let name = st.Whyconf.strategy_name in
      try
@@ -97,7 +99,7 @@ let load_strategies cont =
        let code = Strategy_parser.parse env config code in
        let shortcut = st.Whyconf.strategy_shortcut in
        Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
-       Stdlib.Hstr.add cont.Controller_itp.controller_strategies name
+       Hstr.add cont.Controller_itp.controller_strategies name
                        (name, shortcut, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
        Format.eprintf "Fatal: loading strategy '%s' failed: %s \nSolve this problem in your why3.conf file and retry.@." name msg;
@@ -105,7 +107,7 @@ let load_strategies cont =
     strategies
 
 let list_strategies cont =
-  Stdlib.Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
+  Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
 
 
 let symbol_name s =
@@ -215,7 +217,7 @@ type query =
 
 
 let help_on_queries fmt commands =
-  let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
+  let l = Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
@@ -241,30 +243,38 @@ let set_session_timelimit n = session_timelimit := n
 let set_session_memlimit n = session_memlimit := n
 
 
+type command_prover =
+  | Bad_Arguments of Whyconf.prover
+  | Not_Prover
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
-let parse_prover_name config name args :
-  (Whyconf.config_prover * Call_provers.resource_limit) option =
+let parse_prover_name config name args : command_prover =
   match (return_prover name config) with
-  | None -> None
+  | None -> Not_Prover
   | Some prover_config ->
     begin
-      if (List.length args > 2) then None else
-      match args with
-      | [] ->
-        let default_limit = Call_provers.{empty_limit with
-                                          limit_time = !session_timelimit;
-                                          limit_mem = !session_memlimit} in
-          Some (prover_config, default_limit)
-      | [timeout] -> Some (prover_config,
-                           Call_provers.{empty_limit with
-                                          limit_time = int_of_string timeout;
-                                          limit_mem = !session_memlimit})
-      | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom})
-      | _ -> None
+      let prover = prover_config.Whyconf.prover in
+      try
+        if (List.length args > 2) then Bad_Arguments prover else
+        match args with
+        | [] ->
+            let default_limit = Call_provers.{empty_limit with
+                                              limit_time = !session_timelimit;
+                                              limit_mem = !session_memlimit} in
+            Prover (prover_config, default_limit)
+        | [timeout] -> Prover (prover_config,
+                               Call_provers.{empty_limit with
+                                             limit_time = int_of_string timeout;
+                                             limit_mem = !session_memlimit})
+        | [timeout; oom ] ->
+            Prover (prover_config, Call_provers.{empty_limit with
+                                                 limit_time = int_of_string timeout;
+                                                 limit_mem = int_of_string oom})
+        | _ -> Bad_Arguments prover
+      with
+      | Failure _ -> Bad_Arguments prover
     end
 
 (*******************************)
@@ -345,7 +355,7 @@ let help_message commands_table =
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   (* We first try to apply a command from commands_table (itp_server.ml) *)
-  match Stdlib.Hstr.find commands_table cmd with
+  match Hstr.find commands_table cmd with
   | (_, f) ->
     begin
       match f,id with
@@ -377,21 +387,20 @@ let interp commands_table cont id s =
        try
          let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
          match id with
-         | Some (Session_itp.APn _id) -> Transform (cmd,t,args)
-         | Some (Session_itp.ATn _tid) -> Transform (cmd, t, args)
-         | Some (Session_itp.AFile _f) -> Transform (cmd, t, args)
-         | Some (Session_itp.ATh _th) ->  Transform (cmd, t, args)
-         | _ -> QError ("Please select a goal or trans node in the task tree")
+         | Some _ -> Transform (cmd,t,args)
+         | None -> QError ("Please select a goal or trans node in the task tree")
        with
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
-          | Some (prover_config, limit) ->
+          | Prover (prover_config, limit) ->
              if prover_config.Whyconf.interactive then
                Edit prover_config.Whyconf.prover
              else
                Prove (prover_config, limit)
-          | None ->
-             if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
+          | Bad_Arguments prover ->
+              QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
+          | Not_Prover ->
+             if Hstr.mem cont.Controller_itp.controller_strategies cmd then
                Strategies cmd
              else
                match cmd, args with

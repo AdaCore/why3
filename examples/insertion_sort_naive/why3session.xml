@@ -9,7 +9,7 @@
 <file name="../insertion_sort_naive.mlw">
 <theory name="InsertionSortNaive">
  <goal name="WP_parameter sort" expl="VC for sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -149,7 +149,7 @@
 </theory>
 <theory name="InsertionSortNaiveGen">
  <goal name="WP_parameter sort" expl="VC for sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -250,7 +250,7 @@
 </theory>
 <theory name="InsertionSortParam">
  <goal name="WP_parameter sort" expl="VC for sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -351,7 +351,7 @@
 </theory>
 <theory name="InsertionSortParamBad">
  <goal name="WP_parameter sort" expl="VC for sort">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sort.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>

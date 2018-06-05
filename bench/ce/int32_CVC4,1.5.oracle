@@ -3,13 +3,16 @@ bench/ce/int32.mlw Ce_int32 WP_parameter dummy_update : Valid
 bench/ce/int32.mlw Ce_int32 WP_parameter dummy_update : Unknown (other)
 Counter-example model:File int32.mlw:
 Line 6:
-r = {"type" : "Integer" , "val" : "22" }
+r, ["model", "model_trace:r"] = {"type" : "Integer" ,
+"val" : "22" }
 Line 8:
-r = {"type" : "Integer" , "val" : "84" }
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
+"val" : "84" }
 Line 9:
-r = {"type" : "Integer" , "val" : "42" }
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
+"val" : "42" }
 Line 10:
-r = {"type" : "Integer" ,
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
 "val" : "84" }
 
 bench/ce/int32.mlw Ce_int32 WP_parameter dummy_update : Valid
@@ -17,12 +20,15 @@ bench/ce/int32.mlw Ce_int32 WP_parameter dummy_update : Valid
 bench/ce/int32.mlw Ce_int32 WP_parameter dummy_update : Unknown (other)
 Counter-example model:File int32.mlw:
 Line 6:
-r = {"type" : "Integer" , "val" : "22" }
+r, ["model", "model_trace:r"] = {"type" : "Integer" ,
+"val" : "22" }
 Line 8:
-r = {"type" : "Integer" , "val" : "84" }
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
+"val" : "84" }
 Line 9:
-r = {"type" : "Integer" , "val" : "42" }
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
+"val" : "42" }
 Line 10:
-r = {"type" : "Integer" ,
+r, ["model", "model_trace:r@call"] = {"type" : "Integer" ,
 "val" : "84" }
 

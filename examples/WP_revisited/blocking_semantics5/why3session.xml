@@ -76,7 +76,7 @@
  <goal name="eval_type_term" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_type_term.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_type_term.1.1" expl="">
    <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
    <proof prover="9"><result status="valid" time="0.07" steps="131"/></proof>
@@ -110,7 +110,7 @@
  <goal name="eval_msubst_term" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_msubst_term.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_msubst_term.1.1" expl="">
    <proof prover="3" timelimit="5" memlimit="4000"><result status="valid" time="0.04"/></proof>
    <proof prover="9"><result status="valid" time="0.04" steps="14"/></proof>
@@ -134,7 +134,7 @@
  <goal name="eval_msubst" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_msubst.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_msubst.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.10"/></proof>
    <proof prover="9"><result status="valid" time="0.05" steps="34"/></proof>
@@ -183,7 +183,7 @@
  <goal name="eval_swap_term" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_swap_term.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_swap_term.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.08"/></proof>
    <proof prover="9"><result status="valid" time="0.04" steps="12"/></proof>
@@ -206,7 +206,7 @@
  <goal name="eval_swap_gen" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_swap_gen.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_swap_gen.1.1" expl="">
    <proof prover="9"><result status="valid" time="0.03" steps="47"/></proof>
    <proof prover="10"><result status="valid" time="0.04"/></proof>
@@ -261,7 +261,7 @@
  <goal name="eval_term_change_free" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_term_change_free.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_term_change_free.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    <proof prover="9"><result status="valid" time="0.04" steps="7"/></proof>
@@ -285,7 +285,7 @@
  <goal name="eval_change_free" expl="">
  <transf name="induction_ty_lex">
   <goal name="eval_change_free.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="eval_change_free.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.06"/></proof>
    <proof prover="9"><result status="valid" time="0.05" steps="35"/></proof>
@@ -371,7 +371,7 @@
  <goal name="monotonicity" expl="">
  <transf name="induction_ty_lex">
   <goal name="monotonicity.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="monotonicity.1.1" expl="">
    <proof prover="3" timelimit="5"><result status="valid" time="0.08"/></proof>
    <proof prover="7"><result status="valid" time="0.09"/></proof>
@@ -401,7 +401,7 @@
  <goal name="distrib_conj" expl="">
  <transf name="induction_ty_lex">
   <goal name="distrib_conj.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="distrib_conj.1.1" expl="">
    <proof prover="3" timelimit="5"><result status="valid" time="0.07"/></proof>
    <proof prover="9"><result status="valid" time="0.06" steps="30"/></proof>
@@ -433,7 +433,7 @@
  <goal name="progress" expl="">
  <transf name="induction_ty_lex">
   <goal name="progress.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="progress.1.1" expl="">
    <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
    <proof prover="7"><result status="valid" time="0.00"/></proof>

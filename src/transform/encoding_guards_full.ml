@@ -11,7 +11,7 @@
 
 (** transformation from polymorphic logic to many-sorted logic *)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term

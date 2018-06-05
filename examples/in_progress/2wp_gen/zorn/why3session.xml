@@ -12,7 +12,7 @@
  <proof prover="1"><result status="valid" time="0.36"/></proof>
  </goal>
  <goal name="zorn_proof">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="zorn_proof.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -44,7 +44,7 @@
 </theory>
 <theory name="WellOrderProof">
  <goal name="completion_well_ordered">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="completion_well_ordered.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
@@ -61,7 +61,7 @@
   <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="completion_well_ordered.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="completion_well_ordered.6.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
@@ -175,7 +175,7 @@
  </transf>
  </goal>
  <goal name="step">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="step.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
@@ -206,7 +206,7 @@
  </transf>
  </goal>
  <goal name="well_order_proof">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="well_order_proof.1" expl="1.">
   <proof prover="2"><result status="valid" time="0.06" steps="177"/></proof>
   </goal>

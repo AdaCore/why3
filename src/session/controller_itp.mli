@@ -85,10 +85,10 @@ end
 
 type controller = private
   { mutable controller_session : Session_itp.session;
-    controller_config : Whyconf.config;
+    mutable controller_config : Whyconf.config;
     mutable controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Wstdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
@@ -100,6 +100,9 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 val set_session_max_tasks : int -> unit
 (** sets the maximum number of proof tasks that can be running at the
     same time. Initially set to 1. *)
+
+val set_session_prover_upgrade_policy :
+  controller -> Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit
 
 
 val print_session : Format.formatter -> controller -> unit

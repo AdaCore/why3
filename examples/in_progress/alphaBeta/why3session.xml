@@ -30,7 +30,7 @@
 </theory>
 <theory name="AlphaBeta">
  <goal name="WP_parameter move_value_alpha_beta" expl="VC for move_value_alpha_beta">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter move_value_alpha_beta.0" expl="precondition">
   <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1" obsolete="true"><result status="valid" time="0.00"/></proof>
@@ -40,7 +40,7 @@
   <proof prover="6" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter move_value_alpha_beta.1" expl="postcondition">
-  <transf name="split_goal_wp" >
+  <transf name="split_goal_right" >
    <goal name="WP_parameter move_value_alpha_beta.1.0" expl="postcondition">
    <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -55,10 +55,10 @@
  </transf>
  </goal>
  <goal name="WP_parameter negabeta" expl="VC for negabeta">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter negabeta.0" expl="postcondition">
   <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
-  <transf name="split_goal_wp" >
+  <transf name="split_goal_right" >
    <goal name="WP_parameter negabeta.0.0" expl="VC for negabeta">
    <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
    <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -74,7 +74,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter negabeta.1" expl="postcondition">
-  <transf name="split_goal_wp" >
+  <transf name="split_goal_right" >
    <goal name="WP_parameter negabeta.1.0" expl="VC for negabeta">
    <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
    <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
@@ -109,7 +109,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter negabeta_rec" expl="VC for negabeta_rec">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter negabeta_rec.0" expl="postcondition">
   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>

@@ -18,7 +18,7 @@
 </theory>
 <theory name="BuildMaze">
  <goal name="Ineq1" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="Ineq1.1" expl="">
   <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -28,7 +28,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_edge_and_union" expl="VC for add_edge_and_union">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_edge_and_union.1" expl="precondition">
   <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -41,7 +41,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter build_maze" expl="VC for build_maze">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter build_maze.1" expl="precondition">
   <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>

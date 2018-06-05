@@ -9,7 +9,7 @@
 <file name="../game.mlw">
 <theory name="Game">
  <goal name="step_is_ub_builder">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="step_is_ub_builder.1" expl="1.">
   <proof prover="3" steplimit="1"><result status="valid" time="0.04" steps="86"/></proof>
   </goal>
@@ -39,7 +39,7 @@
 </theory>
 <theory name="DmnReachProofs">
  <goal name="subchain_well_formed">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="subchain_well_formed.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.08" steps="112"/></proof>
   </goal>
@@ -124,7 +124,7 @@
  </transf>
  </goal>
  <goal name="dmn_witness_criterion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="dmn_witness_criterion.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.07" steps="40"/></proof>
   </goal>
@@ -135,12 +135,12 @@
   <proof prover="3"><result status="valid" time="0.26" steps="459"/></proof>
   </goal>
   <goal name="dmn_witness_criterion.4" expl="4.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="dmn_witness_criterion.4.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.39" steps="412"/></proof>
    </goal>
    <goal name="dmn_witness_criterion.4.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="dmn_witness_criterion.4.2.1" expl="1.">
     <proof prover="1"><result status="valid" time="0.71"/></proof>
     </goal>
@@ -168,7 +168,7 @@
    </transf>
    </goal>
    <goal name="dmn_witness_criterion.4.3" expl="3.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="dmn_witness_criterion.4.3.1" expl="1.">
     <proof prover="3"><result status="valid" time="1.56" steps="3405"/></proof>
     </goal>
@@ -196,7 +196,7 @@
    </transf>
    </goal>
    <goal name="dmn_witness_criterion.4.4" expl="4.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="dmn_witness_criterion.4.4.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.42" steps="418"/></proof>
     </goal>
@@ -228,7 +228,7 @@
     <proof prover="3"><result status="valid" time="0.10" steps="60"/></proof>
     </goal>
     <goal name="dmn_witness_criterion.4.4.11" expl="11.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="dmn_witness_criterion.4.4.11.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.11" steps="122"/></proof>
      </goal>
@@ -321,7 +321,7 @@
    <proof prover="3"><result status="valid" time="0.66" steps="832"/></proof>
    </goal>
    <goal name="dmn_witness_criterion.4.6" expl="6.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="dmn_witness_criterion.4.6.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.04" steps="8"/></proof>
     </goal>
@@ -336,7 +336,7 @@
   </transf>
   </goal>
   <goal name="dmn_witness_criterion.5" expl="5.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="dmn_witness_criterion.5.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.04" steps="7"/></proof>
    </goal>
@@ -430,7 +430,7 @@
  </transf>
  </goal>
  <goal name="dmn_reach_next_gen">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="dmn_reach_next_gen.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.09" steps="75"/></proof>
   </goal>
@@ -482,7 +482,7 @@
  </transf>
  </goal>
  <goal name="dmn_reach_lim">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="dmn_reach_lim.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.12" steps="116"/></proof>
   </goal>
@@ -496,7 +496,7 @@
   <proof prover="3"><result status="valid" time="0.09" steps="44"/></proof>
   </goal>
   <goal name="dmn_reach_lim.5" expl="5.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="dmn_reach_lim.5.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.12" steps="108"/></proof>
    </goal>
@@ -551,7 +551,7 @@
   </transf>
   </goal>
   <goal name="dmn_reach_lim.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="dmn_reach_lim.6.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.36" steps="599"/></proof>
    </goal>
@@ -614,7 +614,7 @@
  </transf>
  </goal>
  <goal name="non_wins_criterion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="non_wins_criterion.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
@@ -678,7 +678,7 @@
  </transf>
  </goal>
  <goal name="build_losing_demon">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="build_losing_demon.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.05" steps="6"/></proof>
   </goal>
@@ -766,7 +766,7 @@
  </transf>
  </goal>
  <goal name="dmn_reach_sup">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="dmn_reach_sup.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.08" steps="50"/></proof>
   </goal>
@@ -808,7 +808,7 @@
 </theory>
 <theory name="StratProofs">
  <goal name="have_uniform_winning_start_alternate_def">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="have_uniform_winning_start_alternate_def.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.08" steps="51"/></proof>
   </goal>
@@ -901,7 +901,7 @@
   <goal name="remove_subchains.1" expl="1.">
   <transf name="inline_goal">
    <goal name="remove_subchains.1.1" expl="1.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="remove_subchains.1.1.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.04" steps="9"/></proof>
     </goal>
@@ -927,14 +927,14 @@
  <proof prover="3"><result status="valid" time="0.04" steps="67"/></proof>
  </goal>
  <goal name="have_winning_strat_local_criterion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="have_winning_strat_local_criterion.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="have_winning_strat_local_criterion.1.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.04" steps="12"/></proof>
    </goal>
    <goal name="have_winning_strat_local_criterion.1.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="have_winning_strat_local_criterion.1.2.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.05" steps="8"/></proof>
     </goal>
@@ -977,7 +977,7 @@
    <proof prover="3"><result status="valid" time="0.05" steps="11"/></proof>
    </goal>
    <goal name="have_winning_strat_local_criterion.1.4" expl="4.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="have_winning_strat_local_criterion.1.4.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.93" steps="826"/></proof>
     </goal>
@@ -985,7 +985,7 @@
     <proof prover="3"><result status="valid" time="0.43" steps="445"/></proof>
     </goal>
     <goal name="have_winning_strat_local_criterion.1.4.3" expl="3.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.1.4.3.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.18" steps="221"/></proof>
      </goal>
@@ -1043,7 +1043,7 @@
     <proof prover="3"><result status="valid" time="0.09" steps="119"/></proof>
     </goal>
     <goal name="have_winning_strat_local_criterion.1.4.18" expl="18.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.1.4.18.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.22" steps="211"/></proof>
      </goal>
@@ -1064,7 +1064,7 @@
       <goal name="have_winning_strat_local_criterion.1.4.18.6.1" expl="1.">
       <transf name="inline_goal">
        <goal name="have_winning_strat_local_criterion.1.4.18.6.1.1" expl="1.">
-       <transf name="split_goal_wp">
+       <transf name="split_goal_right">
         <goal name="have_winning_strat_local_criterion.1.4.18.6.1.1.1" expl="1.">
         <proof prover="0"><result status="valid" time="0.42"/></proof>
         </goal>
@@ -1123,7 +1123,7 @@
      <proof prover="3"><result status="valid" time="0.39" steps="469"/></proof>
      </goal>
      <goal name="have_winning_strat_local_criterion.1.4.18.22" expl="22.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="have_winning_strat_local_criterion.1.4.18.22.1" expl="1.">
       <proof prover="1"><result status="valid" time="0.74"/></proof>
       </goal>
@@ -1139,7 +1139,7 @@
      <proof prover="3"><result status="valid" time="0.28" steps="301"/></proof>
      </goal>
      <goal name="have_winning_strat_local_criterion.1.4.18.26" expl="26.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="have_winning_strat_local_criterion.1.4.18.26.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.26" steps="319"/></proof>
       </goal>
@@ -1156,7 +1156,7 @@
       <proof prover="3"><result status="valid" time="0.11" steps="97"/></proof>
       </goal>
       <goal name="have_winning_strat_local_criterion.1.4.18.26.6" expl="6.">
-      <transf name="split_goal_wp">
+      <transf name="split_goal_right">
        <goal name="have_winning_strat_local_criterion.1.4.18.26.6.1" expl="1.">
        <proof prover="3"><result status="valid" time="0.06" steps="53"/></proof>
        </goal>
@@ -1280,7 +1280,7 @@
       <goal name="have_winning_strat_local_criterion.1.4.18.36.1" expl="1.">
       <transf name="inline_goal">
        <goal name="have_winning_strat_local_criterion.1.4.18.36.1.1" expl="1.">
-       <transf name="split_goal_wp">
+       <transf name="split_goal_right">
         <goal name="have_winning_strat_local_criterion.1.4.18.36.1.1.1" expl="1.">
         <proof prover="0"><result status="valid" time="0.04"/></proof>
         </goal>
@@ -1305,7 +1305,7 @@
     </transf>
     </goal>
     <goal name="have_winning_strat_local_criterion.1.4.19" expl="19.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.1.4.19.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.04" steps="33"/></proof>
      </goal>
@@ -1337,7 +1337,7 @@
      <proof prover="3"><result status="valid" time="0.07" steps="39"/></proof>
      </goal>
      <goal name="have_winning_strat_local_criterion.1.4.19.11" expl="11.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="have_winning_strat_local_criterion.1.4.19.11.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.05" steps="39"/></proof>
       </goal>
@@ -1407,7 +1407,7 @@
      </transf>
      </goal>
      <goal name="have_winning_strat_local_criterion.1.4.19.12" expl="12.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="have_winning_strat_local_criterion.1.4.19.12.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.48" steps="496"/></proof>
       </goal>
@@ -1562,7 +1562,7 @@
   </transf>
   </goal>
   <goal name="have_winning_strat_local_criterion.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="have_winning_strat_local_criterion.2.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.10" steps="125"/></proof>
    </goal>
@@ -1578,7 +1578,7 @@
   </transf>
   </goal>
   <goal name="have_winning_strat_local_criterion.3" expl="3.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="have_winning_strat_local_criterion.3.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.05" steps="7"/></proof>
    </goal>
@@ -1673,7 +1673,7 @@
    <proof prover="1"><result status="valid" time="6.33"/></proof>
    </goal>
    <goal name="have_winning_strat_local_criterion.3.32" expl="32.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="have_winning_strat_local_criterion.3.32.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.38" steps="513"/></proof>
     </goal>
@@ -1695,7 +1695,7 @@
    </transf>
    </goal>
    <goal name="have_winning_strat_local_criterion.3.33" expl="33.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="have_winning_strat_local_criterion.3.33.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.09" steps="108"/></proof>
     </goal>
@@ -1733,7 +1733,7 @@
     <proof prover="3"><result status="valid" time="0.10" steps="81"/></proof>
     </goal>
     <goal name="have_winning_strat_local_criterion.3.33.13" expl="13.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.3.33.13.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.04" steps="30"/></proof>
      </goal>
@@ -1790,9 +1790,9 @@
    </transf>
    </goal>
    <goal name="have_winning_strat_local_criterion.3.34" expl="34.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="have_winning_strat_local_criterion.3.34.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.3.34.1.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.22" steps="306"/></proof>
      </goal>
@@ -1817,7 +1817,7 @@
     </transf>
     </goal>
     <goal name="have_winning_strat_local_criterion.3.34.2" expl="2.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.3.34.2.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.06" steps="48"/></proof>
      </goal>
@@ -1878,7 +1878,7 @@
     <proof prover="3"><result status="valid" time="0.27" steps="263"/></proof>
     </goal>
     <goal name="have_winning_strat_local_criterion.3.34.4" expl="4.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="have_winning_strat_local_criterion.3.34.4.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.08" steps="105"/></proof>
      </goal>
@@ -2009,7 +2009,7 @@
  </transf>
  </goal>
  <goal name="sorder_order">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="sorder_order.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.16" steps="109"/></proof>
   </goal>
@@ -2052,7 +2052,7 @@
  </transf>
  </goal>
  <goal name="h_proj_mono">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="h_proj_mono.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.16" steps="132"/></proof>
   </goal>
@@ -2077,7 +2077,7 @@
  </transf>
  </goal>
  <goal name="bounds_projections">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="bounds_projections.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.07" steps="16"/></proof>
   </goal>
@@ -2117,7 +2117,7 @@
  </transf>
  </goal>
  <goal name="chain_projection">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="chain_projection.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.06" steps="20"/></proof>
   </goal>
@@ -2181,7 +2181,7 @@
  </transf>
  </goal>
  <goal name="sorder_completion">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="sorder_completion.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.12" steps="103"/></proof>
   </goal>
@@ -2245,7 +2245,7 @@
  <proof prover="3"><result status="valid" time="0.10" steps="44"/></proof>
  </goal>
  <goal name="evolve_inflationary">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="evolve_inflationary.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.24" steps="73"/></proof>
   </goal>
@@ -2351,7 +2351,7 @@
  </transf>
  </goal>
  <goal name="coherence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="coherence.1" expl="1.">
   <proof prover="3"><result status="valid" time="1.20" steps="560"/></proof>
   </goal>
@@ -2362,7 +2362,7 @@
   <proof prover="1"><result status="valid" time="1.80"/></proof>
   </goal>
   <goal name="coherence.4" expl="4.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="coherence.4.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.28" steps="95"/></proof>
    </goal>
@@ -2392,13 +2392,13 @@
     <goal name="coherence.4.9.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.4.9.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.4.9.1.1.1" expl="1.">
       <transf name="introduce_premises">
        <goal name="coherence.4.9.1.1.1.1" expl="1.">
        <transf name="inline_goal">
         <goal name="coherence.4.9.1.1.1.1.1" expl="1.">
-        <transf name="split_goal_wp">
+        <transf name="split_goal_right">
          <goal name="coherence.4.9.1.1.1.1.1.1" expl="1.">
          <proof prover="3"><result status="valid" time="0.69" steps="291"/></proof>
          </goal>
@@ -2456,7 +2456,7 @@
   </transf>
   </goal>
   <goal name="coherence.5" expl="5.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="coherence.5.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.23" steps="35"/></proof>
    </goal>
@@ -2474,7 +2474,7 @@
     <goal name="coherence.5.5.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.5.5.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.5.5.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.36" steps="228"/></proof>
       </goal>
@@ -2530,7 +2530,7 @@
    <proof prover="3"><result status="valid" time="0.56" steps="305"/></proof>
    </goal>
    <goal name="coherence.5.20" expl="20.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.20.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.26" steps="54"/></proof>
     </goal>
@@ -2564,7 +2564,7 @@
    </transf>
    </goal>
    <goal name="coherence.5.21" expl="21.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.21.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.82" steps="511"/></proof>
     </goal>
@@ -2589,7 +2589,7 @@
    </transf>
    </goal>
    <goal name="coherence.5.22" expl="22.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.22.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.26" steps="56"/></proof>
     </goal>
@@ -2640,7 +2640,7 @@
      <goal name="coherence.5.22.16.1" expl="1.">
      <transf name="inline_goal">
       <goal name="coherence.5.22.16.1.1" expl="1.">
-      <transf name="split_goal_wp">
+      <transf name="split_goal_right">
        <goal name="coherence.5.22.16.1.1.1" expl="1.">
        <proof prover="3"><result status="valid" time="4.49" steps="4129"/></proof>
        </goal>
@@ -2716,7 +2716,7 @@
    <proof prover="3"><result status="valid" time="2.38" steps="1529"/></proof>
    </goal>
    <goal name="coherence.5.37" expl="37.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.37.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.28" steps="99"/></proof>
     </goal>
@@ -2762,7 +2762,7 @@
    <proof prover="3"><result status="valid" time="1.80" steps="1654"/></proof>
    </goal>
    <goal name="coherence.5.43" expl="43.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.43.1" expl="1.">
     <proof prover="1"><result status="valid" time="7.50"/></proof>
     </goal>
@@ -2781,9 +2781,9 @@
    </transf>
    </goal>
    <goal name="coherence.5.44" expl="44.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.5.44.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.5.44.1.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.26" steps="69"/></proof>
      </goal>
@@ -2805,7 +2805,7 @@
     </transf>
     </goal>
     <goal name="coherence.5.44.2" expl="2.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.5.44.2.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.17" steps="37"/></proof>
      </goal>
@@ -2830,7 +2830,7 @@
     <proof prover="3"><result status="valid" time="0.13" steps="87"/></proof>
     </goal>
     <goal name="coherence.5.44.4" expl="4.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.5.44.4.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.25" steps="70"/></proof>
      </goal>
@@ -2918,7 +2918,7 @@
     <goal name="coherence.5.60.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.5.60.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.5.60.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.47" steps="411"/></proof>
       </goal>
@@ -2957,7 +2957,7 @@
     <goal name="coherence.5.61.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.5.61.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.5.61.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.13" steps="6"/></proof>
       </goal>
@@ -2996,7 +2996,7 @@
     <goal name="coherence.5.62.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.5.62.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.5.62.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.74" steps="586"/></proof>
       </goal>
@@ -3035,7 +3035,7 @@
     <goal name="coherence.5.63.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.5.63.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.5.63.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.21" steps="163"/></proof>
       </goal>
@@ -3072,12 +3072,12 @@
   </transf>
   </goal>
   <goal name="coherence.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="coherence.6.1" expl="1.">
    <proof prover="3"><result status="valid" time="1.39" steps="912"/></proof>
    </goal>
    <goal name="coherence.6.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.2.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.25" steps="69"/></proof>
     </goal>
@@ -3096,7 +3096,7 @@
    </transf>
    </goal>
    <goal name="coherence.6.3" expl="3.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.3.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.46" steps="407"/></proof>
     </goal>
@@ -3112,7 +3112,7 @@
    </transf>
    </goal>
    <goal name="coherence.6.4" expl="4.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.4.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.62" steps="517"/></proof>
     </goal>
@@ -3131,12 +3131,12 @@
    </transf>
    </goal>
    <goal name="coherence.6.5" expl="5.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.5.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.54" steps="414"/></proof>
     </goal>
     <goal name="coherence.6.5.2" expl="2.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.5.2.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.18" steps="25"/></proof>
      </goal>
@@ -3161,7 +3161,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.5.3" expl="3.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.5.3.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.25" steps="85"/></proof>
      </goal>
@@ -3221,9 +3221,9 @@
    <proof prover="3"><result status="valid" time="4.21" steps="2022"/></proof>
    </goal>
    <goal name="coherence.6.10" expl="10.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.10.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.1.1" expl="1.">
      <proof prover="3"><result status="valid" time="4.29" steps="2082"/></proof>
      </goal>
@@ -3260,7 +3260,7 @@
     <proof prover="3"><result status="valid" time="0.14" steps="0"/></proof>
     </goal>
     <goal name="coherence.6.10.3" expl="3.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.3.1" expl="1.">
      <proof prover="3"><result status="valid" time="4.26" steps="2556"/></proof>
      </goal>
@@ -3297,7 +3297,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.10.4" expl="4.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.4.1" expl="1.">
      <proof prover="3"><result status="valid" time="4.19" steps="2301"/></proof>
      </goal>
@@ -3343,7 +3343,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.10.5" expl="5.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.5.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.33" steps="147"/></proof>
      </goal>
@@ -3371,7 +3371,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.10.6" expl="6.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.6.1" expl="1.">
      <proof prover="3"><result status="valid" time="3.98" steps="2405"/></proof>
      </goal>
@@ -3405,7 +3405,7 @@
     <proof prover="3"><result status="valid" time="0.64" steps="829"/></proof>
     </goal>
     <goal name="coherence.6.10.8" expl="8.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.8.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.20" steps="155"/></proof>
      </goal>
@@ -3439,7 +3439,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.10.9" expl="9.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.10.9.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.11" steps="40"/></proof>
      </goal>
@@ -3493,7 +3493,7 @@
    </transf>
    </goal>
    <goal name="coherence.6.11" expl="11.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.11.1" expl="1.">
     <proof prover="3"><result status="valid" time="2.87" steps="2010"/></proof>
     </goal>
@@ -3521,7 +3521,7 @@
    </transf>
    </goal>
    <goal name="coherence.6.12" expl="12.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.12.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.19" steps="24"/></proof>
     </goal>
@@ -3573,9 +3573,9 @@
    </transf>
    </goal>
    <goal name="coherence.6.13" expl="13.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="coherence.6.13.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.13.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="4.35"/></proof>
      </goal>
@@ -3591,7 +3591,7 @@
     </transf>
     </goal>
     <goal name="coherence.6.13.2" expl="2.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="coherence.6.13.2.1" expl="1.">
      <proof prover="3"><result status="valid" time="2.46" steps="1640"/></proof>
      </goal>
@@ -3652,13 +3652,13 @@
     <goal name="coherence.6.17.1" expl="1.">
     <transf name="inline_goal">
      <goal name="coherence.6.17.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="coherence.6.17.1.1.1" expl="1.">
       <transf name="introduce_premises">
        <goal name="coherence.6.17.1.1.1.1" expl="1.">
        <transf name="inline_goal">
         <goal name="coherence.6.17.1.1.1.1.1" expl="1.">
-        <transf name="split_goal_wp">
+        <transf name="split_goal_right">
          <goal name="coherence.6.17.1.1.1.1.1.1" expl="1.">
          <proof prover="3"><result status="valid" time="0.18" steps="13"/></proof>
          </goal>
@@ -3758,7 +3758,7 @@
  </transf>
  </goal>
  <goal name="maximal_witness_unicity_prelude">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="maximal_witness_unicity_prelude.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.19" steps="16"/></proof>
   </goal>
@@ -3961,7 +3961,7 @@
  </transf>
  </goal>
  <goal name="maximal_witness_unique">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="maximal_witness_unique.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.15" steps="23"/></proof>
   </goal>
@@ -3977,9 +3977,9 @@
  </transf>
  </goal>
  <goal name="sim_angel_reach">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="sim_angel_reach.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="sim_angel_reach.1.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.18" steps="13"/></proof>
    </goal>
@@ -4046,7 +4046,7 @@
    <proof prover="3"><result status="valid" time="0.19" steps="49"/></proof>
    </goal>
    <goal name="sim_angel_reach.1.20" expl="20.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="sim_angel_reach.1.20.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.22" steps="90"/></proof>
     </goal>
@@ -4115,7 +4115,7 @@
   </transf>
   </goal>
   <goal name="sim_angel_reach.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="sim_angel_reach.2.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.41" steps="370"/></proof>
    </goal>
@@ -4179,9 +4179,9 @@
  </transf>
  </goal>
  <goal name="all_locally_winning">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="all_locally_winning.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="all_locally_winning.1.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.25" steps="66"/></proof>
    </goal>
@@ -4200,7 +4200,7 @@
   </transf>
   </goal>
   <goal name="all_locally_winning.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="all_locally_winning.2.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.20" steps="6"/></proof>
    </goal>
@@ -4274,7 +4274,7 @@
    <proof prover="3"><result status="valid" time="0.78" steps="929"/></proof>
    </goal>
    <goal name="all_locally_winning.2.25" expl="25.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="all_locally_winning.2.25.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.28" steps="86"/></proof>
     </goal>
@@ -4314,7 +4314,7 @@
    <proof prover="3"><result status="valid" time="0.27" steps="97"/></proof>
    </goal>
    <goal name="all_locally_winning.2.29" expl="29.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="all_locally_winning.2.29.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.23" steps="38"/></proof>
     </goal>
@@ -4356,12 +4356,12 @@
   </transf>
   </goal>
   <goal name="all_locally_winning.3" expl="3.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="all_locally_winning.3.1" expl="1.">
    <proof prover="3"><result status="valid" time="2.66" steps="1621"/></proof>
    </goal>
    <goal name="all_locally_winning.3.2" expl="2.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="all_locally_winning.3.2.1" expl="1.">
     <proof prover="3"><result status="valid" time="2.33" steps="911"/></proof>
     </goal>
@@ -4416,7 +4416,7 @@
    </transf>
    </goal>
    <goal name="all_locally_winning.3.3" expl="3.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="all_locally_winning.3.3.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.31" steps="91"/></proof>
     </goal>
@@ -4466,7 +4466,7 @@
     <proof prover="3"><result status="valid" time="1.89" steps="923"/></proof>
     </goal>
     <goal name="all_locally_winning.3.3.17" expl="17.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="all_locally_winning.3.3.17.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.30" steps="126"/></proof>
      </goal>
@@ -4600,7 +4600,7 @@
  </transf>
  </goal>
  <goal name="r_simulation_theorem">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="r_simulation_theorem.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.19" steps="15"/></proof>
   </goal>
@@ -4617,7 +4617,7 @@
   <proof prover="3"><result status="valid" time="0.29" steps="162"/></proof>
   </goal>
   <goal name="r_simulation_theorem.6" expl="6.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="r_simulation_theorem.6.1" expl="1.">
    <proof prover="3"><result status="valid" time="3.30" steps="2369"/></proof>
    </goal>
@@ -4648,7 +4648,7 @@
   </transf>
   </goal>
   <goal name="r_simulation_theorem.7" expl="7.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="r_simulation_theorem.7.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.59" steps="410"/></proof>
    </goal>
@@ -4733,7 +4733,7 @@
   <proof prover="3"><result status="valid" time="0.32" steps="99"/></proof>
   </goal>
   <goal name="r_simulation_theorem.17" expl="17.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="r_simulation_theorem.17.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.22" steps="59"/></proof>
    </goal>
@@ -4764,7 +4764,7 @@
   <proof prover="3"><result status="valid" time="0.26" steps="24"/></proof>
   </goal>
   <goal name="r_simulation_theorem.20" expl="20.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="r_simulation_theorem.20.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.40" steps="178"/></proof>
    </goal>
@@ -4932,7 +4932,7 @@
   <proof prover="3"><result status="valid" time="0.15" steps="40"/></proof>
   </goal>
   <goal name="r_simulation_theorem.58" expl="58.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="r_simulation_theorem.58.1" expl="1.">
    <proof prover="1"><result status="valid" time="5.01"/></proof>
    </goal>
@@ -5022,13 +5022,13 @@
  </transf>
  </goal>
  <goal name="rel_map_equal">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="rel_map_equal.1" expl="1.">
   <transf name="introduce_premises">
    <goal name="rel_map_equal.1.1" expl="1.">
    <transf name="inline_goal">
     <goal name="rel_map_equal.1.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="rel_map_equal.1.1.1.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.13" steps="14"/></proof>
      </goal>
@@ -5047,7 +5047,7 @@
  </transf>
  </goal>
  <goal name="subgame_other_def">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="subgame_other_def.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.13" steps="2"/></proof>
   </goal>
@@ -5063,7 +5063,7 @@
  </transf>
  </goal>
  <goal name="self_order_compatible">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="self_order_compatible.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.22" steps="48"/></proof>
   </goal>
@@ -5088,7 +5088,7 @@
  </transf>
  </goal>
  <goal name="trivial_subgame_indeed">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trivial_subgame_indeed.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.20" steps="29"/></proof>
   </goal>
@@ -5107,7 +5107,7 @@
  <proof prover="3"><result status="valid" time="0.11" steps="24"/></proof>
  </goal>
  <goal name="g_sat_equiv">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="g_sat_equiv.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.13" steps="23"/></proof>
   </goal>
@@ -5132,7 +5132,7 @@
  </transf>
  </goal>
  <goal name="simulation_theorem">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="simulation_theorem.1" expl="1.">
   <proof prover="3"><result status="valid" time="0.27" steps="108"/></proof>
   </goal>

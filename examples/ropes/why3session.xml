@@ -14,8 +14,6 @@
  <proof prover="4"><result status="valid" time="0.03" steps="33"/></proof>
  </goal>
 </theory>
-<theory name="Sig" proved="true">
-</theory>
 <theory name="Rope" proved="true">
  <goal name="rope_length_is_string_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -34,7 +32,7 @@
  <proof prover="4" timelimit="10"><result status="valid" time="0.04" steps="71"/></proof>
  </goal>
  <goal name="WP_parameter get" expl="VC for get" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter get.0" expl="unreachable point" proved="true">
   <proof prover="4" timelimit="10"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
@@ -71,7 +69,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter concat" expl="VC for concat" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter concat.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
@@ -99,7 +97,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter sub" expl="VC for sub" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter sub.0" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
@@ -177,7 +175,7 @@
 </theory>
 <theory name="Balance" proved="true">
  <goal name="WP_parameter string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter string_of_array_concat.0" expl="variant decrease" proved="true">
   <proof prover="4" timelimit="30"><result status="valid" time="0.04" steps="13"/></proof>
   </goal>
@@ -196,7 +194,7 @@
  <proof prover="3"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="WP_parameter string_of_array_length" expl="VC for string_of_array_length" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter string_of_array_length.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -209,7 +207,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter string_of_array_eq" expl="VC for string_of_array_eq" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter string_of_array_eq.0" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
@@ -231,7 +229,7 @@
  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
  </goal>
  <goal name="WP_parameter string_of_array_concat_empty" expl="VC for string_of_array_concat_empty" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter string_of_array_concat_empty.0" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
@@ -250,7 +248,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter insert.0" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
@@ -286,7 +284,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter insert.11" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter insert.11.0" expl="VC for insert" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
@@ -322,7 +320,7 @@
    <goal name="WP_parameter insert.18.0" expl="postcondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="WP_parameter insert.18.0.0" expl="postcondition" proved="true">
-    <transf name="split_goal_wp" proved="true" >
+    <transf name="split_goal_right" proved="true" >
      <goal name="WP_parameter insert.18.0.0.0" expl="VC for insert" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="0.12"/></proof>
      </goal>
@@ -338,7 +336,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter insert_leaves" expl="VC for insert_leaves" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter insert_leaves.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
@@ -403,7 +401,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter balance" expl="VC for balance" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter balance.0" expl="array creation size" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>

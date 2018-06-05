@@ -16,7 +16,7 @@
 </theory>
 <theory name="Merge" proved="true">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -71,7 +71,7 @@
  <proof prover="2" timelimit="6"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="WP_parameter merge_aux" expl="VC for merge_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge_aux.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
@@ -95,7 +95,7 @@
   </goal>
   <goal name="WP_parameter merge_aux.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.26"/></proof>
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter merge_aux.7.0" expl="VC for merge_aux" proved="true">
    <proof prover="2"><result status="valid" time="0.38"/></proof>
    <proof prover="4"><result status="valid" time="1.39" steps="353"/></proof>
@@ -147,7 +147,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter merge.0" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -169,7 +169,7 @@
 </theory>
 <theory name="Mergesort" proved="true">
  <goal name="WP_parameter split" expl="VC for split" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter split.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
@@ -180,7 +180,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter split.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter split.3.0" expl="VC for split" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
    </goal>
@@ -198,7 +198,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter mergesort" expl="VC for mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter mergesort.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
@@ -215,7 +215,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.5" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter mergesort.5.0" expl="VC for mergesort" proved="true">
    <proof prover="4"><result status="valid" time="0.00" steps="11"/></proof>
    </goal>
@@ -226,7 +226,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter mergesort.6" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter mergesort.6.0" expl="VC for mergesort" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
@@ -247,7 +247,7 @@
  <proof prover="2" timelimit="5"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="WP_parameter rev_merge" expl="VC for rev_merge" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter rev_merge.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
@@ -311,7 +311,7 @@
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter rev_merge_rev" expl="VC for rev_merge_rev" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter rev_merge_rev.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
@@ -379,7 +379,7 @@
  <proof prover="4"><result status="valid" time="0.05" steps="86"/></proof>
  </goal>
  <goal name="WP_parameter sort" expl="VC for sort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter sort.0" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05" steps="57"/></proof>
   </goal>
@@ -464,7 +464,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter rev_sort" expl="VC for rev_sort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter rev_sort.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
@@ -556,9 +556,9 @@
  </transf>
  </goal>
  <goal name="WP_parameter mergesort" expl="VC for mergesort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter mergesort.0" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter mergesort.0.0" expl="VC for mergesort" proved="true">
    <transf name="induction_ty_lex" proved="true" >
     <goal name="WP_parameter mergesort.0.0.0" expl="VC for mergesort" proved="true">

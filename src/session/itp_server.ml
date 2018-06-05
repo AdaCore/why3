@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Session_itp
 open Controller_itp
 open Server_utils
@@ -226,7 +226,11 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
       Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
+  | Generic_arg_trans_utils.Arg_trans_term (s, t) ->
+      Pp.sprintf "Error in transformation %s during with term:\n %a : %a " s
+        (print_term ses id) t (print_opt_type ses id) t.Term.t_ty,
+      Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_term2 (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
         (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
@@ -243,6 +247,8 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
+  | Args_wrapper.Arg_pr_not_found pr ->
+      Pp.sprintf "Property not found: %a" (print_pr ses id) pr, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
       Pp.sprintf "Transformation raised a general error: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_theory_not_found s ->
@@ -273,6 +279,8 @@ module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
+let debug_labels = Debug.register_info_flag "print_labels"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 
 (****************)
 (* Command list *)
@@ -280,9 +288,9 @@ let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
 let interrupt_query _cont _args = C.interrupt (); "interrupted"
 
-let commands_table = Stdlib.Hstr.create 17
+let commands_table = Hstr.create 17
 
-let register_command c d f = Stdlib.Hstr.add commands_table c (d,f)
+let register_command c d f = Hstr.add commands_table c (d,f)
 
 let () =
   List.iter (fun (c,d,f) -> register_command c d f)
@@ -790,7 +798,7 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
-    Stdlib.Hstr.iter
+    Hstr.iter
       (fun _ file ->
        on_file file;
        iter_subtree_from_file on_subtree file)
@@ -831,13 +839,13 @@ end
     in
     task_text, loc_color_list
 
-  let create_ce_tab s res any list_loc =
+  let create_ce_tab ~print_labels s res any list_loc =
     let f = get_encapsulating_file s any in
     let filename = Sysutil.absolutize_filename
       (Session_itp.get_dir s) (file_name f)
     in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+    Model_parser.interleave_with_source ~print_labels ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
       ~source_code:source_code ~locations:list_loc
 
@@ -871,6 +879,7 @@ end
       | ATh t ->
           P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
       | APa pid ->
+          let print_labels = Debug.test_flag debug_labels in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
@@ -885,7 +894,7 @@ end
                     res.Call_provers.pr_answer
                 in
                 let ce_result =
-                  Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                  Pp.string_of (Model_parser.print_model_human ~print_labels ?me_name_trans:None)
                   res.Call_provers.pr_model
                 in
                 if ce_result = "" then
@@ -899,7 +908,7 @@ end
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
                     let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session res any old_list_loc
+                      create_ce_tab d.cont.controller_session ~print_labels res any old_list_loc
                     in
                     P.notify (Source_and_ce (source_result, list_loc));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
@@ -1292,8 +1301,8 @@ end
    let request_is_valid r =
      match r with
      | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
-     | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
-     | Get_global_infos -> true
+     | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
+     | Exit_req | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1357,7 +1366,7 @@ end
         read_and_send f
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b,loc)         -> send_task nid b loc
+    | Get_task(nid,b,loc)          -> send_task nid b loc
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
@@ -1413,6 +1422,9 @@ end
          | "memlimit" -> Server_utils.set_session_memlimit i
          | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
        end
+    | Set_prover_policy(p,u)   ->
+       let c = d.cont in
+       Controller_itp.set_session_prover_upgrade_policy c p u
     | Exit_req                -> exit 0
      )
     with

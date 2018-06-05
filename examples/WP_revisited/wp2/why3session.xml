@@ -102,7 +102,7 @@
  <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.02" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter compute_writes" expl="VC for compute_writes">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter compute_writes.1" expl="postcondition">
   <proof prover="7" timelimit="3" memlimit="0"><result status="valid" time="0.06" steps="94"/></proof>
   </goal>
@@ -139,7 +139,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter wp" expl="VC for wp">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter wp.1" expl="postcondition">
   <proof prover="2" timelimit="3"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>

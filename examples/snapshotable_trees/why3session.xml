@@ -8,7 +8,7 @@
 </theory>
 <theory name="Enum">
  <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter enum.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
@@ -48,7 +48,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
@@ -56,7 +56,7 @@
   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter add.3" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter add.3.1" expl="VC for add">
    <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
@@ -82,7 +82,7 @@
 </theory>
 <theory name="Harness">
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter test.1" expl="assertion">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>

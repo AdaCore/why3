@@ -56,11 +56,11 @@ let oct_escape = '\\' rO rO? rO?
 (* integer literals, both decimal, hexadecimal and octal *)
 rule integer_literal = parse
   (* hexadecimal *)
-  | '0'['x''X'] (rH+ as d) rIS eof { Number.int_const_hex d }
+  | '0'['x''X'] (rH+ as d) rIS eof { Number.int_literal_hex d }
   (* octal *)
-  | '0' (rO+ as d)         rIS eof { Number.int_const_oct d }
+  | '0' (rO+ as d)         rIS eof { Number.int_literal_oct d }
   (* decimal *)
-  | (rD+ as d)             rIS eof { Number.int_const_dec d }
+  | (rD+ as d)             rIS eof { Number.int_literal_dec d }
 (* TODO: character literals
   | ('L'? "'" as prelude) (([^ '\\' '\'' '\n']|("\\"[^ '\n']))+ as content) "'"
       {

@@ -13,7 +13,7 @@
  <proof prover="2" timelimit="1"><result status="valid" time="0.36"/></proof>
  </goal>
  <goal name="WP_parameter isqrt16" expl="VC for isqrt16" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter isqrt16.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -146,7 +146,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter isqrt32" expl="VC for isqrt32" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter isqrt32.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -286,7 +286,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter isqrt64" expl="VC for isqrt64" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter isqrt64.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -426,7 +426,7 @@
   <proof prover="3"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="WP_parameter isqrt64.29" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter isqrt64.29.0" expl="VC for isqrt64" proved="true">
    <proof prover="3"><result status="valid" time="0.31"/></proof>
    </goal>
@@ -552,7 +552,7 @@
                         <proof prover="2"><result status="valid" time="0.01"/></proof>
                         </goal>
                         <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1" proved="true">
-                        <transf name="split_all_wp" proved="true" >
+                        <transf name="split_all_right" proved="true" >
                          <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0" proved="true">
                          <transf name="assert" proved="true" arg1="(0 &lt;= t&#39;int b - t&#39;int (1:t))">
                           <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0.0" proved="true">
@@ -711,7 +711,7 @@
                   </transf>
                   </goal>
                   <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1" proved="true">
-                  <transf name="split_all_wp" proved="true" >
+                  <transf name="split_all_right" proved="true" >
                    <goal name="WP_parameter isqrt64.39.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.0" proved="true">
                    <proof prover="1"><result status="valid" time="0.02" steps="117"/></proof>
                    </goal>
@@ -756,7 +756,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter isqrt64.40" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter isqrt64.40.0" expl="VC for isqrt64" proved="true">
    <proof prover="3"><result status="valid" time="0.40"/></proof>
    </goal>

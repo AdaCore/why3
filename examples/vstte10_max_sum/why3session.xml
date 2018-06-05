@@ -11,7 +11,7 @@
 <file name="../vstte10_max_sum.mlw">
 <theory name="MaxAndSum">
  <goal name="WP_parameter max_sum" expl="VC for max_sum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter max_sum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
@@ -47,7 +47,7 @@
 </theory>
 <theory name="MaxAndSum2">
  <goal name="WP_parameter max_sum" expl="VC for max_sum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter max_sum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
@@ -66,7 +66,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.6" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter max_sum.6.1" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
@@ -82,7 +82,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.8" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter max_sum.8.1" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
    </goal>
@@ -104,7 +104,7 @@
 </theory>
 <theory name="TestCase">
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter test.1" expl="array creation size">
   <proof prover="0" timelimit="10"><result status="valid" time="0.02" steps="0"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>

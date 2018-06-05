@@ -13,7 +13,7 @@
  <proof prover="4" timelimit="3"><result status="valid" time="0.12" steps="44"/></proof>
  </goal>
  <goal name="WP_parameter fast_exp_imperative" expl="VC for fast_exp_imperative" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter fast_exp_imperative.0" expl="loop invariant init" proved="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
   <proof prover="4" timelimit="5"><result status="valid" time="0.00" steps="2"/></proof>
@@ -23,7 +23,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.2" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter fast_exp_imperative.2.0" expl="VC for fast_exp_imperative" proved="true">
    <proof prover="4" memlimit="1000"><result status="valid" time="0.13" steps="11"/></proof>
    </goal>
@@ -41,7 +41,7 @@
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.5" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="WP_parameter fast_exp_imperative.5.0" expl="VC for fast_exp_imperative" proved="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="17"/></proof>

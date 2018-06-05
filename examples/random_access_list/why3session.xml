@@ -10,7 +10,7 @@
 <file name="../random_access_list.mlw">
 <theory name="RandomAccessList">
  <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter length_flatten.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
@@ -29,7 +29,7 @@
  <proof prover="0"><result status="valid" time="0.03" steps="70"/></proof>
  </goal>
  <goal name="WP_parameter nth_flatten" expl="VC for nth_flatten">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter nth_flatten.1" expl="postcondition">
   <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
@@ -51,7 +51,7 @@
  <proof prover="0"><result status="valid" time="0.47" steps="406"/></proof>
  </goal>
  <goal name="WP_parameter tail" expl="VC for tail">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tail.1" expl="unreachable point">
   <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -73,7 +73,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter update" expl="VC for update">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter update.1" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
@@ -123,7 +123,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter update.17" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter update.17.1" expl="assertion">
    <proof prover="0"><result status="valid" time="1.21" steps="370"/></proof>
    </goal>
@@ -166,7 +166,7 @@
 </theory>
 <theory name="RandomAccessListWithSeq">
  <goal name="WP_parameter size" expl="VC for size">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter size.1" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -185,7 +185,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter cons" expl="VC for cons">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter cons.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
   </goal>
@@ -204,7 +204,7 @@
  <proof prover="0"><result status="valid" time="0.44" steps="402"/></proof>
  </goal>
  <goal name="WP_parameter tail" expl="VC for tail">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tail.1" expl="unreachable point">
   <proof prover="8"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>

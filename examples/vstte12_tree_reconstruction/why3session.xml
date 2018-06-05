@@ -30,7 +30,7 @@
  <proof prover="6"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="WP_parameter depths_subtree" expl="VC for depths_subtree">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter depths_subtree.1" expl="assertion">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -54,7 +54,7 @@
 </theory>
 <theory name="TreeReconstruction">
  <goal name="WP_parameter build_rec" expl="VC for build_rec">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter build_rec.1" expl="exceptional postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
@@ -82,7 +82,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter build" expl="VC for build">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter build.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -97,7 +97,7 @@
 </theory>
 <theory name="Harness">
  <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter harness.1" expl="postcondition">
   <proof prover="4" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="0.31"/></proof>
   </goal>
@@ -112,7 +112,7 @@
 </theory>
 <theory name="ZipperBasedTermination">
  <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tc.1" expl="variant decrease">
   <proof prover="2"><result status="valid" time="0.00" steps="29"/></proof>
   </goal>
@@ -145,7 +145,7 @@
  <proof prover="2"><result status="valid" time="0.02" steps="107"/></proof>
  </goal>
  <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tc.1" expl="exceptional postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -174,7 +174,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter tc.9" expl="precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter tc.9.1" expl="VC for tc">
    <proof prover="2"><result status="valid" time="0.34" steps="539"/></proof>
    </goal>

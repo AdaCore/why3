@@ -79,7 +79,7 @@ type command =
   | Other        of string * string list
 
 val interp:
-  (string * query) Stdlib.Hstr.t ->
+  (string * query) Wstdlib.Hstr.t ->
   Controller_itp.controller ->
   Session_itp.any option -> string -> command
 

@@ -92,6 +92,7 @@ type model_element_name = {
     (** The name of the source-code element.  *)
   men_kind   : model_element_kind;
     (** The kind of model element. *)
+  men_labels : Ident.Slab.t;
 }
 
 (** Counter-example model elements. Each element represents
@@ -141,6 +142,7 @@ val default_model : model
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->
+  print_labels:bool ->
   Format.formatter ->
   model ->
   unit
@@ -150,12 +152,15 @@ val print_model :
       names. The input is information about model element name. The
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
+    @param print_labels: when set to true, the name is printed together with the
+    labels associated to the specific ident.
 *)
 
 val print_model_human :
   ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
+  print_labels:bool ->
   unit
 (** Same as print_model but is intended to be human readable.
 
@@ -163,12 +168,15 @@ val print_model_human :
 
 
 val model_to_string :
+  print_labels:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
   string
 (** See print_model  *)
 
+(* TODO probably deprecated.
 val print_model_vc_term :
+  print_labels:bool ->
   ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   Format.formatter ->
@@ -183,6 +191,7 @@ val print_model_vc_term :
 *)
 
 val model_vc_term_to_string :
+  print_labels:bool ->
   ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   model ->
@@ -190,6 +199,7 @@ val model_vc_term_to_string :
 (** Gets string with counter-example model elements related to term that
     triggers VC.
     See print_model_vc_term
+*)
 *)
 
 val print_model_json :
@@ -211,7 +221,9 @@ val print_model_json :
       and it is splitted.
       This transformation can be used to store the counterexample information
       related to this term in dedicated JSON field.
-    @model the counter-example model to print.
+    @param model the counter-example model to print.
+    @param print_labels if set to true, add labels associated to the name id to
+      the counterexample output
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -257,6 +269,7 @@ val model_to_string_json :
 (** See print_model_json *)
 
 val interleave_with_source :
+  print_labels:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->
@@ -316,7 +329,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
 *)
 
 type raw_model_parser =
-  Stdlib.Sstr.t -> ((string * string) list) Stdlib.Mstr.t ->
+  Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
     string -> model_element list
 (** Parses the input string into model elements. It contains the list of
     projections and a map associating the name of printed projections to the

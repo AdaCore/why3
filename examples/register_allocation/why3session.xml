@@ -22,7 +22,7 @@
  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="WP_parameter cons" expl="VC for cons" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter cons.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
@@ -48,7 +48,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter nil" expl="VC for nil" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter nil.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
@@ -69,7 +69,7 @@
 </theory>
 <theory name="InfinityOfRegisters" proved="true">
  <goal name="WP_parameter compile" expl="VC for compile" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter compile.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -210,7 +210,7 @@
 </theory>
 <theory name="FiniteNumberOfRegisters" proved="true">
  <goal name="WP_parameter compile" expl="VC for compile" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter compile.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -429,7 +429,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter compile" expl="VC for compile" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="WP_parameter compile.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
@@ -437,7 +437,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter compile.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.46"/></proof>
+  <proof prover="1"><result status="valid" time="3.00"/></proof>
   </goal>
   <goal name="WP_parameter compile.3" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>

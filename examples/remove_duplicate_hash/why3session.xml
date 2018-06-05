@@ -10,7 +10,7 @@
 </theory>
 <theory name="RemoveDuplicate">
  <goal name="WP_parameter remove_duplicate" expl="VC for remove_duplicate">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove_duplicate.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -141,7 +141,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter remove_duplicate.44" expl="index in array bounds">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter remove_duplicate.44.1" expl="VC for remove_duplicate">
    <proof prover="0"><result status="valid" time="0.00" steps="20"/></proof>
    </goal>

@@ -13,7 +13,7 @@ open Format
 open Tptp_ast
 
 open Why3
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term

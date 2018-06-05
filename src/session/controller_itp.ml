@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Format
+open Wstdlib
 open Session_itp
 
 let debug_sched = Debug.register_info_flag "scheduler"
@@ -77,11 +78,11 @@ let print_strategy_status fmt st =
 
 type controller =
   { mutable controller_session: Session_itp.session;
-    controller_config : Whyconf.config;
+    mutable controller_config : Whyconf.config;
     mutable controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
@@ -90,6 +91,9 @@ let session_max_tasks = ref 1
 let set_session_max_tasks n =
   session_max_tasks := n;
   Prove_client.set_max_running_provers n
+
+let set_session_prover_upgrade_policy c p u =
+  c.controller_config <- Whyconf.set_prover_upgrade_policy c.controller_config p u
 
 let load_drivers c =
   let env = c.controller_env in
@@ -114,7 +118,7 @@ let create_controller config env ses =
       controller_config = config;
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
-      controller_strategies = Stdlib.Hstr.create 7;
+      controller_strategies = Hstr.create 7;
       controller_running_proof_attempts = Hpan.create 17;
     }
   in
@@ -157,8 +161,6 @@ let get_undetached_children_no_pa s any : any list =
 (* printing *)
 
 module PSession = struct
-
-  open Stdlib
 
   type any =
     | Session

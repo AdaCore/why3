@@ -11,7 +11,7 @@
 
 open Format
 open Pp
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -87,11 +87,6 @@ let debug_print_labels =
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
-
-let meta_introduced_hypotheses =
-  register_meta
-    ~desc:"marks beginning of hypotheses introduced by introduce_premises"
-    "introduced_premises" []
 
 let create iprinter aprinter tprinter pprinter do_forget_all =
   (module (struct
@@ -588,22 +583,18 @@ let local_decls task symbmap =
     | _ :: rest -> skip t rest
     | [] -> []
   in
-  let rec filter ((b,acc1,acc2) as acc) = function
-    | { td_node = Meta (m,_) } :: rest
-         when meta_equal m meta_introduced_hypotheses ->
-       filter (true, acc2 @ acc1, []) rest
+  let rec filter ((acc1,acc2) as acc) = function
     | { td_node = Decl d } :: rest ->
         let id = Sid.choose d.d_news in
         (try filter acc (skip (Mid.find id symbmap) rest)
          with Not_found ->
-              filter (b,acc1,d::acc2) rest)
+              filter (acc1,d::acc2) rest)
     | _ :: rest -> filter acc rest
-    | [] -> if b then List.rev acc1, List.rev acc2
-            else match acc1,acc2 with
+    | [] -> match acc1,acc2 with
             | [], g::r -> List.rev r, [g]
             | _ -> assert false
   in
-  filter (false,[],[]) (task_tdecls task)
+  filter ([],[]) (task_tdecls task)
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in

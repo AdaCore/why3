@@ -9,7 +9,7 @@
 <file name="../there_and_back_again.mlw">
 <theory name="Convolution">
  <goal name="WP_parameter convolution_rec" expl="VC for convolution_rec">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter convolution_rec.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -28,7 +28,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter convolution" expl="VC for convolution">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter convolution.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
@@ -40,7 +40,7 @@
 </theory>
 <theory name="Palindrome">
  <goal name="WP_parameter palindrome_rec" expl="VC for palindrome_rec">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter palindrome_rec.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
@@ -89,7 +89,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter palindrome" expl="VC for palindrome">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter palindrome.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>

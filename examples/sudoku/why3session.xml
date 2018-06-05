@@ -40,7 +40,7 @@
 </theory>
 <theory name="Solver">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter check_valid_chunk.1" expl="index in array bounds">
   <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
@@ -138,7 +138,7 @@
  <proof prover="0"><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="WP_parameter solve_aux" expl="VC for solve_aux">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter solve_aux.1" expl="exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -473,7 +473,7 @@
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter solve_aux.52" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter solve_aux.52.1" expl="assertion">
    <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
    <proof prover="2" timelimit="30"><result status="valid" time="0.02"/></proof>

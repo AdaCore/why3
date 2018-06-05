@@ -13,7 +13,7 @@ open Why3
 open Mlw_module
 open Py_ast
 open Ptree
-open Stdlib
+open Wstdlib
 
 let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"

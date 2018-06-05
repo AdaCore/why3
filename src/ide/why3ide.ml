@@ -12,7 +12,7 @@
 open Why3
 open Format
 open Gconfig
-open Stdlib
+open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
@@ -252,7 +252,7 @@ let create_colors v =
   let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
+      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
@@ -947,7 +947,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND gconfig.error_color]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
 
 (**** Message-zone printing functions *****)
 
@@ -2186,9 +2186,13 @@ let check_uninstalled_prover =
   let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
   fun p ->
   if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
-  then begin
+  then
+    begin
       Whyconf.Hprover.add uninstalled_prover_seen p ();
-      uninstalled_prover_dialog gconfig p
+      let callback p u =
+        send_request (Set_prover_policy(p,u))
+      in
+      uninstalled_prover_dialog ~callback gconfig p
     end
 
 let treat_notification n =

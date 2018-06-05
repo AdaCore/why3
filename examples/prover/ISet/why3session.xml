@@ -9,7 +9,7 @@
 </theory>
 <theory name="Logic">
  <goal name="WP_parameter iset_ok_char" expl="VC for iset_ok_char">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter iset_ok_char.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
@@ -27,7 +27,7 @@
 </theory>
 <theory name="Impl">
  <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter insert.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
@@ -61,7 +61,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter remove.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
@@ -98,7 +98,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter merge.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>

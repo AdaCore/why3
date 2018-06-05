@@ -16,7 +16,7 @@
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter parallel_gcd" expl="VC for parallel_gcd">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter parallel_gcd.1" expl="loop invariant init">
   <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -65,7 +65,7 @@
  <proof prover="7"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter step" expl="VC for step">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter step.1" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
@@ -141,7 +141,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter parallel_gcd" expl="VC for parallel_gcd">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter parallel_gcd.1" expl="loop invariant init">
   <proof prover="5"><result status="valid" time="0.04" steps="16"/></proof>
   </goal>

@@ -34,7 +34,7 @@
  <proof prover="3"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="WP_parameter height1" expl="VC for height1">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter height1.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -159,7 +159,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter height_stack" expl="VC for height_stack">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter height_stack.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>

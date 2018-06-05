@@ -77,7 +77,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
+INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -169,7 +169,7 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp \
+	   hashcons wstdlib exn_printer pp \
 	   json_base json_parser json_lexer \
 	   debug loc \
 	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
@@ -204,7 +204,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
 		prop_curry \
-		generic_arg_trans_utils case apply \
+		generic_arg_trans_utils case apply subst \
 		ind_itp destruct cut \
 		rec_logic gnat_split_conj gnat_split_disj \
 		eliminate_unused_hypo eliminate_literal induction induction_pr
@@ -1990,7 +1990,7 @@ endif
 MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
-	util/weakhtbl util/stdlib util/rc util/debug \
+	util/weakhtbl util/wstdlib util/rc util/debug \
 	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task core/trans core/pretty core/printer \
@@ -2272,16 +2272,16 @@ headers:
 # myself
 #########
 
-Makefile: Makefile.in config.status
-	./config.status chmod --file $@
+AUTOCONF_FILES = \
+	Makefile \
+	src/jessie/Makefile \
+	src/config.sh \
+	.merlin \
+	src/jessie/.merlin \
+	lib/why3/META \
+	doc/version.tex
 
-src/jessie/Makefile: src/jessie/Makefile.in config.status
-	./config.status chmod --file $@
-
-src/config.sh: src/config.sh.in config.status
-	./config.status chmod --file $@
-
-.merlin: .merlin.in config.status
+$(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@
 
 src/util/config.ml share/Makefile.config: src/config.sh
@@ -2291,16 +2291,8 @@ src/util/config.ml share/Makefile.config: src/config.sh
 clean::
 	rm -f share/Makefile.config
 
-doc/version.tex: doc/version.tex.in config.status
-	./config.status chmod --file $@
-
 config.status: configure
 	./config.status --recheck
-
-all: lib/why3/META .merlin
-
-lib/why3/META: lib/why3/META.in config.status
-	./config.status chmod --file $@
 
 ###################
 # clean and depend
@@ -2309,9 +2301,8 @@ lib/why3/META: lib/why3/META.in config.status
 .PHONY: distclean
 
 distclean: clean
-	rm -f config.status config.cache config.log .merlin \
-	    Makefile src/util/config.ml doc/version.tex \
-	    src/jessie/Makefile src/config.sh lib/why3/META
+	rm -f config.status config.cache config.log \
+	    src/util/config.ml $(AUTOCONF_FILES)
 
 depend:
 	rm -f $^

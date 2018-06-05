@@ -22,6 +22,7 @@ exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
 exception Arg_qid_not_found of Ptree.qualid
+exception Arg_pr_not_found of prsymbol
 exception Arg_error of string
 
 let () = Exn_printer.register
@@ -37,7 +38,7 @@ let () = Exn_printer.register
           Format.fprintf fmt "Argument expected of type %s. None were given." s
       | _ -> raise e)
 
-open Stdlib
+open Wstdlib
 
 (* Use symb to encapsulate ids into correct categories of symbols *)
 type symb =

@@ -10,7 +10,7 @@
 <file name="../optimal_replay.mlw">
 <theory name="OptimalReplay">
  <goal name="WP_parameter distance" expl="VC for distance">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter distance.1" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -85,7 +85,7 @@
   <goal name="WP_parameter distance.23" expl="loop invariant preservation">
   <transf name="inline_goal">
    <goal name="WP_parameter distance.23.1" expl="loop invariant preservation">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter distance.23.1.1" expl="loop invariant preservation">
     <proof prover="0" timelimit="36"><result status="valid" time="0.12" steps="79"/></proof>
     </goal>

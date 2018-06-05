@@ -11,7 +11,7 @@
 <file name="../patience.mlw">
 <theory name="PigeonHole">
  <goal name="WP_parameter pigeon_hole" expl="VC for pigeon_hole">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter pigeon_hole.1" expl="assertion">
   <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
@@ -108,7 +108,7 @@
  <proof prover="4"><result status="valid" time="0.03" steps="161"/></proof>
  </goal>
  <goal name="WP_parameter push_card" expl="VC for push_card">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter push_card.1" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.04" steps="46"/></proof>
   </goal>
@@ -144,7 +144,7 @@
 </theory>
 <theory name="PatienceAbstract">
  <goal name="WP_parameter play_card" expl="VC for play_card">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter play_card.1" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.04" steps="42"/></proof>
   </goal>
@@ -157,7 +157,7 @@
   <goal name="WP_parameter play_card.4" expl="postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter play_card.4.1" expl="postcondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter play_card.4.1.1" expl="VC for play_card">
     <proof prover="4"><result status="valid" time="0.03" steps="8"/></proof>
     </goal>
@@ -243,7 +243,7 @@
   <goal name="WP_parameter play_card.10" expl="postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter play_card.10.1" expl="postcondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter play_card.10.1.1" expl="VC for play_card">
     <proof prover="0"><result status="valid" time="0.02"/></proof>
     <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -377,7 +377,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter play_cards" expl="VC for play_cards">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter play_cards.1" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -411,7 +411,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter play_game" expl="VC for play_game">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter play_game.1" expl="precondition">
   <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
@@ -516,7 +516,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
  </transf>
  </goal>
 </theory>

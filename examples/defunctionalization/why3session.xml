@@ -88,7 +88,7 @@
 </theory>
 <theory name="Defunctionalization2">
  <goal name="WP_parameter continue_2" expl="VC for continue_2">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter continue_2.1" expl="variant decrease">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="4000"><result status="valid" time="1.03"/></proof>
@@ -127,7 +127,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter eval_2" expl="VC for eval_2">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter eval_2.1" expl="variant decrease">
   <proof prover="0" memlimit="4000"><result status="valid" time="0.00"/></proof>
   <proof prover="3" memlimit="4000"><result status="valid" time="0.01" steps="9"/></proof>
@@ -171,7 +171,7 @@
  <goal name="cps_correct_expr" expl="">
  <transf name="induction_ty_lex">
   <goal name="cps_correct_expr.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="cps_correct_expr.1.1" expl="">
    <proof prover="3" timelimit="6"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
@@ -195,7 +195,7 @@
  <goal name="cps2_correct_expr" expl="">
  <transf name="induction_ty_lex">
   <goal name="cps2_correct_expr.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="cps2_correct_expr.1.1" expl="">
    <proof prover="3" timelimit="6"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
@@ -213,7 +213,7 @@
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter cps3_correct_expr" expl="VC for cps3_correct_expr">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter cps3_correct_expr.1" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.02" steps="45"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -266,7 +266,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter continue_4" expl="VC for continue_4">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter continue_4.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -393,7 +393,7 @@
  <proof prover="3"><result status="valid" time="0.03" steps="113"/></proof>
  </goal>
  <goal name="WP_parameter itere_opt" expl="VC for itere_opt">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter itere_opt.1" expl="precondition">
   <proof prover="3" timelimit="6"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
@@ -456,7 +456,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter recompose_values" expl="VC for recompose_values">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter recompose_values.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -511,7 +511,7 @@
  <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="WP_parameter eval_2" expl="VC for eval_2">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter eval_2.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>

@@ -50,6 +50,7 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_color_bg : string;
       mutable error_line_color : string;
       mutable iconset : string;
       (** colors *)
@@ -85,6 +86,7 @@ type ide = {
   ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_error_color_bg : string;
   ide_error_line_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
@@ -110,6 +112,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
+    ide_error_color_bg = "yellow";
     ide_error_color = "red";
     ide_error_line_color = "yellow";
     ide_iconset = "fatcow";
@@ -163,6 +166,9 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_error_color_bg =
+      get_string section ~default:default_ide.ide_error_color_bg
+        "error_color_bg";
     ide_error_line_color =
       get_string section ~default:default_ide.ide_error_line_color
         "error_line_color";
@@ -210,6 +216,7 @@ let load_config config original_config =
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    error_color_bg = ide.ide_error_color_bg;
     error_line_color = ide.ide_error_line_color;
     iconset = ide.ide_iconset;
     config         = config;
@@ -255,6 +262,7 @@ let save_config t =
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
   let config = Whyconf.set_section config "ide" ide in
@@ -1005,7 +1013,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   in
   let remove button p () =
     button#destroy ();
-    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config));
   in
   let iter p policy =
     let label =
@@ -1170,7 +1178,7 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-let uninstalled_prover_dialog c unknown =
+let uninstalled_prover_dialog ~callback c unknown =
   let others,names,versions =
     Whyconf.unknown_to_known_provers
       (Whyconf.get_provers c.config) unknown
@@ -1194,12 +1202,25 @@ let uninstalled_prover_dialog c unknown =
     (* header *)
     let hb = GPack.hbox ~packing:vbox#add () in
     let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
-    let _ =
+    let (_:GMisc.label) =
       let text =
         Pp.sprintf "The prover %a is not installed"
-          Whyconf.print_prover unknown
+                   Whyconf.print_prover unknown
       in
       GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
+    in
+    let (_:GMisc.label) =
+      let text =
+        "WARNING: this policy will not be taken into account immediately \
+         but only if you replay again the proofs."
+      in
+      GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
+    in
+    let (_:GMisc.label) =
+      let text =
+        "WARNING: do not forget to save preferences to keep this policy in future sessions"
+      in
+      GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
     in
     (* choices *)
     let vbox_pack =
@@ -1277,6 +1298,7 @@ let uninstalled_prover_dialog c unknown =
         | _ -> assert false
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
+    let () = callback unknown policy in
     ()
 
 

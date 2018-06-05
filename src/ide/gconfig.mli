@@ -31,6 +31,7 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_color_bg : string;
       mutable error_line_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
@@ -116,6 +117,7 @@ val show_about_window : unit -> unit
 val preferences : t -> unit
 
 val uninstalled_prover_dialog :
+  callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
   t -> Whyconf.prover -> unit
 
 

@@ -11,7 +11,7 @@
 </theory>
 <theory name="Impl">
  <goal name="WP_parameter main" expl="VC for main">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter main.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.12" steps="13"/></proof>
   </goal>
@@ -19,7 +19,7 @@
   <proof prover="2"><result status="valid" time="0.25" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter main.3" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter main.3.1" expl="VC for main">
    <proof prover="1"><result status="valid" time="0.45"/></proof>
    </goal>
@@ -71,7 +71,7 @@
   <proof prover="2"><result status="valid" time="0.26" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter main.18" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter main.18.1" expl="assertion">
    <proof prover="2"><result status="valid" time="0.13" steps="18"/></proof>
    </goal>

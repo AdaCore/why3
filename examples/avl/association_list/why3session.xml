@@ -16,7 +16,7 @@
  <proof prover="4"><result status="valid" time="0.04" steps="103"/></proof>
  </goal>
  <goal name="WP_parameter model_congruence" expl="VC for model_congruence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter model_congruence.1" expl="variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -38,7 +38,7 @@
  <proof prover="4"><result status="valid" time="0.02" steps="70"/></proof>
  </goal>
  <goal name="WP_parameter model_concat" expl="VC for model_concat">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter model_concat.1" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
@@ -89,12 +89,12 @@
  <proof prover="4"><result status="valid" time="0.07" steps="66"/></proof>
  </goal>
  <goal name="WP_parameter model_cut" expl="VC for model_cut">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter model_cut.1" expl="assertion">
   <proof prover="4"><result status="valid" time="0.04" steps="66"/></proof>
   </goal>
   <goal name="WP_parameter model_cut.2" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter model_cut.2.1" expl="assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
@@ -116,7 +116,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter model_cut.3" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter model_cut.3.1" expl="assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
@@ -138,7 +138,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter model_cut.4" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter model_cut.4.1" expl="assertion">
    <proof prover="1"><result status="valid" time="0.05"/></proof>
    </goal>

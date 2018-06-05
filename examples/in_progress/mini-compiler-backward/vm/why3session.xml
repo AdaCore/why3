@@ -33,7 +33,7 @@
 </theory>
 <theory name="VMClock">
  <goal name="transition_star_endpoints">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="transition_star_endpoints.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -68,7 +68,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter transition_deterministic" expl="VC for transition_deterministic">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter transition_deterministic.1" expl="1. assertion">
   <transf name="inversion_pr">
    <goal name="WP_parameter transition_deterministic.1.1" expl="1.">
@@ -541,7 +541,7 @@
  <proof prover="0" edited="vm_VMClock_transition_out_deterministic_1.v"><result status="valid" time="0.95"/></proof>
  </goal>
  <goal name="WP_parameter halt_stuck" expl="VC for halt_stuck">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter halt_stuck.1" expl="1. assertion">
   <proof prover="4"><result status="valid" time="0.86"/></proof>
   </goal>

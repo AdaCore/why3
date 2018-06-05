@@ -7,7 +7,7 @@
 <file name="../bignum.mlw">
 <theory name="BigNum">
  <goal name="WP_parameter nonneg" expl="VC for nonneg">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter nonneg.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -27,7 +27,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter msd" expl="VC for msd">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter msd.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
@@ -47,7 +47,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_digit" expl="VC for add_digit">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_digit.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
@@ -83,7 +83,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter add_cin" expl="VC for add_cin">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter add_cin.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>

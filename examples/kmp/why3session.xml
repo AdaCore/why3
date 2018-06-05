@@ -42,7 +42,7 @@
  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
  <goal name="WP_parameter initnext" expl="VC for initnext">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter initnext.1" expl="array creation size">
   <proof prover="3"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
@@ -85,7 +85,7 @@
   <goal name="WP_parameter initnext.14" expl="loop invariant preservation">
   <transf name="inline_goal">
    <goal name="WP_parameter initnext.14.1" expl="loop invariant preservation">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter initnext.14.1.1" expl="loop invariant preservation">
     <proof prover="3"><result status="valid" time="0.07" steps="26"/></proof>
     </goal>
@@ -123,7 +123,7 @@
   <goal name="WP_parameter initnext.21" expl="loop invariant preservation">
   <transf name="inline_goal">
    <goal name="WP_parameter initnext.21.1" expl="loop invariant preservation">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter initnext.21.1.1" expl="loop invariant preservation">
     <proof prover="3"><result status="valid" time="0.03" steps="22"/></proof>
     </goal>
@@ -177,7 +177,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter kmp" expl="VC for kmp">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter kmp.1" expl="precondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>

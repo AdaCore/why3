@@ -1,12 +1,13 @@
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File array.mlw:
 Line 32:
-a.length = {"type" : "Integer" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "0" }
 File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" , "val" : "0" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "0" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "9" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
@@ -14,17 +15,18 @@ a.elts = {"type" : "Array" ,
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" , "val" : "43" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "43" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "3" } }] }
-a = {"type" : "Array" ,
+a, ["model",
+"model_trace:a", "model_trace:a@call"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" ,
-"val" : "3" } }] }
+{"others" : {"type" : "Integer" , "val" : "3" } }] }
 Line 21:
-a = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+a, ["model", "model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -32,19 +34,20 @@ bench/ce/jlamp_array.mlw Array WP_parameter g : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 24:
-a.length = {"type" : "Integer" , "val" : "43" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "43" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "3" } }] }
-a = {"type" : "Array" ,
+a, ["model",
+"model_trace:a", "model_trace:a@call"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "3" } }] }
+{"others" : {"type" : "Integer" , "val" : "3" } }] }
 Line 27:
-a = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "17" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+a, ["model", "model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -52,32 +55,34 @@ bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 30:
-a.length = {"type" : "Integer" , "val" : "43" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "43" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "3" } }] }
-a = {"type" : "Array" ,
+a, ["model",
+"model_trace:a", "model_trace:a@call"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "17" , "value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" ,
-"val" : "3" } }] }
+{"others" : {"type" : "Integer" , "val" : "3" } }] }
 Line 33:
-a = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "17" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+a, ["model", "model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File array.mlw:
 Line 32:
-a.length = {"type" : "Integer" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "0" }
 File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" , "val" : "0" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "0" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "9" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
@@ -86,14 +91,15 @@ bench/ce/jlamp_array.mlw Array WP_parameter f : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 18:
-a.length = {"type" : "Integer" , "val" : "0" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "0" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 21:
-old a.elts = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+old a.elts, ["model", "model_trace:a.elts@old"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -102,12 +108,14 @@ bench/ce/jlamp_array.mlw Array WP_parameter g : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter g : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 24:
-a.length = {"type" : "Integer" , "val" : "43" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "43" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 27:
-old a.elts = {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+old a.elts, ["model", "model_trace:a.elts@old"] = {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
 bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
@@ -115,16 +123,17 @@ bench/ce/jlamp_array.mlw Array WP_parameter h : Valid
 bench/ce/jlamp_array.mlw Array WP_parameter h : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 30:
-a.length = {"type" : "Integer" , "val" : "43" }
-a.elts = {"type" : "Array" ,
+a.length, ["model", "model_trace:a.length"] = {"type" : "Integer" ,
+"val" : "43" }
+a.elts, ["model", "model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 33:
-old a.elts = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "17" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+old a.elts, ["model", "model_trace:a.elts@old"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 

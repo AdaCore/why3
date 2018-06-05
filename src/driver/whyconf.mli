@@ -11,7 +11,7 @@
 
 (** Managing the configuration of Why3 *)
 
-open Stdlib
+open Wstdlib
 
 (** {2 General configuration} *)
 
@@ -177,6 +177,8 @@ type prover_upgrade_policy =
   | CPU_keep
   | CPU_upgrade of prover
   | CPU_duplicate of prover
+
+val print_prover_upgrade_policy : Format.formatter -> prover_upgrade_policy -> unit
 
 val set_prover_upgrade_policy :
   config -> prover -> prover_upgrade_policy -> config

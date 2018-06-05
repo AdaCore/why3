@@ -18,7 +18,7 @@
     Referred to as "traditional tags" encoding t in Blanchette et al.,
     Encoding monomorphic and polymorphic types, TACAS 2013, LNCS 7795. *)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term

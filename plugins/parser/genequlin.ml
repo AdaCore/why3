@@ -45,7 +45,7 @@ open Why3
 
 open Theory
 open Term
-open Stdlib
+open Wstdlib
 
 open Ident
 

@@ -32,7 +32,7 @@
  <goal name="mem_app">
  <transf name="induction_ty_lex">
   <goal name="mem_app.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="mem_app.1.1" expl="1.">
    <proof prover="1" timelimit="5"><result status="valid" time="0.00" steps="9"/></proof>
    </goal>
@@ -46,7 +46,7 @@
  <goal name="size_stack_nonneg">
  <transf name="induction_ty_lex">
   <goal name="size_stack_nonneg.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="size_stack_nonneg.1.1" expl="1.">
    <proof prover="1" timelimit="5"><result status="valid" time="0.00" steps="6"/></proof>
    </goal>
@@ -67,7 +67,7 @@
  <goal name="any_forest_frame">
  <transf name="induction_ty_lex">
   <goal name="any_forest_frame.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="any_forest_frame.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="9"/></proof>
    </goal>
@@ -87,7 +87,7 @@
  <goal name="any_stack_frame">
  <transf name="induction_ty_lex">
   <goal name="any_stack_frame.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="any_stack_frame.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
@@ -96,7 +96,7 @@
     <goal name="any_stack_frame.1.2.1" expl="1.">
     <transf name="compute_in_goal">
      <goal name="any_stack_frame.1.2.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="any_stack_frame.1.2.1.1.1" expl="1.">
       <proof prover="1" timelimit="36"><result status="valid" time="0.02" steps="104"/></proof>
       </goal>
@@ -154,7 +154,7 @@
  <goal name="final_unique">
  <transf name="induction_ty_lex">
   <goal name="final_unique.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="final_unique.1.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
    </goal>
@@ -166,7 +166,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter inverse_inverse" expl="VC for inverse_inverse">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter inverse_inverse.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
@@ -270,7 +270,7 @@
   <goal name="sub_weaken2.3" expl="3.">
   <transf name="induction_ty_lex">
    <goal name="sub_weaken2.3.1" expl="1.">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="sub_weaken2.3.1.1" expl="1.">
     <proof prover="5" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
@@ -325,21 +325,21 @@
  <goal name="sub_no_rep2">
  <transf name="induction_pr">
   <goal name="sub_no_rep2.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="sub_no_rep2.1.1" expl="1.">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sub_no_rep2.2" expl="2.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="sub_no_rep2.2.1" expl="1.">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sub_no_rep2.3" expl="3.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="sub_no_rep2.3.1" expl="1.">
    <proof prover="0"><result status="valid" time="1.12"/></proof>
    </goal>
@@ -350,7 +350,7 @@
  <goal name="white_valid">
  <transf name="induction_ty_lex">
   <goal name="white_valid.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="white_valid.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.00" steps="9"/></proof>
    </goal>
@@ -364,7 +364,7 @@
  <goal name="final_valid">
  <transf name="induction_ty_lex">
   <goal name="final_valid.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="final_valid.1.1" expl="1.">
    <proof prover="1" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="9"/></proof>
    </goal>
@@ -406,7 +406,7 @@
    <goal name="sub_valid_coloring.1.1" expl="1.">
    <transf name="compute_in_goal">
     <goal name="sub_valid_coloring.1.1.1" expl="1.">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="sub_valid_coloring.1.1.1.1" expl="1.">
      <proof prover="1"><result status="valid" time="0.03" steps="73"/></proof>
      </goal>
@@ -440,7 +440,7 @@
     <goal name="sub_valid_coloring.3.1.1" expl="1.">
     <transf name="compute_in_goal">
      <goal name="sub_valid_coloring.3.1.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="split_goal_right">
       <goal name="sub_valid_coloring.3.1.1.1.1" expl="1.">
       <proof prover="9" edited="koda_ruskey_KodaRuskey_Spec_sub_valid_coloring_1.v"><result status="valid" time="4.89"/></proof>
       </goal>
@@ -478,7 +478,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
  </goal>
  <goal name="WP_parameter sub_valid_coloring_white" expl="VC for sub_valid_coloring_white">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter sub_valid_coloring_white.1" expl="1. postcondition">
   <proof prover="1" timelimit="11"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
@@ -523,9 +523,9 @@
   <goal name="WP_parameter stored_trans1.1" expl="1. VC for stored_trans1">
   <transf name="inline_goal">
    <goal name="WP_parameter stored_trans1.1.1" expl="1. VC for stored_trans1">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter stored_trans1.1.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter stored_trans1.1.1.1.1" expl="1. postcondition">
      <proof prover="1" obsolete="true"><result status="valid" time="0.02" steps="40"/></proof>
      </goal>
@@ -554,9 +554,9 @@
   <goal name="WP_parameter stored_trans2.1" expl="1. VC for stored_trans2">
   <transf name="inline_goal">
    <goal name="WP_parameter stored_trans2.1.1" expl="1. VC for stored_trans2">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter stored_trans2.1.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter stored_trans2.1.1.1.1" expl="1. postcondition">
      <proof prover="1" obsolete="true"><result status="valid" time="0.02" steps="40"/></proof>
      </goal>
@@ -583,7 +583,7 @@
 </theory>
 <theory name="KodaRuskey">
  <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter enum.1" expl="1. unreachable point">
   <proof prover="1" timelimit="5" obsolete="true"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
@@ -595,7 +595,7 @@
    <goal name="WP_parameter enum.3.1" expl="1. postcondition">
    <transf name="compute_in_goal">
     <goal name="WP_parameter enum.3.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter enum.3.1.1.1" expl="1. VC for enum">
      <proof prover="0" obsolete="true"><result status="valid" time="0.15"/></proof>
      </goal>
@@ -646,7 +646,7 @@
    <goal name="WP_parameter enum.14.1" expl="1. postcondition">
    <transf name="compute_in_goal">
     <goal name="WP_parameter enum.14.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter enum.14.1.1.1" expl="1. VC for enum">
      <proof prover="0" obsolete="true"><result status="valid" time="0.12"/></proof>
      </goal>
@@ -758,7 +758,7 @@
   <goal name="WP_parameter enum.46" expl="46. precondition">
   <transf name="inline_goal">
    <goal name="WP_parameter enum.46.1" expl="1. precondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter enum.46.1.1" expl="1. precondition">
     <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="37"/></proof>
     </goal>
@@ -789,7 +789,7 @@
    <goal name="WP_parameter enum.49.1" expl="1. postcondition">
    <transf name="compute_in_goal">
     <goal name="WP_parameter enum.49.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter enum.49.1.1.1" expl="1. VC for enum">
      <proof prover="0" timelimit="16" obsolete="true"><result status="valid" time="0.22"/></proof>
      </goal>
@@ -810,11 +810,11 @@
   <proof prover="1" obsolete="true"><result status="valid" time="0.01" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter enum.51" expl="51. postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter enum.51.1" expl="1. postcondition">
    <transf name="inline_goal">
     <goal name="WP_parameter enum.51.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter enum.51.1.1.1" expl="1. postcondition">
      <proof prover="1" timelimit="5" obsolete="true"><result status="valid" time="0.01" steps="40"/></proof>
      </goal>
@@ -943,7 +943,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter main" expl="VC for main">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter main.1" expl="1. precondition">
   <proof prover="1" obsolete="true"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
@@ -976,7 +976,7 @@
  <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
  <goal name="WP_parameter product_all" expl="VC for product_all">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter product_all.1" expl="1. postcondition">
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
@@ -1026,7 +1026,7 @@
   <proof prover="1" timelimit="31"><result status="valid" time="0.03" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter product_all.17" expl="17. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter product_all.17.1" expl="1. assertion">
    <proof prover="6"><result status="valid" time="0.03" steps="35"/></proof>
    </goal>
@@ -1045,7 +1045,7 @@
   <proof prover="1" timelimit="31"><result status="valid" time="0.38" steps="308"/></proof>
   </goal>
   <goal name="WP_parameter product_all.20" expl="20. loop invariant preservation">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter product_all.20.1" expl="1. loop invariant preservation">
    <proof prover="4"><result status="valid" time="0.04" steps="37"/></proof>
    </goal>
@@ -1068,7 +1068,7 @@
    <goal name="WP_parameter product_all.24.1" expl="1. loop invariant preservation">
    <transf name="inline_goal">
     <goal name="WP_parameter product_all.24.1.1" expl="1. loop invariant preservation">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter product_all.24.1.1.1" expl="1. VC for product_all">
      <proof prover="4"><result status="valid" time="0.05" steps="31"/></proof>
      </goal>
@@ -1099,7 +1099,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter solution_white_or_black" expl="VC for solution_white_or_black">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter solution_white_or_black.1" expl="1. postcondition">
   <transf name="inline_all">
    <goal name="WP_parameter solution_white_or_black.1.1" expl="1. postcondition">
@@ -1123,7 +1123,7 @@
  <proof prover="4"><result status="valid" time="0.03" steps="18"/></proof>
  </goal>
  <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter enum.1" expl="1. postcondition">
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
@@ -1165,7 +1165,7 @@
   <proof prover="1" timelimit="31"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter enum.13" expl="13. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter enum.13.1" expl="1. assertion">
    <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
    </goal>
@@ -1200,7 +1200,7 @@
    <goal name="WP_parameter enum.15.1" expl="1. postcondition">
    <transf name="inline_goal">
     <goal name="WP_parameter enum.15.1.1" expl="1. postcondition">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="WP_parameter enum.15.1.1.1" expl="1. VC for enum">
      <proof prover="1"><result status="valid" time="0.65" steps="496"/></proof>
      </goal>
