@@ -1,0 +1,546 @@
+module Sub
+
+  use import int.Int
+  use import mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use import int.Power
+  use import ref.Ref
+  use import mach.c.C
+  use import array.Array
+  use import map.Map
+  use import types.Types
+  use import lemmas.Lemmas
+
+
+  (** [sub_limb r x y sz] substracts [y] from [(x, sz)] and writes
+      the result to [(r, sz)]. Returns borrow, either 0 or
+      1. Corresponds to [mpn_sub_1]. *)
+  let sub_limb (r x:t) (y:limb) (sz:int32) : limb
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { 0 < sz }
+    ensures { value r sz - power radix sz * result
+              = value x sz - y }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    ensures { 0 <= result <= 1 }
+    writes { r.data.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let b = ref y in
+    let lx = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz && (not (Limb.(=) !b limb_zero)) do
+      invariant { 0 <= !i <= sz }
+      invariant { !i > 0 -> 0 <= !b <= 1 }
+      invariant { value r !i - power radix !i * !b
+                  = value x !i - y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { sz - !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      let (res, borrow) = sub_with_borrow !lx !b limb_zero in
+      set_ofs r !i res;
+      assert { value r !i - power radix !i * !b =
+                 value x !i - y };
+      b := borrow;
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r (!i+1) - power radix (!i+1) * !b
+                  = value x (!i+1) - y
+             (*by
+               value r !i - power radix !i * !b
+             = value r k + power radix k * res
+                 - power radix !i * !b
+             = value r k + power radix k * res
+                 - power radix k * radix * !b
+             = value r k + power radix k * (res - radix * !b)
+             = value r k +
+                 (power radix k) * (!lx - (!b at StartLoop))
+             = value r k - power radix k * (!b at StartLoop)
+                 + power radix k * !lx
+             = value x k - y + power radix k * !lx
+             = value x !i - y*)
+      };
+      i := Int32.(+) !i (Int32.of_int 1);
+    done;
+    if Int32.(=) !i sz then !b
+    else begin
+    while Int32.(<) !i sz do
+      invariant { !b = 0 }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i - power radix !i * !b
+                   = value x !i - y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { sz - !i }
+      lx := get_ofs x !i;
+      set_ofs r !i !lx;
+      assert { value r !i - power radix !i * !b
+                   = value x !i - y };
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+    done;
+    !b
+  end
+
+  (** [sub_limbs r x y sz] substracts [(y, sz)] from [(x, sz)] and
+      writes the result to [(r, sz)]. Returns borrow, either 0 or
+      1. Corresponds to [mpn_sub_n]. *)
+  let sub_limbs (r x y:t) (sz:int32) : limb
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r sz }
+    ensures { 0 <= result <= 1 }
+    ensures { value r sz - power radix sz * result
+              = value x sz - value y sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    writes { r.data.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let ly = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { sz - !i }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i - (power radix !i) * !b
+                  = value x !i - value y !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      invariant { 0 <= !b <= 1 }
+      label StartLoop in
+      lx := get_ofs x !i;
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs r !i res;
+      assert { value r !i - (power radix !i) * !b =
+      value x !i - value y !i };
+      b := borrow;
+      value_tail r !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value r (!i+1) - (power radix (!i+1)) * !b
+                  = value x (!i+1) - value y (!i+1)
+               (*by
+                 value r !i - power radix !i * !b
+               = value r k + power radix k * res
+                   - power radix !i * !b
+               = value r k + power radix k * res
+                   - power radix k * radix * !b
+               = value r k
+                 + power radix k * (res - radix * !b)
+               = value r k
+                 + power radix k * (!lx - !ly - (!b at StartLoop))
+               = value r k - power radix k * (!b at StartLoop)
+                 + power radix k * (!lx - !ly)
+               = value x k - value y k
+                 + power radix k * (!lx - !ly)
+               = value x k - value y k
+                 + power radix k * !lx - power radix k * !ly
+               = value x k + power radix k * !lx
+                 - (value y k + power radix k * !ly)
+               = value x !i
+                 - (value y k + power radix k * !ly)
+               = value x !i - value y !i*)
+        };
+      i := Int32.(+) !i (Int32.of_int 1);
+      done;
+      !b
+
+  (** [sub r x y sx sy] substracts [(y,sy)] from [(x, sx)] and writes the
+      result in [(r, sx)]. [sx] must be greater than or equal to
+      [sy]. Returns borrow, either 0 or 1. Corresponds to [mpn_sub]. *)
+  let sub (r x y:t) (sx sy:int32) : limb
+    requires { 0 <= sy <= sx }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid r sx }
+    ensures { value r sx  - power radix sx * result
+              = value x sx - value y sy }
+    ensures { forall j. (j < offset r \/ offset r + sx <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    ensures { 0 <= result <= 1 }
+    writes { r.data.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let ly = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    let one = Int32.of_int 1 in
+    while Int32.(<) !i sy do
+      variant { sy - !i }
+      invariant { 0 <= !i <= sy }
+      invariant { value r !i - power radix !i * !b =
+                  value x !i - value y !i }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      invariant { 0 <= !b <= 1 }
+      label StartLoop in
+      lx := get_ofs x !i;
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs r !i res;
+      assert { value r !i - power radix !i * !b =
+                  value x !i - value y !i };
+      b := borrow;
+      value_tail r !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value r (!i+1) - power radix (!i+1) * !b =
+              value x (!i+1) - value y (!i+1)
+              (*by
+              value r !i - power radix !i * !b
+              = value r k + power radix k * res
+                - power radix !i * !b
+              = value r k + power radix k * res
+                - (power radix k) * radix * !b
+              = value r k
+                + power radix k * (res - radix * !b)
+              = value r k
+                + power radix k * (!lx - !ly - (!b at StartLoop))
+              = value r k - (power radix k) * (!b at StartLoop)
+                + power radix k * (!lx - !ly)
+              = value x k - value y k
+                + power radix k * (!lx - !ly)
+              = value x k + power radix k * !lx
+                - value y k - power radix k * !ly
+              = value x !i
+                - (value y k + power radix k * !ly)
+              = value x !i - value y !i*) };
+      i := Int32.(+) !i one;
+    done;
+    try
+    begin while Int32.(<) !i sx do
+      variant { sx - !i }
+      invariant { sy <= !i <= sx }
+      invariant { value r !i - power radix !i * !b =
+                  value x !i - value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      invariant { 0 <= !b <= 1 }
+      (if (Limb.(=) !b (Limb.of_int 0)) then raise Break);
+      label StartLoop2 in
+      lx := get_ofs x !i;
+      let res, borrow = sub_with_borrow !lx limb_zero !b in
+      set_ofs r !i res;
+      assert { value r !i - power radix !i * !b =
+      value x !i - value y sy };
+      b := borrow;
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r (!i+1) - power radix (!i+1) * !b =
+               value x (!i+1) - value y sy
+            (*by
+              value r !i - power radix !i * !b
+            = value r k + power radix k * res
+              - (power radix !i) * !b
+            = value r k + power radix k * res
+              - (power radix k) * radix * !b
+            = value r k + power radix k * (res - radix * !b)
+            = value r k
+              + power radix k * (!lx - 0 - (!b at StartLoop2))
+            = value r k - (power radix k) * (!b at StartLoop2)
+              + (power radix k) * !lx
+            = value x k - value y sy
+              + (power radix k) * !lx
+            = value x !i
+              - value y sy*) };
+      i := Int32.(+) !i one;
+    done;
+    assert { !i = sx }
+    end
+    with Break -> assert { !b = 0 }
+    end;
+    while Int32.(<) !i sx do
+      variant { sx - !i }
+      invariant { sy <= !i <= sx }
+      invariant { !i = sx \/ !b = 0 }
+      invariant { value r !i - power radix !i * !b =
+                value x !i - value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      assert { !b = 0 by !i < sx };
+      lx := get_ofs x !i;
+      set_ofs r !i !lx;
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r !i = value x !i - value y sy };
+      assert { value r (!i+1) - power radix (!i+1) * !b
+               = value x (!i+1) - value y sy
+               (*by
+               value r !i + power radix !i * !b
+                 = value r !i
+                 = value r k + power radix k * !lx
+               so value x !i
+                  = value x k + power radix k * !lx
+               so value r k
+                  = value r k + power radix k * !b
+                  = value x k - value y sy*)
+             };
+      i := Int32.(+) !i (Int32.of_int 1);
+    done;
+    !b
+
+  let sub_in_place (x y:t) (sx sy:int32) : limb
+    requires { 0 <= sy <= sx }
+    requires { valid x sx }
+    requires { valid y sy }
+    ensures { value x sx  - power radix sx * result
+              = value (old x) sx - value y sy }
+    ensures { 0 <= result <= 1 }
+    writes { x.data.elts }
+    ensures { forall j. j < x.offset \/ x.offset + sx <= j ->
+              (pelts x)[j] = (pelts (old x))[j] }
+  =
+    let ghost ox = { x } in
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let ly = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    let one = Int32.of_int 1 in
+    while Int32.(<) !i sy do
+      variant { sy - !i }
+      invariant { 0 <= !i <= sy }
+      invariant { value x !i - power radix !i * !b =
+                  value ox !i - value y !i }
+      invariant { 0 <= !b <= 1 }
+      invariant { forall j. !i <= j < sx ->
+                  (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+      invariant { forall j. j < x.offset \/ x.offset + sx <= j ->
+                  (pelts x)[j] = (pelts (old x))[j] }
+      label StartLoop in
+      lx := get_ofs x !i;
+      assert { !lx = (pelts ox)[ox.offset + !i] };
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs x !i res;
+      assert { forall j. !i < j < sx ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j]
+                 by (pelts x)[x.offset + j]
+                 = (pelts (x at StartLoop))[x.offset + j]
+                 = (pelts ox)[x.offset + j]};
+      assert { value x !i - power radix !i * !b = value ox !i - value y !i };
+      b := borrow;
+      value_tail ox !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value x (!i+1) - power radix (!i+1) * !b =
+              value ox (!i+1) - value y (!i+1)
+              (*by value x !i - power radix !i * !b
+              = value x k + power radix k * res
+                - power radix !i * !b
+              = value x k + power radix k * res
+                - (power radix k) * radix * !b
+              = value x k
+                + power radix k * (res - radix * !b)
+              = value x k
+                + power radix k * (!lx - !ly - (!b at StartLoop))
+              = value x k - (power radix k) * (!b at StartLoop)
+                + power radix k * (!lx - !ly)
+              = value ox k - value y k
+                + power radix k * (!lx - !ly)
+              = value ox k + power radix k * !lx
+                - value y k - power radix k * !ly
+              = value ox !i
+                - (value y k + power radix k * !ly)
+              = value ox !i - value y !i*) };
+      i := Int32.(+) !i one;
+    done;
+    try
+    begin while Int32.(<) !i sx do
+      variant { sx - !i }
+      invariant { sy <= !i <= sx }
+      invariant { value x !i - power radix !i * !b =
+                  value ox !i - value y sy }
+      invariant { 0 <= !b <= 1 }
+      invariant { forall j. !i <= j < sx ->
+                  (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] }
+      invariant { forall j. j < x.offset \/ x.offset + sx <= j ->
+                  (pelts x)[j] = (pelts (old x))[j] }
+      (if (Limb.(=) !b limb_zero) then raise ReturnLimb limb_zero);
+      label StartLoop2 in
+      lx := get_ofs x !i;
+      assert { !lx = (pelts ox)[ox.offset + !i] };
+      let res, borrow = sub_with_borrow !lx limb_zero !b in
+      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                           (x.offset + p2i !i + 1)
+                                           (x.offset + p2i sx) res;
+      set_ofs x !i res;
+      assert { value x !i - power radix !i * !b = value ox !i - value y sy };
+      b := borrow;
+      assert { forall j. !i < j < sx ->
+                  (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] };
+      value_tail ox !i;
+      value_tail x !i;
+      assert { value x (!i+1) - power radix (!i+1) * !b =
+               value ox (!i+1) - value y sy
+            (*by
+              value x !i - power radix !i * !b
+            = value x k + power radix k * res
+              - (power radix !i) * !b
+            = value x k + power radix k * res
+              - (power radix k) * radix * !b
+            = value x k + power radix k * (res - radix * !b)
+            = value x k
+              + power radix k * (!lx - 0 - (!b at StartLoop2))
+            = value x k - (power radix k) * (!b at StartLoop2)
+              + (power radix k) * !lx
+            = value ox k - value y sy
+              + (power radix k) * !lx
+            = value ox !i
+              - value y sy*) };
+      i := Int32.(+) !i one;
+    done;
+    assert { !i = sx };
+    !b
+    end
+    with ReturnLimb n -> begin
+      assert { n = 0 = !b };
+      assert { forall j. x.offset + !i <= j < x.offset + sx
+               -> (pelts x)[j] = (pelts ox)[j]
+               by !i <= j - x.offset < sx
+               so (pelts x)[x.offset + (j - x.offset)]
+                  = (pelts ox)[x.offset + (j - x.offset)] };
+      value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sx);
+      value_sub_concat (pelts x) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
+      value_sub_concat (pelts ox) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
+      assert { value x sx = value (old x) sx - value y sy };
+      n
+      end
+    end
+
+  (** [decr x y sz] subtracts from [x] the value of the limb [y] in place.
+      [x] has size [sz]. The subtraction must not overflow. This corresponds
+      to [mpn_decr] *)
+  let decr (x:t) (y:limb) (ghost sz:int32) : unit
+    requires { valid x sz }
+    requires { sz > 0 }
+    requires { 0 <= value x sz - y }
+    ensures  { value x sz = value (old x) sz - y }
+    ensures { forall j. j < x.offset \/ x.offset + sz <= j ->
+              (pelts x)[j] = (pelts (old x))[j] }
+    writes   { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let b = ref y in
+    let lx : ref limb = ref 0 in
+    let i : ref int32 = ref 0 in
+    while not (Limb.(=) !b 0) do
+      invariant { 0 <= !i <= sz }
+      invariant { !i = sz -> !b = 0 }
+      invariant { !i > 0 -> 0 <= !b <= 1 }
+      invariant { value x !i - (power radix !i) * !b
+                  = value ox !i - y }
+      invariant { forall j. !i <= j < sz ->
+                  (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+      invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
+                  (pelts x)[j] = (pelts ox)[j] }
+      variant   { sz - !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      assert { !lx = (pelts ox)[ox.offset + !i] };
+      let (res, borrow) = sub_with_borrow !lx !b 0 in (*TODO*)
+      assert { res - radix * borrow = !lx - !b }; (* TODO remove this *)
+      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                           (x.offset + p2i !i + 1)
+                                           (x.offset + p2i sz) res;
+      set_ofs x !i res;
+      assert { forall j. !i < j < sz ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j] };
+      assert { value x !i - (power radix !i) * !b = value ox !i - y };
+      b := borrow;
+      value_tail x !i;
+      value_tail ox !i;
+      assert { value x (!i+1) - power radix (!i+1) * !b =
+               value ox (!i+1) - y };
+      i := Int32.(+) !i 1;
+      assert { !i = sz -> !b = 0
+               by value x sz - power radix sz * !b = value ox sz - y
+                  so 0 <= value ox sz - y
+                  so value x sz < power radix sz
+                  so value x sz - power radix sz * 1 < 0
+                  so (!b=0 \/ !b=1) };
+    done;
+    value_concat x !i sz;
+    value_concat ox !i sz;
+    assert { forall j. x.offset + !i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                !i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
+
+  (** [incr_1 x sz] subtracts 1 from [x] in place.
+      [x] has size [sz]. The subtraction must not overflow.
+      This corresponds to [mpn_decr] *)
+  let decr_1 (x:t) (ghost sz:int32) : unit
+    requires { valid x sz }
+    requires { sz > 0 }
+    requires { 0 <= value x sz - 1 }
+    ensures  { value x sz = value (old x) sz - 1 }
+    ensures { forall j. j < x.offset \/ x.offset + sz <= j ->
+              (pelts x)[j] = (pelts (old x))[j] }
+    writes   { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let ghost b : ref limb = ref 1 in
+    let lx : ref limb = ref 0 in
+    let i : ref int32 = ref 0 in
+    while (Limb.(=) !lx 0) do
+      invariant { 0 <= !i <= sz }
+      invariant { !i = sz -> !lx <> 0 }
+      invariant { !lx <> 0 <-> !b = 0 }
+      invariant { 0 <= !b <= 1 }
+      invariant { value x !i - (power radix !i) * !b
+                  = value ox !i - 1 }
+      invariant { forall j. !i <= j < sz ->
+                  (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+      invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
+                  (pelts x)[j] = (pelts ox)[j] }
+      variant   { sz - !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      assert { !lx = (pelts ox)[ox.offset + !i] };
+      let res = sub_mod !lx 1 in
+      ghost (if Limb.(=) !lx 0 then b := 1 else b := 0);
+      assert { res - radix * !b = !lx - 1 };
+      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                           (x.offset + p2i !i + 1)
+                                           (x.offset + p2i sz) res;
+      set_ofs x !i res;
+      assert { forall j. !i < j < sz ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j] };
+      assert { value x !i - (power radix !i) * (!b at StartLoop) = value ox !i - 1 };
+      value_tail x !i;
+      value_tail ox !i;
+      assert { value x (!i+1) - power radix (!i+1) * !b =
+               value ox (!i+1) - 1 };
+      i := Int32.(+) !i 1;
+      assert { !i = sz -> !b = 0
+               by value x sz - power radix sz * !b = value ox sz - 1
+                  so 0 <= value ox sz - 1
+                  so value x sz < power radix sz
+                  so value x sz - power radix sz * 1 < 0
+                  so (!b=0 \/ !b=1) };
+    done;
+    value_concat x !i sz;
+    value_concat ox !i sz;
+    assert { forall j. x.offset + !i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                !i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
+
+end

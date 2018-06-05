@@ -1,0 +1,87 @@
+module Compare
+
+  use import int.Int
+  use import mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use import int.Power
+  use import ref.Ref
+  use import mach.c.C
+  use import map.Map
+  use import types.Types
+  use import lemmas.Lemmas
+
+  function compare_int (x y:int) : int =
+    if x < y then -1 else if x=y then 0 else 1
+
+  (** [compare_same_size] compares [x[0..sz-1]] and [y[0..sz-1]] as unsigned integers. It corresponds to [GMPN_CMP]. *)
+  let compare_same_size (x y:t) (sz:int32) : int32
+    requires { valid x sz }
+    requires { valid y sz }
+    ensures { result = compare_int (value x sz) (value y sz) }
+  =
+   let i = ref sz in
+   try
+     while Int32.(>=) !i (Int32.of_int 1) do
+       variant { p2i !i }
+       invariant { 0 <= !i <= sz }
+       invariant { forall j. !i <= j < sz ->
+                   (pelts x)[x.offset+j] = (pelts y)[y.offset+j] }
+       assert { forall j. 0 <= j < sz - !i ->
+                let k = !i+j in
+                !i <= k < sz ->
+                (pelts x)[x.offset+k] = (pelts y)[y.offset+k] /\
+                (pelts x)[!i+x.offset+j] = (pelts y)[!i+y.offset+j] };
+       value_sub_frame_shift (pelts x) (pelts y) (p2i !i+x.offset)
+                             (p2i !i+y.offset) ((p2i sz) - (p2i !i));
+       let ghost k = p2i !i in
+       i := Int32.(-) !i (Int32.of_int 1);
+
+       assert { 0 <= !i < sz };
+       let lx = get_ofs x !i in
+       let ly = get_ofs y !i in
+       if (not (Limb.(=) lx ly))
+       then begin
+            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+p2i sz);
+            value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+p2i sz);
+            assert { compare_int (value x sz)
+                       (value y sz)
+                   = compare_int (value x k) (value y k) };
+            value_sub_tail (pelts x) x.offset (x.offset+k-1);
+            value_sub_tail (pelts y) y.offset (y.offset+k-1);
+            if Limb.(>) lx ly
+            then begin
+             value_sub_upper_bound (pelts y) y.offset (y.offset+k-1);
+             value_sub_lower_bound (pelts x) x.offset (x.offset+k-1);
+             assert { value x k - value y k =
+                      (l2i lx - ly) * (power radix (k-1))
+                    - ((value y (k-1)) - (value x (k-1)))
+                       };
+             assert { (lx - ly) * (power radix (k-1))
+                      >= power radix (k-1)
+                      > ((value y (k-1)) - (value x (k-1)))
+                       };
+             raise Return32 (Int32.of_int 1)
+            end
+            else begin
+             assert { ly > lx };
+             value_sub_upper_bound (pelts x) x.offset (x.offset+k-1);
+             value_sub_lower_bound (pelts y) y.offset (y.offset+k-1);
+             assert { value y k - value x k =
+                    (ly - lx) * (power radix (k-1))
+                    - ((value x (k-1)) - (value y (k-1)))
+                     };
+             assert { (ly - lx) * (power radix (k-1))
+                      >= power radix (k-1)
+                      > ((value x (k-1)) - (value y (k-1)))
+                     };
+            raise Return32 (Int32.(-_) (Int32.of_int 1))
+            end
+         end
+       else ()
+     done;
+     value_sub_frame_shift (pelts x) (pelts y) x.offset y.offset (p2i sz);
+     Int32.of_int 0
+   with Return32 r -> r
+   end
+
+end

@@ -1,0 +1,65 @@
+module Util
+
+  use import int.Int
+  use import mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use import int.Power
+  use import ref.Ref
+  use import mach.c.C
+  use import map.Map
+  use import types.Types
+  use import lemmas.Lemmas
+
+  let copy (r x:t) (sz:int32) : unit
+    requires { valid x sz }
+    requires { valid r sz }
+    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+  =
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let i = ref zero in
+    let xp = ref (C.incr x zero) in
+    let rp = ref (C.incr r zero) in
+    while (Int32.(<) !i sz) do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= !i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset !i }
+      invariant { pelts !xp = pelts x }
+      invariant { pelts !rp = pelts r }
+      invariant { !xp.min = min x }
+      invariant { !xp.max = x.max }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { !xp.offset = x.offset + !i }
+      invariant { !rp.offset = r.offset + !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+                  (pelts r)[j] = old (pelts r)[j] }
+      C.set !rp (C.get !xp);
+      rp.contents <- C.incr !rp one;
+      xp.contents <- C.incr !xp one;
+      i := Int32.(+) !i one;
+    done
+
+  (** [zero r sz] sets [(r,sz)] to zero. Corresponds to [mpn_zero]. *)
+  let zero (r:t) (sz:int32) : unit
+    requires { valid r sz }
+    ensures { value r sz = 0 }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+  =
+    let i = ref (Int32.of_int 0) in
+    let lzero = Limb.of_int 0 in
+    while Int32.(<) !i sz do
+      invariant { 0 <= !i <= sz }
+      variant { sz - !i }
+      invariant { value r !i = 0 }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      set_ofs r !i lzero;
+      value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
+      i := Int32.(+) !i (Int32.of_int 1);
+    done
+
+end

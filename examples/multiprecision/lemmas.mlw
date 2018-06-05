@@ -1,0 +1,207 @@
+module Lemmas
+
+  use import array.Array
+  use import map.Map
+  use map.MapEq
+  use map.Const
+  use import int.Int
+
+  (** {3 complements to map standard library} *)
+
+  predicate map_eq_sub_shift (x y:map int 'a) (xi yi sz:int) =
+    forall i. 0 <= i < sz -> x[xi+i] = y[yi+i]
+
+  let lemma map_eq_shift (x y:map int 'a) (xi yi sz k:int)
+    requires { map_eq_sub_shift x y xi yi sz }
+    requires { 0 <= k < sz }
+    ensures { x[xi+k] = y[yi+k] }
+  = ()
+
+  let rec lemma map_eq_shift_zero (x y: map int 'a) (n m: int)
+    requires { map_eq_sub_shift x y n n (m-n) }
+    variant { m - n }
+    ensures { MapEq.map_eq_sub x y n m }
+  =
+    if n < m then
+    begin
+      assert { forall i. 0 <= i < m-n -> x[n+i] = y[n+i] };
+      assert { forall i. n <= i < m ->
+                 let j = i - n in 0 <= j < m-n ->
+                     x[n+j] = y[n+j] -> x[i] = y[i]};
+      map_eq_shift_zero x y (n+1) m;
+    end
+    else ()
+
+  use import mach.int.Int32
+  use import ref.Ref
+  use import mach.int.UInt64GMP as Limb
+  use import int.Int
+  use import int.Power
+  use import mach.c.C
+  use import types.Types
+
+  meta compute_max_steps 0x100000
+
+  (** {3 Long integers as arrays of libs} *)
+
+  lemma limb_max_bound: 1 <= max_uint64
+
+  function l2i (x:limb) : int = Limb.to_int x
+
+  function p2i (i:int32) : int = int32'int i
+
+  let lemma prod_compat_strict_r (a b c:int)
+    requires { 0 <= a < b }
+    requires { 0 < c }
+    ensures { c * a < c * b }
+  = ()
+  let lemma prod_compat_r (a b c:int)
+    requires { 0 <= a <= b }
+    requires { 0 <= c }
+    ensures { c * a <= c * b }
+  = ()
+
+  (** {3 Integer value of a natural number} *)
+
+  (** [value_sub x n m] denotes the integer represented by
+     the digits x[n..m-1] with lsb at index n *)
+  let rec ghost function value_sub (x:map int limb) (n:int) (m:int) : int
+     variant {m - n}
+   =
+     if n < m then
+       l2i x[n] + radix * value_sub x (n+1) m
+       else 0
+
+  let rec lemma value_sub_frame (x y:map int limb) (n m:int)
+    requires { MapEq.map_eq_sub x y n m }
+    variant  { m - n }
+    ensures  { value_sub x n m = value_sub y n m }
+  =
+    if n < m then value_sub_frame x y (n+1) m else ()
+
+  let rec lemma value_sub_frame_shift (x y:map int limb) (xi yi sz:int)
+    requires { map_eq_sub_shift x y xi yi sz }
+    variant { sz }
+    ensures { value_sub x xi (xi+sz) = value_sub y yi (yi+sz) }
+ =
+    if sz>0
+    then begin
+      map_eq_shift x y xi yi sz 0;
+      assert { forall i. 0 <= i < sz-1 ->
+                 let j = 1+i in x[xi+j] = y[yi+j] };
+      value_sub_frame_shift x y (xi+1) (yi+1) (sz-1)
+      end
+    else assert { 1+2 = 3 }
+
+  let rec lemma value_sub_tail (x:map int limb) (n m:int)
+    requires { n <= m }
+    variant  { m - n }
+    ensures  {
+      value_sub x n (m+1) =
+        value_sub x n m + (Map.get x m) * power radix (m-n) }
+  = [@vc:sp] if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
+
+  let rec lemma value_sub_concat (x:map int limb) (n m l:int)
+    requires { n <= m <= l}
+    variant  { m - n }
+    ensures  {
+      value_sub x n l =
+        value_sub x n m + value_sub x m l * power radix (m-n) }
+  =
+  if n < m then
+     begin
+     assert {n<m};
+     value_sub_concat x (n+1) m l
+     end
+  else ()
+
+  let lemma value_sub_head (x:map int limb) (n m:int)
+    requires { n < m }
+    ensures { value_sub x n m = x[n] + radix * value_sub x (n+1) m }
+  = value_sub_concat x n (n+1) m
+
+  let lemma value_sub_update (x:map int limb) (i n m:int) (v:limb)
+    requires { n <= i < m }
+    ensures {
+      value_sub (Map.set x i v) n m =
+      value_sub x n m + power radix (i - n) * (v -(Map.get x i))
+    }
+  = assert { MapEq.map_eq_sub x (Map.set x i v) n i };
+    assert { MapEq.map_eq_sub x (Map.set x i v) (i+1) m };
+    value_sub_concat x n i m;
+    value_sub_concat (Map.set x i v) n i m;
+    value_sub_head x i m;
+    value_sub_head (Map.set x i v) i m
+
+  let rec lemma value_zero (x:map int limb) (n m:int)
+    requires { MapEq.map_eq_sub x (Const.const Limb.zero_unsigned) n m }
+    variant  { m - n }
+    ensures  { value_sub x n m = 0 }
+  = if n < m then value_zero x (n+1) m else ()
+
+  let lemma value_sub_update_no_change (x: map int limb) (i n m: int) (v:limb)
+     requires { n <= m }
+     requires { i < n \/ m <= i }
+     ensures { value_sub x n m = value_sub (Map.set x i v) n m }
+  = value_sub_frame x (Map.set x i v) n m
+
+  let lemma value_sub_shift_no_change (x:map int limb) (ofs i sz:int) (v:limb)
+     requires { i < 0 \/ sz <= i }
+     requires { 0 <= sz }
+     ensures { value_sub x ofs (ofs + sz) =
+               value_sub (Map.set x (ofs+i) v) ofs (ofs+sz) }
+  = value_sub_frame_shift x (Map.set x (ofs+i) v) ofs ofs sz
+
+  (** {3 Comparisons} *)
+
+  let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
+    variant  { x2 - x1 }
+    ensures  { 0 <= value_sub x x1 x2 }
+  = if x2 <= x1 then () else
+      begin
+        value_sub_head x x1 x2;
+        value_sub_lower_bound x (x1+1) x2
+      end
+
+  let rec lemma value_sub_upper_bound (x:map int limb) (x1 x2:int)
+    requires { x1 <= x2 }
+    variant  { x2 - x1 }
+    ensures  { value_sub x x1 x2 < power radix (x2 - x1) }
+  = if x1 = x2 then () else
+      begin
+      value_sub_tail x x1 (x2-1);
+      assert { value_sub x x1 x2
+               <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
+      value_sub_upper_bound x x1 (x2-1)
+      end
+
+  let lemma value_sub_lower_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { power radix (x2-x1-1) *  l2i (Map.get x (x2-1)) <= value_sub x x1 x2 }
+  = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1)
+               + power radix (x2-x1-1) * l2i (Map.get x (x2-1)) }
+
+  let lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
+  = value_sub_upper_bound x x1 (x2-1)
+
+  function value (x:t) (sz:int) : int =
+     value_sub (pelts x) x.offset (x.offset + sz)
+
+  let lemma value_tail (x:t) (sz:int32)
+    requires { 0 <= sz }
+    ensures  { value x (sz+1) = value x sz + (pelts x)[x.offset + sz] * power radix sz }
+  = value_sub_tail (pelts x) x.offset (x.offset + p2i sz)
+
+  meta remove_prop axiom value_tail
+
+  let lemma value_concat (x:t) (n m:int32)
+    requires { 0 <= n <= m }
+    ensures  { value x m
+             = value x n + power radix n
+                            * value_sub (pelts x) (x.offset + n) (x.offset + m) }
+
+  = value_sub_concat (pelts x) x.offset (x.offset + p2i n) (x.offset + p2i m)
+
+end
