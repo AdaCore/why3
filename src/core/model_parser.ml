@@ -37,7 +37,7 @@ type float_type =
   | Float_hexa of string * float
 
 
-                               let interp_float b eb sb =
+let interp_float b eb sb =
     try
       let is_neg = match b with
         | "#b0" -> false
@@ -596,7 +596,8 @@ let interleave_with_source
     source_code, locations
 
 let print_labels_json (me: model_element_name) fmt =
-  Json_base.list (fun fmt lab -> Json_base.string fmt lab.lab_string) fmt (Slab.elements me.men_labels)
+  Json_base.list (fun fmt lab -> Json_base.string fmt lab.lab_string) fmt
+    (Slab.elements me.men_labels)
 
 (*
 **  Quering the model - json
