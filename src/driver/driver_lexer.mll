@@ -89,6 +89,8 @@ rule token = parse
       { RIGHTPAR }
   | "."
       { DOT }
+  | ".."
+      { DOTDOT }
   | ","
       { COMMA }
   | "'"

@@ -1215,9 +1215,9 @@ let get_rs_name nm =
   if nm = "mixfix []" then "([])" else
   if nm = "mixfix []<-" then "([]<-)" else
   if nm = "mixfix [<-]" then "([<-])" else
+  if nm = "mixfix [..]" then "([..])" else
   if nm = "mixfix [_..]" then "([_..])" else
   if nm = "mixfix [.._]" then "([.._])" else
-  if nm = "mixfix [_.._]" then "([_.._])" else
   try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
   try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
   nm

@@ -1184,9 +1184,9 @@ let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   if nm = Ident.mixfix "[]" then pp_print_string fmt "([])" else
   if nm = Ident.mixfix "[]<-" then pp_print_string fmt "([]<-)" else
   if nm = Ident.mixfix "[<-]" then pp_print_string fmt "([<-])" else
+  if nm = Ident.mixfix "[..]" then pp_print_string fmt "([..])" else
   if nm = Ident.mixfix "[_..]" then pp_print_string fmt "([_..])" else
   if nm = Ident.mixfix "[.._]" then pp_print_string fmt "([.._])" else
-  if nm = Ident.mixfix "[_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op s.rs_name, s.rs_logic with
   | Some x, _ ->
       fprintf fmt "(%s%s%s)"
@@ -1265,13 +1265,13 @@ let print_capp pri ({rs_name = id} as s) fmt vl =
   | _, [t1;t2;t3] when id.id_string = "mixfix []<-" ->
       fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
         print_pv t1 print_pv t2 print_pv t3
+  | _, [t1;t2;t3] when id.id_string = "mixfix [..]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
+        print_pv t1 print_pv t2 print_pv t3
   | _, [t1;t2] when id.id_string = "mixfix [_..]" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
   | _, [t1;t2] when id.id_string = "mixfix [.._]" ->
       fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when id.id_string = "mixfix [_.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
-        print_pv t1 print_pv t2 print_pv t3
   | _, tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
         print_rs s (Pp.print_list Pp.space print_pv) tl
@@ -1284,9 +1284,9 @@ let print_cpur pri ({ls_name = id} as s) fmt vl =
     | _, [_;_] when id.id_string = "mixfix []" -> Some "[]"
     | _, [_;_;_] when id.id_string = "mixfix [<-]" -> Some "[<-]"
     | _, [_;_;_] when id.id_string = "mixfix []<-" -> Some "[]<-"
+    | _, [_;_;_] when id.id_string = "mixfix [..]" -> Some "[..]"
     | _, [_;_] when id.id_string = "mixfix [_..]" -> Some "[_..]"
     | _, [_;_] when id.id_string = "mixfix [.._]" -> Some "[.._]"
-    | _, [_;_;_] when id.id_string = "mixfix [_.._]" -> Some "[_.._]"
     | _ -> None in
   match op, vl with
   | None, [] ->

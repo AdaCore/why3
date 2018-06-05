@@ -56,7 +56,7 @@
 
   let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
   let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
-  let sub_op s e = Qident (mk_id (Ident.mixfix "[_.._]") s e)
+  let sub_op s e = Qident (mk_id (Ident.mixfix "[..]") s e)
   let above_op s e = Qident (mk_id (Ident.mixfix "[_..]") s e)
   let below_op s e = Qident (mk_id (Ident.mixfix "[.._]") s e)
 
@@ -1183,9 +1183,9 @@ lident_op:
 | LEFTSQ RIGHTSQ          { Ident.mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { Ident.mixfix "[<-]" }
 | LEFTSQ RIGHTSQ LARROW   { Ident.mixfix "[]<-" }
-| LEFTSQ UNDERSCORE DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[_.._]" }
-| LEFTSQ            DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[.._]" }
-| LEFTSQ UNDERSCORE DOTDOT            RIGHTSQ { Ident.mixfix "[_..]" }
+| LEFTSQ DOTDOT RIGHTSQ   { Ident.mixfix "[..]" }
+| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.mixfix "[_..]" }
+| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.mixfix "[.._]" }
 
 op_symbol:
 | OP1 { $1 }

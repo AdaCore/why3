@@ -91,7 +91,7 @@ module Seq
 
   (** [s[i..j]] is the sub-sequence of [s] from element [i] included
       to element [j] excluded *)
-  let function ([_.._]) (s:seq 'a) (i:int) (j:int) : seq 'a
+  let function ([..]) (s:seq 'a) (i:int) (j:int) : seq 'a
     requires { 0 <= i <= j <= length s }
     ensures { length result = j - i }
     ensures { forall k. 0 <= k < j - i -> result[k] = s[i + k] }
