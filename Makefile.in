@@ -1873,19 +1873,19 @@ doc/extract_ocaml_code: doc/extract_ocaml_code.ml
 	$(OCAMLC) str.cma -o $@ $<
 
 doc/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code examples/use_api/logic.ml $* doc
+	doc/extract_ocaml_code $* < $< > $@
 
 doc/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code src/driver/whyconf.ml $* doc
+	doc/extract_ocaml_code $* < $< > $@
 
 doc/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code src/driver/call_provers.ml $* doc
+	doc/extract_ocaml_code $* < $< > $@
 
 doc/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code examples/use_api/mlw_tree.ml $* doc
+	doc/extract_ocaml_code $* < $< > $@
 
 doc/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code examples/use_api/transform.ml $* doc
+	doc/extract_ocaml_code $* < $< > $@
 
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
