@@ -127,7 +127,7 @@ will accept an argument of the corresponding snapshot type
 as long as it is not modified by the function.
 
 \section{Logical expressions: terms and formulas}
-\label{sec:types}
+\label{sec:terms}
 
 A significant part of a typical \whyml source file is occupied
 by non-executable logical content intended for specification
@@ -143,7 +143,7 @@ connectives and quantifiers) and the terms of type \texttt{bool}
 syntactical level, and \why will perform the necessary conversions
 behind the scenes.
 
-\begin{figure}[ht]
+\begin{figure}[p!]
 \begin{center}\input{./generated/term1_bnf.tex}\end{center}
 \caption{\whyml terms (part I).}
 \label{fig:bnf:term1}
@@ -165,11 +165,11 @@ The syntax of \whyml terms is given in
 Figures~\ref{fig:bnf:term1}-\ref{fig:bnf:term3}.
 The constructions are listed in the order of
 decreasing precedence.
-For example, as was mentioned in the previous section,
+For example, as was mentioned above,
 bang operators have the highest precedence of all operators,
-so that \texttt{-p.x} is parsed as the negation of the
-record field \texttt{p.x}, whereas \texttt{!p.x} is
-parsed as the field \texttt{x} of a record stored
+so that \texttt{-p.x} denotes the negation of the
+record field \texttt{p.x}, whereas \texttt{!p.x}
+denotes the field \texttt{x} of a record stored
 in the reference \texttt{p}.
 
 An operator inside parentheses can act as an identifier
@@ -194,7 +194,7 @@ of a collection update, we should use a pure logical update
 operator (\texttt{a[i <- v]}) instead.
 
 The \texttt{at} and \texttt{old} operators are used inside
-post-conditions and assertions to refer to the value of
+postconditions and assertions to refer to the value of
 a mutable program variable at some past moment of execution
 (see the next section for details).
 These operators have higher precedence than the infix
@@ -210,13 +210,98 @@ is parsed as the conjunction of three inequalities \texttt{0 <= i},
 In order to refer to symbols introduced in different namespaces
 (\textit{scopes}), we can put a dot-separated
 ``qualifier prefix'' in front of an identifier
-(e.g.~\texttt{Map.S.get m i}) or a term in parentheses
+(e.g.~\texttt{Map.S.get m i}) or in front of a term in parentheses
 (e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
 if the term is a record or a record update). This notation allows
 us to use the symbol \texttt{get} or the collection access operator
 \texttt{([])} from the scope \texttt{Map.S} without importing
 them in the current namespace.
 
+The propositional connectives in \whyml formulas are listed in
+Figure~\ref{fig:bnf:term2}. The non-standard connectives ---
+asymmetric conjunction (\texttt{\&\&}), asymmetric disjunction
+(\texttt{||}), proof indication (\texttt{by}), and consequence
+indication (\texttt{so}) --- are used to control the goal-splitting
+transformations of \why and provide integrated proofs for
+\whyml assertions, postconditions, lemmas, etc.
+The semantics of these connectives
+follows the rules below:
+\begin{itemize}
+\item A proof of \texttt{A \&\& B} is split into
+separate proofs of \texttt{A} and \texttt{A -> B}.
+If \texttt{A \&\& B} occurs as a premise, it behaves
+as a normal conjunction.
+\item A case analysis over \texttt{A || B} is split into
+disjoint cases \texttt{A} and \texttt{not A {/\char92} B}.
+If \texttt{A || B} occurs as a goal, it behaves
+as a normal disjunction.
+\item An occurrence of \texttt{A by B} generates a side condition
+\texttt{B -> A} (the proof justifies the conclusion).
+When \texttt{A by B} occurs as a premise,
+it is reduced to \texttt{A} (the proof is discarded).
+When \texttt{A by B} occurs as a goal,
+it is reduced to \texttt{B} (the proof is verified).
+\item An occurrence of \texttt{A so B} generates a side condition
+\texttt{A -> B} (the premise justifies the consequence).
+When \texttt{A so B} occurs as a premise,
+it behaves as a conjunction \texttt{A {/\char92} B}
+(we use both the premise and the consequence).
+When \texttt{A so B} occurs as a goal,
+it is reduced to \texttt{A} (the premise is verified).
+\end{itemize}
+For example, full splitting of the goal
+\texttt{(A by (exists x. B so C)) \&\& D}
+produces four subgoals:
+\texttt{exists x. B} (the premise is verified),
+\texttt{forall x. B -> C} (the premise justifies the consequence),
+\texttt{(exists x. B {/\char92} C) -> A} (the proof justifies the conclusion),
+and finally, \texttt{A -> D} (the proof of \texttt{A} is discarded
+and \texttt{A} is used to prove \texttt{D}).
+
+%Figure~\ref{fig:byso} contains more examples of usage of
+%\texttt{\&\&}, \texttt{||}, \texttt{by}, and \texttt{so}.
+%\begin{figure}[ht]
+%\begin{center}
+%\begin{tabular}{c|c}
+%\multicolumn{1}{c|}{Initial goal} &
+%\multicolumn{1}{c}{Goals after full splitting} \\
+%\hline
+%\texttt{A -> (B {/\char92} C)} & \texttt{A -> B}, \:\: \texttt{A -> C} \\
+%\texttt{(A {\char92/} B) -> C} & \texttt{A -> C}, \:\: \texttt{B -> C} \\[1ex]
+%\texttt{A -> (B {\&\&} C)} & \texttt{A -> B}, \:\: \texttt{A -> (B -> C)} \\
+%\texttt{(A || B) -> C} & \texttt{A -> C}, \:\: \texttt{(not A {/\char92} B) -> C} \\[1ex]
+%\texttt{A -> (B by C)} & \texttt{A -> C}, \:\: \texttt{A -> (C -> B)} \\
+%\texttt{(A so B) -> C} & \texttt{A -> B}, \:\: \texttt{(A {/\char92} B) -> C} \\[1ex]
+%\texttt{A by (B by C)} & \texttt{C}, \:\:
+%  \texttt{C -> B}, \:\: \texttt{B -> A} \\
+%\texttt{A by (B so C)} & \texttt{B}, \:\:
+%  \texttt{B -> C}, \:\: \texttt{(B {/\char92} C) -> A} \\
+%\end{tabular}
+%\end{center}
+%\caption{Non-standard propositional connectives.}
+%\label{fig:byso}
+%\end{figure}
+
+The behaviour of the splitting transformations is further
+controlled by attributes \texttt{[@stop\_split]} and
+\texttt{[@case\_split]}. Consult Section~\ref{tech:trans:split}
+for details.
+
+Among the propositional connectives,
+\texttt{not} has the highest precedence,
+\texttt{\&\&} has the same precedence as \texttt{/\char92}
+(weaker than negation),
+\texttt{||} has the same precedence as \texttt{\char92/}
+(weaker than conjunction),
+\texttt{by}, \texttt{so}, \texttt{->}, and \texttt{<->}
+all have the same precedence (weaker than disjunction).
+All binary connectives except equivalence are right-associative.
+Equivalence is non-associative and is chained instead:
+\texttt{A <-> B <-> C} is transformed into a conjunction
+of \texttt{A <-> B} and \texttt{B <-> C}.
+To reduce ambiguity, \whyml forbids to place
+a non-parenthesised implication at the right-hand side
+of an equivalence: \texttt{A <-> B -> C} is rejected.
 
 \newpage
 
