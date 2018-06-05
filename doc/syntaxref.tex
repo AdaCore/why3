@@ -25,7 +25,7 @@ In the following, strings are referred to with the non-terminal
 %\subsection{Constants}
 The syntax for numerical constants is given by the following rules:
 %\begin{figure}[ht]
-\begin{center}\input{./constant_bnf.tex}\end{center}
+\begin{center}\input{./generated/constant_bnf.tex}\end{center}
 %\caption{Syntax for numerical constants.}
 %\label{fig:bnf:constant}
 %\end{figure}
@@ -42,7 +42,7 @@ The syntax distinguishes identifiers that start with a lowercase letter
 or an underscore (\nonterm{lident}{}\spacefalse) and identifiers that
 start with an uppercase letter (\nonterm{uident}{}\spacefalse):
 %\begin{figure}[ht]
-\begin{center}\input{./ident_bnf.tex}\end{center}
+\begin{center}\input{./generated/ident_bnf.tex}\end{center}
 %\caption{Syntax for identifiers.}
 %\label{fig:bnf:ident}
 %\end{figure}
@@ -56,7 +56,7 @@ Prefix and infix operators are built from characters organized in four
 precedence groups (\textsl{op-char-1} to \textsl{op-char-4}):
 %as shown in Figure~\ref{fig:bnf:operator}.
 %\begin{figure}[ht]
-\begin{center}\input{./operator_bnf.tex}\end{center}
+\begin{center}\input{./generated/operator_bnf.tex}\end{center}
 %\caption{Syntax for operators.}
 %\label{fig:bnf:operator}
 %\end{figure}
@@ -80,7 +80,7 @@ are always recognized as bang operators.
 %Qualified identifiers are prefixed with a sequence of uppercase
 %identifiers, e.g., \texttt{App.S.get}:
 %\begin{figure}[ht]
-%\begin{center}\input{./qualid_bnf.tex}\end{center}
+%\begin{center}\input{./generated/qualid_bnf.tex}\end{center}
 %\caption{Syntax for qualified identifiers.}
 %\label{fig:bnf:qualid}
 %\end{figure}
@@ -88,7 +88,7 @@ are always recognized as bang operators.
 Finally, any identifier, term, formula, or expression
 in a \whyml source can be tagged either with a string
 \textit{attribute} or a location:
-\begin{center}\input{./attribute_bnf.tex}\end{center}
+\begin{center}\input{./generated/attribute_bnf.tex}\end{center}
 An attribute cannot contain newlines or closing square brackets;
 leading and trailing spaces are ignored.
 A location consists of a file name in double quotes,
@@ -100,7 +100,7 @@ a line number, and starting and ending character positions.
 \whyml features an ML-style type system with polymorphic types,
 variants (sum types), and records that can have mutable fields.
 The syntax for type expressions is the following:
-\begin{center}\input{./type_bnf.tex}\end{center}
+\begin{center}\input{./generated/type_bnf.tex}\end{center}
 Built-in types are \texttt{int} (arbitrary precision integers),
 \texttt{real} (real numbers), \texttt{bool}, the arrow type
 (also called the \textit{mapping type}, right-associative),
@@ -144,19 +144,19 @@ syntactical level, and \why will perform the necessary conversions
 behind the scenes.
 
 \begin{figure}[ht]
-\begin{center}\input{./term1_bnf.tex}\end{center}
+\begin{center}\input{./generated/term1_bnf.tex}\end{center}
 \caption{\whyml terms (part I).}
 \label{fig:bnf:term1}
 \end{figure}
 
 \begin{figure}[ht]
-\begin{center}\input{./term2_bnf.tex}\end{center}
+\begin{center}\input{./generated/term2_bnf.tex}\end{center}
 \caption{\whyml terms (part II).}
 \label{fig:bnf:term2}
 \end{figure}
 
 \begin{figure}[ht]
-\begin{center}\input{./term3_bnf.tex}\end{center}
+\begin{center}\input{./generated/term3_bnf.tex}\end{center}
 \caption{\whyml terms (part III).}
 \label{fig:bnf:term3}
 \end{figure}
@@ -281,7 +281,7 @@ Note that infix symbols of level 1 include equality (\texttt{=}) and
 disequality (\texttt{<>}).
 
 \begin{figure}
-  \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/formula_bnf.tex}}\end{center}
   \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
 \end{figure}
@@ -305,13 +305,13 @@ transformations interpret those connectives as introduction of logical cuts
 The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
 
 \begin{figure}
-  \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/theory_bnf.tex}}\end{center}
   \caption{Syntax for theories (part 1).}
 \label{fig:bnf:theorya}
 \end{figure}
 
 \begin{figure}
-  \begin{center}\framebox{\input{./theory2_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/theory2_bnf.tex}}\end{center}
   \caption{Syntax for theories (part 2).}
 \label{fig:bnf:theoryb}
 \end{figure}
@@ -414,7 +414,7 @@ This type is used in the standard library in the theories
 \subsection{Files}
 
 A \why input file is a (possibly empty) list of theories.
-\begin{center}\framebox{\input{./why_file_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/why_file_bnf.tex}}\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -426,13 +426,13 @@ A \why input file is a (possibly empty) list of theories.
 The syntax for specification clauses in programs
 is given in Figure~\ref{fig:bnf:spec}.
 \begin{figure}
-  \begin{center}\framebox{\input{./spec_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/spec_bnf.tex}}\end{center}
   \caption{Specification clauses in programs.}
 \label{fig:bnf:spec}
 \end{figure}
 Within specifications, terms are extended with new constructs
 \verb|old| and \verb|at|:
-\begin{center}\framebox{\input{./term_old_at_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/term_old_at_bnf.tex}}\end{center}
 Within a postcondition, $\verb|old|~t$ refers to the value of term $t$
 in the prestate. Within the scope of a code mark $L$,
 the term $\verb|at|~t~\verb|'|L$ refers to the value of term $t$ at the program
@@ -443,13 +443,13 @@ point corresponding to $L$.
 The syntax for program expressions is given in
 Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
 \begin{figure}
-  \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/expr_bnf.tex}}\end{center}
   \caption{Syntax for program expressions (part 1).}
 \label{fig:bnf:expra}
 \end{figure}
 
 \begin{figure}
-  \begin{center}\framebox{\input{./expr2_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/expr2_bnf.tex}}\end{center}
   \caption{Syntax for program expressions (part 2).}
 \label{fig:bnf:exprb}
 \end{figure}
@@ -601,7 +601,7 @@ right, lazily.
 
 The syntax for modules is given in Figure~\ref{fig:bnf:module}.
 \begin{figure}
-  \begin{center}\framebox{\input{./module_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/module_bnf.tex}}\end{center}
   \caption{Syntax for modules.}
 \label{fig:bnf:module}
 \end{figure}
@@ -613,7 +613,7 @@ variables, functions, exceptions).
 \subsection{Files}
 
 A \whyml input file is a (possibly empty) list of theories and modules.
-\begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/whyml_file_bnf.tex}}\end{center}
 A theory defined in a \whyml file can only be used within that
 file. If a theory is supposed to be reused from other files, be they
 \why or \whyml files, it should be defined in a \why file.

@@ -1860,9 +1860,9 @@ doc: doc/manual.pdf doc/html/index.html
 BNF = ident qualid attribute constant operator type formula term1 term2 term3 \
 	theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(BNF:%=doc/%_bnf.tex)
+BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
 
-doc/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
+doc/generated/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
 	doc/bnf$(EXE) $< > $@
 
 doc/bnf$(EXE): doc/bnf.mll
@@ -1872,19 +1872,19 @@ doc/bnf$(EXE): doc/bnf.mll
 doc/extract_ocaml_code: doc/extract_ocaml_code.ml
 	$(OCAMLC) str.cma -o $@ $<
 
-doc/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+doc/generated/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
-doc/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+doc/generated/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
-doc/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+doc/generated/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
-doc/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
+doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
-doc/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
+doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
@@ -1904,11 +1904,12 @@ OCAMLCODE_MLWTREE = buildenv openmodule useimport \
 	source1 code1 helper1 source2 code2 source3 code3 \
 	closemodule checkingvcs
 
-OCAMLCODE = $(addprefix doc/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
-	$(addprefix doc/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
-	$(addprefix doc/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
-	$(addprefix doc/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
-	doc/whyconf__provertype.ml
+OCAMLCODE = \
+	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
+	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
+	doc/generated/whyconf__provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
