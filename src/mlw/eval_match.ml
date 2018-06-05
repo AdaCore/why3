@@ -84,12 +84,32 @@ let unfold_inlineable kn ls tl ty = match find_inlineable kn ls with
       Some (t_ty_subst (oty_match mt e.t_ty ty) mv e)
   | None -> None
 
+exception FoundIdl of preid list
+
 let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
   match destructible kn ty with
   | Some ls ->
       let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
-      let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
-      let nvl = List.map mk_v ls.ls_args in
+      let mk_v id ty = create_vsymbol id (ty_inst s ty) in
+      let clone id = List.map (fun _ -> id_clone id) ls.ls_args in
+      let rec lookup_names f = match f.t_node with
+        | Tcase ({t_node = Tvar u}, [bt]) when vs_equal u v ->
+            begin match (fst (t_open_branch bt)).pat_node with
+              | Pvar x -> raise (FoundIdl (clone x.vs_name))
+              | Papp (cs, pl) when ls_equal ls cs ->
+                  let name p = match p.pat_node with
+                    | Pvar x -> id_clone x.vs_name
+                    | _ -> id_clone v.vs_name in
+                  raise (FoundIdl (List.map name pl))
+              | Papp _ | Pwild | Por _ | Pas _ -> ()
+            end
+        | Tcase (t, [bt]) ->
+            lookup_names t; lookup_names (snd (t_open_branch bt))
+        | Tcase (t, _) | Tbinop (Timplies, _, t) -> lookup_names t
+        | Tquant (_, qf) -> let _,_,f = t_open_quant qf in lookup_names f
+        | _ -> () in
+      let idl = try lookup_names f; clone v.vs_name with FoundIdl idl -> idl in
+      let nvl = List.map2 mk_v idl ls.ls_args in
       let t = fs_app ls (List.map t_var nvl) ty in
       let f = t_let_close_simp v t f in
       let tl = tr_map (t_subst_single v t) tl in
