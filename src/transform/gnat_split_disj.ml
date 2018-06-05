@@ -70,5 +70,5 @@ let () =
 
 let () =
    Trans.register_transform_l path_split_name
-    (Trans.compose_l Split_goal.split_goal_wp split_disj)
+    (Trans.compose_l Split_goal.split_goal_right split_disj)
    ~desc:"First do split_goal, then split_disj"

@@ -1,5 +1,5 @@
 open Why3
-open Stdlib
+open Wstdlib
 
 type proof_mode =
     Progressive

@@ -99,7 +99,6 @@ let () =
 
 let () =
   let trans =
-    Trans.compose_l Split_goal.split_goal_wp split_conj in
+    Trans.compose_l Split_goal.split_goal_right split_conj in
   Trans.register_transform_l "split_goal_wp_conj" trans
     ~desc:"split goal followed by conjunction split"
-

@@ -2,7 +2,7 @@
    as seen in the Ada language (see function register_apply_to_records of
    Collect_data_model). *)
 open Why3
-open Stdlib
+open Wstdlib
 open Smt2_model_defs
 
 (* This function should remain consistant with the theories and the gnat2why

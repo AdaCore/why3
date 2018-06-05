@@ -1,5 +1,5 @@
 open Why3
-open Stdlib
+open Wstdlib
 
 type goal_id = Session_itp.proofNodeID
 (* This is the type of identifier of goal. They can be queried from the session
@@ -644,7 +644,7 @@ let iter_main_goals s fu =
   *)
   let files = Session_itp.get_files s in
   let theories =
-    Stdlib.Hstr.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
+    Hstr.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
                         (Session_itp.file_theories x) @ acc)
     files [] in
   let main_goals =

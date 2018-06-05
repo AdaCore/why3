@@ -586,6 +586,7 @@ LIBOBJS
 enable_relocation
 LOCALDIR
 enable_local
+FRAMAC_INCLUDE
 FRAMAC_LIBDIR
 FRAMAC_SHARE
 FRAMAC_VERSION
@@ -617,12 +618,14 @@ BIGINTPKG
 BIGINTLIB
 BIGINTINCLUDE
 enable_zarith
+NUMINCLUDE
 META_OCAMLGRAPH
 HASJSOFOCAML
 LABLGTK2PKG
 LABLGTK2LIB
 enable_ide
 COQCAMLPLIB
+COQCAMLP
 enable_profiling
 OCAMLGRAPHLIB
 OCAMLINSTALLLIB
@@ -637,7 +640,6 @@ FRAMAC
 ISABELLE
 PVS
 COQTOPBYTE
-COQCAMLP
 COQDEP
 COQC
 EMACS
@@ -2842,6 +2844,299 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+# Add compatibility for C99
+   case $ac_cv_prog_cc_stdc in #(
+  no) :
+    ac_cv_prog_cc_c99=no; ac_cv_prog_cc_c89=no ;; #(
+  *) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO C99" >&5
+$as_echo_n "checking for $CC option to accept ISO C99... " >&6; }
+if ${ac_cv_prog_cc_c99+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_prog_cc_c99=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <wchar.h>
+#include <stdio.h>
+
+// Check varargs macros.  These examples are taken from C99 6.10.3.5.
+#define debug(...) fprintf (stderr, __VA_ARGS__)
+#define showlist(...) puts (#__VA_ARGS__)
+#define report(test,...) ((test) ? puts (#test) : printf (__VA_ARGS__))
+static void
+test_varargs_macros (void)
+{
+  int x = 1234;
+  int y = 5678;
+  debug ("Flag");
+  debug ("X = %d\n", x);
+  showlist (The first, second, and third items.);
+  report (x>y, "x is %d but y is %d", x, y);
+}
+
+// Check long long types.
+#define BIG64 18446744073709551615ull
+#define BIG32 4294967295ul
+#define BIG_OK (BIG64 / BIG32 == 4294967297ull && BIG64 % BIG32 == 0)
+#if !BIG_OK
+  your preprocessor is broken;
+#endif
+#if BIG_OK
+#else
+  your preprocessor is broken;
+#endif
+static long long int bignum = -9223372036854775807LL;
+static unsigned long long int ubignum = BIG64;
+
+struct incomplete_array
+{
+  int datasize;
+  double data[];
+};
+
+struct named_init {
+  int number;
+  const wchar_t *name;
+  double average;
+};
+
+typedef const char *ccp;
+
+static inline int
+test_restrict (ccp restrict text)
+{
+  // See if C++-style comments work.
+  // Iterate through items via the restricted pointer.
+  // Also check for declarations in for loops.
+  for (unsigned int i = 0; *(text+i) != '\0'; ++i)
+    continue;
+  return 0;
+}
+
+// Check varargs and va_copy.
+static void
+test_varargs (const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  va_list args_copy;
+  va_copy (args_copy, args);
+
+  const char *str;
+  int number;
+  float fnumber;
+
+  while (*format)
+    {
+      switch (*format++)
+	{
+	case 's': // string
+	  str = va_arg (args_copy, const char *);
+	  break;
+	case 'd': // int
+	  number = va_arg (args_copy, int);
+	  break;
+	case 'f': // float
+	  fnumber = va_arg (args_copy, double);
+	  break;
+	default:
+	  break;
+	}
+    }
+  va_end (args_copy);
+  va_end (args);
+}
+
+int
+main ()
+{
+
+  // Check bool.
+  _Bool success = false;
+
+  // Check restrict.
+  if (test_restrict ("String literal") == 0)
+    success = true;
+  char *restrict newvar = "Another string";
+
+  // Check varargs.
+  test_varargs ("s, d' f .", "string", 65, 34.234);
+  test_varargs_macros ();
+
+  // Check flexible array members.
+  struct incomplete_array *ia =
+    malloc (sizeof (struct incomplete_array) + (sizeof (double) * 10));
+  ia->datasize = 10;
+  for (int i = 0; i < ia->datasize; ++i)
+    ia->data[i] = i * 1.234;
+
+  // Check named initializers.
+  struct named_init ni = {
+    .number = 34,
+    .name = L"Test wide string",
+    .average = 543.34343,
+  };
+
+  ni.number = 58;
+
+  int dynamic_array[ni.number];
+  dynamic_array[ni.number - 1] = 543;
+
+  // work around unused variable warnings
+  return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
+	  || dynamic_array[ni.number - 1] != 543);
+
+  ;
+  return 0;
+}
+_ACEOF
+for ac_arg in '' -std=gnu99 -std=c99 -c99 -AC99 -D_STDC_C99= -qlanglvl=extc99
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_c99=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext
+  test "x$ac_cv_prog_cc_c99" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+
+fi
+# AC_CACHE_VAL
+case "x$ac_cv_prog_cc_c99" in
+  x)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;;
+  xno)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;;
+  *)
+    CC="$CC $ac_cv_prog_cc_c99"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c99" >&5
+$as_echo "$ac_cv_prog_cc_c99" >&6; } ;;
+esac
+if test "x$ac_cv_prog_cc_c99" != xno; then :
+  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c99
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO C89" >&5
+$as_echo_n "checking for $CC option to accept ISO C89... " >&6; }
+if ${ac_cv_prog_cc_c89+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_prog_cc_c89=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdarg.h>
+#include <stdio.h>
+struct stat;
+/* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
+struct buf { int x; };
+FILE * (*rcsopen) (struct buf *, struct stat *, int);
+static char *e (p, i)
+     char **p;
+     int i;
+{
+  return p[i];
+}
+static char *f (char * (*g) (char **, int), char **p, ...)
+{
+  char *s;
+  va_list v;
+  va_start (v,p);
+  s = g (p, va_arg (v,int));
+  va_end (v);
+  return s;
+}
+
+/* OSF 4.0 Compaq cc is some sort of almost-ANSI by default.  It has
+   function prototypes and stuff, but not '\xHH' hex character constants.
+   These don't provoke an error unfortunately, instead are silently treated
+   as 'x'.  The following induces an error, until -std is added to get
+   proper ANSI mode.  Curiously '\x00'!='x' always comes out true, for an
+   array size at least.  It's necessary to write '\x00'==0 to get something
+   that's true only with -std.  */
+int osf4_cc_array ['\x00' == 0 ? 1 : -1];
+
+/* IBM C 6 for AIX is almost-ANSI by default, but it replaces macro parameters
+   inside strings and character constants.  */
+#define FOO(x) 'x'
+int xlc6_cc_array[FOO(a) == 'x' ? 1 : -1];
+
+int test (int i, double x);
+struct s1 {int (*f) (int a);};
+struct s2 {int (*f) (double a);};
+int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
+int argc;
+char **argv;
+int
+main ()
+{
+return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
+  ;
+  return 0;
+}
+_ACEOF
+for ac_arg in '' -qlanglvl=extc89 -qlanglvl=ansi -std \
+	-Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_c89=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext
+  test "x$ac_cv_prog_cc_c89" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+
+fi
+# AC_CACHE_VAL
+case "x$ac_cv_prog_cc_c89" in
+  x)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;;
+  xno)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;;
+  *)
+    CC="$CC $ac_cv_prog_cc_c89"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c89" >&5
+$as_echo "$ac_cv_prog_cc_c89" >&6; } ;;
+esac
+if test "x$ac_cv_prog_cc_c89" != xno; then :
+  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c89
+else
+  ac_cv_prog_cc_stdc=no
+fi
+
+fi
+ ;;
+esac
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO Standard C" >&5
+$as_echo_n "checking for $CC option to accept ISO Standard C... " >&6; }
+  if ${ac_cv_prog_cc_stdc+:} false; then :
+  $as_echo_n "(cached) " >&6
+fi
+
+  case $ac_cv_prog_cc_stdc in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;; #(
+  '') :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;; #(
+  *) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_stdc" >&5
+$as_echo "$ac_cv_prog_cc_stdc" >&6; } ;;
+esac
+
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
   if test -f "$ac_dir/install-sh"; then
@@ -3862,24 +4157,140 @@ $as_echo "$as_me: WARNING: Cannot find emacs, compilation of why3.elc disabled."
    fi
 fi
 
-# checking for Zarith
-if test "$enable_zarith" = yes; then
-   if test "$USEOCAMLFIND" = yes; then
-      BIGINTINCLUDE=$(ocamlfind query zarith)
-   fi
-   if test -n "$BIGINTINCLUDE"; then
-      echo "ocamlfind found zarith in $BIGINTINCLUDE"
-      BIGINTINCLUDE="-I $BIGINTINCLUDE"
-   else
-      as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/zarith/zarith.cma" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/zarith/zarith.cma" >&5
-$as_echo_n "checking for $OCAMLLIB/zarith/zarith.cma... " >&6; }
+# checking for Num
+# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
+found_num=no
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query num)
+   if test -n "$DIR"; then
+      echo "ocamlfind found num in $DIR"
+      NUMINCLUDE="-I $DIR"
+      found_num=yes
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/nums.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/nums.cma" >&5
+$as_echo_n "checking for $DIR/nums.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/zarith/zarith.cma"; then
+if test -r "$DIR/nums.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  found_num=no
+fi
+
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/num.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/num.cmi" >&5
+$as_echo_n "checking for $DIR/num.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/num.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  found_num=no
+fi
+
+   fi
+fi
+if test "$found_num" = no; then
+   DIR="$OCAMLLIB"
+   NUMINCLUDE=
+   found_num=yes
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/nums.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/nums.cma" >&5
+$as_echo_n "checking for $DIR/nums.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/nums.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  found_num=no
+fi
+
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/num.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/num.cmi" >&5
+$as_echo_n "checking for $DIR/num.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/num.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  found_num=no
+fi
+
+fi
+if test "$found_num" = no; then
+   as_fn_error $? "Library Num not found." "$LINENO" 5
+fi
+
+# checking for Zarith
+if test "$enable_zarith" = yes; then
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query zarith)
+      if test -n "$DIR"; then
+         echo "ocamlfind found zarith in $DIR"
+         BIGINTINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      BIGINTINCLUDE="-I +zarith"
+      DIR="$OCAMLLIB/zarith"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/zarith.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/zarith.cma" >&5
+$as_echo_n "checking for $DIR/zarith.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/zarith.cma"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -3894,13 +4305,34 @@ else
   enable_zarith=no
 fi
 
-      if test "$enable_zarith" = no; then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib Zarith not found, using Nums instead." >&5
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/z.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/z.cmi" >&5
+$as_echo_n "checking for $DIR/z.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/z.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_zarith=no
+fi
+
+   if test "$enable_zarith" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib Zarith not found, using Nums instead." >&5
 $as_echo "$as_me: WARNING: Lib Zarith not found, using Nums instead." >&2;}
-         reason_zarith=" (zarith not found)"
-      else
-         BIGINTINCLUDE="-I +zarith"
-      fi
+      reason_zarith=" (zarith not found)"
    fi
 fi
 
@@ -3910,26 +4342,31 @@ if test "$enable_zarith" = yes; then
 else
    BIGINTLIB=nums
    BIGINTPKG=num
+   BIGINTINCLUDE="$NUMINCLUDE"
 fi
 
 # checking for camlzip
 if test "$enable_zip" = yes; then
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      ZIPINCLUDE=$(ocamlfind query zip)
+      DIR=$(ocamlfind query zip)
+      if test -n "DIR"; then
+         echo "ocamlfind found camlzip in $DIR"
+         ZIPINCLUDE="-I $DIR"
+      fi
    fi
-   if test -n "$ZIPINCLUDE"; then
-      echo "ocamlfind found camlzip in $ZIPINCLUDE"
-      ZIPINCLUDE="-I $ZIPINCLUDE"
-   else
-      as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/zip/zip.cma" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/zip/zip.cma" >&5
-$as_echo_n "checking for $OCAMLLIB/zip/zip.cma... " >&6; }
+   if test -z "$DIR"; then
+      ZIPINCLUDE="-I +zip"
+      DIR="$OCAMLLIB/zip"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/zip.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/zip.cma" >&5
+$as_echo_n "checking for $DIR/zip.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/zip/zip.cma"; then
+if test -r "$DIR/zip.cma"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -3944,13 +4381,34 @@ else
   enable_zip=no
 fi
 
-      if test "$enable_zip" = no; then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib camlzip not found, sessions files will not be compressed." >&5
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/zip.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/zip.cmi" >&5
+$as_echo_n "checking for $DIR/zip.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/zip.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_zip=no
+fi
+
+   if test "$enable_zip" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib camlzip not found, sessions files will not be compressed." >&5
 $as_echo "$as_me: WARNING: Lib camlzip not found, sessions files will not be compressed." >&2;}
-         reason_zip=" (camlzip not found)"
-      else
-         ZIPINCLUDE="-I +zip"
-      fi
+      reason_zip=" (camlzip not found)"
    fi
 fi
 
@@ -3958,25 +4416,31 @@ if test "$enable_zip" = yes; then
    ZIPLIB=zip
 else
    ZIPLIB=
+   ZIPINCLUDE=
 fi
 
+# checking for menhirlib
 if test "$enable_menhirLib" = yes; then
-  if test "$USEOCAMLFIND" = yes; then
-     MENHIRINCLUDE=$(ocamlfind query menhirLib)
-  fi
-  if test -n "$MENHIRINCLUDE"; then
-     echo "ocamlfind found menhirLib in $MENHIRINCLUDE"
-     MENHIRINCLUDE="-I $MENHIRINCLUDE"
-  else
-     as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/menhirLib/menhirLib.cmx" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/menhirLib/menhirLib.cmx" >&5
-$as_echo_n "checking for $OCAMLLIB/menhirLib/menhirLib.cmx... " >&6; }
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query menhirLib)
+      if test -n "$DIR"; then
+         echo "ocamlfind found menhirLib in $DIR"
+         MENHIRINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      MENHIRINCLUDE="-I +menhirLib"
+      DIR="$OCAMLLIB/menhirLib"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/menhirLib.cmx" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/menhirLib.cmx" >&5
+$as_echo_n "checking for $DIR/menhirLib.cmx... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/menhirLib/menhirLib.cmx"; then
+if test -r "$DIR/menhirLib.cmx"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -3991,13 +4455,34 @@ else
   enable_menhirLib=no
 fi
 
-     if test "$enable_menhirLib" = no; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib menhirLib not found, parser source files will be bigger." >&5
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/menhirLib.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/menhirLib.cmi" >&5
+$as_echo_n "checking for $DIR/menhirLib.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/menhirLib.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_menhirLib=no
+fi
+
+   if test "$enable_menhirLib" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib menhirLib not found, parser source files will be bigger." >&5
 $as_echo "$as_me: WARNING: Lib menhirLib not found, parser source files will be bigger." >&2;}
-        reason_menhirLib=" (menhirLib not found)"
-     else
-        MENHIRINCLUDE="-I +menhirLib"
-     fi
+      reason_menhirLib=" (menhirLib not found)"
    fi
 fi
 
@@ -4005,26 +4490,33 @@ if test "$enable_menhirLib" = yes; then
    MENHIRLIB=menhirLib
 else
    MENHIRLIB=
+   MENHIRINCLUDE=
 fi
 
 # checking for lablgtk2
-if test "$enable_ide" = yes ; then
+if test "$enable_ide" != yes ; then
+   reason_ide=" (disabled by user)"
+else
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTK2LIB=$(ocamlfind query lablgtk2)
+      DIR=$(ocamlfind query lablgtk2)
+      if test -n "$DIR"; then
+         echo "ocamlfind found lablgtk2 in $DIR"
+         LABLGTK2LIB="$DIR"
+      fi
    fi
-   if test -n "$LABLGTK2LIB";then
-      echo "ocamlfind found lablgtk2 in $LABLGTK2LIB"
-   else
+   if test -z "$DIR"; then
       LABLGTK2LIB="+lablgtk2"
-      as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/lablgtk2/lablgtk.cma" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/lablgtk2/lablgtk.cma" >&5
-$as_echo_n "checking for $OCAMLLIB/lablgtk2/lablgtk.cma... " >&6; }
+      DIR="$OCAMLLIB/lablgtk2"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtk.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/lablgtk.cma" >&5
+$as_echo_n "checking for $DIR/lablgtk.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/lablgtk2/lablgtk.cma"; then
+if test -r "$DIR/lablgtk.cma"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -4039,34 +4531,61 @@ else
   enable_ide=no
 fi
 
-      if test "$enable_ide" = no; then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtk2 not found, IDE disabled." >&5
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/gtkButton.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/gtkButton.cmi" >&5
+$as_echo_n "checking for $DIR/gtkButton.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/gtkButton.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_ide=no
+fi
+
+   if test "$enable_ide" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtk2 not found, IDE disabled." >&5
 $as_echo "$as_me: WARNING: Lib lablgtk2 not found, IDE disabled." >&2;}
-         reason_ide=" (lablgtk2 not found)"
-      fi
+      reason_ide=" (lablgtk2 not found)"
    fi
 fi
 
 # checking for lablgtksourceview2
 if test "$enable_ide" = yes ; then
+   DIR=
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTKSV2LIB=$(ocamlfind query lablgtk2.sourceview2)
-      if test -z "$LABLGTKSV2LIB"; then
-         LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      DIR=$(ocamlfind query lablgtk2.sourceview2)
+      if test -z "$DIR"; then
+         DIR=$(ocamlfind query lablgtksourceview2)
+      fi
+      if test -n "$DIR";then
+         echo "ocamlfind found lablgtksourceview2 in $DIR"
+         LABLGTKSV2LIB="$DIR"
       fi
    fi
-   if test -n "$LABLGTKSV2LIB";then
-      echo "ocamlfind found lablgtksourceview2 in $LABLGTKSV2LIB"
-   else
-      as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/lablgtk2/lablgtksourceview2.cma" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/lablgtk2/lablgtksourceview2.cma" >&5
-$as_echo_n "checking for $OCAMLLIB/lablgtk2/lablgtksourceview2.cma... " >&6; }
+   if test -z "$DIR"; then
+      DIR="$OCAMLLIB/lablgtk2"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtksourceview2.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/lablgtksourceview2.cma" >&5
+$as_echo_n "checking for $DIR/lablgtksourceview2.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/lablgtk2/lablgtksourceview2.cma"; then
+if test -r "$DIR/lablgtksourceview2.cma"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -4081,22 +4600,119 @@ else
   enable_ide=no
 fi
 
-      if test "$enable_ide" = no; then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtksourceview2 not found, IDE disabled." >&5
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/gSourceView2.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/gSourceView2.cmi" >&5
+$as_echo_n "checking for $DIR/gSourceView2.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/gSourceView2.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_ide=no
+fi
+
+   if test "$enable_ide" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtksourceview2 not found, IDE disabled." >&5
 $as_echo "$as_me: WARNING: Lib lablgtksourceview2 not found, IDE disabled." >&2;}
-         reason_ide=" (lablgtksourceview2 not found)"
-      fi
+      reason_ide=" (lablgtksourceview2 not found)"
    fi
 fi
 
 if test "$enable_ide" = yes ; then
-  LABLGTK2PKG="lablgtk2 lablgtk2.init lablgtk2.sourceview2"
+   LABLGTK2PKG="lablgtk2 lablgtk2.init lablgtk2.sourceview2"
 else
-  LABLGTK2PKG=
+   LABLGTK2PKG=
+   LABLGTK2LIB=
 fi
 
 
 
+# checking for ocamlgraph
+if test "$enable_hypothesis_selection" = yes; then
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query ocamlgraph)
+      if test -n "$DIR"; then
+         echo "ocamlfind found ocamlgraph in $DIR"
+         OCAMLGRAPHLIB="$DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      OCAMLGRAPHLIB="+ocamlgraph"
+      DIR="$OCAMLLIB/ocamlgraph"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/graph.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/graph.cma" >&5
+$as_echo_n "checking for $DIR/graph.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/graph.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_hypothesis_selection=no
+fi
+
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/graph.cmi" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/graph.cmi" >&5
+$as_echo_n "checking for $DIR/graph.cmi... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/graph.cmi"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  enable_hypothesis_selection=no
+fi
+
+   if test "$enable_hypothesis_selection" = no; then
+      reason_hypothesis_selection=" (ocamlgraph not found)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&5
+$as_echo "$as_me: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&2;}
+   fi
+fi
+
+if test "$enable_hypothesis_selection" = yes; then
+   META_OCAMLGRAPH="ocamlgraph"
+else
+   META_OCAMLGRAPH=
+   OCAMLGRAPHLIB=
+fi
 
 # checking for js_of_ocaml
 HASJSOFOCAML=no
@@ -4186,9 +4802,8 @@ $as_echo_n "checking Coq version... " >&6; }
    COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([^ ]*\) .*$|\1|p' `
 
    #Even if the name of the variable is CAMLP4 the value can be camlp5
-   CAMLP4BIN=`$COQC -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
-   CAMLP4=`$COQC -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
-   COQCAMLPLIB=`$COQC -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
+   COQCAMLP=`$COQC -config | sed -n -e 's/CAMLP[45]O=\(.*\)$/\1/p'`
+   COQCAMLPLIB=`$COQC -config | sed -n -e 's/CAMLP[45]LIB=\(.*\)$/\1/p'`
 
    case $COQVERSION in
       8.4*)
@@ -4218,6 +4833,16 @@ $as_echo "$COQVERSION" >&6; }
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: $COQVERSION" >&5
 $as_echo "$COQVERSION" >&6; }
+         ;;
+      8.8*)
+         coq_compat_version="COQ88"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $COQVERSION" >&5
+$as_echo "$COQVERSION" >&6; }
+         if test "$enable_coq_tactic" = yes; then
+            enable_coq_tactic=no
+            reason_coq_tactic=" (coq <= 8.7 not found)"
+         fi
          ;;
       *)
          enable_coq_support=no
@@ -4313,48 +4938,7 @@ fi
 fi
 
 if test "$enable_coq_tactic" = yes; then
-   # Extract the first word of "${CAMLP4}o", so it can be a program name with args.
-set dummy ${CAMLP4}o; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_COQCAMLP+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $COQCAMLP in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_COQCAMLP="$COQCAMLP" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $CAMLP4BIN
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_COQCAMLP="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_COQCAMLP" && ac_cv_path_COQCAMLP="no"
-  ;;
-esac
-fi
-COQCAMLP=$ac_cv_path_COQCAMLP
-if test -n "$COQCAMLP"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $COQCAMLP" >&5
-$as_echo "$COQCAMLP" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-   if test "$COQCAMLP" = no; then
+   if test -z "$COQCAMLP"; then
       enable_coq_tactic=no
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find camlpXo." >&5
 $as_echo "$as_me: WARNING: Cannot find camlpXo." >&2;}
@@ -4610,48 +5194,8 @@ $as_echo_n "checking for NASA PVS library... " >&6; }
 $as_echo "$enable_pvs_libs" >&6; }
 fi
 
-# hypothesis_selection
-
-if test "$enable_hypothesis_selection" = yes; then
-   if test "$USEOCAMLFIND" = yes; then
-     OCAMLGRAPHLIB=$(ocamlfind query ocamlgraph)
-   fi
-   if test -n "$OCAMLGRAPHLIB"; then
-     echo "ocamlfind found ocamlgraph in $OCAMLGRAPHLIB"
-   else
-     OCAMLGRAPHLIB="+ocamlgraph"
-     as_ac_File=`$as_echo "ac_cv_file_$OCAMLLIB/ocamlgraph/" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OCAMLLIB/ocamlgraph/" >&5
-$as_echo_n "checking for $OCAMLLIB/ocamlgraph/... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OCAMLLIB/ocamlgraph/"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-
-else
-  enable_hypothesis_selection=no
-fi
-
-     if test "$enable_hypothesis_selection" = no; then
-       reason_hypothesis_selection=" (ocamlgraph not found)"
-       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&5
-$as_echo "$as_me: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&2;}
-     fi
-   fi
-fi
-
 #check frama-c
+FRAMAC_SUPPORTED=Sulfur
 if test "$enable_frama_c" = yes ; then
    # Extract the first word of "frama-c", so it can be a program name with args.
 set dummy frama-c; ac_word=$2
@@ -4699,27 +5243,24 @@ $as_echo "$as_me: WARNING: Cannot find Frama-C." >&2;}
    else
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking Frama-C version" >&5
 $as_echo_n "checking Frama-C version... " >&6; }
-      FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|Version: *\(.*\)$|\1|p'`
+      FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|\(Version: \)\?\(.*\)$|\2|p'`
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FRAMAC_VERSION" >&5
 $as_echo "$FRAMAC_VERSION" >&6; }
       case $FRAMAC_VERSION in
-         Sodium-*) ;;
-         *) { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Version Sodium required." >&5
-$as_echo "$as_me: WARNING: Version Sodium required." >&2;}
+         $FRAMAC_SUPPORTED-*) ;;
+         *) { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Version $FRAMAC_SUPPORTED required." >&5
+$as_echo "$as_me: WARNING: Version $FRAMAC_SUPPORTED required." >&2;}
             enable_frama_c=no
-            reason_frama_c=" (version Sodium required)"
+            reason_frama_c=" (version $FRAMAC_SUPPORTED required)"
             ;;
       esac
-      FRAMAC_SHARE=`$FRAMAC -print-path`
-      FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
    fi
 fi
 
-#For the META
-if test "$enable_hypothesis_selection" = yes; then
-   META_OCAMLGRAPH="ocamlgraph"
-else
-   META_OCAMLGRAPH=""
+if test "$enable_frama_c" = yes; then
+   FRAMAC_SHARE=`$FRAMAC -print-path`
+   FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
+   FRAMAC_INCLUDE="-I $FRAMAC_LIBDIR"
 fi
 
 #Viewer for ps and pdf
@@ -4819,14 +5360,17 @@ VERSION=$PACKAGE_VERSION
 
 
 
+
+
+
 # Finally create the Makefile from Makefile.in
-ac_config_files="$ac_config_files Makefile src/config.sh doc/version.tex"
+ac_config_files="$ac_config_files Makefile src/jessie/Makefile"
+
+ac_config_files="$ac_config_files src/config.sh doc/version.tex"
 
 ac_config_files="$ac_config_files lib/why3/META"
 
-ac_config_files="$ac_config_files .merlin"
-
-ac_config_files="$ac_config_files src/jessie/Makefile"
+ac_config_files="$ac_config_files .merlin src/jessie/.merlin"
 
 ac_config_commands="$ac_config_commands chmod"
 
@@ -5543,11 +6087,12 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "src/jessie/Makefile") CONFIG_FILES="$CONFIG_FILES src/jessie/Makefile" ;;
     "src/config.sh") CONFIG_FILES="$CONFIG_FILES src/config.sh" ;;
     "doc/version.tex") CONFIG_FILES="$CONFIG_FILES doc/version.tex" ;;
     "lib/why3/META") CONFIG_FILES="$CONFIG_FILES lib/why3/META" ;;
     ".merlin") CONFIG_FILES="$CONFIG_FILES .merlin" ;;
-    "src/jessie/Makefile") CONFIG_FILES="$CONFIG_FILES src/jessie/Makefile" ;;
+    "src/jessie/.merlin") CONFIG_FILES="$CONFIG_FILES src/jessie/.merlin" ;;
     "chmod") CONFIG_COMMANDS="$CONFIG_COMMANDS chmod" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -5978,10 +6523,10 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "chmod":C) chmod a-w Makefile src/config.sh doc/version.tex;
+    "chmod":C) chmod a-w Makefile src/jessie/Makefile;
+chmod a-w src/config.sh doc/version.tex;
 chmod a-w lib/why3/META;
-chmod a-w .merlin;
-chmod a-w src/jessie/Makefile;
+chmod a-w .merlin src/jessie/.merlin;
 chmod u+x src/config.sh ;;
 
   esac
