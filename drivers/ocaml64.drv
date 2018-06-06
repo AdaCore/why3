@@ -329,8 +329,8 @@ end
 
 module io.StdIO
   syntax val print_char "Pervasives.print_char %1"
-  syntax val print_int "Pervasives.print_int (Z.to_int %1)"
-  syntax val print_newline "Pervasives.print_newline"
+  syntax val print_int "Pervasives.print_string (Z.to_string %1)"
+  syntax val print_newline "Pervasives.print_newline %1"
 end
 
 module random.Random
