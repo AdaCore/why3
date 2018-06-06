@@ -27,6 +27,7 @@ type reify_env = { kn: known_map;
                    crc_map: Coercion.t;
                    ty_to_map: vsymbol Mty.t;
                    env: Env.env;
+                   interps: Sls.t; (* functions that were inverted*)
                    task: Task.task;
                    bound_vars: Svs.t; (* bound variables, do not map them in a var map*)
                    bound_fr: int; (* separate, negative index for bound vars*)
@@ -42,6 +43,7 @@ let init_renv kn crc lv env task =
     crc_map = crc;
     ty_to_map = Mty.empty;
     env = env;
+    interps = Sls.empty;
     task = task;
     bound_vars = Svs.empty;
     bound_fr = -1;
@@ -309,7 +311,7 @@ let rec reify_term renv t rt =
     let vl, f = open_ls_defn ld in
     Debug.dprintf debug_reification "invert_interp ls %a t %a@."
                                 Pretty.print_ls ls Pretty.print_term t;
-    invert_body renv ls vl f t
+    invert_body { renv with interps = Sls.add ls renv.interps } ls vl f t
   and invert_body renv ls vl f t =
     match f.t_node with
     | Tvar v when vs_equal v (List.hd vl) -> renv, t
@@ -345,6 +347,7 @@ let rec reify_term renv t rt =
     let vl, f = open_ls_defn ld in
     Debug.dprintf debug_reification "invert_ctx_interp ls %a @."
                                 Pretty.print_ls ls;
+    let renv = { renv with interps = Sls.add ls renv.interps } in
     invert_ctx_body renv ls vl f t l g
   and invert_ctx_body renv ls vl f t l g =
     match f.t_node with
@@ -520,7 +523,7 @@ let build_vars_map renv prev =
       renv.store (prev,[]) in
   subst, prev, mapdecls, defdecls
 
-let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
+let build_goals do_trans renv prev mapdecls defdecls subst env lp g rt =
   Debug.dprintf debug_refl "building goals@.";
   let inst_rt = t_subst subst rt in
   Debug.dprintf debug_refl "reified goal instantiated@.";
@@ -556,7 +559,13 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
          Debug.dprintf debug_refl "no cut found@.";
          if do_trans
          then
-           let t = Trans.apply (compute_hyp_few hr) task_r in
+           let g, prev = task_separate_goal task_r in
+           let prev = Sls.fold
+                     (fun ls t ->
+                       Task.add_meta t Compute.meta_rewrite_def [Theory.MAls ls])
+                     renv.interps prev in
+           let t = Task.add_tdecl prev g in
+           let t = Trans.apply (compute_hyp_few hr) t in
            match t with
            | [t] ->
               let rewrite = Apply.rewrite_list None false true
@@ -590,7 +599,7 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
   let subst, prev, mds, dds = build_vars_map renv prev in
-  build_goals true prev mds dds subst env lp g rt)
+  build_goals true renv prev mds dds subst env lp g rt)
 
 open Expr
 open Ity
@@ -677,7 +686,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
     let rinfo, lp, _lv, rt = reify_post lpost in
     let lp = (rs.rs_cty.cty_pre)@lp in
     let subst, prev, mds, dds = build_vars_map rinfo prev in
-    build_goals do_trans prev mds dds subst env lp g rt
+    build_goals do_trans rinfo prev mds dds subst env lp g rt
   with
     ReductionFail renv ->
     (* proof failed, show reification context for debugging *)
