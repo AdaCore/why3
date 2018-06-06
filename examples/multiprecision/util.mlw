@@ -42,6 +42,39 @@ module Util
       i := Int32.(+) !i one;
     done
 
+   (* [is_zero] checks if [x[0..sz-1]] is zero. It corresponds to [mpn_zero_p]. *)
+   let is_zero (x:t) (sz:int32) : int32
+     requires { valid x sz }
+     ensures { 0 <= Int32.to_int result <= 1 }
+     ensures { Int32.to_int result = 1 <-> value x sz = 0 }
+   =
+     let i = ref sz in
+     let uzero = Limb.of_int 0 in
+     let lx = ref uzero in
+     try
+       while Int32.(>=) !i (Int32.of_int 1) do
+         variant { p2i !i }
+         invariant { 0 <= !i <= sz }
+         invariant { value_sub (pelts x) (x.offset + !i) (x.offset + sz)=0 }
+         let ghost k = p2i !i in
+         i := Int32.(-) !i (Int32.of_int 1);
+         assert { 0 <= !i < sz };
+         lx := get_ofs x !i;
+         if not (Limb.(=) !lx uzero)
+         then begin
+           value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
+           value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
+           value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
+           raise Return32 (Int32.of_int 0);
+         end
+         else begin
+           assert { 1+2=3 };
+         end
+       done;
+       Int32.of_int 1
+     with Return32 r -> r
+     end
+
   (** [zero r sz] sets [(r,sz)] to zero. Corresponds to [mpn_zero]. *)
   let zero (r:t) (sz:int32) : unit
     requires { valid r sz }

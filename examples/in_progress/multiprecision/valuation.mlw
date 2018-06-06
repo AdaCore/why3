@@ -42,6 +42,10 @@ module Valuation
                = 1 + valuation (n * power p (k-1)) p }
     end
 
+  lemma valuation_split: forall n p. 1 <= n -> prime p ->
+    let v = valuation n p in
+    valuation (div n (power p v)) p = 0        (* only altergo proves this? *)
+
   let lemma valuation_lower_bound (n p v:int)
     requires {  1 <= n /\ 1 < p /\ 0 <= v }
     requires { divides (power p v) n }
@@ -75,10 +79,6 @@ module Valuation
 
   lemma valuation_zero_prod: forall c1 c2 p. 1 <= c1 -> 1 <= c2 -> prime p ->
     valuation c1 p = 0 -> valuation c2 p = 0 -> valuation (c1 * c2) p = 0
-
-  lemma valuation_split: forall n p. 1 <= n -> prime p ->
-    let v = valuation n p in
-    valuation (div n (power p v)) p = 0         (* only altergo proves this? *)
 
   let rec lemma valuation_times_nondiv (n c p:int)
     requires { 1 <= n /\ 1 <= c }
