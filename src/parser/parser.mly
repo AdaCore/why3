@@ -1066,6 +1066,8 @@ ret_ident:
 | id = attrs(lident_nq)
     { let ats = ATstr Dterm.attr_w_unused_var_no :: id.id_ats in
       mk_pat (Pvar ({id with id_ats = ats}, false)) $startpos $endpos }
+| UNDERSCORE
+    { mk_pat Pwild $startpos $endpos }
 
 return:
 |               ty            { $1, Ity.MaskVisible }
