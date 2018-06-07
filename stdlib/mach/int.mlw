@@ -144,6 +144,22 @@ module UnsignedGMP
       to_int x + to_int y + to_int c
       /\ 0 <= to_int d <= 1 }
 
+  (* add_ssaaaa *)
+  val add_double (a1 a0 b1 b0:t) : (t,t)
+    returns { (h,l) -> l + radix * h
+                     = mod (a0 + radix * a1 + b0 + radix * b1) (radix * radix) }
+
+  (* add_ssaaaa with no overflow *)
+  val add_double_nc (a1 a0 b1 b0:t) : (t,t)
+    requires { a0 + radix * a1 + b0 + radix * b1 < radix * radix }
+    returns  { (h, l) -> l + radix * h = a0 + radix * a1 + b0 + radix * b1 }
+
+  (* add_ssaaaa with ghost carry *)
+  val add_double_gc (a1 a0 b1 b0:t) : (ghost t, t, t)
+    returns  { (c,h,l) -> l + radix * h + radix * radix * c
+                          = a0 + radix * a1 + b0 + radix * b1
+                        /\ 0 <= to_int c <= 1 }
+
   val sub_mod (x y:t) : t
     ensures { to_int result = mod (to_int x - to_int y) radix }
 
@@ -154,6 +170,23 @@ module UnsignedGMP
       to_int x - to_int y - to_int b
       /\ 0 <= to_int d <= 1 }
 
+  (* sub_ddmmss *)
+  val sub_double (a1 a0 b1 b0:t) : (t,t)
+    returns { (h,l) -> l + radix * h
+                       = mod ((a0 + radix * a1) - (b0 + radix * b1))
+                             (radix * radix) }
+
+  (* sub_ddmmss with no underflow *)
+  val sub_double_nb (a1 a0 b1 b0:t) : (t,t)
+    requires { 0 <= ((a0 + radix * a1) - (b0 + radix * b1)) }
+    returns { (h,l) -> l + radix * h = ((a0 + radix * a1) - (b0 + radix * b1)) }
+
+  (* sub_ddmmss with ghost borrow *)
+  val sub_double_gb (a1 a0 b1 b0:t) : (ghost t,t,t)
+    returns { (b,h,l) -> l + radix * h - radix*radix*b
+                         = ((a0 + radix * a1) - (b0 + radix * b1))
+                      /\ 0 <= b <= 1 }
+
   val add3 (x y z:t) : (t,t)
     returns { (r,d) ->
       to_int r + radix * to_int d =
@@ -163,7 +196,7 @@ module UnsignedGMP
   val mul_mod (x y:t) : t
     ensures { to_int result = mod (to_int x * to_int y) radix }
 
-  val mul_double (x y:t) : (t,t)
+  val mul_double (x y:t) : (t,t) (* umul_ppmm *)
     returns { (r,d) ->
       to_int r + radix * to_int d =
       to_int x * to_int y }
