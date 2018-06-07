@@ -71,12 +71,17 @@ let intro_var subst ({vs_name = id; vs_ty = ty} as vs) =
   Mvs.add vs (fs_app ls [] ty) subst,
   create_param_decl ls
 
-let rec intros kn pr f =
+let rec intros kn pr expl f =
+  let is_expl a = Strings.has_prefix "expl:" a.attr_string in
+  let fexpl = Sattr.filter is_expl f.t_attrs in
+  let expl = if Sattr.is_empty fexpl then expl else fexpl in
+  let move_expl f = if Sattr.is_empty fexpl && not (Sattr.is_empty expl)
+                    then t_attr_add (Sattr.min_elt expl) f else f in
   match f.t_node with
   (* (f2 \/ True) => _ *)
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
       when Sattr.mem Term.asym_split f2.t_attrs ->
-        [create_prop_decl Pgoal pr f]
+        [create_prop_decl Pgoal pr (move_expl f)]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
       (* f is going to be removed, preserve its attributes and location in f2 *)
@@ -91,20 +96,20 @@ let rec intros kn pr f =
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
         subst, d::dl in
       let _, fl = List.fold_left add (Mvs.empty, []) fl in
-      List.rev_append fl (intros kn pr f2)
+      List.rev_append fl (intros kn pr expl f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr f
+      dl @ intros kn pr expl f
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
       let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr f
-  | _ -> [create_prop_decl Pgoal pr f]
+      d :: intros kn pr expl f
+  | _ -> [create_prop_decl Pgoal pr (move_expl f)]
 
 let intros ?known_map pr f =
   let tvs = t_ty_freevars Stv.empty f in
@@ -112,7 +117,8 @@ let intros ?known_map pr f =
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
-  Mtv.values decls @ intros known_map pr (t_ty_subst subst Mvs.empty f)
+  let f = t_ty_subst subst Mvs.empty f in
+  Mtv.values decls @ intros known_map pr Sattr.empty f
 
 let introduce_premises = Trans.store (fun t ->
   let known_map = Task.task_known t in
