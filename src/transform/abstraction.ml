@@ -15,7 +15,7 @@ open Term
 open Decl
 
 let abstraction (keep : lsymbol -> bool) =
-  let term_table = Hterm.create 257 in
+  let term_table = Hterm_nt_na.create 257 in
   let extra_decls = ref [] in
 
   let rec abstract t : term =
@@ -27,10 +27,10 @@ let abstraction (keep : lsymbol -> bool) =
         t_map abstract t
     | _ ->
         let t = t_attr_set Sattr.empty t in
-        let (ls, tabs) = try Hterm.find term_table t with Not_found ->
+        let (ls, tabs) = try Hterm_nt_na.find term_table t with Not_found ->
           let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
           let tabs = t_app ls [] t.t_ty in
-          Hterm.add term_table t (ls, tabs);
+          Hterm_nt_na.add term_table t (ls, tabs);
           ls, tabs in
         extra_decls := ls :: !extra_decls;
         tabs in

@@ -424,7 +424,7 @@ let t_similar t1 t2 =
     | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
 
-let t_hash t =
+let t_hash trigger attr t =
   let rec pat_hash bnd bv p = match p.pat_node with
     | Pwild -> bnd, bv, 0
     | Pvar v -> bnd + 1, Mvs.add v bnd bv, bnd + 1
@@ -448,8 +448,13 @@ let t_hash t =
         bnd + 1, Mvs.add v bnd bv, Hashcons.combine hp (bnd + 1)
   in
   let rec t_hash bnd vml t =
-    let comb l h = Hashcons.combine (attr_hash l) h in
-    let h = Sattr.fold comb t.t_attrs (oty_hash t.t_ty) in
+    let h = oty_hash t.t_ty in
+    let h =
+      if attr then
+        let comb l h = Hashcons.combine (attr_hash l) h in
+        Sattr.fold comb t.t_attrs h
+      else h
+    in
     Hashcons.combine h
       begin match descend vml t with
       | Bnd i -> i + 1
@@ -485,8 +490,12 @@ let t_hash t =
                 | [] -> bnd, bv in
               let bnd, bv = add bnd Mvs.empty vl in
               let vml = (bv, b.bv_subst) :: vml in
-              let h = List.fold_left
-                (Hashcons.combine_list (t_hash bnd vml)) h tr in
+              let h =
+                if trigger then
+                  List.fold_left
+                    (Hashcons.combine_list (t_hash bnd vml)) h tr
+                else h
+              in
               Hashcons.combine h (t_hash bnd vml f)
           | Tbinop (op,f,g) ->
               let ho = Hashtbl.hash op in
@@ -565,7 +574,7 @@ let add_nt_vars _ n t s = vars_union s
 
 module TermOHT = struct
   type t = term
-  let hash = t_hash
+  let hash = t_hash true true
   let equal = t_equal
   let compare = t_compare
 end
@@ -573,6 +582,17 @@ end
 module Mterm = Extmap.Make(TermOHT)
 module Sterm = Extset.MakeOfMap(Mterm)
 module Hterm = Exthtbl.Make(TermOHT)
+
+module TermOHT_nt_na = struct
+  type t = term
+  let hash = t_hash false false
+  let equal = t_equal_nt_na
+  let compare = t_compare
+end
+
+module Hterm_nt_na = Exthtbl.Make(TermOHT_nt_na)
+
+let t_hash = t_hash true true
 
 (* hash-consing constructors for terms *)
 

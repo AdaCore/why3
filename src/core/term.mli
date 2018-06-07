@@ -152,6 +152,7 @@ val t_equal : term -> term -> bool
 val t_hash : term -> int
 (* Equality modulo attributes and triggers *)
 val t_equal_nt_na : term -> term -> bool
+module Hterm_nt_na : Exthtbl.S with type key = term
 
 (** {2 Bindings} *)
 
