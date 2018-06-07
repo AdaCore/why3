@@ -226,9 +226,8 @@ let rec disjoint_union (s1 s2: set coloring) : set coloring
 
 use import array.Array
 
-let enum () : (array int, ghost array (set coloring))
-  returns { count, sets ->
-            Array.length count = 51 = Array.length sets
+let enum () : (count: array int, ghost sets: array (set coloring))
+  ensures { Array.length count = 51 = Array.length sets
             /\ (forall i. 0 <= i <= 50 ->
                (forall c: coloring. Seq.length c = i ->
                           (valid c <-> mem c (sets[i]))))

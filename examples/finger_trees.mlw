@@ -48,8 +48,8 @@ module FingerTrees
     | Deep l m r -> d_m l ++ flatten (t_m m) ++ d_m r
     end
 
-  let d_cons (x:'a) (d:digit 'a) : (digit 'a,list (node 'a))
-    returns { b,o -> Cons x (d_m d) = d_m b ++ flatten o /\ length o <= 1 }
+  let d_cons (x:'a) (d:digit 'a) : (b: digit 'a, o: list (node 'a))
+    ensures { Cons x (d_m d) = d_m b ++ flatten o /\ length o <= 1 }
   = match d with
     | One y -> Two x y , Nil
     | Two y z -> Three x y z , Nil

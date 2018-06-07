@@ -300,11 +300,12 @@ module CumulativeTree
 (** {3 update cumulative tree} *)
 
 
-  let rec update_aux (t:tree) (i:int) (ghost a :array int) (v:int) : (tree,int)
+  let rec update_aux
+      (t:tree) (i:int) (ghost a :array int) (v:int) : (t': tree, delta: int)
     requires { is_tree_for t a t.indexes.low t.indexes.high }
     requires { t.indexes.low <= i < t.indexes.high }
     variant { t }
-    returns { (t',delta) ->
+    ensures {
         delta = v - a[i] /\
         t'.indexes.low = t.indexes.low /\
         t'.indexes.high = t.indexes.high /\
@@ -387,12 +388,14 @@ module CumulativeTree
 
   use import ref.Ref
 
-  let rec update_aux_complexity (t:tree) (i:int) (ghost a :array int) (v:int) (ghost c:ref int): (tree,int)
+  let rec update_aux_complexity
+        (t:tree) (i:int) (ghost a :array int)
+        (v:int) (ghost c:ref int) : (t': tree, delta: int)
      requires { is_tree_for t a t.indexes.low t.indexes.high }
      requires { t.indexes.low <= i < t.indexes.high }
      variant { t }
      ensures { !c - old !c <= depth t }
-     returns { (t',delta) ->
+     ensures {
         delta = v - a[i] /\
         t'.indexes.low = t.indexes.low /\
         t'.indexes.high = t.indexes.high /\

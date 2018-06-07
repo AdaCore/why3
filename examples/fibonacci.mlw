@@ -239,12 +239,12 @@ module Zeckendorf
     requires { sum l1 = sum l2 }
     ensures { l1 = l2 }
     variant { sum l1 }
-  = let rec decomp (k acc:int) (lc lb:list int) : (int,list int)
+  = let rec decomp (k acc:int) (lc lb:list int) : (x: int, p: list int)
       requires { wf k lc }
       requires { k >= 2 /\ lc <> Nil }
       requires { 0 <= acc = sum lb - sum lc < fib (k-1) }
-      returns { x,p -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
-      returns { x,p -> wf k p /\ x >= k /\ lc = snoc p x }
+      ensures { fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
+      ensures { wf k p /\ x >= k /\ lc = snoc p x }
       variant { lc }
     = match lc with
       | Nil -> absurd

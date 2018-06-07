@@ -81,9 +81,9 @@ module TreeReconstruction
   exception Failure
     (* used to signal the algorithm's failure i.e. there is no tree *)
 
-  let rec build_rec (d: int) (s: list int) : (tree, list int)
+  let rec build_rec (d: int) (s: list int) : (t: tree, s': list int)
     variant { length s, hd s - d }
-    returns { t, s' -> s = depths d t ++ s' }
+    ensures { s = depths d t ++ s' }
     raises  { Failure -> forall t: tree, s' : list int. depths d t ++ s' <> s }
   = match s with
     | Nil ->

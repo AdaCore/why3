@@ -98,6 +98,15 @@
   let continue_id = "'Continue"
   let return_id   = "'Return"
 
+  let apply_return pat sp =
+    let apply = function
+      | loc, [{pat_desc = Pvar ({id_str = "result"; id_loc = l}, false)}, f]
+        when Loc.equal loc l -> loc, [pat, f]
+      | post -> post in
+    match pat.pat_desc with
+    | Pwild -> sp
+    | _ -> { sp with sp_post = List.map apply sp.sp_post }
+
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -431,15 +440,12 @@ binders: binder+ { List.concat $1 }
 param:
 | anon_binder
     { error_param (floc $startpos $endpos) }
+| lident_nq attr+
+    { error_param (floc $startpos $endpos) }
 | ty_arg
     { [floc $startpos $endpos, None, false, $1] }
 | LEFTPAR GHOST ty RIGHTPAR
     { [floc $startpos $endpos, None, true, $3] }
-| ty_arg attr attr*
-    { match $1 with
-      | PTtyapp (Qident _, []) ->
-             error_param (floc $startpos $endpos)
-      | _ -> error_loc (floc $startpos($2) $endpos($2)) }
 | LEFTPAR binder_vars_rest RIGHTPAR
     { match $2 with [l,_] -> error_param l
       | _ -> error_loc (floc $startpos($3) $endpos($3)) }
@@ -454,6 +460,8 @@ param:
 binder:
 | anon_binder
     { let l,i = $1 in [l, i, false, None] }
+| lident_nq attr+
+    { [floc $startpos $endpos, Some (add_attr $1 $2), false, None] }
 | ty_arg
     { match $1 with
       | PTtyapp (Qident id, [])
@@ -465,12 +473,6 @@ binder:
       | PTtyapp (Qident id, []) ->
              [floc $startpos $endpos, Some id, true, None]
       | _ -> [floc $startpos $endpos, None, true, Some $3] }
-| ty_arg attr attr*
-    { match $1 with
-      | PTtyapp (Qident id, []) ->
-             let id = add_attr id ($2::$3) in
-             [floc $startpos $endpos, Some id, false, None]
-      | _ -> error_loc (floc $startpos($2) $endpos($2)) }
 | LEFTPAR binder_vars_rest RIGHTPAR
     { match $2 with [l,i] -> [l, i, false, None]
       | _ -> error_loc (floc $startpos($3) $endpos($3)) }
@@ -487,12 +489,12 @@ binder_vars:
 | binder_vars_rest  { $1 }
 
 binder_vars_rest:
-| binder_vars_head attr attr* binder_var*
+| binder_vars_head attr+ binder_var*
     { List.rev_append (match $1 with
         | (l, Some id) :: bl ->
-            let l3 = floc $startpos($3) $endpos($3) in
-            (Loc.join l l3, Some (add_attr id ($2::$3))) :: bl
-        | _ -> assert false) $4 }
+            let l2 = floc $startpos($2) $endpos($2) in
+            (Loc.join l l2, Some (add_attr id $2)) :: bl
+        | _ -> assert false) $3 }
 | binder_vars_head anon_binder binder_var*
     { List.rev_append $1 ($2 :: $3) }
 | anon_binder binder_var*
@@ -689,20 +691,25 @@ kind:
 (* Function definitions *)
 
 rec_defn:
-| ghost kind attrs(lident_rich) binders ret_opt spec EQUAL spec seq_expr
-    { let id = mk_id return_id $startpos($7) $endpos($7) in
-      let e = { $9 with expr_desc = Eoptexn (id, snd $5, $9) } in
-      $3, $1, $2, $4, fst $5, snd $5, spec_union $6 $8, e }
+| ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
+    { let pat, ty, mask = $5 in
+      let spec = apply_return pat (spec_union $6 $8) in
+      let id = mk_id return_id $startpos($7) $endpos($7) in
+      let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
+      $3, $1, $2, $4, ty, mask, spec, e }
 
 fun_defn:
-| binders ret_opt spec EQUAL spec seq_expr
-    { let id = mk_id return_id $startpos($4) $endpos($4) in
-      let e = { $6 with expr_desc = Eoptexn (id, snd $2, $6) } in
-      Efun (List.map add_model_attrs $1, fst $2, snd $2, spec_union $3 $5, e) }
+| binders return_opt spec EQUAL spec seq_expr
+    { let pat, ty, mask = $2 in
+      let spec = apply_return pat (spec_union $3 $5) in
+      let id = mk_id return_id $startpos($4) $endpos($4) in
+      let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
+      Efun (List.map add_model_attrs $1, ty, mask, spec, e) }
 
 val_defn:
-| params ret_opt spec
-    { Eany ($1, Expr.RKnone, fst $2, snd $2, $3) }
+| params return_opt spec
+    { let pat, ty, mask = $2 in
+      Eany ($1, Expr.RKnone, ty, mask, apply_return pat $3) }
 
 const_defn:
 | cast EQUAL seq_expr   { { $3 with expr_desc = Ecast ($3, $1) } }
@@ -825,8 +832,9 @@ single_expr_:
     { let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
       Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
-| ANY return spec
-    { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
+| ANY return_named spec
+    { let pat, ty, mask = $2 in
+      Eany ([], Expr.RKnone, Some ty, mask, apply_return pat $3) }
 | VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH ext_match_cases END
@@ -1036,30 +1044,45 @@ variant:
 single_variant:
 | single_term preceded(WITH,lqualid)?  { $1, $2 }
 
-ret_opt:
-| (* epsilon *)     { None, Ity.MaskVisible }
-| COLON return      { Some (fst $2), snd $2 }
+return_opt:
+| (* epsilon *)       { mk_pat Pwild $startpos $endpos, None, Ity.MaskVisible }
+| COLON return_named  { let pat, ty, mask = $2 in pat, Some ty, mask }
+
+return_named:
+| LEFTPAR ret_cast RIGHTPAR
+    { $2 }
+| LEFTPAR comma_list2(ret_cast) RIGHTPAR
+    { mk_pat (Ptuple (List.map (fun (pat,_,_) -> pat) $2)) $startpos $endpos,
+      PTtuple (List.map (fun (_,ty,_) -> ty) $2),
+      Ity.MaskTuple (List.map (fun (_,_,mask) -> mask) $2) }
+| return
+    { let ty, mask = $1 in mk_pat Pwild $startpos $endpos, ty, mask }
+
+ret_cast:
+|       ret_ident cast  { $1, $2, Ity.MaskVisible }
+| GHOST ret_ident cast  { $2, $3, Ity.MaskGhost }
+
+ret_ident:
+| id = attrs(lident_nq)
+    { let ats = ATstr Dterm.attr_w_unused_var_no :: id.id_ats in
+      mk_pat (Pvar ({id with id_ats = ats}, false)) $startpos $endpos }
 
 return:
-| ret_arg           { $1 }
-| lqualid ty_arg+   { PTtyapp ($1, $2), Ity.MaskVisible }
-| ret_arg ARROW ty  { PTarrow (fst $1, $3),
-                      if Ity.mask_ghost (snd $1) then
-                        raise Error else Ity.MaskVisible }
-| GHOST ty          { $2, Ity.MaskGhost }
+|               ty            { $1, Ity.MaskVisible }
+|         GHOST ty            { $2, Ity.MaskGhost }
+| LEFTPAR GHOST ty RIGHTPAR   { $3, Ity.MaskGhost }
+| LEFTPAR ret_ghost RIGHTPAR  { PTtuple (fst $2), Ity.MaskTuple (snd $2) }
 
-ret_arg:
-| lqualid                               { PTtyapp ($1, []), Ity.MaskVisible }
-| quote_lident                          { PTtyvar $1, Ity.MaskVisible }
-| LEFTPAR RIGHTPAR                      { PTtuple [], Ity.MaskVisible }
-| LEFTBRC ty RIGHTBRC                   { PTpure  $2, Ity.MaskVisible }
-| LEFTPAR ret_sub RIGHTPAR              { PTparen (fst $2), snd $2 }
-| LEFTPAR comma_list2(ret_sub) RIGHTPAR { PTtuple (List.map fst $2),
-                                    Ity.MaskTuple (List.map snd $2) }
+ret_ghost:
+|       ty COMMA GHOST ty     { [$1; $4], [Ity.MaskVisible; Ity.MaskGhost] }
+|       ty COMMA ret_ghost    { $1::fst $3, Ity.MaskVisible::snd $3 }
+| GHOST ty COMMA ret_rest     { $2::fst $4, Ity.MaskGhost::snd $4 }
 
-ret_sub:
-| ty                { $1, Ity.MaskVisible }
-| GHOST ty          { $2, Ity.MaskGhost }
+ret_rest:
+|       ty COMMA ret_rest     { $1::fst $3, Ity.MaskVisible::snd $3 }
+| GHOST ty COMMA ret_rest     { $2::fst $4, Ity.MaskGhost::snd $4 }
+|       ty                    { [$1], [Ity.MaskVisible] }
+| GHOST ty                    { [$2], [Ity.MaskGhost] }
 
 (* Patterns *)
 

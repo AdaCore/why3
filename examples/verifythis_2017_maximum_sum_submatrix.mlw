@@ -26,9 +26,8 @@ module Kadane2D
   function array_sum (a: A.array int) (l h: int) : int
     = sum (fun i -> a[i]) l h
 
-  val maximum_subarray (a: A.array int) : (int, int, int)
-    returns { s, lo, hi ->
-              0 <= lo <= hi <= A.length a /\ s = array_sum a lo hi /\
+  val maximum_subarray (a: A.array int) : (s: int, lo: int, hi: int)
+    ensures { 0 <= lo <= hi <= A.length a /\ s = array_sum a lo hi /\
               forall l h. 0 <= l <= h <= A.length a -> s >= array_sum a l h }
 
   (* sum of a submatrix *)
@@ -38,9 +37,9 @@ module Kadane2D
   function matrix_sum (m: matrix int) (rl rh cl ch: int) : int
     = sum (fun j -> sum (col m j) rl rh) cl ch
 
-  let maximum_submatrix (m: matrix int) : (int, int, int, int, int)
-    returns { s, rlo, rhi, clo, chi ->
-              (* this is a legal submatrix *)
+  let maximum_submatrix (m: matrix int) :
+      (s: int, rlo: int, rhi: int, clo: int, chi: int)
+    ensures { (* this is a legal submatrix *)
               0 <= rlo <= rhi <= rows m /\
               0 <= clo <= chi <= columns m /\
               (* s is its sum *)

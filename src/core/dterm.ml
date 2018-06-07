@@ -559,8 +559,12 @@ let quant_vars ~strict env vl =
 let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
   ~desc:"Suppress@ warnings@ on@ unused@ variables"
 
+let attr_w_unused_var_no =
+  Ident.create_attribute "W:unused_variable:N"
+
 let check_used_var t vs =
-  if Debug.test_noflag debug_ignore_unused_var then
+  if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) &&
+      Debug.test_noflag debug_ignore_unused_var then
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then

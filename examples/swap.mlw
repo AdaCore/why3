@@ -48,9 +48,9 @@ module SwapInt32
 
   (* purely applicative version first *)
 
-  let swap (a b: int32) : (int32, int32)
+  let swap (a b: int32) : (x: int32, y: int32)
     requires { in_bounds a /\ in_bounds b }
-    returns  { x,y -> int32'int x = b /\ int32'int y = a }
+    ensures  { int32'int x = b /\ int32'int y = a }
   =
     let a = a + b in
     let b = a - b in

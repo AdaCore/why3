@@ -21,9 +21,9 @@ module Sieve
     ensures { !r = old !r + 1 }
   = r := !r + 1
 
-  let sieve (n:int) : array bool
+  let sieve (n:int) : (m: array bool)
     requires { n > 1 }
-    returns { m -> length m = n /\ forall i. 0 <= i < n -> m[i] <-> prime i }
+    ensures  { length m = n /\ forall i. 0 <= i < n -> m[i] <-> prime i }
   = let t = Array.make n true in
     t[0] <- false;
     t[1] <- false;

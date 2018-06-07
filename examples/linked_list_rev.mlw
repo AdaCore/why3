@@ -42,10 +42,10 @@ module InPlaceRev
     end
 
   let rec ghost mem_decomp (x: loc) (l: list loc)
-    : (list loc, list loc)
+    : (l1: list loc, l2: list loc)
     requires { mem x l }
     variant  { l }
-    returns { (l1,l2) -> l = l1 ++ Cons x l2 }
+    ensures  { l = l1 ++ Cons x l2 }
   = match l with
     | Nil -> absurd
     | Cons h t -> if eq_loc h x then (Nil,t) else
@@ -225,10 +225,10 @@ module InPlaceRevSeq
     forall s: seq 'a. length s > 0 ->
     s == cons s[0] s[1..]
 
-  let rec ghost mem_decomp (x: loc) (s: seq loc) : (seq loc, seq loc)
+  let rec ghost mem_decomp (x: loc) (s: seq loc) : (s1: seq loc, s2: seq loc)
     requires { mem x s }
     variant  { length s }
-    returns  { (s1,s2) -> s == s1 ++ cons x s2 }
+    ensures  { s == s1 ++ cons x s2 }
   =
     if eq_loc s[0] x then (empty, s[1..])
     else begin

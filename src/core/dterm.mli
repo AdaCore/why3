@@ -118,6 +118,7 @@ val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
 (** Final stage *)
 
 val debug_ignore_unused_var : Debug.flag
+val attr_w_unused_var_no : Ident.attribute
 
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 
