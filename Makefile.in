@@ -957,9 +957,6 @@ install_local:: bin/why3shell
 # Coq realizations
 ####################
 
-lib/coq/version: lib/coq/version.in config.status
-	./config.status chmod --file $@
-
 COQVERSIONSPECIFIC=
 
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
@@ -1162,9 +1159,6 @@ clean::
 ####################
 # PVS realizations
 ####################
-
-lib/pvs/version: lib/pvs/version.in config.status
-	./config.status chmod --file $@
 
 ifeq (@enable_pvs_libs@,yes)
 
@@ -2245,6 +2239,8 @@ AUTOCONF_FILES = \
 	.merlin \
 	src/jessie/.merlin \
 	lib/why3/META \
+	lib/coq/version \
+	lib/pvs/version \
 	doc/version.tex
 
 $(AUTOCONF_FILES): %: %.in config.status
