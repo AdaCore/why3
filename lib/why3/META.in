@@ -3,7 +3,7 @@ version = "@VERSION@"
 archive(byte) = "why3.cma"
 archive(native) = "why3.cmxa"
 plugin(native) = "why3.cmxs"
-requires = "str unix num dynlink @ZIPLIB@ @MENHIRLIB@"
+requires = "str unix num dynlink menhirLib @ZIPLIB@"
 
 package "extract" (
   description = "Why3 support library for extracted code"

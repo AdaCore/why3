@@ -55,12 +55,7 @@ OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
-
-ifeq (@enable_menhirLib@,yes)
-MENHIR	  = @MENHIR@ --table
-else
 MENHIR	  = @MENHIR@
-endif
 
 DEPFLAGS = -slash
 
@@ -117,7 +112,7 @@ CMIHACK = -intf-suffix .cmi
 
 # external libraries common to all binaries
 
-EXTOBJS = @MENHIRLIB@
+EXTOBJS = menhirLib
 EXTLIBS = str unix nums dynlink @ZIPLIB@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
@@ -2143,7 +2138,7 @@ src/tools/why3extract.cmx: %.cmx: %.ml
 
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --explain --strict $<
+	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'

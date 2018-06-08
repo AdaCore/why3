@@ -76,12 +76,6 @@ AC_ARG_ENABLE(js_of_ocaml,
     AS_HELP_STRING([--disable-js-of-ocaml], [do not use js-of-ocaml]),,
     enable_js_of_ocaml=yes)
 
-# menhirLib
-
-AC_ARG_ENABLE(menhirLib,
-    AS_HELP_STRING([--disable-menhirLib], [do not use MenhirLib parsing library]),,
-    enable_menhirLib=yes)
-
 # IDE
 
 AC_ARG_ENABLE(ide,
@@ -295,8 +289,8 @@ if test "$MENHIR" = no ; then
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
-AX_VERSION_GE([$MENHIRVERSION], 20160303, [],
-  [AC_MSG_ERROR(You need Menhir 20160303 or higher.)])
+AX_VERSION_GE([$MENHIRVERSION], 20151112, [],
+  [AC_MSG_ERROR(You need Menhir 20151112 or higher.)])
 
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
@@ -500,32 +494,23 @@ else
 fi
 
 # checking for menhirlib
-if test "$enable_menhirLib" = yes; then
-   DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query menhirLib)
-      if test -n "$DIR"; then
-         echo "ocamlfind found menhirLib in $DIR"
-         MENHIRINCLUDE="-I $DIR"
-      fi
-   fi
-   if test -z "$DIR"; then
-      MENHIRINCLUDE="-I +menhirLib"
-      DIR="$OCAMLLIB/menhirLib"
-      AC_CHECK_FILE($DIR/menhirLib.cmx,,enable_menhirLib=no)
-   fi
-   AC_CHECK_FILE($DIR/menhirLib.cmi,,enable_menhirLib=no)
-   if test "$enable_menhirLib" = no; then
-      AC_MSG_WARN([Lib menhirLib not found, parser source files will be bigger.])
-      reason_menhirLib=" (menhirLib not found)"
+found_menhirlib=yes
+DIR=
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query menhirLib)
+   if test -n "$DIR"; then
+      echo "ocamlfind found menhirLib in $DIR"
+      MENHIRINCLUDE="-I $DIR"
    fi
 fi
-
-if test "$enable_menhirLib" = yes; then
-   MENHIRLIB=menhirLib
-else
-   MENHIRLIB=
-   MENHIRINCLUDE=
+if test -z "$DIR"; then
+   MENHIRINCLUDE="-I +menhirLib"
+   DIR="$OCAMLLIB/menhirLib"
+   AC_CHECK_FILE($DIR/menhirLib.cmx,,found_menhirlib=no)
+fi
+AC_CHECK_FILE($DIR/menhirLib.cmi,,found_menhirlib=no)
+if test "$found_menhirlib" = no; then
+   AC_MSG_ERROR([Library menhirLib not found.])
 fi
 
 # checking for lablgtk2
@@ -896,9 +881,7 @@ AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
 
-AC_SUBST(enable_menhirLib)
 AC_SUBST(MENHIRINCLUDE)
-AC_SUBST(MENHIRLIB)
 
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
@@ -989,7 +972,6 @@ echo "    GTK IDE                 : $enable_ide$reason_ide"
 echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
-echo "    MenhirLib support       : $enable_menhirLib$reason_menhirLib"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
