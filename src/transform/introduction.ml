@@ -66,8 +66,11 @@ let rec dequant pos f = t_attr_copy f (match f.t_node with
 
 and dequant_if_case pos f = if case f then dequant pos f else f
 
+let intro_attr = Ident.create_attribute "introduced"
+
 let intro_var subst ({vs_name = id; vs_ty = ty} as vs) =
-  let ls = create_fsymbol (id_clone id) [] ty in
+  let new_id = id_clone ~attrs:(Sattr.singleton intro_attr) id in
+  let ls = create_fsymbol new_id [] ty in
   Mvs.add vs (fs_app ls [] ty) subst,
   create_param_decl ls
 
@@ -92,7 +95,8 @@ let rec intros kn pr expl f =
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
           let subst, d = intro_var subst vs in
           subst, d::dl) svs (subst, dl) in
-        let prx = create_prsymbol (id_fresh "H") in
+        let prx = create_prsymbol (id_fresh "H"
+                                     ~attrs:(Sattr.singleton intro_attr)) in
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
         subst, d::dl in
       let _, fl = List.fold_left add (Mvs.empty, []) fl in
@@ -105,7 +109,8 @@ let rec intros kn pr expl f =
       dl @ intros kn pr expl f
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
-      let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+      let id = id_clone ~attrs:(Sattr.singleton intro_attr) vs.vs_name in
+      let ls = create_lsymbol id [] (Some vs.vs_ty) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
       d :: intros kn pr expl f
@@ -138,8 +143,9 @@ let rec eliminate_exists_aux pr t =
   | Tquant (Texists, q) ->
      let vsl, _, t' = t_open_quant q in
      let intro_var subst vs =
+       let id = id_clone ~attrs:(Sattr.singleton intro_attr) vs.vs_name in
        let ls =
-         create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty)
+         create_lsymbol id [] (Some vs.vs_ty)
        in
        Mvs.add vs (fs_app ls [] vs.vs_ty) subst, create_param_decl ls
      in

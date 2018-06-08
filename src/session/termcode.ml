@@ -226,9 +226,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 4
+let current_shape_version = 5
 
-type shape_version = SV1 | SV2 | SV3
+type shape_version = SV1 | SV2 | SV3 | SV4
 
 (* similarity code of terms, or of "shapes"
 
@@ -259,15 +259,17 @@ let tag_var = 'V'
 let tag_wild = 'w'
 let tag_as = 'z'
 
+exception ShapeTooLong
+
 let shape_buffer = Buffer.create 17
 
 let push s =
   Buffer.add_string shape_buffer s;
-  if Buffer.length shape_buffer >= 256 then raise Exit
+  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
 
 let pushc c =
   Buffer.add_char shape_buffer c;
-  if Buffer.length shape_buffer >= 256 then raise Exit
+  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
 
 let ident h id =
   let x =
@@ -345,7 +347,7 @@ let rec t_shape ~version c m t =
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
@@ -355,7 +357,7 @@ let rec t_shape ~version c m t =
             pat_shape c m p;
             pat_rename_alpha c m p;
             t_shape ~version c m t2
-          | SV3 ->
+          | SV3 | SV4 ->
             pat_rename_alpha c m p;
             t_shape ~version c m t2;
             pat_shape c m p
@@ -365,7 +367,7 @@ let rec t_shape ~version c m t =
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 ->
+        | SV3 | SV4 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -407,30 +409,52 @@ let rec t_shape ~version c m t =
           match version with
             | SV1 ->
                pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 ->
+            | SV2 | SV3 | SV4 ->
                      (* t2 first, intentionally *)
                      t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 -> pushc tag_not; fn f
+      | SV3 | SV4 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
 
-
 let t_shape_task ~version ~expl t =
   Buffer.clear shape_buffer;
-  begin match version with
-  | SV1 | SV2 -> ()
-  | SV3 -> push expl
-  end;
   let f = Task.task_goal_fmla t in
+  let c = ref (-1) in
+  let m = ref Ident.Mid.empty in
   let () =
     try
-      t_shape ~version (ref (-1)) (ref Ident.Mid.empty) f
-    with Exit -> ()
+      (* expl *)
+      begin match version with
+      | SV1 | SV2 -> ()
+      | SV3 | SV4 -> push expl end;
+      (* goal shape *)
+      t_shape ~version c m f;
+      (* introduced premises shape *)
+      begin match version with
+      | SV1 | SV2 | SV3 -> ()
+      | SV4 ->
+         let open Decl in
+         let introduced id = Ident.Sattr.mem
+                               Introduction.intro_attr
+                               id.Ident.id_attrs in
+         let do_td td = match td.Theory.td_node with
+           | Theory.Decl d ->
+              begin match d.d_node with
+              | Dparam _ls -> ()
+              | Dprop (_, pr, f) when introduced pr.pr_name ->
+                 t_shape ~version c m f
+              | _ -> ()
+              end
+           | _ -> () in
+         let _, prev = Task.task_separate_goal t in
+         Task.task_iter do_td prev
+      end
+    with ShapeTooLong -> ()
   in
   Buffer.contents shape_buffer
 
@@ -440,7 +464,7 @@ let time = ref 0.0
 
 let t_shape_task ?(version=current_shape_version) ~expl t =
   let version = match version with
-    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3
+    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4
     | _ -> assert false
   in
 (*
@@ -742,7 +766,7 @@ let time = ref 0.0
 let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
-    | 4 -> CV2
+    | 4 | 5 -> CV2
     | _ -> assert false
   in
 (*

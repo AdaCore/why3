@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -105,20 +105,13 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.15" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="4.61"/></proof>
+  <proof prover="0"><result status="valid" time="4.71"/></proof>
   </goal>
   <goal name="VC toom22_mul.16" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.17" expl="precondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.17.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.18"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.17.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.09"/></proof>
-   </goal>
-  </transf>
+  <proof prover="5"><result status="valid" time="0.08" steps="66"/></proof>
   </goal>
   <goal name="VC toom22_mul.18" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -139,31 +132,38 @@
   <proof prover="5"><result status="valid" time="0.15" steps="93"/></proof>
   </goal>
   <goal name="VC toom22_mul.24" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.25" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.26.0" expl="VC for toom22_mul" proved="true">
+   <proof prover="1"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC toom22_mul.26.1" expl="VC for toom22_mul" proved="true">
+   <proof prover="1"><result status="valid" time="0.09"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.27" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.28" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC toom22_mul.29" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.59" steps="210"/></proof>
+  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="VC toom22_mul.30" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.62" steps="199"/></proof>
+  <proof prover="5"><result status="valid" time="0.53" steps="199"/></proof>
   </goal>
   <goal name="VC toom22_mul.31" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC toom22_mul.32" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.53" steps="212"/></proof>
+  <proof prover="5"><result status="valid" time="0.40" steps="212"/></proof>
   </goal>
   <goal name="VC toom22_mul.33" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.34" steps="164"/></proof>
@@ -202,10 +202,10 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.36" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.37" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.38" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -214,22 +214,22 @@
   <proof prover="5"><result status="valid" time="0.63" steps="140"/></proof>
   </goal>
   <goal name="VC toom22_mul.40" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
-  </goal>
-  <goal name="VC toom22_mul.41" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
+  <goal name="VC toom22_mul.41" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <transf name="split_vc" proved="true" >
+  </transf>
+  </goal>
   <goal name="VC toom22_mul.42" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.43" expl="precondition" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.36"/></proof>
+  <proof prover="5"><result status="valid" time="0.64" steps="211"/></proof>
   </goal>
   <goal name="VC toom22_mul.44" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.44" steps="200"/></proof>
@@ -238,7 +238,7 @@
   <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.46" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.47" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -247,65 +247,64 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.49" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.50" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC toom22_mul.51" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
-  </goal>
-  <goal name="VC toom22_mul.52" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
-  </goal>
-  <goal name="VC toom22_mul.53" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
+  <goal name="VC toom22_mul.52" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <transf name="split_vc" proved="true" >
+  </transf>
+  </goal>
+  <goal name="VC toom22_mul.53" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <transf name="split_vc" proved="true" >
+  </transf>
+  </goal>
   <goal name="VC toom22_mul.54" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.60" steps="182"/></proof>
+  <proof prover="5"><result status="valid" time="0.56" steps="182"/></proof>
   </goal>
   <goal name="VC toom22_mul.55" expl="precondition" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.53"/></proof>
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.51" steps="213"/></proof>
+  <proof prover="5"><result status="valid" time="0.70" steps="213"/></proof>
   </goal>
   <goal name="VC toom22_mul.56" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.49" steps="202"/></proof>
+  <proof prover="5"><result status="valid" time="0.52" steps="202"/></proof>
   </goal>
   <goal name="VC toom22_mul.57" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.40"/></proof>
   </goal>
   <goal name="VC toom22_mul.58" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.59" expl="assertion" proved="true">
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.48" steps="137"/></proof>
   </goal>
   <goal name="VC toom22_mul.60" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.52" steps="220"/></proof>
+  <proof prover="5"><result status="valid" time="0.60" steps="220"/></proof>
   </goal>
   <goal name="VC toom22_mul.61" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.51" steps="172"/></proof>
+  <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.62" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.59" steps="217"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.54" steps="217"/></proof>
   </goal>
   <goal name="VC toom22_mul.63" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.64" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.65" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.66" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.67" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -314,7 +313,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.69" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.13"/></proof>
+  <proof prover="5"><result status="valid" time="0.76" steps="148"/></proof>
   </goal>
   <goal name="VC toom22_mul.70" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -323,12 +322,12 @@
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.93" steps="221"/></proof>
   </goal>
   <goal name="VC toom22_mul.72" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.73" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
@@ -338,42 +337,43 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.75" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.59"/></proof>
+  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.53"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.51" steps="215"/></proof>
   </goal>
   <goal name="VC toom22_mul.76" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.52" steps="202"/></proof>
+  <proof prover="5"><result status="valid" time="0.49" steps="202"/></proof>
   </goal>
   <goal name="VC toom22_mul.77" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.54" steps="211"/></proof>
+  <proof prover="5"><result status="valid" time="0.59" steps="211"/></proof>
   </goal>
   <goal name="VC toom22_mul.78" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.79" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.80" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.83" steps="193"/></proof>
+  <proof prover="5"><result status="valid" time="0.60" steps="193"/></proof>
   </goal>
   <goal name="VC toom22_mul.81" expl="integer overflow" proved="true">
   <proof prover="1"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="VC toom22_mul.82" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.56" steps="142"/></proof>
+  <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC toom22_mul.83" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC toom22_mul.83.0" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC toom22_mul.83.0.0" expl="assertion" proved="true">
-    <proof prover="5"><result status="valid" time="1.16" steps="209"/></proof>
+    <proof prover="5"><result status="valid" time="0.88" steps="209"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.84" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.85" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -395,26 +395,26 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.88" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.89" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.90" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.41"/></proof>
+  <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="VC toom22_mul.91" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.68" steps="204"/></proof>
+  <proof prover="5"><result status="valid" time="0.67" steps="204"/></proof>
   </goal>
   <goal name="VC toom22_mul.92" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="VC toom22_mul.93" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.67" steps="219"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.66" steps="219"/></proof>
   </goal>
   <goal name="VC toom22_mul.94" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
@@ -461,16 +461,16 @@
   <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="1.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.106" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.66" steps="205"/></proof>
+  <proof prover="5"><result status="valid" time="0.68" steps="205"/></proof>
   </goal>
   <goal name="VC toom22_mul.107" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.62" steps="214"/></proof>
+  <proof prover="5"><result status="valid" time="0.71" steps="214"/></proof>
   </goal>
   <goal name="VC toom22_mul.108" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.109" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.110" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -479,7 +479,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.112" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.60" steps="144"/></proof>
+  <proof prover="5"><result status="valid" time="0.61" steps="144"/></proof>
   </goal>
   <goal name="VC toom22_mul.113" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -487,17 +487,17 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.114" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
-  </goal>
-  <goal name="VC toom22_mul.115" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
-  <goal name="VC toom22_mul.116" expl="postcondition" proved="true">
+  <goal name="VC toom22_mul.115" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <transf name="split_vc" proved="true" >
+  </transf>
+  </goal>
+  <goal name="VC toom22_mul.116" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
@@ -505,7 +505,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.118" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.70" steps="203"/></proof>
+  <proof prover="5"><result status="valid" time="0.69" steps="203"/></proof>
   </goal>
   <goal name="VC toom22_mul.119" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.76" steps="227"/></proof>
@@ -520,10 +520,10 @@
   <proof prover="3"><result status="valid" time="0.49"/></proof>
   </goal>
   <goal name="VC toom22_mul.123" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.124" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.76" steps="216"/></proof>
+  <proof prover="5"><result status="valid" time="1.04" steps="216"/></proof>
   </goal>
   <goal name="VC toom22_mul.125" expl="precondition" proved="true">
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.80" steps="238"/></proof>
@@ -532,7 +532,7 @@
   <proof prover="5"><result status="valid" time="0.74" steps="188"/></proof>
   </goal>
   <goal name="VC toom22_mul.127" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.66" steps="233"/></proof>
+  <proof prover="5"><result status="valid" time="0.86" steps="233"/></proof>
   </goal>
   <goal name="VC toom22_mul.128" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -544,23 +544,18 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.131" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.132" expl="assertion" proved="true">
-  <transf name="case" proved="true" arg1="(j &lt; offset r)">
-   <goal name="VC toom22_mul.132.0" expl="true case (assertion)" proved="true">
-   <proof prover="0"><result status="valid" time="0.07"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.132.1" expl="false case (assertion)" proved="true">
-   <proof prover="0"><result status="valid" time="0.11"/></proof>
-   </goal>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.133" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.92" steps="163"/></proof>
   </goal>
   <goal name="VC toom22_mul.134" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.98" steps="197"/></proof>
+  <proof prover="5"><result status="valid" time="1.14" steps="197"/></proof>
   </goal>
   <goal name="VC toom22_mul.135" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -607,12 +602,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.138" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.139" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.140" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="1.90"/></proof>
@@ -631,20 +624,20 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.144" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.145" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.146" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.147" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.63" steps="201"/></proof>
+  <proof prover="5"><result status="valid" time="0.80" steps="201"/></proof>
   </goal>
   <goal name="VC toom22_mul.148" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -672,7 +665,7 @@
    <proof prover="3"><result status="valid" time="0.63"/></proof>
    </goal>
    <goal name="VC toom22_mul.148.4" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.64"/></proof>
+   <proof prover="3"><result status="valid" time="0.83"/></proof>
    </goal>
    <goal name="VC toom22_mul.148.5" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -681,33 +674,60 @@
    <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="2.88" steps="469"/></proof>
    </goal>
    <goal name="VC toom22_mul.148.7" expl="VC for toom22_mul" proved="true">
-   <proof prover="5"><result status="valid" time="1.24" steps="202"/></proof>
+   <proof prover="5"><result status="valid" time="0.98" steps="202"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.149" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.150" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="1.50" steps="238"/></proof>
   </goal>
   <goal name="VC toom22_mul.151" expl="precondition" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.99"/></proof>
+  <proof prover="1"><result status="valid" time="1.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.152" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="235"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC toom22_mul.152.0" expl="precondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC toom22_mul.152.0.0" expl="precondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="VC toom22_mul.152.0.0.0" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.152.0.0.1" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.152.0.0.2" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.152.0.0.3" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.152.0.0.4" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.152.0.0.5" expl="VC for toom22_mul" proved="true">
+     <proof prover="5"><result status="valid" time="1.08" steps="155"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.153" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.154" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.155" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.156" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.157" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
@@ -728,45 +748,18 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.161" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="VC toom22_mul.162" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.163" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.75"/></proof>
+  <proof prover="1"><result status="valid" time="0.94"/></proof>
   </goal>
   <goal name="VC toom22_mul.164" expl="precondition" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC toom22_mul.164.0" expl="precondition" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC toom22_mul.164.0.0" expl="precondition" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="VC toom22_mul.164.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.164.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.03"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.164.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.06"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.164.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.03"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.164.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.164.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="5"><result status="valid" time="0.85" steps="219"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="5"><result status="valid" time="1.22" steps="231"/></proof>
   </goal>
   <goal name="VC toom22_mul.165" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.86" steps="252"/></proof>
@@ -775,7 +768,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.167" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.168" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -784,7 +777,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.170" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.91" steps="287"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.96" steps="287"/></proof>
   </goal>
   <goal name="VC toom22_mul.171" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -815,13 +808,13 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.179" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.95" steps="224"/></proof>
+  <proof prover="5"><result status="valid" time="1.36" steps="224"/></proof>
   </goal>
   <goal name="VC toom22_mul.180" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.180.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.12"/></proof>
-   <proof prover="4"><result status="valid" time="0.10"/></proof>
+   <proof prover="4"><result status="valid" time="0.24"/></proof>
    </goal>
   </transf>
   </goal>
@@ -836,67 +829,67 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.182" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.78" steps="291"/></proof>
+  <proof prover="5"><result status="valid" time="1.25" steps="291"/></proof>
   </goal>
   <goal name="VC toom22_mul.183" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.184" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.26" steps="259"/></proof>
+  <proof prover="5"><result status="valid" time="1.77" steps="259"/></proof>
   </goal>
   <goal name="VC toom22_mul.185" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.186" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.47" steps="280"/></proof>
+  <proof prover="5"><result status="valid" time="1.55" steps="280"/></proof>
   </goal>
   <goal name="VC toom22_mul.187" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.188" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.189" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="279"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.10" steps="279"/></proof>
   </goal>
   <goal name="VC toom22_mul.190" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="1.19"/></proof>
+  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="1.31"/></proof>
   </goal>
   <goal name="VC toom22_mul.191" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.15" steps="318"/></proof>
+  <proof prover="5"><result status="valid" time="1.52" steps="318"/></proof>
   </goal>
   <goal name="VC toom22_mul.192" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.193" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.194" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.195" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.196" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.197" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.198" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.26" steps="289"/></proof>
+  <proof prover="5"><result status="valid" time="1.53" steps="289"/></proof>
   </goal>
   <goal name="VC toom22_mul.199" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.200" expl="precondition" proved="true">
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.56" steps="306"/></proof>
   </goal>
   <goal name="VC toom22_mul.201" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.202" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.203" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -909,7 +902,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.205" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.66" steps="356"/></proof>
+  <proof prover="5"><result status="valid" time="1.82" steps="356"/></proof>
   </goal>
   <goal name="VC toom22_mul.206" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -918,7 +911,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.208" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  <proof prover="5"><result status="valid" time="1.40" steps="185"/></proof>
   </goal>
   <goal name="VC toom22_mul.209" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -931,7 +924,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.211" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
@@ -939,13 +932,13 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.213" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.214" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.215" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.216" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -954,28 +947,28 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.218" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.219" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.220" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.221" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.91" steps="279"/></proof>
+  <proof prover="5"><result status="valid" time="1.15" steps="279"/></proof>
   </goal>
   <goal name="VC toom22_mul.222" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.64"/></proof>
   </goal>
   <goal name="VC toom22_mul.223" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.10" steps="307"/></proof>
+  <proof prover="5"><result status="valid" time="1.42" steps="307"/></proof>
   </goal>
   <goal name="VC toom22_mul.224" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.225" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.226" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -984,13 +977,13 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.228" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.229" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.230" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.65"/></proof>
+  <proof prover="5"><result status="valid" time="1.59" steps="289"/></proof>
   </goal>
   <goal name="VC toom22_mul.231" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -999,19 +992,19 @@
   <proof prover="5"><result status="valid" time="1.37" steps="306"/></proof>
   </goal>
   <goal name="VC toom22_mul.233" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.234" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.235" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.236" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.237" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.40" steps="356"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="1.66" steps="356"/></proof>
   </goal>
   <goal name="VC toom22_mul.238" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -1020,7 +1013,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.240" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.04" steps="185"/></proof>
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC toom22_mul.241" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -1041,13 +1034,13 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.245" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.246" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.247" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.248" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -1065,10 +1058,10 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.253" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.19"/></proof>
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC toom22_mul.254" expl="integer overflow" proved="true">
-  <proof prover="1"><result status="valid" time="0.27"/></proof>
+  <proof prover="1"><result status="valid" time="0.28"/></proof>
   </goal>
   <goal name="VC toom22_mul.255" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -1077,7 +1070,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.257" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.258" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -1164,22 +1157,22 @@
     <goal name="VC toom22_mul.266.0.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.266.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.07"/></proof>
+     <proof prover="3"><result status="valid" time="0.20"/></proof>
      </goal>
      <goal name="VC toom22_mul.266.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     <proof prover="3"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC toom22_mul.266.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.09"/></proof>
+     <proof prover="3"><result status="valid" time="0.22"/></proof>
      </goal>
      <goal name="VC toom22_mul.266.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     <proof prover="3"><result status="valid" time="0.26"/></proof>
      </goal>
      <goal name="VC toom22_mul.266.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.13"/></proof>
+     <proof prover="3"><result status="valid" time="0.18"/></proof>
      </goal>
      <goal name="VC toom22_mul.266.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.07"/></proof>
+     <proof prover="3"><result status="valid" time="0.14"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1188,7 +1181,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.267" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.94"/></proof>
+  <proof prover="1"><result status="valid" time="1.44"/></proof>
   </goal>
   <goal name="VC toom22_mul.268" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -1212,7 +1205,7 @@
      <proof prover="3"><result status="valid" time="0.18"/></proof>
      </goal>
      <goal name="VC toom22_mul.268.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.09"/></proof>
+     <proof prover="3"><result status="valid" time="0.20"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1240,25 +1233,10 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.271" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.272" expl="integer overflow" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC toom22_mul.272.0" expl="integer overflow" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC toom22_mul.272.0.0" expl="integer overflow" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="VC toom22_mul.272.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.06"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.272.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="VC toom22_mul.273" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
@@ -1270,22 +1248,22 @@
     <goal name="VC toom22_mul.274.0.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.274.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.20"/></proof>
+     <proof prover="3"><result status="valid" time="0.32"/></proof>
      </goal>
      <goal name="VC toom22_mul.274.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC toom22_mul.274.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.22"/></proof>
+     <proof prover="3"><result status="valid" time="0.44"/></proof>
      </goal>
      <goal name="VC toom22_mul.274.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.26"/></proof>
+     <proof prover="3"><result status="valid" time="0.41"/></proof>
      </goal>
      <goal name="VC toom22_mul.274.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.18"/></proof>
+     <proof prover="3"><result status="valid" time="0.29"/></proof>
      </goal>
      <goal name="VC toom22_mul.274.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.38"/></proof>
+     <proof prover="3"><result status="valid" time="0.34"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1300,22 +1278,23 @@
     <goal name="VC toom22_mul.275.0.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.275.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.06"/></proof>
+     <proof prover="0"><result status="valid" time="0.05"/></proof>
      </goal>
      <goal name="VC toom22_mul.275.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     <proof prover="3"><result status="valid" time="0.01"/></proof>
      </goal>
      <goal name="VC toom22_mul.275.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.28"/></proof>
+     <proof prover="3"><result status="valid" time="0.34"/></proof>
      </goal>
      <goal name="VC toom22_mul.275.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.26"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
+     <proof prover="1"><result status="valid" time="0.11"/></proof>
      </goal>
      <goal name="VC toom22_mul.275.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.25"/></proof>
+     <proof prover="1"><result status="valid" time="0.20"/></proof>
      </goal>
      <goal name="VC toom22_mul.275.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.28"/></proof>
+     <proof prover="3"><result status="valid" time="0.30"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1374,7 +1353,7 @@
    <goal name="VC toom22_mul.281.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC toom22_mul.281.0.0" expl="precondition" proved="true">
-    <transf name="split_vc" proved="true" >
+    <transf name="introduce_premises" proved="true" >
      <goal name="VC toom22_mul.281.0.0.0" expl="precondition" proved="true">
      <transf name="subst" proved="true" arg1="o1">
       <goal name="VC toom22_mul.281.0.0.0.0" expl="precondition" proved="true">
@@ -1412,7 +1391,7 @@
        <goal name="VC toom22_mul.283.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H4">
         <goal name="VC toom22_mul.283.0.0.0.0.0.0" proved="true">
-        <proof prover="0"><result status="valid" time="0.08"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.09"/></proof>
         </goal>
        </transf>
        </goal>
@@ -1430,17 +1409,14 @@
   <proof prover="0"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC toom22_mul.285" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="VC toom22_mul.286" expl="precondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.286.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.286.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC toom22_mul.285.0" expl="integer overflow" proved="true">
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="0.78"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="VC toom22_mul.286" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC toom22_mul.287" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1494,22 +1470,15 @@
        <goal name="VC toom22_mul.288.2.0.1.0.0" expl="VC for toom22_mul" proved="true">
        <transf name="split_vc" proved="true" >
         <goal name="VC toom22_mul.288.2.0.1.0.0.0" expl="VC for toom22_mul" proved="true">
-        <proof prover="1"><result status="valid" time="0.06"/></proof>
         <proof prover="3"><result status="valid" time="0.01"/></proof>
-        <transf name="split_all_full" proved="true" >
-         <goal name="VC toom22_mul.288.2.0.1.0.0.0.0" expl="VC for toom22_mul" proved="true">
-         <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="0.06"/></proof>
-         <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="0.01"/></proof>
-         </goal>
-        </transf>
         </goal>
         <goal name="VC toom22_mul.288.2.0.1.0.0.1" expl="VC for toom22_mul" proved="true">
-        <proof prover="0"><result status="valid" time="0.03"/></proof>
+        <proof prover="4"><result status="valid" time="0.24"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="VC toom22_mul.288.2.0.1.0.1" proved="true">
-       <proof prover="3"><result status="valid" time="0.01"/></proof>
+       <proof prover="3"><result status="valid" time="0.02"/></proof>
        </goal>
       </transf>
       </goal>
@@ -1544,15 +1513,22 @@
        <goal name="VC toom22_mul.288.2.0.3.0.0" expl="VC for toom22_mul" proved="true">
        <transf name="split_vc" proved="true" >
         <goal name="VC toom22_mul.288.2.0.3.0.0.0" expl="VC for toom22_mul" proved="true">
+        <proof prover="1"><result status="valid" time="0.06"/></proof>
         <proof prover="3"><result status="valid" time="0.01"/></proof>
+        <transf name="split_all_full" proved="true" >
+         <goal name="VC toom22_mul.288.2.0.3.0.0.0.0" expl="VC for toom22_mul" proved="true">
+         <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="0.06"/></proof>
+         <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="0.01"/></proof>
+         </goal>
+        </transf>
         </goal>
         <goal name="VC toom22_mul.288.2.0.3.0.0.1" expl="VC for toom22_mul" proved="true">
-        <proof prover="4"><result status="valid" time="0.24"/></proof>
+        <proof prover="4"><result status="valid" time="0.40"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="VC toom22_mul.288.2.0.3.0.1" proved="true">
-       <proof prover="3"><result status="valid" time="0.02"/></proof>
+       <proof prover="3"><result status="valid" time="0.01"/></proof>
        </goal>
       </transf>
       </goal>
@@ -1565,23 +1541,16 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.289" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="1.02"/></proof>
+  <proof prover="3"><result status="valid" time="1.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.290" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.291" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="1.07"/></proof>
   </goal>
   <goal name="VC toom22_mul.292" expl="precondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.292.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.23"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.292.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.36"/></proof>
-   </goal>
-  </transf>
+  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC toom22_mul.293" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -1632,7 +1601,7 @@
      <proof prover="3"><result status="valid" time="0.06"/></proof>
      </goal>
      <goal name="VC toom22_mul.294.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.90"/></proof>
+     <proof prover="3"><result status="valid" time="1.10"/></proof>
      </goal>
      <goal name="VC toom22_mul.294.0.0.5" expl="VC for toom22_mul" proved="true">
      <proof prover="3"><result status="valid" time="0.86"/></proof>
@@ -1671,22 +1640,22 @@
   <goal name="VC toom22_mul.297" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.297.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.38"/></proof>
+   <proof prover="4"><result status="valid" time="0.26"/></proof>
    </goal>
    <goal name="VC toom22_mul.297.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.297.2" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
+   <goal name="VC toom22_mul.297.2" expl="VC for toom22_mul" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   </goal>
    <goal name="VC toom22_mul.297.3" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.41"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="1.72"/></proof>
    </goal>
    <goal name="VC toom22_mul.297.4" expl="VC for toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.20"/></proof>
    </goal>
    <goal name="VC toom22_mul.297.5" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.15"/></proof>
+   <proof prover="1"><result status="valid" time="0.20"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1697,15 +1666,15 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.300" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.90"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.301" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.301.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.25"/></proof>
+   <proof prover="1"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="VC toom22_mul.301.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.29"/></proof>
+   <proof prover="1"><result status="valid" time="0.26"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1752,16 +1721,16 @@
      <proof prover="3"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC toom22_mul.303.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="1.01"/></proof>
+     <proof prover="3"><result status="valid" time="0.77"/></proof>
      </goal>
      <goal name="VC toom22_mul.303.0.0.3" expl="VC for toom22_mul" proved="true">
      <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC toom22_mul.303.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.84"/></proof>
+     <proof prover="3"><result status="valid" time="1.14"/></proof>
      </goal>
      <goal name="VC toom22_mul.303.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="1.10"/></proof>
+     <proof prover="3"><result status="valid" time="1.12"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1818,22 +1787,22 @@
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.44"/></proof>
+   <proof prover="4"><result status="valid" time="0.38"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.3" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.4" expl="VC for toom22_mul" proved="true">
-   <proof prover="0" timelimit="10"><result status="valid" time="0.07"/></proof>
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.5" expl="VC for toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.20"/></proof>
    </goal>
    <goal name="VC toom22_mul.306.6" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.20"/></proof>
+   <proof prover="1"><result status="valid" time="0.15"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1890,7 +1859,7 @@
        <goal name="VC toom22_mul.311.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H3">
         <goal name="VC toom22_mul.311.0.0.0.0.0.0" proved="true">
-        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.23"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.10"/></proof>
         </goal>
        </transf>
        </goal>
@@ -1941,7 +1910,14 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.314" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.314.0" expl="VC for toom22_mul" proved="true">
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC toom22_mul.314.1" expl="VC for toom22_mul" proved="true">
+   <proof prover="3"><result status="valid" time="1.05"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.315" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -1956,7 +1932,7 @@
        <goal name="VC toom22_mul.315.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H6">
         <goal name="VC toom22_mul.315.0.0.0.0.0.0" proved="true">
-        <proof prover="1"><result status="valid" time="0.10"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.23"/></proof>
         </goal>
        </transf>
        </goal>
@@ -1998,14 +1974,14 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.318" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.64"/></proof>
+  <proof prover="3"><result status="valid" time="1.33"/></proof>
   </goal>
   <goal name="VC toom22_mul.319" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC toom22_mul.319.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC toom22_mul.319.0.0" expl="precondition" proved="true">
-    <transf name="split_vc" proved="true" >
+    <transf name="introduce_premises" proved="true" >
      <goal name="VC toom22_mul.319.0.0.0" expl="precondition" proved="true">
      <transf name="subst" proved="true" arg1="o1">
       <goal name="VC toom22_mul.319.0.0.0.0" expl="precondition" proved="true">
@@ -2013,7 +1989,7 @@
        <goal name="VC toom22_mul.319.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H3">
         <goal name="VC toom22_mul.319.0.0.0.0.0.0" proved="true">
-        <proof prover="1"><result status="valid" time="0.10"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.23"/></proof>
         </goal>
        </transf>
        </goal>
@@ -2035,7 +2011,7 @@
    <goal name="VC toom22_mul.321.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC toom22_mul.321.0.0" expl="precondition" proved="true">
-    <transf name="introduce_premises" proved="true" >
+    <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.321.0.0.0" expl="precondition" proved="true">
      <transf name="subst" proved="true" arg1="o1">
       <goal name="VC toom22_mul.321.0.0.0.0" expl="precondition" proved="true">
@@ -2043,7 +2019,7 @@
        <goal name="VC toom22_mul.321.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H5">
         <goal name="VC toom22_mul.321.0.0.0.0.0.0" proved="true">
-        <proof prover="1"><result status="valid" time="0.11"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.24"/></proof>
         </goal>
        </transf>
        </goal>
@@ -2087,16 +2063,35 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.324" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC toom22_mul.324.0" expl="integer overflow" proved="true">
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.65"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.325" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC toom22_mul.325.0" expl="integer overflow" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC toom22_mul.325.0.0" expl="integer overflow" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="VC toom22_mul.325.0.0.0" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.325.0.0.1" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.326" expl="integer overflow" proved="true">
-  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.44"/></proof>
+  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.82"/></proof>
   </goal>
   <goal name="VC toom22_mul.327" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="1.33"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.328" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2109,7 +2104,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.329" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC toom22_mul.330" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -2124,7 +2119,7 @@
        <goal name="VC toom22_mul.330.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H13">
         <goal name="VC toom22_mul.330.0.0.0.0.0.0" proved="true">
-        <proof prover="1"><result status="valid" time="0.12"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.11"/></proof>
         </goal>
        </transf>
        </goal>
@@ -2179,7 +2174,7 @@
    <proof prover="0"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC toom22_mul.331.6" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.50"/></proof>
+   <proof prover="4"><result status="valid" time="0.32"/></proof>
    </goal>
    <goal name="VC toom22_mul.331.7" expl="VC for toom22_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.53"/></proof>
@@ -2206,7 +2201,7 @@
     <proof prover="4"><result status="valid" time="0.54"/></proof>
     </goal>
     <goal name="VC toom22_mul.335.1.1" expl="VC for toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.46"/></proof>
+    <proof prover="4"><result status="valid" time="0.30"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2254,7 +2249,7 @@
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC toom22_mul.336.13" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.23"/></proof>
+   <proof prover="1"><result status="valid" time="0.26"/></proof>
    </goal>
    <goal name="VC toom22_mul.336.14" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -2272,7 +2267,7 @@
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.336.19" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.26"/></proof>
+   <proof prover="1"><result status="valid" time="0.23"/></proof>
    </goal>
    <goal name="VC toom22_mul.336.20" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -2289,12 +2284,12 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.337" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="2.25"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.338" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.338.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.43"/></proof>
+   <proof prover="4"><result status="valid" time="0.42"/></proof>
    </goal>
    <goal name="VC toom22_mul.338.1" expl="VC for toom22_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.52"/></proof>
@@ -2342,19 +2337,19 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.342" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.28"/></proof>
+  <proof prover="0"><result status="valid" time="1.53"/></proof>
   </goal>
   <goal name="VC toom22_mul.343" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.344" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.345" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.346" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.347" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -2404,7 +2399,7 @@
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.15" expl="VC for toom22_mul" proved="true">
-   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="2.01"/></proof>
+   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.70"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.16" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -2424,7 +2419,6 @@
    </goal>
    <goal name="VC toom22_mul.347.21" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="1"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.22" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.36"/></proof>
@@ -2473,7 +2467,7 @@
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.30" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.31" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -2506,7 +2500,7 @@
     <goal name="VC toom22_mul.347.38.0" expl="VC for toom22_mul" proved="true">
     <transf name="apply" proved="true" arg1="valuation_pow">
      <goal name="VC toom22_mul.347.38.0.0" proved="true">
-     <proof prover="3"><result status="valid" time="0.08"/></proof>
+     <proof prover="3"><result status="valid" time="0.06"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2545,7 +2539,7 @@
    <proof prover="0"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.43" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.44" expl="VC for toom22_mul" proved="true">
    <transf name="apply" proved="true" arg1="valuation_times_nondiv">
@@ -2568,7 +2562,7 @@
    </transf>
    </goal>
    <goal name="VC toom22_mul.347.45" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.33"/></proof>
+   <proof prover="0"><result status="valid" time="1.00"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.46" expl="VC for toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.22"/></proof>
@@ -2623,10 +2617,10 @@
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.58" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.59" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.60" expl="VC for toom22_mul" proved="true">
    <transf name="apply" proved="true" arg1="H8">
@@ -2663,7 +2657,7 @@
        <proof prover="3"><result status="valid" time="0.02"/></proof>
        </goal>
        <goal name="VC toom22_mul.347.63.0.0.2.1" proved="true">
-       <proof prover="4"><result status="valid" time="0.68"/></proof>
+       <proof prover="4"><result status="valid" time="0.48"/></proof>
        </goal>
       </transf>
       </goal>
@@ -2876,14 +2870,14 @@
    <goal name="VC toom22_mul.347.72" expl="VC for toom22_mul" proved="true">
    <transf name="rewrite" proved="true" arg1="H8">
     <goal name="VC toom22_mul.347.72.0" expl="VC for toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.58"/></proof>
+    <proof prover="4"><result status="valid" time="0.50"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="VC toom22_mul.347.73" expl="VC for toom22_mul" proved="true">
    <transf name="unfold" proved="true" arg1="a1">
     <goal name="VC toom22_mul.347.73.0" expl="VC for toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.52"/></proof>
+    <proof prover="4"><result status="valid" time="0.44"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2991,7 +2985,7 @@
     </goal>
     <goal name="VC toom22_mul.347.82.1" expl="VC for toom22_mul" proved="true">
     <proof prover="0"><result status="valid" time="1.60"/></proof>
-    <proof prover="4"><result status="valid" time="0.52"/></proof>
+    <proof prover="4"><result status="valid" time="0.45"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3045,7 +3039,7 @@
     </transf>
     </goal>
     <goal name="VC toom22_mul.347.83.5" proved="true">
-    <proof prover="0"><result status="valid" time="3.39"/></proof>
+    <proof prover="0"><result status="valid" time="4.18"/></proof>
     <proof prover="3"><result status="valid" time="0.07"/></proof>
     </goal>
    </transf>
@@ -3180,27 +3174,27 @@
    </goal>
    <goal name="VC toom22_mul.347.102" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.103" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.05"/></proof>
    <proof prover="1"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.104" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.41"/></proof>
+   <proof prover="4"><result status="valid" time="0.62"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.105" expl="VC for toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.106" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.107" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.05"/></proof>
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
+   <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC toom22_mul.347.108" expl="VC for toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="0"><result status="valid" time="0.05"/></proof>
+   <proof prover="3"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3411,7 +3405,7 @@
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.349.13" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="4.80"/></proof>
+   <proof prover="0"><result status="valid" time="4.22"/></proof>
    </goal>
    <goal name="VC toom22_mul.349.14" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -3471,26 +3465,18 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.352" expl="integer overflow" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC toom22_mul.352.0" expl="integer overflow" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.54"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.353" expl="integer overflow" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC toom22_mul.353.0" expl="integer overflow" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="5.22"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.354" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.354.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.24"/></proof>
+   <proof prover="4"><result status="valid" time="0.40"/></proof>
    </goal>
    <goal name="VC toom22_mul.354.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.24"/></proof>
+   <proof prover="4"><result status="valid" time="0.29"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3513,7 +3499,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.356" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.99"/></proof>
+  <proof prover="0"><result status="valid" time="1.66"/></proof>
   </goal>
   <goal name="VC toom22_mul.357" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3541,7 +3527,22 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.358" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC toom22_mul.358.0" expl="integer overflow" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC toom22_mul.358.0.0" expl="integer overflow" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="VC toom22_mul.358.0.0.0" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.358.0.0.1" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.359" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3569,10 +3570,10 @@
      </transf>
      </goal>
      <goal name="VC toom22_mul.359.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="1.78"/></proof>
+     <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="2.16"/></proof>
      </goal>
      <goal name="VC toom22_mul.359.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.52"/></proof>
+     <proof prover="4"><result status="valid" time="0.35"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3593,7 +3594,14 @@
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.364" expl="precondition" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.24"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.364.0" expl="VC for toom22_mul" proved="true">
+   <proof prover="1"><result status="valid" time="0.23"/></proof>
+   </goal>
+   <goal name="VC toom22_mul.364.1" expl="VC for toom22_mul" proved="true">
+   <proof prover="1"><result status="valid" time="0.27"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.365" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3605,7 +3613,7 @@
      <proof prover="0"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC toom22_mul.365.0.0.1" expl="assertion" proved="true">
-     <proof prover="4"><result status="valid" time="0.53"/></proof>
+     <proof prover="4"><result status="valid" time="0.50"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3614,7 +3622,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.366" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.36"/></proof>
+  <proof prover="0"><result status="valid" time="1.78"/></proof>
   </goal>
   <goal name="VC toom22_mul.367" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3628,7 +3636,7 @@
    <goal name="VC toom22_mul.368.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC toom22_mul.368.0.0" expl="precondition" proved="true">
-    <transf name="introduce_premises" proved="true" >
+    <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.368.0.0.0" expl="precondition" proved="true">
      <transf name="subst" proved="true" arg1="o1">
       <goal name="VC toom22_mul.368.0.0.0.0" expl="precondition" proved="true">
@@ -3636,7 +3644,7 @@
        <goal name="VC toom22_mul.368.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H2">
         <goal name="VC toom22_mul.368.0.0.0.0.0.0" proved="true">
-        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.10"/></proof>
+        <proof prover="0"><result status="valid" time="0.02"/></proof>
         </goal>
        </transf>
        </goal>
@@ -3681,7 +3689,7 @@
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.370.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.15"/></proof>
+   <proof prover="1"><result status="valid" time="0.27"/></proof>
    </goal>
    <goal name="VC toom22_mul.370.2" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
@@ -3692,14 +3700,10 @@
   <proof prover="1"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC toom22_mul.372" expl="integer overflow" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC toom22_mul.372.0" expl="integer overflow" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="8.31"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.373" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC toom22_mul.374" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3714,16 +3718,16 @@
      <proof prover="3"><result status="valid" time="0.06"/></proof>
      </goal>
      <goal name="VC toom22_mul.374.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.40"/></proof>
+     <proof prover="4"><result status="valid" time="0.65"/></proof>
      </goal>
      <goal name="VC toom22_mul.374.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.41"/></proof>
+     <proof prover="4"><result status="valid" time="0.71"/></proof>
      </goal>
      <goal name="VC toom22_mul.374.0.0.4" expl="VC for toom22_mul" proved="true">
      <proof prover="4"><result status="valid" time="0.47"/></proof>
      </goal>
      <goal name="VC toom22_mul.374.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="4"><result status="valid" time="0.51"/></proof>
+     <proof prover="4"><result status="valid" time="0.68"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3732,26 +3736,22 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.375" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.376" expl="integer overflow" proved="true">
-  <transf name="introduce_premises" proved="true" >
+  <transf name="split_all_full" proved="true" >
    <goal name="VC toom22_mul.376.0" expl="integer overflow" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC toom22_mul.376.0.0" expl="integer overflow" proved="true">
-    <proof prover="1"><result status="valid" time="0.16"/></proof>
-    </goal>
-   </transf>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="10.31"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.377" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.377.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.23"/></proof>
+   <proof prover="4"><result status="valid" time="0.49"/></proof>
    </goal>
    <goal name="VC toom22_mul.377.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.27"/></proof>
+   <proof prover="4"><result status="valid" time="0.42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3761,18 +3761,18 @@
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC toom22_mul.378.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.26"/></proof>
+   <proof prover="1"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="VC toom22_mul.378.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="3.70"/></proof>
+   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="2.42"/></proof>
    </goal>
    <goal name="VC toom22_mul.378.3" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.379" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.380" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3793,7 +3793,7 @@
    </transf>
    </goal>
    <goal name="VC toom22_mul.380.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.78"/></proof>
+   <proof prover="0"><result status="valid" time="0.58"/></proof>
    </goal>
    <goal name="VC toom22_mul.380.3" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -3845,34 +3845,15 @@
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC toom22_mul.383.5" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.55"/></proof>
+   <proof prover="4"><result status="valid" time="0.48"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.384" expl="integer overflow" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC toom22_mul.384.0" expl="integer overflow" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC toom22_mul.384.0.0" expl="integer overflow" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="VC toom22_mul.384.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.384.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.385" expl="integer overflow" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC toom22_mul.385.0" expl="integer overflow" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="10.84"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.386" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3881,23 +3862,23 @@
     <goal name="VC toom22_mul.386.0.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.386.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.05"/></proof>
+     <proof prover="0"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC toom22_mul.386.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.01"/></proof>
+     <proof prover="3"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC toom22_mul.386.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
+     <proof prover="4"><result status="valid" time="0.78"/></proof>
      </goal>
      <goal name="VC toom22_mul.386.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.06"/></proof>
-     <proof prover="1"><result status="valid" time="0.26"/></proof>
+     <proof prover="1"><result status="valid" time="0.16"/></proof>
      </goal>
      <goal name="VC toom22_mul.386.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="1"><result status="valid" time="0.20"/></proof>
+     <proof prover="1"><result status="valid" time="0.24"/></proof>
      </goal>
      <goal name="VC toom22_mul.386.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.07"/></proof>
+     <proof prover="0"><result status="valid" time="0.08"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3912,24 +3893,32 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.389" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="VC toom22_mul.390" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
+  <goal name="VC toom22_mul.390" expl="integer overflow" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC toom22_mul.390.0" expl="integer overflow" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC toom22_mul.390.0.0" expl="integer overflow" proved="true">
+    <proof prover="1"><result status="valid" time="0.16"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
   <goal name="VC toom22_mul.391" expl="precondition" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.12"/></proof>
+  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="VC toom22_mul.392" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.392.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC toom22_mul.392.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.30"/></proof>
+   <proof prover="1"><result status="valid" time="0.26"/></proof>
    </goal>
    <goal name="VC toom22_mul.392.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.50"/></proof>
+   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="5.67"/></proof>
    </goal>
    <goal name="VC toom22_mul.392.3" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
@@ -3940,11 +3929,7 @@
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.394" expl="assertion" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.394.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.395" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3959,7 +3944,7 @@
        <goal name="VC toom22_mul.395.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H2">
         <goal name="VC toom22_mul.395.0.0.0.0.0.0" proved="true">
-        <proof prover="3"><result status="valid" time="0.04"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.07"/></proof>
         </goal>
        </transf>
        </goal>
@@ -3997,15 +3982,15 @@
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.396.7" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.29"/></proof>
+   <proof prover="1"><result status="valid" time="0.15"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.397" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC toom22_mul.398" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC toom22_mul.399" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -4018,7 +4003,7 @@
    <goal name="VC toom22_mul.401.0" expl="VC for toom22_mul" proved="true">
    <transf name="apply" proved="true" arg1="H2">
     <goal name="VC toom22_mul.401.0.0" proved="true">
-    <proof prover="4"><result status="valid" time="0.41"/></proof>
+    <proof prover="4"><result status="valid" time="0.72"/></proof>
     </goal>
    </transf>
    </goal>
@@ -4030,7 +4015,7 @@
    </transf>
    </goal>
    <goal name="VC toom22_mul.401.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4047,7 +4032,7 @@
        <goal name="VC toom22_mul.402.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H2">
         <goal name="VC toom22_mul.402.0.0.0.0.0.0" proved="true">
-        <proof prover="3"><result status="valid" time="0.04"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.07"/></proof>
         </goal>
        </transf>
        </goal>
@@ -4062,11 +4047,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.403" expl="assertion" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.403.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.404" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
@@ -4075,25 +4056,25 @@
   <proof prover="1"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="VC toom22_mul.406" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.407" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul.408" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.409" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.410" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC toom22_mul.411" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC toom22_mul.412" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.413" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(j &lt; offset r)">
@@ -4106,9 +4087,12 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.414" expl="postcondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC toom22_mul.414.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <transf name="case" proved="true" arg1="(j &lt; offset r)">
+   <goal name="VC toom22_mul.414.0" expl="true case (postcondition)" proved="true">
+   <proof prover="0"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC toom22_mul.414.1" expl="false case (postcondition)" proved="true">
+   <proof prover="0"><result status="valid" time="0.09"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4126,7 +4110,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.417" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.418" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -4137,7 +4121,7 @@
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC toom22_mul.418.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.79"/></proof>
+   <proof prover="4"><result status="valid" time="0.53"/></proof>
    </goal>
    <goal name="VC toom22_mul.418.3" expl="VC for toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -4167,7 +4151,22 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.420" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC toom22_mul.420.0" expl="integer overflow" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC toom22_mul.420.0.0" expl="integer overflow" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="VC toom22_mul.420.0.0.0" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="VC toom22_mul.420.0.0.1" expl="VC for toom22_mul" proved="true">
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.421" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -4176,23 +4175,22 @@
     <goal name="VC toom22_mul.421.0.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC toom22_mul.421.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.04"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
      </goal>
      <goal name="VC toom22_mul.421.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.02"/></proof>
+     <proof prover="3"><result status="valid" time="0.05"/></proof>
      </goal>
      <goal name="VC toom22_mul.421.0.0.2" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.06"/></proof>
-     <proof prover="4"><result status="valid" time="0.52"/></proof>
+     <proof prover="0"><result status="valid" time="0.09"/></proof>
      </goal>
      <goal name="VC toom22_mul.421.0.0.3" expl="VC for toom22_mul" proved="true">
-     <proof prover="1"><result status="valid" time="0.16"/></proof>
+     <proof prover="4"><result status="valid" time="0.78"/></proof>
      </goal>
      <goal name="VC toom22_mul.421.0.0.4" expl="VC for toom22_mul" proved="true">
-     <proof prover="1"><result status="valid" time="0.24"/></proof>
+     <proof prover="4"><result status="valid" time="0.48"/></proof>
      </goal>
      <goal name="VC toom22_mul.421.0.0.5" expl="VC for toom22_mul" proved="true">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
+     <proof prover="0"><result status="valid" time="0.06"/></proof>
      </goal>
     </transf>
     </goal>
@@ -4207,57 +4205,50 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.424" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC toom22_mul.425" expl="integer overflow" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC toom22_mul.425.0" expl="integer overflow" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC toom22_mul.425.0.0" expl="integer overflow" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="VC toom22_mul.425.0.0.0" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
-     </goal>
-     <goal name="VC toom22_mul.425.0.0.1" expl="VC for toom22_mul" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC toom22_mul.424.0" expl="integer overflow" proved="true">
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="4.91"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="VC toom22_mul.425" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.426" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.426.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.15"/></proof>
+   <proof prover="1"><result status="valid" time="0.24"/></proof>
    </goal>
    <goal name="VC toom22_mul.426.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.26"/></proof>
+   <proof prover="1"><result status="valid" time="0.24"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.427" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.427.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC toom22_mul.427.1" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.25"/></proof>
+   <proof prover="1"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC toom22_mul.427.2" expl="VC for toom22_mul" proved="true">
-   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="4.88"/></proof>
+   <proof prover="4"><result status="valid" time="0.66"/></proof>
    </goal>
    <goal name="VC toom22_mul.427.3" expl="VC for toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.428" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.429" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.429.0" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.430" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -4272,7 +4263,7 @@
        <goal name="VC toom22_mul.430.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H2">
         <goal name="VC toom22_mul.430.0.0.0.0.0.0" proved="true">
-        <proof prover="3"><result status="valid" time="0.04"/></proof>
+        <proof prover="3"><result status="valid" time="0.02"/></proof>
         </goal>
        </transf>
        </goal>
@@ -4310,26 +4301,26 @@
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC toom22_mul.431.7" expl="VC for toom22_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.27"/></proof>
+   <proof prover="1"><result status="valid" time="0.29"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.432" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC toom22_mul.433" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.31"/></proof>
+  <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC toom22_mul.434" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC toom22_mul.435" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.29"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="VC toom22_mul.436" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC toom22_mul.436.0" expl="VC for toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.40"/></proof>
+   <proof prover="4"><result status="valid" time="0.77"/></proof>
    </goal>
    <goal name="VC toom22_mul.436.1" expl="VC for toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.10"/></proof>
@@ -4352,7 +4343,7 @@
        <goal name="VC toom22_mul.437.0.0.0.0.0" expl="precondition" proved="true">
        <transf name="apply" proved="true" arg1="H2">
         <goal name="VC toom22_mul.437.0.0.0.0.0.0" proved="true">
-        <proof prover="3"><result status="valid" time="0.02"/></proof>
+        <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.07"/></proof>
         </goal>
        </transf>
        </goal>
@@ -4367,7 +4358,11 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul.438" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.438.0" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC toom22_mul.439" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -4384,43 +4379,40 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.441" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.442" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul.443" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC toom22_mul.444" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC toom22_mul.445" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul.446" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul.447" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="VC toom22_mul.448" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(j &lt; offset r)">
    <goal name="VC toom22_mul.448.0" expl="true case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="3.94"/></proof>
+   <proof prover="0"><result status="valid" time="3.29"/></proof>
    </goal>
    <goal name="VC toom22_mul.448.1" expl="false case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="1.17"/></proof>
+   <proof prover="0"><result status="valid" time="1.42"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC toom22_mul.449" expl="postcondition" proved="true">
-  <transf name="case" proved="true" arg1="(j &lt; offset r)">
-   <goal name="VC toom22_mul.449.0" expl="true case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="0.08"/></proof>
-   </goal>
-   <goal name="VC toom22_mul.449.1" expl="false case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="0.09"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC toom22_mul.449.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4435,19 +4427,21 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.4" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <transf name="split_vc" proved="true" >
+  </transf>
   </goal>
   <goal name="VC toom22_mul_rec.7" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -4481,10 +4475,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.16" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.17" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.18" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -4511,10 +4505,10 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.26" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.27" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.28" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -4523,7 +4517,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.30" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.31" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -4541,22 +4535,22 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.36" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.37" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.38" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.39" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.40" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.41" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
@@ -4564,7 +4558,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.43" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.44" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -4575,9 +4569,7 @@
   </transf>
   </goal>
   <goal name="VC toom22_mul_rec.46" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <transf name="split_vc" proved="true" >
-  </transf>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC toom22_mul_rec.47" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
