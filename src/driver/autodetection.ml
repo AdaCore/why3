@@ -405,6 +405,7 @@ let check_support_library data ver =
     let support_ver = input_line f in
     close_in f;
     if support_ver = ver then true
+    else if support_ver = "" then raise Not_found
     else begin
       eprintf
         "Found prover %s version %s, but the compiled Why3 library supports only version %s@."
