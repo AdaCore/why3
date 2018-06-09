@@ -34,7 +34,7 @@ module TortoiseAndHareAlgorithm
   = if n > 0 then x_in_range (n - 1)
 
   (* First, we prove the existence of mu and lambda, with a ghost program.
-     Starting with x0, we repeteadly apply f, storing the elements in
+     Starting with x0, we repeatedly apply f, storing the elements in
      a sequence, until we find a repetition. *)
   let ghost periodicity () : (int, int)
     returns { mu, lambda ->
