@@ -93,7 +93,7 @@ module TortoiseAndHareAlgorithm
     ()
 
   (* Finally, we implement the tortoise and hare algorithm that computes
-     the values of mu and lambda in linear time and constant space *)
+     the values of mu and lambda in time O(mu+lambda) and constant space *)
   let tortoise_and_hare () : (mu:int, lambda:int)
     ensures { 0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
               x (mu + lambda) = x mu }
@@ -101,7 +101,7 @@ module TortoiseAndHareAlgorithm
   = let mu, lambda = periodicity () in
     equality mu lambda;
     (* the first loop implements the tortoise and hare,
-       and finds the smallest n >= 1 such that x n = x (2n) *)
+       and finds the smallest n >= 1 such that x n = x (2n), in O(mu+lambda) *)
     let tortoise = ref (f x0) in
     let hare = ref (f (f x0)) in
     let n = ref 1 in
@@ -125,36 +125,27 @@ module TortoiseAndHareAlgorithm
     assert { exists k. k >= 1 /\ n = k * lambda >= 1 };
     assert { forall j. j >= mu -> x j = x (j + n) };
     let xn = !tortoise in
-    (* a first loop to find mu *)
+    (* then a second loop finds mu and lambda, in O(mu) *)
     let i   = ref 0  in
     let xi  = ref x0 in (* = x i     *)
     let xni = ref xn in (* = x (n+i) *)
+    let lam = ref 0  in (* 0 or lambda *)
     while !xi <> !xni do
       invariant { 0 <= !i <= mu }
       invariant { !xi = x !i /\ !xni = x (n + !i) }
       invariant { forall j. 0 <= j < !i -> x j <> x (n + j) }
+      invariant { if !lam = 0 then forall j. 0 < j < !i -> x (n + j) <> x n
+                  else !lam = lambda }
       variant   { mu - !i }
+      if !lam = 0 && !i > 0 && !xni = xn then lam := !i;
       xi  := f !xi;
       xni := f !xni;
       incr i;
     done;
     let m = !i in
     assert { m = mu };
-    (* and a second loop to find lambda
-       (this is slightly less efficient than the argument in TAOCP,
-       but since the first loop is already O(mu+lambda), using two loops
-       respectively O(mu) and O(lambda) is not a problem). *)
-    i := 1;
-    xni := f xn;
-    while !xni <> xn do
-      invariant { !xni = x (n + !i) }
-      invariant { forall j. 1 <= j < !i -> x (n + j) <> x n }
-      invariant { 1 <= !i <= lambda }
-      variant   { lambda - !i }
-      xni := f !xni;
-      incr i
-    done;
-    assert { !i = lambda };
-    m, !i
+    let l = if !lam = 0 then n else !lam in
+    assert { l = lambda };
+    m, l
 
 end
