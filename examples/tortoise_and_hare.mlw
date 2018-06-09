@@ -36,12 +36,10 @@ module TortoiseAndHareAlgorithm
   (* First, we prove the existence of mu and lambda, with a ghost program.
      Starting with x0, we repeatedly apply f, storing the elements in
      a sequence, until we find a repetition. *)
-  let ghost periodicity () : (int, int)
-    returns { mu, lambda ->
-      0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
-      x (mu + lambda) = x mu /\
-      forall i j. 0 <= i < j < mu + lambda -> x i <> x j
-    }
+  let ghost periodicity () : (mu:int, lambda:int)
+    ensures { 0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
+              x (mu + lambda) = x mu }
+    ensures { forall i j. 0 <= i < j < mu + lambda -> x i <> x j }
   = let s = ref (singleton x0) in
     let cur = ref x0 in
     for k = 1 to m do
@@ -75,9 +73,9 @@ module TortoiseAndHareAlgorithm
       ensures  { x (n + k * lambda) = x n } =
       if k > 0 then begin
         plus_lambdas n (k - 1); plus_lambda (n + (k - 1) * lambda) end in
-    let decomp (i: int) : (int, int)
+    let decomp (i: int) : (qi:int, mi:int)
       requires { i >= mu }
-      returns  { qi,mi -> i = mu + qi * lambda + mi && qi >= 0 &&
+      ensures  { i = mu + qi * lambda + mi && qi >= 0 &&
                  0 <= mi < lambda && x i = x (mu + mi) } =
       let qi = div (i - mu) lambda in
       let mi = mod (i - mu) lambda in
@@ -96,12 +94,10 @@ module TortoiseAndHareAlgorithm
 
   (* Finally, we implement the tortoise and hare algorithm that computes
      the values of mu and lambda in linear time and constant space *)
-  let tortoise_and_hare () : (int, int)
-    returns { mu, lambda ->
-      0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
-      x (mu + lambda) = x mu /\
-      forall i j. 0 <= i < j < mu + lambda -> x i <> x j
-    }
+  let tortoise_and_hare () : (mu:int, lambda:int)
+    ensures { 0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
+              x (mu + lambda) = x mu }
+    ensures { forall i j. 0 <= i < j < mu + lambda -> x i <> x j }
   = let mu, lambda = periodicity () in
     equality mu lambda;
     (* the first loop implements the tortoise and hare,

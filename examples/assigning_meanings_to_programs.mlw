@@ -35,9 +35,9 @@ module Division
   use import int.Int
   use import ref.Ref
 
-  let division (x: int) (y: int)
+  let division (x: int) (y: int) : (q: int, r: int)
     requires { 0 <= x /\ 0 < y }
-    returns  { q, r -> 0 <= r < y /\ x = q * y + r }
+    ensures  { 0 <= r < y /\ x = q * y + r }
   = let q = ref 0 in
     let r = ref x in
     while !r >= y do
