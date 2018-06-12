@@ -20,7 +20,19 @@ eval `opam config env`
 ./configure --enable-local
 make
 
-if test "$1" = bench; then
-bin/why3config --detect-provers
-make bench
-fi
+while test $# -gt 0
+do
+    case "$1" in
+        bench)
+            bin/why3config --detect-provers
+            make bench
+            ;;
+        ide)
+            WHY3CONFIG="" xvfb-run bin/why3 ide --batch "" examples/logic/einstein.why
+            ;;
+        doc)
+            make doc
+            ;;
+    esac
+    shift
+done
