@@ -38,12 +38,12 @@ bench:
   variables:
     COMPILER: system
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
 
 .bench_template: &bench_definition
   stage: test
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
   only:
     - tags
     - schedules
@@ -72,9 +72,10 @@ full:
   stage: test
   variables:
     COMPILER: system
-    PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx
+    DEBIAN_PACKAGES: hevea rubber texlive-latex-extra
+    OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide doc
 
 opam:
   stage: build
