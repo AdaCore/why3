@@ -240,7 +240,7 @@ module RandomAccessListWithSeq
                   if mod i 2 = 0 then x0 else x1
     end
 
-  let rec tail (l: ral 'a) : ral 'a
+   let rec tail (l: ral 'a) : ral 'a
     requires { 0 < length (elements l) }
     variant  { l }
     ensures  { elements result == (elements l)[1..] }

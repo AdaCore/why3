@@ -1,0 +1,62 @@
+
+(** {1 Hillel challenge}
+
+    See https://www.hillelwayne.com/post/theorem-prover-showdown/
+
+*)
+
+module Leftpad
+
+  use import int.Int
+  use import int.MinMax
+  use import array.Array
+
+  type char (* whatever it is *)
+  type string = array char
+
+  let leftpad (pad: char) (n: int) (s: string) : string
+    ensures { length result = max n (length s) }
+    ensures { forall i. 0 <= i < length result - length s -> result[i] = pad }
+    ensures { forall i. 0 <= i < length s ->
+              result[length result - 1 - i] = s[length s - 1 - i] }
+  = let len = max n (length s) in
+    let res = Array.make len pad in
+    Array.blit s 0 res (len - length s) (length s);
+    res
+
+end
+
+module Unique
+
+  use import int.Int
+  use import ref.Refint
+  clone hashtbl.Hashtbl with type key = int
+  use import array.Array
+
+  predicate mem (x: int) (a: array int) (i: int) =
+    exists j. 0 <= j < i /\ a[j] = x
+
+  predicate hmem (x: int) (h: Hashtbl.t unit) =
+    Hashtbl.contents h x <> Hashtbl.List.Nil
+
+  let unique (a: array int) : array int
+    ensures { forall x. mem x result (length result) <-> mem x a (length a) }
+    ensures { forall i j. 0 <= i < j < length result -> result[i] <> result[j] }
+  = let n = length a in
+    let h = Hashtbl.create n in
+    let res = Array.make n 0 in
+    let len = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { 0 <= !len <= i }
+      invariant { forall x. mem x a i <-> hmem x h }
+      invariant { forall x. mem x a i <-> mem x res !len }
+      invariant { forall i j. 0 <= i < j < !len -> res[i]<>res[j] }
+      if not (Hashtbl.mem h a[i]) then begin
+        Hashtbl.add h a[i] ();
+        res[!len] <- a[i];
+        incr len
+      end
+    done;
+    Array.sub res 0 !len
+
+end

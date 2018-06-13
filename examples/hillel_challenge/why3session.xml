@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="5">
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../hillel_challenge.mlw" proved="true">
+<theory name="Leftpad" proved="true">
+ <goal name="VC leftpad" expl="VC for leftpad" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="Unique" proved="true">
+ <goal name="VC unique" expl="VC for unique" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC unique.0" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC unique.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC unique.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC unique.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC unique.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC unique.5" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC unique.6" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC unique.7" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC unique.8" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC unique.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC unique.10" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.59"/></proof>
+  </goal>
+  <goal name="VC unique.11" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(x=o)">
+   <goal name="VC unique.11.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="88"/></proof>
+   </goal>
+   <goal name="VC unique.11.1" expl="false case (loop invariant preservation)" proved="true">
+   <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
+    <goal name="VC unique.11.1.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="VC unique.11.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="105"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC unique.12" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(j &lt; len-1)">
+   <goal name="VC unique.12.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
+   </goal>
+   <goal name="VC unique.12.1" expl="false case (loop invariant preservation)" proved="true">
+   <transf name="assert" proved="true" arg1="(not (mem o a i1))">
+    <goal name="VC unique.12.1.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="VC unique.12.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC unique.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC unique.14" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC unique.15" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(x = o)">
+   <goal name="VC unique.15.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
+   </goal>
+   <goal name="VC unique.15.1" expl="false case (loop invariant preservation)" proved="true">
+   <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
+    <goal name="VC unique.15.1.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="VC unique.15.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC unique.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC unique.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC unique.18" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC unique.19" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC unique.20" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
