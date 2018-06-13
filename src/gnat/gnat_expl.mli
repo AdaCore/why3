@@ -39,6 +39,7 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   | VC_Inline_Check
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre

@@ -35,6 +35,7 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   | VC_Inline_Check
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -80,6 +81,7 @@ let is_warning_reason r =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   | VC_Inline_Check
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -156,6 +158,7 @@ let reason_from_string s =
    | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
    | "VC_ASSERT"                    -> VC_Assert
    | "VC_RAISE"                     -> VC_Raise
+   | "VC_INLINE_CHECK"              -> VC_Inline_Check
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -206,6 +209,7 @@ let reason_to_ada reason =
    | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
    | VC_Assert                    -> "VC_ASSERT"
    | VC_Raise                     -> "VC_RAISE"
+   | VC_Inline_Check              -> "VC_INLINE_CHECK"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -251,6 +255,7 @@ let reason_to_string reason =
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Assert                    -> "assert"
    | VC_Raise                     -> "raise"
+   | VC_Inline_Check              -> "inline_check"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
