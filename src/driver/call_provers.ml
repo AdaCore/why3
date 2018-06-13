@@ -16,6 +16,9 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let debug_attrs = Debug.register_info_flag "print_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
+
 type reason_unknown =
   | Resourceout
   | Other
@@ -171,10 +174,11 @@ let print_steps fmt s =
 let print_prover_result fmt {pr_answer = ans; pr_status = status;
                              pr_output = out; pr_time   = t;
                              pr_steps  = s;   pr_model  = m} =
+  let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if not (Model_parser.is_model_empty m) then begin
     fprintf fmt "\nCounter-example model:";
-    Model_parser.print_model fmt m
+    Model_parser.print_model ~print_attrs fmt m
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
@@ -225,8 +229,8 @@ let print_delim fmt d =
   | Str.Delim s -> Format.fprintf fmt "Delim %s" s
   | Str.Text s -> Format.fprintf fmt "Text %s" s
  *)
-let debug_print_model model =
-  let model_str = Model_parser.model_to_string model in
+let debug_print_model ~print_attrs model =
+  let model_str = Model_parser.model_to_string ~print_attrs model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
 let analyse_result res_parser printer_mapping out =
@@ -253,7 +257,7 @@ let analyse_result res_parser printer_mapping out =
           (* get model if possible *)
           let m = res_parser.prp_model_parser model printer_mapping in
           Debug.dprintf debug "Call_provers: model:@.";
-          debug_print_model m;
+          debug_print_model ~print_attrs:false m;
           let m = if is_model_empty m then saved_model else (Some m) in
           analyse m (Some res) tl
     | Str.Delim res :: tl ->

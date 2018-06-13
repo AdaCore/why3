@@ -12,6 +12,7 @@
 #ifndef REQUEST_H
 #define REQUEST_H
 
+#include "queue.h"
 #include <stdbool.h>
 
 typedef enum { REQ_RUN, REQ_INTERRUPT } request_type;
@@ -38,5 +39,14 @@ void print_request(prequest r);
 
 //does *not* free the id of the request
 void free_request(prequest r);
+
+// Global queue to contain queued requests
+extern pqueue queue;
+
+// initialize the global request queue
+void init_request_queue();
+
+// remove the entries from the queue whose id field is equal to <id>
+void remove_from_queue(char *id);
 
 #endif

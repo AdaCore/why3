@@ -1,57 +1,77 @@
 bench/ce/jlamp_array.mlw Array VC f: Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 11:
-two = {"type" : "Integer" ,
+two, [[@model], [@model_trace:two]] = {"type" : "Integer" ,
 "val" : "2" }
 Line 14:
-three = {"type" : "Integer" , "val" : "3" }
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
+"val" : "3" }
 Line 18:
-a = {"type" : "Integer" , "val" : "2" }
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
 Line 22:
-a = {"type" : "Integer" ,
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "2" }
 
 bench/ce/jlamp_array.mlw Array VC f: Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 11:
-two = {"type" : "Integer" ,
+two, [[@model], [@model_trace:two]] = {"type" : "Integer" ,
 "val" : "2" }
 Line 14:
-three = {"type" : "Integer" , "val" : "3" }
-Line 18:
-a = {"type" : "Integer" , "val" : "2" }
-Line 21:
-old a = {"type" : "Integer" , "val" : "2" }
-old three = {"type" : "Integer" ,
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
 "val" : "3" }
+Line 18:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 21:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 22:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
 
 bench/ce/jlamp_array.mlw Array VC g: Valid
 bench/ce/jlamp_array.mlw Array VC g: Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 11:
-two = {"type" : "Integer" ,
+two, [[@model], [@model_trace:two]] = {"type" : "Integer" ,
 "val" : "2" }
 Line 14:
-three = {"type" : "Integer" , "val" : "3" }
-Line 24:
-a = {"type" : "Integer" , "val" : "2" }
-Line 27:
-old a = {"type" : "Integer" , "val" : "2" }
-old three = {"type" : "Integer" ,
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
 "val" : "3" }
+Line 24:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 27:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 28:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
 
 bench/ce/jlamp_array.mlw Array VC h: Valid
 bench/ce/jlamp_array.mlw Array VC h: Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 11:
-two = {"type" : "Integer" ,
+two, [[@model], [@model_trace:two]] = {"type" : "Integer" ,
 "val" : "2" }
 Line 14:
-three = {"type" : "Integer" , "val" : "3" }
-Line 30:
-a = {"type" : "Integer" , "val" : "2" }
-Line 33:
-old a = {"type" : "Integer" , "val" : "2" }
-old three = {"type" : "Integer" ,
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
 "val" : "3" }
+Line 30:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 33:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+three, [[@model], [@model_trace:three]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 34:
+a, [[@model], [@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
 

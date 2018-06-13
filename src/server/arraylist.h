@@ -40,7 +40,8 @@ bool list_is_empty(plist l);
 int list_length(plist l);
 
 // remove the element in the list whose key is equal to <key>. If no such data
-// exists, do nothing.
+// exists, do nothing. Note that removing an element may alter the order of
+// the remaining elements of the list.
 void list_remove(plist l, int key);
 
 // Return the data whose key is equal to <key>. Return NULL if no such data

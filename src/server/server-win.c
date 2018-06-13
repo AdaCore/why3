@@ -154,8 +154,6 @@ void add_to_completion_port(HANDLE h, ULONG_PTR key) {
    }
 }
 
-pqueue queue;
-
 void init_connect_data(t_conn_data* data, int kind) {
    ZeroMemory(data, sizeof(t_conn_data));
    data->overlap.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
@@ -470,6 +468,7 @@ void handle_msg(pclient client, int key) {
        }
         break;
       case REQ_INTERRUPT:
+        remove_from_queue(r->id);
         // TODO: remove r from the queue if still there, or kill the process r->id;
         free_request(r);
         break;
@@ -647,9 +646,9 @@ void init() {
    strcpy(pipe_name, TEXT("\\\\.\\pipe\\"));
    strcat(pipe_name, my_pipe_name);
 
-   queue = init_queue(100);
-   clients = init_list(16);
-   processes = init_list(16);
+   init_request_queue();
+   clients = init_list(parallel);
+   processes = init_list(parallel);
 
    server_socket = (pserver*) malloc(parallel * sizeof(pserver));
    server_key = (int*) malloc(parallel * sizeof(int));

@@ -211,6 +211,9 @@ LIB_PARSER = ptree glob typing parser_messages parser typing report lexer
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
+		abstract_quantifiers eliminate_unknown_types \
+		eliminate_unknown_lsymbols \
+		eliminate_symbol \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
 		encoding_guards_full encoding_tags_full \

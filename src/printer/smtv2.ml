@@ -271,11 +271,13 @@ let rec print_term info fmt t =
 	      match vc_term_info.vc_loc with
 	      | None -> ()
 	      | Some loc ->
-		let attrs = match vc_term_info.vc_func_name with
-		  | None ->
-		    ls.ls_name.id_attrs
-		  | Some _ ->
-		    model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term in
+                let attrs = (* match vc_term_info.vc_func_name with
+                  | None -> *)
+                    ls.ls_name.id_attrs
+                  (* | Some _ ->
+                    model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
+                   *)
+in
 		let _t_check_pos = t_attr_set ~loc attrs t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)

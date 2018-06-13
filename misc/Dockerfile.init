@@ -2,8 +2,10 @@ FROM ocaml/ocaml:debian-stable
 
 # install dependencies
 ARG debian_packages
-RUN apt-get update && \
-    apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb $debian_packages
+RUN apt-get update
+RUN apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb
+RUN apt-get install -y $debian_packages
+RUN apt-get clean
 
 # create user
 RUN sudo adduser --disabled-password --gecos '' why3
@@ -16,4 +18,5 @@ RUN opam init -a -y -j1 --compiler=$compiler
 RUN opam repository add coq-released https://coq.inria.fr/opam/released
 
 ARG opam_packages
-RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo $opam_packages
+RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo
+RUN test -z "$opam_packages" || opam install -y $opam_packages

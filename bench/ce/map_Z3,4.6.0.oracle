@@ -1,34 +1,47 @@
 bench/ce/map.mlw ModelMap t1: Unknown (other)
 Counter-example model:File map.mlw:
 Line 5:
-i = {"type" : "Integer" , "val" : "0" }
-t = {"type" : "Array" ,
-"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "1" } },
+i, [[@model], [@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "0" }
+t, [[@model], [@introduced],
+[@model_trace:t]] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "1" } },
 {"others" : {"type" : "Integer" ,
 "val" : "1" } }] }
 
 bench/ce/map.mlw M VC test_map: Timeout
 Counter-example model:File map.mlw:
 Line 16:
-x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] }
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
 Line 17:
-old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
+Line 19:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "2" } }] }
 
 bench/ce/map.mlw M VC test_map_multidim1: Timeout
 Counter-example model:File map.mlw:
 Line 22:
-x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "1" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" , "val" : "3" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "4" } }] } }] }
+Line 23:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" , "val" : "3" } }] } }, {"indice" : "1" ,
 "value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
 "value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "1" ,
@@ -36,11 +49,11 @@ x = {"type" : "Array" , "val" : [{"indice" : "0" ,
 {"others" : {"type" : "Integer" , "val" : "3" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "4" } }] } }] }
-Line 23:
-old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+Line 25:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" , "val" : "3" } }] } }, {"indice" : "1" ,
 "value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
 "value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "1" ,
@@ -52,19 +65,28 @@ old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
 bench/ce/map.mlw M VC test_map_multidim2: Timeout
 Counter-example model:File map.mlw:
 Line 27:
-x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } },
+{"indice" : "1" , "value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
 "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "5" } }] } }] }
+Line 28:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"indice" : "1" ,
 "value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
 "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "2" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "5" } }] } }] }
-Line 28:
-old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+Line 32:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"indice" : "1" ,
 "value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
 "value" : {"type" : "Integer" , "val" : "3" } },
@@ -75,30 +97,36 @@ old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
 bench/ce/map.mlw M VC proj_map_test1: Timeout
 Counter-example model:File map.mlw:
 Line 34:
-x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] }
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
 Line 35:
-old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "2" } }] }
+Line 37:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "2" } }] }
 
 bench/ce/map.mlw M VC proj_map_test2: Timeout
 Counter-example model:File map.mlw:
 Line 39:
-x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] }
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" , "val" : false } }] }
 Line 40:
-old x = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
-"value" : {"type" : "Boolean" , "val" : true } },
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Boolean" , "val" : true } },
+{"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" , "val" : false } }] }
+Line 42:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Boolean" , "val" : true } },
+{"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 

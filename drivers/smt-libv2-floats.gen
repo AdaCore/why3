@@ -70,8 +70,17 @@ theory ieee_float.Float32
   syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
 
   prelude "(define-fun fp.isFinite32 ((x Float32)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
+  prelude "(define-fun fp.isIntegral32 ((x Float32)) Bool (or (fp.isZero x) (and (fp.isNormal x) (= x (fp.roundToIntegral RNE x)))))"
+
 
   syntax predicate t'isFinite "(fp.isFinite32 %1)"
+  syntax predicate is_int "(fp.isIntegral32 %1)"
+
+  (* Faithful translations of the axiomatisation, mainly to remove this crud
+     from the smtlib output of SPARK. *)
+  syntax function round "(fp.to_real ((_ to_fp 8 24) %1 %2))"
+  syntax predicate in_range "(<= (abs %1) (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111)))"
+  syntax predicate no_overflow "(<= (abs (fp.to_real ((_ to_fp 8 24) %1 %2))) (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111)))"
 
   remove allprops
 end
@@ -85,8 +94,16 @@ theory ieee_float.Float64
   syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
 
   prelude "(define-fun fp.isFinite64 ((x Float64)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
+  prelude "(define-fun fp.isIntegral64 ((x Float64)) Bool (or (fp.isZero x) (and (fp.isNormal x) (= x (fp.roundToIntegral RNE x)))))"
 
   syntax predicate t'isFinite "(fp.isFinite64 %1)"
+  syntax predicate is_int "(fp.isIntegral64 %1)"
+
+  (* Faithful translations of the axiomatisation, mainly to remove this crud
+     from the smtlib output of SPARK. *)
+  syntax function round "(fp.to_real ((_ to_fp 11 53) %1 %2))"
+  syntax predicate in_range "(<= (abs %1) (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)))"
+  syntax predicate no_overflow "(<= (abs (fp.to_real ((_ to_fp 11 53) %1 %2))) (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)))"
 
   remove allprops
 end

@@ -77,6 +77,7 @@ let add_model_element (el: term) info_model =
   let info_model = S.remove el info_model in
   S.add el info_model
 
+        (*
 let add_old attr_str =
   try
     let pos = Str.search_forward (Str.regexp "@") attr_str 0 in
@@ -109,6 +110,7 @@ let model_trace_for_postcondition ~attrs (info: vc_term_info)  =
       (Ident.create_model_trace_attr
 	 ((Opt.get_def "" info.vc_func_name)  ^ "@result"))
       attrs
+         *)
 
 let get_fun_name name =
   let splitted = Strings.bounded_split ':' name 2 in

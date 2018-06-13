@@ -3,8 +3,15 @@ bench/ce/int32.mlw Ce_int32 VC dummy_update: Valid
 bench/ce/int32.mlw Ce_int32 VC dummy_update: Timeout
 Counter-example model:File int32.mlw:
 Line 6:
-r = {"type" : "Integer" , "val" : "84" }
+r, [[@model], [@introduced], [@model_trace:r]] = {"type" : "Integer" ,
+"val" : "22" }
 Line 8:
-old r = {"type" : "Integer" ,
+r, [[@model], [@introduced], [@model_trace:r]] = {"type" : "Integer" ,
+"val" : "84" }
+Line 9:
+r, [[@model], [@introduced], [@model_trace:r]] = {"type" : "Integer" ,
+"val" : "42" }
+Line 10:
+r, [[@model], [@introduced], [@model_trace:r]] = {"type" : "Integer" ,
 "val" : "84" }
 

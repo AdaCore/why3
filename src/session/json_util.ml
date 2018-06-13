@@ -68,7 +68,9 @@ let convert_unix_process (ps: Unix.process_status) =
   | Unix.WSTOPPED _  -> String "WSTOPPED"
 
 let convert_model (m: Model_parser.model) =
-  String (Pp.string_of (fun fmt m -> Model_parser.print_model fmt m) m)
+  String (Pp.string_of
+            (* By default, we print attributes in JSON *)
+            (fun fmt m -> Model_parser.print_model ~print_attrs:true fmt m) m)
 
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
