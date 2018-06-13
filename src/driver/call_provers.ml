@@ -368,8 +368,8 @@ let adapt_limits limit on_timelimit =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
       then (2 * limit.limit_time + 1)
-      (* if prover implements time limit, use 16t + 1 *)
-      else if on_timelimit then 16 * limit.limit_time + 1
+      (* if prover implements time limit, use 4t + 1 *)
+      else if on_timelimit then 4 * limit.limit_time + 1
       (* otherwise use t *)
       else limit.limit_time }
 
