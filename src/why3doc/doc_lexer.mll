@@ -170,31 +170,27 @@ and scan_isolated fmt empty in_pre delayed = parse
   | ""    { if not in_pre then pp_print_string fmt "<pre>";
             scan fmt empty delayed lexbuf }
 
-and scan_embedded fmt depth = parse
-  | '['   { pp_print_char fmt '[';
-            scan_embedded fmt (depth + 1) lexbuf }
-  | ']'   { if depth > 0 then begin
-              pp_print_char fmt ']';
-              scan_embedded fmt (depth - 1) lexbuf
+and scan_embedded fmt ldelim = parse
+  | ' '* ('`' '`'* as delim) as s
+          { if String.length delim <> ldelim then begin
+              pp_print_string fmt s;
+              scan_embedded fmt ldelim lexbuf
             end }
-  | "\\[" { pp_print_char fmt '[';
-            scan_embedded fmt depth lexbuf }
-  | "\\]" { pp_print_char fmt ']';
-            scan_embedded fmt depth lexbuf }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
   | ident as s
           { print_ident fmt lexbuf s;
-            scan_embedded fmt depth lexbuf }
-  | "\n"   { new_line lexbuf;
-             pp_print_char fmt '\n';
-             scan_embedded fmt depth lexbuf }
-  | '"'    { pp_print_string fmt "&quot;";
-             string fmt true lexbuf;
-             scan_embedded fmt depth lexbuf }
+            scan_embedded fmt ldelim lexbuf }
+  | "\n"  { new_line lexbuf;
+            pp_print_char fmt '\n';
+            scan_embedded fmt ldelim lexbuf }
+  | '"'   { pp_print_string fmt "&quot;";
+            string fmt true lexbuf;
+            scan_embedded fmt ldelim lexbuf }
   | "'\"'"
-  | _ as s { pp_print_string fmt s;
-             scan_embedded fmt depth lexbuf }
+  | _ as s
+          { pp_print_string fmt s;
+            scan_embedded fmt ldelim lexbuf }
 
 and comment fmt do_output = parse
   | "(*"   { if do_output then pp_print_string fmt "(*";
@@ -262,9 +258,12 @@ and doc fmt block headings = parse
                   doc fmt (r <> []) r lexbuf
                 end else brace r
            }
-  | '['    { if not block then pp_print_string fmt "<p>";
+  | "\\`"  { pp_print_char fmt '`';
+             doc fmt true headings lexbuf }
+  | ('`' '`'* as delim) ' '*
+           { if not block then pp_print_string fmt "<p>";
              pp_print_string fmt "<code>";
-             scan_embedded fmt 0 lexbuf;
+             scan_embedded fmt (String.length delim) lexbuf;
              pp_print_string fmt "</code>";
              doc fmt true headings lexbuf }
   | ' '    { if block then pp_print_char fmt ' ';
