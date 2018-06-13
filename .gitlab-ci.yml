@@ -38,12 +38,12 @@ bench:
   variables:
     COMPILER: system
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
 
 .bench_template: &bench_definition
   stage: test
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
   only:
     - tags
     - schedules

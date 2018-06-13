@@ -27,6 +27,9 @@ do
             bin/why3config --detect-provers
             make bench
             ;;
+        ide)
+            WHY3CONFIG="" xvfb-run bin/why3 ide --batch "" examples/logic/einstein.why
+            ;;
         doc)
             make doc
             ;;
