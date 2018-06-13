@@ -69,11 +69,13 @@ val get_main : config -> main
 val set_main : config -> main -> config
 (** [set_main config main] replace the main section by the given one *)
 
+val set_stdlib: bool -> config -> config
+(** Set if the standard library should be added to loadpath *)
+
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
-val default_loadpath : string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int

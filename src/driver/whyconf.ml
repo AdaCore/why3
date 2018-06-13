@@ -178,6 +178,8 @@ type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
   datadir  : string;      (* "/usr/local/share/why/" *)
   loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
+  stdlib  : bool;
+  (* add the standard library in the loadpath (default true) *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
@@ -211,7 +213,9 @@ let loadpath m =
     eprintf "[Info] loadpath set using WHY3LOADPATH='%s'@." d;
 *)
     Strings.split ':' d
-  with Not_found -> m.loadpath
+  with Not_found ->
+    let stdlib = if m.stdlib then default_loadpath else [] in
+    m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}
 
@@ -272,6 +276,7 @@ let empty_main =
     libdir = Config.libdir;
     datadir = Config.datadir;
     loadpath = [];
+    stdlib = true;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
@@ -280,15 +285,12 @@ let empty_main =
                       with Not_found -> "editor %f");
   }
 
-let default_main =
-  { empty_main with loadpath = default_loadpath }
-
 let set_main rc main =
   let section = empty_section in
   let section = set_int section "magic" magicnumber in
-  let section = set_string ~default:default_main.libdir
+  let section = set_string ~default:empty_main.libdir
     section "libdir" main.libdir in
-  let section = set_string ~default:default_main.datadir
+  let section = set_string ~default:empty_main.datadir
     section "datadir" main.datadir in
   let section = set_stringl section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
@@ -528,16 +530,17 @@ let load_strategy strategies section =
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
     raise WrongMagicNumber;
-  { libdir    = get_string ~default:default_main.libdir section "libdir";
-    datadir   = get_string ~default:default_main.datadir section "datadir";
+  { libdir    = get_string ~default:empty_main.libdir section "libdir";
+    datadir   = get_string ~default:empty_main.datadir section "datadir";
     loadpath  = List.map (Sysutil.concat dirname)
-                         (get_stringl ~default:[] section "loadpath");
-    timelimit = get_int ~default:default_main.timelimit section "timelimit";
-    memlimit  = get_int ~default:default_main.memlimit section "memlimit";
-    running_provers_max = get_int ~default:default_main.running_provers_max
+        (get_stringl ~default:[] section "loadpath");
+    stdlib = true;
+    timelimit = get_int ~default:empty_main.timelimit section "timelimit";
+    memlimit  = get_int ~default:empty_main.memlimit section "memlimit";
+    running_provers_max = get_int ~default:empty_main.running_provers_max
                                   section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
-    default_editor = get_string ~default:default_main.default_editor section "default_editor";
+    default_editor = get_string ~default:empty_main.default_editor section "default_editor";
   }
 
 let read_config_rc conf_file =
@@ -587,14 +590,14 @@ let get_config (filename,rc) =
   }
 
 let default_config conf_file =
-  get_config (conf_file, set_main Rc.empty default_main)
+  get_config (conf_file, set_main Rc.empty empty_main)
 
 let read_config conf_file =
   let filenamerc =
     try
       read_config_rc conf_file
     with Exit ->
-      default_conf_file, set_main Rc.empty default_main
+      default_conf_file, set_main Rc.empty empty_main
   in
   try
     get_config filenamerc
@@ -843,6 +846,8 @@ let set_section config name section = assert (name <> "main");
 let set_family config name section = assert (name <> "prover");
   {config with config = set_family config.config name section}
 
+let set_stdlib stdlib config =
+  {config with main = {config.main with stdlib}}
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
@@ -874,6 +879,7 @@ module Args = struct
   let opt_extra = ref []
   let opt_loadpath = ref []
   let opt_help = ref false
+  let opt_stdlib = ref true
 
   let common_options_head = [
     "-C", Arg.String (fun s -> opt_config := Some s),
@@ -886,6 +892,8 @@ module Args = struct
         "<dir> add <dir> to the library search path";
     "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
         " same as -L";
+    "--no-stdlib", Arg.Clear opt_stdlib,
+    " do not add the standard library to the loadpath";
     Debug.Args.desc_debug;
     Debug.Args.desc_debug_all;
     Debug.Args.desc_debug_list; ]
@@ -906,6 +914,7 @@ module Args = struct
       exit 0
     end;
     let base_config = read_config !opt_config in
+    let base_config = set_stdlib !opt_stdlib base_config in
     let config = List.fold_left merge_config base_config !opt_extra in
     let main = get_main config in
     load_plugins main;

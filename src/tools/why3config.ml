@@ -176,7 +176,8 @@ let main () =
     auto_fallback ();
   let config =
     if !resetloadpath then
-      set_main config (set_loadpath (get_main config) default_loadpath)
+      (** temporary 13/06/18 after introduction of --no-stdlib *)
+      set_main config (set_loadpath (get_main config) [])
     else config
   in
   let config =
