@@ -105,25 +105,6 @@ let install_plugin main p =
   if p <> target then Sysutil.copy_file p target;
   Whyconf.add_plugin main (Filename.chop_extension target)
 
-let plugins_auto_detection config =
-  let main = get_main config in
-  let main = set_plugins main [] in
-  let dir = Whyconf.pluginsdir main in
-  let main =
-    if Sys.file_exists dir then
-      let files = Sys.readdir dir in
-      let fold main p =
-        if p.[0] == '.' then main else
-        let p = Filename.concat dir p in
-        try
-            install_plugin main p
-        with Exit -> main
-      in
-      Array.fold_left fold main files
-    else main
-  in
-  set_main config main
-
 (*  Activate the fallback to auto mode on error *)
 let auto_fallback () =
   if auto_fb then begin
@@ -186,8 +167,9 @@ let main () =
     else config
   in
   let config =
-    if !autoplugins
-    then plugins_auto_detection config
+    if !autoplugins then
+      (** temporary 13/06/18 after introduction of --no-auto-plugins *)
+      set_main config (set_plugins (get_main config) [])
     else config
   in
   if !save then begin

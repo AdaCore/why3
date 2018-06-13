@@ -180,6 +180,8 @@ type main = {
   loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
   stdlib  : bool;
   (* add the standard library in the loadpath (default true) *)
+  autoplugins  : bool;
+  (* autoload the plugins in libdir (default true) *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
@@ -252,13 +254,31 @@ let add_plugin m p =
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
 let pluginsdir m = Filename.concat m.libdir "plugins"
-let load_plugins m =
+
+let plugins_auto_detection main =
+  let dir = pluginsdir main in
+  let plugins =
+    if Sys.file_exists dir then
+      let files = Sys.readdir dir in
+      let fold acc p =
+        if p.[0] == '.' then acc else
+          let p = Filename.concat dir p in
+          (Filename.chop_extension p)::acc
+      in
+      Array.fold_left fold [] files
+    else
+      []
+  in
+  plugins
+
+let load_plugins main =
   let load x =
     try Plugin.load x
     with exn ->
       Format.eprintf "%s can't be loaded: %a@." x
         Exn_printer.exn_printer exn in
-  List.iter load m.plugins
+  if main.autoplugins then List.iter load (plugins_auto_detection main);
+  List.iter load main.plugins
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why3.conf" *)
@@ -277,6 +297,7 @@ let empty_main =
     datadir = Config.datadir;
     loadpath = [];
     stdlib = true;
+    autoplugins = true;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
@@ -535,6 +556,7 @@ let load_main dirname section =
     loadpath  = List.map (Sysutil.concat dirname)
         (get_stringl ~default:[] section "loadpath");
     stdlib = true;
+    autoplugins = true;
     timelimit = get_int ~default:empty_main.timelimit section "timelimit";
     memlimit  = get_int ~default:empty_main.memlimit section "memlimit";
     running_provers_max = get_int ~default:empty_main.running_provers_max
@@ -849,6 +871,9 @@ let set_family config name section = assert (name <> "prover");
 let set_stdlib stdlib config =
   {config with main = {config.main with stdlib}}
 
+let set_autoplugins autoplugins config =
+  {config with main = {config.main with autoplugins}}
+
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
@@ -880,6 +905,7 @@ module Args = struct
   let opt_loadpath = ref []
   let opt_help = ref false
   let opt_stdlib = ref true
+  let opt_autoplugins = ref true
 
   let common_options_head = [
     "-C", Arg.String (fun s -> opt_config := Some s),
@@ -894,6 +920,8 @@ module Args = struct
         " same as -L";
     "--no-stdlib", Arg.Clear opt_stdlib,
     " do not add the standard library to the loadpath";
+    "--no-autoplugins", Arg.Clear opt_autoplugins,
+    " do not load the plugins from the standard path";
     Debug.Args.desc_debug;
     Debug.Args.desc_debug_all;
     Debug.Args.desc_debug_list; ]
@@ -915,6 +943,7 @@ module Args = struct
     end;
     let base_config = read_config !opt_config in
     let base_config = set_stdlib !opt_stdlib base_config in
+    let base_config = set_autoplugins !opt_autoplugins base_config in
     let config = List.fold_left merge_config base_config !opt_extra in
     let main = get_main config in
     load_plugins main;
