@@ -8,7 +8,7 @@ if test -n "$DEBIAN_PACKAGES" -o -n "$OPAM_PACKAGES"; then
 else
   IMAGE=bench-image-$COMPILER
 fi
-docker build -t $IMAGE -f misc/Dockerfile.init --build-arg compiler=$COMPILER --build-arg debian_packages="$DEBIAN_PACKAGES" --build-arg opam_packages="$OPAM_PACKAGES" .
+docker build -t $IMAGE --force-rm -f misc/Dockerfile.init --build-arg compiler=$COMPILER --build-arg debian_packages="$DEBIAN_PACKAGES" --build-arg opam_packages="$OPAM_PACKAGES" .
 CID=$(docker create --rm -i -w /home/why3/why3 $IMAGE /bin/sh)
 docker start $CID
 docker cp . $CID:/home/why3/why3
