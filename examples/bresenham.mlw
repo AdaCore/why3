@@ -6,26 +6,26 @@ module M
   use import ref.Ref
 
   (*  Parameters.
-      Without loss of generality, we can take [x1=0] and [y1=0].
-      Thus the line to draw joins [(0,0)] to [(x2,y2)]
-      and we have [deltax = x2] and [deltay = y2].
+      Without loss of generality, we can take `x1=0` and `y1=0`.
+      Thus the line to draw joins `(0,0)` to `(x2,y2)`
+      and we have `deltax = x2` and `deltay = y2`.
       Moreover we assume being in the first octant, i.e.
-      [0 <= y2 <= x2]. The seven other cases can be easily
+      `0 <= y2 <= x2`. The seven other cases can be easily
       deduced by symmetry. *)
 
-  (* [best x y] expresses that the point [(x,y)] is the best
+  (* `best x y` expresses that the point `(x,y)` is the best
      possible point i.e. the closest to the real line
-     i.e. for all y', we have |y - x*y2/x2| <= |y' - x*y2/x2|
-     We stay in type [int] by multiplying everything by [x2]. *)
+     i.e. for all `y'`, we have `|y - x*y2/x2| <= |y' - x*y2/x2|`
+     We stay in type `int` by multiplying everything by `x2`. *)
 
   use import int.Abs
 
   predicate best (x2 y2 x y: int) =
     forall y': int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
 
-  (** Key lemma for Bresenham's proof: if [b] is at distance less or equal
-   than [1/2] from the rational [c/a], then it is the closest such integer.
-   We express this property using integers by multiplying everything by [2a]. *)
+  (** Key lemma for Bresenham's proof: if `b` is at distance less or equal
+   than `1/2` from the rational `c/a`, then it is the closest such integer.
+   We express this property using integers by multiplying everything by `2a`. *)
 
   lemma closest :
     forall a b c: int.

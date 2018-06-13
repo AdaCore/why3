@@ -384,7 +384,7 @@ module MapBase
     assert { selected d.key s };
     { field = Sel.join l.field d r.field }
 
-  (** Add every element from [a] into [t]. *)
+  (** Add every element from `a` into `t`. *)
   let rec add_all (a:t 'a) (t:t 'a) : t 'a
     ensures { forall k. result.domn k <-> a.domn k \/ t.domn k }
     ensures { forall k. a.domn k -> result.func k = a.func k }
@@ -412,8 +412,8 @@ module MapBase
       end
     end
 
-  (** Create the table with the elements of [a]
-      whose key appear in [p]. *)
+  (** Create the table with the elements of `a`
+      whose key appear in `p`. *)
   let rec filter (p:t 'b) (a:t 'a) : t 'a
     ensures { forall k. result.domn k <-> a.domn k /\ p.domn k }
     ensures { forall k. result.domn k -> result.func k = a.func k }
@@ -441,8 +441,8 @@ module MapBase
       end
     end
 
-  (** Complement of [filter]: remove from [a] every element whose
-      key appear in [p]. *)
+  (** Complement of `filter`: remove from `a` every element whose
+      key appear in `p`. *)
   let rec remove_all (p:t 'b) (a:t 'a) : t 'a
     ensures { forall k. result.domn k <-> a.domn k /\ not p.domn k }
     ensures { forall k. result.domn k -> result.func k = a.func k }
@@ -468,7 +468,7 @@ module MapBase
     end
 
   (** Create a table with the elements that appear
-      exactly in one of [a] and [b], but not both. *)
+      exactly in one of `a` and `b`, but not both. *)
   let rec symdiff (a b:t 'a) : t 'a
     ensures { forall k. result.domn k <-> not (a.domn k <-> b.domn k) }
     ensures { forall k. result.domn k /\ a.domn k -> result.func k = a.func k }
@@ -652,7 +652,7 @@ module Map
     | Some (_,v) -> Some v
     end
 
-  (** Set the binding for key [k], erasing any such previous binding. *)
+  (** Set the binding for key `k`, erasing any such previous binding. *)
   let insert (k0:K.t) (v:'a) (t:t 'a) : t 'a
     ensures { result.card = if t.domn k0 then t.card else t.card + 1 }
     ensures { forall k. CO.eq k k0 -> result.domn k /\ result.func k = v }
@@ -662,7 +662,7 @@ module Map
       result.func k = t.func k }
   = MB.insert (k0,v) t
 
-  (** Erase any potential binding for key [k]. *)
+  (** Erase any potential binding for key `k`. *)
   let remove (k0:K.t) (t:t 'a) : t 'a
     ensures { result.card = if t.domn k0 then t.card - 1 else t.card }
     ensures { forall k. CO.eq k k0 -> not result.domn k }
@@ -673,8 +673,8 @@ module Map
   = MB.remove k0 t
 
   (** Split the table in three parts:
-      Bindings with key lower than [k], value associated to [k],
-      and bindings with key greater than [k]. *)
+      Bindings with key lower than `k`, value associated to `k`,
+      and bindings with key greater than `k`. *)
   let split (k0:K.t) (t:t 'a) : (t 'a,option 'a,t 'a)
     returns { (lf:t 'a,o,rg:t 'a) ->
       (forall k. CO.lt k k0 -> lf.domn k <-> t.domn k) /\
@@ -849,9 +849,9 @@ module Set
     ensures { forall k. not CO.eq k k0 -> result.set k <-> t.set k }
   = MB.remove k0 t
 
-  (** Split the set into three parts: elements lower than [k],
-      elements equal to [k],
-      and elements bigger than [k] *)
+  (** Split the set into three parts: elements lower than `k`,
+      elements equal to `k`,
+      and elements bigger than `k` *)
   let split (k0:K.t) (t:t) : (t,bool,t)
     returns { (lf:t,b,rg:t) ->
       (forall k. CO.lt k k0 -> lf.set k <-> t.set k) /\

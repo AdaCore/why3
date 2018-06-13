@@ -46,11 +46,11 @@ module LinearProbing
     ensures { 0 <= result < n }
   = mod (hash k) n
 
-  (** [j] lies between [l] and [r], cyclically *)
+  (** `j` lies between `l` and `r`, cyclically *)
   predicate between (l j r: int) =
     l <= j < r || r < l <= j || j < r < l
 
-  (** number of dummy values in array [a] between [l] and [u] *)
+  (** number of dummy values in array `a` between `l` and `u` *)
   scope NumOfDummy
     use int.NumOf
 

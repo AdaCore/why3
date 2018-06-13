@@ -358,7 +358,7 @@ module AsciiCode
     assert { numof (fun_or (nth b) (nth c)) 0 32 = numof (nth b) 0 32 + numof (nth c) 0 32 };
     assert { numof (nth (bw_or b c)) 0 32 = numof (fun_or (nth b) (nth c)) 0 32 }
 
-  (** The [ascii] function makes any character valid in the
+  (** The `ascii` function makes any character valid in the
       sense that we just defined. One way to implement it is to count
       the number of 1-bits of a character encoded on 7 bits, and if this
       number is odd, set the 8th bit to 1 if not, do nothing. *)

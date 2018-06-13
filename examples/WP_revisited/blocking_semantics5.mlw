@@ -135,7 +135,7 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   end
 
 
-(** [valid_fmla f] is true when [f] is valid in any environment *)
+(** `valid_fmla f` is true when `f` is valid in any environment *)
 predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
 
@@ -415,8 +415,8 @@ lemma Cons_append: forall a: 'a, l1 l2: list 'a.
 lemma Append_nil_l:
   forall l: list 'a. Nil ++ l = l
 
-(** substitution of a reference [x] by a logic variable [v]
-   warning: proper behavior only guaranted if [v] is fresh *)
+(** substitution of a reference `x` by a logic variable `v`
+   warning: proper behavior only guaranted if `v` is fresh *)
 
 function msubst_term (t:term) (x:mident) (v:ident) : term =
   match t with
@@ -437,7 +437,7 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   end
 
 
-(** [fresh_in_term id t] is true when [id] does not occur in [t] *)
+(** `fresh_in_term id t` is true when `id` does not occur in `t` *)
 predicate fresh_in_term (id:ident) (t:term) =
   match t with
   | Tvalue _ | Tderef _  -> true

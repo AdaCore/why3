@@ -61,7 +61,7 @@ module RAL
   predicate selection_possible (s:selector) (l:seq 'a) =
     0 <= s.index && (if s.hole then s.index <= length l else s.index < length l)
 
-  (** Selection predicate: We are exactly at the [index]-th position of the
+  (** Selection predicate: We are exactly at the `index`-th position of the
      rebuild sequence, and there is an element in the middle iff we are
      not trying to select a hole. *)
   predicate selected (s:selector) (e:split 'a) =
@@ -276,4 +276,3 @@ module RAL
     check { a[1] = 2 }
 
 end
-
