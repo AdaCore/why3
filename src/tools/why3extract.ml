@@ -40,6 +40,7 @@ type flat_modular = Flat | Modular
 let opt_modu_flat = ref Flat
 
 let is_uppercase = Strings.char_is_uppercase
+let opt_interface = ref false
 
 let add_opt_file x =
   let invalid_path () = Format.eprintf "invalid path: %s@." x; exit 1 in
@@ -74,6 +75,8 @@ let option_list = [
       " perform a flat extraction (default option)";
   "--modular", Arg.Unit (fun () -> opt_modu_flat := Modular),
       " perform a modular extraction";
+  "--interface", Arg.Unit (fun () -> opt_interface := true),
+      " also extract interface files (requires modular extraction)";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<file|dir> destination of extracted code";
   "--output", Arg.String (fun s -> opt_output := Some s),
@@ -144,19 +147,37 @@ let print_preludes =
     Printer.print_prelude fmt l
 
 let print_mdecls ?fname m mdecls =
-  let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+  let pargs, printer = Pdriver.lookup_printer opt_driver in
+  let fg = printer.Pdriver.file_gen in
+  let pr = printer.Pdriver.decl_printer in
   let test_decl_not_driver decl =
     let decl_name = Mltree.get_decl_name decl in
     let test_id_not_driver id =
       Printer.query_syntax pargs.Pdriver.syntax id = None in
     List.exists test_id_not_driver decl_name in
   if List.exists test_decl_not_driver mdecls then begin
+    let flat = opt_modu_flat = Flat in
+    (* print interface file *)
+    if !opt_interface then begin
+      match printer.Pdriver.interf_gen, printer.Pdriver.interf_printer with
+      | None, _ | _, None ->
+         eprintf "Driver does not support interface extraction";
+         exit 1
+      | Some ig, Some ipr ->
+         let iout, old = get_cout_old ig m ?fname in
+         let ifmt = formatter_of_out_channel iout in
+         let pr_idecl fmt d =
+           fprintf fmt "%a" (ipr pargs ?old ?fname ~flat m) d in
+         Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
+         if iout <> stdout then close_out iout end;
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
     (* print driver prelude *)
     let pm = pargs.Pdriver.thprelude in
     print_preludes m.mod_theory.Theory.th_name fmt pm;
-    let flat = opt_modu_flat = Flat in
+    (* print module prelude *)
+    printer.Pdriver.prelude_printer pargs ?old ?fname ~flat fmt m;
+    (* print decls *)
     let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
     Pp.print_list Pp.nothing pr_decl fmt mdecls;
     if cout <> stdout then close_out cout end
@@ -330,43 +351,45 @@ let () =
   try
     match opt_modu_flat with
     | Modular -> Queue.iter do_modular opt_queue
-    | Flat -> let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
-      let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
-      let cout = match opt_output with
-        | None -> stdout
-        | Some file -> open_out file in
-      let fmt = formatter_of_out_channel cout in
-      let thprelude = pargs.Pdriver.thprelude in
-      let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
-      let rec do_preludes id =
-        (try
-          let m = find_module_id mm id in
-          Ident.Sid.iter do_preludes m.mod_used
-        with Not_found -> ());
-        print_preludes id fmt thprelude
-      in
-      print_prelude pargs.Pdriver.prelude;
-      let visit_m _ m =
-        do_preludes m.mod_theory.Theory.th_name;
-        let tm = translate_module m in
-        let visit_id id _ = visit ~recurs:true mm id in
-        Ident.Mid.iter visit_id tm.Mltree.mod_known;
-      in
-      Mstr.iter visit_m mm;
-      let extract fmt { info_id = id } =
-        let pm = find_module_id mm id in
-        let m = translate_module pm in
-        let d = Ident.Mid.find id m.Mltree.mod_known in
-        pr pargs ~flat:true pm fmt d in
-      let idl = List.rev !toextract in
-      let is_local { info_id = id; info_rec = r } =
-        let (path, m, _) = Pmodule.restore_path id in
-        path = [] || Mstr.mem m mm || not r in
-      let idl = match opt_rec_single with
-        | Single -> List.filter is_local idl
-        | Recursive -> idl in
-      Pp.print_list Pp.nothing extract fmt idl;
-      if cout <> stdout then close_out cout
+    | Flat ->
+       let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
+       let (pargs, printer) = Pdriver.lookup_printer opt_driver in
+       let pr = printer.Pdriver.decl_printer in
+       let cout = match opt_output with
+         | None -> stdout
+         | Some file -> open_out file in
+       let fmt = formatter_of_out_channel cout in
+       let thprelude = pargs.Pdriver.thprelude in
+       let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
+       let rec do_preludes id =
+         (try
+            let m = find_module_id mm id in
+            Ident.Sid.iter do_preludes m.mod_used
+          with Not_found -> ());
+         print_preludes id fmt thprelude
+       in
+       print_prelude pargs.Pdriver.prelude;
+       let visit_m _ m =
+         do_preludes m.mod_theory.Theory.th_name;
+         let tm = translate_module m in
+         let visit_id id _ = visit ~recurs:true mm id in
+         Ident.Mid.iter visit_id tm.Mltree.mod_known;
+       in
+       Mstr.iter visit_m mm;
+       let extract fmt { info_id = id } =
+         let pm = find_module_id mm id in
+         let m = translate_module pm in
+         let d = Ident.Mid.find id m.Mltree.mod_known in
+         pr pargs ~flat:true pm fmt d in
+       let idl = List.rev !toextract in
+       let is_local { info_id = id; info_rec = r } =
+         let (path, m, _) = Pmodule.restore_path id in
+         path = [] || Mstr.mem m mm || not r in
+       let idl = match opt_rec_single with
+         | Single -> List.filter is_local idl
+         | Recursive -> idl in
+       Pp.print_list Pp.nothing extract fmt idl;
+       if cout <> stdout then close_out cout
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

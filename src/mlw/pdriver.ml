@@ -229,22 +229,40 @@ let load_driver env file extra_files =
 open Wstdlib
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+type interface_generator = ?fname:string -> Pmodule.pmodule -> string
 
-type printer =
+type interf_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule -> Mltree.decl Pp.pp
+
+type prelude_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule Pp.pp
+
+let print_empty_prelude _ ?old:_ ?fname:_ ~flat:_ _ _ = ()
+
+type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
   Pmodule.pmodule -> Mltree.decl Pp.pp
 
-type reg_printer = Pp.formatted * filename_generator * printer
+type printer =
+  { desc            : Pp.formatted;
+    file_gen        : filename_generator;
+    decl_printer    : decl_printer;
+    interf_gen      : interface_generator option;
+    interf_printer  : interf_printer option;
+    prelude_printer : prelude_printer; }
 
-let printers : reg_printer Hstr.t = Hstr.create 17
+
+let printers : printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 exception NoPrinter
 
-let register_printer ~desc s fg p =
+let register_printer s p =
   if Hstr.mem printers s then raise (KnownPrinter s);
-  Hstr.replace printers s (desc, fg, p)
+  Hstr.replace printers s p
 
 let lookup_printer drv =
   let p = match drv.drv_printer with
@@ -262,11 +280,11 @@ let lookup_printer drv =
     }
   in
   try
-    let (_,fg,p) = Hstr.find printers p in (fg,printer_args,p)
+    let printer = Hstr.find printers p in printer_args, printer
   with Not_found -> raise (UnknownPrinter p)
 
 let list_printers () =
-  Hstr.fold (fun k (desc,_,_) acc -> (k,desc)::acc) printers []
+  Hstr.fold (fun k { desc = desc; _ } acc -> (k,desc)::acc) printers []
 
 (* exception report *)
 

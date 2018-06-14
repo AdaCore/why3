@@ -39,16 +39,36 @@ val load_driver : Env.env -> string -> string list -> driver
       @param string driver file name
       @param string list additional drivers containing only theories/modules *)
 
-type printer =
+type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+
+type interface_generator = ?fname:string -> Pmodule.pmodule -> string
+type interf_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule -> Mltree.decl Pp.pp
+
+(** Things to do at the beginning of a module, e.g. open/#include.
+    Only used in modular extraction. *)
+type prelude_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule Pp.pp
+
+val print_empty_prelude: prelude_printer
+
+type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
   Pmodule.pmodule -> Mltree.decl Pp.pp
 
-type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+type printer =
+  { desc            : Pp.formatted;
+    file_gen        : filename_generator;
+    decl_printer    : decl_printer;
+    interf_gen      : interface_generator option;
+    interf_printer  : interf_printer option;
+    prelude_printer : prelude_printer; }
 
-val register_printer :
-  desc:Pp.formatted -> string -> filename_generator -> printer -> unit
+val register_printer : string -> printer -> unit
 
-val lookup_printer : driver -> filename_generator * printer_args * printer
+val lookup_printer : driver -> printer_args * printer
 
 val list_printers : unit -> (string * Pp.formatted) list
 
