@@ -34,7 +34,7 @@ module Residuals
     forall c w r. mem (Cons c w) (Star r) ->
        exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 (Star r)
 
-  (** [residual r c] denotes the set of words [w] such that [mem c.w r] *)
+  (** `residual r c` denotes the set of words `w` such that `mem c.w r` *)
   let rec residual (r:regexp) (c:char) : regexp
     variant { r }
     ensures { forall w. mem w result <-> mem (Cons c w) r }
