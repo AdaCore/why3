@@ -218,7 +218,7 @@ let bypass_pretty s id =
 
 let get_exception_message ses id e =
   match e with
-  | Controller_itp.Noprogress ->
+  | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""

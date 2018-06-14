@@ -1362,11 +1362,18 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 
 exception NoProgress
 
+let () = Exn_printer.register
+    (fun fmt e ->
+      match e with
+      | NoProgress ->
+          Format.fprintf fmt "The transformation made no progress.\n"
+      | _ -> raise e)
+
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task,table = get_task_name_table s id in
   let subtasks = Trans.apply_transform_args name env args table task in
   (* If any generated task is equal to the former task, then we made no
-         progress because we need to prove more lemmas than before *)
+     progress because we need to prove more lemmas than before *)
   match subtasks with
   | [t'] when Task.task_equal t' task && not allow_no_effect ->
      Debug.dprintf debug "[apply_trans_to_goal] apply_transform made no progress@.";

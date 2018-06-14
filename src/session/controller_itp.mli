@@ -40,8 +40,6 @@ type strategy_status = STSgoto of proofNodeID * int | STShalt
 
 val print_strategy_status : Format.formatter -> strategy_status -> unit
 
-exception Noprogress
-
 (** {2 Signature for asynchronous schedulers} *)
 
 (** Default delay for the scheduler timeout *)
