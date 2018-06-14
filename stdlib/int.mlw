@@ -173,7 +173,7 @@ end
 
 Division and modulo operators with the same conventions as mainstream
 programming language such as C, Java, OCaml, that is, division rounds
-towards zero, and thus [mod x y] has the same sign as [x].
+towards zero, and thus `mod x y` has the same sign as `x`.
 
 *)
 
@@ -314,7 +314,7 @@ module NumOf
 
   use import Int
 
-  (** number of [n] such that [a <= n < b] and [p n] *)
+  (** number of `n` such that `a <= n < b` and `p n` *)
   let rec function numof (p: int -> bool) (a b: int) : int
     variant { b - a }
   = if b <= a then 0 else
@@ -383,7 +383,7 @@ module Sum
 
   use import Int
 
-  (** sum of [f n] for [a <= n < b] *)
+  (** sum of `f n` for `a <= n < b` *)
   let rec function sum (f: int -> int) (a b: int) : int
     variant { b - a }
   = if b <= a then 0 else sum f a (b - 1) + f (b - 1)
@@ -444,7 +444,7 @@ module Iter
 
   use import Int
 
-  (** [iter k x] is [f^k(x)] *)
+  (** `iter k x` is `f^k(x)` *)
   let rec function iter (f: 'a -> 'a) (k: int) (x: 'a) : 'a
     requires { k >= 0 }
     variant  { k }
