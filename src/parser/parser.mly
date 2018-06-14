@@ -275,6 +275,9 @@ single_clone_subst:
 | AXIOM     qualid              { CSaxiom ($2) }
 | LEMMA     qualid              { CSlemma ($2) }
 | GOAL      qualid              { CSgoal  ($2) }
+| AXIOM     DOT                 { CSprop  (Decl.Paxiom) }
+| LEMMA     DOT                 { CSprop  (Decl.Plemma) }
+| GOAL      DOT                 { CSprop  (Decl.Pgoal) }
 
 (* Meta declarations *)
 

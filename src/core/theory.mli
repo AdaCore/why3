@@ -185,6 +185,7 @@ type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
+  inst_df : prop_kind;
 }
 
 val empty_inst : th_inst

@@ -587,7 +587,6 @@ module TermOHT_nt_na = struct
   type t = term
   let hash = t_hash false false
   let equal = t_equal_nt_na
-  let compare = t_compare
 end
 
 module Hterm_nt_na = Exthtbl.Make(TermOHT_nt_na)

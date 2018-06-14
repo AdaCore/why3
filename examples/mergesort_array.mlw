@@ -15,9 +15,11 @@ module Elt
 
   val predicate le elt elt
 
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
-  clone export array.Sorted with type elt = elt, predicate le = le
+  clone export array.Sorted with type
+    elt = elt, predicate le = le, axiom .
 
 end
 
@@ -30,7 +32,7 @@ end
 
 module Merge
 
-  clone export Elt
+  clone export Elt with axiom .
   use export ref.Refint
   use export array.Array
   use import map.Occ
@@ -94,7 +96,7 @@ end
 
 module TopDownMergesort
 
-  clone import Merge
+  clone import Merge with axiom .
   use import mach.int.Int
 
   let rec mergesort_rec (a tmp: array elt) (l r: int) : unit
@@ -131,7 +133,7 @@ end
 
 module BottomUpMergesort
 
-  clone import Merge
+  clone import Merge with axiom .
   use import mach.int.Int
   use import int.MinMax
 
@@ -207,7 +209,7 @@ end
 
 module NaturalMergesort
 
-  clone import Merge
+  clone import Merge with axiom .
   use import mach.int.Int
   use import int.MinMax
 

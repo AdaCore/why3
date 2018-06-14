@@ -9,7 +9,7 @@ module Pqueue
   type elt
   (** the abstract type of elements *)
 
-  clone export relations.TotalOrder with type t = elt
+  clone export relations.TotalOrder with type t = elt, axiom .
   (** `elt` is equipped with a total order `rel` *)
 
   use import list.List
@@ -76,7 +76,7 @@ module PqueueNoDup
   type elt
   (** the abstract type of elements *)
 
-  clone export relations.TotalOrder with type t = elt
+  clone export relations.TotalOrder with type t = elt, axiom .
   (** `elt` is equipped with a total order `rel` *)
 
   use import set.Fset

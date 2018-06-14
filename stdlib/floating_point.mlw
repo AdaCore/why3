@@ -197,7 +197,7 @@ module GenFloatSpecStrict
 
   use import Rounding
   use import real.Real
-  clone export GenFloat
+  clone export GenFloat with axiom .
 
 
   predicate of_real_post (m:mode) (x:real) (res:t) =
@@ -248,7 +248,8 @@ module Single
     type t = single,
     constant max = max_single,
     constant max_representable_integer = max_int,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
 end
 
@@ -261,7 +262,8 @@ module Double
     type t = double,
     constant max = max_double,
     constant max_representable_integer = max_int,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
 end
 
@@ -279,7 +281,7 @@ module GenFloatFull
   use import Rounding
   use import real.Real
 
-  clone export GenFloat
+  clone export GenFloat with axiom .
 
   (** {3 special values} *)
 
@@ -421,7 +423,7 @@ module GenFloatSpecFull
   use import real.Square
   use import Rounding
   use import SpecialValues
-  clone export GenFloatFull
+  clone export GenFloatFull with axiom .
 
   (** {3 binary operations} *)
 
@@ -620,7 +622,8 @@ module SingleFull
     constant min = min_single,
     constant max = max_single,
     constant max_representable_integer = max_int,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
 end
 
@@ -637,7 +640,8 @@ module DoubleFull
     constant min = min_double,
     constant max = max_double,
     constant max_representable_integer = max_int,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
 end
 
@@ -648,7 +652,7 @@ module GenFloatSpecMultiRounding
   use import Rounding
   use import real.Real
   use import real.Abs
-  clone export GenFloat
+  clone export GenFloat with axiom .
 
   (** {3 binary operations} *)
 
@@ -736,7 +740,9 @@ module SingleMultiRounding
     constant min_normalized = min_normalized_single,
     constant eps_normalized = eps_normalized_single,
     constant eta_normalized = eta_normalized_single,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
 
 end
 
@@ -757,6 +763,7 @@ module DoubleMultiRounding
     constant min_normalized = min_normalized_double,
     constant eps_normalized = eps_normalized_double,
     constant eta_normalized = eta_normalized_double,
-    lemma Bounded_real_no_overflow
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
 end

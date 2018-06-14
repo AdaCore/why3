@@ -95,7 +95,8 @@ module MapSum
   (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
 
   type container = map int int
-  clone export sum.Sum with type container = container, function f = get
+  clone export sum.Sum with
+    type container = container, function f = get, axiom .
 
 end
 

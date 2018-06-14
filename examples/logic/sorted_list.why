@@ -19,7 +19,7 @@ end
 
 theory SortedList
   use import List
-  clone import Order as O
+  clone import Order as O with axiom .
 
   inductive sorted (l : list t) =
     | sorted_nil :

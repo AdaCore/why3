@@ -864,7 +864,8 @@ module Float32
     goal eb_gt_1,
     goal sb_gt_1,
     goal max_int,
-    goal pow2sb
+    goal pow2sb,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -899,7 +900,8 @@ module Float64
     goal eb_gt_1,
     goal sb_gt_1,
     goal max_int,
-    goal pow2sb
+    goal pow2sb,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -949,7 +951,8 @@ module Float32_BV_Converter
     predicate is_finite = t'isFinite,
     predicate le = (.<=),
     function to_real = t'real,
-    function round = round
+    function round = round,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
   axiom of_ubv32_to_real : forall m, x.
     t'real (of_ubv32 m x) = round m (FromInt.from_int (BV32.t'int x))
@@ -963,7 +966,8 @@ module Float64_BV_Converter
     predicate is_finite = t'isFinite,
     predicate le = (.<=),
     function to_real = t'real,
-    function round = round
+    function round = round,
+    axiom . (* TODO: "lemma"? "goal"? *)
 
   axiom of_ubv32_to_real : forall m, x.
     t'real (of_ubv32 m x) = FromInt.from_int (BV32.t'int x)

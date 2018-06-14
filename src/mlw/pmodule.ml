@@ -172,6 +172,7 @@ and mod_inst = {
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mxs.t;
+  mi_df  : prop_kind;
 }
 
 let empty_mod_inst m = {
@@ -184,6 +185,7 @@ let empty_mod_inst m = {
   mi_pv  = Mvs.empty;
   mi_rs  = Mrs.empty;
   mi_xs  = Mxs.empty;
+  mi_df  = Plemma;
 }
 
 (** {2 Module under construction} *)
@@ -618,7 +620,7 @@ let clone_decl inst cl uc d = match d.d_node with
         | Plemma, Some Pgoal -> true, Pgoal
         | Plemma, _ -> false, Plemma
         | Paxiom, Some k -> false, k
-        | Paxiom, None -> false, Paxiom (* TODO: Plemma *) in
+        | Paxiom, None -> false, inst.mi_df in
       if skip then uc else
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
@@ -1111,7 +1113,8 @@ let clone_export uc m inst =
           mi_pk = mi.mi_pk;
           mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
-          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs}
+          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs;
+          mi_df = mi.mi_df}
         with Not_found -> uc end
     | Umeta (m,al) ->
         begin try add_meta uc m (List.map (function
@@ -1135,7 +1138,8 @@ let clone_export uc m inst =
     mi_pk  = inst.mi_pk;
     mi_pv  = cl.pv_table;
     mi_rs  = cl.rs_table;
-    mi_xs  = cl.xs_table} in
+    mi_xs  = cl.xs_table;
+    mi_df  = inst.mi_df} in
   add_clone uc mi
 
 (** {2 WhyML language} *)

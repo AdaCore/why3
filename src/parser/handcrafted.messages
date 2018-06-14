@@ -95,7 +95,7 @@ term_eof: UIDENT COMMA WRITES
 
 term_eof: UIDENT WITH 
 ##
-## Ends in an error in state: 1173.
+## Ends in an error in state: 1176.
 ##
 ## term_eof -> term . EOF [ # ]
 ##
@@ -119,7 +119,7 @@ term_eof: UIDENT WITH
 
 term_eof: WRITES 
 ##
-## Ends in an error in state: 1171.
+## Ends in an error in state: 1174.
 ##
 ## term_eof' -> . term_eof [ # ]
 ##
@@ -2906,7 +2906,7 @@ term_comma_list_eof: UIDENT OR WRITES
 
 term_comma_list_eof: UIDENT RIGHTSQ 
 ##
-## Ends in an error in state: 1169.
+## Ends in an error in state: 1172.
 ##
 ## term_comma_list_eof -> comma_list1(single_term) . EOF [ # ]
 ##
@@ -3065,7 +3065,7 @@ term_comma_list_eof: UIDENT WRITES
 
 term_comma_list_eof: WRITES 
 ##
-## Ends in an error in state: 1167.
+## Ends in an error in state: 1170.
 ##
 ## term_comma_list_eof' -> . term_comma_list_eof [ # ]
 ##
@@ -3077,7 +3077,7 @@ term_comma_list_eof: WRITES
 
 qualid_eof: UIDENT WRITES 
 ##
-## Ends in an error in state: 1165.
+## Ends in an error in state: 1168.
 ##
 ## qualid_eof -> qualid . EOF [ # ]
 ##
@@ -3096,7 +3096,7 @@ qualid_eof: UIDENT WRITES
 
 qualid_eof: WRITES 
 ##
-## Ends in an error in state: 1163.
+## Ends in an error in state: 1166.
 ##
 ## qualid_eof' -> . qualid_eof [ # ]
 ##
@@ -3249,7 +3249,7 @@ qualid_comma_list_eof: LEFTPAR WRITES
 
 qualid_comma_list_eof: UIDENT COMMA WRITES 
 ##
-## Ends in an error in state: 1159.
+## Ends in an error in state: 1162.
 ##
 ## separated_nonempty_list(COMMA,qualid) -> qualid COMMA . separated_nonempty_list(COMMA,qualid) [ EOF ]
 ##
@@ -3300,7 +3300,7 @@ qualid_comma_list_eof: UIDENT WHILE
 
 qualid_comma_list_eof: UIDENT WRITES 
 ##
-## Ends in an error in state: 1158.
+## Ends in an error in state: 1161.
 ##
 ## separated_nonempty_list(COMMA,qualid) -> qualid . [ EOF ]
 ## separated_nonempty_list(COMMA,qualid) -> qualid . COMMA separated_nonempty_list(COMMA,qualid) [ EOF ]
@@ -3320,7 +3320,7 @@ qualid_comma_list_eof: UIDENT WRITES
 
 qualid_comma_list_eof: WRITES 
 ##
-## Ends in an error in state: 1155.
+## Ends in an error in state: 1158.
 ##
 ## qualid_comma_list_eof' -> . qualid_comma_list_eof [ # ]
 ##
@@ -3332,7 +3332,7 @@ qualid_comma_list_eof: WRITES
 
 mlw_file: AXIOM UIDENT COLON WRITES 
 ##
-## Ends in an error in state: 1132.
+## Ends in an error in state: 1135.
 ##
 ## pure_decl -> AXIOM attrs(ident_nq) COLON . term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3344,7 +3344,7 @@ mlw_file: AXIOM UIDENT COLON WRITES
 
 mlw_file: AXIOM UIDENT POSITION WRITES 
 ##
-## Ends in an error in state: 1131.
+## Ends in an error in state: 1134.
 ##
 ## pure_decl -> AXIOM attrs(ident_nq) . COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3364,7 +3364,7 @@ mlw_file: AXIOM UIDENT POSITION WRITES
 
 mlw_file: AXIOM WRITES 
 ##
-## Ends in an error in state: 1130.
+## Ends in an error in state: 1133.
 ##
 ## pure_decl -> AXIOM . attrs(ident_nq) COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3406,7 +3406,7 @@ mlw_file: CLONE EXPORT WRITES
 
 mlw_file: CLONE IMPORT CONTINUE 
 ##
-## Ends in an error in state: 1126.
+## Ends in an error in state: 1129.
 ##
 ## use_clone -> CLONE boption(IMPORT) . tqualid option(preceded(AS,uident)) clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3418,7 +3418,7 @@ mlw_file: CLONE IMPORT CONTINUE
 
 mlw_file: CLONE UIDENT AS CORE_UIDENT WRITES 
 ##
-## Ends in an error in state: 1128.
+## Ends in an error in state: 1131.
 ##
 ## use_clone -> CLONE boption(IMPORT) tqualid option(preceded(AS,uident)) . clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3430,9 +3430,10 @@ mlw_file: CLONE UIDENT AS CORE_UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH AXIOM WRITES 
 ##
-## Ends in an error in state: 1118.
+## Ends in an error in state: 1120.
 ##
 ## single_clone_subst -> AXIOM . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
+## single_clone_subst -> AXIOM . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
 ## The known suffix of the stack is as follows:
 ## AXIOM 
@@ -3442,7 +3443,7 @@ mlw_file: CLONE UIDENT WITH AXIOM WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1116.
+## Ends in an error in state: 1118.
 ##
 ## single_clone_subst -> CONSTANT qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3454,7 +3455,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT UIDENT WRITES 
 ##
-## Ends in an error in state: 1115.
+## Ends in an error in state: 1117.
 ##
 ## single_clone_subst -> CONSTANT qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> CONSTANT qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3474,7 +3475,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT WRITES 
 ##
-## Ends in an error in state: 1114.
+## Ends in an error in state: 1116.
 ##
 ## single_clone_subst -> CONSTANT . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> CONSTANT . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3487,7 +3488,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1112.
+## Ends in an error in state: 1114.
 ##
 ## single_clone_subst -> EXCEPTION qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3499,7 +3500,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT WRITES 
 ##
-## Ends in an error in state: 1111.
+## Ends in an error in state: 1113.
 ##
 ## single_clone_subst -> EXCEPTION qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> EXCEPTION qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3519,7 +3520,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION WRITES 
 ##
-## Ends in an error in state: 1110.
+## Ends in an error in state: 1112.
 ##
 ## single_clone_subst -> EXCEPTION . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> EXCEPTION . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3532,7 +3533,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1108.
+## Ends in an error in state: 1110.
 ##
 ## single_clone_subst -> FUNCTION qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3544,7 +3545,7 @@ mlw_file: CLONE UIDENT WITH FUNCTION UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION UIDENT WRITES 
 ##
-## Ends in an error in state: 1107.
+## Ends in an error in state: 1109.
 ##
 ## single_clone_subst -> FUNCTION qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> FUNCTION qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3564,7 +3565,7 @@ mlw_file: CLONE UIDENT WITH FUNCTION UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION WRITES 
 ##
-## Ends in an error in state: 1106.
+## Ends in an error in state: 1108.
 ##
 ## single_clone_subst -> FUNCTION . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> FUNCTION . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3577,9 +3578,10 @@ mlw_file: CLONE UIDENT WITH FUNCTION WRITES
 
 mlw_file: CLONE UIDENT WITH GOAL WRITES 
 ##
-## Ends in an error in state: 1104.
+## Ends in an error in state: 1105.
 ##
 ## single_clone_subst -> GOAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
+## single_clone_subst -> GOAL . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
 ## The known suffix of the stack is as follows:
 ## GOAL 
@@ -3589,7 +3591,7 @@ mlw_file: CLONE UIDENT WITH GOAL WRITES
 
 mlw_file: CLONE UIDENT WITH LEMMA UIDENT WRITES 
 ##
-## Ends in an error in state: 1120.
+## Ends in an error in state: 1123.
 ##
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst . COMMA separated_nonempty_list(COMMA,single_clone_subst) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -3603,7 +3605,7 @@ mlw_file: CLONE UIDENT WITH LEMMA UIDENT WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 288, spurious reduction of production ident_rich -> uident 
 ## In state 341, spurious reduction of production qualid -> ident_rich 
-## In state 1103, spurious reduction of production single_clone_subst -> LEMMA qualid 
+## In state 1104, spurious reduction of production single_clone_subst -> LEMMA qualid 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -3613,6 +3615,7 @@ mlw_file: CLONE UIDENT WITH LEMMA WRITES
 ## Ends in an error in state: 1102.
 ##
 ## single_clone_subst -> LEMMA . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
+## single_clone_subst -> LEMMA . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LEMMA 
@@ -3754,7 +3757,7 @@ mlw_file: CLONE UIDENT WITH TYPE WRITES
 
 mlw_file: CLONE UIDENT WITH VAL UIDENT COMMA WRITES 
 ##
-## Ends in an error in state: 1121.
+## Ends in an error in state: 1124.
 ##
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst COMMA . separated_nonempty_list(COMMA,single_clone_subst) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8316,7 +8319,7 @@ mlw_file: PREDICATE WRITES
 
 mlw_file: SCOPE CORE_UIDENT WRITES 
 ##
-## Ends in an error in state: 1135.
+## Ends in an error in state: 1138.
 ##
 ## module_decl -> scope_head . list(module_decl) END [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8352,7 +8355,7 @@ mlw_file: SCOPE WRITES
 
 mlw_file: THEORY UIDENT END WRITES 
 ##
-## Ends in an error in state: 1150.
+## Ends in an error in state: 1153.
 ##
 ## list(mlw_module) -> mlw_module . list(mlw_module) [ EOF ]
 ##
@@ -8364,7 +8367,7 @@ mlw_file: THEORY UIDENT END WRITES
 
 mlw_file: THEORY UIDENT VAL RANGE EOF 
 ##
-## Ends in an error in state: 1138.
+## Ends in an error in state: 1141.
 ##
 ## list(module_decl) -> module_decl . list(module_decl) [ END ]
 ##
@@ -8384,14 +8387,14 @@ mlw_file: THEORY UIDENT VAL RANGE EOF
 ## In state 550, spurious reduction of production val_defn -> params return_opt spec 
 ## In state 133, spurious reduction of production mk_expr(val_defn) -> val_defn 
 ## In state 558, spurious reduction of production prog_decl -> VAL ghost kind attrs(lident_rich) mk_expr(val_defn) 
-## In state 1137, spurious reduction of production module_decl -> prog_decl 
+## In state 1140, spurious reduction of production module_decl -> prog_decl 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: THEORY UIDENT WITH 
 ##
-## Ends in an error in state: 1145.
+## Ends in an error in state: 1148.
 ##
 ## mlw_module -> module_head . list(module_decl) END [ THEORY MODULE EOF ]
 ##
@@ -9230,7 +9233,7 @@ mlw_file: USE WRITES
 
 mlw_file: VAL CORE_LIDENT END 
 ##
-## Ends in an error in state: 1148.
+## Ends in an error in state: 1151.
 ##
 ## nonempty_list(module_decl) -> module_decl . [ EOF ]
 ## nonempty_list(module_decl) -> module_decl . nonempty_list(module_decl) [ EOF ]
@@ -9251,7 +9254,7 @@ mlw_file: VAL CORE_LIDENT END
 ## In state 550, spurious reduction of production val_defn -> params return_opt spec 
 ## In state 133, spurious reduction of production mk_expr(val_defn) -> val_defn 
 ## In state 558, spurious reduction of production prog_decl -> VAL ghost kind attrs(lident_rich) mk_expr(val_defn) 
-## In state 1137, spurious reduction of production module_decl -> prog_decl 
+## In state 1140, spurious reduction of production module_decl -> prog_decl 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

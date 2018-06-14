@@ -11,7 +11,7 @@ Authors:  Martin Clochard
 module Tarski
 
   use import set.Fset
-  clone export relations.PartialOrder
+  clone export relations.PartialOrder with axiom .
 
   constant a : set t
 
@@ -28,7 +28,7 @@ end
 
 module Tarski_rec
   use import set.Fset
-  clone export Tarski
+  clone export Tarski with axiom .
 
   let lemma least_fix_point () : unit
    ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }
@@ -45,7 +45,7 @@ end
 
 module Tarski_while
   use import set.Fset
-  clone export Tarski
+  clone export Tarski with axiom .
   use import ref.Ref
 
   let lemma least_fix_point () : unit

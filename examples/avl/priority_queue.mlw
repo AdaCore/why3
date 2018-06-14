@@ -24,7 +24,7 @@ module PQueue
   scope D type t 'a end
   scope K type t end
   clone export key_type.KeyType with type t = D.t, type key = K.t
-  clone preorder.Computable as CO with type t = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
 
   (** {2 Instantiation of the AVL tree module} *)
 

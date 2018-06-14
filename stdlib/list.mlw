@@ -338,7 +338,7 @@ module Sorted
 
   type t
   predicate le t t
-  clone relations.Transitive with type t = t, predicate rel = le
+  clone relations.Transitive with type t = t, predicate rel = le, axiom Trans
 
   inductive sorted (l: list t) =
     | Sorted_Nil:
@@ -378,7 +378,8 @@ module RevSorted
 
   type t
   predicate le t t
-  clone import relations.Transitive with type t = t, predicate rel = le
+  clone import relations.Transitive with
+    type t = t, predicate rel = le, axiom Trans
   predicate ge (x y: t) = le y x
 
   use import List

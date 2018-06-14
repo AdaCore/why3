@@ -25,8 +25,8 @@ end
 
 module AC
 
-  clone export Assoc
-  clone export Comm with type t = t, function op = op
+  clone export Assoc with axiom Assoc
+  clone export Comm with type t = t, function op = op, axiom Comm
   meta AC function op
 
 end
@@ -35,7 +35,7 @@ end
 
 module Monoid
 
-  clone export Assoc
+  clone export Assoc with axiom Assoc
   constant unit : t
   axiom Unit_def_l : forall x:t. op unit x = x
   axiom Unit_def_r : forall x:t. op x unit = x
@@ -46,8 +46,8 @@ end
 
 module CommutativeMonoid
 
-  clone export Monoid
-  clone export Comm with type t = t, function op = op
+  clone export Monoid with axiom Assoc, axiom Unit_def_l, axiom Unit_def_r
+  clone export Comm with type t = t, function op = op, axiom Comm
   meta AC function op
 
 end
@@ -56,7 +56,7 @@ end
 
 module Group
 
-  clone export Monoid
+  clone export Monoid with axiom Assoc, axiom Unit_def_l, axiom Unit_def_r
   function inv t : t
   axiom Inv_def_l : forall x:t. op (inv x) x = unit
   axiom Inv_def_r : forall x:t. op x (inv x) = unit
@@ -71,8 +71,8 @@ end
 
 module CommutativeGroup
 
-  clone export Group
-  clone export Comm with type t = t, function op = op
+  clone export Group with axiom .
+  clone export Comm with type t = t, function op = op, axiom Comm
   meta AC function op
 
 end
@@ -90,9 +90,10 @@ module Ring
   clone export CommutativeGroup with type t = t,
                                 constant unit = zero,
                                 function op = (+),
-                                function inv = (-_)
+                                function inv = (-_),
+                                axiom .
 
-  clone Assoc as MulAssoc with type t = t, function op = (*)
+  clone Assoc as MulAssoc with type t = t, function op = (*), axiom Assoc
 
   axiom Mul_distr_l : forall x y z : t. x * (y + z) = x * y + x * z
   axiom Mul_distr_r : forall x y z : t. (y + z) * x = y * x + z * x
@@ -103,8 +104,8 @@ end
 
 module CommutativeRing
 
-  clone export Ring
-  clone Comm as MulComm with type t = t, function op = (*)
+  clone export Ring with axiom .
+  clone Comm as MulComm with type t = t, function op = (*), axiom Comm
   meta AC function (*)
 
 end
@@ -113,7 +114,7 @@ end
 
 module UnitaryCommutativeRing
 
-  clone export CommutativeRing
+  clone export CommutativeRing with axiom .
   constant one : t
   axiom Unitary : forall x:t. one * x = x
   axiom NonTrivialRing : zero <> one
@@ -124,11 +125,12 @@ end
 
 module OrderedUnitaryCommutativeRing
 
-  clone export UnitaryCommutativeRing
+  clone export UnitaryCommutativeRing with axiom .
 
   predicate (<=) t t
 
-  clone export relations.TotalOrder with type t = t, predicate rel = (<=)
+  clone export relations.TotalOrder with
+    type t = t, predicate rel = (<=), axiom .
 
   axiom ZeroLessOne : zero <= one
 
@@ -144,7 +146,7 @@ end
 
 module Field
 
-  clone export UnitaryCommutativeRing
+  clone export UnitaryCommutativeRing with axiom .
 
   function inv t : t
 
@@ -180,11 +182,12 @@ end
 
 module OrderedField
 
-  clone export Field
+  clone export Field with axiom .
 
   predicate (<=) t t
 
-  clone export relations.TotalOrder with type t = t, predicate rel = (<=)
+  clone export relations.TotalOrder with
+    type t = t, predicate rel = (<=), axiom .
 
   axiom ZeroLessOne : zero <= one
 

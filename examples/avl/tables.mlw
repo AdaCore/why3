@@ -24,7 +24,7 @@ module MapBase
   (** Stored elements are identified by totally ordered keys *)
   scope D type t 'a end scope K type t end
   clone export key_type.KeyType with type t = D.t, type key = K.t
-  clone preorder.Computable as CO with type t = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
   scope D
     let function measure 'a : unit = ()
   end
@@ -512,7 +512,7 @@ module Map
 
   (** Parameter: key type with computable total preorder. *)
   scope K type t end
-  clone preorder.Computable as CO with type t = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
 
   (** Elements are key-value pairs *)
   scope D
@@ -711,7 +711,7 @@ module Set
 
   (** Parameter: comparable elements. *)
   scope K type t end
-  clone preorder.Computable as CO with type t = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
 
   (** Elements are themselves the keys. *)
   scope D

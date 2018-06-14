@@ -28,9 +28,7 @@ module Real
   clone export algebra.OrderedField with type t = real,
     constant zero = zero, constant one = one,
     function (-_) = (-_), function (+) = (+),
-    function (*) = (*), predicate (<=) = (<=),
-    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
-    lemma NonTrivialRing, lemma ZeroLessOne
+    function (*) = (*), predicate (<=) = (<=)
 
   val (/) (x y:real) : real
     requires { y <> 0.0 }
@@ -101,9 +99,8 @@ end
 module MinMax
 
   use import Real
-  clone export relations.MinMax with type t = real, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  clone export relations.MinMax with
+    type t = real, predicate le = (<=), goal .
 
 end
 
@@ -257,7 +254,7 @@ module PowerInt
 
   clone export int.Exponentiation with
     type t = real, constant one = Real.one, function (*) = Real.(*),
-    goal Assoc, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r, axiom Power_0, axiom Power_s
 
   lemma Pow_ge_one:
     forall x:real, n:int. 0 <= n /\ 1.0 <=. x -> 1.0 <=. power x n

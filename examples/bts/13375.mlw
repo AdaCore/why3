@@ -37,7 +37,7 @@ module Spec
  type my_type
 
  clone Signed as My_Type_T
-   with type signed_type = my_type
+   with type signed_type = my_type, axiom .
  axiom axiom_first :
   My_Type_T.first = 1
 

@@ -280,7 +280,8 @@ theory Mat22
   clone export
     int.Exponentiation with
       type t = t, function one = id, function (*) = mult,
-      goal Assoc, goal Unit_def_l, goal Unit_def_r
+      goal Assoc, goal Unit_def_l, goal Unit_def_r,
+      axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 

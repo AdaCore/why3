@@ -78,6 +78,7 @@ and mod_inst = {
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mxs.t;
+  mi_df  : prop_kind;
 }
 
 val empty_mod_inst: pmodule -> mod_inst

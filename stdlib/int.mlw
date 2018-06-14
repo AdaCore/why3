@@ -28,9 +28,7 @@ module Int
   clone export algebra.OrderedUnitaryCommutativeRing with
     type t = int, constant zero = zero, constant one = one,
     function (-_) = (-_), function (+) = (+),
-    function (*) = (*), predicate (<=) = (<=),
-    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
-    lemma NonTrivialRing, lemma ZeroLessOne
+    function (*) = (*), predicate (<=) = (<=)
 
 end
 
@@ -246,7 +244,7 @@ module Exponentiation
   function (*) t t : t
 
   clone export algebra.Monoid
-    with type t = t, constant unit = one, function op = (*)
+    with type t = t, constant unit = one, function op = (*), axiom .
 
   (* TODO: implement with let rec once let cloning is done *)
   function power t int : t
@@ -298,7 +296,8 @@ module Power
   clone export Exponentiation with
     type t = int, constant one = one,
     function (*) = (*), function power = power,
-    goal Assoc, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r,
+    axiom Power_0, axiom Power_s
 
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0

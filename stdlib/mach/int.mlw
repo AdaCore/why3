@@ -67,7 +67,7 @@ module Bounded_int
     requires { [@expl:integer overflow] in_bounds (a - b) }
     ensures  { result = a - b }
 
-  val ( * ) (a:t) (b:t) : t
+  val (*) (a:t) (b:t) : t
     requires { [@expl:integer overflow] in_bounds (a * b) }
     ensures  { result = a * b }
 
@@ -114,7 +114,7 @@ module Unsigned
   let constant min_unsigned : int = 0
 
   clone export Bounded_int with
-    constant min = min_unsigned
+    constant min = min_unsigned, axiom .
 
   constant zero_unsigned : t
 
@@ -131,7 +131,7 @@ module UnsignedGMP
   (** Additional GMP-inspired arithmetic primitives *)
 
   use import int.Int
-  clone export Unsigned
+  clone export Unsigned with axiom .
   use import int.EuclideanDivision
 
   val add_mod (x y:t) : t

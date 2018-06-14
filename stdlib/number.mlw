@@ -123,8 +123,7 @@ module Gcd
 
   (* gcd is associative commutative *)
 
-  clone algebra.AC with type t = int, function op = gcd,
-    lemma Comm, lemma Assoc
+  clone algebra.AC with type t = int, function op = gcd
 
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a

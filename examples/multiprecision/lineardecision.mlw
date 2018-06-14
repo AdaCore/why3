@@ -2,13 +2,17 @@ module LinearEquationsCoeffs
 
 type a
 function (+) a a : a
-function ( *) a a : a
+function (*) a a : a
 function (-_) a : a
 function azero: a
 function aone: a
 predicate ale a a
 
-clone algebra.OrderedUnitaryCommutativeRing as A with type t = a, function (+) = (+), function ( *) = ( *), function (-_) = (-_), constant zero = azero, constant one=aone, predicate (<=) = ale
+clone algebra.OrderedUnitaryCommutativeRing as A with
+  type t = a, function (+) = (+), function (*) = (*),
+  function (-_) = (-_), constant zero = azero,
+  constant one=aone, predicate (<=) = ale,
+  axiom .
 
 function (-) a a : a
 
@@ -57,7 +61,7 @@ module LinearEquationsDecision
 use import int.Int
 type coeff
 
-clone LinearEquationsCoeffs as C with type t = coeff
+clone LinearEquationsCoeffs as C with type t = coeff, axiom .
 type vars = C.vars
 
 type expr = Term coeff int | Add expr expr | Cst coeff
@@ -80,7 +84,7 @@ let rec predicate expr_bound (e:expr) (b:int)
 
 function interp (e:expr) (y:vars) (z:C.cvars) : C.a
 = match e with
-  | Term c v -> C.( *) (C.interp c z) (y v)
+  | Term c v -> C.(*) (C.interp c z) (y v)
   | Add e1 e2 -> C.(+) (interp e1 y z) (interp e2 y z)
   | Cst c -> C.interp c z
   end
@@ -262,9 +266,9 @@ let rec opp_expr (e:expr) : expr
   | Term c j ->
     let oc = C.opp c in
     let r = Term oc j in
-    assert { forall y z. interp r y z = C.( *) (C.interp oc z) (y j)
-             = C.( *) (C.(-_) (C.interp c z)) (y j)
-             = C.(-_) (C.( *) (C.interp c z) (y j))
+    assert { forall y z. interp r y z = C.(*) (C.interp oc z) (y j)
+             = C.(*) (C.(-_) (C.interp c z)) (y j)
+             = C.(-_) (C.(*) (C.interp c z) (y j))
              = C.(-_) (interp e y z) };
     r
   | Add e1 e2 ->
@@ -353,7 +357,7 @@ let rec lemma interp_ctx_wl (ctx l: context) (g:equality)
 
 let rec mul_expr (e:expr) (c:coeff) : expr
   ensures { forall y z. interp result y z
-            = C.( *) (C.interp c z) (interp e y z) }
+            = C.(*) (C.interp c z) (interp e y z) }
   ensures { valid_expr e -> valid_expr result }
   variant { e }
   raises  { C.Unknown -> true }
@@ -475,9 +479,9 @@ let sub_expr (e1 e2:expr)
            let v2 = interp e2 y z in
            let vr = interp r y z in
            C.(+) vr v2 = v1
-           by C.( *) v2 (C.(-_) C.aone) = C.(-_) v2
+           by C.(*) v2 (C.(-_) C.aone) = C.(-_) v2
            so C.(+) vr v2
-           = C.(+) (C.(+) v1 (C.( *) v2 (C.(-_) C.aone))) v2
+           = C.(+) (C.(+) v1 (C.(*) v2 (C.(-_) C.aone))) v2
            = C.(+) (C.(+) v1 (C.(-_) v2)) v2 = v1 };
   r
 
@@ -982,7 +986,8 @@ use import RationalCoeffs
 use import real.RealInfix
 use import real.FromInt
 
-clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 
@@ -1027,7 +1032,8 @@ let iinv (t:t') : t'
   raises { NError -> true }
 = raise NError
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t', type C.cvars = int->int,function C.interp = interp_id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = izero, val C.cone = ione, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = iadd, val C.mul = imul, val C.opp = iopp, val C.eq = ieq, val C.inv = iinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t', type C.cvars = int->int,function C.interp = interp_id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = izero, val C.cone = ione, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = iadd, val C.mul = imul, val C.opp = iopp, val C.eq = ieq, val C.inv = iinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 
 use import real.FromInt
@@ -1398,7 +1404,8 @@ use import real.RealInfix
 
 type coeff = t
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = MPError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.(*) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = MPError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 module LinearDecisionIntMP
@@ -1448,7 +1455,8 @@ let mpinv (a:t) : t
 = raise MPError
 
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = int, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 use LinearDecisionRationalMP as R
 use import real.FromInt

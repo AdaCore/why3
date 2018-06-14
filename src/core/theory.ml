@@ -542,6 +542,7 @@ type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
+  inst_df : prop_kind;
 }
 
 let empty_inst = {
@@ -549,6 +550,7 @@ let empty_inst = {
   inst_ts = Mts.empty;
   inst_ls = Mls.empty;
   inst_pr = Mpr.empty;
+  inst_df = Plemma;
 }
 
 exception CannotInstantiate of ident
@@ -731,7 +733,7 @@ let cl_prop cl inst (k,pr,f) =
     | Plemma, Some Pgoal -> raise EmptyDecl
     | Plemma, _ -> Plemma
     | Paxiom, Some k -> k
-    | Paxiom, None -> Paxiom (* TODO: Plemma *) in
+    | Paxiom, None -> inst.inst_df in
   let pr' = cl_clone_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'

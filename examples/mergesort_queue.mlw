@@ -15,9 +15,10 @@ module MergesortQueue
 
   type elt
   val predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
-  clone export list.Sorted      with type t = elt, predicate le  = le,
-  goal Transitive.Trans
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+  clone export list.Sorted with
+    type t = elt, predicate le  = le, goal Transitive.Trans
 
   let merge (q1: t elt) (q2: t elt) (q: t elt)
     requires { q.elts = Nil /\ sorted q1.elts /\ sorted q2.elts }

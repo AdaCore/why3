@@ -60,7 +60,7 @@ module CoincidenceCountAnyType
     ensures { result <-> x = y }
   val predicate rel (x y : t)
 
-  clone import relations.TotalStrictOrder with type t, predicate rel
+  clone import relations.TotalStrictOrder with type t, predicate rel, axiom .
 
   clone export list.Sorted
      with type t = t, predicate le = rel, goal Transitive.Trans

@@ -81,7 +81,7 @@ syn keyword  whyImport contained import
 
 syn region   whyNone matchgroup=whyKeyword start="\<import\>" matchgroup=whyModSpec end="\<\(\u\(\w\|'\)*\.\)*\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
 
-syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
+syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)\>\|" contains=@whyAllErrs,whyComment
 
 syn keyword  whyKeyword  as by constant
 syn keyword  whyKeyword  else epsilon exists

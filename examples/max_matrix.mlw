@@ -91,7 +91,7 @@ module MaxMatrixMemo
   use import Bitset
   use map.Map
 
-  clone import appmap.Appmap with type key = int
+  clone import appmap.Appmap with type key = int, axiom .
 
   val constant n : int
     ensures { 0 <= result <= size }
@@ -108,7 +108,7 @@ module MaxMatrixMemo
   predicate permutation (s: mapii) = solution s 0
 
   function f (s: mapii) (i: int) : int = m[i][Map.get s i]
-  clone import sum.Sum with type container = mapii, function f = f
+  clone import sum.Sum with type container = mapii, function f = f, axiom .
 
   lemma sum_ind:
     forall i: int. i < n -> forall j: int.

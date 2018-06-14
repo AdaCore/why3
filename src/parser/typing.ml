@@ -1293,6 +1293,9 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
         let pr = find_prop_ns t.th_export p in
         { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new
             (ClashSymbol pr.pr_name.id_string) pr Pgoal s.mi_pk }
+    | CSprop k ->
+        (* TODO: check for multiple settings *)
+        { s with mi_df = k }
   in
   List.fold_left add_inst (empty_mod_inst m) s
 

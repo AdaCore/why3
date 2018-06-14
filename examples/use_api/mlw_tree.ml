@@ -27,7 +27,7 @@ open Ptree
 (* start a module *)
 (* BEGIN{openmodule} *)
 let () = Typing.open_file env [] (* empty pathname *)
-let mk_ident s = { id_str = s; id_ats=[]; id_loc = Loc.dummy_position }
+let mk_ident s = { id_str = s; id_ats = []; id_loc = Loc.dummy_position }
 let m = Typing.open_module (mk_ident "Program")
 (* END{openmodule} *)
 

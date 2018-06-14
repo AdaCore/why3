@@ -4,7 +4,7 @@ use import int.Int
 
 type mat 'a
 
-clone algebra.UnitaryCommutativeRing as F
+clone algebra.UnitaryCommutativeRing as F with axiom .
 
 function get (mat F.t) int int : F.t
 function set (mat F.t) int int F.t : mat F.t
@@ -109,16 +109,19 @@ module InfMatrix
   type t
   constant tzero: t
 
-  clone export algebra.UnitaryCommutativeRing with type t = t, constant zero = tzero
+  clone export algebra.UnitaryCommutativeRing with
+    type t = t, constant zero = tzero, axiom .
 
   use import int.Int
-  clone export relations.MinMax with type t = int, predicate le = (<=)
+  clone export relations.MinMax with
+    type t = int, predicate le = (<=),
+    axiom . (* FIXME: replace with "goal" and prove *)
 
   type mat
 
   val function get mat int int : t
- 
- val function row_zeros mat int : int
+
+  val function row_zeros mat int : int
   val function col_zeros mat int : int
 
   val function create (rz: int -> int) (cz: int -> int) (f: int -> int -> t)
@@ -163,7 +166,8 @@ module InfMatrix
     lemma set_def_rowz_changed,
     lemma set_def_rowz_unchanged,
     lemma set_def_other_rowz,
-    lemma set_def_other_colz
+    lemma set_def_other_colz,
+    axiom . (* FIXME: replace with "goal" and prove *)
 
   let ghost function fcreate (r c: int) (f: int -> int -> t) : mat =
     create (fun _ -> max 0 c) (fun _ -> max 0 r) f
@@ -293,7 +297,9 @@ end
 module InfIntMatrix
 
   use import int.Int
-  clone export InfMatrix with type t = int, constant tzero = zero
+  clone export InfMatrix with
+    type t = int, constant tzero = zero,
+    axiom . (* FIXME: replace with "goal" and prove *)
   use import int.Sum
 
   use import int.Int (*FIXME needed so i < i+1 ?*)
@@ -646,7 +652,8 @@ use import int.Int
 
 let predicate eq0_int (x:int) = x = 0
 
-clone export ringdecision.AssocAlgebraDecision with type r = int, type a = mat, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = ( *), val azero = mzero, val aone = id, val aplus = add, val aopp = opp, val atimes = mul, val asub = sub, val ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r, goal asub_def, goal A.Inv_def_l, goal A.Inv_def_r
+clone export ringdecision.AssocAlgebraDecision with type r = int, type a = mat, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = mzero, val aone = id, val aplus = add, val aopp = opp, val atimes = mul, val asub = sub, val ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r, goal asub_def, goal A.Inv_def_l, goal A.Inv_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 

@@ -69,14 +69,15 @@ module AVL
       the sequence. In other words, `M.sum f [a_1;...;a_n]` is the
       monoidal summary of sequence `[a_1;...;a_n]` with respect to
       measure `f`. *)
-  clone monoid.ComputableMonoid as M
+  clone monoid.ComputableMonoid as M with axiom .
   clone monoid.MonoidSum as M with
     (* scope M = M *)
     type M.t = M.t,
     constant M.zero = M.zero,
     function M.op = M.op,
     goal M.assoc,
-    goal M.neutral
+    goal M.neutral,
+    axiom .
 
   (** Abstract description of the data stored in the tree:
       measurable elements. *)

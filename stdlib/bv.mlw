@@ -425,7 +425,8 @@ module BV64
     constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
-    goal max_int_val
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
@@ -445,7 +446,8 @@ module BV32
     constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
-    goal max_int_val
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
@@ -465,7 +467,8 @@ module BV16
     constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
-    goal max_int_val
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
@@ -485,7 +488,8 @@ module BV8
     constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
-    goal max_int_val
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
@@ -527,7 +531,10 @@ module BVConverter_32_64
     type smallBV = BV32.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV32.t'int,
-    function to_uint_big = BV64.t'int
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+
 end
 
 module BVConverter_16_64
@@ -541,7 +548,9 @@ module BVConverter_16_64
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV16.t'int,
-    function to_uint_big = BV64.t'int
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
 end
 
 module BVConverter_8_64
@@ -555,7 +564,9 @@ module BVConverter_8_64
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV8.t'int,
-    function to_uint_big = BV64.t'int
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
 end
 
 module BVConverter_16_32
@@ -569,7 +580,9 @@ module BVConverter_16_32
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV16.t'int,
-    function to_uint_big = BV32.t'int
+    function to_uint_big = BV32.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
 end
 
 module BVConverter_8_32
@@ -583,7 +596,9 @@ module BVConverter_8_32
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV8.t'int,
-    function to_uint_big = BV32.t'int
+    function to_uint_big = BV32.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
 end
 
 module BVConverter_8_16
@@ -597,5 +612,7 @@ module BVConverter_8_16
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
     function to_uint_small = BV8.t'int,
-    function to_uint_big = BV16.t'int
+    function to_uint_big = BV16.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
 end

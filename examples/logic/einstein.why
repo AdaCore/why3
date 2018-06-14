@@ -33,14 +33,14 @@ theory Einstein
 
   (** Each house is associated bijectively to a color and a person *)
 
-  clone Bijection as Color with type t = house, type u = color
-  clone Bijection as Owner with type t = house, type u = person
+  clone Bijection as Color with type t = house, type u = color, axiom .
+  clone Bijection as Owner with type t = house, type u = person, axiom .
 
   (** Each drink, cigar brand and pet are associated bijectively to a person *)
 
-  clone Bijection as Drink with type t = person, type u = drink
-  clone Bijection as Cigar with type t = person, type u = cigar
-  clone Bijection as Pet   with type t = person, type u = pet
+  clone Bijection as Drink with type t = person, type u = drink, axiom .
+  clone Bijection as Cigar with type t = person, type u = cigar, axiom .
+  clone Bijection as Pet   with type t = person, type u = pet, axiom .
 
   (** Relative positions of the houses *)
 
