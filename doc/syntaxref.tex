@@ -707,20 +707,29 @@ file. If a theory is supposed to be reused from other files, be they
 \section{The \why Standard Library}
 \label{sec:library}\index{standard library}\index{library}
 
-The \why standard library provides general-purpose theories and
+The \why standard library provides general-purpose
 modules, to be used in logic and/or programs.
 It can be browsed on-line at \url{http://why3.lri.fr/stdlib/}.
-Each file contains one or several theories and/or modules.
-To \texttt{use} or \texttt{clone} a theory/module \texttt{T} from file
-\texttt{file}, use the syntax \texttt{file.T}, since \texttt{file} is
-available in \why's default load path. For instance, the theory of
+Each file contains one or several modules.
+To \texttt{use} or \texttt{clone} a module \texttt{M} from file
+\texttt{file}, use the syntax \texttt{file.M}, since \texttt{file} is
+available in \why's default load path. For instance, the module of
 integers and the module of references are imported as follows:
-
 \begin{whycode}
   use import int.Int
   use import ref.Ref
 \end{whycode}
-
+A sub-directory \texttt{mach/} provides various modules to model
+machine arithmetic.
+For instance, the module of 63-bit integers and the module of arrays
+indexed by 63-bit integers are imported as follows:
+\begin{whycode}
+  use import mach.int.Int63
+  use import mach.array.Array63
+\end{whycode}
+In particular, the types and operations from these modules are mapped
+to native OCaml's types and operations when \why code is extracted to
+OCaml (see Sec.~\ref{sec:extract}).
 
 %%% Local Variables:
 %%% mode: latex
