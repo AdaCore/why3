@@ -111,7 +111,7 @@ module BV_Gen
 
   type t
 
-  (** [nth b n] is the [n]-th bit of [b]. Bit 0 is
+  (** `nth b n` is the `n`-th bit of `b`. Bit 0 is
       the least significant bit *)
   val function nth t int : bool
 
@@ -156,8 +156,8 @@ module BV_Gen
   (** Warning: shift operators of an amount greater than or equal to
       the size are specified here, in concordance with SMTLIB. This is
       not necessarily the case in hardware, where the amount of the
-      shift might be taken modulo the size, eg. [lsr x 64] might be
-      equal to [x], whereas in this theory it is 0.
+      shift might be taken modulo the size, eg. `lsr x 64` might be
+      equal to `x`, whereas in this theory it is 0.
   *)
 
   val function lsr t int : t

@@ -10,7 +10,7 @@ module Set
 
   type set 'a = map 'a bool
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
   meta "material_type_arg" type set, 0
 
   (** membership *)
@@ -98,7 +98,7 @@ module SetMap
 
   use export Set
 
-  (** { f x | x in U } *)
+  (** `{ f x | x in U }` *)
   function map (f: 'a  -> 'b) (u: set 'a) : set 'b =
     fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x
 
@@ -118,7 +118,7 @@ module Fset
 
   type set 'a
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
   meta "material_type_arg" type set, 0
 
   (** membership *)
@@ -342,7 +342,7 @@ module FsetSum
   use import Fset as S
 
   function sum (set 'a) ('a -> int) : int
-  (** [sum s f] is the sum Sum_{S.mem x s} f x *)
+  (** `sum s f` is the sum `\sum_{S.mem x s} f x` *)
 
   axiom Sum_def_empty :
     forall f. sum (S.empty: set 'a) f = 0

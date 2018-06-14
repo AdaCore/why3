@@ -10,7 +10,7 @@ module Pqueue
   (** the abstract type of elements *)
 
   clone export relations.TotalOrder with type t = elt
-  (** [elt] is equipped with a total order [rel] *)
+  (** `elt` is equipped with a total order `rel` *)
 
   use import list.List
   use import list.Mem
@@ -30,11 +30,11 @@ module Pqueue
   (** push an element in a queue *)
 
   exception Empty
-  (** exception raised by [pop] and [peek] to signal an empty queue *)
+  (** exception raised by `pop` and `peek` to signal an empty queue *)
 
   predicate minimal_elt (x: elt) (s: list elt) =
      mem x s /\ forall e: elt. mem e s -> rel x e
-  (** property of the element returned by [pop] and [peek] *)
+  (** property of the element returned by `pop` and `peek` *)
 
   val pop (q: t) : elt writes {q}
     ensures { permut (Cons result q.elts) (old q.elts) }
@@ -77,7 +77,7 @@ module PqueueNoDup
   (** the abstract type of elements *)
 
   clone export relations.TotalOrder with type t = elt
-  (** [elt] is equipped with a total order [rel] *)
+  (** `elt` is equipped with a total order `rel` *)
 
   use import set.Fset
 
@@ -94,11 +94,11 @@ module PqueueNoDup
   (** push an element in a queue *)
 
   exception Empty
-  (** exception raised by [pop] and [peek] to signal an empty queue *)
+  (** exception raised by `pop` and `peek` to signal an empty queue *)
 
   predicate minimal_elt (x: elt) (s: set elt) =
      mem x s /\ forall e: elt. mem e s -> rel x e
-  (** property of the element returned by [pop] and [peek] *)
+  (** property of the element returned by `pop` and `peek` *)
 
   val pop (q: t) : elt writes {q}
     ensures { q.elts = remove result (old q.elts) }

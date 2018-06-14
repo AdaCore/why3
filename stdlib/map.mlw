@@ -51,8 +51,8 @@ module MapSorted
 
   predicate sorted_sub (a : map int elt) (l u : int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
-  (** [sorted_sub a l u] is true whenever the array segment [a(l..u-1)]
-      is sorted w.r.t order relation [le] *)
+  (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
+      is sorted w.r.t order relation `le` *)
 
 end
 
@@ -92,7 +92,7 @@ module MapSum
   use import int.Int
   use export Map
 
-  (** [sum m l h] is the sum of [m[i]] for [l <= i < h] *)
+  (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
 
   type container = map int int
   clone export sum.Sum with type container = container, function f = get
@@ -108,7 +108,7 @@ module Occ
   use import Map
 
   function occ (v: 'a) (m: map int 'a) (l u: int) : int
-    (** number of occurrences of [v] in [m] between [l] included and [u] excluded *)
+    (** number of occurrences of `v` in `m` between `l` included and `u` excluded *)
 
   axiom occ_empty:
     forall v: 'a, m: map int 'a, l u: int.
@@ -196,24 +196,24 @@ module MapInjection
 
   predicate injective (a: map int int) (n: int) =
     forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
-  (** [injective a n] is true when [a] is an injection
-      on the domain [(0..n-1)] *)
+  (** `injective a n` is true when `a` is an injection
+      on the domain `(0..n-1)` *)
 
   predicate surjective (a: map int int) (n: int) =
     forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
-  (** [surjective a n] is true when [a] is a surjection
-      from [(0..n-1)] to [(0..n-1)] *)
+  (** `surjective a n` is true when `a` is a surjection
+      from `(0..n-1)` to `(0..n-1)` *)
 
   predicate range (a: map int int) (n: int) =
     forall i: int. 0 <= i < n -> 0 <= a[i] < n
-  (** [range a n] is true when [a] maps the domain
-      [(0..n-1)] into [(0..n-1)] *)
+  (** `range a n` is true when `a` maps the domain
+      `(0..n-1)` into `(0..n-1)` *)
 
   lemma injective_surjective:
     forall a: map int int, n: int.
     injective a n -> range a n -> surjective a n
-  (** main lemma: an injection on [(0..n-1)] that
-      ranges into [(0..n-1)] is also a surjection *)
+  (** main lemma: an injection on `(0..n-1)` that
+      ranges into `(0..n-1)` is also a surjection *)
 
   use import Occ
 
@@ -233,7 +233,7 @@ module MapParam
   type elt
   type map
 
-  (** if ['b] is an infinite type, then [map 'a 'b] is infinite *)
+  (** if `'b` is an infinite type, then `map 'a 'b` is infinite *)
   meta "material_type_arg" type map, 1
 
   function get (map 'a 'b) 'a : 'b
