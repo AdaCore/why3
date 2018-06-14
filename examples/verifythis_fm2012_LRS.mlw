@@ -91,31 +91,31 @@ module LCP
 use export int.Int
 use import array.Array
 
-(** [is_common_prefix a x y l] is true when the prefixes of length [l]
-    at respective positions [x] and [y] in array [a] are identical. In
-    other words, the array parts a[x..x+l-1] and a[y..y+l-1] are equal
+(** `is_common_prefix a x y l` is true when the prefixes of length `l`
+    at respective positions `x` and `y` in array `a` are identical. In
+    other words, the array parts `a[x..x+l-1]` and `a[y..y+l-1]` are equal
     *)
 predicate is_common_prefix (a:array int) (x y l:int) =
   0 <= l /\ x+l <= a.length /\ y+l <= a.length /\
   (forall i:int. 0 <= i < l -> a[x+i] = a[y+i])
 
-(** This lemma helps for the proof of [lcp] (but is not mandatory) and
-    is needed later (for [le_trans]) *)
+(** This lemma helps for the proof of `lcp` (but is not mandatory) and
+    is needed later (for `le_trans`) *)
 lemma not_common_prefix_if_last_char_are_different:
   forall a:array int, x y:int, l:int.
     0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
       not is_common_prefix a x y (l+1)
 
-(** [is_longest_common_prefix a x y l] is true when [l] is the maximal
-    length such that prefixes at positions [x] and [y] in array [a]
+(** `is_longest_common_prefix a x y l` is true when `l` is the maximal
+    length such that prefixes at positions `x` and `y` in array `a`
     are identical. *)
 predicate is_longest_common_prefix (a:array int) (x y l:int) =
   is_common_prefix a x y l /\
   forall m:int. l < m -> not (is_common_prefix a x y m)
 
-(** This lemma helps to proving [lcp] (but again is not mandatory),
-    and is needed for proving [lcp_sym] and [le_trans] lemmas, and
-    the post-condition of [compare] function in the "absurd" case *)
+(** This lemma helps to proving `lcp` (but again is not mandatory),
+    and is needed for proving `lcp_sym` and `le_trans` lemmas, and
+    the post-condition of `compare` function in the "absurd" case *)
 
 lemma longest_common_prefix_succ:
   forall a:array int, x y l:int.
@@ -226,11 +226,11 @@ let compare (a:array int) (x y:int) : int
 
 
   use map.MapInjection
-  (** [range a] is true when for each [i], [a[i]] is between [0] at
-      [a.length-1] *)
+  (** `range a` is true when for each `i`, `a[i]` is between `0` and
+      `a.length-1` *)
   predicate range (a:array int) = MapInjection.range a.elts a.length
 
-  (** for the [permut] predicate (permutation of elements) *)
+  (** for the `permut` predicate (permutation of elements) *)
   use array.ArrayPermut
 
   predicate le (a : array int) (x y:int) = x = y \/ lt a x y
@@ -281,7 +281,7 @@ let sort (a:array int) (data : array int)
        assert { ArrayPermut.exchange (data at L) data (!j-1) !j };
        decr j
      done;
-     (* needed to prove the invariant [sorted_sub a data.elts 0 i] *)
+     (* needed to prove the invariant `sorted_sub a data.elts 0 i` *)
      assert { !j > 0 -> le a data[!j-1] data[!j] }
    done
 
@@ -351,7 +351,7 @@ let select (s:suffixArray) (i:int) : int
 
 use array.ArrayPermut
 
-(** needed to establish invariant in function [create] *)
+(** needed to establish invariant in function `create` *)
 lemma permut_permutation : forall a1 a2:array int.
   ArrayPermut.permut_all a1 a2 /\ permutation a1.elts a1.length ->
     permutation a2.elts a2.length
@@ -444,9 +444,9 @@ module LRS
   use SuffixArray
 
 
-(** additional properties relating [le] and [longest_common_prefix] *)
+(** additional properties relating `le` and `longest_common_prefix` *)
 
-(* needed for [lrs] function, last before last assert *)
+(* needed for `lrs` function, last before last assert *)
 lemma lcp_sym :
   forall a:array int, x y l:int.
      0 <= x <= a.length /\ 0 <= y <= a.length ->
@@ -506,7 +506,7 @@ lemma le_le_common_prefix:
          solLength := l
       end
     done;
-    (** the following assert needs [lcp_sym] lemma *)
+    (** the following assert needs `lcp_sym` lemma *)
     assert { forall j k l:int.
                 0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
                  LCP.is_longest_common_prefix a

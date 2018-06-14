@@ -418,7 +418,7 @@ module NumOcc
     | Nil      -> 0
     | Cons y r -> (if x = y then 1 else 0) + num_occ x r
     end
-  (** number of occurrences of [x] in [l] *)
+  (** number of occurrences of `x` in `l` *)
 
   lemma Num_Occ_NonNeg: forall x:'a, l: list 'a. num_occ x l >= 0
 

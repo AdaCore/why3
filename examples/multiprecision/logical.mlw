@@ -113,9 +113,9 @@ module Logical
            };
     r
 
-  (** [lshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the left and
-      writes the result in [(r, sz)]. Returns the [cnt] most significant
-      bits of [(x, sz)]. Corresponds to [mpn_lshift]. *)
+  (** `lshift r x sz cnt` shifts `(x, sz)` `cnt` bits to the left and
+      writes the result in `(r, sz)`. Returns the `cnt` most significant
+      bits of `(x, sz)`. Corresponds to `mpn_lshift`. *)
   (*TODO overlapping allowed if r >= x*)
   let lshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { 0 < cnt < Limb.length }
@@ -252,9 +252,9 @@ module Logical
    value_sub_head (pelts r) r.offset (r.offset + p2i sz);
    retval
 
-  (** [rshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the right and
-      writes the result in [(r, sz)]. Returns the [cnt] least significant
-      bits of [(x, sz)]. Corresponds to [mpn_rshift]. *)
+  (** `rshift r x sz cnt` shifts `(x, sz)` `cnt` bits to the right and
+      writes the result in `(r, sz)`. Returns the `cnt` least significant
+      bits of `(x, sz)`. Corresponds to `mpn_rshift`. *)
   (*TODO overlapping allowed if r <= x*)
   let rshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { valid x sz }

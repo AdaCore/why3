@@ -6,7 +6,7 @@ module Lemmas
   use map.Const
   use import int.Int
 
-  (** {3 complements to map standard library} *)
+  (** {3 Complements to map standard library} *)
 
   predicate map_eq_sub_shift (x y:map int 'a) (xi yi sz:int) =
     forall i. 0 <= i < sz -> x[xi+i] = y[yi+i]
@@ -63,8 +63,8 @@ module Lemmas
 
   (** {3 Integer value of a natural number} *)
 
-  (** [value_sub x n m] denotes the integer represented by
-     the digits x[n..m-1] with lsb at index n *)
+  (** `value_sub x n m` denotes the integer represented by
+     the digits `x[n..m-1]` with lsb at index n *)
   let rec ghost function value_sub (x:map int limb) (n:int) (m:int) : int
      variant {m - n}
    =

@@ -166,8 +166,8 @@ module RedBlackTree
 
   (* insertion *)
 
-  (** [almost_rbtree n t]: [t] may have one red-red conflict at its root;
-      it satisfies [rbtree n] everywhere else *)
+  (** `almost_rbtree n t`: `t` may have one red-red conflict at its root;
+      it satisfies `rbtree n` everywhere else *)
 
   predicate almost_rbtree (n : int) (t : tree) =
     match t with
@@ -190,8 +190,8 @@ module RedBlackTree
     forall x: key, v: value, l r: tree, n: int.
     almost_rbtree n (Node Black l x v r) -> rbtree n (Node Black l x v r)
 
-  (** [lbalance c x l r] acts as a black node constructor,
-      solving a possible red-red conflict on [l], using the following
+  (** `lbalance c x l r` acts as a black node constructor,
+      solving a possible red-red conflict on `l`, using the following
       schema:
 
       B (R (R a x b) y c) z d
@@ -216,8 +216,8 @@ module RedBlackTree
         Node Black l k v r
     end
 
-  (** [rbalance l x r] is similar to [lbalance], solving a possible red-red
-      conflict on [r]. The balancing schema is similar:
+  (** `rbalance l x r` is similar to `lbalance`, solving a possible red-red
+      conflict on `r`. The balancing schema is similar:
 
       B a x (R (R b y c) z d)
       B a x (R b y (R c z d)) -> R (B a x b) y (R c z d)
@@ -240,8 +240,8 @@ module RedBlackTree
         Node Black l k v r
     end
 
-  (* [insert x s] inserts [x] in tree [s], resulting in a possible top red-red
-     conflict when [s] is red. *)
+  (* `insert x s` inserts `x` in tree `s`, resulting in a possible top red-red
+     conflict when `s` is red. *)
 
   let rec insert (t : tree) (k : key) (v : value) : tree
     requires { bst t /\ exists n: int. rbtree n t }
@@ -265,7 +265,7 @@ module RedBlackTree
         else (* k = k' *) Node Black l k' v r
     end
 
-  (* finally [add x s] calls [insert] and recolors the root as black *)
+  (* finally `add x s` calls `insert` and recolors the root as black *)
 
   let add (t : tree) (k : key) (v : value) : tree
     requires { bst t /\ exists n:int. rbtree n t }
@@ -320,7 +320,7 @@ module Vacid0
   = let (d, t) = !m in
     try find t k with Not_found -> d end
 
-  (* the easy way: implements [remove] using [replace] *)
+  (* the easy way: implements `remove` using `replace` *)
   let remove (m : ref rbt) k
     requires { inv !m }
     ensures { inv !m /\

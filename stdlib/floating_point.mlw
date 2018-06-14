@@ -73,11 +73,11 @@ end
 
 (** {2 Generic theory of floats}
 
-The theory is parametrized by the real constant [max] which denotes
-the maximal representable number, the real constant [min] which denotes
+The theory is parametrized by the real constant `max` which denotes
+the maximal representable number, the real constant `min` which denotes
 the minimal number whose rounding is not null, and the integer constant
-[max_representable_integer] which is the maximal integer [n] such that
-every integer between [0] and [n] are representable.
+`max_representable_integer` which is the maximal integer `n` such that
+every integer between `0` and `n` are representable.
 
 *)
 
@@ -404,7 +404,7 @@ module GenFloatFull
     is_finite (round_logic m x) /\ value (round_logic m x) < 0.0 /\
     sign (round_logic m x) = Neg
 
-  (** lemmas on [gen_zero] *)
+  (** lemmas on `gen_zero` *)
 
   lemma is_gen_zero_comp1 : forall x y:t.
     is_gen_zero x /\ value x = value y /\ is_finite y -> is_gen_zero y

@@ -150,12 +150,12 @@ module IntArraySorted
 
   predicate sorted_sub (a : array int) (l u : int) =
     M.sorted_sub a.elts l u
-  (** [sorted_sub a l u] is true whenever the array segment [a(l..u-1)]
-      is sorted w.r.t order relation [le] *)
+  (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
+      is sorted w.r.t order relation `le` *)
 
   predicate sorted (a : array int) =
     M.sorted_sub a.elts 0 a.length
-  (** [sorted a] is true whenever the array [a] is sorted w.r.t [le] *)
+  (** `sorted a` is true whenever the array `a` is sorted w.r.t `le` *)
 
 end
 
@@ -170,12 +170,12 @@ module Sorted
 
   predicate sorted_sub (a: array elt) (l u: int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
-  (** [sorted_sub a l u] is true whenever the array segment [a(l..u-1)]
-      is sorted w.r.t order relation [le] *)
+  (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
+      is sorted w.r.t order relation `le` *)
 
   predicate sorted (a: array elt) =
     forall i1 i2 : int. 0 <= i1 <= i2 < length a -> le a[i1] a[i2]
-  (** [sorted a] is true whenever the array [a] is sorted w.r.t [le] *)
+  (** `sorted a` is true whenever the array `a` is sorted w.r.t `le` *)
 
 end
 
@@ -205,8 +205,8 @@ module ArrayExchange
   predicate exchange (a1 a2: array 'a) (i j: int) =
     a1.length = a2.length /\
     M.exchange a1.elts a2.elts 0 a1.length i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
+  (** `exchange a1 a2 i j` means that arrays `a1` and `a2` only differ
+      by the swapping of elements at indices `i` and `j` *)
 
 end
 
@@ -224,22 +224,22 @@ module ArrayPermut
   predicate permut (a1 a2: array 'a) (l u: int) =
     a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
     M.permut a1.elts a2.elts l u
-  (** [permut a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
-      Values outside of the interval [(l..u-1)] are ignored. *)
+  (** `permut a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`.
+      Values outside of the interval `(l..u-1)` are ignored. *)
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts 0 l /\
     permut a1 a2 l u /\
     map_eq_sub a1.elts a2.elts u (length a1)
-  (** [permut_sub a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
-      and values outside of the interval [(l..u-1)] are equal. *)
+  (** `permut_sub a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`
+      and values outside of the interval `(l..u-1)` are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
     a1.length = a2.length /\ M.permut a1.elts a2.elts 0 a1.length
-  (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
-      of array [a2]. *)
+  (** `permut_all a1 a2 l u` is true when array `a1` is a permutation
+      of array `a2`. *)
 
   lemma exchange_permut_sub:
     forall a1 a2: array 'a, i j l u: int.
@@ -281,7 +281,7 @@ module ArraySum
   use import Array
   use import map.MapSum as M
 
-  (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
+  (** `sum a l h` is the sum of `a[i]` for `l <= i < h` *)
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h
 
 end
@@ -292,7 +292,7 @@ module NumOf
   use import Array
   use int.NumOf as N
 
-  (** the number of [a[i]] such that [l <= i < u] and [pr i a[i]] *)
+  (** the number of `a[i]` such that `l <= i < u` and `pr i a[i]` *)
   function numof (pr: int -> 'a -> bool) (a: array 'a) (l u: int) : int =
     N.numof (fun i -> pr i a[i]) l u
 
@@ -302,7 +302,7 @@ module NumOfEq
   use import Array
   use int.NumOf as N
 
-  (** the number of [a[i]] such that [l <= i < u] and [a[i] = v] *)
+  (** the number of `a[i]` such that `l <= i < u` and `a[i] = v` *)
   function numof (a: array 'a) (v: 'a) (l u: int) : int =
     N.numof (fun i -> a[i] = v) l u
 

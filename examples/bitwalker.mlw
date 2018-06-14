@@ -40,7 +40,7 @@ module Bitwalker
     assert { BV64.eq_sub_bv x BV64.zeros (C32_64.toBig len) (BV64.sub (BV64.of_int 64) (C32_64.toBig len))
          <-> BV64.ult x (maxvalue len) }
 
- (** return [value] with the bit of index [left] from the left set to [flag] *)
+ (** return `value` with the bit of index `left` from the left set to `flag` *)
   let poke_64bit_bv (value : BV64.t) (left : BV32.t) (flag : bool) : BV64.t
     requires { BV32.t'int left < 64 }
     ensures  { forall i. 0 <= i < 64 /\ i <> 63 - BV32.t'int left ->
@@ -64,8 +64,8 @@ module Bitwalker
       end
     end
 
- (** return [value] with the bit of index [left] from the left set to [flag] *)
-(* version where [left] is an int and not a bitvector, which
+ (** return `value` with the bit of index `left` from the left set to `flag` *)
+(* version where `left` is an int and not a bitvector, which
   is closer to the result of the SPARK translation from signed
   integers *)
   let poke_64bit (value : BV64.t) (left : int) (flag : bool) : BV64.t
@@ -92,7 +92,7 @@ module Bitwalker
     end
 
 
-  (* return the bit of [byte] at position [left] starting from the
+  (* return the bit of `byte` at position `left` starting from the
   left *)
 
   let peek_8bit_bv (byte : BV8.t) (left : BV32.t) : bool
@@ -110,7 +110,7 @@ module Bitwalker
     not (BV32.eq (BV32.bw_and (C8_32.toBig byte) mask) BV32.zeros)
     end
 
-  (* return the bit of the [left]/8 element of [addr] at position mod [left] 8 starting from the left *)
+  (* return the bit of the `left`/8 element of `addr` at position mod `left` 8 starting from the left *)
   let peek_8bit_array (addr : array BV8.t) (left : BV32.t) : bool
     requires { 8 * (length addr) < BV32.two_power_size }
     requires { BV32.t'int left < 8 * length addr }
@@ -118,8 +118,8 @@ module Bitwalker
   =
     peek_8bit_bv (addr[ BV32.to_uint (BV32.udiv_check left (8:BV32.t)) ]) (BV32.urem_check left (8:BV32.t))
 
-  (* return a bitvector of 64 bits with its [len] bits of the right
-    set to the bits between [start] and [start] + [len] of [addr] *)
+  (* return a bitvector of 64 bits with its `len` bits of the right
+    set to the bits between `start` and `start+len` of `addr` *)
   let peek (start : BV32.t) (len : BV32.t) (addr : array BV8.t) : BV64.t
     requires { BV32.t'int len <= 64 }
     requires { BV32.t'int start + BV32.t'int len < BV32.two_power_size }
@@ -185,7 +185,7 @@ module Bitwalker
   }
 *)
 
-  (* return [byte] with the bit at index [left] from the left set to [flag] *)
+  (* return `byte` with the bit at index `left` from the left set to `flag` *)
   let poke_8bit (byte : BV8.t) (left : BV32.t) (flag : bool) : BV8.t
     requires { BV32.t'int left < 8 }
     ensures  { forall i:int. 0 <= i < 8 -> i <> 7 - BV32.t'int left ->

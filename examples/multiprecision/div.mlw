@@ -318,9 +318,9 @@ module Div
     assert { !qh * d + !r = ul + radix * uh };
     (!qh,!r)
 
-(** [divmod_1 q x y sz] divides [(x,sz)] by [y], writes the quotient
-    in [(q, sz)] and returns the remainder. Corresponds to
-    [mpn_divmod_1]. *)
+(** `divmod_1 q x y sz` divides `(x, sz)` by `y`, writes the quotient
+    in `(q, sz)` and returns the remainder. Corresponds to
+    `mpn_divmod_1`. *)
 (* TODO develop further decimal points (qxn) *)
 let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
@@ -1241,10 +1241,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let u2, b2 = sub_with_borrow u1 z limb_zero in
     (u2, (Limb.(+) b1 b2))
 
-  (** [submul_limb r x y sz] multiplies [(x, sz)] by [y], substracts the [sz]
-      least significant limbs from [(r, sz)] and writes the result in [(r,sz)].
+  (** `submul_limb r x y sz` multiplies `(x, sz)` by `y`, subtracts the `sz`
+      least significant limbs from `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the borrow
-      of the substraction. Corresponds to [mpn_submul_1].*)
+      of the subtraction. Corresponds to `mpn_submul_1`.*)
   let submul_limb (r x:t) (y:limb) (sz:int32):limb
     requires { valid x sz }
     requires { valid r sz }
@@ -1363,7 +1363,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     done;
     !b
 
-  (* [(x,sz)] is normalized if its most significant bit is set. *)
+  (* `(x, sz)` is normalized if its most significant bit is set. *)
   predicate normalized (x:t) (sz:int32) =
     valid x sz
     /\ (pelts x)[x.offset + sz - 1] >= div radix 2
@@ -3722,9 +3722,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
 
 (*  val sub_limb_in_place (x:t) (y:limb) (sz:int32) : limb*)
 
-  (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
-    in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to
-    [mpn_tdiv_qr]. *)
+  (** `div_qr q r x y sx sy` divides `(x, sx)` by `(y, sy)`, writes the quotient
+    in `(q, (sx-sy))` and the remainder in `(r, sy)`. Corresponds to
+    `mpn_tdiv_qr`. *)
   let div_qr (q r x y nx ny:t) (sx sy:int32) : unit
     requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid x sx }

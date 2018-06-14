@@ -206,14 +206,14 @@ end
 
 (** {2 Arrays with 63-bit indices}
 
-    Contrary to arrays from module [Array], the contents of the array
+    Contrary to arrays from module `Array`, the contents of the array
     is here modeled as a sequence. It makes it easier to resuse existing
     functions over sequences. (We may consider doing this for regular arrays
     as well in the future.)
 
-    A coercion is declared so that an array [a] can be used
-    as a sequence. As a consequence, notation [a[i]] in the logic is
-    directly that of sequences. You have to import module [seq.Seq] to be
+    A coercion is declared so that an array `a` can be used
+    as a sequence. As a consequence, notation `a[i]` in the logic is
+    directly that of sequences. You have to import module `seq.Seq` to be
     able to use it.
 *)
 
@@ -335,8 +335,8 @@ module Array63Exchange
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
     SE.exchange a1.elts a2.elts i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
+  (** `exchange a1 a2 i j` means that arrays `a1` and `a2` only differ
+      by the swapping of elements at indices `i` and `j` *)
 
 end
 
@@ -369,9 +369,9 @@ module Array63Permut
 
   predicate permut (a1 a2: array 'a) (l u: int) =
     SP.permut a1.elts a2.elts l u
-  (** [permut a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
-      Values outside of the interval [(l..u-1)] are ignored. *)
+  (** `permut a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`.
+      Values outside of the interval `(l..u-1)` are ignored. *)
 
   predicate array_eq (a1 a2: array 'a) (l u: int) =
     seq_eq_sub a1.elts a2.elts l u
@@ -380,14 +380,14 @@ module Array63Permut
     seq_eq_sub a1.elts a2.elts 0 l /\
     permut a1 a2 l u /\
     seq_eq_sub a1.elts a2.elts u (length a1)
-  (** [permut_sub a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
-      and values outside of the interval [(l..u-1)] are equal. *)
+  (** `permut_sub a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`
+      and values outside of the interval `(l..u-1)` are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
     SP.permut a1.elts a2.elts 0 a1.length
-  (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
-      of array [a2]. *)
+  (** `permut_all a1 a2 l u` is true when array `a1` is a permutation
+      of array `a2`. *)
 
   (** we can always enlarge the interval *)
   lemma permut_sub_weakening:
@@ -408,14 +408,14 @@ end
 
 (** {2 Arrays of 63-bit integers}
 
-    Here the model is simply a sequence of integers (of type [int]),
-    instead of being a sequence of values of type [int63].
+    Here the model is simply a sequence of integers (of type `int`),
+    instead of being a sequence of values of type `int63`.
 
     As a consequence, we have to provide the additional information
     that each of the element fits within the bounds of 63-bit integers.
 
-    Caveat: type [array63] below is not compatible with type
-    [Array63.array int63].
+    Caveat: type `array63` below is not compatible with type
+    `Array63.array int63`.
 *)
 
 module ArrayInt63

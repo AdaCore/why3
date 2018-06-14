@@ -160,26 +160,26 @@ module HeightSmallSpace
   (** Count number of leaves in a tree. *)
   function leaves (t: tree 'a) : int = 1 + size t
 
-  (** [height_limited acc depth lim t]:
-       Compute the [height t] if the number of leaves in [t] is at most [lim],
-         fails otherwise. [acc] and [depth] are accumulators.
+  (** `height_limited acc depth lim t`:
+       Compute the `height t` if the number of leaves in `t` is at most `lim`,
+         fails otherwise. `acc` and `depth` are accumulators.
          For maintaining the limit within the recursion, this routine
          also send back the difference between the number of leaves and
          the limit in case of success.
-       Method: find out one child with number of leaves at most [lim/2] using
+       Method: find out one child with number of leaves at most `lim/2` using
          recursive calls. If no such child is found, the tree has at
-         least [lim+1] leaves, hence fails. Otherwise, accumulate the result
+         least `lim+1` leaves, hence fails. Otherwise, accumulate the result
          of the recursive call for that child and make a recursive tail-call
          for the other child, using the computed difference in order to
-         update [lim]. Since non-tail-recursive calls halve the limit,
-         the space complexity is logarithmic in [lim].
+         update `lim`. Since non-tail-recursive calls halve the limit,
+         the space complexity is logarithmic in `lim`.
        Note that as is, this has a degenerate case:
          if the small child is extremely small, we may waste a lot
          of computing time on the large child to notice it is large,
          while in the end processing only the small child until the
          tail-recursive call. Analysis shows that this results in
          super-polynomial time behavior (recursion T(N) = T(N/2)+T(N-1))
-       To mitigate this, we perform recursive calls on all [lim/2^k] limits
+       To mitigate this, we perform recursive calls on all `lim/2^k` limits
          in increasing order (see process_small_child subroutine), until
          one succeed or maximal limits both fails. This way,
          the time spent by a single phase of the algorithm is representative

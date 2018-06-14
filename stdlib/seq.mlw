@@ -13,7 +13,7 @@ module Seq
   (** the polymorphic type of sequences *)
   type seq 'a
 
-  (** [seq 'a] is an infinite type *)
+  (** `seq 'a` is an infinite type *)
   meta "infinite_type" type seq
 
   val function length (seq 'a) : int
@@ -22,7 +22,7 @@ module Seq
     forall s: seq 'a. 0 <= length s
 
   val function get (seq 'a) int : 'a
-  (** [get s i] is the ([i]+1)-th element of sequence [s]
+  (** `get s i` is the `i+1`-th element of sequence `s`
       (the first element has index 0) *)
 
   let function ([]) (s: seq 'a) (i: int) : 'a =
@@ -52,8 +52,8 @@ module Seq
   val constant empty : seq 'a
     ensures { length result = 0 }
 
-  (** [set s i v] is a new sequence [u] such that
-      [u[i] = v] and [u[j] = s[j]] otherwise *)
+  (** `set s i v` is a new sequence `u` such that
+      `u[i] = v` and `u[j] = s[j]` otherwise *)
   let function set (s:seq 'a) (i:int) (v:'a) : seq 'a
     requires { 0 <= i < length s }
     ensures { length result = length s }
@@ -89,8 +89,8 @@ module Seq
   = while false do variant { 0 } () done;
     create (1 + length s) (fun i -> if i = length s then x else s[i])
 
-  (** [s[i..j]] is the sub-sequence of [s] from element [i] included
-      to element [j] excluded *)
+  (** `s[i..j]` is the sub-sequence of `s` from element `i` included
+      to element `j` excluded *)
   let function ([..]) (s:seq 'a) (i:int) (j:int) : seq 'a
     requires { 0 <= i <= j <= length s }
     ensures { length result = j - i }
@@ -122,7 +122,7 @@ module Seq
 end
 
 (** {2 Lemma library about algebraic interactions between
-       [empty]/[singleton]/[cons]/[snoc]/[++]/[[ .. ]]} *)
+       `empty`/`singleton`/`cons`/`snoc`/`++`/`[ .. ]`} *)
 
 module FreeMonoid
 
@@ -373,12 +373,12 @@ module Sorted
 
   predicate sorted_sub (s: seq t) (l u: int) =
     forall i1 i2. l <= i1 <= i2 < u -> le s[i1] s[i2]
-  (** [sorted_sub s l u] is true whenever the sub-sequence [s[l .. u-1]] is
-      sorted  w.r.t. order relation [le] *)
+  (** `sorted_sub s l u` is true whenever the sub-sequence `s[l .. u-1]` is
+      sorted  w.r.t. order relation `le` *)
 
   predicate sorted (s: seq t) =
     sorted_sub s 0 (length s)
-  (** [sorted s] is true whenever the sequence [s] is sorted w.r.t [le]  *)
+  (** `sorted s` is true whenever the sequence `s` is sorted w.r.t `le`  *)
 
   lemma sorted_cons:
     forall x: t, s: seq t.
@@ -473,22 +473,22 @@ module Permut
     length s1 = length s2 /\
     0 <= l <= length s1 /\ 0 <= u <= length s1 /\
     forall v: 'a. occ v s1 l u = occ v s2 l u
-  (** [permut s1 s2 l u] is true when the segment [s1[l..u-1]] is a
-  permutation of the segment [s2[l..u-1]]. Values outside this range are
+  (** `permut s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]`. Values outside this range are
   ignored. *)
 
   predicate permut_sub (s1 s2: seq 'a) (l u: int) =
     seq_eq_sub s1 s2 0 l /\
     permut s1 s2 l u /\
     seq_eq_sub s1 s2 u (length s1)
-  (** [permut_sub s1 s2 l u] is true when the segment [s1[l..u-1]] is a
-  permutation of the segment [s2[l..u-1]] and values outside this range
+  (** `permut_sub s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]` and values outside this range
   are equal. *)
 
   predicate permut_all (s1 s2: seq 'a) =
     length s1 = length s2 /\ permut s1 s2 0 (length s1)
-  (** [permut_all s1 s2] is true when sequence [s1] is a permutation of
-  sequence [s2] *)
+  (** `permut_all s1 s2` is true when sequence `s1` is a permutation of
+  sequence `s2` *)
 
   lemma exchange_permut_sub:
     forall s1 s2: seq 'a, i j l u: int.
@@ -537,7 +537,7 @@ module FoldLeft
   use import Seq
   use import int.Int
 
-  (** [fold_left f a [b1; ...; bn]] is [f (... (f (f a b1) b2) ...) bn] *)
+  (** `fold_left f a [b1; ...; bn]` is `f (... (f (f a b1) b2) ...) bn` *)
   let rec function fold_left (f: 'a -> 'b -> 'a) (acc: 'a) (s: seq 'b) : 'a
     variant { length s }
   = if length s = 0 then acc else fold_left f (f acc s[0]) s[1 ..]
@@ -560,7 +560,7 @@ module FoldRight
   use import Seq
   use import int.Int
 
-  (** [fold_right f [a1; ...; an] b] is [f a1 (f a2 (... (f an b) ...))] *)
+  (** `fold_right f [a1; ...; an] b` is `f a1 (f a2 (... (f an b) ...))` *)
   let rec function fold_right (f: 'b -> 'a -> 'a) (s: seq 'b) (acc: 'a) : 'a
     variant { length s }
   = if length s = 0 then acc

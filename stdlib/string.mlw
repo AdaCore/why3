@@ -118,7 +118,7 @@ module Buffer
 
   val create (size:int) : t
     requires { size >= 0 } ensures { result.length = 0 }
-    (** [size] is only given as a hint for the initial size *)
+    (** `size` is only given as a hint for the initial size *)
 
   val contents (b:t) : string
     ensures { S.length result = length b }
