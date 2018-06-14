@@ -1,8 +1,25 @@
 
 (** {1 Hillel challenge}
 
-    See https://www.hillelwayne.com/post/theorem-prover-showdown/
+  See https://www.hillelwayne.com/post/theorem-prover-showdown/
 
+  The challenge proposed by Hillel Wayne was to provide purely functional
+  implementations and proofs for three imperative programs he proved using
+  Dafny (as an attempt to understand whether the proof of FP code is easier
+  than the proof of imperative programs).
+
+  Below are imperative implementations and proofs for the three Hillel
+  challenges. Thus it is not really a response to the challenge, but rather
+  an alternative to the Dafny proofs.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(** {2 Challenge 1: Lefpad}
+
+  Takes a padding character, a string, and a total length, returns the
+  string padded to that length with that character. If length is less
+  than the length of the string, does nothing.
 *)
 
 module Leftpad
@@ -25,6 +42,14 @@ module Leftpad
     res
 
 end
+
+(** {2 Challenge 2: Unique}
+
+  Takes a sequence of integers, returns the unique elements of that
+  list. There is no requirement on the ordering of the returned
+  values.
+
+*)
 
 module Unique
 
@@ -58,5 +83,57 @@ module Unique
       end
     done;
     Array.sub res 0 !len
+
+end
+
+(** {2 Challenge 3: Fulcrum}
+
+  Given a sequence of integers, returns the index `i` that minimizes
+  `|sum(seq[..i]) - sum(seq[i..])|`. Does this in O(n) time and O(n)
+  memory.
+
+  We do it in O(n) time and O(1) space. A first loop computes the sum
+  of the array. A second scans the array from left to right, while
+  maintaining the left and right sums in two variables. Updating these
+  variables is simply of matter of adding `a[i]` to `left` and subtracting
+  `a[i]` to `right`.
+
+*)
+
+module Fulcrum
+
+  use import int.Int
+  use import int.Abs
+  use import ref.Refint
+  use import array.Array
+  use import array.ArraySum
+
+  function diff (a: array int) (i: int) : int =
+    abs (sum a 0 i - sum a i (length a))
+
+  let fulcrum (a: array int) : int
+    ensures { 0 <= result <= length a }
+    ensures { forall i. 0 <= i <= length a -> diff a result <= diff a i }
+  = let n = length a in
+    let right = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { !right = sum a 0 i }
+      right += a[i]
+     done;
+    let left = ref 0 in
+    let besti = ref 0 in
+    let bestd = ref (abs !right) in
+    for i = 0 to n - 1 do
+      invariant { !left = sum a 0 i }
+      invariant { !right = sum a i n }
+      invariant { 0 <= !besti <= i }
+      invariant { !bestd = diff a !besti }
+      invariant { forall j. 0 <= j <= i -> !bestd <= diff a j }
+      left += a[i];
+      right -= a[i];
+      let d = abs (!left - !right) in
+      if d < !bestd then begin bestd := d; besti := i+1 end
+    done;
+    !besti
 
 end
