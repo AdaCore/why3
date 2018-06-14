@@ -79,8 +79,8 @@ end
 (** Mergesort.
 
     This implementation splits the input list in two according to even- and
-    odd-order elements (see function [split] below). Thus it is not stable.
-    For a stable implementation, see below module [OCamlMergesort]. *)
+    odd-order elements (see function `split` below). Thus it is not stable.
+    For a stable implementation, see below module `OCamlMergesort`. *)
 
 module Mergesort
 
@@ -124,8 +124,8 @@ end
 
     - all functions are tail recursive. To avoid the extra cost of
       List.rev, sort is duplicated in two versions that respectively
-      sort in order and in reverse order ([sort] and [sort_rev]) and
-      merge is duplicated as well ([rev_merge] and [rev_merge_rev]).
+      sort in order and in reverse order (`sort` and `sort_rev`) and
+      merge is duplicated as well (`rev_merge` and `rev_merge_rev`).
 
     Note: this is a stable sort, but stability is not proved here.
 *)
@@ -214,8 +214,8 @@ module OCamlMergesort
       | Nil -> absurd
     end
 
-  (** [sort n l] sorts [prefix n l]
-      and [rev_sort n l]  sorts [prefix n l] in reverse order. *)
+  (** `sort n l` sorts `prefix n l`
+      and `rev_sort n l`  sorts `prefix n l` in reverse order. *)
 
   use import mach.int.Int
 

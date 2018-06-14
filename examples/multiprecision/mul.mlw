@@ -14,9 +14,9 @@ module Mul
   use import add.Add
 
 
-    (** [mul_limb r x y sz] multiplies [x[0..sz-1]] by the limb [y] and
-    writes the n least significant limbs in [r], and returns the most
-    significant limb. It corresponds to [mpn_mul_1]. *)
+    (** `mul_limb r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
+    writes the n least significant limbs in `r`, and returns the most
+    significant limb. It corresponds to `mpn_mul_1`. *)
   let mul_limb (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
@@ -91,10 +91,10 @@ module Mul
     done;
     !c
 
-  (** [addmul_limb r x y sz] multiplies [(x, sz)] by [y], adds the [sz]
-      least significant limbs to [(r, sz)] and writes the result in [(r,sz)].
+  (** `addmul_limb r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
+      least significant limbs to `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the carry
-      of the addition. Corresponds to [mpn_addmul_1].*)
+      of the addition. Corresponds to `mpn_addmul_1`.*)
   let addmul_limb (r x:t) (y:limb) (sz:int32):limb
     requires { valid x sz }
     requires { valid r sz }
@@ -214,9 +214,9 @@ module Mul
     done;
     !c
 
-  (** [mul_limbs r x y sz] multiplies [(x, sz)] and [(y, sz)] and
-  writes the result to [(r, 2*sz)]. [r] must not overlap with either
-  [x] or [y]. Corresponds to [mpn_mul_n].  *)
+  (** `mul_limbs r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  writes the result to `(r, 2*sz)`. `r` must not overlap with either
+  `x` or `y`. Corresponds to `mpn_mul_n`.  *)
   let mul_limbs (r x y:t) (sz:int32) : unit
     requires { sz > 0 }
     requires { valid x sz }
@@ -479,9 +479,9 @@ module Mul
     done;
     !c
 
-  (** [mul r x y sx sy] multiplies [(x, sx)] and [(y,sy)] and writes
-  the result in [(r, sx+sy)]. [sx] must be greater than or equal to
-  [sy]. Corresponds to [mpn_mul]. *)
+  (** `mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  the result in `(r, sx+sy)`. `sx` must be greater than or equal to
+  `sy`. Corresponds to `mpn_mul`. *)
   let mul (r x y:t) (sx sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }

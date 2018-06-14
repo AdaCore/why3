@@ -42,7 +42,7 @@ module Util
       i := Int32.(+) !i one;
     done
 
-   (* [is_zero] checks if [x[0..sz-1]] is zero. It corresponds to [mpn_zero_p]. *)
+   (* `is_zero` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)
    let is_zero (x:t) (sz:int32) : int32
      requires { valid x sz }
      ensures { 0 <= Int32.to_int result <= 1 }
@@ -75,7 +75,7 @@ module Util
      with Return32 r -> r
      end
 
-  (** [zero r sz] sets [(r,sz)] to zero. Corresponds to [mpn_zero]. *)
+  (** `zero r sz` sets `(r,sz)` to zero. Corresponds to `mpn_zero`. *)
   let zero (r:t) (sz:int32) : unit
     requires { valid r sz }
     ensures { value r sz = 0 }

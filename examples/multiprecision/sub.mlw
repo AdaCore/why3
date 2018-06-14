@@ -12,9 +12,9 @@ module Sub
   use import lemmas.Lemmas
 
 
-  (** [sub_limb r x y sz] substracts [y] from [(x, sz)] and writes
-      the result to [(r, sz)]. Returns borrow, either 0 or
-      1. Corresponds to [mpn_sub_1]. *)
+  (** `sub_limb r x y sz` subtracts `y` from `(x, sz)` and writes
+      the result to `(r, sz)`. Returns borrow, either 0 or
+      1. Corresponds to `mpn_sub_1`. *)
   let sub_limb (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
@@ -87,9 +87,9 @@ module Sub
     !b
   end
 
-  (** [sub_limbs r x y sz] substracts [(y, sz)] from [(x, sz)] and
-      writes the result to [(r, sz)]. Returns borrow, either 0 or
-      1. Corresponds to [mpn_sub_n]. *)
+  (** `sub_limbs r x y sz` subtracts `(y, sz)` from `(x, sz)` and
+      writes the result to `(r, sz)`. Returns borrow, either 0 or
+      1. Corresponds to `mpn_sub_n`. *)
   let sub_limbs (r x y:t) (sz:int32) : limb
     requires { valid x sz }
     requires { valid y sz }
@@ -153,9 +153,9 @@ module Sub
       done;
       !b
 
-  (** [sub r x y sx sy] substracts [(y,sy)] from [(x, sx)] and writes the
-      result in [(r, sx)]. [sx] must be greater than or equal to
-      [sy]. Returns borrow, either 0 or 1. Corresponds to [mpn_sub]. *)
+  (** `sub r x y sx sy` subtracts `(y,sy)` from `(x, sx)` and writes the
+      result in `(r, sx)`. `sx` must be greater than or equal to
+      `sy`. Returns borrow, either 0 or 1. Corresponds to `mpn_sub`. *)
   let sub (r x y:t) (sx sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
@@ -418,9 +418,9 @@ module Sub
       end
     end
 
-  (** [decr x y sz] subtracts from [x] the value of the limb [y] in place.
-      [x] has size [sz]. The subtraction must not overflow. This corresponds
-      to [mpn_decr] *)
+  (** `decr x y sz` subtracts from `x` the value of the limb `y` in place.
+      `x` has size `sz`. The subtraction must not overflow. This corresponds
+      to `mpn_decr` *)
   let decr (x:t) (y:limb) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
@@ -480,9 +480,9 @@ module Sub
                 so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
     value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
 
-  (** [incr_1 x sz] subtracts 1 from [x] in place.
-      [x] has size [sz]. The subtraction must not overflow.
-      This corresponds to [mpn_decr] *)
+  (** `incr_1 x sz` subtracts 1 from `x` in place.
+      `x` has size `sz`. The subtraction must not overflow.
+      This corresponds to `mpn_decr` *)
   let decr_1 (x:t) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
