@@ -38,7 +38,7 @@ end
 
 theory Solution
 
-  use import int.Int
+  use int.Int
   use export map.Map
 
   (** the number of queens *)
@@ -86,7 +86,7 @@ end
 
 module BitsSpec
 
-  use import S
+  use S
 
   constant size : int = 32
 
@@ -121,7 +121,7 @@ module BitsSpec
   val diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
 
-  use import ref.Ref
+  use ref.Ref
   val rightmost_bit_trick (a: t) (ghost min : ref int) : t
     requires { not (is_empty a.mdl) }
     writes   { min }
@@ -138,8 +138,8 @@ end
 
 module Bits
 
-  use import S
-  use import bv.BV32
+  use S
+  use bv.BV32
 
   constant size : int = 32
 
@@ -236,10 +236,10 @@ end
 
 module NQueensBits
 
-  use import BitsSpec
-  use import ref.Ref
-  use import Solution
-  use import int.Int
+  use BitsSpec
+  use ref.Ref
+  use Solution
+  use int.Int
 
   val ghost col: ref solution  (* solution under construction *)
   (* val ghost k  : ref int       (* current row in the current solution *) *)

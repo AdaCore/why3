@@ -1,6 +1,6 @@
 theory InfMatrixGen
 
-use import int.Int
+use int.Int
 
 type mat 'a
 
@@ -111,7 +111,7 @@ module InfMatrix
   clone export algebra.UnitaryCommutativeRing with
     type t = t, constant zero = tzero, axiom .
 
-  use import int.Int
+  use int.Int
   clone export relations.MinMax with
     type t = int, predicate le = (<=),
     axiom . (* FIXME: replace with "goal" and prove *)
@@ -189,8 +189,8 @@ end
 (* copied over from verifythis_2016_matrix_multiplication *)
 module Sum_extended
 
-  use import int.Int
-  use import int.Sum
+  use int.Int
+  use int.Sum
 
   function addf (f g:int -> int) : int -> int = fun x -> f x + g x
 
@@ -232,8 +232,8 @@ end
 
 theory MaxFun
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   (* maximum of a function over an interval; always at least 0 *)
 
@@ -295,13 +295,13 @@ end
 
 module InfIntMatrix
 
-  use import int.Int
+  use int.Int
   clone export InfMatrix with
     type t = int, constant tzero = zero,
     axiom . (* FIXME: replace with "goal" and prove *)
-  use import int.Sum
+  use int.Sum
 
-  use import int.Int (*FIXME needed so i < i+1 ?*)
+  use int.Int (*FIXME needed so i < i+1 ?*)
 
   (* Zero matrix *)
 
@@ -394,7 +394,7 @@ module InfIntMatrix
   function mul_cell (a b: mat) : int -> int -> int =
     fun i j -> sum (mul_atom a b i j) 0 (mul_cell_bound a b i j)
 
-  use import MaxFun
+  use MaxFun
 
   lemma cell_oob_r:
     forall a b: mat, i j: int.
@@ -462,7 +462,7 @@ module InfIntMatrix
                = sum (fun k -> mul_atom id m i j k) 0 (mul_cell_bound id m i j)
                = 0 = get m i j))
 
-  use import Sum_extended
+  use Sum_extended
 
   function ft1 (a b c: mat) (i j: int)  : int -> int -> int =
                 fun k -> smulf (mul_atom a b i k) (get c k j)
@@ -646,8 +646,8 @@ end
 
 module InfIntMatrixDecision
 
-use import InfIntMatrix
-use import int.Int
+use InfIntMatrix
+use int.Int
 
 let predicate eq0_int (x:int) = x = 0
 
@@ -657,12 +657,12 @@ clone export ringdecision.AssocAlgebraDecision with type r = int, type a = mat, 
 end
 
 module MatrixTests
-  use import InfIntMatrix
-  use import int.Int
+  use InfIntMatrix
+  use int.Int
 
-  use import InfIntMatrixDecision
-  use import int.Sum
-  use import Sum_extended
+  use InfIntMatrixDecision
+  use int.Sum
+  use Sum_extended
 
   function cols (a: mat) : int (* if matrix is a finite rectangle, return number of cols *)
   function rows (a: mat) : int
@@ -788,9 +788,9 @@ module MatrixTests
   =
     assert { c == mul a b }
 
-  use import int.Power
-  use import number.Parity
-  use import int.ComputerDivision
+  use int.Power
+  use number.Parity
+  use int.ComputerDivision
 
   let ghost function cut_quarters (a: mat) : (mat, mat, mat, mat)
     requires { is_finite a }

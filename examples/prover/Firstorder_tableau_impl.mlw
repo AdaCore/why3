@@ -1,27 +1,27 @@
 module Types
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
   type nl_tableau 'b0 'b1 =
     | NL_Root
     | NL_Node (nl_tableau 'b0 'b1) (nl_fo_formula 'b0 'b1)
@@ -42,30 +42,30 @@ module Types
 end
 
 module Logic
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
-  use import Types
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
+  use Types
   function nat_nlsize_tableau (t:nl_tableau 'b0 'b1) : nat =
     match t with | NL_Root -> let s = one_nat in s
       | NL_Node v0 v1 v2 ->
@@ -392,31 +392,31 @@ module Logic
 end
 
 module Impl
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
-  use import Types
-  use import Logic
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
+  use Types
+  use Logic
   let rec bind_var_symbol_in_tableau (t:nl_tableau int int) (x:int) (i:int)
     (ghost fr0: int -> (symbol 'b0)) (ghost bnd0: int -> (symbol 'b0))
     (ghost fr1: int -> (fo_term 'b0 'b1))

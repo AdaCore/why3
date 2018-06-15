@@ -17,11 +17,11 @@
    values of all descendant leaves, which we call here 'node summary' *)
 module Fenwick
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import int.Sum
-  use import array.Array as A
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use int.Sum
+  use array.Array
 
   (* Encode fenwick trees within an array. The leaves field represent
      the actual number of element within the model. *)
@@ -89,7 +89,7 @@ module Fenwick
      are exactly the childs of elements of range [a;b[. *)
   let rec ghost fen_compact (f:fenwick) (a b:int) : unit
     requires { 0 <= a <= b /\ 2 * b < f.t.length /\ valid f }
-    ensures { sum (A.([]) f.t) a b  = sum  (A.([]) f.t) (2*a+1) (2*b+1) }
+    ensures { sum (([]) f.t) a b  = sum (([]) f.t) (2*a+1) (2*b+1) }
     variant { b - a }
   = if a < b then fen_compact f (a+1) b
 
@@ -106,7 +106,7 @@ module Fenwick
        and use compaction lemma to halve interval size. *)
     while !ra <> !rb do
       invariant { 0 <= !ra <= !rb <= f.t.length }
-      invariant { !acc + sum (A.([]) f.t) !ra !rb = rget f a b }
+      invariant { !acc + sum (([]) f.t) !ra !rb = rget f a b }
       variant { !rb - !ra }
       if mod !ra 2 = 0 then acc := !acc + f.t[!ra];
       ra := div !ra 2;

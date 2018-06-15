@@ -19,8 +19,8 @@ end
 
 module NQueensSetsTermination
 
-  use import S
-  use import ref.Refint
+  use S
+  use ref.Refint
 
   let rec t (a b c : set int) variant { cardinal a } =
     if not (is_empty a) then begin
@@ -41,7 +41,7 @@ end
 
 theory Solution
 
-  use import int.Int
+  use int.Int
   use export map.Map
 
   (* the number of queens *)
@@ -89,9 +89,9 @@ end
 
 module NQueensSets
 
-  use import S
-  use import ref.Refint
-  use import Solution
+  use S
+  use ref.Refint
+  use Solution
 
   val ghost col: ref solution  (* solution under construction *)
   val ghost k  : ref int       (* current row in the current solution *)

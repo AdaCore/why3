@@ -7,8 +7,8 @@ Find the sum of all the multiples of 3 or 5 below 1000.*)
 
 theory DivModHints
 
-  use import int.Int
-  use import int.ComputerDivision
+  use int.Int
+  use int.ComputerDivision
 
   lemma mod_div_unique :
     forall x y q r:int. x >= 0 /\ y > 0 /\ x = q*y + r /\ 0 <= r < y ->
@@ -57,9 +57,9 @@ end
 
 theory TriangularNumbers
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Div2
+  use int.Int
+  use int.ComputerDivision
+  use int.Div2
   use DivModHints as DMH
 
   lemma tr_mod_2:
@@ -78,8 +78,8 @@ end
 
 theory SumMultiple
 
-  use import int.Int
-  use import int.ComputerDivision
+  use int.Int
+  use int.ComputerDivision
 
   (* [sum_multiple_3_5_lt n] is the sum of all the multiples
      of 3 or 5 below n] *)
@@ -95,7 +95,7 @@ theory SumMultiple
     mod n 3 = 0 \/ mod n 5 = 0 ->
     sum_multiple_3_5_lt (n+1) = sum_multiple_3_5_lt n + n
 
-  use import TriangularNumbers
+  use TriangularNumbers
 
   function closed_formula_aux (n:int) : int =
     let n3 = div n 3 in
@@ -155,9 +155,9 @@ end
 
 module Euler001
 
-  use import SumMultiple
-  use import int.Int
-  use import mach.int.Int
+  use SumMultiple
+  use int.Int
+  use mach.int.Int
 
   let solve n
     requires { n >= 1 }
@@ -186,9 +186,9 @@ module Euler001
   (** for extraction *)
 
 (*
-  use import string.Char
-  use import io.StdIO
-  use import ref.Ref
+  use string.Char
+  use io.StdIO
+  use ref.Ref
 
   let go ()
    ensures { !cur_linenum = (old !cur_linenum) + 1 }

@@ -55,7 +55,7 @@ theory Nat
 end
 
 theory List
-  use import Nat
+  use Nat
 
   type list 'a = Nil | Cons 'a  (list 'a)
 
@@ -130,7 +130,7 @@ theory List
   | Cons y ys -> if x = y then Suc (count x ys) else count x ys
   end
 
-  use import HighOrd
+  use HighOrd
 
   function map (f: 'a -> 'b) (l: list 'a) : list 'b = match l with
   | Nil      -> Nil
@@ -197,7 +197,7 @@ end
 
 theory Tree
 
-  use import Nat
+  use Nat
 
   type tree 'a =
   | Leaf
@@ -233,9 +233,9 @@ end
 (******************************************************************************)
 theory IsaPlanner_all
 
-  use import Nat
-  use import List
-  use import Tree
+  use Nat
+  use List
+  use Tree
 
   goal P1: forall l: list 'a, n : nat.
   take n l ++ drop n l = l
@@ -389,9 +389,9 @@ end
 
 theory IsaPlanner_beyond
 
-  use import Nat
-  use import List
-  use import Tree
+  use Nat
+  use List
+  use Tree
 
   goal P48: forall xs : list 'a.
   xs <> Nil  -> butlast xs ++ (Cons (last xs) Nil) = xs

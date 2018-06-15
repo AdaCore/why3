@@ -8,8 +8,8 @@
 
 module HoareLogic
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (* Example: Slow Subtraction *)
 
@@ -90,12 +90,12 @@ end
 
 module MoreHoareLogic
 
-  use import int.Int
-  use import option.Option
-  use import ref.Ref
-  use import list.List
-  use import list.HdTl
-  use import list.Length
+  use int.Int
+  use option.Option
+  use ref.Ref
+  use list.List
+  use list.HdTl
+  use list.Length
 
   function sum (l : list int) : int = match l with
   | Nil -> 0
@@ -119,8 +119,8 @@ module MoreHoareLogic
       l := tail !l
     done
 
-  use import list.Mem
-  use import list.Append
+  use list.Mem
+  use list.Append
 
   type elt
   val predicate eq (x y: elt)

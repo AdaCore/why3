@@ -8,11 +8,11 @@ Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
 
 module ABQL
 
-use import array.Array
-use import int.Int
-use import ref.Refint
-use import int.EuclideanDivision
-use import option.Option
+use array.Array
+use int.Int
+use ref.Refint
+use int.EuclideanDivision
+use option.Option
 
 val constant n : int
 axiom N_val: 2 <= n
@@ -42,10 +42,10 @@ let fetch_and_add (r:ref tick)
 
 predicate lt (tick1 tick2: tick) = tick1.v < tick2.v
 
-use import list.List
-use import list.HdTl
-use import list.Append
-clone import list.Sorted with type t = tick, predicate le = lt, lemma Transitive.Trans
+use list.List
+use list.HdTl
+use list.Append
+clone list.Sorted with type t = tick, predicate le = lt, lemma Transitive.Trans
 
 inductive consecutive (l:list tick) =
   | Consecutive_Nil : consecutive Nil
@@ -129,10 +129,10 @@ val scheduler () : int
   ensures { 0 <= result < n }
   writes  { random }
 
-use import array.NumOfEq
-use import queue.Queue
-use import list.NumOcc
-use import list.Mem
+use array.NumOfEq
+use queue.Queue
+use list.NumOcc
+use list.Mem
 
 
 let lemma numof_equiv (a1 a2: array 'a) (v:'a) (l u: int)

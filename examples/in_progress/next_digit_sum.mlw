@@ -9,12 +9,12 @@ module M
    Ocaml code given at the end of file.
 *)
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import int.MinMax
-  use import int.EuclideanDivision
-  use import int.Power
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use int.MinMax
+  use int.EuclideanDivision
+  use int.Power
 
   function sum_digits int : int
 
@@ -43,7 +43,7 @@ module M
   = if i < j then interp_eq x1 x2 (i+1) j
 
   (* the sum of the elements of x[i..j[ *)
-  use import int.Sum
+  use int.Sum
 
   function sum (m: M.map int int) (i j: int) : int =
     Sum.sum (fun k -> M.get m k) i (j - 1)

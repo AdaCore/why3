@@ -37,7 +37,7 @@ end
 
 module Bounded_int
 
-  use import int.Int
+  use int.Int
 
   type t
 
@@ -93,7 +93,7 @@ module Bounded_int
   val (>) (a:t) (b:t) : bool
     ensures  { result <-> to_int a > to_int b }
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   val (/) (a:t) (b:t) : t
     requires { [@expl:division by zero] b <> 0 }
@@ -109,7 +109,7 @@ end
 
 module Unsigned
 
-  use import int.Int
+  use int.Int
 
   let constant min_unsigned : int = 0
 
@@ -130,9 +130,9 @@ module UnsignedGMP
 
   (** Additional GMP-inspired arithmetic primitives *)
 
-  use import int.Int
+  use int.Int
   clone export Unsigned with axiom .
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   val add_mod (x y:t) : t
     ensures { to_int result = mod (to_int x + to_int y) (max+1) }
@@ -205,7 +205,7 @@ end
 
 module Int31
 
-  use import int.Int
+  use int.Int
 
   type int31 = < range -0x4000_0000 0x3fff_ffff >
 
@@ -232,7 +232,7 @@ end
 
 module Int32
 
-  use import int.Int
+  use int.Int
 
   type int32 = < range -0x8000_0000 0x7fff_ffff >
 
@@ -273,7 +273,7 @@ end
 
 module UInt32Gen
 
-  use import int.Int
+  use int.Int
 
   type uint32 = < range 0 0xffff_ffff >
 
@@ -302,10 +302,10 @@ end
 
 module UInt32GMP
 
-  use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
+  use int.Int
+  use int.EuclideanDivision
+  use int.Power
+  use Int32
   use export UInt32Gen
 
   clone export UnsignedGMP with
@@ -370,7 +370,7 @@ end
 
 module Int63
 
-  use import int.Int
+  use int.Int
 
   type int63 = < range -0x4000_0000_0000_0000 0x3fff_ffff_ffff_ffff >
 
@@ -402,8 +402,8 @@ end
 
 module Refint63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
   use export ref.Ref
 
   let incr (r: ref int63) : unit
@@ -434,8 +434,8 @@ end
 
 module MinMax63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
 
   let min (x y: int63) : int63
     ensures { result = if to_int x <= to_int y then x else y }
@@ -454,8 +454,8 @@ end
 
 module State63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
 
   type state = private mutable { }
 
@@ -477,9 +477,9 @@ end
 
 module Random63
 
-  use import int.Int
-  use import Int63
-  use import State63
+  use int.Int
+  use Int63
+  use State63
 
   val s: state
 
@@ -501,7 +501,7 @@ end
 
 module Int64
 
-  use import int.Int
+  use int.Int
 
   type int64 = < range -0x8000_0000_0000_0000 0x7fff_ffff_ffff_ffff >
 
@@ -528,7 +528,7 @@ end
 
 module UInt64Gen
 
-  use import int.Int
+  use int.Int
 
   type uint64 = < range 0 0xffff_ffff_ffff_ffff >
 
@@ -565,10 +565,10 @@ end
 
 module UInt64GMP
 
-  use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
+  use int.Int
+  use int.EuclideanDivision
+  use int.Power
+  use Int32
   use export UInt64Gen
 
   clone export UnsignedGMP with

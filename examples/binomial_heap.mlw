@@ -9,18 +9,18 @@
 
 module BinomialHeap
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Reverse
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Reverse
+  use list.Append
 
   (** The type of elements, together with a total pre-order *)
 
   type elt
 
   val predicate le elt elt
-  clone import relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (** Trees.
 
@@ -287,7 +287,7 @@ module BinomialHeap
 
   (** Complexity analysis. *)
 
-  use import int.Power
+  use int.Power
 
   let rec lemma has_order_size (k: int) (l: list tree)
     requires { has_order k l }

@@ -1,12 +1,12 @@
 
 module Types
 
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_term_impl.Types
-  use import list.List
-  use import Functions.Func
-  use import Firstorder_semantics.Sem
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_term_impl.Types
+  use list.List
+  use Functions.Func
+  use Firstorder_semantics.Sem
 
   (* ghost field: explicitly to get rid of the existential. *)
 
@@ -32,13 +32,13 @@ end
 
 module Logic
 
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_formula_list_spec.Spec
-  use import Functions.Func
-  use import option.Option
-  use import OptionFuncs.Funcs
+  use Firstorder_formula_spec.Spec
+  use Firstorder_term_spec.Spec
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_formula_list_spec.Spec
+  use Functions.Func
+  use option.Option
+  use OptionFuncs.Funcs
 
   predicate is_atom (phi:fo_formula 'ls 'b) = match phi with
     | PApp _ _ -> true
@@ -195,8 +195,8 @@ module Logic
 
   (* Skolemization environment. *)
 
-  use import Choice.Choice
-  use import list.List
+  use Choice.Choice
+  use list.List
 
   (* Hack to force possibility of instantiation of extend_env
      definition axiom ! *)
@@ -221,33 +221,33 @@ end
 
 module Impl
 
-  use import Types
-  use import Logic
-  use import Functions.Func
+  use Types
+  use Logic
+  use Functions.Func
   use import set.Set as S
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Types
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Types
-  use import list.List
-  use import option.Option
-  use import OptionFuncs.Funcs
-  use import Firstorder_semantics.Sem
-  use import bool.Bool
-  use import list.Mem
-  use import int.Int
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Impl
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Types
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Types
+  use list.List
+  use option.Option
+  use OptionFuncs.Funcs
+  use Firstorder_semantics.Sem
+  use bool.Bool
+  use list.Mem
+  use int.Int
 
   exception Unsat
 
@@ -584,9 +584,9 @@ module Impl
         end
     end
 
-  use import ISet.Logic
-  use import ISet.Impl
-  use import Choice.Choice
+  use ISet.Logic
+  use ISet.Impl
+  use Choice.Choice
 
   let rec term_free_vars (t:nlimpl_fo_term) (ghost fvp:set int) : list int
     requires { nlimpl_fo_term_ok t }

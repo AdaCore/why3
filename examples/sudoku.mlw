@@ -9,8 +9,8 @@
 
 module Grid
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
 
   (** A grid is a map from integers to integers *)
   type grid = map int int
@@ -46,7 +46,7 @@ module Grid
 
   *)
 
-  use import array.Array
+  use array.Array
 
   type sudoku_chunks =
     { column_start : array int;
@@ -144,11 +144,11 @@ end
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
 module TheClassicalSudokuGrid
 
-  use import Grid
-  use import map.Map
-  use import int.Int
+  use Grid
+  use map.Map
+  use int.Int
 
-  use import array.Array
+  use array.Array
 
   let classical_sudoku () : sudoku_chunks
     ensures { well_formed_sudoku result }
@@ -229,9 +229,9 @@ end
 
 module Solver
 
-  use import Grid
-  use import array.Array
-  use import int.Int
+  use Grid
+  use array.Array
+  use int.Int
 
   (** predicate for the loop invariant of next function *)
   predicate valid_chunk_up_to (g:grid) (i:int)
@@ -246,7 +246,7 @@ module Solver
 
   exception Invalid
 
-  use import array.Array
+  use array.Array
 
   (** `check_valid_chunk g i start offsets` checks the validity
       of the chunk that includes `i` *)
@@ -523,12 +523,12 @@ module RandomSolver
 
   (* a variant: solve using a random order of cells *)
 
-  use import Grid
-  use import array.Array
-  use import int.Int
+  use Grid
+  use array.Array
+  use int.Int
   use random.Random
 
-  use import Solver
+  use Solver
 
   let rec solve_aux (s:sudoku_chunks) (randoffset:int) (g : array int) (i : int)
     requires { well_formed_sudoku s }
@@ -637,12 +637,12 @@ end
 
 module Test
 
-  use import Grid
-  use import TheClassicalSudokuGrid
+  use Grid
+  use TheClassicalSudokuGrid
 
-  use import Solver
-  use import map.Map
-  use import array.Array
+  use Solver
+  use map.Map
+  use array.Array
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()

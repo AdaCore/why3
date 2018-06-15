@@ -2,9 +2,9 @@
 (* Part factorised out of selection module (for cloning). *)
 theory SelectionTypes
 
-  use import list.List
-  use import option.Option
-  use import list.Append
+  use list.List
+  use option.Option
+  use list.Append
 
   type split 'a = {
     left : list 'a;
@@ -41,12 +41,12 @@ end
 
 module AVL
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import program_type.TypeParams
-  use import option.Option
-  use import ref.Ref
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use program_type.TypeParams
+  use option.Option
+  use ref.Ref
 
   clone monoid.ComputableMonoid as M
   clone monoid.MonoidList as M with type M.t = M.m,
@@ -539,7 +539,7 @@ module AVL
         forall e. selected sr e /\ rebuild e = rlis ->
           selected s (left_extend llis (p.D.mp.mdl d) e) }
 
-  use import ref.Ref
+  use ref.Ref
 
   (* Create a reference over a dummy split.
      For use as argument for the functions taking such a reference. *)

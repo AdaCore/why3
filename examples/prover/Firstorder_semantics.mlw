@@ -1,17 +1,17 @@
 
 module Sem
 
-  use import Choice.Choice
-  use import Functions.Func
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_tableau_spec.Spec
-  use import bool.Bool
-  use import list.List
-  use import option.Option
-  use import OptionFuncs.Funcs
+  use Choice.Choice
+  use Functions.Func
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_term_spec.Spec
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_tableau_spec.Spec
+  use bool.Bool
+  use list.List
+  use option.Option
+  use OptionFuncs.Funcs
 
   type model 'ls 'st = {
     interp_fun : 'ls -> (list 'st -> 'st) ;

@@ -25,8 +25,8 @@ with logarithmic time operations.
 
 module ArraySum
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   (** `sum a i j` denotes the sum `\sum_{i <= k < j} a[k]`.
       It is axiomatizated by the two following axioms expressing
@@ -60,10 +60,10 @@ end
 
 module Simple
 
-  use import int.Int
-  use import array.Array
-  use import ArraySum
-  use import ref.Ref
+  use int.Int
+  use array.Array
+  use ArraySum
+  use ref.Ref
 
   (** `query a i j` returns the sum of elements in `a` between
       index `i` inclusive and index `j` exclusive *)
@@ -87,9 +87,9 @@ end
 
 module ExtraLemmas
 
-  use import int.Int
-  use import array.Array
-  use import ArraySum
+  use int.Int
+  use array.Array
+  use ArraySum
 
   (** summation in adjacent intervals *)
   lemma sum_concat : forall a:array int, i j k:int.
@@ -130,10 +130,10 @@ end
 
 module CumulativeArray
 
-  use import int.Int
-  use import array.Array
-  use import ArraySum
-  use import ExtraLemmas
+  use int.Int
+  use array.Array
+  use ArraySum
+  use ExtraLemmas
 
   predicate is_cumulative_array_for (c:array int) (a:array int) =
     c.length = a.length + 1 /\
@@ -199,11 +199,11 @@ end
 
 module CumulativeTree
 
-  use import int.Int
-  use import array.Array
-  use import ArraySum
-  use import ExtraLemmas
-  use import int.ComputerDivision
+  use int.Int
+  use array.Array
+  use ArraySum
+  use ExtraLemmas
+  use int.ComputerDivision
 
   type indexes =
     { low : int;
@@ -363,7 +363,7 @@ module CumulativeTree
       that it is indeed logarithmic in function of the number of its
       elements *)
 
-  use import int.MinMax
+  use int.MinMax
 
   function depth (t:tree) : int =
     match t with
@@ -373,7 +373,7 @@ module CumulativeTree
 
   lemma depth_min : forall t. depth t >= 1
 
-  use import bv.Pow2int
+  use bv.Pow2int
 
   let rec lemma depth_is_log (t:tree) (a :array int) (k:int)
      requires { k >= 0 }
@@ -391,7 +391,7 @@ module CumulativeTree
 
   (** `update_aux` function instrumented with a credit *)
 
-  use import ref.Ref
+  use ref.Ref
 
   let rec update_aux_complexity
         (t:tree) (i:int) (ghost a :array int)

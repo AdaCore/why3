@@ -34,8 +34,8 @@ module Spec
   (* the following lemma is useful to verify both Caterpillar and
      RealTime implementations below *)
 
-  use import list.Append
-  use import list.Length
+  use list.Append
+  use list.Length
 
   let rec lemma take_lemma (l1 l2 l3: list 'a) (n: int)
     requires { 0 <= n <= length l1 }
@@ -49,9 +49,9 @@ end
 (* task 1 *)
 module Caterpillar
 
-  use import Spec
-  use import list.Append
-  use import list.Length
+  use Spec
+  use list.Append
+  use list.Length
 
   type cat 'a = {
     ch: int;
@@ -106,9 +106,9 @@ end
 
 module RealTime
 
-  use import Spec
-  use import list.Append
-  use import list.Length
+  use Spec
+  use list.Append
+  use list.Length
 
   (* For technical reasons, the global queue cannot contain
      polymorphic values, to we assume values to be of some

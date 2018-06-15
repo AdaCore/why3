@@ -6,13 +6,13 @@ module InsertionSort
   type elt
   val predicate le elt elt
 
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
   clone export list.Sorted with
     type t = elt, predicate le  = le, goal Transitive.Trans
 
-  use import list.List
-  use import list.Permut
+  use list.List
+  use list.Permut
 
   let rec insert (x: elt) (l: list elt) : list elt
     requires { sorted l }

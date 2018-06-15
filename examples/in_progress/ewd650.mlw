@@ -3,11 +3,11 @@
 
 module EWD650
 
-  use import int.Int
-  use import int.Power
-  use import number.Parity
-  use import number.Divisibility
-  use import ref.Refint
+  use int.Int
+  use int.Power
+  use number.Parity
+  use number.Divisibility
+  use ref.Refint
 
   let theorem (p: int) (k: int) (r: int)
     requires { p >= 1 /\ odd p /\ k >= 1 /\ 1 <= r < power 2 k /\ odd r }

@@ -3,13 +3,13 @@
 (* Definition of ordered transition systems. *)
 module OrderedTransition
 
-  use import int.Int
-  use import ho_rel.Rel
-  use import ho_set.Set
-  use import order.Ordered
-  use import fn.Image
-  use import fn.Fun
-  use import transition.Trace
+  use int.Int
+  use ho_rel.Rel
+  use ho_set.Set
+  use order.Ordered
+  use fn.Image
+  use fn.Fun
+  use transition.Trace
 
   constant pos : set int = (<=) 0
 
@@ -38,14 +38,14 @@ end
 
 module OTGameCommon
 
-  use import int.Int
-  use import ho_set.Set
-  use import ho_rel.Rel
+  use int.Int
+  use ho_set.Set
+  use ho_rel.Rel
   use import game.Game as G
-  use import order.LimUniq
-  use import fn.Image
-  use import fn.Fun
-  use import transition.Trace
+  use order.LimUniq
+  use fn.Image
+  use fn.Fun
+  use transition.Trace
   use export OrderedTransition
 
   type state 'a 'o =
@@ -130,7 +130,7 @@ end
 
 module OTGame "W:non_conservative_extension:N" (* => OTGameProof *)
 
-  use import game.Game
+  use game.Game
   use export OTGameCommon
 
   axiom ot_enforce_ex : forall s:otrans 'a 'o,p pi q qi.
@@ -149,20 +149,20 @@ end
 
 module OTGameProof
 
-  use import int.Int
-  use import transition.TraceConstructors
-  use import transition.TraceGame
-  use import order.Ordered
-  use import order.Chain
-  use import ho_set.Set
-  use import ho_rel.RelSet
-  use import fn.Fun
-  use import fn.Image
-  use import choice.Choice
+  use int.Int
+  use transition.TraceConstructors
+  use transition.TraceGame
+  use order.Ordered
+  use order.Chain
+  use ho_set.Set
+  use ho_rel.RelSet
+  use fn.Fun
+  use fn.Image
+  use choice.Choice
   use import game.Game as G
-  use import OTGameCommon
-  use import game.BasicStrats
-  use import game_simulation.Sim
+  use OTGameCommon
+  use game.BasicStrats
+  use game_simulation.Sim
 
   predicate ecart (s:otrans 'a 'o) (d:int) (t:trace 'a) (st:state 'a 'o) =
     t.rel = s.transition /\

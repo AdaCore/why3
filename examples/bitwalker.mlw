@@ -1,8 +1,8 @@
 module Bitwalker
-  use import int.Int
-  use import int.EuclideanDivision
-  use import array.Array
-  use import ref.Ref
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use ref.Ref
   (* use bv.BV32 *)
   (* use bv.BV8 *)
   (* use bv.BV64 *)
@@ -13,7 +13,7 @@ module Bitwalker
   use bv.BVConverter_8_32 as C8_32
 
 (* file missing in repository
-  use import mach.bv.BV
+  use mach.bv.BV
 *)
 
   function nth8_stream (stream : array BV8.t) (pos : int) : bool =

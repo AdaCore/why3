@@ -2,7 +2,7 @@
 
 theory Expr
 
-  use import int.Int
+  use int.Int
 
   type expr = Cte int | Plus expr expr | Minus expr expr | Mult expr expr
 
@@ -42,8 +42,8 @@ end
 module Compiler
   
   use export list.Append
-  use import Expr
-  use import StackMachine
+  use Expr
+  use StackMachine
   
   function compile (e:expr) : list asm =
     match e with

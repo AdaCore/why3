@@ -6,7 +6,7 @@
 
 module Parity
 
-  use import int.Int
+  use int.Int
 
   predicate even (n: int) = exists k: int. n = 2 * k
   predicate odd (n: int) = exists k: int. n = 2 * k + 1
@@ -25,7 +25,7 @@ module Parity
   lemma even_2k: forall k: int. even (2 * k)
   lemma odd_2k1: forall k: int. odd (2 * k + 1)
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   lemma even_mod2 :
     forall n:int. even n <-> mod n 2 = 0
@@ -37,7 +37,7 @@ end
 module Divisibility
 
   use export int.Int
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   let predicate divides (d:int) (n:int)
     ensures { result <-> exists q:int. n = q * d }
@@ -75,7 +75,7 @@ module Divisibility
   lemma divides_trans:
     forall a b c: int. divides a b -> divides b c -> divides a c
 
-  use import int.Abs
+  use int.Abs
 
   lemma divides_bounds:
     forall a b: int. divides a b -> b <> 0 -> abs a <= abs b
@@ -94,7 +94,7 @@ module Divisibility
   lemma divides_mod_computer:
     forall a b: int. b <> 0 -> divides b a -> CD.mod a b = 0
 
-  use import Parity
+  use Parity
 
   lemma even_divides: forall a: int. even a <-> divides 2 a
   lemma odd_divides: forall a: int. odd a <-> not (divides 2 a)
@@ -106,7 +106,7 @@ end
 module Gcd
 
   use export int.Int
-  use import Divisibility
+  use Divisibility
 
   function gcd int int : int
 
@@ -123,7 +123,7 @@ module Gcd
 
   (* gcd is associative commutative *)
 
-  clone import algebra.AC with type t = int, function op = gcd
+  clone algebra.AC with type t = int, function op = gcd
 
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a
@@ -153,7 +153,7 @@ end
 module Prime
 
   use export int.Int
-  use import Divisibility
+  use Divisibility
 
   predicate prime (p: int) =
     2 <= p /\ forall n: int. 1 < n < p -> not (divides n p)
@@ -171,7 +171,7 @@ module Prime
     (forall d: int. 2 <= d -> prime d -> 1 < d*d <= p -> not (divides d p)) ->
     prime p
 
-  use import Parity
+  use Parity
 
   lemma even_prime: forall p: int. prime p -> even p -> p = 2
 
@@ -184,12 +184,12 @@ end
 module Coprime
 
   use export int.Int
-  use import Divisibility
-  use import Gcd
+  use Divisibility
+  use Gcd
 
   predicate coprime (a b: int) = gcd a b = 1
 
-  use import Prime
+  use Prime
 
   lemma prime_coprime:
     forall p: int.

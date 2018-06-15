@@ -57,7 +57,7 @@ module Combinators
        subst c (App (App (App S v1) v2) v3) -->
        subst c (App (App v1 v3) (App v2 v3))
 
-  clone import relations.ReflTransClosure
+  clone relations.ReflTransClosure
     with type t = term, predicate rel = (-->)
   predicate (-->*) (t1 t2: term) = relTR t1 t2
 
@@ -145,7 +145,7 @@ module Combinators
 
   (* task 2 *)
 
-  use import int.Int
+  use int.Int
 
   inductive only_K (t: term) =
     | only_K_K:
@@ -179,7 +179,7 @@ module Combinators
     variant { n }
   = if n = 0 then K else App (ks (n-1)) K
 
-  use import number.Parity
+  use number.Parity
 
   let rec reduction3 (ghost c:context) (ghost n:int) (t: term) : term
     requires { n >= 0 /\ t = ks n /\ is_context c }

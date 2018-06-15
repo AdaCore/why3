@@ -1,12 +1,12 @@
 module Compiler_logic
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import vm.Vm
-  use import vm.VMClock
-  use import state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use vm.Vm
+  use vm.VMClock
+  use state.State
 
   function fst (p: ('a,'b)) : 'a = let (x,_) = p in x
   meta rewrite_def function fst

@@ -1,9 +1,9 @@
 module MatrixMultiplication
 
-  use import int.Int
-  use import int.Sum
-  use import map.Map
-  use import matrix.Matrix
+  use int.Int
+  use int.Sum
+  use map.Map
+  use matrix.Matrix
 
   function mul_atom (a b: matrix int) (i j: int) : int -> int =
     fun k -> a.elts[i][k] * b.elts[k][j]

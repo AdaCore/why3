@@ -24,9 +24,9 @@
 
 module Leftpad
 
-  use import int.Int
-  use import int.MinMax
-  use import array.Array
+  use int.Int
+  use int.MinMax
+  use array.Array
 
   type char (* whatever it is *)
   type string = array char
@@ -53,10 +53,10 @@ end
 
 module Unique
 
-  use import int.Int
-  use import ref.Refint
+  use int.Int
+  use ref.Refint
   clone hashtbl.Hashtbl as H with type key = int
-  use import array.Array
+  use array.Array
 
   predicate mem (x: int) (a: array int) (i: int) =
     exists j. 0 <= j < i /\ a[j] = x
@@ -102,11 +102,11 @@ end
 
 module Fulcrum
 
-  use import int.Int
-  use import int.Abs
-  use import ref.Refint
-  use import array.Array
-  use import array.ArraySum
+  use int.Int
+  use int.Abs
+  use ref.Refint
+  use array.Array
+  use array.ArraySum
 
   function diff (a: array int) (i: int) : int =
     abs (sum a 0 i - sum a i (length a))

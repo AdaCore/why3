@@ -7,7 +7,7 @@
 
 module HashedTypeWithDummy
 
-  use import int.Int
+  use int.Int
 
   type key
   type keym (** the logic model of a key *)
@@ -30,16 +30,16 @@ end
 
 module LinearProbing
 
-  clone import HashedTypeWithDummy with axiom .
+  clone HashedTypeWithDummy with axiom .
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import option.Option
-  use import list.Mem
-  use import map.Map
-  use import map.Const
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use option.Option
+  use list.Mem
+  use map.Map
+  use map.Const
+  use ref.Ref
+  use array.Array
 
   let function bucket (k: key) (n: int) : int
     requires { 0 < n }
@@ -52,7 +52,7 @@ module LinearProbing
 
   (** number of dummy values in array `a` between `l` and `u` *)
   scope NumOfDummy
-    use import int.NumOf
+    use int.NumOf
 
     function numof (a: array key) (l u: int) : int =
       NumOf.numof (fun i -> eq a[i] dummy) l u

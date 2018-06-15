@@ -7,9 +7,9 @@
 
 module LCP
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
   predicate eqseq (a: array int) (x y: int) (len: int) =
     0 <= len /\ x + len <= length a /\ y + len <= length a /\

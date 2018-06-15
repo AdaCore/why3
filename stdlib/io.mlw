@@ -1,13 +1,13 @@
 module StdIO
 
-  use import string.Char
-  (*i use import string.String *)
+  use string.Char
+  (*i use string.String *)
 
   (** ghost references to represent the standard output *)
-  use import int.Int
-  use import list.List
-  use import list.Reverse
-  use import ref.Ref
+  use int.Int
+  use list.List
+  use list.Reverse
+  use ref.Ref
 
   type prdata = PrChar char | PrInt int
 

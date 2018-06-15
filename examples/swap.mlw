@@ -3,8 +3,8 @@
 
 module Swap
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   let swap (a b: ref int) : unit
     writes  { a, b }
@@ -20,8 +20,8 @@ end
 
 module SwapInt32
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (* a simple model of 32-bit integers with addition, subtraction,
      and possible overflows *)

@@ -12,10 +12,10 @@ module Pqueue
   clone export relations.TotalOrder with type t = elt, axiom .
   (** `elt` is equipped with a total order `rel` *)
 
-  use import list.List
-  use import list.Mem
-  use import list.Permut
-  use import list.Length
+  use list.List
+  use list.Mem
+  use list.Permut
+  use list.Length
 
   type t = abstract { mutable elts: list elt }
   (** the priority queue is modeled as a list of elements *)
@@ -79,7 +79,7 @@ module PqueueNoDup
   clone export relations.TotalOrder with type t = elt, axiom .
   (** `elt` is equipped with a total order `rel` *)
 
-  use import set.Fset
+  use set.Fset
 
   type t = abstract { mutable elts: set elt }
   (** the priority queue is modeled as a finite set of elements *)

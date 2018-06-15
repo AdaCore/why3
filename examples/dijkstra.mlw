@@ -7,9 +7,9 @@
 
 module DijkstraShortestPath
 
-  use import int.Int
-  use import ref.Ref
-  use import set.Fset
+  use int.Int
+  use ref.Ref
+  use set.Fset
 
   (** The graph is introduced as a set v of vertices and a function g_succ
      returning the successors of a given vertex.
@@ -18,8 +18,8 @@ module DijkstraShortestPath
 
   type vertex
 
-  clone import impset.Impset as S with type elt = vertex
-  clone import impmap.ImpmapNoDom with type key = vertex
+  clone impset.Impset as S with type elt = vertex
+  clone impmap.ImpmapNoDom with type key = vertex
 
   constant v: Fset.set vertex
 

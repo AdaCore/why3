@@ -52,11 +52,11 @@ proceedings, Springer LNCS.
 
 module N
 
-  use import array.Array
-  use import map.Map
-  use import map.MapEq
-  use import map.Const
-  use import int.Int
+  use array.Array
+  use map.Map
+  use map.MapEq
+  use map.Const
+  use int.Int
 
   (** {3 complements to map standard library} *)
 
@@ -84,11 +84,11 @@ module N
     end
     else ()
 
-  use import mach.int.Int32
-  use import ref.Ref
+  use mach.int.Int32
+  use ref.Ref
   use import mach.int.UInt64GMP as Limb
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
 
   meta compute_max_steps 0x100000
 
@@ -242,7 +242,7 @@ module N
     ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
   = value_sub_upper_bound x x1 (x2-1)
 
-  use import mach.c.C
+  use mach.c.C
   type t = ptr limb
 
   function value (x:t) (sz:int) : int =
@@ -836,7 +836,7 @@ module N
       end
     end
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   (** [incr x y sz] adds to [x] the value of the limb [y] in place.
       [x] has size [sz]. The addition must not overflow. This corresponds
@@ -2081,7 +2081,7 @@ module N
 
   (** {3 Logical operations} *)
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
  let lemma pow2_64 ()
    ensures { power 2 64 = radix }

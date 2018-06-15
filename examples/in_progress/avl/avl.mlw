@@ -2,11 +2,11 @@
 (* Part factorized out (without parameters). *)
 module Base
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import list.Length
-  use import program_type.TypeParams
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use list.Length
+  use program_type.TypeParams
 
   (* tree representation. The two integer parameters corresponds
      to height and size of the tree, stored at every node. *)
@@ -133,13 +133,13 @@ end
 (* Doubly-ended lists as avl. *)
 module AVL
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import list.Length
-  use import program_type.TypeParams
-  use import option.Option
-  use import ref.Ref
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use list.Length
+  use program_type.TypeParams
+  use option.Option
+  use ref.Ref
   use export Base
 
   (* Parameter: balancing.
@@ -467,7 +467,7 @@ module AVL
      while this method is O(n). *)
   namespace Enum
 
-    use import list.Reverse
+    use list.Reverse
 
     (* Missing in list.Reverse. *)
     let rec lemma reverse_append_gen (l1 l2:list 'a) : unit
@@ -533,7 +533,7 @@ module AVL
   (* Trick to avoid aliasing. *)
   namespace Enum
 
-    use import list.Reverse
+    use list.Reverse
 
     (* Create an empty enumeration going the given way. *)
     let empty_enum (ghost ltr:bool) (ghost p:type_params 'a 'b) : Enum.t 'a 'b
@@ -625,9 +625,9 @@ end
 (* Part factorised out of selection module (for cloning). *)
 theory SelectionTypes
 
-  use import list.List
-  use import option.Option
-  use import list.Append
+  use list.List
+  use option.Option
+  use list.Append
   use Base
 
   type position 'a = {
@@ -674,11 +674,11 @@ end
      The result would be unspecified within the set of selected elements. *)
 module Selection
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import option.Option
-  use import program_type.TypeParams
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use option.Option
+  use program_type.TypeParams
 
   use export SelectionTypes
 
@@ -737,7 +737,7 @@ module Selection
           let e2 = { e with left = node_model l.m.lis (l.prm.mdl d) e.left } in
           selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis }
 
-  use import ref.Ref
+  use ref.Ref
 
   (* Create a reference over a dummy position.
      For use as argument for the functions taking such a reference. *)

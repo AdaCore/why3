@@ -1,9 +1,9 @@
 (* From simulation, define a notion of subgame. *)
 module SubGameDef
 
-  use import ho_set.Set
-  use import game.Game
-  use import game_simulation.SimDef
+  use ho_set.Set
+  use game.Game
+  use game_simulation.SimDef
 
   predicate direct_subgame (g1 g2:game 'a) =
     g1.progress = g2.progress /\
@@ -15,8 +15,8 @@ end
 
 module SubGame "W:non_conservative_extension:N" (* => SubGameProof *)
 
-  use import game.Game
-  use import ho_rel.Rel
+  use game.Game
+  use ho_rel.Rel
   use export SubGameDef
 
   axiom trivial_subgame_subgame : forall g1 g2:game 'a.
@@ -32,18 +32,18 @@ end
 
 module SubGameProof
 
-  use import SubGameDef
-  use import fn.Fun
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import order.Chain
-  use import order.Product
-  use import order.ProductChain
-  use import game.Game
-  use import game.BasicStrats
-  use import game_simulation.Sim
+  use SubGameDef
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.Chain
+  use order.Product
+  use order.ProductChain
+  use game.Game
+  use game.BasicStrats
+  use game_simulation.Sim
 
   lemma L0 : forall s:set 'a. related (=) s = s
     by sext (related (=) s) s

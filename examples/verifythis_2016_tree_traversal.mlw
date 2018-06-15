@@ -61,7 +61,7 @@ who entered the competition.
 (** Component-as-array memory model with null pointers. *)
 module Memory
 
-  use import map.Map
+  use map.Map
   (** `loc` is the type of memory locations (e.g pointers) *)
   type loc
   val predicate eq (x y:loc) ensures { result <-> x = y }
@@ -122,12 +122,12 @@ end
     some frame/separation properties. *)
 module TreeShape
 
-  use import int.Int
-  use import set.Set
-  use import map.Map
-  use import bintree.Tree
-  use import bintree.Size
-  use import Memory
+  use int.Int
+  use set.Set
+  use map.Map
+  use bintree.Tree
+  use bintree.Size
+  use Memory
 
   (** The described structure can be modeled as a tree of locations *)
   type treel = tree loc
@@ -265,11 +265,11 @@ end
     to the one proposed in the challenge. *)
 module Recursive
 
-  use import map.Map
-  use import bintree.Tree
-  use import ref.Ref
-  use import Memory
-  use import TreeShape
+  use map.Map
+  use bintree.Tree
+  use ref.Ref
+  use Memory
+  use TreeShape
 
   (** Recursion-based proof of the algorithm.
       The principal idea is the following: in its recursive
@@ -410,15 +410,15 @@ end
     derecursiving the previous one *)
 module Iterative
 
-  use import int.Int
-  use import map.Map
-  use import map.Const
-  use import bintree.Tree
-  use import bintree.Size
-  use import option.Option
-  use import ref.Ref
-  use import Memory
-  use import TreeShape
+  use int.Int
+  use map.Map
+  use map.Const
+  use bintree.Tree
+  use bintree.Size
+  use option.Option
+  use ref.Ref
+  use Memory
+  use TreeShape
 
   (** Snapshot of all relevant memory values in the program *)
   type snap = {

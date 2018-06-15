@@ -1,6 +1,6 @@
 module Intf
 
-  use import int.Int
+  use int.Int
 
   type t = private {
                   size: int;        (* elements are 0,1,...,size-1 *)
@@ -38,8 +38,8 @@ end
 
 module Impl
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   (* there is a path from x to y of length at most d *)
   inductive path (size: int) (link: array int) (x d y: int) =
@@ -181,7 +181,7 @@ module Impl
 
       end
 
-  clone import Intf with
+  clone Intf with
     type t = t,
     val  create = create,
     val  find = find,

@@ -3,9 +3,9 @@
 
 module Queue
 
-  use import list.List
-  use import list.Append
-  use import list.Length as L
+  use list.List
+  use list.Append
+  use list.Length as L
 
   type t 'a = abstract { mutable elts: list 'a }
 

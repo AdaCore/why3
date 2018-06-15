@@ -1,5 +1,5 @@
 theory MinMax
-  use import relations.MinMax
+  use relations.MinMax
 
   goal G : forall x y z : t. le y z -> le x z -> le x y ->
                              min x (max (min z x) y) = x

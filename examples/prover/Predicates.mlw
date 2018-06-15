@@ -1,8 +1,8 @@
 
 module Pred
 
-  use import Functions.Func
-  use import bool.Bool
+  use Functions.Func
+  use bool.Bool
 
   predicate predExtensionalEqual (p q:'a -> bool) =
     forall x:'a. p x <-> q x

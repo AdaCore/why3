@@ -7,10 +7,10 @@ module Assoc
   clone import key_type.KeyType as K
   clone import relations.Equivalence as Eq with type t = key
 
-  use import list.List
-  use import list.Mem
-  use import list.Append
-  use import option.Option
+  use list.List
+  use list.Mem
+  use list.Append
+  use option.Option
 
   predicate appear (k:key) (l:list (t 'a)) =
     exists x. mem x l /\ Eq.rel k x.key
@@ -98,10 +98,10 @@ end
 
 module AssocSorted
 
-  use import list.List
-  use import list.Append
-  use import list.Mem
-  use import option.Option
+  use list.List
+  use list.Append
+  use list.Mem
+  use option.Option
 
   clone import key_type.KeyType as K
   clone import preorder.Full as O with type t = key

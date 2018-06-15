@@ -31,7 +31,7 @@ module SpecialValues
 
   type sign = Neg | Pos
 
-  use import real.Real
+  use real.Real
 
   inductive same_sign_real sign real =
     | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
@@ -83,10 +83,10 @@ every integer between `0` and `n` are representable.
 
 module GenFloat
 
-  use import Rounding
-  use import real.Real
-  use import real.Abs
-  use import real.FromInt
+  use Rounding
+  use real.Real
+  use real.Abs
+  use real.FromInt
   use int.Int as Int
 
   type t
@@ -195,8 +195,8 @@ end
 
 module GenFloatSpecStrict
 
-  use import Rounding
-  use import real.Real
+  use Rounding
+  use real.Real
   clone export GenFloat with axiom .
 
 
@@ -277,9 +277,9 @@ This theory extends the generic theory above by adding the special values.
 
 module GenFloatFull
 
-  use import SpecialValues
-  use import Rounding
-  use import real.Real
+  use SpecialValues
+  use Rounding
+  use real.Real
 
   clone export GenFloat with axiom .
 
@@ -385,7 +385,7 @@ module GenFloatFull
 
   lemma round_of_zero : forall m:mode. is_gen_zero (round_logic m 0.0)
 
-  use import real.Abs
+  use real.Abs
 
   lemma round_logic_le : forall m:mode, x:real.
     is_finite (round_logic m x) -> abs (value (round_logic m x)) <= max
@@ -419,10 +419,10 @@ end
 
 module GenFloatSpecFull
 
-  use import real.Real
-  use import real.Square
-  use import Rounding
-  use import SpecialValues
+  use real.Real
+  use real.Square
+  use Rounding
+  use SpecialValues
   clone export GenFloatFull with axiom .
 
   (** {3 binary operations} *)
@@ -649,9 +649,9 @@ end
 
 module GenFloatSpecMultiRounding
 
-  use import Rounding
-  use import real.Real
-  use import real.Abs
+  use Rounding
+  use real.Real
+  use real.Abs
   clone export GenFloat with axiom .
 
   (** {3 binary operations} *)

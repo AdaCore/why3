@@ -3,7 +3,7 @@
 
 module Square
 
-  use import int.Int
+  use int.Int
 
   function sqr (x:int) : int = x * x
 
@@ -23,9 +23,9 @@ end
 
 module Simple
 
-  use import int.Int
-  use import ref.Ref
-  use import Square
+  use int.Int
+  use ref.Ref
+  use Square
 
   let isqrt (x:int) : int
     requires { x >= 0 }
@@ -52,10 +52,10 @@ end
 
 module NewtonMethod
 
-  use import int.Int
-  use import mach.int.Int
-  use import ref.Ref
-  use import Square
+  use int.Int
+  use mach.int.Int
+  use ref.Ref
+  use Square
 
   let sqrt (x : int) : int
     requires { x >= 0 }

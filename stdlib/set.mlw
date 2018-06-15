@@ -5,8 +5,8 @@
 
 module Set
 
-  use import map.Map
-  use import map.Const
+  use map.Map
+  use map.Const
 
   type set 'a = map 'a bool
 
@@ -112,7 +112,7 @@ end
 
 module Fset
 
-  use import int.Int
+  use int.Int
 
   (* TODO: monomorphize to fix issue with equality *)
 
@@ -220,7 +220,7 @@ end
 module FsetComprehension
 
   use export Fset
-  use import int.Int
+  use int.Int
 
   (** { x | x in U and p(x) } *)
   function filter (p: 'a -> bool) (u: set 'a) : set 'a
@@ -252,8 +252,8 @@ end
 
 module FsetNth
 
-  use import int.Int
-  use import Fset
+  use int.Int
+  use Fset
 
   function nth (i: int) (s: set 'a) : 'a
 
@@ -271,7 +271,7 @@ end
 
 module FsetInduction
 
-  use import Fset
+  use Fset
 
   type t
 
@@ -314,8 +314,8 @@ end
 
 module Min
 
-  use import Fset
-  use import int.Int
+  use Fset
+  use int.Int
 
   type param
 
@@ -338,7 +338,7 @@ end
 
 module FsetSum
 
-  use import int.Int
+  use int.Int
   use import Fset as S
 
   function sum (set 'a) ('a -> int) : int

@@ -23,7 +23,7 @@ end
 (** {2 Abstract monoid with aggregation} *)
 module MonoidSum
 
-  use import seq.Seq
+  use seq.Seq
   clone import Monoid as M with axiom .
 
   function agg (f:'a -> t) (s:seq 'a) : t
@@ -38,8 +38,8 @@ end
 (** {2 Definition of aggregation (refinement of MonoidSum} *)
 module MonoidSumDef
 
-  use import seq.Seq
-  use import seq.FreeMonoid
+  use seq.Seq
+  use seq.FreeMonoid
 
   (* TODO: do that refinement correctly ! *)
   clone import Monoid as M with axiom .

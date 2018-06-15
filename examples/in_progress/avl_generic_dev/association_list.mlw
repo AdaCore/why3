@@ -7,9 +7,9 @@ module Assoc
   clone import key_type.KeyType as K
   clone import relations_params.EquivalenceParam as Eq with type t = key
 
-  use import list.List
-  use import list.Mem
-  use import option.Option
+  use list.List
+  use list.Mem
+  use option.Option
 
   predicate appear (p:param 'a) (k:key 'a) (l:list (t 'a 'b)) =
     exists x. mem x l /\ correct_for p k /\ Eq.rel p k (key x)
@@ -84,10 +84,10 @@ end
 
 module AssocSorted
 
-  use import list.List
-  use import list.Append
-  use import list.Mem
-  use import option.Option
+  use list.List
+  use list.Append
+  use list.Mem
+  use option.Option
 
   clone import key_type.KeyType as K
   clone import preorder.FullParam as O with type t = key

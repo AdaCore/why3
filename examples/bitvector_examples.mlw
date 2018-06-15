@@ -1,9 +1,9 @@
 module Test_proofinuse
 
-  use import int.Int
-  use import int.Power
-  use import int.EuclideanDivision
-  use import bv.BV32
+  use int.Int
+  use int.Power
+  use int.EuclideanDivision
+  use bv.BV32
 
   (* Shift is div example -------------------  *)
 
@@ -44,7 +44,7 @@ module Test_proofinuse
 
   (* test invariant from frama-c ---------------- *)
 
-  use import ref.Ref
+  use ref.Ref
 
   let testVariant( n : t ) =
     let i = ref n in
@@ -67,8 +67,8 @@ end
 (** {1 Examples from Hackers Delight} *)
 
 theory Hackers_delight
-  use import int.Int
-  use import bv.BV32
+  use int.Int
+  use bv.BV32
 
   (** de morgan's laws *)
 
@@ -146,8 +146,8 @@ theory Hackers_delight
 end
 
 module Hackers_delight_mod
-  use import int.Int
-  use import bv.BV32
+  use int.Int
+  use bv.BV32
 
   (* de morgan's laws *)
 
@@ -259,10 +259,10 @@ end
 
 module Test_imperial_violet
 
-  use import int.Int
-  use import int.EuclideanDivision
-  use import bv.BV32
-  use import array.Array
+  use int.Int
+  use int.EuclideanDivision
+  use bv.BV32
+  use array.Array
 
   (* to_int and bounds *)
 
@@ -303,8 +303,8 @@ end
 
 module Test_from_bitvector_example
 
-  use import int.Int
-  use import bv.BV32
+  use int.Int
+  use bv.BV32
 
   goal Test1:
     let b = bw_and zeros ones in nth_bv b one = False

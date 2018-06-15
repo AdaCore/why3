@@ -27,7 +27,7 @@ end
 
 module AddListRec
 
-use import SumList
+use SumList
 
 let rec sum (l: list or_integer_float) : (si: int, sf: real) =
     variant { l }
@@ -56,8 +56,8 @@ end
 
 module AddListImp
 
-use import SumList
-use import ref.Ref
+use SumList
+use ref.Ref
 
 let sum (l: list or_integer_float) : (si: int, sf: real) =
     ensures { si = add_int l /\ sf = add_real l }

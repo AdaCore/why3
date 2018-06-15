@@ -3,7 +3,7 @@
 
 module Peano
 
-  use import int.Int
+  use int.Int
 
   type t = abstract { v: int }
   meta coercion function v
@@ -60,7 +60,7 @@ module Peano
      e.g. addition of two values of different signs
   *)
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   val div (x y: t) : t
     requires { y.v <> 0 }
@@ -69,7 +69,7 @@ module Peano
     requires { y.v <> 0 }
     ensures  { result.v = mod x.v y.v }
 
-  use import int.MinMax
+  use int.MinMax
 
   val max (x y: t) : t
     ensures { result.v = max x.v y.v }

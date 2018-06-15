@@ -8,10 +8,10 @@ Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
 
 module ColoredTiles
 
-use import int.Int
-use import set.Fset
-use import set.FsetComprehension
-use import seq.Seq
+use int.Int
+use set.Fset
+use set.FsetComprehension
+use seq.Seq
 
 type color = Red | Black
 
@@ -133,7 +133,7 @@ let lemma bij_cardinal (u: set 'a) (f: 'a -> 'b) (g: 'b -> 'a)
 
 function rmleft (nr:int) (c:coloring) : coloring = c[nr+1 ..]
 
-use import seq.FreeMonoid
+use seq.FreeMonoid
 
 lemma ext: forall c1 c2: coloring. Seq.(==) c1 c2 -> c1 = c2
 lemma app_eq: forall c1 c2 c3 c4: coloring. c1 = c2 -> c3 = c4 -> c1 ++ c3 = c2 ++ c4
@@ -224,7 +224,7 @@ let rec disjoint_union (s1 s2: set coloring) : set coloring
              so Fset.(==) u (union s1 s2)};
     u
 
-use import array.Array
+use array.Array
 
 let enum () : (count: array int, ghost sets: array (set coloring))
   ensures { Array.length count = 51 = Array.length sets

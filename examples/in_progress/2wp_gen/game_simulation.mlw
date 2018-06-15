@@ -3,15 +3,15 @@
 (* Basic definitions about simulations. *)
 module SimDef
 
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import ho_set.Set
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import order.Ordered
-  use import order.Chain
-  use import fn.Fun
-  use import fn.Image
+  use game.Game
+  use game_no_strat.StratLessDef
+  use ho_set.Set
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.Ordered
+  use order.Chain
+  use fn.Fun
+  use fn.Image
 
   (* Simulation = relation that maps winning strategies from one game to
      the other. *)
@@ -64,9 +64,9 @@ end
 (* Simulation theorem: step simulation -> simulation. *)
 module Sim "W:non_conservative_extension:N" (* => SimProof *)
 
-  use import game.Game
+  use game.Game
   use export SimDef
-  use import ho_rel.Rel
+  use ho_rel.Rel
 
   (* (obvious) prelude lemma. *)
   axiom simulation_comp : forall g1:game 'a,r12,g2:game 'b,r23,g3:game 'c.
@@ -85,14 +85,14 @@ end
    to the completed game. *)
 module SimCompleteDef
 
-  use import game.Game
-  use import choice.Choice
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.Chain
-  use import order.LimUniq
-  use import fn.Fun
-  use import fn.Image
+  use game.Game
+  use choice.Choice
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.Chain
+  use order.LimUniq
+  use fn.Fun
+  use fn.Image
 
   (* Completed game description *)
   predicate complete_transition (g:game 'a) (h:set 'a) (hs:set (set 'a)) =
@@ -154,13 +154,13 @@ end
 
 module SimComplete "W:non_conservative_extension:N" (* => SimCompleteProof *)
 
-  use import game.Game
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
+  use game.Game
+  use ho_rel.Rel
+  use ho_rel.RelSet
   use export SimCompleteDef
   use export SimDef
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtraDef
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
 
   axiom complete_lift_composition : forall o:erel 'a,r:rel 'a 'b.
     order o -> compose (complete_rel o) (complete_lift o r) = r
@@ -194,16 +194,16 @@ end
    but must be forgotten. *)
 module SimExtendedDef
 
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtraDef
-  use import SimDef
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import ho_set.Set
-  use import order.Chain
-  use import fn.Fun
-  use import fn.Image
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+  use SimDef
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use ho_set.Set
+  use order.Chain
+  use fn.Fun
+  use fn.Image
 
   (* Define extended game. *)
   predicate set_with_left (x:'a) (s:set 'b) (u:('a,'b)) =
@@ -401,15 +401,15 @@ end
 
 module SimExtended "W:non_conservative_extension:N" (* => SimExtendedProof *)
 
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtraDef
-  use import SimDef
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+  use SimDef
   use export SimExtendedDef
-  use import ho_set.Set
-  use import fn.Fun
-  use import fn.Image
-  use import ho_rel.RelSet
+  use ho_set.Set
+  use fn.Fun
+  use fn.Image
+  use ho_rel.RelSet
 
   axiom simulation_to_extended : forall g1 g2,r:rel 'a 'b.
     step_simulate g1 r g2 ->
@@ -461,12 +461,12 @@ end
 (* Explicit, end-to-end simulation. *)
 module SimExplicitDef
 
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
-  use import ho_set.Set
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtraDef
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use ho_set.Set
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
   use export SimDef
   use export SimExtendedDef
   use export SimCompleteDef
@@ -501,10 +501,10 @@ end
 
 module SimExplicit "W:non_conservative_extension:N" (* => SimProof *)
 
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
+  use game.Game
+  use game_no_strat.StratLessDef
+  use ho_rel.Rel
+  use ho_rel.RelSet
   use export SimExplicitDef
 
   axiom simulation_explicit : forall g1,r:rel 'a 'b,g2 invf invl f.
@@ -531,19 +531,19 @@ end
 (* Utility properties used everywhere. *)
 module Util
 
-  use import game.Game
-  use import game.BasicStrats
-  use import choice.Choice
-  use import game_no_strat.WinAlt
-  use import order.LimUniq
-  use import ho_rel.Rel
-  use import ho_rel.Prod
-  use import ho_rel.RelSet
-  use import ho_set.Set
-  use import order.Chain
-  use import fn.Fun
-  use import fn.Image
-  use import SimDef
+  use game.Game
+  use game.BasicStrats
+  use choice.Choice
+  use game_no_strat.WinAlt
+  use order.LimUniq
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use ho_rel.RelSet
+  use ho_set.Set
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+  use SimDef
 
   (* If we have a step simulation, there exists an explicitation.
      Useful to derive implicit theorems from explict ones. *)
@@ -611,18 +611,18 @@ end
 
 module SimCompleteProof
 
-  use import game.Game
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtra
-  use import choice.Choice
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import ho_rel.RelSet
-  use import fn.Image
-  use import order.SubChain
-  use import Util
-  use import SimDef
-  use import SimCompleteDef
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtra
+  use choice.Choice
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use fn.Image
+  use order.SubChain
+  use Util
+  use SimDef
+  use SimCompleteDef
 
   lemma complete_rel_simulation : forall g:game 'a,start win inv.
     victory_invariant g start win inv ->
@@ -755,7 +755,7 @@ module SimCompleteProof
 
     )
 
-  use import fn.Fun
+  use fn.Fun
 
   (* FIXME: although necessary here, that's not really the place
      this lemma belongs.... *)
@@ -779,9 +779,9 @@ module SimCompleteProof
       so sext (add h x) h by x = y by supremum o h y
     )
 
-  use import ho_rel.Prod
-  use import order.Product
-  use import order.ProductChain
+  use ho_rel.Prod
+  use order.Product
+  use order.ProductChain
 
   lemma complete_lift_step_simulation : forall g1 g2 invl invf,r:rel 'a 'b.
     step_simulate_by g1 r g2 invf invl ->
@@ -919,7 +919,7 @@ module SimCompleteProof
       so x = sup o hl
     )
 
-  use import ho_rel.Rel
+  use ho_rel.Rel
 
   lemma complete_lift_composition : forall o:erel 'a,r:rel 'a 'b.
     order o -> let c = complete_rel o in let cr = complete_lift o r in
@@ -953,10 +953,10 @@ end
    to avoid unwanted visibility of some proof arguments. *)
 module SimExtendedWf
 
-  use import game.Game
-  use import ho_rel.Rel
-  use import ho_rel.Prod
-  use import SimExtendedDef
+  use game.Game
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use SimExtendedDef
 
   (* For some reasons, provers have a hard time dealing with bare
      rprod definition. This proxy helps a lot. *)
@@ -969,22 +969,22 @@ end
 
 module SimExtendedProof_Enrich
 
-  use import game.Game
-  use import game_no_strat.WinAlt
-  use import game_no_strat.InvExtra
-  use import SimExtendedWf
-  use import SimDef
-  use import SimExtendedDef
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import order.LimUniq
-  use import order.Product
-  use import order.ProductChain
-  use import order.SubChain
-  use import fn.Fun
-  use import fn.Image
+  use game.Game
+  use game_no_strat.WinAlt
+  use game_no_strat.InvExtra
+  use SimExtendedWf
+  use SimDef
+  use SimExtendedDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.LimUniq
+  use order.Product
+  use order.ProductChain
+  use order.SubChain
+  use fn.Fun
+  use fn.Image
 
   (* A few lemmas for simulation to the extended games. *)
 
@@ -1752,24 +1752,24 @@ end
 
 module SimExtendedProof_Reduce
 
-  use import game.Game
-  use import game_no_strat.WinAlt
-  use import game_no_strat.InvExtra
-  use import SimDef
-  use import SimExtendedDef
-  use import SimExtendedWf
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import ho_rel.RelSet
-  use import ho_rel.Prod
-  use import order.LimUniq
-  use import order.Product
-  use import order.ProductChain
-  use import order.SubChain
-  use import fn.Fun
-  use import fn.Image
-  use import transfinite.ExtensionDet
-  use import transfinite.Transport
+  use game.Game
+  use game_no_strat.WinAlt
+  use game_no_strat.InvExtra
+  use SimDef
+  use SimExtendedDef
+  use SimExtendedWf
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.LimUniq
+  use order.Product
+  use order.ProductChain
+  use order.SubChain
+  use fn.Fun
+  use fn.Image
+  use transfinite.ExtensionDet
+  use transfinite.Transport
 
   lemma make_reducible_invariant : forall o1 g2 inv p q f,r:rel 'a 'b.
     let o2 = g2.progress in
@@ -1995,15 +1995,15 @@ end
 
 module SimExtendedProof_Forget
 
-  use import fn.Fun
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import ho_rel.Prod
-  use import order.SubChain
-  use import order.Product
-  use import SimExtendedWf
-  use import SimExtendedDef
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use order.SubChain
+  use order.Product
+  use SimExtendedWf
+  use SimExtendedDef
 
   (* Utility lemma to transfer minima to sub-chains... *)
   lemma minimum_downward : forall o:erel 'a,h1 h2 x.
@@ -2411,9 +2411,9 @@ module SimExtendedProof_Forget
       so s = (x,y)
     )
 
-  use import SimDef
-  use import choice.Choice
-  use import order.ProductChain
+  use SimDef
+  use choice.Choice
+  use order.ProductChain
 
   (* Limit pairing: we can reconstruct paired supremum
      from supremum on second history alone. *)
@@ -2471,10 +2471,10 @@ module SimExtendedProof_Forget
     so let s = sup o1 hr1 in (supremum o1 h1 s so s = x)
     by supremum o1 hr1 s
 
-  use import ho_set.SetBigOps
-  use import ho_rel.RelSet
-  use import game.Game
-  use import game_no_strat.StratLessDef
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use game.Game
+  use game_no_strat.StratLessDef
 
   lemma sim_forget : forall o1:erel 'a,g2:game 'b,r p q inv f_p.
     let gp = extended_game o1 r g2 in
@@ -2699,21 +2699,21 @@ end
 (* Conclusion for SimExtended proofs. *)
 module SimExtendedProof
 
-  use import Util
-  use import game.Game
-  use import SimDef
-  use import SimExtendedDef
-  use import ho_set.Set
-  use import fn.Fun
-  use import fn.Image
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
-  use import choice.Choice
-  use import game_no_strat.InvExtra
-  use import SimExtendedWf
-  use import SimExtendedProof_Enrich
-  use import SimExtendedProof_Reduce
-  use import SimExtendedProof_Forget
+  use Util
+  use game.Game
+  use SimDef
+  use SimExtendedDef
+  use ho_set.Set
+  use fn.Fun
+  use fn.Image
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use choice.Choice
+  use game_no_strat.InvExtra
+  use SimExtendedWf
+  use SimExtendedProof_Enrich
+  use SimExtendedProof_Reduce
+  use SimExtendedProof_Forget
 
   lemma simulation_to_extended : forall g1 g2,r:rel 'a 'b.
     let o1 = g1.progress in
@@ -2779,13 +2779,13 @@ end
 (* Put everything together. *)
 module SimProof
 
-  use import SimDef
-  use import game.Game
-  use import fn.Fun
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
+  use SimDef
+  use game.Game
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use ho_rel.RelSet
 
   lemma rel_set_compose : forall r1:rel 'a 'b,r2:rel 'b 'c,s.
     let rc = compose r1 r2 in
@@ -2799,10 +2799,10 @@ module SimProof
     simulate g1 r12 g2 /\ simulate g2 r23 g3 ->
     simulate g1 (compose r12 r23) g3
 
-  use import SimComplete
-  use import SimExtended
-  use import order.SubChain
-  use import order.ProductChain
+  use SimComplete
+  use SimExtended
+  use order.SubChain
+  use order.ProductChain
 
   lemma simulation : forall g1,r:rel 'a 'b,g2.
     step_simulate g1 r g2 -> simulate g1 r g2
@@ -2822,10 +2822,10 @@ module SimProof
     so simulate gc1 (compose ecr proj2) g2
     so simulate g1 (compose lr cr) g2
 
-  use import ho_set.SetBigOps
-  use import game_no_strat.StratLessDef
-  use import game_no_strat.InvExtra
-  use import SimExplicitDef
+  use ho_set.SetBigOps
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtra
+  use SimExplicitDef
 
   lemma simulation_explicit : forall g1,r:rel 'a 'b,g2 invf invl f.
     step_simulate_by g1 r g2 invf invl ->

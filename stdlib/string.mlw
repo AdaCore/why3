@@ -4,7 +4,7 @@
 
 module Char
 
-  use import int.Int
+  use int.Int
 
   type char = private { code : int }
     invariant { 0 <= code <= 255 }
@@ -42,12 +42,12 @@ end
 
 module String
 
-  use import int.Int
-  use import Char
-  use import map.Map as M
+  use int.Int
+  use Char
+  use map.Map as M
 
   type string = private {
-    mutable ghost chars: map int char;
+    mutable ghost chars: M.map int char;
                  length: int
   } invariant { length >= 0 }
 
@@ -70,10 +70,10 @@ module String
 
   val set (s:string) (i:int) (v:char) : unit writes {s}
     requires { 0 <= i < length s }
-    ensures  { s.chars = old s.chars[i <- v] }
+    ensures  { s.chars = old M.(s.chars[i <- v]) }
 
   val unsafe_set (s:string) (i:int) (v:char) : unit writes {s}
-    ensures { s.chars = old s.chars[i <- v] }
+    ensures { s.chars = old M.(s.chars[i <- v]) }
 
   val copy (s:string) : string
     ensures { length result = length s }
@@ -106,8 +106,8 @@ end
 
 module Buffer
 
-  use import int.Int
-  use import Char
+  use int.Int
+  use Char
   use import String as S
   use import map.Map as M
 

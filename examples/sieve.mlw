@@ -9,10 +9,10 @@
 
 module Sieve
 
-  use import int.Int
-  use import array.Array
-  use import ref.Ref
-  use import number.Prime
+  use int.Int
+  use array.Array
+  use ref.Ref
+  use number.Prime
 
   predicate no_factor_lt (bnd num:int) =
     num > 1 /\ forall k l. 1 < l < bnd /\ k > 1 -> num <> k * l

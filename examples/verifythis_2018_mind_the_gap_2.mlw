@@ -8,10 +8,10 @@ Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
 
 module GapBuffer
 
-  use import int.Int
-  use import seq.Seq
-  use import map.Map as M
-  use import array.Array
+  use int.Int
+  use seq.Seq
+  use map.Map
+  use array.Array
 
   type char
   val constant dummy_char : char
@@ -21,7 +21,7 @@ module GapBuffer
     mutable l : int;
     mutable r : int
   } invariant { 0 <= l <= r <= data.length }
-  by { data = Array.make 1 dummy_char; l = 0; r = 0 }
+  by { data = make 1 dummy_char; l = 0; r = 0 }
 
   function len_contents (b:buffer) : int
     = b.data.length - b.r + b.l

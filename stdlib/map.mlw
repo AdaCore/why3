@@ -21,7 +21,7 @@ end
 
 module Const
 
-  use import Map
+  use Map
 
   let function const (v: 'b) : map 'a 'b = fun _ -> v
 
@@ -42,8 +42,8 @@ end
 
 module MapSorted
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   type elt
 
@@ -60,8 +60,8 @@ end
 
 module MapEq
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   predicate map_eq_sub (a1 a2 : map int 'a) (l u : int) =
     forall i:int. l <= i < u -> a1[i] = a2[i]
@@ -70,8 +70,8 @@ end
 
 module MapExchange
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   predicate exchange (a1 a2: map int 'a) (l u i j: int) =
     l <= i < u /\ l <= j < u /\
@@ -89,7 +89,7 @@ end
 
 module MapSum
 
-  use import int.Int
+  use int.Int
   use export Map
 
   (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
@@ -105,8 +105,8 @@ end
 (* TODO: we could define Occ using theory int.NumOf *)
 module Occ
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   function occ (v: 'a) (m: map int 'a) (l u: int) : int
     (** number of occurrences of `v` in `m` between `l` included and `u` excluded *)
@@ -169,9 +169,9 @@ end
 
 module MapPermut
 
-  use import int.Int
-  use import Map
-  use import Occ
+  use int.Int
+  use Map
+  use Occ
 
   predicate permut (m1 m2: map int 'a) (l u: int) =
     forall v: 'a. occ v m1 l u = occ v m2 l u
@@ -192,7 +192,7 @@ end
 
 module MapInjection
 
-  use import int.Int
+  use int.Int
   use export Map
 
   predicate injective (a: map int int) (n: int) =
@@ -216,7 +216,7 @@ module MapInjection
   (** main lemma: an injection on `(0..n-1)` that
       ranges into `(0..n-1)` is also a surjection *)
 
-  use import Occ
+  use Occ
 
   lemma injection_occ:
     forall m: map int int, n: int.

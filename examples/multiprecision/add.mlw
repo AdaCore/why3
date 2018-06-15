@@ -1,15 +1,15 @@
 module Add
 
-  use import int.Int
-  use import mach.int.Int32
+  use int.Int
+  use mach.int.Int32
   use import mach.int.UInt64GMP as Limb
-  use import int.Power
-  use import ref.Ref
-  use import mach.c.C
-  use import array.Array
-  use import map.Map
-  use import types.Types
-  use import lemmas.Lemmas
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
 
   (** `add_limb r x y sz` adds to `x` the value of the limb `y`,
       writes the result in `r` and returns the carry. `r` and `x`
@@ -420,7 +420,7 @@ module Add
       end
     end
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   (** `incr x y sz` adds to `x` the value of the limb `y` in place.
       `x` has size `sz`. The addition must not overflow. This corresponds

@@ -17,11 +17,11 @@
 
 module Types
 
-  use import int.Int
-  use import array.Array
-  use import list.List
-  use import Functions.Func
-  use import Predicates.Pred
+  use int.Int
+  use array.Array
+  use list.List
+  use Functions.Func
+  use Predicates.Pred
 
   type timestamp 'a = {
     time : int ;
@@ -43,14 +43,14 @@ end
 
 module Logic
 
-  use import Types
-  use import int.Int
-  use import int.ComputerDivision
+  use Types
+  use int.Int
+  use int.ComputerDivision
   use import map.Map as M
-  use import array.Array
-  use import list.List
-  use import Functions.Func
-  use import Choice.Choice
+  use array.Array
+  use list.List
+  use Functions.Func
+  use Choice.Choice
 
   function func_of_array (a:array 'a) (def:'a) : int -> 'a
   axiom func_of_array_def : forall a:array 'a,def:'a,x:int.
@@ -134,16 +134,16 @@ end
 
 module Impl
 
-  use import Types
-  use import Logic
-  use import int.Int
-  use import int.ComputerDivision
+  use Types
+  use Logic
+  use int.Int
+  use int.ComputerDivision
   use import map.Map as M
-  use import array.Array
-  use import list.List
-  use import Functions.Func
-  use import Predicates.Pred
-  use import Choice.Choice
+  use array.Array
+  use list.List
+  use Functions.Func
+  use Predicates.Pred
+  use Choice.Choice
 
   (* extraction trick to speedup integer operations with
      constants. *)

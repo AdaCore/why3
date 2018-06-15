@@ -80,9 +80,9 @@ and Guillaume Melquiond (Inria) who entered the competition as "team Why3".
 
 module RelaxedPrefix
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   type char
   val eq (x y : char) : bool ensures { result = True <-> x = y }

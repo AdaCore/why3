@@ -5,8 +5,8 @@
 (** {2 Preliminary definitions} *)
 theory SelectionTypes
 
-  use import seq.Seq
-  use import option.Option
+  use seq.Seq
+  use option.Option
 
   (** Describe a position in the sequence `left ++ middle ++ right`
       (see `rebuild`) *)
@@ -55,12 +55,12 @@ module AVL
        routine (monoid operations, element measure,...) is assumed to
        take constant time) *)
 
-  use import int.Int
-  use import bool.Bool
+  use int.Int
+  use bool.Bool
   use import seq.Seq as S
-  use import seq.FreeMonoid
-  use import option.Option
-  use import ref.Ref
+  use seq.FreeMonoid
+  use option.Option
+  use ref.Ref
   use mach.peano.Peano as I
 
   (** The implementation is parameterized by an abstract monoid.
@@ -495,7 +495,7 @@ module AVL
 
       *)
 
-  use import SelectionTypes
+  use SelectionTypes
 
   (** Parameter: selector type. The elements of that type
       are intended to describe the class of splits we wish to find. *)
@@ -542,7 +542,7 @@ module AVL
         forall e. selected sr e /\ rebuild e = rseq ->
           selected s (left_extend lseq d e) }
 
-  use import ref.Ref
+  use ref.Ref
 
   (** Create a reference over a dummy split. All the binary-search-based
       routines take a ghost reference to explicitly return the existential

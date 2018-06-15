@@ -9,12 +9,12 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
   predicate le elt elt
 
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   type heap
@@ -69,8 +69,8 @@ end
 
 module Size
 
-  use import TreeRank
-  use import int.Int
+  use TreeRank
+  use int.Int
 
   let rec function size (t: tree 'a) : int = match t with
     | E -> 0
@@ -84,8 +84,8 @@ end
 
 module Occ
 
-  use import TreeRank
-  use import int.Int
+  use TreeRank
+  use int.Int
 
   function occ (x: 'a) (t: tree 'a) : int = match t with
     | E -> 0
@@ -104,14 +104,14 @@ module LeftistHeap
 
   type elt
   val predicate le elt elt
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
-  use import TreeRank
+  use TreeRank
   use export Size
   use export Occ
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   type t = tree elt
 

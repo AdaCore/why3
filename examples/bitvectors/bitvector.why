@@ -3,8 +3,8 @@
 theory BitVector
 
   use export bool.Bool
-  use import int.Int
-  use import power2.Pow2int
+  use int.Int
+  use power2.Pow2int
 
   function size : int
   (* size at least 2 since we need 2-complement representation *)
@@ -275,7 +275,7 @@ theory BitVector
      integer n on size bits. *)
   function from_int (n:int) : bv
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
 
 (*  axiom nth_from_int_high:
@@ -373,7 +373,7 @@ end
 
 theory BV32_64
 
-  use import int.Int
+  use int.Int
 
   use BV32 as BV32
   use BV64 as BV64
@@ -391,8 +391,8 @@ end
 
 theory TestBv32
 
-  use import BV32
-  use import int.Int
+  use BV32
+  use int.Int
 
   goal Test1:
     let b = bw_and bvzero bvone in nth b 1 = False

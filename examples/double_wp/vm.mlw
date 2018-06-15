@@ -33,12 +33,12 @@ end
 
 theory Vm
 
-  use import state.State
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import int.EuclideanDivision
+  use state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use int.EuclideanDivision
 
   type pos = int                           (* read position on stack        *)
   type stack = list int                    (* stack contains just integers  *)

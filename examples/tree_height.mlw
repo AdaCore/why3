@@ -4,10 +4,10 @@
 
 module HeightCPS
 
-  use import int.Int
-  use import int.MinMax
-  use import bintree.Tree
-  use import bintree.Height
+  use int.Int
+  use int.MinMax
+  use bintree.Tree
+  use bintree.Height
 
   let rec height_cps (t: tree 'a) (k: int -> 'b) : 'b
     variant { t }
@@ -30,13 +30,13 @@ end
 
 module Iteration
 
-  use import int.Int
-  use import int.MinMax
-  use import list.List
-  use import bintree.Tree
-  use import bintree.Size
-  use import bintree.Height
-  use import ref.Ref
+  use int.Int
+  use int.MinMax
+  use list.List
+  use bintree.Tree
+  use bintree.Size
+  use bintree.Height
+  use ref.Ref
 
   type cont 'a = Id | Kleft (tree 'a) (cont 'a) | Kright int (cont 'a)
 
@@ -104,12 +104,12 @@ end
 
 module HeightStack
 
-  use import int.Int
-  use import int.MinMax
-  use import list.List
-  use import bintree.Tree
-  use import bintree.Size
-  use import bintree.Height
+  use int.Int
+  use int.MinMax
+  use list.List
+  use bintree.Tree
+  use bintree.Size
+  use bintree.Height
 
   type stack 'a = list (int, tree 'a)
 
@@ -149,13 +149,13 @@ end
 
 module HeightSmallSpace
 
-  use import int.Int
-  use import int.MinMax
-  use import int.ComputerDivision
-  use import option.Option
-  use import bintree.Tree
-  use import bintree.Size
-  use import bintree.Height
+  use int.Int
+  use int.MinMax
+  use int.ComputerDivision
+  use option.Option
+  use bintree.Tree
+  use bintree.Size
+  use bintree.Height
 
   (** Count number of leaves in a tree. *)
   function leaves (t: tree 'a) : int = 1 + size t
@@ -220,7 +220,7 @@ module HeightSmallSpace
       end
     end
 
-  use import ref.Ref
+  use ref.Ref
 
   let height (t: tree 'a) : int
     ensures { result = height t }

@@ -201,8 +201,8 @@ end
 
 theory TestSemantics
 
-use import SemOp
-use import map.Const
+use SemOp
+use map.Const
 
 function my_sigma : env = Const.const (Vint 0)
 constant x : ident
@@ -358,8 +358,8 @@ end
 
 theory TypingAndSemantics
 
-use import SemOp
-use import Typing
+use SemOp
+use Typing
 
 (*
 inductive compatible datatype value =
@@ -406,8 +406,8 @@ end
 
 theory FreshVariables
 
-use import SemOp
-use import list.Append
+use SemOp
+use list.Append
 
 lemma Cons_append: forall a: 'a, l1 l2: list 'a.
   Cons a (l1 ++ l2) = (Cons a l1) ++ l2
@@ -509,9 +509,9 @@ end
 
 theory HoareLogic
 
-use import Syntax
-use import SemOp
-use import FreshVariables
+use Syntax
+use SemOp
+use FreshVariables
 
 (* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:
@@ -594,10 +594,10 @@ end
 
 theory WP
 
-use import SemOp
-use import Typing
-use import TypingAndSemantics
-use import FreshVariables
+use SemOp
+use Typing
+use TypingAndSemantics
+use FreshVariables
 
 
 function fresh_from (f:fmla) : ident

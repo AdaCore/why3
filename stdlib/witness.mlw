@@ -17,8 +17,8 @@
 
 module Witness
 
-  use import int.Int
-  use import relations.WellFounded
+  use int.Int
+  use relations.WellFounded
 
   predicate r (x y: ((int->bool),int)) =
     let p, x = x in

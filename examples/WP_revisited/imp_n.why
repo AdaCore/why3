@@ -35,7 +35,7 @@ lemma check_skip:
 (* program states *)
 
 use map.Map as IdMap
-use import int.Int
+use int.Int
 
 type state = IdMap.map ident int
 
@@ -56,7 +56,7 @@ function eval_expr (s:state) (e:expr) : int =
        eval_bin (eval_expr s e1) op (eval_expr s e2)
   end
 
-  use import map.Const
+  use map.Const
 
   goal Test13 :
     let s = Const.const 0 in

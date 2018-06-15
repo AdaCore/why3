@@ -15,8 +15,8 @@ axiom morph_inv: forall z:Z.t. morph (Z.(-_) z) = C.(-_) (morph z)
 
 val predicate eq0 (x:Z.t) ensures { result <-> x = Z.zero }
 
-use import int.Int
-use import list.List
+use int.Int
+use list.List
 
 type t = Var int | Add t t | Mul t t | Cst Z.t
 
@@ -49,8 +49,8 @@ function interp' (x:t') (y:vars) : C.t =
 predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
 predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
 
-use import list.Append
-use import list.Length
+use list.Append
+use list.Length
 
 let rec lemma mon_append (x1 x2: list int) (y:vars)
   ensures { mon (x1 ++ x2) y = C.(*) (mon x1 y) (mon x2 y) }
@@ -205,7 +205,7 @@ end
 (** Tests *)
 module Tests
 
-use import int.Int
+use int.Int
 
 function id (x:int) : int = x
 let predicate eq0_int (x:int) = x = 0
@@ -254,8 +254,8 @@ end
 module AssocAlgebraDecision
 
 
-use import int.Int
-use import list.List
+use int.Int
+use list.List
 
 type r
 type a
@@ -317,8 +317,8 @@ let rec ghost function interp' (x: t') (y: vars) : a =
 predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
 predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
 
-use import list.Append
-use import list.Length
+use list.Append
+use list.Length
 
 let rec lemma mon_append (x1 x2: list int) (y: vars)
   ensures { mon (x1 ++ x2) y = atimes (mon x1 y) (mon x2 y) }
@@ -459,7 +459,7 @@ end
 
 module ReifyTests
 
-use import int.Int
+use int.Int
 
 let predicate eq0_int (x:int) = x=0
 

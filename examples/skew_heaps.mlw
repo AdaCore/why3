@@ -6,11 +6,11 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
   predicate le elt elt
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   type t
@@ -62,15 +62,15 @@ end
 
 module SkewHeaps
 
-  use import int.Int
-  use import bintree.Tree
+  use int.Int
+  use bintree.Tree
   use export bintree.Size
   use export bintree.Occ
 
   type elt
 
   val predicate le elt elt
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   (* [e] is no greater than the root of [t], if any *)
@@ -163,14 +163,14 @@ end
 
 module HeapSort
 
-  use import SkewHeaps
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArrayPermut
+  use SkewHeaps
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArrayPermut
   clone export array.Sorted with type elt = elt, predicate le = le, axiom .
-  use import map.Occ as M
-  use import bintree.Occ as H
+  use map.Occ as M
+  use bintree.Occ as H
 
   let heapsort (a: array elt) : unit
     ensures { sorted a }

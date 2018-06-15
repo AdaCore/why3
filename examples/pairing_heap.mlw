@@ -9,12 +9,12 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
   val predicate le elt elt
 
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   type heap
@@ -66,7 +66,7 @@ end
 
 module HeapType
 
-  use import list.List
+  use list.List
 
   type elt
   type heap = E | T elt (list heap)
@@ -75,9 +75,9 @@ end
 
 module Size
 
-  use import HeapType
-  use import int.Int
-  use import list.List
+  use HeapType
+  use int.Int
+  use list.List
 
   function size (h: heap) : int = match h with
     | E -> 0
@@ -116,9 +116,9 @@ end
 
 module Occ
 
-  use import HeapType
-  use import int.Int
-  use import list.List
+  use HeapType
+  use int.Int
+  use list.List
 
   function occ (x: elt) (h: heap) : int = match h with
     | E -> 0
@@ -155,15 +155,15 @@ end
 
 module PairingHeap
 
-  use import int.Int
+  use int.Int
   use export HeapType
   use export Size
   use export Occ
-  use import list.List
-  use import list.Length
+  use list.List
+  use list.Length
 
   val predicate le elt elt
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   (* [e] is no greater than the root of [h], if any *)

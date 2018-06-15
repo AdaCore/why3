@@ -1,14 +1,14 @@
 module C
 
-  use import mach.int.Unsigned
-  use import mach.int.Int32
-  use import mach.int.UInt32GMP as UInt32
-  use import array.Array
-  use import map.Map
-  use import int.Int
-  predicate in_us_bounds (n:int) = 0 <= n <= max_uint32
+  use mach.int.Unsigned
+  use mach.int.Int32
+  use mach.int.UInt32GMP as UInt32
+  use array.Array
+  use map.Map
+  use int.Int
+  predicate in_us_bounds (n:int) = 0 <= n <= UInt32.max_uint32
   predicate in_bounds (n:int) = min_int32 <= n <= max_int32
-  use import ref.Ref
+  use ref.Ref
 
   type zone
 
@@ -76,7 +76,7 @@ module C
     ensures { forall i. 0 <= i < sz -> valid_ptr_shift p i }
   = ()
 
-  val malloc (sz:uint32) : ptr 'a
+  val malloc (sz:UInt32.uint32) : ptr 'a
     requires { 0 <= sz }
     ensures { result.zone <> null_zone -> plength result = sz }
     ensures { result.offset = 0 }
@@ -179,6 +179,6 @@ module C
   val print_space () : unit
   val print_newline () : unit
 
-  val print_uint32 (n:uint32):unit
+  val print_uint32 (n:UInt32.uint32):unit
 
 end

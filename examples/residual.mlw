@@ -67,7 +67,7 @@ module Test
 
   type char = int
 
-  clone import Residuals with type char = char
+  clone Residuals with type char = char
 
   let constant a : char = 65
 
@@ -84,10 +84,10 @@ end
 module DFA
 
   type char
-  use import list.List
+  use list.List
   type word = list char
 
-  use import map.Map
+  use map.Map
 
   (** automaton where states = 0..size-1, init state = 0 *)
 

@@ -2,12 +2,12 @@
 
 module Matrix63
 
-  use import int.Int
-  use import mach.int.Int63
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int63
+  use map.Map as M
 
   type matrix 'a = private {
-    ghost mutable elts: map int (map int 'a);
+    ghost mutable elts: M.map int (M.map int 'a);
                   rows: int63;
                columns: int63
   } invariant { 0 <= to_int rows /\ 0 <= to_int columns }

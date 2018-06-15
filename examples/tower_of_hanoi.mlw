@@ -1,10 +1,10 @@
 module Hanoi
   (* a simple version where the disks are natural numbers from 1 to n *)
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.SortedInt
+  use int.Int
+  use list.List
+  use list.Length
+  use list.SortedInt
 
   type tower = {
     mutable rod : list int;
@@ -61,12 +61,12 @@ end
 module Tower_of_Hanoi
   (* a generalized version where the disks are arbitrary integers *)
 
-  use import int.Int
-  use import list.List
-  use import list.Length
+  use int.Int
+  use list.List
+  use list.Length
 
-  use import list.RevAppend
-  clone import list.RevSorted with type t = int, predicate le = (<),
+  use list.RevAppend
+  clone list.RevSorted with type t = int, predicate le = (<),
   goal Transitive.Trans
 
   type tower = {

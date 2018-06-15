@@ -4,10 +4,10 @@
 
 module BinarySearch
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
 
   (* the code and its specification *)
 
@@ -43,9 +43,9 @@ end
 
 module BinarySearchAnyMidPoint
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   exception Not_found (* raised to signal a search failure *)
 
@@ -80,10 +80,10 @@ end
 
 module BinarySearchInt32
 
-  use import int.Int
-  use import mach.int.Int32
-  use import ref.Ref
-  use import mach.array.Array32
+  use int.Int
+  use mach.int.Int32
+  use ref.Ref
+  use mach.array.Array32
 
   (* the code and its specification *)
 
@@ -121,10 +121,10 @@ end
 
 module BinarySearchBoolean
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
 
   let binary_search (a: array int) : int
     requires { 0 < a.length }

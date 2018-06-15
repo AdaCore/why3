@@ -8,9 +8,9 @@
 
 module Array32
 
-  use import int.Int
-  use import mach.int.Int32
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int32
+  use map.Map as M
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -25,7 +25,7 @@ module Array32
 
   val ([]<-) (a: array 'a) (i: int32) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < a.length }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = M.set (old a.elts) i v }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -40,7 +40,7 @@ module Array32
 
   let defensive_set (a: array 'a) (i: int32) (v: 'a)
     ensures { 0 <= i < a.length }
-    ensures { a.elts = (old a.elts)[i <- v] }
+    ensures { a.elts = M.set (old a.elts) i v }
     raises  { OutOfBounds -> (i < 0 \/ i >= a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
@@ -108,9 +108,9 @@ end
 
 module Array31
 
-  use import int.Int
-  use import mach.int.Int31
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int31
+  use map.Map as M
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -125,7 +125,7 @@ module Array31
 
   val ([]<-) (a: array 'a) (i: int31) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < a.length }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = M.set (old a.elts) i v }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -140,7 +140,7 @@ module Array31
 
   let defensive_set (a: array 'a) (i: int31) (v: 'a)
     ensures { 0 <= i < a.length }
-    ensures { a.elts = (old a.elts)[i <- v] }
+    ensures { a.elts = M.set (old a.elts) i v }
     raises  { OutOfBounds -> (i < 0 \/ i >= a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
@@ -219,9 +219,9 @@ end
 
 module Array63
 
-  use import int.Int
-  use import mach.int.Int63
-  use import seq.Seq
+  use int.Int
+  use mach.int.Int63
+  use seq.Seq
 
   type array 'a = private {
     mutable ghost elts : seq 'a;
@@ -328,10 +328,10 @@ end
 
 module Array63Exchange
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
-  use import seq.Exchange as SE
+  use int.Int
+  use mach.int.Int63
+  use Array63
+  use seq.Exchange as SE
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
     SE.exchange a1.elts a2.elts i j
@@ -342,9 +342,9 @@ end
 
 module Array63Swap
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
+  use int.Int
+  use mach.int.Int63
+  use Array63
   use export Array63Exchange
 
   let swap (a:array 'a) (i j:int63) : unit
@@ -359,13 +359,13 @@ end
 
 module Array63Permut
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
-  use import seq.Seq
-  use import seq.SeqEq
-  use import seq.Permut as SP
-  use import Array63Exchange
+  use int.Int
+  use mach.int.Int63
+  use Array63
+  use seq.Seq
+  use seq.SeqEq
+  use seq.Permut as SP
+  use Array63Exchange
 
   predicate permut (a1 a2: array 'a) (l u: int) =
     SP.permut a1.elts a2.elts l u
@@ -420,9 +420,9 @@ end
 
 module ArrayInt63
 
-  use import int.Int
-  use import mach.int.Int63
-  use import seq.Seq
+  use int.Int
+  use mach.int.Int63
+  use seq.Seq
 
   type array63 = private {
     mutable ghost elts: seq int;
@@ -453,7 +453,7 @@ module ArrayInt63
     ensures  { result.length = a.length }
     ensures  { forall i. 0 <= i < result.length -> result[i] = a[i] }
 
-  use import seq.Exchange
+  use seq.Exchange
 
   let swap (a:array63) (i j:int63) : unit
     requires { 0 <= i < length a /\ 0 <= j < length a }

@@ -24,7 +24,7 @@ end
 
 module Type0
 
-  use import TypeParams
+  use TypeParams
 
   (* Program version of the type. *)
   type t
@@ -43,7 +43,7 @@ end
 
 module Type1
 
-  use import TypeParams
+  use TypeParams
 
   (* Need two types variables to represent both the program and logic worlds. *)
   type t 'a 'b
@@ -58,7 +58,7 @@ end
 
 module Type1Prm
 
-  use import TypeParams
+  use TypeParams
 
   type t 'a 'b
   type m 'b
@@ -73,7 +73,7 @@ end
 
 module Type2
 
-  use import TypeParams
+  use TypeParams
 
   type t 'a 'b 'c 'd
   type m 'b 'd
@@ -84,7 +84,7 @@ end
 
 module Type2Prm
 
-  use import TypeParams
+  use TypeParams
 
   type t 'a 'b 'c 'd
   type m 'b 'd

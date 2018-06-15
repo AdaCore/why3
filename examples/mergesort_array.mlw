@@ -15,7 +15,7 @@ module Elt
 
   val predicate le elt elt
 
-  clone import relations.TotalPreOrder with
+  clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
 
   clone export array.Sorted with type
@@ -35,7 +35,7 @@ module Merge
   clone export Elt with axiom .
   use export ref.Refint
   use export array.Array
-  use import map.Occ
+  use map.Occ
   use export array.ArrayPermut
 
   (* merges tmp[l..m[ and tmp[m..r[ into a[l..r[ *)
@@ -96,8 +96,8 @@ end
 
 module TopDownMergesort
 
-  clone import Merge with axiom .
-  use import mach.int.Int
+  clone Merge with axiom .
+  use mach.int.Int
 
   let rec mergesort_rec (a tmp: array elt) (l r: int) : unit
     requires { 0 <= l <= r <= length a = length tmp }
@@ -133,9 +133,9 @@ end
 
 module BottomUpMergesort
 
-  clone import Merge with axiom .
-  use import mach.int.Int
-  use import int.MinMax
+  clone Merge with axiom .
+  use mach.int.Int
+  use int.MinMax
 
   let bottom_up_mergesort (a: array elt) : unit
     ensures { sorted a }
@@ -209,9 +209,9 @@ end
 
 module NaturalMergesort
 
-  clone import Merge with axiom .
-  use import mach.int.Int
-  use import int.MinMax
+  clone Merge with axiom .
+  use mach.int.Int
+  use int.MinMax
 
   (* returns the maximal hi such that a[lo..hi[ is sorted *)
   let find_run (a: array elt) (lo: int) : int

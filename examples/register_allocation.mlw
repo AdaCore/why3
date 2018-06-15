@@ -7,7 +7,7 @@
 
 module Spec
 
-  use import int.Int
+  use int.Int
 
   type addr
 
@@ -39,7 +39,7 @@ module Spec
   function update (reg: registers) (r: register) (v: int) : registers =
     fun r' -> if r' = r then v else reg r'
 
-  use import list.List
+  use list.List
 
   type stack = list int
 
@@ -70,7 +70,7 @@ module Spec
     | Cons i l -> exec_list l (exec i s)
     end
 
-  use import list.Append
+  use list.Append
 
   let rec lemma exec_append (c1 c2: code) (s: state) : unit
     ensures { exec_list (c1 ++ c2) s = exec_list c2 (exec_list c1 s) }
@@ -101,9 +101,9 @@ end
 
 module DWP
 
-  use import list.List
-  use import list.Append
-  use import Spec
+  use list.List
+  use list.Append
+  use Spec
 
   meta compute_max_steps 0x10000
 
@@ -169,11 +169,11 @@ end
 
 module InfinityOfRegisters
 
-  use import int.Int
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
   (** `compile e r` returns a list of instructions that stores the value
       of `e` in register `r`, without modifying any register `r' < r`. *)
@@ -204,11 +204,11 @@ end
 
 module FiniteNumberOfRegisters
 
-  use import int.Int
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
   (** we have k registers, namely 0,1,...,k-1,
       and there are at least two of them, otherwise we can't add *)
@@ -242,12 +242,12 @@ end
 
 module OptimalNumberOfRegisters
 
-  use import int.Int
-  use import int.MinMax
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
   (** we have `k` registers, namely `0,1,...,k-1`,
       and there are at least two of them, otherwise we can't add *)

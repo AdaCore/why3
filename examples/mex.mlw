@@ -26,11 +26,11 @@
 *)
 module MexArray
 
-  use import int.Int
-  use import map.Map
-  use import array.Array
-  use import ref.Refint
-  use import pigeon.Pigeonhole
+  use int.Int
+  use map.Map
+  use array.Array
+  use ref.Refint
+  use pigeon.Pigeonhole
 
   predicate mem (x: int) (a: array int) =
     exists i. 0 <= i < length a && a[i] = x
@@ -89,11 +89,11 @@ end
  *)
 module MexArrayInPlace
 
-  use import int.Int
-  use import int.NumOf
-  use import array.Array
-  use import array.ArraySwap
-  use import ref.Refint
+  use int.Int
+  use int.NumOf
+  use array.Array
+  use array.ArraySwap
+  use ref.Refint
 
   predicate mem (x: int) (a: array int) =
     exists i. 0 <= i < length a && a[i] = x

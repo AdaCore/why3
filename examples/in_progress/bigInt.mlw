@@ -4,13 +4,13 @@
 
 module N
 
-  use import map.Map
-  use import mach.int.Int31
-  use import mach.array.Array31
-  use import ref.Ref
+  use map.Map
+  use mach.int.Int31
+  use mach.array.Array31
+  use ref.Ref
 
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
 
 (** {2 data type for unbound integers and invariants} *)
 
@@ -48,7 +48,7 @@ module N
           to_int (Map.get x n) + base * value_sub x (n+1) m l
         else 0
 
-  use import map.MapEq
+  use map.MapEq
 
   let rec lemma value_sub_frame (x y:map int int31) (n m l:int)
     requires { MapEq.map_eq_sub x y n m }
@@ -445,13 +445,13 @@ end
 
 module Z
 
-  use import map.Map
-  use import mach.int.Int31
-  use import mach.array.Array31
-  use import ref.Ref
+  use map.Map
+  use mach.int.Int31
+  use mach.array.Array31
+  use ref.Ref
 
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
   let constant base : int = 32768
   let constant max_digit : int = 16384
   let constant min_digit : int = -16384
@@ -479,7 +479,7 @@ module Z
           to_int (Map.get x n) + base * value_sub x (n+1) m l
         else 0
 
-  use import map.MapEq
+  use map.MapEq
 
   let rec lemma value_sub_frame (x y:map int int31) (n m l:int)
     requires { MapEq.map_eq_sub x y n m }

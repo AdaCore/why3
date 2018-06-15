@@ -4,7 +4,7 @@
 
 module Pow2int
 
-  use import int.Int
+  use int.Int
 
   function pow2 (i:int) : int
 
@@ -85,7 +85,7 @@ module Pow2int
   lemma pow2_63: pow2 63 =   0x8000000000000000
   lemma pow2_64: pow2 64 =  0x10000000000000000
 
-  (*** use import int.EuclideanDivision
+  (*** use int.EuclideanDivision
 
    lemma Div_pow: forall x i:int.
      i > 0 -> pow2 (i-1) <= x < pow2 i -> div x (pow2 (i-1)) = 1
@@ -104,7 +104,7 @@ end
 module BV_Gen
 
   use export bool.Bool
-  use import int.Int
+  use int.Int
 
   constant size : int
   axiom size_pos : size > 0
@@ -196,7 +196,7 @@ module BV_Gen
 
   lemma lsl_zeros: forall x. lsl x 0 = x
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   function rotate_right t int : t
 
@@ -213,7 +213,7 @@ module BV_Gen
 
   (** Conversions from/to integers *)
 
-  use import Pow2int
+  use Pow2int
 
   constant two_power_size : int
   constant max_int : int

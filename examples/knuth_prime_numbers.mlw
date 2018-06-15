@@ -26,13 +26,13 @@
 
 module PrimeNumbers
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import number.Parity
-  use import number.Divisibility
-  use import number.Prime
-  use import ref.Refint
-  use import map.Map
+  use int.Int
+  use int.ComputerDivision
+  use number.Parity
+  use number.Divisibility
+  use number.Prime
+  use ref.Refint
+  use map.Map
 
   predicate no_prime_in (l u: int) =
     forall x: int. l < x < u -> not (prime x)
@@ -57,7 +57,7 @@ module PrimeNumbers
   axiom Bertrand_postulate [@W:non_conservative_extension:N] :
     forall p: int. prime p -> not (no_prime_in p (2*p))
 
-  use import array.Array
+  use array.Array
 
   (** `prime_numbers m` returns an array containing the first `m`
   prime numbers *)

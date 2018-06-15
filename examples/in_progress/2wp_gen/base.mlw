@@ -51,7 +51,7 @@ end
 (* Proofs of above Fun modules *)
 module FunProofs
 
-  use import Fun
+  use Fun
 
   predicate hack (f g h:'a -> 'b) = f = g = h
   lemma ext : forall f g:'a -> 'b.
@@ -71,7 +71,7 @@ end
 (* Basic definition on sets-as-arrows *)
 module Set
 
-  use import Fun
+  use Fun
 
   type set 'a = 'a -> bool
 
@@ -97,7 +97,7 @@ end
 (* Some usual big operators on sets. *)
 module SetBigOps
 
-  use import Set
+  use Set
 
   function bigunion (c:set (set 'a)) : set 'a = fun x -> exists s. c s /\ s x
   function biginter (c:set (set 'a)) : set 'a = fun x -> forall s. c s -> s x
@@ -107,7 +107,7 @@ end
 (* Basic definition on relations-as-arrows *)
 module Rel
 
-  use import Fun
+  use Fun
 
   type rel 'a 'b = 'a -> 'b -> bool
   type erel 'a = rel 'a 'a
@@ -178,7 +178,7 @@ end
 (* Elements related to a set. *)
 module RelSet
 
-  use import Set
+  use Set
   use export Rel
 
   predicate related (r:rel 'a 'b) (s:set 'a) (y:'b) = exists x. s x /\ r x y
@@ -189,8 +189,8 @@ end
 
 module RelProofs
 
-  use import FunExt
-  use import Rel
+  use FunExt
+  use Rel
 
   lemma extensionality : forall r1 r2:rel 'a 'b. rext r1 r2 -> r1 = r2
     by ext r1 r2 by forall x. ext (r1 x) (r2 x)
@@ -225,7 +225,7 @@ end
 module SubsetOrder "W:non_conservative_extension:N" (* => SetProofs *)
 
   use export Set
-  use import Rel
+  use Rel
 
   axiom subset_order : order (subset:erel (set 'a))
 
@@ -233,8 +233,8 @@ end
 
 module SetProofs
 
-  use import FunExt
-  use import Set
+  use FunExt
+  use Set
 
   lemma anti_subset : forall s1 s2:set 'a.
     subset s1 s2 /\ subset s2 s1 -> sext s1 s2
@@ -245,8 +245,8 @@ end
 
 module Image
 
-  use import Fun
-  use import Set
+  use Fun
+  use Set
 
   predicate image (f:'a -> 'b) (s:set 'a) (y:'b) = exists x. s x /\ f x = y
 
@@ -256,8 +256,8 @@ end
 
 module PartialFun "W:non_conservative_extension:N" (* => PartialFunInstance *)
 
-  use import Fun
-  use import Set
+  use Fun
+  use Set
 
   type pfun 'a 'b
 
@@ -305,8 +305,8 @@ end
 
 module PartialFunInstance
 
-  use import FunExt
-  use import Set
+  use FunExt
+  use Set
 
   type o 'a = N | S 'a
 
@@ -363,7 +363,7 @@ end
 module SubFunOrder
 
   use export PartialFun
-  use import Rel
+  use Rel
 
   lemma subfun_order : order (subfun:erel (pfun 'a 'b))
     by forall f g:pfun 'a 'b. subfun f g /\ subfun g f -> f = g by pext f g

@@ -1,12 +1,12 @@
-use import map.Map
-use import array.Array
-use import array.IntArraySorted
-use import array.ArrayPermut
-use import array.ArraySwap
-use import int.Int
-use import ref.Refint
-use import int.Sum
-use import number.Parity
+use map.Map
+use array.Array
+use array.IntArraySorted
+use array.ArrayPermut
+use array.ArraySwap
+use int.Int
+use ref.Refint
+use int.Sum
+use number.Parity
 
 let ghost function array_max (a:array int) : int
   ensures  { forall j. 0 <= j < length a -> a[j] <= result }

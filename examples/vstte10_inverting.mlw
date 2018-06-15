@@ -8,8 +8,8 @@
 
 module InvertingAnInjection
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
   use map.MapInjection as M
 
   predicate injective (a: array int) (n: int) = M.injective a.elts n
@@ -43,8 +43,8 @@ end
 
 module Test
 
-  use import array.Array
-  use import InvertingAnInjection
+  use array.Array
+  use InvertingAnInjection
 
   let test () =
     let a = make 10 0 in

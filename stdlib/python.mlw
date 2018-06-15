@@ -1,7 +1,7 @@
 module Python
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
   use array.Array as A
 
   (* Python's lists are actually resizable arrays, but we simplify here *)
@@ -34,7 +34,7 @@ module Python
 
   (* ad-hoc facts about exchange *)
 
-  use import map.Occ
+  use map.Occ
 
   function occurrence (v: 'a) (l: list 'a) : int =
     Occ.occ v l.A.elts 0 l.A.length
@@ -43,7 +43,7 @@ module Python
      nor computer division, but something else defined in
      https://docs.python.org/3/reference/expressions.html *)
 
-  use import int.Abs
+  use int.Abs
   use int.EuclideanDivision as E
 
   function div (x y: int) : int =

@@ -8,9 +8,9 @@
 
 module MaxAndSum
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   let max_sum (a: array int) (n: int) : (sum: int, max: int)
     requires { n = length a }
@@ -29,10 +29,10 @@ end
 
 module MaxAndSum2
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArraySum
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArraySum
 
   predicate is_max (a: array int) (l h: int) (m: int) =
     (forall k: int. l <= k < h -> a[k] <= m) &&
@@ -56,10 +56,10 @@ end
 
 module TestCase
 
-  use import int.Int
-  use import MaxAndSum2
-  use import array.Array
-  use import array.ArraySum
+  use int.Int
+  use MaxAndSum2
+  use array.Array
+  use array.ArraySum
 
   exception BenchFailure
 

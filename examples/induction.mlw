@@ -26,10 +26,10 @@ end
 (** {2 With a simple induction} *)
 
 module Induction1
-  use import Hyps
+  use Hyps
 
   predicate pr (k: int) = p k && p (k+1)
-  clone import int.SimpleInduction
+  clone int.SimpleInduction
     with predicate p = pr, lemma base, lemma induction_step
 
   goal G: forall n: int. 0 <= n -> p n
@@ -39,9 +39,9 @@ end
 (** {2 With a strong induction} *)
 
 module Induction2
-  use import Hyps
+  use Hyps
 
-  clone import int.Induction
+  clone int.Induction
     with predicate p = p, constant bound = zero
 
   goal G: forall n: int. 0 <= n -> p n
@@ -51,7 +51,7 @@ end
 (** {2 With a recursive lemma function} *)
 
 module LemmaFunction1
-  use import Hyps
+  use Hyps
 
   let rec lemma ind (n: int) requires { 0 <= n} ensures { p n }
     variant { n }
@@ -66,8 +66,8 @@ end
 (** {2 With a while loop} *)
 
 module LemmaFunction2
-  use import Hyps
-  use import ref.Ref
+  use Hyps
+  use ref.Ref
 
   let lemma ind (n: int) requires { 0 <= n} ensures { p n }
     =
@@ -84,8 +84,8 @@ end
 (** {2 With an ascending while loop} *)
 
 module LemmaFunction3
-  use import Hyps
-  use import ref.Ref
+  use Hyps
+  use ref.Ref
 
   let lemma ind (n: int) requires { 0 <= n} ensures { p n }
     =

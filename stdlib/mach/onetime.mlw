@@ -3,7 +3,7 @@
 
 module OneTime
 
-  use import int.Int
+  use int.Int
 
   type t = abstract { v: int; mutable valid: bool }
   meta coercion function v

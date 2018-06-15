@@ -5,12 +5,12 @@
 
 module PQueue
 
-  use import int.Int
-  use import avl.SelectionTypes
-  use import option.Option
-  use import ref.Ref
+  use int.Int
+  use avl.SelectionTypes
+  use option.Option
+  use ref.Ref
   use import seq.Seq as S
-  use import seq.FreeMonoid
+  use seq.FreeMonoid
   use mach.peano.Peano as I
 
   (** {2 Implementation parameters} *)
@@ -213,7 +213,7 @@ module PQueue
 
   (** Conversion from sequences to bags:
       from number of occurences. *)
-  use import seq.Occ
+  use seq.Occ
 
   let ghost function to_bag (s:seq 'a) : 'a -> int =
     fun x -> occ x s 0 (length s)

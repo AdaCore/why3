@@ -7,10 +7,10 @@
 
 module KodaRuskey_Spec
 
-  use import map.Map
-  use import list.List
-  use import list.Append
-  use import int.Int
+  use map.Map
+  use list.List
+  use list.Append
+  use int.Int
 
   type color = White | Black
 
@@ -90,11 +90,11 @@ end
 
 module Lemmas
 
-  use import map.Map
-  use import list.List
-  use import list.Append
-  use import int.Int
-  use import KodaRuskey_Spec
+  use map.Map
+  use list.List
+  use list.Append
+  use int.Int
+  use KodaRuskey_Spec
 
   type stack = list forest
 
@@ -403,14 +403,14 @@ end
 
 module KodaRuskey
 
-  use import seq.Seq as S
-  use import list.List
-  use import KodaRuskey_Spec
-  use import Lemmas
+  use seq.Seq as S
+  use list.List
+  use KodaRuskey_Spec
+  use Lemmas
   use map.Map as M
-  use import array.Array
-  use import int.Int
-  use import ref.Ref
+  use array.Array
+  use int.Int
+  use ref.Ref
 
   val ghost map_of_array (a: array 'a) : M.map int 'a
     ensures { result = a.elts }
@@ -518,14 +518,14 @@ end
 (* wip
 module CountCorrect
 
-  use import seq.Seq as S
+  use seq.Seq as S
   use map.Map as M
-  use import map.Const
-  use import list.List
-  use import int.Int
-  use import KodaRuskey_Spec
-  use import Lemmas
-  use import ref.Ref
+  use map.Const
+  use list.List
+  use int.Int
+  use KodaRuskey_Spec
+  use Lemmas
+  use ref.Ref
 
   predicate id_forest (f: forest) (c1 c2: coloring) =
     forall j. mem_forest j f -> M.get c1 j = M.get c2 j

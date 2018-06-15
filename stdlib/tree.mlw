@@ -1,6 +1,6 @@
 module Tree
 
-  use import list.List
+  use list.List
 
   type forest 'a = list (tree 'a)
   with tree 'a   = Node 'a (forest 'a)
@@ -9,9 +9,9 @@ end
 
 module Size
 
-  use import Tree
-  use import list.List
-  use import int.Int
+  use Tree
+  use list.List
+  use int.Int
 
   let rec function size_forest (f: forest 'a) : int
     ensures { result >= 0 }
@@ -29,7 +29,7 @@ end
 
 module Forest
 
-  use import int.Int
+  use int.Int
 
   type forest 'a =
     | E
@@ -39,8 +39,8 @@ end
 
 module SizeForest
 
-  use import Forest
-  use import int.Int
+  use Forest
+  use int.Int
 
   let rec function size_forest (f: forest 'a) : int
     ensures { result >= 0 }
@@ -53,7 +53,7 @@ end
 
 module MemForest
 
-  use import Forest
+  use Forest
 
   predicate mem_forest (n: 'a) (f: forest 'a) = match f with
     | E -> false

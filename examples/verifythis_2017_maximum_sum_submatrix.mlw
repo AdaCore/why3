@@ -15,20 +15,20 @@ Author: Jean-Christophe Filliâtre (CNRS)
 
 module Kadane2D
 
-  use import int.Int
-  use import ref.Refint
-  use import int.Sum
-  use import array.Array as A
-  use import matrix.Matrix as M
+  use int.Int
+  use ref.Refint
+  use int.Sum
+  use array.Array
+  use matrix.Matrix
 
   (* maximum-sum subarray problem is assumed *)
 
-  function array_sum (a: A.array int) (l h: int) : int
+  function array_sum (a: array int) (l h: int) : int
     = sum (fun i -> a[i]) l h
 
-  val maximum_subarray (a: A.array int) : (s: int, lo: int, hi: int)
-    ensures { 0 <= lo <= hi <= A.length a /\ s = array_sum a lo hi /\
-              forall l h. 0 <= l <= h <= A.length a -> s >= array_sum a l h }
+  val maximum_subarray (a: array int) : (s: int, lo: int, hi: int)
+    ensures { 0 <= lo <= hi <= length a /\ s = array_sum a lo hi /\
+              forall l h. 0 <= l <= h <= length a -> s >= array_sum a l h }
 
   (* sum of a submatrix *)
 
@@ -48,7 +48,7 @@ module Kadane2D
               forall rl rh. 0 <= rl <= rh <= rows m ->
               forall cl ch. 0 <= cl <= ch <= columns m ->
               s >= matrix_sum m rl rh cl ch }
-  = let a = A.make m.columns 0 in
+  = let a = Array.make m.columns 0 in
     let maxsum = ref 0 in
     let rlo = ref 0 in
     let rhi = ref 0 in
@@ -61,7 +61,7 @@ module Kadane2D
       invariant { forall rl' rh. 0 <= rl' < rl -> rl' <= rh <= rows m ->
                   forall cl ch. 0 <= cl <= ch <= columns m ->
                   !maxsum >= matrix_sum m rl' rh cl ch }
-      A.fill a 0 (columns m) 0;
+      fill a 0 (columns m) 0;
       for rh = rl + 1 to rows m do
         invariant { 0 <= !rlo <= !rhi <= rows m }
         invariant { 0 <= !clo <= !chi <= columns m }

@@ -58,7 +58,7 @@ end
 
 module LinearEquationsDecision
 
-use import int.Int
+use int.Int
 type coeff
 
 clone LinearEquationsCoeffs as C with type t = coeff, axiom .
@@ -89,8 +89,8 @@ function interp (e:expr) (y:vars) (z:C.cvars) : C.a
   | Cst c -> C.interp c z
   end
 
-use import bool.Bool
-use import list.List
+use bool.Bool
+use list.List
 
 type equality = (expr, expr)
 type context = list equality
@@ -136,10 +136,10 @@ function interp_ctx (l: context) (g: equality) (y: vars) (z:C.cvars) : bool
   | Cons h t -> (interp_eq h y z) -> (interp_ctx t g y z)
   end
 
-use import mach.int.Int63
-use import seq.Seq
-use import mach.array.Array63
-use import mach.matrix.Matrix63
+use mach.int.Int63
+use seq.Seq
+use mach.array.Array63
+use mach.matrix.Matrix63
 
 let apply_r (m: matrix coeff) (v: array coeff) : array coeff
   requires { v.length = m.columns }
@@ -165,7 +165,7 @@ let apply_l (v: array coeff) (m: matrix coeff) : array coeff
   done;
   r
 
-use import ref.Ref
+use ref.Ref
 
 let sprod (a b: array coeff) : coeff
   requires { a.length = b.length }
@@ -226,8 +226,8 @@ let predicate (==) (a b: array coeff)
     done;
     !r
 
-use import int.MinMax
-use import list.Length
+use int.MinMax
+use list.Length
 
 let rec function max_var (e:expr) : int
   variant { e }
@@ -305,7 +305,7 @@ let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
                  norm_eq_aux e2 ae ac
   end
 
-use import debug.Debug
+use debug.Debug
 
 let norm_eq (e:equality) : (expr, coeff)
   returns { (ex, c) -> forall y z.
@@ -341,7 +341,7 @@ let rec lemma interp_ctx_valid (ctx:context) (g:equality)
   variant  { ctx }
 = match ctx with Nil -> () | Cons _ t -> interp_ctx_valid t g end
 
-use import list.Append
+use list.Append
 
 let rec lemma interp_ctx_wr (ctx l:context) (g:equality)
   ensures { forall y z. interp_ctx ctx g y z -> interp_ctx (ctx ++ l) g y z }
@@ -494,7 +494,7 @@ let rec same_eq (eq1 eq2: equality) : bool
   if zero_expr e && C.eq c1 c2 then true
   else (print (add_expr (Cst C.czero) e); print c1; print c2; false)
 
-use import option.Option
+use option.Option
 
 let rec norm_context (l:context) : context
   ensures { forall g y z. interp_ctx result g y z -> interp_ctx l g y z }
@@ -586,7 +586,7 @@ let addmul_row (m:matrix coeff) (src dst: int63) (c: coeff) : unit
     set m dst j (C.add (get m dst j) (C.mul c (get m src j)))
   done
 
-use import ref.Ref
+use ref.Ref
 
 let gauss_jordan (a: matrix coeff) : option (array coeff)
   (*AX=B, a=(A|B), result=X*)
@@ -828,10 +828,10 @@ end
 
 module RationalCoeffs
 
-use import int.Int
-use import real.RealInfix
-use import real.FromInt
-use import int.Abs
+use int.Int
+use real.RealInfix
+use real.FromInt
+use int.Abs
 
 type t = (int, int)
 type rvars = int -> real
@@ -878,9 +878,9 @@ lemma cross: forall n1 d1 n2 d2: int. d1 <> 0 -> d2 <> 0 ->
              n1 * d2 = n2 * d1 <->
              forall v. rinterp (n1,d1) v = rinterp (n2,d2) v
 
-use import int.ComputerDivision
-use import ref.Ref
-use import number.Gcd
+use int.ComputerDivision
+use ref.Ref
+use number.Gcd
 
 let gcd (x:int) (y:int)
   requires { x > 0 /\ y > 0 }
@@ -982,9 +982,9 @@ end
 
 module LinearDecisionRational
 
-use import RationalCoeffs
-use import real.RealInfix
-use import real.FromInt
+use RationalCoeffs
+use real.RealInfix
+use real.FromInt
 
 clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r, goal .
 
@@ -992,7 +992,7 @@ end
 
 module LinearDecisionInt
 
-use import int.Int
+use int.Int
 
 type t' =  IC int | Error
 
@@ -1034,10 +1034,10 @@ let iinv (t:t') : t'
 clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t', type C.cvars = int->int,function C.interp = interp_id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = izero, val C.cone = ione, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = iadd, val C.mul = imul, val C.opp = iopp, val C.eq = ieq, val C.inv = iinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r, goal .
 
 
-use import real.FromInt
-use import RationalCoeffs
+use real.FromInt
+use RationalCoeffs
 use LinearDecisionRational as R
-use import list.List
+use list.List
 
 let ghost function m_y (y:int -> int): (int -> real)
   ensures { forall i. result i = from_int (y i) }
@@ -1076,8 +1076,8 @@ let rec m_expr (e:expr') : R.expr'
   | ProdR c e -> R.ProdR (m_cprod c) (m_expr e)
   end
 
-use import list.Length
-use import debug.Debug
+use list.Length
+use debug.Debug
 
 let m_eq (eq:equality') : R.equality'
   ensures { forall y z. R.interp_eq' result (m_y y) (m_y z)
@@ -1115,11 +1115,11 @@ end
 
 module Test
 
-use import RationalCoeffs
-use import LinearDecisionRational
-use import int.Int
-use import real.RealInfix
-use import real.FromInt
+use RationalCoeffs
+use LinearDecisionRational
+use int.Int
+use real.RealInfix
+use real.FromInt
 
 meta "compute_max_steps" 0x10000
 meta coercion function from_int
@@ -1132,8 +1132,8 @@ end
 
 module TestInt
 
-use import LinearDecisionInt
-use import int.Int
+use LinearDecisionInt
+use int.Int
 
 meta "compute_max_steps" 0x10000
 
@@ -1147,13 +1147,13 @@ end
 module MP64Coeffs
 
 use mach.int.UInt64 as M
-use import real.RealInfix
-use import real.FromInt
-use import real.PowerReal
+use real.RealInfix
+use real.FromInt
+use real.PowerReal
 use RationalCoeffs as Q
-use import int.Int
+use int.Int
 
-use import debug.Debug
+use debug.Debug
 
 type evars = int -> int
 
@@ -1397,8 +1397,8 @@ end
 
 module LinearDecisionRationalMP
 
-use import MP64Coeffs
-use import real.RealInfix
+use MP64Coeffs
+use real.RealInfix
 
 type coeff = t
 
@@ -1407,9 +1407,9 @@ clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.)
 end
 module LinearDecisionIntMP
 
-use import int.Int
-use import int.Power
-use import MP64Coeffs
+use int.Int
+use int.Power
+use MP64Coeffs
 
 type t = | I int | E exp | R
 
@@ -1455,12 +1455,12 @@ let mpinv (a:t) : t
 clone export LinearEquationsDecision with type C.a = int, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r, goal .
 
 use LinearDecisionRationalMP as R
-use import real.FromInt
-use import real.PowerReal
-use import real.RealInfix
-use import int.Int
+use real.FromInt
+use real.PowerReal
+use real.RealInfix
+use int.Int
 
-use import list.List
+use list.List
 
 predicate pos_exp (t:t) (y:evars)
 = match t with
@@ -1529,7 +1529,7 @@ let function m_eq (eq:equality') : R.equality'
   ensures { valid_eq' eq -> R.valid_eq' result }
 = match eq with (e1,e2) -> (m_expr e1, m_expr e2) end
 
-use import list.Length
+use list.Length
 
 let rec function m_ctx (ctx:context') : R.context'
   ensures { forall y z g. pos_ctx' ctx z -> pos_eq' g z ->
@@ -1559,13 +1559,13 @@ end
 
 module EqPropMP
 
-use import int.Int
-use import LinearDecisionIntMP
-use import array.Array
-use import int.MinMax
-use import option.Option
-use import list.List
-use import list.Append
+use int.Int
+use LinearDecisionIntMP
+use array.Array
+use int.MinMax
+use option.Option
+use list.List
+use list.Append
 
 
 use MP64Coeffs as E
@@ -1749,9 +1749,9 @@ predicate is_eq_tbl (a:array (option E.exp)) (l:context')
   | Some e -> forall y z. y=z -> ctx_holds' l y z
               -> E.interp_exp (E.Var i) z = E.interp_exp e z
   end
-use import int.NumOf
-use import array.NumOfEq
-use import list.Length
+use int.NumOf
+use array.NumOfEq
+use list.Length
 
 let prop_ctx (l:context') (g:equality') : (context', equality')
   requires { valid_ctx' l }
@@ -1972,10 +1972,10 @@ end
 
 module TestMP
 
-use import EqPropMP
-use import mach.int.UInt64
-use import int.Int
-use import int.Power
+use EqPropMP
+use mach.int.UInt64
+use int.Int
+use int.Power
 
 meta "compute_max_steps" 0x10000
 
@@ -2005,8 +2005,8 @@ end
 
 module Test2
 
-use import int.Int
-use import LinearDecisionInt
+use int.Int
+use LinearDecisionInt
 
 meta "compute_max_steps" 0x10000
 
@@ -2019,8 +2019,8 @@ end
 
 module Fmla
 
-use import map.Map
-use import int.Int
+use map.Map
+use int.Int
 
 type value
 constant dummy : value
@@ -2052,7 +2052,7 @@ end
 
 module TestFmla
 
-use import Fmla
+use Fmla
 
 meta "compute_max_steps" 0x10000
 

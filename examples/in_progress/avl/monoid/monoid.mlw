@@ -13,7 +13,7 @@ end
 
 module MonoidList
 
-  use import list.Append
+  use list.Append
   clone import Monoid as M
 
   (* Because definitions cannot be replicated via cloning. *)
@@ -30,7 +30,7 @@ module MonoidList
 end
 
 module MonoidListDef
-  use import list.List
+  use list.List
 
   namespace M
     type t
@@ -49,7 +49,7 @@ end
 
 module ComputableMonoid
 
-  use import program_type.TypeParams
+  use program_type.TypeParams
   clone export program_type.Type0
   clone export Monoid with type t = m
 

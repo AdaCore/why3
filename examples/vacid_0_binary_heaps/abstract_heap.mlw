@@ -3,16 +3,16 @@ module AbstractHeap
 
 (**** logic declarations *****)
 
-use import int.Int
-use import bag.Bag
-use import bag_of_integers.Bag_integers
+use int.Int
+use bag.Bag
+use bag_of_integers.Bag_integers
 
 (* abstract interface for heaps *)
 
 type logic_heap
 function model (h:logic_heap): (bag int)
 
-use import ref.Ref
+use ref.Ref
 
 val create (sz:int) : ref logic_heap
   requires { 0 <= sz }

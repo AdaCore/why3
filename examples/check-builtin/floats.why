@@ -1,12 +1,12 @@
 
 theory TestGappa
 
-   use import real.Real
-   use import real.Abs
-   use import real.Square
-   use import floating_point.Rounding
+   use real.Real
+   use real.Abs
+   use real.Square
+   use floating_point.Rounding
    use floating_point.Single as Single
-   use import floating_point.Double
+   use floating_point.Double
 
   goal Round_single_01:
     Single.round NearestTiesToEven 0.1 = 0x1.99999ap-4

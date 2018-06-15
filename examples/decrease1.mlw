@@ -7,9 +7,9 @@
 
 module Decrease1
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   predicate decrease1 (a: array int) =
     forall i: int. 0 <= i < length a - 1 -> a[i+1] >= a[i] - 1

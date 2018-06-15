@@ -27,7 +27,7 @@ end
 
 module MutableSet
 
-  use import set.Fset
+  use set.Fset
 
   type elt
 
@@ -56,11 +56,11 @@ end
 
 module RemoveDuplicate
 
-  use import Spec
-  use import set.Fset
-  use import MutableSet
-  use import ref.Refint
-  use import array.Array
+  use Spec
+  use set.Fset
+  use MutableSet
+  use ref.Refint
+  use array.Array
 
   let remove_duplicate (a: array elt) : array elt
     requires { 1 <= length a }

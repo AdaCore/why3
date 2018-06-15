@@ -2,8 +2,8 @@
 
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (*  Parameters.
       Without loss of generality, we can take `x1=0` and `y1=0`.
@@ -18,7 +18,7 @@ module M
      i.e. for all `y'`, we have `|y - x*y2/x2| <= |y' - x*y2/x2|`
      We stay in type `int` by multiplying everything by `x2`. *)
 
-  use import int.Abs
+  use int.Abs
 
   predicate best (x2 y2 x y: int) =
     forall y': int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)

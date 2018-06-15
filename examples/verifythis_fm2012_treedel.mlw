@@ -83,13 +83,13 @@ end
 
 module Treedel
 
-  use import Memory
-  use import bintree.Tree
-  use import bintree.Inorder
-  use import list.List
-  use import list.Mem
-  use import list.Append
-  use import list.Distinct
+  use Memory
+  use bintree.Tree
+  use bintree.Inorder
+  use list.List
+  use list.Mem
+  use list.Append
+  use list.Distinct
 
   function root (t: tree loc) : loc =
     match t with

@@ -1,13 +1,13 @@
 
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (** Memory model and definition of is_list *)
   type pointer
 
-  clone import impmap.ImpmapNoDom with type key = pointer
+  clone impmap.ImpmapNoDom with type key = pointer
 
   val constant null: pointer
   val predicate is_null (x: pointer)
@@ -131,9 +131,9 @@ module M
 
   (** behavior *)
 
-  use import list.List
-  use import list.Append
-  use import list.Reverse
+  use list.List
+  use list.Append
+  use list.Reverse
 
   function model (next: t pointer) (p: pointer): list pointer
   (* axiom model_def: forall next: t pointer, p: pointer. *)
@@ -181,13 +181,13 @@ end
 
 module M2
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (** Memory model and definition of is_list *)
   type pointer
 
-  clone import impmap.ImpmapNoDom with type key = pointer
+  clone impmap.ImpmapNoDom with type key = pointer
 
   val constant null: pointer
   val predicate is_null (x: pointer)
@@ -298,9 +298,9 @@ module M2
 
   (** behavior *)
 
-  use import list.List
-  use import list.Append
-  use import list.Reverse
+  use list.List
+  use list.Append
+  use list.Reverse
 
   (* meta "encoding : lskept" function Cons *)
   (* meta "encoding : lskept" function Nil *)

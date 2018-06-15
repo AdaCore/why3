@@ -1,7 +1,7 @@
 
 theory TestBv32
 
-  use import bv.BV32
+  use bv.BV32
 
   lemma Test1:
     let b = bw_and zeros ones in nth b 1 = False
@@ -25,7 +25,7 @@ end
 
 theory NthConvert
 
-  use import mach.int.Int
+  use mach.int.Int
 
   use bv.BV8 as BV8
   use bv.BV64 as BV64

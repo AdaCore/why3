@@ -1,7 +1,7 @@
 
 module Bag
 
-  use import int.Int
+  use int.Int
 
   type bag 'a = 'a -> int
 
@@ -21,8 +21,8 @@ end
 
 module BagSpec
 
-  use import int.Int
-  use import Bag
+  use int.Int
+  use Bag
 
   type t 'a = private {
           mutable size: int;
@@ -47,9 +47,9 @@ end
 
 module ResizableArraySpec
 
-  use import int.Int
-  use import map.Map
-  use import map.Const
+  use int.Int
+  use map.Map
+  use map.Const
 
   type rarray 'a = private {
     ghost mutable len: int;
@@ -90,8 +90,8 @@ end
 
 module BagImpl
 
-  use import int.Int
-  use import Bag
+  use int.Int
+  use Bag
   use import ResizableArraySpec as R
   use map.Map as Map
   use int.NumOf as NumOf
@@ -164,7 +164,7 @@ module BagImpl
     resize t.data n;
     t.size <- n
 
-  clone import BagSpec with
+  clone BagSpec with
     type t = t,
     val create = create,
     val clear = clear,
@@ -174,9 +174,9 @@ end
 
 module Harness
 
-  use import int.Int
-  use import Bag
-  use import BagImpl
+  use int.Int
+  use Bag
+  use BagImpl
 
   let test1 () =
     let b = create () in

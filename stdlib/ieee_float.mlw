@@ -33,12 +33,12 @@ end
 
 module GenericFloat
 
-  use import int.Int
-  use import bv.Pow2int
+  use int.Int
+  use bv.Pow2int
   use real.Abs as Abs
   use real.FromInt as FromInt
   use real.Truncate as Truncate
-  use import real.RealInfix
+  use real.RealInfix
   use export RoundingMode
 
   (** {2 Part I - Public Interface}   *)
@@ -793,7 +793,7 @@ module Float_BV_Converter
   use bv.BV16 as BV16
   use bv.BV32 as BV32
   use bv.BV64 as BV64
-  use import RoundingMode
+  use RoundingMode
 
   (* with unsigned int as bitvector *)
   type t                        (* float *)
@@ -808,7 +808,7 @@ module Float_BV_Converter
   function to_ubv32 mode t : BV32.t
   function to_ubv64 mode t : BV64.t
 
-  use import real.RealInfix
+  use real.RealInfix
   use real.FromInt as FromInt
 
   predicate is_finite t
@@ -846,7 +846,7 @@ end
 
 module Float32
   use int.Int as Int
-  use import real.Real
+  use real.Real
 
   type t = < float 8 24 >
 
@@ -882,7 +882,7 @@ end
 
 module Float64
   use int.Int as Int
-  use import real.Real
+  use real.Real
 
   type t = < float 11 53 >
 
@@ -944,7 +944,7 @@ module FloatConverter
 end
 
 module Float32_BV_Converter
-  use import Float32
+  use Float32
 
   clone export Float_BV_Converter with
     type t = t,
@@ -959,7 +959,7 @@ module Float32_BV_Converter
 end
 
 module Float64_BV_Converter
-  use import Float64
+  use Float64
 
   clone export Float_BV_Converter with
     type t = t,

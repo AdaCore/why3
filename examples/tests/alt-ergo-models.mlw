@@ -11,7 +11,7 @@ DONE: modele donné apres timeout
 
 module M1
 
-  use import int.Int
+  use int.Int
 
   let f (x [@model:0]:int) : int
     ensures { [@model:post] result <= 50 }
@@ -21,7 +21,7 @@ module M1
     ensures { result <= 50 }
   = if x >= 42 then x + 3 else 0
 
-  use import ref.Ref
+  use ref.Ref
 
   let g (x : ref int) : int
     ensures { result <= 50 }

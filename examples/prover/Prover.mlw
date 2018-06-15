@@ -1,8 +1,8 @@
 
 module Types
 
-  use import Functions.Func
-  use import Firstorder_term_spec.Spec
+  use Functions.Func
+  use Firstorder_term_spec.Spec
 
   (* The prover return a contradictory assignment.
      To be perfectly correct, its initial
@@ -17,16 +17,16 @@ end
 
 module Logic
 
-  use import FormulaTransformations.Types
-  use import FormulaTransformations.Logic
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_tableau_spec.Spec
-  use import Functions.Func
-  use import bool.Bool
-  use import Firstorder_semantics.Sem
+  use FormulaTransformations.Types
+  use FormulaTransformations.Logic
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_spec.Spec
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_term_spec.Spec
+  use Firstorder_tableau_spec.Spec
+  use Functions.Func
+  use bool.Bool
+  use Firstorder_semantics.Sem
 
   predicate is_atom_list (phil:fo_formula_list 'ls 'b) = match phil with
     | FOFNil -> true
@@ -90,44 +90,44 @@ end
 
 module Impl
 
-  use import Firstorder_semantics.Sem
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
-  use import Firstorder_tableau_impl.Types
-  use import Firstorder_tableau_impl.Logic
-  use import Firstorder_tableau_impl.Impl
-  use import FormulaTransformations.Types
-  use import FormulaTransformations.Logic
-  use import FormulaTransformations.Impl
-  use import Unification.Types
-  use import Unification.Logic
-  use import Unification.Impl
-  use import BacktrackArray.Logic
-  use import BacktrackArray.Impl
-  use import Functions.Func
-  use import option.Option
-  use import OptionFuncs.Funcs
-  use import bool.Bool
-  use import int.Int
-  use import Types
-  use import Logic
-  use import ref.Ref
-  use import list.List
+  use Firstorder_semantics.Sem
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
+  use Firstorder_tableau_impl.Types
+  use Firstorder_tableau_impl.Logic
+  use Firstorder_tableau_impl.Impl
+  use FormulaTransformations.Types
+  use FormulaTransformations.Logic
+  use FormulaTransformations.Impl
+  use Unification.Types
+  use Unification.Logic
+  use Unification.Impl
+  use BacktrackArray.Logic
+  use BacktrackArray.Impl
+  use Functions.Func
+  use option.Option
+  use OptionFuncs.Funcs
+  use bool.Bool
+  use int.Int
+  use Types
+  use Logic
+  use ref.Ref
+  use list.List
 
   exception Failure
 

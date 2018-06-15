@@ -50,7 +50,7 @@ module PigeonHole
 
 *)
 
-  use import int.Int
+  use int.Int
 
   predicate range (f: int -> int) (n: int) (m:int) =
     forall i: int. 0 <= i < n -> 0 <= f i < m
@@ -116,9 +116,9 @@ end
 
 module PatienceCode
 
-  use import int.Int
-  use import list.List
-  use import list.RevAppend
+  use int.Int
+  use list.List
+  use list.RevAppend
 
   (** this code was the one written initially, without any
       specification, except for termination, ans unreachability
@@ -210,7 +210,7 @@ end
 
 module PatienceAbstract
 
-  use import int.Int
+  use int.Int
 
 (** To specify the expected property of the Patience game, we first
     provide an abstract version, working on a abstract state that
@@ -228,8 +228,8 @@ module PatienceAbstract
 
   (** {3 Abstract state} *)
 
-  use import map.Map
-  use import map.Const
+  use map.Map
+  use map.Const
 
   type state = {
     ghost mutable num_stacks : int;
@@ -312,7 +312,7 @@ module PatienceAbstract
 
   (** {2 Programs} *)
 
-  use import ref.Ref
+  use ref.Ref
   exception Return int
 
   (** `play_card c i s` pushes the card `c` on state `s` *)
@@ -380,9 +380,9 @@ module PatienceAbstract
 
 
 
-  use import list.List
-  use import list.Length
-  use import list.NthNoOpt
+  use list.List
+  use list.Length
+  use list.NthNoOpt
 
 
 
@@ -424,7 +424,7 @@ module PatienceAbstract
 
 
 
-  use import PigeonHole
+  use PigeonHole
 
 
 
@@ -539,16 +539,16 @@ end
 
 module PatienceFull
 
-  use import int.Int
-  use import PatienceAbstract
+  use int.Int
+  use PatienceAbstract
 
 
 (** glue between the ghost state and the stacks of cards *)
 
-  use import list.List
-  use import list.Length
-  use import list.NthNoOpt
-  use import map.Map
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+  use map.Map
 
   predicate glue_stack (s:state) (i:int) (st:list card) =
       length st = s.stack_sizes[i] /\
@@ -566,8 +566,8 @@ module PatienceFull
 
 (** {3 playing a card} *)
 
-  use import list.RevAppend
-  use import ref.Ref
+  use list.RevAppend
+  use ref.Ref
   exception Return
 
 
@@ -775,7 +775,7 @@ module PatienceFull
           nth sigma.seqval[i] l < nth sigma.seqval[j] l)
        (** the card values denoted by [sigma] are increasing *)
 
-  use import PigeonHole
+  use PigeonHole
 
   let play_game (input: list card) : list (list card)
     requires { length input > 0 }

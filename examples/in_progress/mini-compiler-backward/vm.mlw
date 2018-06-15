@@ -31,11 +31,11 @@ end
 
 module Vm "Virtual Machine for IMP language"
 
-  use import state.State
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
 
   type pos = int                           (* read position on stack        *)
   type stack = list int                    (* stack contains just integers  *)
@@ -148,15 +148,15 @@ end
 
 module VMClock
 
-  use import state.State
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import list.Nth
-  use import list.NthLengthAppend
-  use import option.Option
-  use import Vm
+  use state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Nth
+  use list.NthLengthAppend
+  use option.Option
+  use Vm
 
   type clock_state = VMC pos stack state int
   type parameter = (code,clock_state -> bool)

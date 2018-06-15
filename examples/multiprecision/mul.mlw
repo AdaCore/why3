@@ -1,17 +1,17 @@
 module Mul
 
-  use import int.Int
-  use import mach.int.Int32
+  use int.Int
+  use mach.int.Int32
   use import mach.int.UInt64GMP as Limb
-  use import int.Power
-  use import ref.Ref
-  use import mach.c.C
-  use import array.Array
-  use import map.Map
-  use import types.Types
-  use import lemmas.Lemmas
-  use import util.Util
-  use import add.Add
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use util.Util
+  use add.Add
 
 
     (** `mul_limb r x y sz` multiplies `x[0..sz-1]` by the limb `y` and

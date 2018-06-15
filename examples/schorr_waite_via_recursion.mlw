@@ -27,9 +27,9 @@
     and arbitrary-sized memory blocks. *)
 module Memory
 
-  use import int.Int
-  use import option.Option
-  use import map.Map
+  use int.Int
+  use option.Option
+  use map.Map
   (** Memory locations *)
   type loc
   (** Null pointer *)
@@ -101,10 +101,10 @@ end
 (** Define notions about the memory graph *)
 module GraphShape
 
-  use import int.Int
-  use import set.Fset
-  use import map.Map
-  use import Memory
+  use int.Int
+  use set.Fset
+  use map.Map
+  use Memory
 
   predicate black (c:color) = c <> White
 
@@ -133,14 +133,14 @@ end
 (** Proof of Schorr-Waite algorithm *)
 module SchorrWaite
 
-  use import int.Int
-  use import option.Option
-  use import set.Fset
-  use import map.Map
-  use import map.Const
-  use import ref.Ref
-  use import Memory
-  use import GraphShape
+  use int.Int
+  use option.Option
+  use set.Fset
+  use map.Map
+  use map.Const
+  use ref.Ref
+  use Memory
+  use GraphShape
 
   let black (l: loc) : bool
     requires { l <> null }

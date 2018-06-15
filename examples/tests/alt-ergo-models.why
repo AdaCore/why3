@@ -1,7 +1,7 @@
 
 theory T
 
-  use import int.Int
+  use int.Int
 
   goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
 
@@ -20,13 +20,13 @@ end
 
 theory ModelInt
 
-use import int.Int
+use int.Int
 
 goal test0 : forall x [@model:0]:int. not (0 < x < 1)
 
 goal test1 : forall x [@model:0]:int. not (0 <= x <= 1)
 
-use import int.EuclideanDivision
+use int.EuclideanDivision
 
 goal test2 : forall x [@model:0]:int. div x x = 1
 
@@ -71,7 +71,7 @@ end
 
 theory ModelReal
 
-use import real.Real
+use real.Real
 
 goal test1 : forall x [@model:0]:real. not (0.0 < x < 1.0)
 
@@ -81,7 +81,7 @@ end
 
 theory ModelArray
 
-use import map.Map
+use map.Map
 
 goal t1 : forall t [@model:0] :map int int, i [@model:0] : int.
    get (set t 0 42) i = get t i

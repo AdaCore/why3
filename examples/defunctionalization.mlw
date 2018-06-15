@@ -58,7 +58,7 @@ end
 
 module DirectSem
 
-use import Expr
+use Expr
 
 (** Values:
 {h <blockquote><pre>
@@ -133,7 +133,7 @@ end
 
 module CPS
 
-use import Expr
+use Expr
 
 (** {4 Exercise 0.1}
 
@@ -147,7 +147,7 @@ use import Expr
 
 *)
 
-use import DirectSem
+use DirectSem
 
 let rec eval_1 (e:expr) (k: int->'a) : 'a
   variant { e }
@@ -170,8 +170,8 @@ end
 
 module Defunctionalization
 
-use import Expr
-use import DirectSem
+use Expr
+use DirectSem
 
 (** {4 Exercise 0.2}
 
@@ -282,8 +282,8 @@ end
 
 module Defunctionalization2
 
-use import Expr
-use import DirectSem
+use Expr
+use DirectSem
 
 (** {4 Exercise 0.2}
 
@@ -392,7 +392,7 @@ end
 
 module SemWithError
 
-use import Expr
+use Expr
 
 (** Errors:
 {h <blockquote><pre>
@@ -734,8 +734,8 @@ module ReductionSemantics
 A small step semantics, defined iteratively with reduction contexts
 *)
 
-  use import Expr
-  use import DirectSem
+  use Expr
+  use DirectSem
 
 (**
 Expressions:
@@ -1076,8 +1076,8 @@ end
 
 module RWithError
 
-use import Expr
-use import SemWithError
+use Expr
+use SemWithError
 
 (** {4 Exercise 2.3}
   An abstract machine for the case with errors

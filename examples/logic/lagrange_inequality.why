@@ -10,8 +10,8 @@ sum_squares a  \times sum_squares b = (scalar product a.b)^2 +
 sum {1 <= i <j <=n} (a_i b_j - a_j b_i)^2
 *)
 
-  use import real.Real
-  use import real.Square
+  use real.Real
+  use real.Square
 
   (** dot product, a.k.a. scalar product, of two vectors *)
   function dot (x1:real) (x2:real) (y1:real) (y2:real) : real =
@@ -36,9 +36,9 @@ end
 theory CauchySchwarzInequality
 
 
-  use import real.Real
-  use import real.Square
-  use import LagrangeInequality
+  use real.Real
+  use real.Square
+  use LagrangeInequality
 
   lemma CauchySchwarz_aux:
      forall x1 x2 y1 y2 : real.
@@ -64,10 +64,10 @@ end
 
 theory TriangleInequality
 
-  use import real.Real
-  use import real.Square
-  use import LagrangeInequality
-  use import CauchySchwarzInequality
+  use real.Real
+  use real.Square
+  use LagrangeInequality
+  use CauchySchwarzInequality
 
 (** Triangle inequality, proved thanks to
   ||x+y||² = ||x||² + 2<x,y> + ||y||²

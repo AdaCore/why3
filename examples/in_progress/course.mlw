@@ -1,11 +1,11 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (* preliminaries *)
 
-  clone import appmap.Appmap as M with type key = int
+  clone appmap.Appmap with type key = int
 
   type array 'a = t 'a
 

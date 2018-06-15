@@ -21,7 +21,7 @@
 
 theory Bitset
 
-  use import int.Int
+  use int.Int
 
   constant size : int (* elements belong to 0..size-1 *)
 
@@ -59,9 +59,9 @@ end
 
 module HashTable
 
-  use import option.Option
-  use import int.Int
-  use import map.Map
+  use option.Option
+  use int.Int
+  use map.Map
 
   type t 'a 'b = private { ghost mutable contents: map 'a (option 'b) }
 
@@ -85,13 +85,13 @@ end
 
 module MaxMatrixMemo
 
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
-  use import Bitset
-  use import map.Map
+  use int.Int
+  use int.MinMax
+  use ref.Ref
+  use Bitset
+  use map.Map
 
-  clone import appmap.Appmap with type key = int, axiom .
+  clone appmap.Appmap with type key = int, axiom .
 
   val constant n : int
     ensures { 0 <= result <= size }
@@ -108,13 +108,13 @@ module MaxMatrixMemo
   predicate permutation (s: mapii) = solution s 0
 
   function f (s: mapii) (i: int) : int = m[i][Map.get s i]
-  clone import sum.Sum with type container = mapii, function f = f, axiom .
+  clone sum.Sum with type container = mapii, function f = f, axiom .
 
   lemma sum_ind:
     forall i: int. i < n -> forall j: int.
     forall s: mapii. sum (Map.set s i j) i n = m[i][j] + sum s (i+1) n
 
-  use import option.Option
+  use option.Option
   use HashTable as H
 
   type key = (int, set)

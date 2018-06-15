@@ -75,8 +75,8 @@ end
 module TreeReconstruction
 
   use export Tree
-  use import list.Length
-  use import list.HdTlNoOpt
+  use list.Length
+  use list.HdTlNoOpt
 
   exception Failure
     (* used to signal the algorithm's failure i.e. there is no tree *)
@@ -111,7 +111,7 @@ end
 
 module Harness
 
-  use import TreeReconstruction
+  use TreeReconstruction
 
   let harness ()
     ensures { result = Node Leaf (Node (Node Leaf Leaf) Leaf) }
@@ -146,9 +146,9 @@ end
 
 module ZipperBasedTermination
 
-  use import Tree
-  use import list.Length
-  use import list.Reverse
+  use Tree
+  use list.Length
+  use list.Reverse
 
   exception Failure
 
@@ -173,9 +173,9 @@ end
 
 module ZipperBased
 
-  use import Tree
-  use import list.Length
-  use import list.Reverse
+  use Tree
+  use list.Length
+  use list.Reverse
 
   (* the following function generalizes function [depths] to a forest, that
      is a list of pairs (depth, tree) *)

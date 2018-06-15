@@ -3,7 +3,7 @@
    properly. *)
 theory ParamsTypes
 
-  use import int.Int
+  use int.Int
   type view_base 'c 'd =
     | VEmpty
     | VNode 'c 'd 'c int
@@ -19,7 +19,7 @@ end
    constant. *)
 module Params
 
-  use import int.Int
+  use int.Int
 
   (* type for data stored in the nodes. *)
   clone program_type.Type2 as Data
@@ -65,11 +65,11 @@ end
 (* AVL, modeled as a doubly-ended list + a non-negative height. *)
 module AVL
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import option.Option
-  use import ref.Ref
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use option.Option
+  use ref.Ref
 
   (* AVL Parameters. *)
   clone import Params as P
@@ -477,7 +477,7 @@ module AVL
      but this is O(n*log(n)), while this method is O(n). *)
   namespace Enum
 
-    use import list.Reverse
+    use list.Reverse
 
     (* Missing in list.Reverse. *)
     let rec lemma reverse_append_gen (l1 l2:list 'a) : unit
@@ -528,7 +528,7 @@ module AVL
   (* Trick to avoid aliasing. *)
   namespace Enum
 
-    use import list.Reverse
+    use list.Reverse
     let empty_enum (ghost ltr:bool)
       (ghost dinv:Data.m 'a 'b -> bool) : Enum.t 'a 'b
       ensures { result.Enum.m.Enum.left_to_right = ltr }
@@ -616,8 +616,8 @@ end
 
 theory SelectionTypes
 
-  use import list.List
-  use import option.Option
+  use list.List
+  use option.Option
 
   type position_base 'a = {
     left : list 'a;
@@ -651,10 +651,10 @@ end
      The result would be unspecified within the set of selected elements. *)
 module Selection
 
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import option.Option
+  use int.Int
+  use bool.Bool
+  use list.Append
+  use option.Option
 
   clone export AVL
   use export SelectionTypes
@@ -712,7 +712,7 @@ module Selection
         forall e. selected sr.S.m e ->
         selected s.S.m { e with left = node_model l.m.lis d.P.Data.m e.left } }
 
-  use import ref.Ref
+  use ref.Ref
 
   let ghost default_position () : position 'a 'b =
     { left = Nil; middle = None; right = Nil }
@@ -863,12 +863,12 @@ end
    Those implement ordered associative tables. *)
 module AVLSorted
 
-  use import int.Int
-  use import option.Option
-  use import bool.Bool
-  use import list.Append
-  use import list.Mem
-  use import list.Length
+  use int.Int
+  use option.Option
+  use bool.Bool
+  use list.Append
+  use list.Mem
+  use list.Length
 
   clone import AVL as A
 
@@ -1031,8 +1031,8 @@ module AVLSorted
   (* And we would get this (or something close).
      Right now, this is done by hand. *)
 
-  namespace import F
-    use import ref.Ref
+  scope import F
+    use ref.Ref
 
     lemma selected_append : forall s,e,l:list_model 'a 'b.
       selected s e l /\ selector_correct s l -> match e.middle with
@@ -1248,7 +1248,7 @@ module AVLSorted
       else ()
     end
 
-  use import ref.Ref
+  use ref.Ref
 
   let map_empty (o:order 'a) (inv:data_model 'a 'b -> bool) : map 'a 'b
     requires { forall d. inv d -> correct_for_order o (get_key_m d) }

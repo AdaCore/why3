@@ -1,21 +1,21 @@
 
 module Types
 
-  use import Functions.Func
+  use Functions.Func
   (*use import Assoc.Types as AS
   use import Assoc.Logic as AS
   use import Assoc.Impl as AS*)
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
 
   type sdata = PConflict nlimpl_fo_term_list nlimpl_fo_term_list
     | Assign nlimpl_fo_term
@@ -41,22 +41,22 @@ end
 
 module Logic
 
-  use import int.Int
-  use import Functions.Func
-  use import option.Option
+  use int.Int
+  use Functions.Func
+  use option.Option
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import list.List
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Types
+  use list.List
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Types
 
   constant sdata_inv : sdata -> bool
   axiom sdata_inv_def : forall x:sdata.
@@ -206,25 +206,25 @@ end
 
 module Impl
 
-  use import int.Int
-  use import Functions.Func
-  use import option.Option
+  use int.Int
+  use Functions.Func
+  use option.Option
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import list.List
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Types
-  use import Logic
-  use import ref.Ref
-  use import list.Mem
+  use list.List
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Types
+  use Logic
+  use ref.Ref
+  use list.Mem
 
   exception UnificationFailure
 

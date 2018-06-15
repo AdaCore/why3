@@ -4,10 +4,10 @@ module Sum
 
   (* computes the sum a[1] + ... + a[n] *)
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArraySum
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArraySum
 
   let sum (a: array int) (n: int)
     requires { 0 <= n < a.length }
@@ -32,8 +32,8 @@ module Division
      we do not seek for a variant which decreases at each statement, but
      only at each execution of the loop body. *)
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   let division (x: int) (y: int) : (q: int, r: int)
     requires { 0 <= x /\ 0 < y }

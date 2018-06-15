@@ -23,7 +23,7 @@ end
 
 theory Step1 (* k <= f(n+k) by induction over k *)
 
-  use import Puzzle
+  use Puzzle
 
   predicate p (k: int) = forall n: int. 0 <= n -> k <= f (n+k)
   clone int.SimpleInduction as I1
@@ -33,8 +33,8 @@ end
 
 theory Solution
 
-  use import Puzzle
-  use import Step1
+  use Puzzle
+  use Step1
 
   lemma L3: forall n: int. 0 <= n -> n <= f n && f n <= f (f n)
   lemma L4: forall n: int. 0 <= n -> f n < f (n+1)

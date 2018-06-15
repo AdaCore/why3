@@ -1,14 +1,14 @@
 module Compare
 
-  use import int.Int
-  use import mach.int.Int32
+  use int.Int
+  use mach.int.Int32
   use import mach.int.UInt64GMP as Limb
-  use import int.Power
-  use import ref.Ref
-  use import mach.c.C
-  use import map.Map
-  use import types.Types
-  use import lemmas.Lemmas
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
 
   function compare_int (x y:int) : int =
     if x < y then -1 else if x=y then 0 else 1

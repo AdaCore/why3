@@ -5,17 +5,17 @@ module DfaExample
 
   type char = Zero | One
 
-  clone import regexp.Regexp with type char = char
+  clone regexp.Regexp with type char = char
 
   (** mutable input stream *)
 
-  use import option.Option
+  use option.Option
 
   type stream = abstract { mutable state: list char }
 
   val input: stream
 
-  use import list.Length
+  use list.Length
 
   val get () : option char writes {input}
     ensures { match old input.state with

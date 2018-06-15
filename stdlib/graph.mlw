@@ -3,8 +3,8 @@
 
 module Path
 
-  use import list.List
-  use import list.Append
+  use list.List
+  use list.Append
 
   type vertex
 
@@ -45,9 +45,9 @@ end
 module IntPathWeight
 
   clone export Path
-  use import int.Int
-  use import list.List
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Append
 
   val function weight vertex vertex : int
 
@@ -72,8 +72,8 @@ end
 (***
 module SimplePath
 
-  use import list.List
-  use import list.Mem
+  use list.List
+  use list.Mem
 
   type graph
 

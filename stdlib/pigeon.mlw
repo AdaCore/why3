@@ -3,8 +3,8 @@
 
 module Pigeonhole
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
 
   let rec lemma pigeonhole (n m: int) (f: int -> int)
     requires { 0 <= m < n }
@@ -32,12 +32,12 @@ end
 
 module ListAndSet
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
   use list.Mem as Mem
-  use import set.Fset
+  use set.Fset
 
   type t
 

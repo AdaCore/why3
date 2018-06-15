@@ -1,6 +1,6 @@
 theory Test
 
-  clone import regexp.Regexp with type char = int
+  clone regexp.Regexp with type char = int
 
   lemma empty_is_empty: forall w: word. not (mem w Empty)
 

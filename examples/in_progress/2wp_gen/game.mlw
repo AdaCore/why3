@@ -7,11 +7,11 @@
    strategy, hence the asymetry. *)
 module Game
 
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import order.LimUniq
-  use import order.Chain
-  use import transfinite.ExtensionDef
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.LimUniq
+  use order.Chain
+  use transfinite.ExtensionDef
 
   type game 'a = {
     (* Progress relation: a play must follow the progression
@@ -101,8 +101,8 @@ end
 (* A few basic properties of strategies on such games. *)
 module BasicStrats "W:non_conservative_extension:N" (* => BasicStratsProof *)
 
-  use import Game
-  use import ho_set.Set
+  use Game
+  use ho_set.Set
 
   axiom have_uniform_winning_strat_quantifier_inversion :
     forall g:game 'a,start win.
@@ -133,15 +133,15 @@ end
 
 module BasicStratsProof
 
-  use import Game
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import choice.Choice
-  use import order.SubChain
-  use import order.LimUniq
-  use import fn.Fun
-  use import transfinite.ExtensionDet
-  use import transfinite.Transport
+  use Game
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use choice.Choice
+  use order.SubChain
+  use order.LimUniq
+  use fn.Fun
+  use transfinite.ExtensionDet
+  use transfinite.Transport
 
   (* Obvious way of the equivalence. *)
   lemma have_uniform_winning_strat_quantifier_inversion_1 :

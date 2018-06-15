@@ -1,7 +1,7 @@
 
 theory FibonacciTest
 
-  use import int.Fibonacci
+  use int.Fibonacci
 
   lemma isfib_2_1 : fib 2 = 1
   lemma isfib_6_8 : fib 6 = 8
@@ -12,9 +12,9 @@ end
 
 module FibonacciLinear
 
-  use import int.Fibonacci
-  use import int.Int
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use ref.Ref
 
   let fib (n:int) : int
     requires { n >= 0 }
@@ -35,8 +35,8 @@ end
 
 module FibRecGhost
 
-  use import int.Fibonacci
-  use import int.Int
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
     requires { k >= 0 }
@@ -63,8 +63,8 @@ end
 
 module FibRecNoGhost
 
-  use import int.Fibonacci
-  use import int.Int
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (a b k: int) : int
     requires { k >= 0 }
@@ -83,10 +83,10 @@ end
 
 module SmallestFibAbove
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
 
   let smallest_fib_above (x: int) : int
     requires { 0 <= x }
@@ -117,12 +117,12 @@ Cf https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem
 
 module Zeckendorf
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
-  use import list.List
-  use import SmallestFibAbove
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
+  use list.List
+  use SmallestFibAbove
 
   function sum (l: list int) : int = match l with
   | Nil -> 0
@@ -265,7 +265,7 @@ end
 
 theory Mat22
 
-  use import int.Int
+  use int.Int
 
   type t = { a11: int; a12: int; a21: int; a22: int }
 
@@ -287,10 +287,10 @@ end
 
 module FibonacciLogarithmic
 
-  use import int.Int
-  use import int.Fibonacci
-  use import int.ComputerDivision
-  use import Mat22
+  use int.Int
+  use int.Fibonacci
+  use int.ComputerDivision
+  use Mat22
 
   val constant m1110 : t
     ensures { result = { a11 = 1; a12 = 1;

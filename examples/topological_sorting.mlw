@@ -45,13 +45,13 @@ end
 (** static topological sorting by depth-first search *)
 module Static
 
-  use import ref.Ref
-  use import Graph
+  use ref.Ref
+  use Graph
   use set.Fset as Fset
 
   clone impset.Impset as S with type elt = vertex
   clone appset.Appset as SA with type elt = vertex
-  clone import impmap.ImpmapNoDom with type key = vertex
+  clone impmap.ImpmapNoDom with type key = vertex
 
   val ghost function defined_sort (m: t int): Fset.set vertex
     ensures { forall v: vertex [Fset.mem v result].
@@ -140,9 +140,9 @@ A New Approach to Incremental Topological Ordering
 *)
 module Online_Basic
 
-  use import ref.Ref
-  use import Online_graph
-  use import set.Fset
+  use ref.Ref
+  use Online_graph
+  use set.Fset
 
   clone impset.Impset as S with type elt = vertex
   clone appset.Appset as SA with type elt = vertex

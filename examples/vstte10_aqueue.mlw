@@ -8,9 +8,9 @@
 
 module AmortizedQueue
 
-  use import int.Int
-  use import option.Option
-  use import list.ListRich
+  use int.Int
+  use option.Option
+  use list.ListRich
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }

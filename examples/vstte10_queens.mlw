@@ -8,8 +8,8 @@
 
 module NQueens
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   predicate eq_board (b1 b2: array int) (pos: int) =
     forall q. 0 <= q < pos -> b1[q] = b2[q]
@@ -114,7 +114,7 @@ module NQueens
 
       TODO: prove soundness i.e. we indeed count the number of solutions *)
 
-  use import ref.Refint
+  use ref.Refint
 
   let rec count_bt_queens (board: array int) (n: int) (pos: int) : int
     variant  { n - pos }
@@ -148,11 +148,11 @@ end
 
 module NQueens63
 
-  use import int.Int
-  use import ref.Refint
-  use import seq.Seq
-  use import mach.array.Array63
-  use import mach.int.Int63
+  use int.Int
+  use ref.Refint
+  use seq.Seq
+  use mach.array.Array63
+  use mach.int.Int63
 
   predicate is_board (board: array int63) (pos: int) =
     forall q. 0 <= q < pos -> 0 <= board[q] < (length board)

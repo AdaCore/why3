@@ -5,9 +5,9 @@
 (* Few Definitions. *)
 module ExtensionDef
 
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.Chain
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.Chain
 
   (* Transfinite extensions of a base chain [chb] respectively to an order [o],
      and a successor relation [succ]:
@@ -51,9 +51,9 @@ end
 (* Few simple lemmas on general extensions (e.g transfinite trees) *)
 module Extension "W:non_conservative_extension:N" (* => ExtensionProof *)
 
-  use import order.Chain
-  use import ho_set.Set
-  use import ho_set.SetBigOps
+  use order.Chain
+  use ho_set.Set
+  use ho_set.SetBigOps
   use export ExtensionDef
 
   (* Transfinite extension indeed produces extensions. *)
@@ -92,9 +92,9 @@ end
 (* Extra lemmas for deterministic extensions *)
 module ExtensionDet "W:non_conservative_extension:N" (* => ExtensionProof *)
 
-  use import order.Chain
-  use import ho_set.Set
-  use import ho_set.SetBigOps
+  use order.Chain
+  use ho_set.Set
+  use ho_set.SetBigOps
   use export Extension
 
   (* Obviously, if an extension is deterministic it is an extension. *)
@@ -178,9 +178,9 @@ end
   of a given relation to be reached by another as well. *)
 module TransportDef
 
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import order.Chain
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Chain
 
   (* If h2 is an extension of h1 for o and some successor relation
      (notably the 'maximal' upper_bound relation !),
@@ -196,9 +196,9 @@ end
 
 module Transport "W:non_conservative_extension:N" (* => TransportProof *)
 
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import ExtensionDef
+  use ho_set.Set
+  use ho_rel.Rel
+  use ExtensionDef
   use export TransportDef
 
   axiom transport : forall o succ1 succ2,h1 h2:set 'a.
@@ -214,12 +214,12 @@ end
 
 module ExtensionProof
 
-  use import ExtensionDef
-  use import order.Chain
-  use import order.SubChain
-  use import fn.Fun
-  use import ho_set.Set
-  use import ho_set.SetBigOps
+  use ExtensionDef
+  use order.Chain
+  use order.SubChain
+  use fn.Fun
+  use ho_set.Set
+  use ho_set.SetBigOps
 
   lemma tr_ext_compare : forall o succ,h1 h2:set 'a.
     (transitive o /\ tr_succ o succ -> ("induction" tr_ext o succ h1 h2) ->
@@ -481,13 +481,13 @@ end
 
 module TransportProof
 
-  use import TransportDef
-  use import Extension
-  use import order.Chain
-  use import order.SubChain
-  use import fn.Fun
-  use import ho_set.Set
-  use import ho_set.SetBigOps
+  use TransportDef
+  use Extension
+  use order.Chain
+  use order.SubChain
+  use fn.Fun
+  use ho_set.Set
+  use ho_set.SetBigOps
 
   lemma transport : forall o succ1 succ2,h1 h2:set 'a.
     transitive o /\ tr_succ o succ1 /\ tr_ext o succ1 h1 h2 /\

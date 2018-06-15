@@ -27,8 +27,8 @@ type fmla =
   | Flet ident term fmla
   | Fforall ident datatype fmla
 
-use import int.Int
-use import bool.Bool
+use int.Int
+use bool.Bool
 
 type value =
   | Vint int
@@ -261,8 +261,8 @@ end
 
 theory TestSemantics
 
-use import Imp
-use import map.Const
+use Imp
+use map.Const
 
 function my_sigma : env = Const.const (Vint 0)
 function my_pi : env = Const.const (Vint 42)
@@ -302,7 +302,7 @@ end
 
 theory HoareLogic
 
-use import Imp
+use Imp
 
 
 (** Hoare logic rules (partial correctness) *)
@@ -360,7 +360,7 @@ end
 
 module WP
 
-use import Imp
+use Imp
 
 use set.Fset as Set
 
@@ -425,7 +425,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
            eval_fmla sigma' pi' result
      }
 
-  use import HoareLogic
+  use HoareLogic
 
   let rec wp (i:stmt) (q:fmla)
     ensures { valid_triple result i q }

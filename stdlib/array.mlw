@@ -9,8 +9,8 @@ modification of an array does not modify its length.
 
 module Array
 
-  use import int.Int
-  use import map.Map as M
+  use int.Int
+  use map.Map as M
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -25,7 +25,7 @@ module Array
 
   val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
     ensures { result.length = a.length }
-    ensures { result.elts = a.elts[i <- v] }
+    ensures { result.elts = M.set a.elts i v }
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < length a }
@@ -128,7 +128,7 @@ end
 
 module Init
 
-  use import int.Int
+  use int.Int
   use export Array
 
   val init (n: int) (f: int -> 'a) : array 'a
@@ -143,9 +143,9 @@ end
 
 module IntArraySorted
 
-  use import int.Int
-  use import Array
-  clone import map.MapSorted as M with type elt = int, predicate le = (<=)
+  use int.Int
+  use Array
+  clone map.MapSorted as M with type elt = int, predicate le = (<=)
 
   predicate sorted_sub (a : array int) (l u : int) =
     M.sorted_sub a.elts l u
@@ -160,8 +160,8 @@ end
 
 module Sorted
 
-  use import int.Int
-  use import Array
+  use int.Int
+  use Array
 
   type elt
 
@@ -182,9 +182,9 @@ end
 
 module ArrayEq
 
-  use import int.Int
-  use import Array
-  use import map.MapEq
+  use int.Int
+  use Array
+  use map.MapEq
 
   predicate array_eq_sub (a1 a2: array 'a) (l u: int) =
     a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
@@ -197,9 +197,9 @@ end
 
 module ArrayExchange
 
-  use import int.Int
-  use import Array
-  use import map.MapExchange as M
+  use int.Int
+  use Array
+  use map.MapExchange as M
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
     a1.length = a2.length /\
@@ -213,11 +213,11 @@ end
 
 module ArrayPermut
 
-  use import int.Int
-  use import Array
-  use import map.MapPermut as M
-  use import map.MapEq
-  use import ArrayEq
+  use int.Int
+  use Array
+  use map.MapPermut as M
+  use map.MapEq
+  use ArrayEq
   use export ArrayExchange
 
   predicate permut (a1 a2: array 'a) (l u: int) =
@@ -259,8 +259,8 @@ end
 
 module ArraySwap
 
-  use import int.Int
-  use import Array
+  use int.Int
+  use Array
   use export ArrayExchange
 
   let swap (a:array 'a) (i:int) (j:int) : unit
@@ -277,8 +277,8 @@ end
 
 module ArraySum
 
-  use import Array
-  use import map.MapSum as M
+  use Array
+  use map.MapSum as M
 
   (** `sum a l h` is the sum of `a[i]` for `l <= i < h` *)
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h
@@ -288,7 +288,7 @@ end
 (** {2 Number of array elements satisfying a given predicate} *)
 
 module NumOf
-  use import Array
+  use Array
   use int.NumOf as N
 
   (** the number of `a[i]` such that `l <= i < u` and `pr i a[i]` *)
@@ -298,7 +298,7 @@ module NumOf
 end
 
 module NumOfEq
-  use import Array
+  use Array
   use int.NumOf as N
 
   (** the number of `a[i]` such that `l <= i < u` and `a[i] = v` *)
@@ -308,16 +308,16 @@ module NumOfEq
 end
 
 module ToList
-  use import int.Int
-  use import Array
-  use import list.List
+  use int.Int
+  use Array
+  use list.List
 
   let rec function to_list (a: array 'a) (l u: int) : list 'a
     requires { l >= 0 /\ u <= a.length }
     variant  { u - l }
   = if u <= l then Nil else Cons a[l] (to_list a (l+1) u)
 
-  use import list.Append
+  use list.Append
 
   let rec lemma to_list_append (a: array 'a) (l m u: int)
     requires { 0 <= l <= m <= u <= a.length }
@@ -328,8 +328,8 @@ module ToList
 end
 
 module ToSeq
-  use import int.Int
-  use import Array
+  use int.Int
+  use Array
   use seq.Seq as S
 
   let rec function to_seq_sub (a: array 'a) (l u: int) : S.seq 'a
@@ -362,11 +362,11 @@ end
 
 module Inversions
 
-  use import Array
-  use import ArrayExchange
-  use import int.Int
-  use import int.Sum
-  use import int.NumOf
+  use Array
+  use ArrayExchange
+  use int.Int
+  use int.Sum
+  use int.NumOf
 
   (* to prove termination, we count the total number of inversions *)
   predicate inversion (a: array int) (i j: int) =

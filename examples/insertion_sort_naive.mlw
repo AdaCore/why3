@@ -8,12 +8,12 @@
 
 module InsertionSortNaive
 
-  use import int.Int
-  use import ref.Ref
-  use import ref.Refint
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use ref.Refint
+  use array.Array
+  use array.IntArraySorted
+  use array.ArrayPermut
 
   let sort (a:array int)
     ensures { sorted a }
@@ -47,17 +47,17 @@ end
 
 module InsertionSortNaiveGen
 
-  use import int.Int
-  use import ref.Ref
-  use import ref.Refint
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use ref.Refint
+  use array.Array
+  use array.ArrayPermut
 
   type elt
 
   val predicate le elt elt
 
-  clone import map.MapSorted as M with type elt = elt, predicate le = le
+  clone map.MapSorted as M with type elt = elt, predicate le = le
 
   axiom le_refl: forall x:elt. le x x
 
@@ -104,12 +104,12 @@ end
 
 module InsertionSortParam
 
-  use import int.Int
-  use import ref.Ref
-  use import ref.Refint
-  use import map.Map
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use ref.Refint
+  use map.Map
+  use array.Array
+  use array.ArrayPermut
 
   type param
 
@@ -165,12 +165,12 @@ module InsertionSortParamBad
    (* this version is hard to prove because predicate sorted_sub
       applies to an array instead of a map *)
 
-  use import int.Int
-  use import ref.Ref
-  use import ref.Refint
-  use import map.Map
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use ref.Refint
+  use map.Map
+  use array.Array
+  use array.ArrayPermut
 
   type param
 

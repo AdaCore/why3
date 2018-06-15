@@ -16,8 +16,8 @@
 
 module GmpModel
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   constant beta' : int
   axiom one_lt_beta' : 1 < beta'
@@ -74,11 +74,11 @@ end
 module GmpAuxiliaryfunctions
 
   use export GmpModel
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Power
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use int.Power
+  use ref.Ref
+  use array.Array
 
   val rb: ref bool
 
@@ -168,8 +168,8 @@ end
 
 module GmpSquareRoot
 
-  use import GmpAuxiliaryfunctions
-  use import ref.Ref
+  use GmpAuxiliaryfunctions
+  use ref.Ref
 
 (**
   let division_step (np sp: pointer) (nn l h: size) (c q: ref int) : unit

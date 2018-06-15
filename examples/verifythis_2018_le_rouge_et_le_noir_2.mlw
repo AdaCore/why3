@@ -6,7 +6,7 @@
 Author: Martin Clochard (LRI, Université Paris Sud)
 *)
 
-use import int.Int
+use int.Int
 use import set.Fset as F
 
 (* The part about bijections, preservation of finiteness and cardinality,
@@ -97,7 +97,7 @@ predicate valid_coloring_inter (n:int) (m:int) (s:seq color) =
 predicate valid_coloring_at (n:int) (m:int) (s:seq color) =
   valid_coloring_l n s /\ s[m] = Black /\ forall i. 0 <= i < m -> s[i] = Red
 
-use import array.Array
+use array.Array
 
 
 let main () : unit

@@ -20,8 +20,8 @@ end
 
 theory PropositionalCalculus
 
-use import bool.Bool
-use import Formula
+use bool.Bool
+use Formula
 
 type prop_fmla = fmla ident
 
@@ -44,7 +44,7 @@ function eval (f:prop_fmla) (v:idmap bool) : bool =
   end
 
 
-  use import map.Const
+  use map.Const
 
   goal Test1 :
     let x = mk_ident 0 in

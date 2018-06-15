@@ -50,7 +50,7 @@ module HO
   predicate equalizer (a:'a -> bool) (f g:'a -> 'b) =
     forall x. a x -> f x = g x
 
-  use import int.Int
+  use int.Int
 
   function range (a b:int) : int -> bool = \x. a <= x < b
 
@@ -157,8 +157,8 @@ end
 
 module HOProof
 
-  use import HO
-  use import NoDiscriminate
+  use HO
+  use NoDiscriminate
 
   predicate hack (f g h:'a -> 'b) = f = g = h
   let lemma extensionality (f g:'a -> 'b)
@@ -213,8 +213,8 @@ end
 
 module PartialMap
 
-  use import HO
-  use import option.Option
+  use HO
+  use option.Option
 
   type pmap 'a 'b = 'a -> option 'b
 
@@ -237,7 +237,7 @@ end
 
 module Bind
 
-  use import HO
+  use HO
 
   type bind 'a 'b =
     | Old 'a
@@ -259,7 +259,7 @@ end
 module BindFull
 
   clone import Dummy as DBindFull
-  use import HO
+  use HO
   use export Bind
 
   axiom bfold_identity : bfold Old Fresh = (id:bind 'a 'b -> bind 'a 'b)
@@ -291,9 +291,9 @@ end
 
 module BindProof
 
-  use import HOFull
-  use import Bind
-  use import NoDiscriminate
+  use HOFull
+  use Bind
+  use NoDiscriminate
 
   let lemma bfold_identity ()
     ensures { bfold Old Fresh = (id:bind 'a 'b -> bind 'a 'b) }
@@ -332,10 +332,10 @@ end
 (* Useful higher-order definition about lists. *)
 module HOList
 
-  use import list.List
-  use import list.Nth
-  use import option.Option
-  use import HO
+  use list.List
+  use list.Nth
+  use option.Option
+  use HO
 
   function map (f:'a -> 'b) (l:list 'a) : list 'b = match l with
     | Nil -> Nil
@@ -364,11 +364,11 @@ end
 module HOListFull
 
   clone import Dummy as DHOListFull
-  use import list.List
-  use import list.Nth
-  use import list.Length
-  use import option.Option
-  use import HO
+  use list.List
+  use list.Nth
+  use list.Length
+  use option.Option
+  use HO
   use export HOList
 
   axiom map_nth : forall f:'a -> 'b,l:list 'a,n:int.
@@ -398,14 +398,14 @@ end
 
 module HOListProof
 
-  use import list.List
-  use import list.Nth
-  use import list.NthLength
-  use import list.Length
-  use import option.Option
-  use import int.Int
-  use import HOList
-  use import NoDiscriminate
+  use list.List
+  use list.Nth
+  use list.NthLength
+  use list.Length
+  use option.Option
+  use int.Int
+  use HOList
+  use NoDiscriminate
 
   let rec lemma map_nth (f:'a -> 'b) (l:list 'a) (n:int) : unit
     ensures { nth n (map f l) = match nth n l with
@@ -463,7 +463,7 @@ end
 (* Axiomatic module: arbitrary choice. *)
 module Choice
 
-  use import option.Option
+  use option.Option
   constant default : 'a
   function choice (p:'a -> bool) : 'a
   axiom choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
@@ -480,9 +480,9 @@ end
 
 module Finite
 
-  use import HO
-  use import Choice
-  use import int.Int
+  use HO
+  use Choice
+  use int.Int
   predicate equirange (p:'a -> bool) (n:int) =
     n >= 0 /\
     exists f g. (forall x. range 0 n x -> p (f x) /\ g (f x) = x) /\
@@ -497,8 +497,8 @@ end
 module FiniteFull
 
   clone import Dummy as DFiniteFull
-  use import HO
-  use import int.Int
+  use HO
+  use int.Int
   use export Finite
 
   axiom finite_empty : finite (none:'a -> bool)
@@ -541,12 +541,12 @@ end
 
 module FiniteProof
 
-  use import HOFull
-  use import Choice
-  use import int.Int
-  use import Finite
-  use import option.Option
-  use import NoDiscriminate
+  use HOFull
+  use Choice
+  use int.Int
+  use Finite
+  use option.Option
+  use NoDiscriminate
 
   predicate equirange_with (n:int) (p:'a -> bool) (f:int -> 'a) (g:'a -> int) =
     (forall x. range 0 n x -> p (f x) /\ g (f x) = x) /\

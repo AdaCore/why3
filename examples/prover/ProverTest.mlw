@@ -5,20 +5,20 @@ end
 
 module Impl
 
-  use import ProverMain.Impl
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_term_impl.Types
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_impl.Impl
-  use import int.Int
+  use ProverMain.Impl
+  use Firstorder_symbol_impl.Types
+  use Firstorder_term_impl.Types
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_term_impl.Logic
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_impl.Impl
+  use int.Int
 
   let imply (a b:nlimpl_fo_formula) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok a }

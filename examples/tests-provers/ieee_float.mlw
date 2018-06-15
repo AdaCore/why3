@@ -11,7 +11,7 @@ theory A
 end
 
 module M603_018
-  use import ieee_float.Float32
+  use ieee_float.Float32
 
   constant x : t = zeroF
   constant y : t = 1.0
@@ -57,7 +57,7 @@ end
 
 module M121_039_nonlinear
 
-  use import ieee_float.Float32
+  use ieee_float.Float32
 
   constant max : t = 340282346638528859811704183484516925440.0
   constant min : t = .- max
@@ -92,8 +92,8 @@ end
 
 module LB09_025_conversion
 
-  use import ieee_float.Float32
-  use import int.Int
+  use ieee_float.Float32
+  use int.Int
 
   let ghost fti x
     requires { x .>= of_int RNE (-2147483648) /\ x .+ (of_int RNE 1) .<= of_int RNE 2147483647 }

@@ -42,9 +42,9 @@
 
 module Conjugate
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
   predicate is_partition (a: array int) =
     (* at least one element *)
@@ -97,9 +97,9 @@ end
 
 module Test
 
-  use import int.Int
-  use import array.Array
-  use import Conjugate
+  use int.Int
+  use array.Array
+  use Conjugate
 
   let test () ensures { result.length >= 4 } =
     let a = make 5 0 in

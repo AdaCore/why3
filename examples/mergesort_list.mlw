@@ -14,7 +14,7 @@ module Elt
 
   type elt
   val predicate le elt elt
-  clone import relations.TotalPreOrder
+  clone relations.TotalPreOrder
     with type t = elt, predicate rel = le, axiom .
   clone export list.Sorted with
     type t = elt, predicate le  = le, goal Transitive.Trans
@@ -46,9 +46,9 @@ end
 module EfficientMerge (* : MergeSpec *)
 
   clone export Elt with axiom .
-  use import list.Mem
-  use import list.Reverse
-  use import list.RevAppend
+  use list.Mem
+  use list.Reverse
+  use list.RevAppend
 
   lemma sorted_reverse_cons:
     forall acc x1. sorted (reverse acc) ->
@@ -85,7 +85,7 @@ end
 
 module Mergesort
 
-  clone import Merge (* or EfficientMerge *) with axiom .
+  clone Merge (* or EfficientMerge *) with axiom .
 
   let split (l0: list 'a) : (list 'a, list 'a)
     requires { length l0 >= 2 }
@@ -134,9 +134,9 @@ end
 module OCamlMergesort
 
   clone export Elt with axiom .
-  use import list.Mem
-  use import list.Reverse
-  use import list.RevAppend
+  use list.Mem
+  use list.Reverse
+  use list.RevAppend
 
   lemma sorted_reverse_cons:
     forall acc x1. sorted (reverse acc) ->
@@ -218,7 +218,7 @@ module OCamlMergesort
   (** `sort n l` sorts `prefix n l`
       and `rev_sort n l`  sorts `prefix n l` in reverse order. *)
 
-  use import mach.int.Int
+  use mach.int.Int
 
   let rec sort (n: int) (l: list elt) : list elt
     requires { 2 <= n <= length l }

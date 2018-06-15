@@ -3,8 +3,8 @@
 
 module FactRecursive
 
-  use import int.Int
-  use import int.Fact
+  use int.Int
+  use int.Fact
 
   let rec fact_rec (x:int) : int
     requires { x >= 0 }
@@ -21,9 +21,9 @@ end
 
 module FactImperative
 
-  use import int.Int
-  use import int.Fact
-  use import ref.Ref
+  use int.Int
+  use int.Fact
+  use ref.Ref
 
   let fact_imp (x:int) : int
     requires { x >= 0 }

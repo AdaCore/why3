@@ -15,14 +15,14 @@ one</a>}: it does not use any Coq proofs, but lemma functions instead.
 
 module InPlaceRev
 
-  use import map.Map
-  use import ref.Ref
-  use import int.Int
-  use import list.List
+  use map.Map
+  use ref.Ref
+  use int.Int
+  use list.List
   use list.Quant as Q
-  use import list.Append
-  use import list.Mem
-  use import list.Length
+  use list.Append
+  use list.Mem
+  use list.Length
   use export list.Reverse
 
   type loc
@@ -199,11 +199,11 @@ end
 
 module InPlaceRevSeq
 
-  use import int.Int
+  use int.Int
   use map.Map as Map
-  use import seq.Seq
-  use import seq.Mem
-  use import seq.Reverse
+  use seq.Seq
+  use seq.Mem
+  use seq.Reverse
 
   type loc
 
@@ -236,7 +236,7 @@ module InPlaceRevSeq
       let (s1, s2) = mem_decomp x s[1..] in (cons s[0] s1, s2)
     end
 
-  use import ref.Ref
+  use ref.Ref
 
   type memory 'a = ref (Map.map loc 'a)
 

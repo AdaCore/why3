@@ -1,6 +1,6 @@
 module Cursor
 
-  use import seq.Seq
+  use seq.Seq
 
   type cursor 'a = private {
     ghost mutable visited : seq 'a;
@@ -26,10 +26,10 @@ end
 
 module ListCursor
 
-  use import seq.Seq
-  use import seq.OfList
-  use import list.List
-  use import int.Int
+  use seq.Seq
+  use seq.OfList
+  use list.List
+  use int.Int
 
   type cursor 'a = private {
     ghost mutable visited    : seq 'a;
@@ -48,7 +48,7 @@ module ListCursor
     ensures { result.visited = empty }
     ensures { result.collection = l }
 
-  clone import Cursor as C with
+  clone Cursor as C with
     type cursor = cursor,
     predicate permitted = permitted,
     predicate complete  = complete,
@@ -58,11 +58,11 @@ end
 
 module ArrayCursor
 
-  use import array.Array
-  use import array.ToSeq
-  use import seq.Seq
-  use import seq.OfList
-  use import int.Int
+  use array.Array
+  use array.ToSeq
+  use seq.Seq
+  use seq.OfList
+  use int.Int
 
   type cursor 'a = private {
     ghost mutable visited    : seq 'a;
@@ -81,7 +81,7 @@ module ArrayCursor
     ensures { result.visited = empty }
     ensures { result.collection = to_seq a }
 
-  clone import Cursor as C with
+  clone Cursor as C with
     type cursor = cursor,
     predicate permitted = permitted,
     predicate complete  = complete,
