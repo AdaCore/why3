@@ -675,12 +675,12 @@ function size_e (e:expr) : int =
 
 lemma size_e_pos: forall e: expr. size_e e >= 1
 
-use Defunctionalization
+use Defunctionalization as D
 
 function size_c (c:cont) : int =
   match c with
   | I -> 0
-  | A e2 k -> 2 + Defunctionalization.size_e e2 + size_c k
+  | A e2 k -> 2 + D.size_e e2 + size_c k
   | B _ k -> 1 + size_c k
   end
 
@@ -698,7 +698,7 @@ let rec continue_4 (c:cont) (v:int) : value
   end
 
 with eval_4 (e:expr) (c:cont) : value
-  variant { size_c c + Defunctionalization.size_e e }
+  variant { size_c c + D.size_e e }
   ensures { eval_cont c (eval_0 e) result }
   =
   match e with
@@ -886,9 +886,9 @@ predicate is_empty_context (c:context) =
   end
 
 
-use Defunctionalization (* for size_e *)
+use Defunctionalization as D (* for size_e *)
 
-function size_e (e:expr) : int = Defunctionalization.size_e e
+function size_e (e:expr) : int = D.size_e e
 
 function size_c (c:context) : int =
   match c with
@@ -1099,9 +1099,9 @@ use import SemWithError
 
 type context = Empty | Left context expr | Right int context
 
-use Defunctionalization (* for size_e *)
+use Defunctionalization as D (* for size_e *)
 
-function size_e (e:expr) : int = Defunctionalization.size_e e
+function size_e (e:expr) : int = D.size_e e
 
 function size_c (c:context) : int =
   match c with

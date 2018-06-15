@@ -48,7 +48,7 @@ module N
           to_int (Map.get x n) + base * value_sub x (n+1) m l
         else 0
 
-  use map.MapEq
+  use import map.MapEq
 
   let rec lemma value_sub_frame (x y:map int int31) (n m l:int)
     requires { MapEq.map_eq_sub x y n m }
@@ -479,7 +479,7 @@ module Z
           to_int (Map.get x n) + base * value_sub x (n+1) m l
         else 0
 
-  use map.MapEq
+  use import map.MapEq
 
   let rec lemma value_sub_frame (x y:map int int31) (n m l:int)
     requires { MapEq.map_eq_sub x y n m }

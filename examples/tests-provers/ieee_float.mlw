@@ -1,7 +1,7 @@
 theory A
 
-  use ieee_float.Float32
-  use ieee_float.Float64
+  use ieee_float.Float32 as Float32
+  use ieee_float.Float64 as Float64
 
   lemma ebsb32 : Float32.t'eb = 8  /\ Float32.t'sb = 24
   lemma ebsb64 : Float64.t'eb = 11 /\ Float64.t'sb = 53

@@ -3,41 +3,40 @@
 
 (* Association with respect to an equivalence relation. *)
 module Assoc
-  
+
   clone import key_type.KeyType as K
   clone import relations.Equivalence as Eq with type t = key
-  
+
   use import list.List
   use import list.Mem
   use import list.Append
   use import option.Option
-  use import HighOrd
-  
+
   predicate appear (k:key) (l:list (t 'a)) =
     exists x. mem x l /\ Eq.rel k x.key
-  
+
   lemma appear_append : forall k:key,l r:list (t 'a).
     appear k (l++r) <-> appear k l \/ appear k r
-  
+
   (* Unique occurence (a desirable property of an association list). *)
   predicate unique (l:list (t 'a)) = match l with
     | Nil -> true
     | Cons x q -> not appear x.key q /\ unique q
     end
-  
+
   (* functional update with equivalence classes. *)
   function equiv_update (f:key -> 'b) (k:key) (b:'b) : key -> 'b =
     \k2. if Eq.rel k k2 then b else f k2
-  
+
   function const_none : 'a -> option 'b = \x.None
-  
+
   (* functional model of an association list. *)
   function model (l:list (t 'a)) : key -> option (t 'a) =
     match l with
     | Nil -> const_none
     | Cons d q -> equiv_update (model q) d.key (Some d)
     end
-  
+
   (* A key is bound iff it occurs in the association lists. *)
   let rec lemma model_occurence (k:key) (l:list (t 'a)) : unit
     ensures { appear k l <-> match model l k with None -> false
@@ -45,14 +44,14 @@ module Assoc
     ensures { not appear k l <-> model l k = None }
     variant { l }
   = match l with Cons _ q -> model_occurence k q | _ -> () end
-  
+
   (* A key is bound to a value with an equivalent key. *)
   let rec lemma model_link (k:key) (l:list (t 'a)) : unit
     ensures { match model l k with None -> true
       | Some d -> Eq.rel k d.key end }
     variant { l }
   = match l with Cons _ q -> model_link k q | _ -> () end
-  
+
   (* Two equivalent keys are bound to the same value. *)
   let rec lemma model_equal (k1 k2:key) (l:list (t 'a)) : unit
     requires { Eq.rel k1 k2 }
@@ -62,7 +61,7 @@ module Assoc
     | Cons _ q -> model_equal k1 k2 q
     | _ -> ()
     end
-  
+
   (* If the list satisfies the uniqueness property,
      then every value occuring in the list is the image of its key. *)
   let rec lemma model_unique (k:key) (l:list (t 'a)) : unit
@@ -70,12 +69,12 @@ module Assoc
     ensures { forall d. mem d l -> model l d.key = Some d }
     variant { l }
   = match l with Cons _ q -> model_unique k q | _ -> () end
-  
+
   (* Singleton association list. *)
   let lemma model_singleton (k:key) (d:t 'a) : unit
     ensures { model (Cons d Nil) k = if rel k d.key then Some d else None }
   = ()
-  
+
   (* Unique union of association list by concatenation. *)
   let rec lemma model_concat (k:key) (l r:list (t 'a)) : unit
     requires { unique (l++r) /\ unique l /\ unique r }
@@ -91,19 +90,19 @@ module Assoc
     | Nil -> ()
     | Cons _ q -> model_concat k q r
     end
-  
+
 end
 
 
 (* Sorted (increasing) association list. *)
 
 module AssocSorted
-  
+
   use import list.List
   use import list.Append
   use import list.Mem
   use import option.Option
-  
+
   clone import key_type.KeyType as K
   clone import preorder.Full as O with type t = key
   clone export Assoc with type K.key = K.key,
@@ -119,14 +118,14 @@ module AssocSorted
     function K.key = K.key,
     predicate O.rel = O.lt,
     goal O.Trans
-  
+
   (* Sorted lists are association lists with unicity property. *)
   let rec lemma increasing_unique (l:list (t 'a)) : unit
     requires { S.increasing l }
     ensures { unique l }
     variant { l }
   = match l with Cons _ q -> increasing_unique q | _ -> () end
-  
+
   let lemma model_cut (k:key) (l r:list (t 'a)) : unit
     requires { S.increasing r }
     requires { S.increasing l }
@@ -156,7 +155,7 @@ module AssocSorted
       end && false };
     assert { forall k2. eq k k2 -> model (l++r) k2 <> None ->
       (not appear k2 l /\ not appear k2 r) && false }
-  
+
   let lemma model_split (d:t 'a) (l r:list (t 'a)) : unit
     requires { S.increasing l }
     requires { S.increasing r }
@@ -168,6 +167,6 @@ module AssocSorted
     ensures { forall k2. lt k2 d.key -> model (l++Cons d r) k2 = model l k2 }
     ensures { forall k2. le d.key k2 -> model l k2 = None }
   = ()
-  
+
 end
 

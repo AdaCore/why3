@@ -41,7 +41,7 @@ module IntDivF
 end
 
 module Rat
-  use int.Int
+  use int.Int as Int
 
   type rat
 
@@ -122,8 +122,8 @@ end
 
 module RealTrunc
   use import Real
-  use real.FromInt
-  use real.Truncate
+  use real.FromInt as FromInt
+  use real.Truncate as Truncate
 
   function floor (x : real) : real = FromInt.from_int (Truncate.floor x)
   function ceiling (x : real) : real = FromInt.from_int (Truncate.ceil x)
@@ -164,7 +164,7 @@ module IntToRat
 end
 
 module IntToReal
-  use real.FromInt
+  use real.FromInt as FromInt
 
   function to_real (x : int) : real = FromInt.from_int x
 end
@@ -179,7 +179,7 @@ end
 module RatToReal
   use import Rat
   use import real.Real
-  use real.FromInt
+  use real.FromInt as FromInt
 
   function to_real (x : rat) : real =
     FromInt.from_int (numerator x) / FromInt.from_int (denominator x)

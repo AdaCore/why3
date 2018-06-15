@@ -5,5 +5,5 @@ end
 
 module M
   type t = { b: int } (* no field a *)
-  clone S with type t = t
+  clone import S with type t = t
 end

@@ -85,7 +85,7 @@ module ListCursorImpl (* : ListCursor *)
     ensures { result.to_visit = t }
   = { visited = empty; collection = t; to_visit = t }
 
-  clone cursor.ListCursor with
+  clone import cursor.ListCursor with
     type cursor     = cursor,
     val  create     = create,
     val  C.has_next = has_next,
@@ -187,7 +187,7 @@ module ArrayCursorImpl (* : ArrayCursor *)
       c.index <- c.index + 1;
       x end
 
-  clone cursor.ArrayCursor with
+  clone import cursor.ArrayCursor with
     type cursor   = cursor,
     val  C.next     = next,
     val  C.has_next = has_next,

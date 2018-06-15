@@ -196,7 +196,7 @@ module SuffixSort
   use import int.Int
   use import ref.Refint
   use import array.Array
-  use LCP
+  use import LCP
 
   (** order by prefix *)
   predicate lt (a : array int) (x y:int) =
@@ -224,14 +224,13 @@ let compare (a:array int) (x y:int) : int
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-
-  use map.MapInjection
+  use map.MapInjection as Inj
   (** `range a` is true when for each `i`, `a[i]` is between `0` and
       `a.length-1` *)
-  predicate range (a:array int) = MapInjection.range a.elts a.length
+  predicate range (a:array int) = Inj.range a.elts a.length
 
   (** for the `permut` predicate (permutation of elements) *)
-  use array.ArrayPermut
+  use import array.ArrayPermut
 
   predicate le (a : array int) (x y:int) = x = y \/ lt a x y
 
@@ -244,7 +243,7 @@ let compare (a:array int) (x y:int) : int
     le a x y /\ le a y z -> le a x z
 
   (** spec of sorted in increasing prefix order *)
-  use map.Map
+  use map.Map as Map
 
   predicate sorted_sub (a:array int) (data:Map.map int int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u ->
@@ -257,17 +256,17 @@ let sort (a:array int) (data : array int)
   requires { data.length = a.length }
   requires { range data }
   ensures { sorted a data }
-  ensures { ArrayPermut.permut_all (old data) data }
+  ensures { permut_all (old data) data }
   =
    for i = 0 to data.length - 1 do
-     invariant { ArrayPermut.permut_all (old data) data   }
+     invariant { permut_all (old data) data   }
      invariant { sorted_sub a data.elts 0 i  }
      invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { range data }
-       invariant { ArrayPermut.permut_all (old data) data   }
+       invariant { permut_all (old data) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -278,7 +277,7 @@ let sort (a:array int) (data : array int)
        let t = data[!j] in
        data[!j] <- data[b];
        data[b] <- t;
-       assert { ArrayPermut.exchange (data at L) data (!j-1) !j };
+       assert { exchange (data at L) data (!j-1) !j };
        decr j
      done;
      (* needed to prove the invariant `sorted_sub a data.elts 0 i` *)
@@ -293,8 +292,8 @@ module SuffixSort_test
 
   use import int.Int
   use import array.Array
-  use LCP
-  use SuffixSort
+  use import LCP
+  use import SuffixSort
 
   exception BenchFailure
 
@@ -327,13 +326,13 @@ module SuffixArray
 
 use import int.Int
 use import array.Array
-use LCP
-use SuffixSort
-use map.Map
-use map.MapInjection
+use import LCP
+use import SuffixSort
+use map.Map as Map
+use map.MapInjection as Inj
 
 predicate permutation (m:Map.map int int) (u : int) =
-  MapInjection.range m u /\ MapInjection.injective m u
+  Inj.range m u /\ Inj.injective m u
 
 type suffixArray = {
     values : array int;
@@ -349,11 +348,11 @@ let select (s:suffixArray) (i:int) : int
   ensures { result = s.suffixes[i] }
   = s.suffixes[i]
 
-use array.ArrayPermut
+use import array.ArrayPermut
 
 (** needed to establish invariant in function `create` *)
 lemma permut_permutation : forall a1 a2:array int.
-  ArrayPermut.permut_all a1 a2 /\ permutation a1.elts a1.length ->
+  permut_all a1 a2 /\ permutation a1.elts a1.length ->
     permutation a2.elts a2.length
 
 (** constructor of suffixArray structure *)
@@ -438,10 +437,10 @@ module LRS
   use import int.Int
   use import ref.Ref
   use import array.Array
-  use map.MapInjection
-  use LCP
-  use SuffixSort
-  use SuffixArray
+  use map.MapInjection as Inj
+  use import LCP
+  use import SuffixSort
+  use import SuffixArray
 
 
 (** additional properties relating `le` and `longest_common_prefix` *)

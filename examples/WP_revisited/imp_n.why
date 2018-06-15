@@ -56,7 +56,7 @@ function eval_expr (s:state) (e:expr) : int =
        eval_bin (eval_expr s e1) op (eval_expr s e2)
   end
 
-  use map.Const
+  use import map.Const
 
   goal Test13 :
     let s = Const.const 0 in

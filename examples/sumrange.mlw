@@ -25,8 +25,8 @@ with logarithmic time operations.
 
 module ArraySum
 
-  use export int.Int
-  use export array.Array
+  use import int.Int
+  use import array.Array
 
   (** `sum a i j` denotes the sum `\sum_{i <= k < j} a[k]`.
       It is axiomatizated by the two following axioms expressing
@@ -60,6 +60,8 @@ end
 
 module Simple
 
+  use import int.Int
+  use import array.Array
   use import ArraySum
   use import ref.Ref
 
@@ -85,7 +87,8 @@ end
 
 module ExtraLemmas
 
-  use array.Array
+  use import int.Int
+  use import array.Array
   use import ArraySum
 
   (** summation in adjacent intervals *)
@@ -127,9 +130,10 @@ end
 
 module CumulativeArray
 
-  use array.Array
+  use import int.Int
+  use import array.Array
   use import ArraySum
-  use ExtraLemmas
+  use import ExtraLemmas
 
   predicate is_cumulative_array_for (c:array int) (a:array int) =
     c.length = a.length + 1 /\
@@ -195,9 +199,10 @@ end
 
 module CumulativeTree
 
-  use array.Array
+  use import int.Int
+  use import array.Array
   use import ArraySum
-  use ExtraLemmas
+  use import ExtraLemmas
   use import int.ComputerDivision
 
   type indexes =
@@ -367,7 +372,7 @@ module CumulativeTree
     end
 
   lemma depth_min : forall t. depth t >= 1
-  
+
   use import bv.Pow2int
 
   let rec lemma depth_is_log (t:tree) (a :array int) (k:int)
@@ -444,6 +449,5 @@ module CumulativeTree
       if i >= m then query_aux_complexity r a i j c else
       query_aux_complexity l a i m c + query_aux_complexity r a m j c
     end
-
 
 end

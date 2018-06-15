@@ -38,12 +38,11 @@ end
 module OCaml
 
   use export int.Int
-  use mach.int.Int63
+  use mach.int.Int63 as Int63
   use export int.MinMax
   use export option.Option
   use export Pervasives
-
-  use Sys
+  use import Sys
 
   use mach.array.Array63 as Array
   type array 'a = Array.array 'a

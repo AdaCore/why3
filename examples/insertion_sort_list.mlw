@@ -6,7 +6,7 @@ module InsertionSort
   type elt
   val predicate le elt elt
 
-  clone relations.TotalPreOrder with
+  clone import relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
   clone export list.Sorted with
     type t = elt, predicate le  = le, goal Transitive.Trans

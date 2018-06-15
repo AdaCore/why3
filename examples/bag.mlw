@@ -49,7 +49,7 @@ module ResizableArraySpec
 
   use import int.Int
   use import map.Map
-  use map.Const
+  use import map.Const
 
   type rarray 'a = private {
     ghost mutable len: int;
@@ -93,9 +93,9 @@ module BagImpl
   use import int.Int
   use import Bag
   use import ResizableArraySpec as R
-  use map.Map
-  use int.NumOf
-  use null.Null
+  use map.Map as Map
+  use int.NumOf as NumOf
+  use null.Null as Null
 
   function numof (r: rarray (Null.t 'a)) (x: 'a) (l u: int) : int =
     NumOf.numof (fun i -> (Map.get r.R.data i).Null.v = Null.Value x) l u
@@ -164,7 +164,7 @@ module BagImpl
     resize t.data n;
     t.size <- n
 
-  clone BagSpec with
+  clone import BagSpec with
     type t = t,
     val create = create,
     val clear = clear,

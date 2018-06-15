@@ -413,7 +413,7 @@ module BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
 
-  use int.Int (* needed to use range types *)
+  use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
 
@@ -434,7 +434,7 @@ module BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
 
-  use int.Int (* needed to use range types *)
+  use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF >
 
@@ -455,7 +455,7 @@ module BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
 
-  use int.Int (* needed to use range types *)
+  use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF >
 
@@ -476,7 +476,7 @@ module BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
 
-  use int.Int (* needed to use range types *)
+  use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFF >
 
@@ -521,8 +521,8 @@ end
 (** {2 Converters of common size_bvs} *)
 
 module BVConverter_32_64
-  use BV32
-  use BV64
+  use BV32 as BV32
+  use BV64 as BV64
 
   predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF_FFFF:BV64.t)
 
@@ -538,8 +538,8 @@ module BVConverter_32_64
 end
 
 module BVConverter_16_64
-  use BV16
-  use BV64
+  use BV16 as BV16
+  use BV64 as BV64
 
   predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF:BV64.t)
 
@@ -554,8 +554,8 @@ module BVConverter_16_64
 end
 
 module BVConverter_8_64
-  use BV8
-  use BV64
+  use BV8 as BV8
+  use BV64 as BV64
 
   predicate in_range (b : BV64.t) = BV64.ule b (0xFF:BV64.t)
 
@@ -570,8 +570,8 @@ module BVConverter_8_64
 end
 
 module BVConverter_16_32
-  use BV16
-  use BV32
+  use BV16 as BV16
+  use BV32 as BV32
 
   predicate in_range (b : BV32.t) = BV32.ule b (0xFFFF:BV32.t)
 
@@ -586,8 +586,8 @@ module BVConverter_16_32
 end
 
 module BVConverter_8_32
-  use BV8
-  use BV32
+  use BV8 as BV8
+  use BV32 as BV32
 
   predicate in_range (b : BV32.t) = BV32.ule b (0xFF:BV32.t)
 
@@ -602,8 +602,8 @@ module BVConverter_8_32
 end
 
 module BVConverter_8_16
-  use BV8
-  use BV16
+  use BV8 as BV8
+  use BV16 as BV16
 
   predicate in_range (b : BV16.t) = BV16.ule b (0xFF:BV16.t)
 

@@ -221,7 +221,7 @@ module Int31
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV31
+(*  use bv.BV31 as BV31
 
   val to_bv (x: int31) : BV31.t
     ensures { BV31.to_int result = to_int x }
@@ -247,8 +247,9 @@ module Int32
     function to_int = int32'int,
     lemma to_int_in_bounds,
     lemma extensionality
+
 (*
-  use bv.BV32
+  use bv.BV32 as BV32
 
   val to_bv (x: int32) : BV32.t
     ensures { BV32.to_int result = to_int x }
@@ -261,7 +262,7 @@ module Int32BV
 
   use export Int32
 
-  use bv.BV32
+  use bv.BV32 as BV32
 
   val to_bv (x: int32) : BV32.t
     ensures { BV32.to_int result = to_int x }
@@ -358,7 +359,7 @@ module UInt32GMP
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
 
-(*  use bv.BV32
+(*  use bv.BV32 as BV32
 
   val to_bv (x: uint32) : BV32.t
     ensures { BV32.to_uint result = to_int x }
@@ -390,7 +391,7 @@ module Int63
   let constant max_int = of_int max_int63
   let constant min_int = of_int min_int63
 
-(*  use bv.BV63
+(*  use bv.BV63 as BV63
 
   val to_bv (x: int63) : BV63.t
     ensures { BV63.to_int result = to_int x }
@@ -516,7 +517,7 @@ module Int64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64
+(*  use bv.BV64 as BV64
 
   val to_bv (x: int64) : BV64.t
     ensures { BV64.to_int result = to_int x }
@@ -553,7 +554,7 @@ module UInt64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64
+(*  use bv.BV64 as BV64
 
   val to_bv (x: uint64) : BV64.t
     ensures { BV64.to_uint result = to_int x }

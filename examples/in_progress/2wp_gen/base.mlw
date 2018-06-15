@@ -2,8 +2,6 @@
 (* Basic arrow definitions *)
 module Fun
 
-  use export HighOrd
-
   predicate ext (f g:'a -> 'b) = forall x. f x = g x
   predicate equalizer (a:'a -> bool) (f g:'a -> 'b) =
     forall x. a x -> f x = g x

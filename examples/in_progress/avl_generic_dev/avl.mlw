@@ -2,79 +2,78 @@
 (* Technical reason: type must be declared outside for clones to work
    properly. *)
 theory ParamsTypes
-  
+
   use import int.Int
   type view_base 'c 'd =
     | VEmpty
     | VNode 'c 'd 'c int
-  
+
   type m_base 'c =
     | Empty
     | Node (m_base 'c) 'c (m_base 'c) int
-  
+
 end
 
 (* AVL parameters: a binary tree structure
    (exact representation is unknown), + a positive balancing
    constant. *)
 module Params
-  
+
   use import int.Int
-  
+
   (* type for data stored in the nodes. *)
   clone program_type.Type2 as Data
-  
+
   (* Abstract binary tree structure. *)
   namespace Tree
-  
+
     use export ParamsTypes
     type m 'a 'b = m_base (Data.m 'a 'b)
-    
+
     clone export program_type.Type2 with type m = m
-    
+
     type view 'a 'b = view_base (t 'a 'b) (Data.t 'a 'b)
-    
+
     (* Construction/pattern-matching over the tree. *)
     val empty () : t 'a 'b
       ensures { result.m = Empty }
       ensures { c result }
-    
+
     val node (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) (h:int) : t 'a 'b
       requires { c l /\ Data.c d /\ c r }
       ensures { result.m = Node l.m d.Data.m r.m h }
       ensures { c result }
-    
+
     val view (t:t 'a 'b) : view 'a 'b
       ensures { match result with
         | VEmpty -> t.m = Empty
         | VNode l d r h -> t.m = Node l.m d.Data.m r.m h /\
           c l /\ Data.c d /\ c r
         end }
-    
+
   end
-  
+
   (* Balancing constant for the tree. This will bound
      the height difference between the subtrees at a node of
      the avl. Larger constant mean deeper trees but less
      balancing operations. *)
   constant balancing : int
   axiom balancing_positive : balancing > 0
-  
+
 end
 
 (* AVL, modeled as a doubly-ended list + a non-negative height. *)
 module AVL
-  
+
   use import int.Int
   use import bool.Bool
   use import list.Append
-  use import HighOrd
   use import option.Option
   use import ref.Ref
-  
+
   (* AVL Parameters. *)
   clone import Params as P
-  
+
   (* The model of an avl is morally a list. *)
   type l 'a 'b = list (Data.m 'a 'b)
   (* Excepted that we also expose an integer (the height of the tree),
@@ -84,24 +83,24 @@ module AVL
     hgt : int;
     inv : Data.m 'a 'b -> bool;
   }
-  
+
   (* Shortcut. *)
   function node_model (l:l 'a 'b) (d:Data.m 'a 'b) (r:l 'a 'b) : l 'a 'b =
     l ++ Cons d r
-  
+
   (* list obtained from a tree by infix traversal. *)
   function list_model (t:Tree.m 'a 'b) : l 'a 'b = match t with
     | Tree.Empty -> Nil
     | Tree.Node l d r _ -> node_model (list_model l) d (list_model r)
     end
-  
+
   (* Height of the tree. *)
   function real_height (t:Tree.m 'a 'b) : int = match t with
     | Tree.Empty -> 0
     | Tree.Node l _ r _ -> let hl = real_height l in let hr = real_height r in
       1 + if hl < hr then hr else hl
     end
-  
+
   let rec lemma real_height_nonnegative (t:Tree.m 'a 'b) : unit
     ensures { real_height t >= 0 }
     variant { t }
@@ -109,7 +108,7 @@ module AVL
     | Tree.Empty -> ()
     | Tree.Node l _ r _ -> real_height_nonnegative l; real_height_nonnegative r
     end
-  
+
   (* Balanced tree + correctness of stored height. *)
   predicate balanced (t:Tree.m 'a 'b) = match t with
     | Tree.Empty -> true
@@ -117,7 +116,7 @@ module AVL
       -balancing <= real_height r - real_height l <= balancing /\
       balanced l /\ balanced r
     end
-  
+
   (* Well-formedness of the data is guaranteed by the parameters.
      We also allow user to specify additional properties satisfied
      by the stored data. *)
@@ -127,13 +126,13 @@ module AVL
     | Tree.Node l d r _ ->
       avl_data_correct inv l /\ inv d /\ avl_data_correct inv r
     end
-  
+
   (* Tree rotations are the core of balancing, so we show that
      they preserve the model. *)
   lemma rotation_preserve_model : forall ld rd:Data.m 'a 'b,fl fm fr:l 'a 'b.
       node_model (node_model fl ld fm) rd fr =
         node_model fl ld (node_model fm rd fr)
-  
+
   (* Avl type. *)
   type t 'a 'b = {
     (* Representation as a binary tree. *)
@@ -141,7 +140,7 @@ module AVL
     (* Model. *)
     ghost m : m 'a 'b;
   }
-  
+
   (* Invariant. *)
   predicate c (a:t 'a 'b) =
     let tm = a.repr.Tree.m in
@@ -150,14 +149,14 @@ module AVL
     a.m.lis = list_model tm /\
     a.m.hgt = real_height tm /\
     Tree.c a.repr
-  
+
   (* Get the height of the avl. *)
   let height (a:t 'a 'b) : int
     requires { c a }
     ensures { result = a.m.hgt }
   = match Tree.view a.repr with Tree.VEmpty -> 0 | Tree.VNode _ _ _ h -> h end
-  
-  
+
+
   (* Constructors. *)
   (* The empty avl. *)
   let empty (ghost dinv:Data.m 'a 'b -> bool) : t 'a 'b
@@ -167,7 +166,7 @@ module AVL
     ensures { result.m.hgt = 0 }
   =
     { repr = Tree.empty (); m = { lis = Nil; inv = dinv; hgt = 0 } }
-  
+
   (* Node. Restricted to perfect balancing. *)
   let node (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
     requires { l.m.inv = r.m.inv }
@@ -186,7 +185,7 @@ module AVL
       m = { lis = node_model l.m.lis d.Data.m r.m.lis;
             inv = r.m.inv;
             hgt = h } }
-  
+
   (* Useful constructor. *)
   let singleton (ghost dinv:Data.m 'a 'b -> bool) (d:Data.t 'a 'b) : t 'a 'b
     requires { Data.c d /\ dinv d.Data.m }
@@ -198,12 +197,12 @@ module AVL
     let e = Tree.empty () in
     { repr = Tree.node e d e 1;
       m = { lis = Cons d.Data.m Nil; inv = dinv; hgt = 1 } }
-  
+
   (* View of an avl, in similar fashion to Tree.view. *)
   type view 'a 'b =
     | AEmpty
     | ANode (t 'a 'b) (Data.t 'a 'b) (t 'a 'b) int
-  
+
   (* Pattern-matching. *)
   let view (t:t 'a 'b) : view 'a 'b
     requires { c t }
@@ -229,7 +228,7 @@ module AVL
                         hgt = real_height r.Tree.m } }
       h
     end
-  
+
   (* Emptyness test. *)
   let is_empty (t:t 'a 'b) : bool
     requires { c t }
@@ -239,7 +238,7 @@ module AVL
     | Tree.VEmpty -> true
     | _ -> false
     end
-  
+
   (* Node constructor, defective balancing allowed in input. *)
   let balance (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
     requires { l.m.inv = r.m.inv }
@@ -286,7 +285,7 @@ module AVL
           end
       end
     else node l d r
-  
+
   (* Decompose l ++ [d] ++ r as head::tail,avl version. Internal function. *)
   let rec decompose_front_node
     (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : (Data.t 'a 'b,t 'a 'b)
@@ -304,7 +303,7 @@ module AVL
     | ANode l d2 r2 _ -> let (d3,left) = decompose_front_node l d2 r2 in
       (d3,balance left d r)
     end
-  
+
   (* Pattern-matching over the model list front. *)
   let decompose_front (t:t 'a 'b) : option (Data.t 'a 'b,t 'a 'b)
     requires { c t }
@@ -315,7 +314,7 @@ module AVL
     | AEmpty -> None
     | ANode l d r _ -> Some (decompose_front_node l d r)
     end
-  
+
   let rec decompose_back_node
     (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : (t 'a 'b,Data.t 'a 'b)
     requires { c l /\ Data.c d /\ c r /\ l.m.inv = r.m.inv /\ l.m.inv d.Data.m }
@@ -332,7 +331,7 @@ module AVL
     | ANode l2 d2 r _ -> let (right,d3) = decompose_back_node l2 d2 r in
       (balance l d right,d3)
     end
-  
+
   (* Pattern-matching over the model list back. *)
   let decompose_back (t:t 'a 'b) : option (t 'a 'b,Data.t 'a 'b)
     requires { c t }
@@ -343,7 +342,7 @@ module AVL
     | AEmpty -> None
     | ANode l d r _ -> Some (decompose_back_node l d r)
     end
-  
+
   let rec front_node (ghost li:ref (l 'a 'b)) (l:t 'a 'b)
     (d:Data.t 'a 'b) : Data.t 'a 'b
     requires { c l /\ Data.c d /\ l.m.inv d.Data.m }
@@ -355,7 +354,7 @@ module AVL
     | ANode l d2 r _ -> let res = front_node li l d2 in
       li := !li ++ r.m.lis ++ Cons d.Data.m Nil; res
     end
-  
+
   (* Get the front of a non-empty list. *)
   let front (ghost li:ref (l 'a 'b)) (t:t 'a 'b) : Data.t 'a 'b
     requires { c t /\ match t.m.lis with Nil -> false | _ -> true end }
@@ -366,7 +365,7 @@ module AVL
     | ANode l d2 r _ -> let res = front_node li l d2 in
       li := !li ++ r.m.lis; res
     end
-  
+
   let rec back_node (ghost li:ref (l 'a 'b)) (d:Data.t 'a 'b)
      (r:t 'a 'b) : Data.t 'a 'b
     requires { c r /\ Data.c d /\ r.m.inv d.Data.m }
@@ -378,7 +377,7 @@ module AVL
     | ANode l d2 r _ -> let res = back_node li d2 r in
       li := Cons d.Data.m l.m.lis ++ !li; res
     end
-  
+
   (* Get the back of a non-empty list. *)
   let back (ghost li:ref (l 'a 'b)) (t:t 'a 'b) : Data.t 'a 'b
     requires { c t /\ match t.m.lis with Nil -> false | _ -> true end }
@@ -389,7 +388,7 @@ module AVL
     | ANode l d2 r _ -> let res = back_node li d2 r in
       li := l.m.lis ++ !li; res
     end
-  
+
   (* Concatenation of avl, balancing hypothesis on inputs. *)
   let fuse (l r:t 'a 'b) : t 'a 'b
     requires { c l /\ c r /\ l.m.inv = r.m.inv }
@@ -408,8 +407,8 @@ module AVL
         balance l d0 r'
       end
     end
-  
-  
+
+
   (* list cons with avl. *)
   let rec cons (d:Data.t 'a 'b) (t:t 'a 'b) : t 'a 'b
     requires { Data.c d /\ c t /\ t.m.inv d.Data.m }
@@ -422,7 +421,7 @@ module AVL
     | AEmpty -> singleton t.m.inv d
     | ANode l d2 r _ -> balance (cons d l) d2 r
     end
-  
+
   (* Reverse cons. *)
   let rec snoc (t:t 'a 'b) (d:Data.t 'a 'b) : t 'a 'b
     requires { c t /\ Data.c d /\ t.m.inv d.Data.m }
@@ -434,7 +433,7 @@ module AVL
     | AEmpty -> singleton t.m.inv d
     | ANode l d2 r _ -> balance l d2 (snoc r d)
     end
-  
+
   (* Node constructor, allow no balancing hypothesis at all. *)
   let rec join (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
     requires { c l /\ Data.c d /\ c r }
@@ -458,7 +457,7 @@ module AVL
         else node l d r
       end
     end
-  
+
   (* Concatenation, no balancing hypothesis on inputs. *)
   let concat (l:t 'a 'b) (r:t 'a 'b) : t 'a 'b
     requires { c l /\ c r /\ l.m.inv = r.m.inv }
@@ -472,54 +471,54 @@ module AVL
         join l d0 r'
       end
     end
-  
+
   (* Efficient enumeration of avl elements.
      Of course, it can be done by successful application of decompose,
      but this is O(n*log(n)), while this method is O(n). *)
   namespace Enum
-    
+
     use import list.Reverse
-    
+
     (* Missing in list.Reverse. *)
     let rec lemma reverse_append_gen (l1 l2:list 'a) : unit
       ensures { reverse (l1 ++ l2) = reverse l2 ++ reverse l1 }
       variant { l1 }
     = match l1 with Cons _ q -> reverse_append_gen q l2 | _ -> () end
-    
+
     type base 'a 'b = End | More (Data.t 'a 'b) (t 'a 'b) (base 'a 'b)
-    
+
     (* Model of a left-to-right enumeration. *)
     function model_lr (e:base 'a 'b) : l 'a 'b =
       match e with
       | End -> Nil
       | More d r q -> Cons d.Data.m (r.m.lis ++ model_lr q)
       end
-    
+
     (* right-to-left version. *)
     function model_rl (e:base 'a 'b) : l 'a 'b =
       match e with
       | End -> Nil
       | More d l q -> Cons d.Data.m (reverse l.m.lis ++ model_rl q)
       end
-    
+
     predicate base_correct (di:Data.m 'a 'b -> bool) (e:base 'a 'b) =
       match e with
       | End -> true
       | More d t next -> Data.c d /\ c t /\ base_correct di next /\
         t.m.inv = di /\ di d.Data.m
       end
-    
+
     type m 'a 'b = {
       inv : Data.m 'a 'b -> bool;
       lis : l 'a 'b;
       left_to_right : bool;
     }
-    
+
     type t 'a 'b = {
       repr : base 'a 'b;
       ghost m : m 'a 'b;
     }
-    
+
     predicate c (e: t 'a 'b) =
       base_correct e.m.inv e.repr /\
       e.m.lis = if e.m.left_to_right
@@ -528,7 +527,7 @@ module AVL
   end
   (* Trick to avoid aliasing. *)
   namespace Enum
-    
+
     use import list.Reverse
     let empty_enum (ghost ltr:bool)
       (ghost dinv:Data.m 'a 'b -> bool) : Enum.t 'a 'b
@@ -538,7 +537,7 @@ module AVL
       ensures { Enum.c result }
     = { Enum.repr = Enum.End;
         Enum.m = { Enum.inv = dinv; Enum.lis = Nil; Enum.left_to_right = ltr } }
-    
+
     let rec enum_lr (t:t 'a 'b) (acc:Enum.t 'a 'b) : Enum.t 'a 'b
       requires { c t /\ Enum.c acc }
       requires { let accm = acc.Enum.m in
@@ -554,7 +553,7 @@ module AVL
                     Enum.m = { accm with
                       Enum.lis = Cons d.Data.m (r.m.lis ++ accm.Enum.lis) } }
       end
-    
+
     let rec enum_rl (t:t 'a 'b) (acc:Enum.t 'a 'b) : Enum.t 'a 'b
       requires { Enum.c acc /\ c t }
       requires { let accm = acc.Enum.m in
@@ -571,7 +570,7 @@ module AVL
                     Enum.m = { accm with
                       Enum.lis = Cons d.Data.m (rl ++ accm.Enum.lis) } }
       end
-    
+
     let decompose_lr (t:Enum.t 'a 'b) : option (Data.t 'a 'b,Enum.t 'a 'b)
       requires { Enum.c t }
       requires { t.Enum.m.Enum.left_to_right }
@@ -593,7 +592,7 @@ module AVL
           Enum.m = { t.Enum.m with Enum.lis = l0 } } in
         Some (d,enum_lr r q')
       end
-    
+
     let decompose_rl (t:Enum.t 'a 'b) : option (Data.t 'a 'b,Enum.t 'a 'b)
       requires { Enum.c t }
       requires { not t.Enum.m.Enum.left_to_right }
@@ -610,26 +609,26 @@ module AVL
           Enum.m = { t.Enum.m with Enum.lis = l0 } } in
         Some (d,enum_rl l q')
       end
-    
+
   end
-  
+
 end
 
 theory SelectionTypes
-  
+
   use import list.List
   use import option.Option
-  
+
   type position_base 'a = {
     left : list 'a;
     middle : option 'a;
     right : list 'a;
   }
-  
+
   type way_base 'a = Left 'a
     | Right 'a
     | Here
-  
+
 end
 
 (* Addition/Removal/Etc(split,etc) algorithms based on selection.
@@ -651,51 +650,50 @@ end
    Note: it would also work for non-deterministic selection.
      The result would be unspecified within the set of selected elements. *)
 module Selection
-  
+
   use import int.Int
   use import bool.Bool
   use import list.Append
   use import option.Option
-  use import HighOrd
-  
+
   clone export AVL
   use export SelectionTypes
-  
+
   (* Position inside a list l. *)
   type position 'a 'b = position_base (P.Data.m 'a 'b)
-  
+
   function rebuild (p:position 'a 'b) : l 'a 'b =
     match p.middle with
     | None -> p.left ++ p.right
     | Some d -> node_model p.left d p.right
     end
-  
+
   function option_to_list (o:option 'a) : list 'a = match o with
     | None -> Nil
     | Some d -> Cons d Nil
     end
-  
+
   lemma rebuild_alternative_def : forall p:position 'a 'b.
     rebuild p = p.left ++ option_to_list p.middle ++ p.right
-  
+
   (* selector type. *)
   clone program_type.Type2 as S
-  
+
   (* Correctness of a selector with respect to a list. *)
   predicate selector_correct (s:S.m 'a 'b) (l:l 'a 'b)
-  
+
   (* A position is selected by a selector. *)
   predicate selected (s:S.m 'a 'b) (e:position 'a 'b)
-  
+
   (* way to the position. *)
   type way 'a 'b = way_base (S.t 'a 'b)
-  
+
   (* A correct selector for the empty list
      always select its only possible position. *)
   axiom selector_correct_empty : forall s:S.m 'a 'b.
     selector_correct s Nil ->
       selected s { left = Nil ; middle = None ; right = Nil }
-  
+
   (* Branch on a position. *)
   val selected_way (s:S.t 'a 'b)
     (l:t 'a 'b) (d:P.Data.t 'a 'b) (r:t 'a 'b) : way 'a 'b
@@ -713,12 +711,12 @@ module Selection
       | Right sr -> selector_correct sr.S.m r.m.lis /\ S.c sr /\
         forall e. selected sr.S.m e ->
         selected s.S.m { e with left = node_model l.m.lis d.P.Data.m e.left } }
-  
+
   use import ref.Ref
-  
+
   let ghost default_position () : position 'a 'b =
     { left = Nil; middle = None; right = Nil }
-  
+
   let rec add (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
     (d:P.Data.t 'a 'b) (t:t 'a 'b) : t 'a 'b
     requires { selector_correct s.S.m t.m.lis }
@@ -746,7 +744,7 @@ module Selection
         node tl d tr
       end
     end
-  
+
   let rec remove (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
     (t:t 'a 'b) : t 'a 'b
     requires { selector_correct s.S.m t.m.lis }
@@ -774,7 +772,7 @@ module Selection
         fuse tl tr
       end
     end
-  
+
   let rec split (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
     (t:t 'a 'b) : (t 'a 'b,option (P.Data.t 'a 'b),t 'a 'b)
     requires { selector_correct s.S.m t.m.lis }
@@ -804,7 +802,7 @@ module Selection
         (tl,Some td,tr)
       end
     end
-  
+
   let rec get (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
     (t:t 'a 'b) : option (P.Data.t 'a 'b)
     requires { selector_correct s.S.m t.m.lis }
@@ -831,7 +829,7 @@ module Selection
         Some td
       end
     end
-  
+
   let rec mem (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
     (t:t 'a 'b) : bool
     requires { selector_correct s.S.m t.m.lis }
@@ -856,7 +854,7 @@ module Selection
         true
       end
     end
-  
+
 end
 
 (*
@@ -864,17 +862,16 @@ end
 (* Instantiation to sorted (increasing) avl.
    Those implement ordered associative tables. *)
 module AVLSorted
-  
+
   use import int.Int
   use import option.Option
   use import bool.Bool
-  use import HighOrd
   use import list.Append
   use import list.Mem
   use import list.Length
-  
+
   clone import AVL as A
-  
+
   (* Key used for ordering. *)
   type key 'a
   type key_model 'a
@@ -894,10 +891,10 @@ module AVLSorted
     type A.KT.key = key_model,
     type A.KT.t = data_model,
     type A.param = order
-  
-  
+
+
   (*
-  
+
   (* Comparison is computable. *)
   val compare (o:order 'a) (k1 k2:key 'a) : int
     requires { correct_for_order o (key_model k1) /\ key_correct k1 }
@@ -905,21 +902,21 @@ module AVLSorted
     ensures { result > 0 <-> lt o (key_model k2) (key_model k1) }
     ensures { result < 0 <-> lt o (key_model k1) (key_model k2) }
     ensures { result = 0 <-> eq o (key_model k1) (key_model k2) }
-  
+
   predicate majorate (o:order 'a) (k:key_model 'a) (l:list_model 'a 'b) =
     forall d0. mem d0 l -> let k0 = get_key_m d0 in
       correct_for_order o k0 /\ lt o k0 k
-  
+
   predicate minorate (o:order 'a) (k:key_model 'a) (l:list_model 'a 'b) =
     forall d0. mem d0 l -> let k0 = get_key_m d0 in
       correct_for_order o k0 /\ lt o k k0
-  
+
   predicate sorted (o:order 'a) (l:list_model 'a 'b) = match l with
       | Nil -> true
       | Cons d q -> let k = get_key_m d in
         correct_for_order o k /\ minorate o k q /\ sorted o q
     end
-    
+
   (* Sorted with a midpoint. *)
   let rec lemma sorted_def_midpoint (o:order 'a) (l:list_model 'a 'b)
     (d:data_model 'a 'b) (r:list_model 'a 'b) : unit
@@ -935,12 +932,12 @@ module AVLSorted
       | Nil -> ()
       | Cons _ ql -> sorted_def_midpoint o ql d r
     end
-  
+
   predicate before (o:order 'a) (l:list_model 'a 'b) (r:list_model 'a 'b) =
     forall d1 d2. mem d1 l /\ mem d2 r ->
       let k1 = get_key_m d1 in let k2 = get_key_m d2 in
       correct_for_order o k1 /\ correct_for_order o k2 /\ lt o k1 k2
-  
+
   (* Other variant: condition for a concatenation to be sorted. *)
   let rec lemma sorted_def_concat (o:order 'a) (l:list_model 'a 'b)
     (r:list_model 'a 'b) : unit
@@ -952,21 +949,21 @@ module AVLSorted
       | Nil -> ()
       | Cons _ ql -> sorted_def_concat o ql r
     end
-  
+
   type position 'a 'b = {
     left : list_model 'a 'b;
     middle : option (data_model 'a 'b);
     right : list_model 'a 'b;
   }
-  
+
   (* Selection will be done by ordered key. *)
   type selector 'a 'b = (order 'a,key 'a)
-  
+
   (* Correctness is sortedness. *)
   predicate selector_correct (s:selector 'a 'b) (l:list_model 'a 'b) =
     let (o,k) = s in sorted o l /\ correct_for_order o (key_model k) /\
       key_correct k
-    
+
   (* Selected position is:
      - The position of the element equivalent to the key for the
        corresponding order.
@@ -981,12 +978,12 @@ module AVLSorted
           eq o (get_key_m d) (key_model k) /\
           correct_for_order o (get_key_m d)
       end
-  
+
   (* Way to the position. *)
   type way 'a 'b= Left (selector 'a 'b)
     | Right (selector 'a 'b)
     | Here
-  
+
   (* Way selection. *)
   let selected_way (s:selector 'a 'b)
     (l:avl 'a 'b) (d:data 'a 'b) (r:avl 'a 'b) : way 'a 'b
@@ -1015,7 +1012,7 @@ module AVLSorted
     else if cmp > 0
     then Right s
     else Here
-  
+
   (* In an ideal world...
      1) It would be nice to have the two cloned AVL modules unified
         (they are intended to be the same), as well as the two (identical)
@@ -1030,26 +1027,26 @@ module AVLSorted
        lemma selected_append,
        lemma selector_correct_empty,
        val selected_way = selected_way*)
-  
+
   (* And we would get this (or something close).
      Right now, this is done by hand. *)
-  
+
   namespace import F
     use import ref.Ref
-    
+
     lemma selected_append : forall s,e,l:list_model 'a 'b.
       selected s e l /\ selector_correct s l -> match e.middle with
         | Some d -> l = node_model e.left d e.right
         | None -> l = e.left ++ e.right
       end
-    
+
     lemma selector_correct_empty : forall s:selector 'a 'b.
       selector_correct s (Nil:list_model 'a 'b) ->
         selected s { left = Nil ; middle = None ; right = Nil }
           (Nil:list_model 'a 'b)
-    
+
     val ghost default_position () : position 'a 'b
-  
+
     val add (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
       (d:data 'a 'b) (a:avl 'a 'b) : avl 'a 'b
       requires { selector_correct s a.model }
@@ -1061,7 +1058,7 @@ module AVLSorted
       ensures { avl_correct result }
       ensures { result.data_inv = a.data_inv }
       writes { r }
-  
+
     val remove (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
       (a:avl 'a 'b) : avl 'a 'b
       requires { selector_correct s a.model }
@@ -1072,7 +1069,7 @@ module AVLSorted
       ensures { avl_correct result }
       ensures { result.data_inv = a.data_inv }
       writes { r }
-  
+
     val split (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
       (a:avl 'a 'b) : (avl 'a 'b,option (data 'a 'b),avl 'a 'b)
       requires { avl_correct a }
@@ -1085,7 +1082,7 @@ module AVLSorted
           | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
         end /\ l.data_inv = a.data_inv /\ r.data_inv = a.data_inv }
       writes { p }
-    
+
     val get (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
       (a:avl 'a 'b) : option (data 'a 'b)
       requires { avl_correct a }
@@ -1096,7 +1093,7 @@ module AVLSorted
           | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
         end }
       writes { p }
-  
+
     val mem (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
       (a:avl 'a 'b) : bool
       requires { avl_correct a }
@@ -1105,10 +1102,10 @@ module AVLSorted
         selected s !p a.model }
       writes { p }
   end
-  
+
   (* Functional model. *)
   type fun_model 'a 'b = key_model 'a -> option (data_model 'a 'b)
-  
+
   function functional_model (o:order 'a)
     (l:list_model 'a 'b) : fun_model 'a 'b =
     match l with
@@ -1117,22 +1114,22 @@ module AVLSorted
         \y. if correct_for_order o y &&
           eq o y (get_key_m x) then Some x else f0 y
     end
-  
+
   type map 'a 'b = {
     avl_repr : avl 'a 'b;
     order : order 'a;
     ghost fmodel : fun_model 'a 'b;
   }
-  
+
   function map_data_inv (m:map 'a 'b) : data_model 'a 'b -> bool =
     m.avl_repr.data_inv
-  
+
   predicate map_correct (m:map 'a 'b) =
     avl_correct m.avl_repr /\
     sorted m.order m.avl_repr.model /\
     m.fmodel = functional_model m.order m.avl_repr.model /\
     (forall d. m.map_data_inv d -> correct_for_order m.order (get_key_m d))
-  
+
   (* A key that is either minorated/majorated in some list is not
      represented in its functional model. *)
   let rec lemma fun_model_minorate (o:order 'a) (k:key_model 'a)
@@ -1143,7 +1140,7 @@ module AVLSorted
     ensures { functional_model o l k = None }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_minorate o k ql end
-  
+
   let rec lemma fun_model_majorate (o:order 'a) (k:key_model 'a)
     (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
     requires { sorted o l }
@@ -1152,7 +1149,7 @@ module AVLSorted
     ensures { functional_model o (l++r) k = functional_model o r k }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_majorate o k ql r end
-  
+
   let rec lemma fun_model_selected (o:order 'a) (k:key 'a)
     (p:position 'a 'b) (l:list_model 'a 'b) (ks:key_model 'a) : unit
     requires { selected (o,k) p l }
@@ -1193,7 +1190,7 @@ module AVLSorted
           && not eq o kpl ks };
         fun_model_selected o k { p with left = qpl } ql ks
     end
-  
+
   let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
     (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
     requires { sorted o l }
@@ -1208,8 +1205,8 @@ module AVLSorted
       functional_model o (l++r) k = Some d }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_concat o k ql r end
-    
-  
+
+
   (*
   (* Functional model of a concatenation. *)
   let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
@@ -1221,7 +1218,7 @@ module AVLSorted
     ensures { functional_model o (l++r) k = functional_model o l k }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_concat o k ql r end
-  
+
   (* Node selection. *)
   let rec lemma fun_model_node (o:order 'a) (k:key_model 'a)
     (l:list_model 'a 'b) (d:data_model 'a 'b) (r:list_model 'a 'b) : unit
@@ -1231,14 +1228,14 @@ module AVLSorted
     ensures { functional_model o (node_model l d r) k = Some d }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_node o k ql d r end*)
-  
+
   let rec lemma fun_model_incorrect (o:order 'a) (k:key_model 'a)
     (l:list_model 'a 'b) : unit
     requires { not(correct_for_order o k) }
     ensures { functional_model o l k = None }
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_incorrect o k ql end
-  
+
   let rec lemma fun_model_nonnone (o:order 'a) (d:data_model 'a 'b)
     (l:list_model 'a 'b) : unit
     requires { sorted o l }
@@ -1250,9 +1247,9 @@ module AVLSorted
       then fun_model_nonnone o d ql
       else ()
     end
-  
+
   use import ref.Ref
-  
+
   let map_empty (o:order 'a) (inv:data_model 'a 'b -> bool) : map 'a 'b
     requires { forall d. inv d -> correct_for_order o (get_key_m d) }
     ensures { result.order = o }
@@ -1264,7 +1261,7 @@ module AVLSorted
     { avl_repr = rp;
       order = o;
       fmodel = functional_model o rp.model }
-  
+
   let map_singleton (o:order 'a) (inv:data_model 'a 'b -> bool)
     (d:data 'a 'b) : map 'a 'b
     requires { forall d. inv d -> correct_for_order o (get_key_m d) }
@@ -1285,7 +1282,7 @@ module AVLSorted
     { avl_repr = rp;
       order = o;
       fmodel = functional_model o rp.model }
-  
+
   let map_add (d:data 'a 'b) (m:map 'a 'b) : map 'a 'b
     requires { m.map_data_inv (data_model d) /\ data_correct d }
     requires { map_correct m }
@@ -1309,7 +1306,7 @@ module AVLSorted
     assert { selected (o,k)
       { !r with middle = Some (data_model d) } res0.model };
     res
-  
+
   let map_mem (k:key 'a) (m:map 'a 'b) : bool
     requires { key_correct k /\ correct_for_order m.order (key_model k) }
     requires { map_correct m }
@@ -1319,7 +1316,7 @@ module AVLSorted
     let ghost r = ref (default_position ()) in
     let o = m.order in
     mem r (o,k) m.avl_repr
-  
+
   let map_remove (k:key 'a) (m:map 'a 'b) : map 'a 'b
     requires { key_correct k /\ correct_for_order m.order (key_model k) }
     requires { map_correct m }
@@ -1340,8 +1337,8 @@ module AVLSorted
       fmodel = functional_model o res0.model } in
     assert { selected (o,k) { !r with middle = None } res0.model };
     res
-  
-  
+
+
   let map_find (k:key 'a) (m:map 'a 'b) : option (data 'a 'b)
     requires { key_correct k /\ correct_for_order m.order (key_model k) }
     requires { map_correct m }
@@ -1354,7 +1351,7 @@ module AVLSorted
     let ghost r = ref (default_position ()) in
     let o = m.order in
     get r (o,k) m.avl_repr
-  
+
   let map_split (k:key 'a)
     (m:map 'a 'b) : (map 'a 'b,option (data 'a 'b),map 'a 'b)
     requires { key_correct k /\ correct_for_order m.order (key_model k) }
@@ -1391,7 +1388,7 @@ module AVLSorted
       order = m.order;
       fmodel = functional_model o r0.model } in
     (l,o0,r)
-  
+
   let map_concat (m1 m2:map 'a 'b) : map 'a 'b
     requires { map_correct m1 /\ map_correct m2 /\
       m1.map_data_inv = m2.map_data_inv /\

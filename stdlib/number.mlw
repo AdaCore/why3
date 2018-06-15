@@ -80,19 +80,19 @@ module Divisibility
   lemma divides_bounds:
     forall a b: int. divides a b -> b <> 0 -> abs a <= abs b
 
-  use int.EuclideanDivision
+  use int.EuclideanDivision as ED
 
   lemma mod_divides_euclidean:
-    forall a b: int. b <> 0 -> EuclideanDivision.mod a b = 0 -> divides b a
+    forall a b: int. b <> 0 -> ED.mod a b = 0 -> divides b a
   lemma divides_mod_euclidean:
-    forall a b: int. b <> 0 -> divides b a -> EuclideanDivision.mod a b = 0
+    forall a b: int. b <> 0 -> divides b a -> ED.mod a b = 0
 
-  use int.ComputerDivision
+  use int.ComputerDivision as CD
 
   lemma mod_divides_computer:
-    forall a b: int. b <> 0 -> ComputerDivision.mod a b = 0 -> divides b a
+    forall a b: int. b <> 0 -> CD.mod a b = 0 -> divides b a
   lemma divides_mod_computer:
-    forall a b: int. b <> 0 -> divides b a -> ComputerDivision.mod a b = 0
+    forall a b: int. b <> 0 -> divides b a -> CD.mod a b = 0
 
   use import Parity
 
@@ -123,7 +123,7 @@ module Gcd
 
   (* gcd is associative commutative *)
 
-  clone algebra.AC with type t = int, function op = gcd
+  clone import algebra.AC with type t = int, function op = gcd
 
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a
@@ -132,17 +132,17 @@ module Gcd
 
   lemma gcd_euclid: forall a b q: int. gcd a b = gcd a (b - q * a)
 
-  use int.ComputerDivision
+  use int.ComputerDivision as CD
 
   lemma Gcd_computer_mod:
-    forall a b: int [gcd b (ComputerDivision.mod a b)].
-    b <> 0 -> gcd b (ComputerDivision.mod a b) = gcd a b
+    forall a b: int [gcd b (CD.mod a b)].
+    b <> 0 -> gcd b (CD.mod a b) = gcd a b
 
-  use int.EuclideanDivision
+  use int.EuclideanDivision as ED
 
   lemma Gcd_euclidean_mod:
-    forall a b: int [gcd b (EuclideanDivision.mod a b)].
-    b <> 0 -> gcd b (EuclideanDivision.mod a b) = gcd a b
+    forall a b: int [gcd b (ED.mod a b)].
+    b <> 0 -> gcd b (ED.mod a b) = gcd a b
 
   lemma gcd_mult: forall a b c: int. 0 <= c -> gcd (c * a) (c * b) = c * gcd a b
 

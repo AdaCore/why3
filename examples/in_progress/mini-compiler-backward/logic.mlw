@@ -7,7 +7,6 @@ module Compiler_logic
   use import vm.Vm
   use import vm.VMClock
   use import state.State
-  use import HighOrd
 
   function fst (p: ('a,'b)) : 'a = let (x,_) = p in x
   meta rewrite_def function fst

@@ -99,8 +99,7 @@ end
 module MinMax
 
   use import Real
-  clone export relations.MinMax with
-    type t = real, predicate le = (<=), goal .
+  clone export relations.MinMax with type t = real, predicate le = (<=), goal .
 
 end
 
@@ -108,7 +107,7 @@ end
 
 module FromInt
 
-  use int.Int
+  use int.Int as Int
   use import Real
 
   function from_int int : real

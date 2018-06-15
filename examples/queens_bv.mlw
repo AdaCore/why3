@@ -128,7 +128,7 @@ module BitsSpec
     ensures  { !min = min_elt a.mdl }
     ensures  { result.mdl = singleton !min }
 
-  use bv.BV32
+  use bv.BV32 as BV32
   val below (n: BV32.t) : t
     requires { BV32.ule n (32:BV32.t) }
     ensures  { result.mdl = interval 0 (BV32.t'int n) }

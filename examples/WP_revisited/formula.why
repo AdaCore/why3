@@ -44,7 +44,7 @@ function eval (f:prop_fmla) (v:idmap bool) : bool =
   end
 
 
-  use map.Const
+  use import map.Const
 
   goal Test1 :
     let x = mk_ident 0 in

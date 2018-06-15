@@ -6,7 +6,7 @@ module StdIO
   (** ghost references to represent the standard output *)
   use import int.Int
   use import list.List
-  use list.Reverse
+  use import list.Reverse
   use import ref.Ref
 
   type prdata = PrChar char | PrInt int
@@ -42,6 +42,6 @@ module StdIO
     ensures { !cur_pos = 0 }
     ensures { !current_line = Nil }
     ensures { !cur_linenum = (old !cur_linenum) + 1 }
-    ensures { !flushed = Cons (Reverse.reverse (old !current_line)) (old !flushed) }
+    ensures { !flushed = Cons (reverse (old !current_line)) (old !flushed) }
 
 end

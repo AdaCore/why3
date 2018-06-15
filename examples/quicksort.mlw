@@ -76,7 +76,7 @@ module Shuffle
   use import array.Array
   use import array.ArraySwap
   use import array.ArrayPermut
-  use random.Random
+  use import random.Random
 
   let shuffle (a: array int) : unit
     writes  { a, Random.s }

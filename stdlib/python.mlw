@@ -2,34 +2,34 @@ module Python
 
   use import int.Int
   use import ref.Ref
-  use array.Array
+  use array.Array as A
 
   (* Python's lists are actually resizable arrays, but we simplify here *)
-  type list 'a = Array.array 'a
+  type list 'a = A.array 'a
 
   function ([]) (l: list 'a) (i: int) : 'a =
-    Array.([]) l i
+    A.([]) l i
 
   function ([<-]) (l: list 'a) (i: int) (v: 'a) : list 'a =
-    Array.([<-]) l i v
+    A.([<-]) l i v
 
   let function len (l: list 'a) : int
-  = Array.length l
+  = A.length l
 
   let ([]) (l: list 'a) (i: int) : 'a
-    requires { 0 <= i < Array.length l }
+    requires { 0 <= i < A.length l }
     ensures  { result = l[i] }
-  = Array.([]) l i
+  = A.([]) l i
 
   let ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
-    requires { 0 <= i < Array.length l }
+    requires { 0 <= i < A.length l }
     writes   { l }
-    ensures  { l = Array.([<-]) (old l) i v }
-  = Array.([]<-) l i v
+    ensures  { l = A.([<-]) (old l) i v }
+  = A.([]<-) l i v
 
   val range (l u: int) : list int
     requires { l <= u }
-    ensures  { Array.length result = u - l }
+    ensures  { A.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
   (* ad-hoc facts about exchange *)
@@ -37,7 +37,7 @@ module Python
   use import map.Occ
 
   function occurrence (v: 'a) (l: list 'a) : int =
-    Occ.occ v l.Array.elts 0 l.Array.length
+    Occ.occ v l.A.elts 0 l.A.length
 
   (* Python's division and modulus according are neither Euclidean division,
      nor computer division, but something else defined in

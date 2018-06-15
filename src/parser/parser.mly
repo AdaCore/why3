@@ -246,14 +246,16 @@ use_clone:
     { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
 | USE boption(IMPORT) tqualid option(preceded(AS, uident))
     { let loc = floc $startpos $endpos in
+      let import = $2 || $4 = None in
       Typing.open_scope loc (use_as $3 $4);
       Typing.add_decl loc (Duse $3);
-      Typing.close_scope loc ~import:$2 }
+      Typing.close_scope loc ~import }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
+      let import = $2 || $4 = None in
       Typing.open_scope loc (use_as $3 $4);
       Typing.add_decl loc (Dclone ($3, $5));
-      Typing.close_scope loc ~import:$2 }
+      Typing.close_scope loc ~import }
 
 clone_subst:
 | (* epsilon *)                         { [] }

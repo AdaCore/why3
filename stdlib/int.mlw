@@ -56,10 +56,7 @@ module MinMax
 
   use import Int
 
-  clone export relations.MinMax with
-    type t = int, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  clone export relations.MinMax with type t = int, predicate le = (<=), goal .
 
   let min (x y : int) : int
     ensures { result = min x y }

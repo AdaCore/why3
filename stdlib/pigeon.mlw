@@ -36,7 +36,7 @@ module ListAndSet
   use import list.List
   use import list.Length
   use import list.Append
-  use list.Mem
+  use list.Mem as Mem
   use import set.Fset
 
   type t
@@ -48,7 +48,8 @@ module ListAndSet
     exists e: t, l1 l2 l3: list t.
     l = l1 ++ (Cons e (l2 ++ (Cons e l3)))
 
-  clone set.FsetInduction with type t = t, predicate p = pigeon_set
+  clone set.FsetInduction as FSI with
+    type t = t, predicate p = pigeon_set
 
   lemma corner:
     forall s: set t, l: list t.

@@ -262,7 +262,7 @@ end
 theory TestSemantics
 
 use import Imp
-use map.Const
+use import map.Const
 
 function my_sigma : env = Const.const (Vint 0)
 function my_pi : env = Const.const (Vint 42)
@@ -425,7 +425,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
            eval_fmla sigma' pi' result
      }
 
-  use HoareLogic
+  use import HoareLogic
 
   let rec wp (i:stmt) (q:fmla)
     ensures { valid_triple result i q }

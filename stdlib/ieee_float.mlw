@@ -35,9 +35,9 @@ module GenericFloat
 
   use import int.Int
   use import bv.Pow2int
-  use real.Abs
-  use real.FromInt
-  use real.Truncate
+  use real.Abs as Abs
+  use real.FromInt as FromInt
+  use real.Truncate as Truncate
   use import real.RealInfix
   use export RoundingMode
 
@@ -495,17 +495,17 @@ module GenericFloat
     no_overflow m (to_real x *. to_real y +. to_real z) /\
     to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
 
-  use real.Square
+  use real.Square as S
 
   axiom sqrt_finite: forall m:mode, x:t [sqrt m x].
     is_finite x -> to_real x >=. 0. ->
     is_finite (sqrt m x) /\
-    to_real (sqrt m x) = round m (Square.sqrt (to_real x))
+    to_real (sqrt m x) = round m (S.sqrt (to_real x))
 
   lemma sqrt_finite_rev: forall m:mode, x:t [sqrt m x].
     is_finite (sqrt m x) ->
     is_finite x /\ to_real x >=. 0. /\
-    to_real (sqrt m x) = round m (Square.sqrt (to_real x))
+    to_real (sqrt m x) = round m (S.sqrt (to_real x))
 
   predicate same_sign_real (x:t) (r:real) =
     (is_positive x /\ r >. 0.0) \/ (is_negative x /\ r <. 0.0)
@@ -649,7 +649,7 @@ module GenericFloat
 
   (* _____________ *)
 
-  use real.Truncate
+  use real.Truncate as Truncate
 
   (* This predicate specify if a float is finite and is an integer *)
   predicate is_int (x:t)
@@ -789,10 +789,10 @@ end
 (** {2 Conversions to/from bitvectors} *)
 
 module Float_BV_Converter
-  use bv.BV8
-  use bv.BV16
-  use bv.BV32
-  use bv.BV64
+  use bv.BV8 as BV8
+  use bv.BV16 as BV16
+  use bv.BV32 as BV32
+  use bv.BV64 as BV64
   use import RoundingMode
 
   (* with unsigned int as bitvector *)
@@ -809,7 +809,7 @@ module Float_BV_Converter
   function to_ubv64 mode t : BV64.t
 
   use import real.RealInfix
-  use real.FromInt
+  use real.FromInt as FromInt
 
   predicate is_finite t
   predicate le t t
@@ -845,7 +845,7 @@ end
 (** {2 Standard simple precision floats (32 bits)} *)
 
 module Float32
-  use int.Int
+  use int.Int as Int
   use import real.Real
 
   type t = < float 8 24 >
@@ -881,7 +881,7 @@ end
 (** {2 Standard double precision floats (64 bits)} *)
 
 module Float64
-  use int.Int
+  use int.Int as Int
   use import real.Real
 
   type t = < float 11 53 >
@@ -918,8 +918,8 @@ end
 
 module FloatConverter
 
-  use Float64
-  use Float32
+  use Float64 as Float64
+  use Float32 as Float32
 
   use export RoundingMode
 

@@ -130,7 +130,6 @@ module Init
 
   use import int.Int
   use export Array
-  use HighOrd
 
   val init (n: int) (f: int -> 'a) : array 'a
     requires { [@expl:array creation size] n >= 0 }

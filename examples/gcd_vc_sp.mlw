@@ -52,7 +52,7 @@ module BinaryGcd
   lemma odd1: forall n: int. 0 <= n -> not (even n) <-> n = 2 * div n 2 + 1
   lemma div_nonneg: forall n: int. 0 <= n -> 0 <= div n 2
 
-  use number.Coprime
+  use import number.Coprime
 
   lemma gcd_even_even: forall u v: int. 0 <= v -> 0 <= u ->
     gcd (2 * u) (2 * v) = 2 * gcd u v

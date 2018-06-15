@@ -61,8 +61,8 @@ theory TwoPlayerGame
     type elt = move,
     function cost = cost
 
-  use list.Elements
-  use set.Fset
+  use import list.Elements
+  use import set.Fset
 
   axiom minmax_depth_non_zero:
     forall p:position, n:int. n > 0 ->
@@ -71,7 +71,7 @@ theory TwoPlayerGame
         if Fset.is_empty moves then position_value p else
           - MinMaxRec.min (p,n-1) moves
 
-  use list.Mem
+  use import list.Mem
 
   goal Test:
     forall p:position, m:move.
@@ -103,8 +103,8 @@ module AlphaBeta
 
   use TwoPlayerGame as G
   use import list.List
-  use list.Elements
-  use set.Fset
+  use import list.Elements
+  use import set.Fset
 
   let rec move_value_alpha_beta alpha beta pos depth move =
     requires { depth >= 1 }

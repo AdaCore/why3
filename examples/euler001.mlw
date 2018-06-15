@@ -60,7 +60,7 @@ theory TriangularNumbers
   use import int.Int
   use import int.ComputerDivision
   use import int.Div2
-  use DivModHints
+  use DivModHints as DMH
 
   lemma tr_mod_2:
     forall n:int. n >= 0 -> mod (n*(n+1)) 2 = 0
@@ -105,8 +105,7 @@ theory SumMultiple
 
   predicate p (n:int) = sum_multiple_3_5_lt (n+1) = closed_formula_aux n
 
-  use DivModHints
-  use TriangularNumbers
+  use DivModHints as DMH
 
   lemma mod_15:
     forall n:int.

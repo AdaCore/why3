@@ -142,7 +142,7 @@ module MinMax
   type t
   predicate le t t
 
-  clone TotalOrder with type t = t, predicate rel = le, axiom .
+  clone TotalOrder as TO with type t = t, predicate rel = le, axiom .
 
   function min (x y : t) : t = if le x y then x else y
   function max (x y : t) : t = if le x y then y else x

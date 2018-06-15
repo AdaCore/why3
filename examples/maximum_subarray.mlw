@@ -251,7 +251,7 @@ module BoundedIntegers
   use import mach.int.Refint63
   use import seq.Seq
   use import mach.array.Array63
-  use int.Sum
+  use import int.Sum
 
   function sum (a: array int63) (lo hi: int) : int =
     Sum.sum (fun i -> (a[i] : int)) lo hi

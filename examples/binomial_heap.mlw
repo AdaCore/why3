@@ -20,7 +20,7 @@ module BinomialHeap
   type elt
 
   val predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
+  clone import relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (** Trees.
 

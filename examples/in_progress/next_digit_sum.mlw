@@ -43,7 +43,7 @@ module M
   = if i < j then interp_eq x1 x2 (i+1) j
 
   (* the sum of the elements of x[i..j[ *)
-  use int.Sum
+  use import int.Sum
 
   function sum (m: M.map int int) (i j: int) : int =
     Sum.sum (fun k -> M.get m k) i (j - 1)

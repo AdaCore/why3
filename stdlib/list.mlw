@@ -338,7 +338,8 @@ module Sorted
 
   type t
   predicate le t t
-  clone relations.Transitive with type t = t, predicate rel = le, axiom Trans
+  clone import relations.Transitive with
+    type t = t, predicate rel = le, axiom Trans
 
   inductive sorted (l: list t) =
     | Sorted_Nil:
@@ -384,8 +385,8 @@ module RevSorted
 
   use import List
 
-  clone Sorted as Incr with type t = t, predicate le = le, goal Transitive.Trans
-  clone Sorted as Decr with type t = t, predicate le = ge, goal Transitive.Trans
+  clone Sorted as Incr with type t = t, predicate le = le, goal .
+  clone Sorted as Decr with type t = t, predicate le = ge, goal .
 
   predicate compat (s t: list t) =
     match s, t with

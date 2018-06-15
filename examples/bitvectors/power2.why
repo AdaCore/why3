@@ -143,16 +143,10 @@ theory Pow2real
 
   lemma Power_sum : forall n m: int. pow2 (n+m) = pow2 n *. pow2 m
 
-  use Pow2int
+  use Pow2int as P2I
   use import real.FromInt
 
   lemma Pow2_int_real:
-    forall x:int. x >= 0 -> pow2 x = from_int (Pow2int.pow2 x)
+    forall x:int. x >= 0 -> pow2 x = from_int (P2I.pow2 x)
 
 end
-
-(*
-Local Variables:
-compile-command: "why3 ide power2.why"
-End:
-*)

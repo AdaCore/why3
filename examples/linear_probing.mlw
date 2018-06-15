@@ -37,7 +37,7 @@ module LinearProbing
   use import option.Option
   use import list.Mem
   use import map.Map
-  use map.Const
+  use import map.Const
   use import ref.Ref
   use import array.Array
 
@@ -52,7 +52,7 @@ module LinearProbing
 
   (** number of dummy values in array `a` between `l` and `u` *)
   scope NumOfDummy
-    use int.NumOf
+    use import int.NumOf
 
     function numof (a: array key) (l u: int) : int =
       NumOf.numof (fun i -> eq a[i] dummy) l u

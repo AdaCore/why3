@@ -1,8 +1,6 @@
 
 module Func
 
-  use export HighOrd
-
   predicate extensionalEqual (f g:'a -> 'b) =
     forall x:'a. f x = g x
 

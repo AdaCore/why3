@@ -18,7 +18,7 @@ module BitCount8bit_fact
   lemma nth_as_bv_is_int : forall a i.
     t'int (nth_as_bv a i) = nth_as_int a (t'int i)
 
-    use import int.EuclideanDivision
+  use import int.EuclideanDivision
 
   let ghost step1 (n x1 : t) (i : int) : unit
     requires { 0 <= i < 4 }
@@ -390,7 +390,7 @@ module AsciiCode
       odd number of changes on a valid ascii character, the result
       will be invalid, hence the validity of the encoding. *)
 
-  use Hamming
+  use import Hamming
 
   let rec lemma tmp (a b : t) (i j : int)
       requires { i < j }

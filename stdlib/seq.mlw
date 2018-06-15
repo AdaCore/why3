@@ -369,7 +369,8 @@ module Sorted
 
   type t
   predicate le t t
-  clone relations.TotalOrder with type t = t, predicate rel = le, axiom .
+  clone relations.TotalOrder as TO with
+    type t = t, predicate rel = le, axiom .
 
   predicate sorted_sub (s: seq t) (l u: int) =
     forall i1 i2. l <= i1 <= i2 < u -> le s[i1] s[i2]
@@ -401,9 +402,7 @@ end
 module SortedInt (** sorted sequences of integers *)
 
   use import int.Int
-  clone export Sorted with type t = int, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  clone export Sorted with type t = int, predicate le = (<=), goal .
 
 end
 
