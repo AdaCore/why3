@@ -1,7 +1,7 @@
 BENCH ?= no
 
 ifeq ($(BENCH),yes)
-  WHY3=../../../bin/why3.opt
+  WHY3=../../bin/why3.opt
 else
   ifeq ($(BINDIR),)
     WHY3=why3
@@ -22,7 +22,7 @@ dir:
 	mkdir -p build
 
 cfiles: why3 dir
-	why3 extract -D c -L . --recursive --modular --interface -o build/ wmpn.mlw
+	$(WHY3) extract -D c -L . --recursive --modular --interface -o build/ wmpn.mlw
 
 extract: why3 dir cfiles
 
