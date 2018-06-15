@@ -6,19 +6,19 @@
 
 module TestExtraction
 
-  use import int.Int
-  use import int.ComputerDivision
+  use int.Int
+  use int.ComputerDivision
   let f (x: int) : int = x+1
   let test_int () = f 31 + (div 33 3 + 2 - 4) - -1
 
-  use import mach.int.Int63
+  use mach.int.Int63
   let f63 (x: int63) : int63 = x + 1
   let test_int63 () =
     to_int (f63 31 + (33 / 3 + 2 - 4) - (-1))
 
-  use import int.Int
-  use import ref.Ref
-  use import ref.Refint
+  use int.Int
+  use ref.Ref
+  use ref.Refint
 
   let test_ref () : int =
     let r = ref 0 in
@@ -27,23 +27,23 @@ module TestExtraction
     decr r;
     !r
 
-  use import array.Array
+  use array.Array
 
   let test_array () =
     let a = Array.make 43 (0:int63) in
     for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
     a[42]
 
-  use import mach.array.Array63
+  use mach.array.Array63
 
   let test_array63 () : int =
     let a = Array63.make 43 0 in
     for i = 1 to 42 do a[Int63.of_int i] <- a[Int63.of_int (i - 1)] + 1 done;
     a[42]
 
-  use import seq.Seq
-  use import int.Int
-  use import mach.int.Int
+  use seq.Seq
+  use int.Int
+  use mach.int.Int
 
   (* FIXME: this function is never used.
             Use it somewhere and supply a driver? *)
@@ -89,7 +89,7 @@ module TestExtraction
   let create_r (x: int) (y: int) : r int =
     { aa = x; i = y }
 
-  use import ref.Ref
+  use ref.Ref
 
   let update (c: cursor int) : int
   = c.index
@@ -231,7 +231,7 @@ module TestExtraction
 
   (** optional and named arguments *)
 
-  use import option.Option
+  use option.Option
 
   let opt_f (x [@ocaml:named]: int) (y [@ocaml:named]) = x+y
   let constant opt_a = opt_f 40 2
@@ -246,7 +246,7 @@ module TestExtraction
 
   (** test the execution of the extracted code *)
 
-  use import ocaml.Pervasives
+  use ocaml.Pervasives
 
   let test1 () raises { AssertFailure } =
     ocaml_assert ((1:int) + 1 = 2)
@@ -263,7 +263,7 @@ module TestExtraction
 
   (** machine arithmetic *)
 
-  use import mach.int.Int63
+  use mach.int.Int63
 
   let get_min_int63 (x: int63) : int
   = min_int63

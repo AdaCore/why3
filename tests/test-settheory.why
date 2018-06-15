@@ -1,10 +1,10 @@
 
 theory TestOverriding
 
-  use import settheory.Relation
-  use import settheory.InverseDomRan
-  use import settheory.Overriding
-  use import settheory.Function
+  use settheory.Relation
+  use settheory.InverseDomRan
+  use settheory.Overriding
+  use settheory.Function
 
   constant f : rel int int = singleton (3,4)
   constant g : rel int int = f <+ (singleton (5,6))
@@ -28,16 +28,16 @@ end
 
 theory TestCompose
 
-  use import settheory.Relation
-  use import settheory.InverseDomRan
-  use import settheory.Composition
-  use import settheory.Function
+  use settheory.Relation
+  use settheory.InverseDomRan
+  use settheory.Composition
+  use settheory.Function
 
   constant f : rel int int = singleton (3,4)
   constant g : rel int int = singleton (4,6)
   constant h : rel int int = semicolon f g
 
-  use import settheory.Interval
+  use settheory.Interval
 
   constant fun_int_int : set (rel int int) = integer +-> integer
 

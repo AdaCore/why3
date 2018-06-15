@@ -2,8 +2,8 @@
 
 module Binary
 
-  use import int.Int
-  use import mach.int.Int63
+  use int.Int
+  use mach.int.Int63
 
   goal G: forall x: int63, y: int. x = y /\ y = x
 
@@ -24,14 +24,14 @@ end
 
 module SameOne
 
-  use import Simple
+  use Simple
 
 end
 
 module Same
 
-  use import Simple
-  use import SameOne
+  use Simple
+  use SameOne
 
   goal G: forall x: t. x = 42
 
@@ -67,14 +67,14 @@ end
 
 module SameTransitivity
 
-  use import Transitivity
+  use Transitivity
 
 end
 
 module SameTransitivityCheck
 
-  use import Transitivity
-  use import SameTransitivity
+  use Transitivity
+  use SameTransitivity
 
   goal G2: forall x: a. is_c x
 
@@ -93,7 +93,7 @@ end
 
 module TrickyPolymorphicAlpha
 
-  use import list.List
+  use list.List
 
   type t 'a
   type t1 'a
@@ -111,7 +111,7 @@ end
 
 module TrickyPolymorphicBeta
 
-  use import list.List
+  use list.List
 
   type t 'a
   type t1 'a

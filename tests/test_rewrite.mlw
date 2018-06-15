@@ -4,7 +4,7 @@ module M
 
   predicate (-->) (x y:'a) = "rewrite" x = y
 
-  use import int.Int
+  use int.Int
 
   goal g0 :
      forall x:int. ("rewrite" x = 42) -> x+1 = 42+1

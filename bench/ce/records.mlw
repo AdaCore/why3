@@ -4,8 +4,8 @@
 
 module M
 
-  use import ref.Ref
-  use import int.Int
+  use ref.Ref
+  use int.Int
 
   (*** In all cases, records are decomposed using match eval ***)
 
@@ -49,7 +49,7 @@ end
 
 module Mutable
 
-  use import int.Int
+  use int.Int
 
 
   type r = {mutable f [@model_trace:.my_field_f] :int; mutable g:bool}

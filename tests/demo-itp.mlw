@@ -1,45 +1,42 @@
 module Naming
-  use import int.Int
+  use int.Int
   constant x : int
   goal G : forall x:int. x >= 0 -> x = 0
 end
 
 module ApplyRewrite
 
-  use import int.Int
+  use int.Int
 
   function f int int : int
-
-  use HighOrd
 
   axiom H: forall x. (fun (z: int) -> x + z) =  f x
 
   goal g1: (fun toto -> 42 + toto) = f 42
-  
+
   axiom Ha: forall x. (fun (z: int) -> x + z) 2 = 2
-  
-  goal g3: (fun toto -> 42 + toto) 2 = 2 
-    
+
+  goal g3: (fun toto -> 42 + toto) 2 = 2
+
   goal g2: (fun y -> y + y) = f 24
 end
 
 module A
-  
-  use import int.Int
-  use HighOrd
+
+  use int.Int
 
   function f int: int
 
   axiom H: forall y. exists x. f x = x + y
-  
+
   goal g1: exists x. f x = x + 42
-  
+
   goal g: (fun y -> f y) 0 = 3
 
   constant b: bool
 
   axiom Ha: forall y. if b = true then let x = 3 in f x = x + y else false
-  
+
   goal ga: if b = true then let z = 3 in f z = z + 42 else false
 
   goal gb: if b  = true then let z = 453 in f z = z + 42 else false
@@ -47,28 +44,35 @@ module A
 end
 
 module Soundness
-  use import int.Int
-  use HighOrd
+
+  use int.Int
+
   function f0 (x y z:int) : int = x * y + z
+
   predicate p (f:int -> int) =
     f (-1) = 0 && forall n:int. f n = f 0 + (f 1 - f 0) * n
+
   lemma A : forall y z:int. p (fun x -> f0 x y z) <-> y = z
+
   meta rewrite lemma A
+
   lemma Fail : 0 = 0 /\ p (fun x -> f0 x x x)
+
   lemma Absurd : false
+
 end
 
 module TestCEX
 
-  use import int.Int
-  
+  use int.Int
+
   goal g: forall x. x=0
-  
+
 end
 
 module TestCopyPaste
 
- use import int.Int
+ use int.Int
 
  goal g1: 1=2 /\ 3=4
 
@@ -77,7 +81,7 @@ module TestCopyPaste
 end
 
 module M
-  use import int.Int
+  use int.Int
 
   function (++) (x:int) (y:int) : int  = x * y
 
@@ -85,7 +89,7 @@ end
 
 module TestWarnings
 
-  use import int.Int
+  use int.Int
 
   function f (x y : int) :int = x
 
@@ -99,7 +103,7 @@ end
 
 module TestTaskPrinting
 
-  use import int.Int
+  use int.Int
 
   function averyveryveryveryveryverylongname int : int
 
@@ -122,7 +126,7 @@ module TestTaskPrinting
 
   goal g7: 2 + 3 = Int.(+) 3 3
 
-  use import M
+  use M
 
   function (++) (x:int) (y:int) : int  = x * y
 
@@ -133,7 +137,7 @@ end
 module TestAutomaticIntro
 
 
-  use import int.Int
+  use int.Int
 
   goal g : forall x:int. x > 0 -> forall y z:int. y = z -> x=y
 
@@ -141,7 +145,7 @@ end
 
 module TestInduction
 
-  use import int.Int
+  use int.Int
 
   predicate p int
 
@@ -159,7 +163,7 @@ end
 
 module TestAutoFocus
 
-  use import int.Int
+  use int.Int
 
 
   goal g0: 0=0 /\ 1=1
@@ -179,9 +183,9 @@ end
 
 module TestRewritePoly
 
-  use import int.Int
-  use import list.List
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Append
 
   goal g : (Cons 1 Nil) ++ ((Cons 2 Nil) ++ Nil) = Cons 1 (Cons 2 Nil)
 
@@ -190,7 +194,7 @@ end
 
 module Power
 
-  use import int.Int
+  use int.Int
 
   function power int int : int
   axiom power_0 : forall x:int. power x 0 = 1

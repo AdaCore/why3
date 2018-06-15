@@ -1,10 +1,10 @@
 module A
-  use import int.Int
+  use int.Int
   type t = private { a: int } invariant { a >= 0 } by { a = 0 }
 end
 
 module B
-  use import int.Int
+  use int.Int
   type t = { a: int; b: int } invariant { a >= b >= 0 } by { a = 0; b = 0 }
   clone A with type t = t
 end

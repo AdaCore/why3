@@ -1,6 +1,6 @@
 theory ModelMap
 
-use import map.Map
+use map.Map
 
 goal t1 : forall t:map int int, i : int.
    get (set t 0 42) i = get t i
@@ -9,9 +9,9 @@ end
 
 module M
 
-  use import int.Int
-  use import ref.Ref
-  use import map.Map
+  use int.Int
+  use ref.Ref
+  use map.Map
 
   let ghost test_map (ghost x : ref (map int int)) : unit
     ensures { !x[0] <> !x[1] }

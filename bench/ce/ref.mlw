@@ -1,7 +1,7 @@
 module M
-  use import ref.Ref
-  use import list.List
-  use import int.Int
+  use ref.Ref
+  use list.List
+  use int.Int
 
   let test_post (x: int) (y: ref int): unit
     ensures { old !y >= x }

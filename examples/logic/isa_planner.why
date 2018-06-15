@@ -130,8 +130,6 @@ theory List
   | Cons y ys -> if x = y then Suc (count x ys) else count x ys
   end
 
-  use HighOrd
-
   function map (f: 'a -> 'b) (l: list 'a) : list 'b = match l with
   | Nil      -> Nil
   | Cons x xs -> Cons (f x) (map f xs)

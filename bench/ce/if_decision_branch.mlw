@@ -1,7 +1,7 @@
 
 module Main
 
-  use import int.Int
+  use int.Int
 
   type path_sel_type = { mutable sel_path : bool}
 
@@ -12,8 +12,8 @@ end
 
 module Other
 
-  use import int.Int
-  use import Main
+  use int.Int
+  use Main
 
   let f (a : int)
     ensures {result = 5}

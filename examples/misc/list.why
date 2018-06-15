@@ -1,8 +1,6 @@
 theory Map
   use list.List
 
-  use HighOrd as HO
-
   function map (fn : 'a -> 'b) (l : list 'a) : list 'b = match l with
     | Cons x r -> Cons (fn x) (map fn r)
     | Nil -> Nil
