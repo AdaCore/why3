@@ -343,12 +343,15 @@ let help_message commands_table =
      @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
      @ <query> [arguments]@\n\
      @ <strategy shortcut>@\n\
-     @ mark @\n\
-     @ clean @\n\
-     @ replay @\n\
      @ bisect @\n\
+     @ clean @\n\
+     @ edit @\n\
+     @ Focus @\n\
      @ help <transformation_name> @\n\
      @ list_ide_command @ \n\
+     @ mark @\n\
+     @ replay [all]@\n\
+     @ Unfocus @\n\
      @\n\
      Available queries are:@\n@[%a@]" help_on_queries commands_table
 

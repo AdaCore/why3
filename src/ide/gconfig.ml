@@ -58,6 +58,7 @@ type t =
       original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
+      mutable hidden_provers : string list;
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
@@ -88,6 +89,7 @@ type ide = {
   ide_error_line_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
+  ide_hidden_provers : string list;
 }
 
 let default_ide =
@@ -113,6 +115,7 @@ let default_ide =
     ide_error_color = "red";
     ide_error_line_color = "yellow";
     ide_iconset = "fatcow";
+    ide_hidden_provers = [];
   }
 
 let load_ide section =
@@ -170,6 +173,7 @@ let load_ide section =
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
+    ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
   }
 
 
@@ -221,6 +225,7 @@ let load_config config original_config =
     iconset = ide.ide_iconset;
     config         = config;
     original_config = original_config;
+    hidden_provers = ide.ide_hidden_provers;
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
     session_nb_processes = Whyconf.running_provers_max main;
@@ -264,6 +269,7 @@ let save_config t =
   let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
+  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
@@ -921,11 +927,85 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
   in
   ()
 
+(* Page "Provers" *)
+
+let provers_page c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Provers" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let page_pack = page#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:page_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let scrollview =
+  try
+    GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
+      ~packing:hbox_pack ()
+  with Gtk.Error _ -> assert false
+  in let () = scrollview#set_shadow_type `OUT in
+  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+  let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:vbox_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  (* show/hide provers *)
+  let frame =
+    GBin.frame ~label:"Provers visible in the contextual menu" ~packing:hbox_pack ()
+  in
+  let provers_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame#add () in
+  let hidden_provers = Hashtbl.create 7 in
+  Mprover.iter
+    (fun _ p ->
+      let name = prover_parseable_format p.prover in
+      let label = Pp.string_of_wnl print_prover p.prover in
+      let hidden = ref (List.mem name c.hidden_provers) in
+      Hashtbl.add hidden_provers name hidden;
+      let b =
+        GButton.check_button ~label ~packing:provers_box#add ()
+          ~active:(not !hidden)
+      in
+      let (_ : GtkSignal.id) =
+        b#connect#toggled ~callback:
+          (fun () -> hidden := not !hidden;
+            c.hidden_provers <-
+              Hashtbl.fold
+              (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
+      in ())
+    (Whyconf.get_provers c.config);
+  (* default prover *)
+(*
+  let frame2 =
+    GBin.frame ~label:"Default prover" ~packing:hbox_pack () in
+  let provers_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame2#add () in
+  let group =
+    let b =
+      GButton.radio_button ~label:"(none)" ~packing:provers_box#add
+                           ~active:(c.config.default_prover = "") () in
+    let (_ : GtkSignal.id) =
+      b#connect#toggled ~callback:(fun () -> c.config.default_prover <- "") in
+    b#group in
+  Mprover.iter
+    (fun _ p ->
+      let name = prover_parseable_format p.prover in
+      let label = Pp.string_of_wnl print_prover p.prover in
+      let b =
+        GButton.radio_button ~label ~group ~packing:provers_box#add
+                             ~active:(name = c.config.default_prover) () in
+      let (_ : GtkSignal.id) =
+        b#connect#toggled ~callback:(fun () -> c.config.default_prover <- name)
+      in ())
+    (Whyconf.get_provers c.config)
+ *)
+  ()
 
 (* Page "Uninstalled provers" *)
 
 let alternatives_frame c (notebook:GPack.notebook) =
-  let label = GMisc.label ~text:"Uninstalled provers" () in
+  let label = GMisc.label ~text:"Uninstalled provers policies" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
@@ -1058,6 +1138,8 @@ let preferences (c : t) =
   appearance_settings c notebook;
   (* page "editors" **)
   editors_page c notebook;
+  (* page "Provers" **)
+  provers_page c notebook;
   (* page "uninstalled provers" *)
   alternatives_frame c notebook;
   (* page "Colors" **)

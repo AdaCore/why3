@@ -38,6 +38,7 @@ type t =
       original_config : Whyconf.config;
       (* mutable altern_provers : prover option Mprover.t; *)
       (* mutable replace_prover : conf_replace_prover; *)
+      mutable hidden_provers : string list;
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
