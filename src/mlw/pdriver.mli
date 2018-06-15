@@ -16,6 +16,7 @@ type driver = private {
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
+  drv_thinterface : Printer.interface_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_converter   : Printer.syntax_map;
@@ -27,6 +28,7 @@ type printer_args = private {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;

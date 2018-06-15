@@ -362,6 +362,7 @@ type info = Pdriver.printer_args = private {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;

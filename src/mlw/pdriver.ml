@@ -24,6 +24,7 @@ type driver = {
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
+  drv_thinterface : Printer.interface_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_converter   : Printer.syntax_map;
@@ -34,6 +35,7 @@ type printer_args = {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;
@@ -85,6 +87,7 @@ let load_driver env file extra_files =
   List.iter add_global f.fe_global;
 
   let thprelude = ref Mid.empty in
+  let thinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let converter_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
@@ -179,6 +182,10 @@ let load_driver env file extra_files =
     with Not_found -> Loc.error ~loc (UnknownExn (!qualid,q))
   in
   let add_local_module loc m = function
+    | MRinterface s ->
+       let th = m.mod_theory in
+       let l = Mid.find_def [] th.th_name !thinterface in
+       thinterface := Mid.add th.th_name (s::l) !thinterface
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.Ity.xs_name s false
@@ -218,6 +225,7 @@ let load_driver env file extra_files =
     drv_printer     = !printer;
     drv_prelude     = List.rev !prelude;
     drv_thprelude   = Mid.map List.rev !thprelude;
+    drv_thinterface = Mid.map List.rev !thinterface;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_converter   = !converter_map;
@@ -273,6 +281,7 @@ let lookup_printer drv =
       env         = drv.drv_env;
       prelude     = drv.drv_prelude;
       thprelude   = drv.drv_thprelude;
+      thinterface = drv.drv_thinterface;
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       converter   = drv.drv_converter;

@@ -143,6 +143,44 @@ static struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
 }
 "
 
+  interface
+"
+struct __add32_with_carry_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+static struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c);
+
+struct __sub32_with_borrow_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+static struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);
+
+struct __mul32_double_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+static struct __mul32_double_result mul32_double(uint32_t x, uint32_t y);
+
+struct __add32_3_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+static struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);
+
+struct __lsld32_result
+{ uint32_t __field_0;
+  uint32_t __field_1;
+};
+
+static struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
+"
+
   syntax converter of_int "%1U"
 
   syntax val (+)     "%1 + %2"
@@ -331,6 +369,70 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 }
 "
 
+  interface
+"
+#include \"config.h\"
+#include \"gmp.h\"
+#include \"gmp-impl.h\"
+#include \"longlong.h\"
+
+#undef invert_limb
+
+struct __add64_with_carry_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __add64_with_carry_result
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c);
+
+struct __add64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __add64_double_result
+add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0);
+
+struct __sub64_with_borrow_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __sub64_with_borrow_result
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b);
+
+struct __sub64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __sub64_double_result
+sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0);
+
+struct __mul64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y);
+
+static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d);
+
+struct __add64_3_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z);
+
+struct __lsld64_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt);
+"
   syntax converter of_int "%1ULL"
 
   syntax val (+)     "%1 + %2"

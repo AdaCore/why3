@@ -20,6 +20,7 @@
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING
+%token INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT DOTDOT QUOTE EOF
@@ -29,7 +30,7 @@
 %token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
 
-%nonassoc SYNTAX REMOVE PRELUDE
+%nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
 
 %start <Driver_ast.file> file
@@ -118,6 +119,7 @@ ident:
 | SYNTAX       { "syntax" }
 | REMOVE       { "remove" }
 | PRELUDE      { "prelude" }
+| INTERFACE    { "interface" }
 | BLACKLIST    { "blacklist" }
 | PRINTER      { "printer" }
 | STEPS        { "steps" }
@@ -199,6 +201,7 @@ module_:
 
 mrule:
 | trule                          { MRtheory $1 }
+| INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
 | SYNTAX VAL qualid STRING       { MRval ($3, $4) }
 
