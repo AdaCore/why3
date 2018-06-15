@@ -182,7 +182,7 @@ extract_and_run () {
 }
 
 extract_and_test_wmp () {
-    dir="examples/in_progress/multiprecision"
+    dir=$1
     shift
     printf "  $dir... "
     printf "clean... "
@@ -346,7 +346,8 @@ extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,
 echo ""
 
 echo "=== Checking extraction to C ==="
-extract_and_test_wmp
+extract_and_test_wmp examples/in_progress/multiprecision
+extract_and_test_wmp examples/multiprecision
 echo ""
 
 echo "=== Checking --list-* ==="
