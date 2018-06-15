@@ -146,6 +146,13 @@ type config_editor = {
   editor_options : string list;
 }
 
+type detected_prover = {
+  exec_name  : string;
+  version_switch : string;
+  version_regexp : string;
+  output : string;
+}
+
 (** Strategies *)
 
 type config_strategy = {
@@ -182,6 +189,9 @@ type main = {
   (* add the standard library in the loadpath (default true) *)
   autoplugins  : bool;
   (* autoload the plugins in libdir (default true) *)
+  autoprovers  : bool;
+  (* generate on the fly provers, editors, shortcut config from
+     previously detected provers data (default true) *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
@@ -285,6 +295,7 @@ type config = {
   config    : Rc.t;
   main      : main;
   provers   : config_prover Mprover.t;
+  detected_provers : detected_prover list;
   prover_shortcuts : prover Mstr.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
@@ -298,6 +309,7 @@ let empty_main =
     loadpath = [];
     stdlib = true;
     autoplugins = true;
+    autoprovers = true;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
@@ -312,7 +324,10 @@ let set_main rc main =
   let section = set_string ~default:empty_main.libdir
     section "libdir" main.libdir in
   let section = set_string ~default:empty_main.datadir
-    section "datadir" main.datadir in
+      section "datadir" main.datadir in
+  let section = set_bool ~default:true section "stdlib" main.stdlib in
+  let section = set_bool ~default:true section "autoplugins" main.autoplugins in
+  let section = set_bool ~default:true section "onthefly_provers" main.autoprovers in
   let section = set_stringl section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
   let section = set_int section "memlimit" main.memlimit in
@@ -344,6 +359,19 @@ let set_prover _ (prover,shortcuts) family =
 let set_provers rc provers =
   let family = Mprover.fold set_prover provers [] in
   set_simple_family rc "prover" family
+
+let set_detected_prover prover =
+  let section = empty_section in
+  let section = set_string section "exec_name" prover.exec_name in
+  let section = set_string section "version_switch" prover.version_switch in
+  let section = set_string ~escape_eol:true
+      section "version_regexp" prover.version_regexp in
+  let section = set_string section "output" prover.output in
+  section
+
+let set_detected_provers rc detected_provers =
+  let family = List.map set_detected_prover detected_provers in
+  set_simple_family rc "detected_prover" family
 
 let set_prover_shortcut prover shortcuts family =
   let section = empty_section in
@@ -462,6 +490,19 @@ let load_prover (provers,shortcuts) section =
     provers,shortcuts
 
 
+let load_detected_prover acc section =
+  try
+    let v = {
+      exec_name = get_string section "exec_name";
+      version_switch = get_string section "version_switch";
+      version_regexp = get_string section "version_regexp";
+      output = get_string section "output"
+    } in
+    v::acc
+  with MissingField s ->
+    Warning.emit "[Warning] cannot load a detected_prover section: missing field '%s'@." s;
+    acc
+
 let load_shortcut acc section =
   try
     let name = get_string section "name" in
@@ -555,8 +596,9 @@ let load_main dirname section =
     datadir   = get_string ~default:empty_main.datadir section "datadir";
     loadpath  = List.map (Sysutil.concat dirname)
         (get_stringl ~default:[] section "loadpath");
-    stdlib = true;
-    autoplugins = true;
+    stdlib = get_bool ~default:true section "stdlib";
+    autoplugins = get_bool ~default:true section "autoplugins";
+    autoprovers = get_bool ~default:true section "onthefly_provers";
     timelimit = get_int ~default:empty_main.timelimit section "timelimit";
     memlimit  = get_int ~default:empty_main.memlimit section "memlimit";
     running_provers_max = get_int ~default:empty_main.running_provers_max
@@ -592,7 +634,10 @@ let get_config (filename,rc) =
   in
   let provers = get_simple_family rc "prover" in
   let provers,shortcuts = List.fold_left load_prover
-    (Mprover.empty,Mstr.empty) provers in
+      (Mprover.empty,Mstr.empty) provers in
+  let detected_provers =
+    List.fold_left load_detected_prover
+      [] (get_simple_family rc "detected_prover") in
   let fam_shortcuts = get_simple_family rc "shortcut" in
   let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
   let editors = get_family rc "editor" in
@@ -605,6 +650,7 @@ let get_config (filename,rc) =
     config    = rc;
     main      = main;
     provers   = provers;
+    detected_provers;
     prover_shortcuts = shortcuts;
     editors   = editors;
     provers_upgrade_policy = policy;
@@ -780,6 +826,7 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_detected_provers config = config.detected_provers
 let get_prover_config config prover =
   Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
@@ -799,6 +846,12 @@ let set_provers config ?shortcuts provers =
     config = set_provers_shortcuts config.config shortcuts provers;
     provers = provers;
     prover_shortcuts = shortcuts;
+  }
+
+let set_detected_provers config detected_provers =
+  {config with
+    config = set_detected_provers config.config detected_provers;
+    detected_provers;
   }
 
 let set_prover_shortcuts config shortcuts =
@@ -874,6 +927,9 @@ let set_stdlib stdlib config =
 let set_autoplugins autoplugins config =
   {config with main = {config.main with autoplugins}}
 
+let set_autoprovers autoprovers config =
+  {config with main = {config.main with autoprovers}}
+
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
@@ -898,6 +954,13 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Shortcut %s appears twice in the configuration file" s
   | _ -> raise e)
 
+let provers_from_detected_provers =
+  ref (fun _ -> invalid_arg
+          "provers_from_detected_provers: Must be filled by Autodetection")
+
+
+let add_builtin_provers config = !provers_from_detected_provers config
+
 
 module Args = struct
   let opt_config = ref None
@@ -906,6 +969,7 @@ module Args = struct
   let opt_help = ref false
   let opt_stdlib = ref true
   let opt_autoplugins = ref true
+  let opt_autoprovers = ref true
 
   let common_options_head = [
     "-C", Arg.String (fun s -> opt_config := Some s),
@@ -922,6 +986,8 @@ module Args = struct
     " do not add the standard library to the loadpath";
     "--no-autoplugins", Arg.Clear opt_autoplugins,
     " do not load the plugins from the standard path";
+    "--no-builtin-provers-at-statup", Arg.Clear opt_autoprovers,
+    " do not generate builtin provers at startup";
     Debug.Args.desc_debug;
     Debug.Args.desc_debug_all;
     Debug.Args.desc_debug_list; ]
@@ -942,14 +1008,17 @@ module Args = struct
       exit 0
     end;
     let base_config = read_config !opt_config in
-    let base_config = set_stdlib !opt_stdlib base_config in
-    let base_config = set_autoplugins !opt_autoplugins base_config in
     let config = List.fold_left merge_config base_config !opt_extra in
+    let apply_not_default f o b = if !o then b else f !o b in
+    let config = apply_not_default set_stdlib opt_stdlib config in
+    let config = apply_not_default set_autoplugins opt_autoplugins config in
+    let config = apply_not_default set_autoprovers opt_autoprovers config in
     let main = get_main config in
     load_plugins main;
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
+    let config = if config.main.autoprovers then add_builtin_provers config else config in
     config, base_config, Env.create_env lp
 
   let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =

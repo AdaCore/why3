@@ -24,6 +24,7 @@ let usage_msg =
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
+let provers_at_startup = ref true
 let resetloadpath = ref false
 
 (* When no arguments are given, activate the fallback to auto mode on error.
@@ -63,6 +64,8 @@ let option_list = Arg.align [
       Arg.Set_string shortcut;
       Arg.String (fun name -> Queue.add (!id, !shortcut, name) prover_bins)]),
   "<id> <shortcut> <file> add a new prover executable";
+  "--no-builtin-provers-at-statup", Arg.Unit (fun () -> provers_at_startup := false; autoprovers := true),
+  " write in .why3.conf the parameter of the provers";
   "--list-prover-families", Arg.Set opt_list_prover_families,
   " list known prover families";
   "--install-plugin", Arg.String add_plugin,
@@ -117,6 +120,8 @@ let main () =
   Arg.parse option_list anon_file usage_msg;
 
   let opt_list = ref false in
+  (* set info flags for detection *)
+  Debug.set_flag Autodetection.info;
 
   (* Debug flag *)
   Debug.Args.set_flags_selected ();
@@ -163,7 +168,15 @@ let main () =
   in
   let config =
     if !autoprovers
-    then Autodetection.run_auto_detection config
+    then
+      let config = Whyconf.set_provers config Mprover.empty in
+      let config = Whyconf.set_autoprovers !provers_at_startup config in
+      let env = Autodetection.run_auto_detection config in
+      if !provers_at_startup then
+        let detected_provers = Autodetection.generate_detected_config env in
+        Whyconf.set_detected_provers config detected_provers
+      else
+        Autodetection.generate_builtin_config env config
     else config
   in
   let config =
