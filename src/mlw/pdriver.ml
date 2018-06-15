@@ -245,9 +245,9 @@ type interf_printer =
 
 type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
-  -> Pmodule.pmodule Pp.pp
+  -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
 
-let print_empty_prelude _ ?old:_ ?fname:_ ~flat:_ _ _ = ()
+let print_empty_prelude _ ?old:_ ?fname:_ ~flat:_ _ _ _ = ()
 
 type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->

@@ -52,7 +52,7 @@ type interf_printer =
     Only used in modular extraction. *)
 type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
-  -> Pmodule.pmodule Pp.pp
+  -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
 
 val print_empty_prelude: prelude_printer
 

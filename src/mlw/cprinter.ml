@@ -79,9 +79,10 @@ module C = struct
     | Sbreak
     | Sreturn of expr
 
+  and include_kind = Sys | Proj (* include <...> vs. include "..." *)
   and definition =
     | Dfun of ident * proto * body
-    | Dinclude of ident
+    | Dinclude of ident * include_kind
     | Dproto of ident * proto
     | Ddecl of names
     | Dstruct of struct_def
@@ -206,7 +207,7 @@ module C = struct
     | Ddecl (ty,l) ->
       let l,b = aux l in
       Ddecl (ty, l), b
-    | Dinclude i -> Dinclude i, true
+    | Dinclude (i,k) -> Dinclude (i,k), true
     | Dstruct _ -> raise (Unsupported "struct declaration inside function")
     | Dfun _ -> raise (Unsupported "nested function")
     | Dtypedef _ -> raise (Unsupported "typedef inside function")
@@ -387,6 +388,7 @@ module Print = struct
   let () = assert (List.length c_keywords = 32)
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
+  let sanitizer s = String.lowercase_ascii (sanitizer s)
   let printer = create_ident_printer c_keywords ~sanitizer
 
   let print_ident fmt id = fprintf fmt "%s" (id_unique printer id)
@@ -527,7 +529,8 @@ module Print = struct
 					     (print_ty ~paren:false) print_ident))
 	       args
                print_body body in
-       fprintf fmt "%s" s (* print into string first to print nothing in case of exception *)
+       (* print into string first to print nothing in case of exception *)
+       fprintf fmt "%s" s
     | Dproto (id, (rt, args)) ->
       let s = sprintf "%a %a(@[%a@]);@;"
                 (print_ty ~paren:false) rt
@@ -552,13 +555,16 @@ module Print = struct
                                          (print_ty ~paren:false) ty s))
                  lf in
        fprintf fmt "%s" s
-    | Dinclude id ->
-       fprintf fmt "#include<%a.h>@;" print_ident id
+    | Dinclude (id, Sys) ->
+       fprintf fmt "#include <%s.h>@;"  (sanitizer id.id_string)
+    | Dinclude (id, Proj) ->
+       fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
     | Dtypedef (ty,id) ->
        let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
 	         (print_ty ~paren:false) ty print_ident id in
        fprintf fmt "%s" s
-    with Unprinted s -> Format.printf "Missed a def because : %s@." s
+    with Unprinted s ->
+      Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
 
   and print_body fmt (def, s) =
     if def = []
@@ -569,6 +575,33 @@ module Print = struct
         (print_stmt ~braces:true)
         fmt (def,s)
 
+  let print_header_def fmt def =
+    try match def with
+    | Dfun (id,(rt,args),_) | Dproto (id, (rt, args)) ->
+       let s = sprintf "%a %a(@[%a@]);@;"
+                 (print_ty ~paren:false) rt
+                 print_ident id
+                 (print_list comma
+		    (print_pair_delim nothing space nothing
+		       (print_ty ~paren:false) print_ident))
+	         args in
+       fprintf fmt "%s" s
+    | Dstruct (s, lf) ->
+       let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
+                 s
+                 (print_list newline
+                    (fun fmt (s,ty) -> fprintf fmt "%a %s;"
+                                         (print_ty ~paren:false) ty s))
+                 lf in
+       fprintf fmt "%s" s
+    | Dinclude _ | Ddecl _ -> ()
+    | Dtypedef (ty,id) ->
+       let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
+	         (print_ty ~paren:false) ty print_ident id in
+       fprintf fmt "%s" s
+    with Unprinted s ->
+      Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
+
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
     newline fmt ();
@@ -576,7 +609,8 @@ module Print = struct
 
 end
 
-(*TODO simplifications : propagate constants, collapse blocks with only a statement and no def*)
+(*TODO simplifications : propagate constants, collapse blocks with
+   only a statement and no def*)
 
 module MLToC = struct
 
@@ -1080,19 +1114,21 @@ module MLToC = struct
          Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
          begin
            match idef with
-           | Some (Dalias ty) -> [C.Dtypedef (ty_of_mlty info ty, id)]
+           | Some (Dalias _ty) -> [] (*[C.Dtypedef (ty_of_mlty info ty, id)] *)
            | Some _ -> raise (Unsupported "Ddata/Drecord@.")
            | None ->
               begin match query_syntax info.syntax id with
               | Some _ -> []
               | None ->
-                 raise (Unsupported ("type declaration without syntax or alias: "^id.id_string))
+                 raise (Unsupported
+                          ("type declaration without syntax or alias: "
+                           ^id.id_string))
               end
          end
 
       | _ -> [] (*TODO exn ? *) end
     with Unsupported s ->
-      Format.printf "Unsupported : %s@." s; []
+      Debug.dprintf debug_c_extraction "Unsupported : %s@." s; []
 
   let translate_decl (info:info) (d:Mltree.decl) : C.definition list
     =
@@ -1113,6 +1149,7 @@ end
 
 let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
+  let n = Print.sanitizer n in
   let r = match fname with
     | None -> n ^ suffix
     | Some f -> f ^ "__" ^ n ^ suffix in
@@ -1126,24 +1163,27 @@ let print_header_decl args ?old ?fname ~flat m fmt d =
   ignore fname;
   ignore flat;
   ignore m;
-  ignore args;
-  ignore fmt;
-  ignore d;
-  () (* TODO *)
+  let cds = MLToC.translate_decl args d in
+  List.iter (Format.fprintf fmt "%a@." Print.print_header_def) cds
 
-let print_prelude args ?old ?fname ~flat fmt m =
+let print_prelude args ?old ?fname ~flat deps fmt pm =
   ignore old;
   ignore fname;
   ignore flat;
+  ignore pm;
   ignore args;
-  ignore fmt;
-  ignore m;
-  () (* TODO *)
+  let add_include id =
+    Format.fprintf fmt "%a@." Print.print_def C.(Dinclude (id,Proj)) in
+  List.iter
+    (fun m ->
+      let id = m.Pmodule.mod_theory.Theory.th_name in
+      add_include id)
+    (List.rev deps)
 
 let print_decl args ?old ?fname ~flat m fmt d =
   ignore old;
   ignore fname;
-  ignore flat; (*FIXME*)
+  ignore flat;
   ignore m;
   let cds = MLToC.translate_decl args d in
   List.iter (Format.fprintf fmt "%a@." Print.print_def) cds
