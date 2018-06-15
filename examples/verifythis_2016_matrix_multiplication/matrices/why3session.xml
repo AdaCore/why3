@@ -5,8 +5,6 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../matrices.mlw" proved="true">
-<theory name="MatrixGen" proved="true">
-</theory>
 <theory name="Matrix" proved="true">
  <goal name="set_def1" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
@@ -19,16 +17,6 @@
  </goal>
  <goal name="set_def4" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
- </goal>
-</theory>
-<theory name="FixedMatrix" proved="true">
- <goal name="rows_and_cols_nonnegative" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
- </goal>
-</theory>
-<theory name="SquareFixedMatrix" proved="true">
- <goal name="r_and_c_nonnegative" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="MatrixArithmetic" proved="true">

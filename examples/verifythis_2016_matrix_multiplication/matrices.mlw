@@ -85,62 +85,13 @@ theory Matrix
     lemma set_def1,
     lemma set_def2,
     lemma set_def3,
-    lemma set_def4
+    lemma set_def4,
+    axiom rows_and_cols_nonnegative,
+    axiom extensionality
 
   use import int.Int
 
 end
-
-theory FixedMatrix
-
-  use import int.Int
-
-  constant r: int
-  constant c: int
-
-  type mat 'a
-
-  function rows (mat 'a) : int =  r
-
-  function cols (mat 'a) : int  =  c
-
-  axiom r_and_c_nonnegative:
-    0 <= r /\ 0 <= c
-
-  clone export MatrixGen with
-  	type mat 'a  = mat 'a,
-	function rows = rows,
-	function cols = cols,
-	goal rows_and_cols_nonnegative
-
-  use HighOrd
-
-  function create (f: int -> int -> 'a) : mat 'a
-
-  axiom create_get:
-    forall f: int -> int -> 'a, i j: int.
-    0 <= i < r -> 0 <= j < c -> get (create f) i j = f i j
-
-end
-
-theory SquareFixedMatrix
-
-  use import int.Int
-
-  constant d: int
-
-  axiom dimension_nonnegative:
-    0 <= d
-
-  clone export FixedMatrix with
-        function r = d,
-	function c = d,
-	goal r_and_c_nonnegative
-
-end
-
-(* theory Square_Matrix = Matrix with  axiom rows_and_cols_nonnegative:
-    forall m: mat 'a. 0 <= rows m /\ 0 <= cols m /\ rows m = cols m  *)
 
 module MatrixArithmetic
 
