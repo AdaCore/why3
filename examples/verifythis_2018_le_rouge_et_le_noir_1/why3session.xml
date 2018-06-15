@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2018_le_rouge_et_le_noir_1.mlw" proved="true">
 <theory name="ColoredTiles" proved="true">
  <goal name="valid_contr" proved="true">
@@ -685,7 +684,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.4" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="621"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="592"/></proof>
   </goal>
   <goal name="VC enum.5" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -696,13 +695,13 @@
   <goal name="VC enum.7" expl="assertion" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC enum.7.0" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.20" steps="401"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.22" steps="339"/></proof>
    </goal>
    <goal name="VC enum.7.1" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.07" steps="320"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="335"/></proof>
    </goal>
    <goal name="VC enum.7.2" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.71" steps="1198"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="0.56" steps="650"/></proof>
    </goal>
   </transf>
   </goal>
@@ -713,15 +712,48 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.10" expl="assertion" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC enum.10.0" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="5"><result status="valid" time="3.99" steps="3310"/></proof>
+  <transf name="case" proved="true" arg1="i=3">
+   <goal name="VC enum.10.0" expl="true case (assertion)" proved="true">
+   <transf name="rewrite" proved="true" arg1="h">
+    <goal name="VC enum.10.0.0" expl="true case (assertion)" proved="true">
+    <transf name="rewrite" proved="true" arg1="H1">
+     <goal name="VC enum.10.0.0.0" expl="true case (assertion)" proved="true">
+     <transf name="split_all_full" proved="true" >
+      <goal name="VC enum.10.0.0.0.0" expl="VC for enum" proved="true">
+      <transf name="introduce_premises" proved="true" >
+       <goal name="VC enum.10.0.0.0.0.0" expl="VC for enum" proved="true">
+       <proof prover="3"><result status="valid" time="0.02"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="VC enum.10.0.0.0.1" expl="VC for enum" proved="true">
+      <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+      </goal>
+      <goal name="VC enum.10.0.0.0.2" expl="VC for enum" proved="true">
+      <transf name="introduce_premises" proved="true" >
+       <goal name="VC enum.10.0.0.0.2.0" expl="VC for enum" proved="true">
+       <proof prover="3"><result status="valid" time="0.02"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="VC enum.10.1" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.09" steps="762"/></proof>
-   </goal>
-   <goal name="VC enum.10.2" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="7.46" steps="8921"/></proof>
+   <goal name="VC enum.10.1" expl="false case (assertion)" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="VC enum.10.1.0" expl="VC for enum" proved="true">
+    <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.98" steps="1416"/></proof>
+    </goal>
+    <goal name="VC enum.10.1.1" expl="VC for enum" proved="true">
+    <proof prover="0"><result status="valid" time="0.30" steps="657"/></proof>
+    </goal>
+    <goal name="VC enum.10.1.2" expl="VC for enum" proved="true">
+    <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="5.52" steps="5902"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -734,7 +766,7 @@
   <goal name="VC enum.13" expl="assertion" proved="true">
   <transf name="assert" proved="true" arg1="(forall m:array (set2 coloring), i v. m[i &lt;- v][i] = v)">
    <goal name="VC enum.13.0" proved="true">
-   <proof prover="2"><result status="valid" time="0.03" steps="30"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="30"/></proof>
    </goal>
    <goal name="VC enum.13.1" expl="assertion" proved="true">
    <transf name="subst" proved="true" arg1="sets">
@@ -763,7 +795,7 @@
        <goal name="VC enum.14.0.0.0.0.0" expl="VC for enum" proved="true">
        <transf name="apply" proved="true" arg1="colo_31">
         <goal name="VC enum.14.0.0.0.0.0.0" proved="true">
-        <proof prover="3"><result status="valid" time="0.01"/></proof>
+        <proof prover="3"><result status="valid" time="0.02"/></proof>
         </goal>
         <goal name="VC enum.14.0.0.0.0.0.1" proved="true">
         <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -773,7 +805,7 @@
       </transf>
       </goal>
       <goal name="VC enum.14.0.0.0.1" expl="VC for enum" proved="true">
-      <proof prover="2"><result status="valid" time="0.43" steps="1383"/></proof>
+      <proof prover="0"><result status="valid" time="0.22" steps="854"/></proof>
       </goal>
       <goal name="VC enum.14.0.0.0.2" expl="VC for enum" proved="true">
       <transf name="introduce_premises" proved="true" >
@@ -784,7 +816,7 @@
         </transf>
         </goal>
         <goal name="VC enum.14.0.0.0.2.0.1" proved="true">
-        <proof prover="2"><result status="valid" time="0.43" steps="1383"/></proof>
+        <proof prover="0"><result status="valid" time="0.26" steps="854"/></proof>
         </goal>
        </transf>
        </goal>
@@ -799,13 +831,13 @@
    <goal name="VC enum.14.1" expl="false case (assertion)" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="VC enum.14.1.0" expl="VC for enum" proved="true">
-    <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.20" steps="578"/></proof>
+    <proof prover="0"><result status="valid" time="0.21" steps="592"/></proof>
     </goal>
     <goal name="VC enum.14.1.1" expl="VC for enum" proved="true">
-    <proof prover="2"><result status="valid" time="0.30" steps="994"/></proof>
+    <proof prover="0"><result status="valid" time="0.38" steps="812"/></proof>
     </goal>
     <goal name="VC enum.14.1.2" expl="VC for enum" proved="true">
-    <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.58" steps="1510"/></proof>
+    <proof prover="0"><result status="valid" time="0.51" steps="1462"/></proof>
     </goal>
    </transf>
    </goal>
@@ -814,33 +846,34 @@
   <goal name="VC enum.15" expl="assertion" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC enum.15.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="1.94" steps="2366"/></proof>
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="1.27" steps="1414"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.16" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="36"/></proof>
   </goal>
   <goal name="VC enum.17" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="457"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="209"/></proof>
   </goal>
   <goal name="VC enum.18" expl="loop invariant init" proved="true">
   <transf name="assert" proved="true" arg1="(i=0\/i=1\/i=2\/i=3)">
    <goal name="VC enum.18.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="32"/></proof>
+   <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC enum.18.1" expl="loop invariant init" proved="true">
    <transf name="revert" proved="true" arg1="h">
     <goal name="VC enum.18.1.0" expl="loop invariant init" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="VC enum.18.1.0.0" expl="loop invariant init" proved="true">
-     <proof prover="0"><result status="valid" time="0.17" steps="394"/></proof>
+     <proof prover="0"><result status="valid" time="0.22" steps="394"/></proof>
      </goal>
      <goal name="VC enum.18.1.0.1" expl="loop invariant init" proved="true">
-     <proof prover="2"><result status="valid" time="0.48" steps="954"/></proof>
+     <proof prover="0"><result status="valid" time="0.26" steps="397"/></proof>
      </goal>
      <goal name="VC enum.18.1.0.2" expl="loop invariant init" proved="true">
-     <proof prover="2"><result status="valid" time="0.67" steps="1333"/></proof>
+     <proof prover="0"><result status="valid" time="0.24" steps="399"/></proof>
      </goal>
      <goal name="VC enum.18.1.0.3" expl="loop invariant init" proved="true">
      <transf name="introduce_premises" proved="true" >
@@ -851,7 +884,7 @@
         <goal name="VC enum.18.1.0.3.0.0.0" expl="loop invariant init" proved="true">
         <transf name="rewrite" proved="true" arg1="H7">
          <goal name="VC enum.18.1.0.3.0.0.0.0" expl="loop invariant init" proved="true">
-         <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
+         <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="34"/></proof>
          </goal>
         </transf>
         </goal>
@@ -862,7 +895,7 @@
        </transf>
        </goal>
        <goal name="VC enum.18.1.0.3.0.1" proved="true">
-       <proof prover="3"><result status="valid" time="0.01"/></proof>
+       <proof prover="3"><result status="valid" time="0.02"/></proof>
        </goal>
       </transf>
       </goal>
@@ -878,19 +911,19 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.20" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.21" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.22" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.23" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.24" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC enum.25" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -899,7 +932,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
   <goal name="VC enum.27" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="45"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="45"/></proof>
   </goal>
   <goal name="VC enum.28" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -907,10 +940,10 @@
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC enum.28.1" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.25"/></proof>
+   <proof prover="1"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="VC enum.28.2" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.19" steps="490"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="362"/></proof>
    </goal>
    <goal name="VC enum.28.3" expl="VC for enum" proved="true">
    <proof prover="3"><result status="valid" time="0.13"/></proof>
@@ -924,7 +957,7 @@
   </transf>
   </goal>
   <goal name="VC enum.29" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="138"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="138"/></proof>
   </goal>
   <goal name="VC enum.30" expl="loop invariant init" proved="true">
   <transf name="case" proved="true" arg1="i=n">
@@ -934,7 +967,7 @@
    <goal name="VC enum.30.1" expl="false case (loop invariant init)" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="VC enum.30.1.0" expl="VC for enum" proved="true">
-    <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.20" steps="474"/></proof>
+    <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.20" steps="350"/></proof>
     </goal>
     <goal name="VC enum.30.1.1" expl="VC for enum" proved="true">
     <proof prover="0"><result status="valid" time="0.17" steps="370"/></proof>
@@ -944,7 +977,7 @@
   </transf>
   </goal>
   <goal name="VC enum.31" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="125"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC enum.32" expl="loop invariant init" proved="true">
   <transf name="split_vc" proved="true" >
@@ -958,12 +991,12 @@
    <proof prover="0"><result status="valid" time="0.20" steps="605"/></proof>
    </goal>
    <goal name="VC enum.32.3" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.12"/></proof>
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.33" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="140"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="140"/></proof>
   </goal>
   <goal name="VC enum.34" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -975,10 +1008,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.37" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.38" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13"/></proof>
+  <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC enum.39" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -987,10 +1020,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.41" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.42" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC enum.43" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1005,33 +1038,33 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.47" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.12"/></proof>
+  <proof prover="1"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC enum.48" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC enum.48.0" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.06" steps="168"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="181"/></proof>
    </goal>
    <goal name="VC enum.48.1" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.24" steps="604"/></proof>
+   <proof prover="0"><result status="valid" time="0.24" steps="623"/></proof>
    </goal>
    <goal name="VC enum.48.2" expl="VC for enum" proved="true">
-   <proof prover="3"><result status="valid" time="0.58"/></proof>
+   <proof prover="3"><result status="valid" time="0.91"/></proof>
    </goal>
    <goal name="VC enum.48.3" expl="VC for enum" proved="true">
    <transf name="case" proved="true" arg1="i&lt;k">
     <goal name="VC enum.48.3.0" expl="true case" proved="true">
-    <proof prover="2"><result status="valid" time="0.08" steps="285"/></proof>
+    <proof prover="0"><result status="valid" time="0.08" steps="285"/></proof>
     </goal>
     <goal name="VC enum.48.3.1" expl="false case" proved="true">
     <transf name="case" proved="true" arg1="i=k">
      <goal name="VC enum.48.3.1.0" expl="false case (true case)" proved="true">
-     <proof prover="2"><result status="valid" time="0.33" steps="743"/></proof>
+     <proof prover="0"><result status="valid" time="0.33" steps="599"/></proof>
      </goal>
      <goal name="VC enum.48.3.1.1" expl="false case" proved="true">
      <transf name="assert" proved="true" arg1="(get1 c i = get1 c[k+1 ..] (i-k-1))">
       <goal name="VC enum.48.3.1.1.0" proved="true">
-      <proof prover="3"><result status="valid" time="0.60"/></proof>
+      <proof prover="3"><result status="valid" time="0.95"/></proof>
       </goal>
       <goal name="VC enum.48.3.1.1.1" expl="false case" proved="true">
       <proof prover="1"><result status="valid" time="0.21"/></proof>
@@ -1043,36 +1076,36 @@
    </transf>
    </goal>
    <goal name="VC enum.48.4" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.40"/></proof>
+   <proof prover="1"><result status="valid" time="0.40"/></proof>
    </goal>
    <goal name="VC enum.48.5" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.08"/></proof>
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC enum.48.6" expl="VC for enum" proved="true">
    <proof prover="3"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC enum.48.7" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.03" steps="58"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="58"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.49" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC enum.50" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13"/></proof>
+  <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC enum.51" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.52" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
   <goal name="VC enum.53" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
   <goal name="VC enum.54" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="170"/></proof>
   </goal>
   <goal name="VC enum.55" expl="loop invariant preservation" proved="true">
   <transf name="apply" proved="true" arg1="H21">
@@ -1085,42 +1118,42 @@
   </transf>
   </goal>
   <goal name="VC enum.56" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.28"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="157"/></proof>
   </goal>
   <goal name="VC enum.57" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC enum.57.0" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.28" steps="656"/></proof>
+   <proof prover="0"><result status="valid" time="0.28" steps="519"/></proof>
    </goal>
    <goal name="VC enum.57.1" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.36" steps="664"/></proof>
+   <proof prover="0"><result status="valid" time="0.36" steps="542"/></proof>
    </goal>
    <goal name="VC enum.57.2" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.30" steps="747"/></proof>
+   <proof prover="0"><result status="valid" time="0.30" steps="634"/></proof>
    </goal>
    <goal name="VC enum.57.3" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.06" steps="172"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="172"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.58" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="170"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="170"/></proof>
   </goal>
   <goal name="VC enum.59" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.60" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="49"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="49"/></proof>
   </goal>
   <goal name="VC enum.61" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="295"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="295"/></proof>
   </goal>
   <goal name="VC enum.62" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC enum.62.0" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC enum.62.0.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.46" steps="1513"/></proof>
+    <proof prover="0"><result status="valid" time="0.87" steps="2233"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1130,7 +1163,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.64" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC enum.65" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -1139,31 +1172,31 @@
   <proof prover="3"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC enum.67" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC enum.68" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC enum.68.0" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.16" steps="367"/></proof>
+   <proof prover="0"><result status="valid" time="0.16" steps="369"/></proof>
    </goal>
    <goal name="VC enum.68.1" expl="VC for enum" proved="true">
    <proof prover="3"><result status="valid" time="0.95"/></proof>
    </goal>
    <goal name="VC enum.68.2" expl="VC for enum" proved="true">
-   <proof prover="2"><result status="valid" time="0.81" steps="1813"/></proof>
+   <proof prover="0"><result status="valid" time="0.81" steps="1399"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.69" expl="assertion" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC enum.69.0" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.16"/></proof>
+   <proof prover="1"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC enum.69.1" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.98"/></proof>
+   <proof prover="1"><result status="valid" time="0.73"/></proof>
    </goal>
    <goal name="VC enum.69.2" expl="VC for enum" proved="true">
-   <proof prover="4"><result status="valid" time="0.12"/></proof>
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="VC enum.69.3" expl="VC for enum" proved="true">
    <proof prover="0"><result status="valid" time="0.09" steps="220"/></proof>
@@ -1174,32 +1207,32 @@
   <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
   <goal name="VC enum.71" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="59"/></proof>
   </goal>
   <goal name="VC enum.72" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.33" steps="779"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.33" steps="798"/></proof>
   </goal>
   <goal name="VC enum.73" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC enum.73.0" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.62" steps="1337"/></proof>
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.62" steps="1167"/></proof>
    </goal>
    <goal name="VC enum.73.1" expl="VC for enum" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="2.85" steps="4861"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="0.34" steps="628"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC enum.74" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.36" steps="861"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.38" steps="861"/></proof>
   </goal>
-  <goal name="VC enum.75" expl="VC for enum" proved="true">
+  <goal name="VC enum.75" expl="out of loop bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC enum.76" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="380"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="380"/></proof>
   </goal>
   <goal name="VC enum.77" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
  </transf>
  </goal>

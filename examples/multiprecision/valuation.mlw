@@ -1,11 +1,11 @@
 module Valuation
 
-  use import int.Int
-  use import int.Power
-  use import int.ComputerDivision
+  use int.Int
+  use int.Power
+  use int.ComputerDivision
   use export number.Divisibility
-  use import number.Prime
-  use import number.Coprime
+  use number.Prime
+  use number.Coprime
   use export number.Parity
 
   let rec function valuation (n p: int)
@@ -115,7 +115,7 @@ module Valuation
 
   lemma valuation_mod: forall n p. 1 <= n -> 1 < p -> (mod n p = 0 <-> valuation n p > 0)
 
-  lemma valuation_decomp_aux: forall n p. 1 <= n -> 1 < p ->
+  lemma valuation_decomp: forall n p. 1 <= n -> 1 < p ->
         n = (power p (valuation n p)) * (div n (power p (valuation n p)))
         by divides (power p (valuation n p)) n
 
