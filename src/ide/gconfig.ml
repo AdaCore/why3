@@ -265,6 +265,7 @@ let save_config t =
   let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
+  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
@@ -800,6 +801,7 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:vb#add ()
   in
+(*
   let intropremises =
     GButton.check_button ~label:"introduce premises"
       ~packing:display_options_box#add ()
@@ -809,6 +811,7 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     intropremises#connect#toggled ~callback:
       (fun () -> c.intro_premises <- not c.intro_premises)
   in
+*)
   let showfullcontext =
     GButton.check_button ~label:"show full task context"
       ~packing:display_options_box#add ()
@@ -942,7 +945,7 @@ let provers_page c (notebook:GPack.notebook) =
   let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   (* show/hide provers *)
   let frame =
-    GBin.frame ~label:"Prover button in the left toolbar" ~packing:hbox_pack ()
+    GBin.frame ~label:"Provers visible in the contextual menu" ~packing:hbox_pack ()
   in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -998,7 +1001,7 @@ let provers_page c (notebook:GPack.notebook) =
 (* Page "Uninstalled provers" *)
 
 let alternatives_frame c (notebook:GPack.notebook) =
-  let label = GMisc.label ~text:"Uninstalled provers" () in
+  let label = GMisc.label ~text:"Uninstalled provers policies" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()

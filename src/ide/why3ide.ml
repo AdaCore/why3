@@ -474,6 +474,10 @@ let provers_factory =
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
   new GMenu.factory tools_submenu_provers
 
+(* context_tools : simplified tools menu for mouse-3 *)
+
+let context_tools_menu = GMenu.menu ()
+let context_tools_factory = new GMenu.factory context_tools_menu ~accel_group
 
 
 (* 1.3 "View" menu items *)
@@ -1593,7 +1597,7 @@ let (_ : GtkSignal.id) =
           sel#select_path path
         | _ -> ()
         end;
-        tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+        context_tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
         true
       | _ -> (* Other buttons *) false
     end
@@ -1948,13 +1952,20 @@ let add_submenu_strategy (shortcut,strategy) =
              (String.map (function '_' -> ' ' | c -> c) strategy)
              ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
   let callback () =
     Debug.dprintf debug "interp command '%s'@." strategy;
     interp strategy
   in
+  connect_menu_item i ~callback;
+  let  i = create_menu_item
+             context_tools_factory
+             (String.map (function '_' -> ' ' | c -> c) strategy)
+             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
+  in
+  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
+          (parse_shortcut_as_key shortcut);
   connect_menu_item i ~callback
+
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
   let  i = create_menu_item
@@ -1968,7 +1979,16 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
-  connect_menu_item i ~callback
+  connect_menu_item i ~callback;
+  if not (List.mem prover_parseable_name gconfig.hidden_provers) then
+    begin
+      let  i = create_menu_item
+             context_tools_factory
+             prover_name
+             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
+      in
+      connect_menu_item i ~callback;
+    end
 
 
 
@@ -1994,7 +2014,7 @@ let init_completion provers transformations strategies commands =
               provers
   in
   List.iter add_submenu_prover provers_sorted;
-
+  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
