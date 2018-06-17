@@ -1,12 +1,23 @@
 
-(** {1 Constructive existence of a witness}
+(** {1 Witnesses of existential proofs} *)
+
+(** {2 Non-constructive existence of a witness} *)
+
+module Witness
+
+  val ghost function witness (p: 'a -> bool) : 'a
+    requires { exists x. p x }
+    ensures  { p result }
+
+end
+
+(** {2 Constructive existence of a witness}
 
     Given a predicate `p` over integers and the existence of
     a nonnegative integer `n` such that `p n`, one can build
     a witness using a linear search starting from 0.
 
-    The difficulty here is to prove the termination of the
-    function implementing this linear search. We use a custom
+    The difficulty here is to prove termination. We use a custom
     variant predicate and we prove the accessibility of all
     integers for which there exists a witnes above.
 
@@ -15,17 +26,19 @@
     and Jean-François Monin).
 *)
 
-module Witness
+module Nat
 
   use int.Int
   use relations.WellFounded
 
+  (** since a custom variant relation has to be a toplevel predicate symbol,
+      we store the predicate `p` inside the variant expression *)
   predicate r (x y: ((int->bool),int)) =
     let p, x = x in
     let q, y = y in
     p = q && x = y+1 > 0 && not (p y)
 
-  let witness (p: int -> bool) : int
+  let function witness (p: int -> bool) : int
     requires { exists n. n >= 0 /\ p n }
     ensures  { result >= 0 /\ p result }
   = let lemma l1 (x: int)
