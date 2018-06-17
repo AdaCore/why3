@@ -136,6 +136,9 @@ let print_stats fmt stats =
       print_json_field "stats"
         (map_bindings get_name print_prover_stats) fmt kv_list
 
+let sort_messages (l : (Gnat_expl.check * msg) list) =
+  List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
+
 let print_json_msg fmt (check, m) =
   Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a%a}"
     (print_json_field "id" int) check.Gnat_expl.id
@@ -168,6 +171,6 @@ let print_messages () =
   let msg_set = Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
   in
   Format.printf "{%a%a%a}@."
-  (print_json_field "results" (list print_json_msg)) msg_set
+  (print_json_field "results" (list print_json_msg)) (sort_messages msg_set)
   print_warning_list !warning_list
   print_timing_entry (Util.get_timings ())
