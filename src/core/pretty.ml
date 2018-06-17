@@ -400,10 +400,16 @@ let print_constr fmt (cs,pjl) =
 
 let print_ty_decl fmt ts =
   let print_def fmt = function
-    | NoDef -> ()
-    | Alias ty -> fprintf fmt " =@ %a" print_ty ty
-    | Range _  -> fprintf fmt " =@ <range ...>" (* TODO *)
-    | Float _  -> fprintf fmt " =@ <float ...>" (* TODO *)
+    | NoDef     -> ()
+    | Alias ty  -> fprintf fmt " =@ %a" print_ty ty
+    | Range ir  ->
+        fprintf fmt " =@ <range %s .. %s>"
+          (BigInt.to_string ir.Number.ir_lower)
+          (BigInt.to_string ir.Number.ir_upper)
+    | Float irf ->
+        fprintf fmt " =@ <float %d %d>"
+          irf.Number.fp_exponent_digits
+          irf.Number.fp_significand_digits
   in
   fprintf fmt "@[<hov 2>type %a%a%a%a@]"
     print_ts ts print_id_attrs ts.ts_name
