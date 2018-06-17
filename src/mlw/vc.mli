@@ -15,5 +15,6 @@ val sp_attr : Ident.attribute (* switch to fast WP *)
 val wp_attr : Ident.attribute (* switch to classical WP (Cfun only) *)
 val kp_attr : Ident.attribute (* preserve preconditions after the call *)
 val wb_attr : Ident.attribute (* treat an abstract block as a whitebox *)
+val nt_attr : Ident.attribute (* allow non-terminating calls and loops *)
 
 val vc : Env.env -> known_map -> Theory.theory_uc -> pdecl -> pdecl list

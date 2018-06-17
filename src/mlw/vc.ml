@@ -62,9 +62,11 @@ let sp_attr = Ident.create_attribute "vc:sp"
 let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
+let nt_attr = Ident.create_attribute "vc:divergent"
 
-let vc_attrs = Sattr.add kp_attr (Sattr.add wb_attr
-  (Sattr.add sp_attr (Sattr.add wp_attr Sattr.empty)))
+let vc_attrs =
+  Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
+  (Sattr.add sp_attr (Sattr.add wp_attr Sattr.empty))))
 
 (* VCgen environment *)
 
@@ -77,21 +79,23 @@ type vc_env = {
   ps_int_gt : lsymbol;
   fs_int_pl : lsymbol;
   fs_int_mn : lsymbol;
-  exn_count : int ref;
   ps_wf_acc : lsymbol;
+  exn_count : int ref;
+  divergent : bool;
 }
 
-let mk_env {Theory.th_export = ns} {Theory.th_export = ns2} kn tuc = {
+let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc = {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
-  ps_int_le = Theory.ns_find_ls ns ["infix <="];
-  ps_int_ge = Theory.ns_find_ls ns ["infix >="];
-  ps_int_lt = Theory.ns_find_ls ns ["infix <"];
-  ps_int_gt = Theory.ns_find_ls ns ["infix >"];
-  fs_int_pl = Theory.ns_find_ls ns ["infix +"];
-  fs_int_mn = Theory.ns_find_ls ns ["infix -"];
+  ps_int_le = Theory.ns_find_ls ns_int ["infix <="];
+  ps_int_ge = Theory.ns_find_ls ns_int ["infix >="];
+  ps_int_lt = Theory.ns_find_ls ns_int ["infix <"];
+  ps_int_gt = Theory.ns_find_ls ns_int ["infix >"];
+  fs_int_pl = Theory.ns_find_ls ns_int ["infix +"];
+  fs_int_mn = Theory.ns_find_ls ns_int ["infix -"];
+  ps_wf_acc = Theory.ns_find_ls ns_acc ["acc"];
   exn_count = ref 0;
-  ps_wf_acc = Theory.ns_find_ls ns2 ["acc"];
+  divergent = false;
 }
 
 let acc env r t =
@@ -132,6 +136,7 @@ let expl_loop_keep = Ident.create_attribute "expl:loop invariant preservation"
 let expl_loop_vari = Ident.create_attribute "expl:loop variant decrease"
 let expl_variant   = Ident.create_attribute "expl:variant decrease"
 let expl_type_inv  = Ident.create_attribute "expl:type invariant"
+let expl_divergent = Ident.create_attribute "expl:termination"
 
 let attrs_has_expl attrs =
   Sattr.exists (fun a -> Strings.has_prefix "expl:" a.attr_string) attrs
@@ -504,7 +509,7 @@ let inv_of_pure {known_map = kn} loc fl k =
    - [xres] names the value carried by the exception
    [case_xmap] is used for match-with-exceptions *)
 let rec k_expr env lps e res xmap =
-  let loc = e.e_loc in
+  let loc = e.e_loc and eff = e.e_effect in
   let attrs = Sattr.diff e.e_attrs vc_attrs in
   let t_tag t = t_attr_set ?loc attrs t in
   let var_or_proxy_case xmap e k =
@@ -513,6 +518,13 @@ let rec k_expr env lps e res xmap =
     | _ -> let v = proxy_of_expr e in
            Kseq (k_expr env lps e v xmap, 0, k v) in
   let var_or_proxy = var_or_proxy_case xmap in
+  let check_divergence k =
+    if eff.eff_oneway && not env.divergent then begin
+      Warning.emit ?loc "termination@ of@ this@ expression@ \
+        cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
+        clause@ in@ the@ outer@ specification";
+      Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)
+    end else k in
   let k = match e.e_node with
     | Evar v ->
         Klet (res, t_tag (t_var v.pv_vs), t_true)
@@ -537,7 +549,7 @@ let rec k_expr env lps e res xmap =
         let pre = inv_of_pure env loc [pre] (Kcut pre) in
         let post = k_of_post expl_post res cty.cty_post in
         (* handle exceptions that pass through *)
-        let xs_pass = e.e_effect.eff_raises in
+        let xs_pass = eff.eff_raises in
         let xq_pass = Mxs.set_inter cty.cty_xpost xs_pass in
         let xq_pass = Mxs.inter (fun _ ql (i,v) ->
           let xq = k_of_post expl_xpost v ql in
@@ -558,6 +570,9 @@ let rec k_expr env lps e res xmap =
         let k = Mxs.fold add_xq xq_lost k in
         let k = Mxs.fold add_xq xq_pass k in
         let k = bind_oldies cty.cty_oldies k in
+        (* ignore divergence here if we check it later *)
+        let k = if Sattr.mem nt_attr e1.e_attrs
+                then check_divergence k else k in
         if cty.cty_pre = [] then k else Kseq (pre, 0, k)
     | Eexec (ce, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
         (* [ VC(ce) (if ce is a lambda executed in-place)
@@ -598,13 +613,17 @@ let rec k_expr env lps e res xmap =
            with the xpost assumed and the exception raised. *)
         let skip = match ce.c_node with
           | Cfun _ -> xmap | _ -> Mxs.empty in
-        let xq = complete_xpost cty e.e_effect skip in
+        let xq = complete_xpost cty eff skip in
         let k = Mxs.fold2_inter (fun _ ql (i,v) k ->
           let xk = k_of_post expl_xpost v ql in
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
-        let k = bind_oldies oldies (k_havoc loc e.e_effect k) in
+        let k = bind_oldies oldies (k_havoc loc eff k) in
+        (* ignore divergence here if we check it later *)
+        let k = match ce.c_node with
+          | Cfun e when not (Sattr.mem nt_attr e.e_attrs) -> k
+          | _ -> check_divergence k in
         let k = if pre = [] then k else
           if Sattr.mem kp_attr e.e_attrs
             then Kseq (Kcut p, 0, k)
@@ -614,7 +633,7 @@ let rec k_expr env lps e res xmap =
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
           | _ -> k end
     | Eassign asl ->
-        let cv = e.e_effect.eff_covers in
+        let cv = eff.eff_covers in
         if Sreg.is_empty cv then k_unit res else
         (* compute the write effect *)
         let add wr (r,f,v) =
@@ -807,7 +826,8 @@ let rec k_expr env lps e res xmap =
         let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
-        Kpar (j, k_havoc loc e.e_effect k)
+        let k = check_divergence k in
+        Kpar (j, k_havoc loc eff k)
     | Efor (vx, (a, d, b), vi, invl, e1) ->
         let int_of_pv = match vx.pv_vs.vs_ty.ty_node with
           | Tyapp (s,_) when ts_equal s ts_int ->
@@ -847,7 +867,8 @@ let rec k_expr env lps e res xmap =
         in
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
-        let k = Kpar (j, k_havoc loc e.e_effect k) in
+        let k = Kpar (j, k_havoc loc eff k) in
+        let k = check_divergence k in
         (* [ ASSUME a <= b+1 ;
              [ STOP inv[a]
              | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
@@ -880,7 +901,11 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
     let rinv = inv_of_pvs env e.e_loc (Spv.singleton v) in
     let k = List.fold_right assert_inv rinv (Kstop q) in
     List.fold_right assert_inv qinv k in
-  let k = Kseq (k_expr env lps e res xmap, 0, add_qinv res q) in
+  (* do not check termination if asked nicely *)
+  let env = if Sattr.mem nt_attr e.e_attrs then
+    { env with divergent = true } else env in
+  let k = k_expr env lps e res xmap in
+  let k = Kseq (k, 0, add_qinv res q) in
   let k = Mxs.fold (fun _ ((i,r), xq) k ->
     Kseq (k, i, add_qinv r xq)) xq k in
   (* move the postconditions under the VCgen tag *)

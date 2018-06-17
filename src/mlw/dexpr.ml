@@ -937,11 +937,7 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
-      print_xs xs) (Sxs.diff eeff.eff_raises ueff.eff_raises);
-  if eeff.eff_oneway && not ueff.eff_oneway then
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> eff.eff_oneway) e)
-      "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
-        stated@ in@ the@ specification"
+      print_xs xs) (Sxs.diff eeff.eff_raises ueff.eff_raises)
 
 let check_aliases recu c =
   let rds_regs = c.cty_freeze.isb_reg in
@@ -974,8 +970,8 @@ let check_aliases recu c =
   let regs = List.fold_left add_arg rds_regs c.cty_args in
   if recu then ignore (add_ity regs c.cty_result)
 
-let check_fun inr rsym dsp e =
-  let c,e = match e with
+let check_fun inr rsym dsp ce =
+  let c,e = match ce with
     | { c_node = Cfun e; c_cty = c } -> c,e
     | _ -> invalid_arg "Dexpr.check_fun" in
   let c = match rsym with
@@ -1547,6 +1543,8 @@ and lambda uloc env pvl mask dsp dvl de =
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post e.e_ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
+  let e = if not dsp.ds_diverge then e
+          else e_attr_add Vc.nt_attr e in
   c_fun ~mask pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =
