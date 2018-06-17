@@ -403,7 +403,7 @@ let print_ty_decl fmt ts =
     | NoDef     -> ()
     | Alias ty  -> fprintf fmt " =@ %a" print_ty ty
     | Range ir  ->
-        fprintf fmt " =@ <range %s .. %s>"
+        fprintf fmt " =@ <range %s %s>"
           (BigInt.to_string ir.Number.ir_lower)
           (BigInt.to_string ir.Number.ir_upper)
     | Float irf ->
