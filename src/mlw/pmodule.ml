@@ -755,7 +755,7 @@ let clone_ppat cl sm pp mask =
 
 let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
-  | Econst c -> e_const c e.e_ity
+  | Econst c -> e_const c (clone_ity cl e.e_ity)
   | Eexec (c,_) -> e_exec (clone_cexp cl sm c)
   | Eassign asl ->
       let conv (r,f,v) =
@@ -1015,10 +1015,20 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = List.fold_left add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
-      if tdl = [] then List.fold_left add_vc uc vcl else
-        let add uc d = add_pdecl ~warn:false ~vc:false uc d in
-        List.fold_left add uc (create_type_decl tdl)
+      let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
+      let uc = List.fold_left add_vc uc vcl in
+      let dl = if ndl <> [] then create_type_decl ndl else [] in
+      let save_special_ls d d' = match d.d_node, d'.d_node with
+        | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
+            cl.ls_table <- Mls.add ls ls' cl.ls_table;
+        | Dtype _, Dtype _ -> ()
+        | _ -> assert false in
+      begin match tdl, dl with
+      | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
+          List.iter2 save_special_ls d.pd_pure d'.pd_pure
+      | _ -> () end;
+      let add uc d = add_pdecl ~warn:false ~vc:false uc d in
+      List.fold_left add uc dl
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)

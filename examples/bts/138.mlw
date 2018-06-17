@@ -1,27 +1,17 @@
-module Test 
+module Test
 
   use int.Int
 
   type a = < range 22 46 >
-  
+
   let f (b : a) =
     requires {a'int b = 42}
     ensures {a'int result = a'int b}
     (42:a)
-    
-end
 
-module Test2
-  use int.Int
-
-  let f (b : int) =
-    requires {b = 42}
-    ensures {result = b}
-    42
-    
 end
 
 module Test1
-  clone Test2 as T (* Replace with Test does not work *)
-  
+  clone Test as T (* Replace with Test does not work *)
+
 end
