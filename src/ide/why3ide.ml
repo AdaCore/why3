@@ -2104,6 +2104,10 @@ let () =
   mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
 
 
+let interrupt_item =
+  create_menu_item tools_factory "Interrupt"
+                   "Stop all running proof attempts"
+
 let bisect_item =
   create_menu_item tools_factory "Bisect on external proof"
                    "Search for a maximal set of hypotheses to remove before calling a prover"
@@ -2154,6 +2158,10 @@ let complete_context_menu () =
     mark_obsolete_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
                                 (fun id -> Command_req (id, "mark")));
+  connect_menu_item
+    interrupt_item
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+                                (fun id -> Command_req (id, "interrupt")));
   connect_menu_item
     edit_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"

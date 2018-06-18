@@ -326,36 +326,31 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \item[Replay valid obsolete proofs] all proof nodes below the selected nodes that are obsolete but whose former status was Valid are replayed.
 \item[Replay all obsolete proofs] all proof nodes below the selected nodes that are obsolete are replayed.
 \end{description}
+
 \item[Menu \textsf{File}]\emptyitem
 \begin{description}
-\item[Add File] adds a file in the GUI.
+\item[Add File to session] adds a file in the current proof session.
 %\item[Detect provers] runs provers auto-detection
-]\item[Preferences] opens a window for modifying preferred
+\item[Preferences] opens a window for modifying preferred
   configuration parameters, see details below.
-\item[Reload] reloads the input files from disk, and update the session state accordingly.
 \item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
+\item[Save files] saves edited soruce files on disk.
+\item[Save session and files] saves both current session state and edited files on disk.
+\item[Save all and Refresh session] save session and edited files, and refresh the current session tree.
 \item[Quit] exits the GUI.
 \end{description}
 
-\item[Menu \textsf{View}]\emptyitem
+\item[Menu \textsf{Tools}]\emptyitem
 \begin{description}
-\item[Expand All] expands all the rows of the tree view.
-\item[Collapse proved goals] closes all the rows of the tree view
-  that are proved.
-% \item[Hide proved goals] completely hides the proved rows of the tree
-%   view [EXPERIMENTAL]
-\end{description}
-
-\item[Menu \textsf{Tools}]
 \item[Strategies] section provides a set of actions that are
   performed on the selected goal(s):
   \begin{description}
-  \item[Split] splits the current goal into subgoals if it is a
-    conjunction of two or more goals. It corresponds to the
-    \verb|split_goal_wp| transformation.
-  \item[Inline] inlines the definitions in the conclusion of the goal.
-    It corresponds to the \verb|introduce_premises| transformation
-    follwoed by \verb|inline_goal|.
+  \item[Split VC] splits the current goal into subgoals.
+  % \item[Inline] inlines the definitions in the conclusion of the goal.
+  %   It corresponds to the \verb|introduce_premises| transformation
+  %   follwoed by \verb|inline_goal|.
+  \item[Auto level 0] is a basic proof search strategy that applies a few provers
+    on the goal with a short time limit.
   \item[Auto level 1] is a strategy that first applies a few provers
     on the goal with a short time limit, then splits the goal and
     tries again on the subgoals
@@ -367,16 +362,15 @@ proof obligations, the corresponding proof attempts are marked obsolete.
   Section~\ref{sec:strategies}, as well as a description on how to
   design strategies of your own.
 
-\item[Provers] provide a button for each detected prover. Clicking on such a
-  button starts the corresponding prover on the selected goal(s).
+\item[Provers] provide a menu item for each detected prover. Clicking on
+  such an item starts the corresponding prover on the selected
+  goal(s). To start a prover with a different time limit, you may
+  either change the default time limit in the Preferences, or using
+  the text command field and type the prover name followed by the time
+  limit.
 
-% \item[Inline] replaces the head predicate symbol of the goal with its
-%   definition. It corresponds to the
-%   \verb|inline_goal| transformation.
+\item[Transformations] gives access to all the known transformations.
 
-\item[Tools] section provides a set of specific action that are
-  typically performed on the selected goal(s). :
-  \begin{description}
 \item[Edit] starts an editor on the selected task.
 
   For automatic provers, this allows to see the file sent to the
@@ -386,29 +380,42 @@ proof obligations, the corresponding proof attempts are marked obsolete.
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Replay] replays all the obsolete proofs.
+\item[Replay valid obsolete proofs] replays all the obsolete proofs below the current node whose former state was Valid.
 
-  If ``only unproved goals'' is selected, only formerly successful
-  proofs are rerun. If ``all goals'', then all obsolete proofs are
-  rerun, successful or not.
-
-\item[Remove] removes a proof attempt or a transformation.
+\item[Replay all obsolete proofs] replays all the obsolete proofs below the current node.
 
 \item[Clean] removes any unsuccessful proof attempt for which there is
   another successful proof attempt for the same goal
 
+\item[Remove] removes a proof attempt or a transformation.
+
+\item[Mark obsolete] marks all the proof as
+  obsolete.  This allows to replay every proof.
+
 \item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
 
-\item[Mark as obsolete] marks all the proof as
-  obsolete.
-  This allows to replay every proof.
-\item[Non-splitting transformation] applies one of the available
-  transformations, as listed in Section~\ref{sec:transformations}.
-\item[Splitting transformation] is the same as above, but for
-  splitting transformations, \ie those that can generate
-  several sub-goals.
+\item[Bisect]
+
+\item[Focus]
+
+\item[Unfocus]
+
+\item[Copy]
+
+\item[Paste]
+
 \end{description}
+
+\item[Menu \textsf{View}]\emptyitem
+\begin{description}
+\item[Expand All] expands all the rows of the tree view.
+\item[Collapse proved goals] closes all the rows of the tree view
+  that are proved.
+% \item[Hide proved goals] completely hides the proved rows of the tree
+%   view [EXPERIMENTAL]
+\end{description}
+
 
 \item[Menu \textsf{Help}]
 A very short online help, and some information about this software.
