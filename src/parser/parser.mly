@@ -22,8 +22,7 @@
     ~desc:"When set, model attributes are not added during parsing"
     "no_auto_model"
 
-  let add_attr id l =
-    { id with id_ats = l }
+  let add_attr id l = { id with id_ats = l }
 
   let add_model_trace_attr id =
     if Debug.test_flag debug_auto_model then id else
@@ -100,7 +99,7 @@
 
   let apply_return pat sp =
     let apply = function
-      | loc, [{pat_desc = Pvar ({id_str = "result"; id_loc = l}, false)}, f]
+      | loc, [{pat_desc = Pvar {id_str = "result"; id_loc = l}}, f]
         when Loc.equal loc l -> loc, [pat, f]
       | post -> post in
     match pat.pat_desc with
@@ -174,6 +173,7 @@
 %nonassoc LARROW
 %nonassoc below_COMMA
 %nonassoc COMMA
+%nonassoc AS
 %nonassoc GHOST
 %nonassoc prec_attr
 %nonassoc COLON (* weaker than -> because of t: a -> b *)
@@ -565,19 +565,25 @@ single_term_:
     { Tinfix (l, o, r) }
 | l = single_term ; o = infix_op_234 ; r = single_term
     { Tidapp (Qident o, [l; r]) }
-| term_arg located(term_arg)+ (* FIXME/TODO: "term term_arg" *)
+| term_arg located(term_arg)+
     { let join f (a,_,e) = mk_term (Tapply (f,a)) $startpos e in
       (List.fold_left join $1 $2).term_desc }
 | IF term THEN term ELSE term
     { Tif ($2, $4, $6) }
 | LET pattern EQUAL term IN term
-    { let cast ty = { $4 with term_desc = Tcast ($4, ty) } in
-      let pat, def = match $2.pat_desc with
-        | Ptuple [] -> { $2 with pat_desc = Pwild }, cast (PTtuple [])
-        | Pcast ({pat_desc = (Pvar (_,false)|Pwild)} as p, ty) -> p, cast ty
-        | _ -> $2, $4 in
+    { let re_pat pat d = { pat with pat_desc = d } in
+      let rec deparen pat = match pat.pat_desc with
+        | Pparen p -> deparen p
+        | Pcast (p,ty) -> re_pat pat (Pcast (deparen p, ty))
+        | _ -> pat in
+      let pat = deparen $2 in
+      let cast ty = { $4 with term_desc = Tcast ($4, ty) } in
+      let pat, def = match pat.pat_desc with
+        | Ptuple [] -> re_pat pat Pwild, cast (PTtuple [])
+        | Pcast ({pat_desc = (Pvar _|Pwild)} as p, ty) -> p, cast ty
+        | _ -> pat, $4 in
       match pat.pat_desc with
-      | Pvar (id,false) -> Tlet (id, def, $6)
+      | Pvar id -> Tlet (id, def, $6)
       | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
       | _ -> Tcase (def, [pat, $6]) }
 | LET attrs(lident_op_id) EQUAL term IN term
@@ -793,7 +799,7 @@ single_expr_:
     { Einfix (l,o,r) }
 | l = single_expr ; o = infix_op_234 ; r = single_expr
     { Eidapp (Qident o, [l;r]) }
-| expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
+| expr_arg located(expr_arg)+
     { let join f (a,_,e) = mk_expr (Eapply (f,a)) $startpos e in
       (List.fold_left join $1 $2).expr_desc }
 | IF seq_expr THEN contract_expr ELSE contract_expr
@@ -802,32 +808,33 @@ single_expr_:
     { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
     { let re_pat pat d = { pat with pat_desc = d } in
-      let rec ghostify pat = match pat.pat_desc with
-        (* let_pattern marks the opening variable with Ptuple [_] *)
-        | Ptuple [{pat_desc = Pvar (id,_)}] -> re_pat pat (Pvar (id,$2))
-        | Ptuple (p::pl) -> re_pat pat (Ptuple (ghostify p :: pl))
-        | Pas (p,id,gh) -> re_pat pat (Pas (ghostify p, id, gh))
-        | Por (p1,p2) -> re_pat pat (Por (ghostify p1, p2))
-        | Pcast (p,t) -> re_pat pat (Pcast (ghostify p, t))
-        | _ when $2 -> Loc.errorm ~loc:(floc $startpos($2) $endpos($2))
-            "illegal ghost qualifier" (* $4 does not start with a Pvar *)
+      let rec deparen gh pat = match pat.pat_desc with
+        | Ptuple (p::pl) -> re_pat pat (Ptuple (deparen gh p :: pl))
+        | Pas (p,id,g) -> re_pat pat (Pas (deparen gh p, id, g))
+        | Por (p,q) -> re_pat pat (Por (deparen gh p, q))
+        | Pcast (p,ty) -> re_pat pat (Pcast (deparen gh p, ty))
+        | _ when gh -> re_pat pat (Pghost (deparen false pat))
+        | Pghost p -> re_pat pat (Pghost (deparen false p))
+        | Pparen p -> deparen false p (* gh == false *)
         | _ -> pat in
-      let pat = ghostify $4 in
+      let pat = deparen $2 $4 in
       let kind = match pat.pat_desc with
         | _ when $3 = Expr.RKnone -> $3
-        | Pvar (_,_) | Pcast ({pat_desc = Pvar (_,_)},_) -> $3
+        | Pvar _ | Pcast ({pat_desc = Pvar _},_) -> $3
         | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
             "illegal kind qualifier" in
       let cast ty = { $6 with expr_desc = Ecast ($6, ty) } in
       let pat, def = match pat.pat_desc with
         | Ptuple [] -> re_pat pat Pwild, cast (PTtuple [])
-        | Pcast ({pat_desc = (Pvar _|Pwild)} as pat, ty) -> pat, cast ty
+        | Pcast ({pat_desc = (Pvar _|Pwild)} as p, ty) -> p, cast ty
         | _ -> pat, $6 in
       match pat.pat_desc with
-      | Pvar (id, gh) ->
-        let id = add_model_trace_attr id in
-        Elet (id, gh, kind, def, $8)
+      | Pvar id -> Elet (add_model_trace_attr id, false, kind, def, $8)
       | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
+      | Pghost {pat_desc = Pvar id} ->
+                    Elet (add_model_trace_attr id, true, kind, def, $8)
+      | Pghost {pat_desc = Pwild} ->
+                  Elet (id_anonymous pat.pat_loc, true, kind, def, $8)
       | _ -> Ematch (def, [pat, $8], []) }
 | LET ghost kind attrs(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
@@ -1033,7 +1040,7 @@ alias:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar (id,false)) $startpos $endpos, $1] }
+      [mk_pat (Pvar id) $startpos $endpos, $1] }
 
 raises:
 | uqualid ARROW term
@@ -1074,7 +1081,7 @@ ret_cast:
 ret_ident:
 | id = attrs(lident_nq)
     { let ats = ATstr Dterm.attr_w_unused_var_no :: id.id_ats in
-      mk_pat (Pvar ({id with id_ats = ats}, false)) $startpos $endpos }
+      mk_pat (Pvar {id with id_ats = ats}) $startpos $endpos }
 | UNDERSCORE
     { mk_pat Pwild $startpos $endpos }
 
@@ -1113,26 +1120,20 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
+| GHOST mk_pat(pat_uni_)                { Pghost $2 }
 | mk_pat(pat_uni_) AS ghost attrs(lident_nq)
-    { let id = add_model_trace_attr $4 in
-      Pas ($1,id,$3) }
+                                        { Pas ($1,add_model_trace_attr $4,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
-| pat_arg_shared_                       { $1 }
-| attrs(lident_nq)
-    { let id = add_model_trace_attr $1 in
-      Pvar (id, false) }
-| GHOST attrs(lident_nq)               { Pvar ($2,true) }
-
-pat_arg_shared_:
 | UNDERSCORE                            { Pwild }
+| attrs(lident_nq)                      { Pvar (add_model_trace_attr $1) }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
-| LEFTPAR pattern_ RIGHTPAR             { $2 }
+| LEFTPAR pattern RIGHTPAR              { Pparen $2 }
 | LEFTBRC field_list1(pattern) RIGHTBRC { Prec $2 }
 
-(* let-patterns that cannot start with "ghost" *)
+(* let-patterns cannot start with "ghost" *)
 
 let_pattern: mk_pat(let_pattern_) { $1 }
 
@@ -1146,15 +1147,11 @@ let_pat_conj_:
                                         { Ptuple ($1::$3) }
 
 let_pat_uni_:
-| let_pat_arg_                          { $1 }
+| pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | mk_pat(let_pat_uni_) AS ghost attrs(lident_nq)
-                                        { Pas ($1,$4,$3) }
+                                        { Pas ($1,add_model_trace_attr $4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
-
-let_pat_arg_:
-| pat_arg_shared_   { $1 }
-| attrs(lident_nq)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
 
 (* Idents *)
 

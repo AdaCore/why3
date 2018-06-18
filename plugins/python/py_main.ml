@@ -63,7 +63,7 @@ let return ~loc =
   Qident (mk_id ~loc "Return")
 let return_handler ~loc =
   let x = mk_id ~loc "x" in
-  [return ~loc, Some (mk_pat ~loc (Pvar (x, false))), mk_var ~loc x]
+  [return ~loc, Some (mk_pat ~loc (Pvar x)), mk_var ~loc x]
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))

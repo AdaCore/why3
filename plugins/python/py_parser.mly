@@ -134,7 +134,7 @@ single_spec:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar (id, false)) $startpos $endpos, $1] }
+      [mk_pat (Pvar id) $startpos $endpos, $1] }
 
 expr:
 | d = expr_desc

@@ -46,13 +46,15 @@ type pattern = {
 
 and pat_desc =
   | Pwild
-  | Pvar of ident * ghost
+  | Pvar of ident
   | Papp of qualid * pattern list
   | Prec of (qualid * pattern) list
   | Ptuple of pattern list
   | Pas of pattern * ident * ghost
   | Por of pattern * pattern
   | Pcast of pattern * pty
+  | Pghost of pattern
+  | Pparen of pattern
 
 (*s Logical terms and formulas *)
 

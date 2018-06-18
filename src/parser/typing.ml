@@ -154,10 +154,14 @@ let parse_record ~loc ns km get_val fl =
   cs, List.map get_val pjl
 
 let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
+  match desc with
+    | Ptree.Pparen p -> dpattern ns km p
+    | _ -> (* creative indentation ahead *)
   Dterm.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar (x, false) -> DPvar (create_user_id x)
-    | Ptree.Papp (q, pl) ->
+    | Ptree.Pparen _ -> assert false (* never *)
+    | Ptree.Pvar x -> DPvar (create_user_id x)
+    | Ptree.Papp (q,pl) ->
         let pl = List.map (dpattern ns km) pl in
         DPapp (find_lsymbol_ns ns q, pl)
     | Ptree.Ptuple pl ->
@@ -169,11 +173,11 @@ let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
           | None -> Dterm.dpattern DPwild in
         let cs,fl = parse_record ~loc ns km get_val fl in
         DPapp (cs,fl)
-    | Ptree.Pas (p, x, false) -> DPas (dpattern ns km p, create_user_id x)
-    | Ptree.Por (p, q) -> DPor (dpattern ns km p, dpattern ns km q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern ns km p, dty_of_pty ns ty)
-    | Ptree.Pvar (_, true) | Ptree.Pas (_, _, true) -> Loc.errorm ~loc
-        "ghost variables are only allowed in programs")
+    | Ptree.Pas (p,x,false) -> DPas (dpattern ns km p, create_user_id x)
+    | Ptree.Por (p,q) -> DPor (dpattern ns km p, dpattern ns km q)
+    | Ptree.Pcast (p,ty) -> DPcast (dpattern ns km p, dty_of_pty ns ty)
+    | Ptree.Pghost _ | Ptree.Pas (_,_,true) ->
+        Loc.errorm ~loc "ghost patterns are only allowed in programs")
 
 let quant_var ns (loc, id, gh, ty) =
   if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
@@ -491,24 +495,30 @@ let find_constructor muc q =
     | _ -> false in
   find_special muc test "constructor" q
 
-let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
+let rec dpattern muc gh { pat_desc = desc; pat_loc = loc } =
+  match desc with
+    | Ptree.Pparen p -> dpattern muc gh p
+    | Ptree.Pghost p -> dpattern muc true p
+    | _ -> (* creative indentation ahead *)
   Dexpr.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar (x, gh) -> DPvar (create_user_id x, gh)
-    | Ptree.Papp (q, pl) ->
-        DPapp (find_constructor muc q, List.map (dpattern muc) pl)
+    | Ptree.Pparen _ | Ptree.Pghost _ -> assert false
+    | Ptree.Pvar x -> DPvar (create_user_id x, gh)
+    | Ptree.Papp (q,pl) ->
+        DPapp (find_constructor muc q, List.map (dpattern muc gh) pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
-          | Some p -> dpattern muc p
+          | Some p -> dpattern muc gh p
           | None -> Dexpr.dpattern DPwild in
         let cs,fl = parse_record ~loc muc get_val fl in
         DPapp (cs,fl)
     | Ptree.Ptuple pl ->
-        DPapp (rs_tuple (List.length pl), List.map (dpattern muc) pl)
-    | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, dity_of_pty muc pty)
-    | Ptree.Pas (p, x, gh) -> DPas (dpattern muc p, create_user_id x, gh)
-    | Ptree.Por (p, q) -> DPor (dpattern muc p, dpattern muc q))
+        DPapp (rs_tuple (List.length pl), List.map (dpattern muc gh) pl)
+    | Ptree.Pcast (p,pty) -> DPcast (dpattern muc gh p, dity_of_pty muc pty)
+    | Ptree.Pas (p,x,g) -> DPas (dpattern muc gh p, create_user_id x, gh || g)
+    | Ptree.Por (p,q) -> DPor (dpattern muc gh p, dpattern muc gh q))
 
+let dpattern muc pat = dpattern muc false pat
 
 (* specifications *)
 
@@ -547,11 +557,13 @@ let dpre muc pl lvm old =
   List.map dpre pl
 
 let dpost muc ql lvm old ity =
-  let dpost (loc,pfl) = match pfl with
+  let rec dpost (loc,pfl) = match pfl with
+    | [{ pat_desc = Ptree.Pparen p; pat_loc = loc}, f] ->
+        dpost (loc, [p,f])
     | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
         let v = create_pvsymbol (id_fresh "result") ity in
         v, Loc.try3 ~loc type_fmla muc lvm old f
-    | [{ pat_desc = Ptree.Pvar (id,false) }, f] ->
+    | [{ pat_desc = Ptree.Pvar id }, f] ->
         let v = create_pvsymbol (create_user_id id) ity in
         let lvm = Mstr.add id.id_str v lvm in
         v, Loc.try3 ~loc type_fmla muc lvm old f
