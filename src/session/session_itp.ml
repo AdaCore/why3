@@ -670,24 +670,24 @@ let file_proved s f =
     Hstr.add s.file_state f.file_name b;
     b
 
+let pa_proved s paid =
+  let pa = get_proof_attempt_node s paid in
+  match pa.proof_state with
+  | None -> false
+  | Some pa ->
+     begin
+       match pa.Call_provers.pr_answer with
+       | Call_provers.Valid -> true
+       | _ -> false
+     end
+
 let any_proved s any : bool =
   match any with
   | AFile file -> file_proved s file
   | ATh th -> th_proved s th
   | ATn tn -> tn_proved s tn
   | APn pn -> pn_proved s pn
-  | APa pa ->
-      begin
-        let pa = get_proof_attempt_node s pa in
-        match pa.proof_state with
-        | None -> false
-        | Some pa ->
-          begin
-            match pa.Call_provers.pr_answer with
-            | Call_provers.Valid -> true
-            | _ -> false
-          end
-      end
+  | APa pa -> pa_proved s pa
 
 
 
