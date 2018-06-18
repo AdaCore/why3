@@ -159,29 +159,37 @@ let print_statistics ses files =
 let print_report ses (id,p,l,r) =
   let g = S.get_proof_name ses id in
   printf "   goal '%s', prover '%a': " g.Ident.id_string Whyconf.print_prover p;
-  begin
-    match !opt_smoke with
-    | SD_None -> ()
-    | _ -> printf "Smoke detected!:@ "
-  end;
-  match r with
-  | C.Result(new_res,old_res) ->
-        printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
-          print_result new_res print_result old_res
-          l.Call_provers.limit_time
-          l.Call_provers.limit_mem
-          l.Call_provers.limit_steps
-  | C.No_former_result new_res ->
-      printf "no former result available, new result is: %a@."
-        print_result new_res
-  | C.CallFailed msg ->
-      printf "internal failure '%a'@." Exn_printer.exn_printer msg;
-  | C.Replay_interrupted ->
-      printf "replay interrupted@."
-  | C.Edited_file_absent f ->
-      printf "proof script absent (%s)@." f
-  | C.Prover_not_installed ->
-     printf "not installed@."
+  match !opt_smoke with
+  | SD_None ->
+     begin
+       match r with
+       | C.Result(new_res,old_res) ->
+          printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
+                 print_result new_res print_result old_res
+                 l.Call_provers.limit_time
+                 l.Call_provers.limit_mem
+                 l.Call_provers.limit_steps
+       | C.No_former_result new_res ->
+          printf "no former result available, new result is: %a@."
+                 print_result new_res
+       | C.CallFailed msg ->
+          printf "internal failure '%a'@." Exn_printer.exn_printer msg;
+       | C.Replay_interrupted ->
+          printf "replay interrupted@."
+       | C.Edited_file_absent f ->
+          printf "proof script absent (%s)@." f
+       | C.Prover_not_installed ->
+          printf "not installed@."
+     end
+  | _ ->
+     let res =
+       match r with
+       | C.Result(new_res,_old_res) -> new_res
+       | C.No_former_result new_res -> new_res
+       | _ -> assert false
+     in
+     printf "result is: %a -> Smoke detected!@."
+                 print_result res
 
 
 let same_result r1 r2 =
