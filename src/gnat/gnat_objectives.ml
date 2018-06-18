@@ -74,21 +74,13 @@ type objective_rec =
      toplevel           : GoalSet.t;
      (* the set of top-level goals, that is not obtained by transformation.
       * They are "entry points" of the objective into the Why3 session *)
-     to_be_counterexampled : GoalSet.t;
-
      mutable not_proved : bool;
-     (* when a goal is not proved, the objective is marked "not proved" by
-      * setting this boolean to "true" *)
+   (* when a goal is not proved, the objective is marked "not proved" by
+    * setting this boolean to "true" *)
      mutable counter_example : bool;
-     (* when a goal is not proved and a counterexample for the goal should
-      * be got, the objective is marked "counterexample" by setting this
-      * boolean to "true" *)
-     mutable temporary_ce : goal_id option;
-     (* There is a partially-split ce for this goal *)
-     mutable definitive_ce : goal_id option;
-     (* There is a fully-split ce for this goal. (it cannot be split in more
-        subgoals)
-     *)
+   (* when a goal is not proved and a counterexample for the goal should
+    * be got, the objective is marked "counterexample" by setting this
+    * boolean to "true" *)
    }
 (* an objective consists of to be scheduled and to be proved goals *)
 
@@ -96,11 +88,8 @@ let empty_objective () =
    { to_be_scheduled = GoalSet.empty ();
      to_be_proved    = GoalSet.empty ();
      toplevel        = GoalSet.empty ();
-     to_be_counterexampled = GoalSet.empty ();
      not_proved      = false;
-     counter_example = false;
-     temporary_ce    = None;
-     definitive_ce   = None;
+     counter_example = false
    }
 
 (* The state of the module consists of these mutable structures *)
@@ -158,54 +147,26 @@ let add_clone derive goal =
    let obj = get_objective derive in
    add_to_objective ~toplevel:false obj goal
 
-let add_to_objective_ce ex go =
-  GoalMap.add goalmap go ex;
-  let obj = find ex in
-  GoalSet.add obj.to_be_counterexampled go
 
 let add_to_objective = add_to_objective ~toplevel:true
 (* we mask the add_to_objective function here and fix it's toplevel argument to
    "true", so that outside calls always set toplevel to true *)
 
-let find_ce obj =
-  let obj_rec = Gnat_expl.HCheck.find explmap obj in
-  if obj_rec.definitive_ce = None then
-    obj_rec.temporary_ce
-  else
-    obj_rec.definitive_ce
-
 let set_not_interesting x = GoalSet.add not_interesting x
 let is_not_interesting x = GoalSet.mem not_interesting x
 let is_interesting x = not (is_not_interesting x)
 
-let next_ce obj =
-  try
-    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-    let goal = GoalSet.choose obj_rec.to_be_counterexampled in
-    GoalSet.remove obj_rec.to_be_counterexampled goal;
-    Some goal
-  with Not_found -> None
-
-(* When we are in ce mode we want to query for to_be_counterexampled instead of
-   to_be_scheduled *)
-let next ~ce objective =
+let next objective =
    (* this lookup should always succeed, otherwise it would mean we have a
       corrupt database *)
    let obj_rec = Gnat_expl.HCheck.find explmap objective in
-   let set =
-     if ce then
-       obj_rec.to_be_counterexampled
-     else
-       obj_rec.to_be_scheduled
-   in
-
    let rec build acc n =
      if n = 0 then acc
      else try
         (* the [choose] can fail however, in that case we want to return
            the goals found up to now *)
-        let goal = GoalSet.choose set in
-        GoalSet.remove set goal;
+        let goal = GoalSet.choose obj_rec.to_be_scheduled in
+        GoalSet.remove obj_rec.to_be_scheduled goal;
         build (goal :: acc) (n-1)
      with Not_found ->
         acc
@@ -230,8 +191,6 @@ let rev_strategy = List.rev strategy
 let last_transform = List.hd rev_strategy
 
 let first_transform = List.hd strategy
-
-let transform_ce = Gnat_split_disj.split_disj_name
 
 (* When provided with a starategy name, returns the successor in the list
    [strategy]. This is done by filling a local hashtable with key elements
@@ -275,12 +234,6 @@ let find_next_transformation s (goal: goal_id) =
     (* in the other case, we just apply the transformation that's there *)
     get_first_transform_of_goal s goal
 
-let is_full_split_goal_ce ses (goal: goal_id) =
-  if not (Session_itp.get_transformations ses goal = []) then false
-  else
-    let tr_name = parent_transform_name ses goal in
-    tr_name = transform_ce
-
 let is_full_split_goal ses (goal: goal_id) =
    (* check whether other transformations should be applied to the goal. If the
       transformation is part of the strategy, we check if it is the last one.
@@ -289,16 +242,12 @@ let is_full_split_goal ses (goal: goal_id) =
   if not (Session_itp.get_transformations ses goal = []) then false
   else
     let tr_name = parent_transform_name ses goal in
-    if List.mem tr_name strategy then
-      tr_name = last_transform
-    else
-      true
+    not (List.mem tr_name strategy) || tr_name = last_transform
 
 let has_already_been_applied s trans (goal: goal_id) =
    (* check whether the goal has already been split by the given
       transformation *)
-   List.exists (fun x -> Session_itp.get_transf_name s x = trans)
-    (Session_itp.get_transformations s goal)
+   List.exists (fun x -> Session_itp.get_transf_name s x = trans) (Session_itp.get_transformations s goal)
 
 (* TODO get_project_dir is the one from Session. We should be able to not use it *)
 let db_filename = "why3session.xml"
@@ -459,19 +408,6 @@ let subsubgoals s (g: goal_id) =
   with
     Not_found -> []
 
-let subsubgoals_ce s (g: goal_id) =
-  let transfs = Session_itp.get_transformations s g in
-  try
-    let tr =
-      List.find (fun x -> Session_itp.get_transf_name s x = transform_ce)
-      transfs
-    in
-    Session_itp.get_sub_tasks s tr
-  with
-    Not_found -> []
-
-
-
 (* Functor that takes a scheduler and provides functions to schedule
    transformations and proof attempts *)
 module Make (S: Controller_itp.Scheduler) = struct
@@ -517,123 +453,71 @@ let further_split (c: Controller_itp.controller) (goal: goal_id) =
    in
    split (find_next_transformation c.Controller_itp.controller_session goal)
 
-let further_split_ce (c: Controller_itp.controller) (goal: goal_id) =
-  let s = c.Controller_itp.controller_session in
-  if has_already_been_applied s transform_ce goal then
-    ()
-  else
-    let callback _tr_st = () in
-    C.schedule_transformation c goal transform_ce [] ~callback:callback
-      ~notification:(fun _ -> ())
-
-let register_result ~ce ~has_model c goal result =
+let register_result c goal result : 'a * 'b =
    let obj = get_objective goal in
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason obj) in
-   if not (ce || warn) then begin
-     (* We first remove the goal from the list of goals to be tried. It may be
-      * put back later, see below *)
-     GoalSet.remove obj_rec.to_be_proved goal;
-     if result then
-     (* goal has been proved, we only need to store that info *)
-       if not (GoalSet.is_empty obj_rec.to_be_proved) then
-         obj, Work_Left
-       else
-         if obj_rec.not_proved then
-           obj, Not_Proved
+   if obj_rec.counter_example then
+     (* The prover run was scheduled just to get counterexample *)
+     obj, Not_Proved
+   else
+     let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason obj) in
+     if not warn then begin
+       (* We first remove the goal from the list of goals to be tried. It may be
+        * put back later, see below *)
+       GoalSet.remove obj_rec.to_be_proved goal;
+       if result then
+         (* goal has been proved, we only need to store that info *)
+         if not (GoalSet.is_empty obj_rec.to_be_proved) then
+           obj, Work_Left
          else
-           obj, Proved
-     else begin try
+           if obj_rec.not_proved then
+             obj, Not_Proved
+           else obj, Proved
+       else begin try
          (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
          if Gnat_config.manual_prover = None &&
-            not (all_provers_tried c.Controller_itp.controller_session goal) then begin
-           (* put the goal back to be scheduled and proved *)
-           GoalSet.add obj_rec.to_be_scheduled goal;
-           GoalSet.add obj_rec.to_be_proved goal;
-           obj, Work_Left
-         end else begin
-           (* This particular goal has been tried with all provers. But maybe
-              we can split/apply transformations. *)
-           if is_full_split_goal c.Controller_itp.controller_session goal then
-             unproved_vc_continue obj obj_rec
-           else
-             let new_goals =
-               further_split c goal;
-               subsubgoals c.Controller_itp.controller_session goal
-             in
-             if new_goals = [] then unproved_vc_continue obj obj_rec
-             else begin
-               (* if we are here, it means we have simplified the goal. We add the
-                  new goals to the set of goals to be proved/scheduled. *)
-               List.iter (add_clone goal) new_goals;
-               obj, Work_Left
-             end
-         end
-     with Exit ->
-       if obj_rec.counter_example then
-         (* We have only one goal to provide counterexamples from *)
-         obj, Counter_Example
-       else
-         begin
-           (* if we cannot simplify, the objective has been disproved *)
-           GoalSet.reset obj_rec.to_be_scheduled;
-           if Gnat_config.counterexamples then begin
-             (* The goal will be scheduled to get a counterexample *)
-             obj_rec.not_proved <- true;
-             obj_rec.counter_example <- true;
-             GoalSet.add obj_rec.to_be_counterexampled goal;
-             (* The goal will be scheduled manually in Gnat_main.handle_result
-                so it is not put to the obj_rec.to_be_scheduled *)
-             obj, Counter_Example
-           end
-           else
-             obj, Not_Proved
-         end
-     end
-   end
-
-   else if warn then
-     obj, (if result then Proved else Not_Proved)
-
-   else
-     begin
-       if obj_rec.definitive_ce != None then
-         obj, Not_Proved
-       else
-         (* The counterexamples pass did not finish yet *)
-         begin
-           GoalSet.remove obj_rec.to_be_counterexampled goal;
-           if result then
-             (* result is true there is no counterexample *)
-             obj, Counter_Example
-           else
-             (* The result is false but we don't know if we found counterexamples yet *)
-             if is_full_split_goal_ce c.Controller_itp.controller_session goal then
-               if has_model then
-                 begin
-                   obj_rec.definitive_ce <- Some goal;
-                   GoalSet.reset obj_rec.to_be_counterexampled;
-                   obj, Not_Proved
-                 end
-               else
-                 obj, Counter_Example
+           not (all_provers_tried c.Controller_itp.controller_session goal) then begin
+             (* put the goal back to be scheduled and proved *)
+             GoalSet.add obj_rec.to_be_scheduled goal;
+             GoalSet.add obj_rec.to_be_proved goal;
+             obj, Work_Left
+           end else begin
+             (* This particular goal has been tried with all provers. But maybe
+                we can split/apply transformations. *)
+             if is_full_split_goal c.Controller_itp.controller_session goal then
+               unproved_vc_continue obj obj_rec
              else
-               begin
-                 try
-                   let new_goals =
-                     further_split_ce c goal;
-                     subsubgoals_ce c.Controller_itp.controller_session goal
-                   in
-                   List.iter (add_to_objective_ce obj) new_goals;
-                   (if has_model then
-                     obj_rec.temporary_ce <- Some goal);
-                   obj, Counter_Example
-                 with _e -> (* Transformation failed *) obj, Counter_Example
+               let new_goals =
+                 further_split c goal;
+                 subsubgoals c.Controller_itp.controller_session goal
+               in
+               if new_goals = [] then unproved_vc_continue obj obj_rec
+               else begin
+                 (* if we are here, it means we have simplified the goal. We add the
+                    new goals to the set of goals to be proved/scheduled. *)
+                 List.iter (add_clone goal) new_goals;
+                 obj, Work_Left
                end
-         end
-     end
+           end
+       with Exit ->
+         (* if we cannot simplify, the objective has been disproved *)
+         GoalSet.reset obj_rec.to_be_scheduled;
 
+         if Gnat_config.counterexamples then begin
+           (* The goal will be scheduled to get a counterexample *)
+           obj_rec.not_proved <- true;
+           obj_rec.counter_example <- true;
+           GoalSet.add obj_rec.to_be_proved goal;
+           (* The goal will be scheduled manually in Gnat_main.handle_result
+              so it is not put to the obj_rec.to_be_scheduled *)
+           obj, Counter_Example
+         end else
+           obj, Not_Proved
+       end
+     end
+     else
+       obj, (if result then Proved else Not_Proved)
 
 let iter_main_goals s fu =
   (* Main goals are at the following point in the theory:
@@ -1161,8 +1045,7 @@ let session_find_unproved_pa c obj =
             let pa = Session_itp.get_proof_attempt_node session panid in
             if select_appropriate_proof_attempt obj_rec pa then
               raise (PA_Found panid)) pa_ids_list
-    | _ -> ()
-  in
+    | _ -> () in
 
   let iter_on_sub_goal g =
     Session_itp.fold_all_any session traversal_function () (Session_itp.APn g) in
@@ -1182,7 +1065,7 @@ let session_find_unproved_goal c obj =
   let traversal_function () g =
     match g with
     | Session_itp.APn g ->
-        if not (Session_itp.pn_proved session g) && GoalMap.mem goalmap g then
+        if not (Session_itp.pn_proved session g) then
           raise (Found_goal_id g)
     | _ -> () in
 
