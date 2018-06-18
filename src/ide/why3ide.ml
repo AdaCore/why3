@@ -2073,8 +2073,13 @@ let () =
   edit_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._e
 
 let replay_menu_item =
-  create_menu_item tools_factory "Replay obsolete"
-                   "Replay all obsolete proofs (shortcut: r)"
+  create_menu_item tools_factory "Replay valid obsolete proofs"
+                   "Replay valid obsolete proofs below the current node (shortcut: r)"
+
+let replay_all_menu_item =
+  create_menu_item tools_factory "Replay all obsolete proofs"
+                   "Replay all obsolete proofs below the current node"
+
 let () =
   replay_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._r
 
@@ -2121,7 +2126,7 @@ let paste_item = create_menu_item tools_factory "Paste"
                                   "Paste the copied node below the current node"
 
 
-let () =
+let complete_context_menu () =
   let on_selected_rows ~multiple ~notif_kind ~action f () =
     match get_selected_row_references () with
     | [] ->
@@ -2137,6 +2142,10 @@ let () =
     replay_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
                                 (fun id -> Command_req (id, "replay")));
+  connect_menu_item
+    replay_all_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+                                (fun id -> Command_req (id, "replay all")));
   connect_menu_item
     clean_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
@@ -2164,7 +2173,24 @@ let () =
   connect_menu_item
     unfocus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
-                                (fun id -> Command_req (id, "Unfocus")))
+                                (fun id -> Command_req (id, "Unfocus")));
+  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
+  let replay_context_menu_item =
+    create_menu_item context_tools_factory "Replay valid obsolete proofs"
+                     "Replay valid obsolete proofs below the current node (shortcut: r)" in
+  connect_menu_item
+    replay_context_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+                                (fun id -> Command_req (id, "replay")));
+  let replay_all_context_menu_item =
+    create_menu_item context_tools_factory "Replay all obsolete proofs"
+                     "Replay all obsolete proofs below the current node" in
+  connect_menu_item
+    replay_all_context_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+                                (fun id -> Command_req (id, "replay all")));
+  ()
+
 
 
 (*************************************)
@@ -2317,6 +2343,7 @@ let treat_notification n =
      main_window#show ();
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
+     complete_context_menu ();
      Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;

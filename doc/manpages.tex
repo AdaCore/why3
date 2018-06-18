@@ -319,6 +319,13 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \subsection{Menus}
 
 \begin{description}
+\item[Context menu]\emptyitem This menu is selected by the mouse right button on some row of the task tree view.
+\begin{description}
+\item[provers] The detected provers are listed. Note that you can hide some provers of that list using the preferences, tab \textsf{Provers}.
+\item[strategies] the set of known strategies is listed
+\item[Replay valid obsolete proofs] all proof nodes below the selected nodes that are obsolete but whose former status was Valid are replayed.
+\item[Replay all obsolete proofs] all proof nodes below the selected nodes that are obsolete are replayed.
+\end{description}
 \item[Menu \textsf{File}]\emptyitem
 \begin{description}
 \item[Add File] adds a file in the GUI.

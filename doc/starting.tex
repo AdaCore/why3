@@ -81,8 +81,7 @@ You are now ready to call provers on the goals
     -{}-detect-provers}}.
 %END LATEX
 %HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3 config -{}-detect-provers}.)
-A prover is selected using the context menu (right-click), in the
-\texttt{Provers} sub-menu.
+A prover is selected using the context menu (right-click).
 This prover is then called on the goal selected
 in the tree view. You can select several goals at a time, either
 by using multi-selection (typically by clicking while pressing the
@@ -111,13 +110,12 @@ obvious here it will not succeed.
 Instead of calling a prover on a goal, you can apply a transformation
 to it.  Since $G_2$ is a conjunction, a possibility is to split it
 into subgoals. You can do that by selecting \textsf{Split VC} in the
-\texttt{Strategies} sub-menu of the context menu. Now you have two
-subgoals, and you can try again a prover on them, for example
-Alt-Ergo. We already have a lot of goals and proof attempts, so it is
-a good idea to close the sub-trees which are already proved: this can
-be done by the menu \textsf{View/Collapse proved goals}, or even
-better by its shortcut ``Ctrl-C''.  You should see now what is
-displayed on Figure~\ref{fig:gui4}.
+context menu. Now you have two subgoals, and you can try again a
+prover on them, for example Alt-Ergo. We already have a lot of goals
+and proof attempts, so it is a good idea to close the sub-trees which
+are already proved: this can be done by the menu \textsf{View/Collapse
+  proved goals}, or even better by its shortcut ``Ctrl-C''.  You
+should see now what is displayed on Figure~\ref{fig:gui4}.
 
 %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
 \begin{figure}[tbp]
@@ -129,7 +127,7 @@ displayed on Figure~\ref{fig:gui4}.
 
 The first part of goal $G_2$ is still unproved. As a last resort, we
 can try to call the Coq proof assistant, by selecting it in the
-\texttt{Provers} list.
+context menu.
 A new sub-row appear for Coq, and the Coq proof editor is launched.
 (It is \texttt{coqide} by default; see
 Section~\ref{sec:ideref} for details on how to configure this). You get
@@ -217,7 +215,7 @@ reminds us that $G_2$ is not proved.
 You may want to clean some the proof attempts, \eg removing the
 unsuccessful ones when a project is finally fully proved.
 A proof or a transformation can be removed by selecting it and
-using menu \textsf{Tools/Remove} or key \texttt{Suppr}.
+using menu \textsf{Tools/Remove} or the \texttt{Delete} key.
 It performs an automatic removal of all proofs
 attempts that are unsuccessful, while there exists a successful proof
 attempt for the same goal.

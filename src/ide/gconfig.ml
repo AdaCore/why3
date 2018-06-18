@@ -950,7 +950,7 @@ let provers_page c (notebook:GPack.notebook) =
   let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   (* show/hide provers *)
   let frame =
-    GBin.frame ~label:"Provers visible in the contextual menu" ~packing:hbox_pack ()
+    GBin.frame ~label:"Provers visible in the context menu" ~packing:hbox_pack ()
   in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
