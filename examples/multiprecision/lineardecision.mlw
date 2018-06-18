@@ -2002,7 +2002,7 @@ goal g'': forall r r' i c x x' y l: int.
   -> cst propagation ? *)
 
 end
-
+(*
 module Test2
 
 use int.Int
@@ -2016,7 +2016,7 @@ goal g: forall x y z: int.
   x = 0
 
 end
-
+*)
 module Fmla
 
 use map.Map
@@ -2049,7 +2049,7 @@ let f (f:fmla) : bool
   ensures { result -> forall b. interp f b }
 = false
 end
-
+(*
 module TestFmla
 
 use Fmla
@@ -2061,3 +2061,4 @@ goal g:
      ((forall x. forall y. foo (add x (add (add a dummy) y))) = True)
 
 end
+*)

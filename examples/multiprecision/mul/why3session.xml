@@ -8,6 +8,7 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../mul.mlw" proved="true">
 <theory name="Mul" proved="true">
  <goal name="VC mul_limb" expl="VC for mul_limb" proved="true">
@@ -184,7 +185,7 @@
   </transf>
   </goal>
   <goal name="VC addmul_limb.11" expl="assertion" proved="true">
-  <proof prover="0" timelimit="10"><result status="valid" time="6.40"/></proof>
+  <proof prover="0" timelimit="10"><result status="valid" time="8.95"/></proof>
   </goal>
   <goal name="VC addmul_limb.12" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09"/></proof>
@@ -221,7 +222,7 @@
   </transf>
   </goal>
   <goal name="VC addmul_limb.15" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="2.24"/></proof>
+  <proof prover="0"><result status="valid" time="3.71"/></proof>
   </goal>
   <goal name="VC addmul_limb.16" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -314,7 +315,7 @@
   <proof prover="0" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC addmul_limb.28" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.40"/></proof>
+  <proof prover="0"><result status="valid" time="0.73"/></proof>
   </goal>
   <goal name="VC addmul_limb.29" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.19"/></proof>
@@ -435,7 +436,7 @@
   <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="57"/></proof>
   </goal>
   <goal name="VC mul_limbs.21" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="4.68"/></proof>
+  <proof prover="4"><result status="valid" time="7.28"/></proof>
   </goal>
   <goal name="VC mul_limbs.22" expl="precondition" proved="true">
   <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="58"/></proof>
@@ -491,7 +492,7 @@
   <goal name="VC mul_limbs.34" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC mul_limbs.34.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.43"/></proof>
+   <proof prover="0"><result status="valid" time="0.62"/></proof>
    </goal>
   </transf>
   </goal>
@@ -524,7 +525,7 @@
         <proof prover="0"><result status="valid" time="0.62"/></proof>
         </goal>
         <goal name="VC mul_limbs.38.0.0.0.0.0.1" proved="true">
-        <proof prover="2"><result status="valid" time="0.18"/></proof>
+        <proof prover="2"><result status="valid" time="0.43"/></proof>
         </goal>
        </transf>
        </goal>
@@ -543,14 +544,14 @@
    <goal name="VC mul_limbs.39.0" expl="integer overflow" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC mul_limbs.39.0.0" expl="integer overflow" proved="true">
-    <proof prover="0" memlimit="1000"><result status="valid" time="3.74"/></proof>
+    <proof prover="0" memlimit="1000"><result status="valid" time="5.38"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC mul_limbs.40" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="VC mul_limbs.41" expl="loop variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -585,7 +586,7 @@
   </transf>
   </goal>
   <goal name="VC mul_limbs.49" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.40"/></proof>
+  <proof prover="2"><result status="valid" time="0.63"/></proof>
   </goal>
   <goal name="VC mul_limbs.50" expl="postcondition" proved="true">
   <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="41"/></proof>
@@ -706,7 +707,7 @@
   <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
   <goal name="VC addmul_limbs.21" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  <proof prover="2"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="VC addmul_limbs.22" expl="precondition" proved="true">
   <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="69"/></proof>
@@ -800,7 +801,7 @@
        <goal name="VC addmul_limbs.39.0.0.0.0.0" expl="assertion" proved="true">
        <transf name="reflection_f" proved="true" arg1="mp_decision">
         <goal name="VC addmul_limbs.39.0.0.0.0.0.0" expl="assertion" proved="true">
-        <proof prover="0"><result status="valid" time="0.50"/></proof>
+        <proof prover="0"><result status="valid" time="0.26"/></proof>
         </goal>
         <goal name="VC addmul_limbs.39.0.0.0.0.0.1" proved="true">
         <proof prover="3"><result status="valid" time="0.28"/></proof>
@@ -923,7 +924,7 @@
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
    <goal name="VC mul.7.1" expl="VC for mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.41"/></proof>
+   <proof prover="0"><result status="valid" time="0.60"/></proof>
    </goal>
    <goal name="VC mul.7.2" expl="VC for mul" proved="true">
    <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="72"/></proof>
@@ -992,7 +993,7 @@
   <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="67"/></proof>
   </goal>
   <goal name="VC mul.27" expl="assertion" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.59" steps="137"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.86" steps="137"/></proof>
   </goal>
   <goal name="VC mul.28" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.60"/></proof>
@@ -1024,7 +1025,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC mul.34" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.30" steps="86"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.15" steps="86"/></proof>
   </goal>
   <goal name="VC mul.35" expl="precondition" proved="true">
   <proof prover="5" memlimit="2000"><result status="valid" time="0.22" steps="87"/></proof>
@@ -1109,10 +1110,10 @@
          <proof prover="3"><result status="valid" time="0.04"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.14" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.04"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.15" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.16" proved="true">
          <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -1136,10 +1137,10 @@
          <proof prover="3"><result status="valid" time="0.34"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.23" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.24" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.25" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1208,7 +1209,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.47" proved="true">
-         <proof prover="3"><result status="valid" time="0.01"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.48" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1220,7 +1221,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.51" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.01"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.52" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1232,10 +1233,10 @@
          <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.55" proved="true">
-         <proof prover="3"><result status="valid" time="0.04"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.56" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.57" proved="true">
          <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -1301,7 +1302,7 @@
          <proof prover="3"><result status="valid" time="0.26"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.78" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.79" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1331,7 +1332,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.88" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC mul.41.0.0.0.0.0.0.89" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1411,7 +1412,7 @@
         </transf>
         </goal>
         <goal name="VC mul.41.0.0.0.0.0.1" proved="true">
-        <proof prover="3"><result status="valid" time="0.31"/></proof>
+        <proof prover="6"><result status="valid" time="0.22"/></proof>
         </goal>
        </transf>
        </goal>
@@ -1429,7 +1430,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC mul.43" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  <proof prover="2"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC mul.44" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -1438,7 +1439,7 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC mul.46" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="3.14"/></proof>
+  <proof prover="0"><result status="valid" time="6.01"/></proof>
   </goal>
   <goal name="VC mul.47" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.19"/></proof>
