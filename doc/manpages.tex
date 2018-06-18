@@ -395,36 +395,57 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
 
-\item[Bisect]
+\item[Bisect] performs a reduction of the context for the the current selected proof attempt, which must be a Valid one.
 
-\item[Focus]
+\item[Focus] focus the tree session view to the current node
 
-\item[Unfocus]
+\item[Unfocus] undoes the Focus action
 
-\item[Copy]
+\item[Copy] Marks of proof sub-tree for copy/past action
 
-\item[Paste]
+\item[Paste] Paste the previously selected sub-tree under the current node
 
 \end{description}
 
 \item[Menu \textsf{View}]\emptyitem
 \begin{description}
-\item[Expand All] expands all the rows of the tree view.
+\item[Enlarge font] selects a large font
+\item[Reduce font] selects a smaller font
 \item[Collapse proved goals] closes all the rows of the tree view
   that are proved.
-% \item[Hide proved goals] completely hides the proved rows of the tree
-%   view [EXPERIMENTAL]
+\item[Expand All] expands all the rows of the tree view.
+\item[Collapse under node] closes all the rows of the tree view under the given node
+  that are proved.
+\item[Expand below node] expands the children below the current node
+\item[Expand all below node] expands the whole subtree of the current node
+\item[Go to parent node] move to the parent of the current node
+\item[Go to first child] mode to the first child of the current node
+\item[Select next unproven goal] go to the next unproven goal after the current node
 \end{description}
 
 
-\item[Menu \textsf{Help}]
-A very short online help, and some information about this software.
+\item[Menu \textsf{Help}]\emptyitem
+\begin{description}
+\item[Legend]
+Explanations of the meaning of the various icons
+\item[About]
+some information about this software.
 \end{description}
+
+\end{description}
+
 
 \subsection{Preferences Dialog}
 
 The preferences dialog allows you to customize various settings. They
 are grouped together under several tabs.
+
+Note that there are to different buttons to close that dialog. The
+``Close'' button will make modifications of any of these settings
+effective only for the current run of the GUI. The ``Save\&Close''
+button will save the modified settings in Why3 configuration file, to
+make them permanent.
+
 
 \begin{description}
 \item[\textsf{General Settings} tab] allows one to set
@@ -436,28 +457,8 @@ are grouped together under several tabs.
   \item the memory given to provers, in megabytes
   \item the maximal number of simultaneous provers allowed to run in parallel
   \end{itemize}
-  By default, modification of any of these settings has effect only
-  for the current run of the GUI. A checkbox allows you to save these
-  settings also for future sessions.
-\item a few display settings:
-  \begin{itemize}
-  \item introduce premises: if selected, the goal of the task shown in
-    top-right window is displayed after introduction of universally
-    quantified variables and implications, \eg a goal of the form
-    $\forall x: t. P \rightarrow Q$ is displayed as
-    \[
-    \begin{array}{l}
-      x : t \\
-      H : P \\
-      \hline
-      Q
-    \end{array}
-    \]
-  \item show labels in formulas
-  \item show source locations in formulas
-  \item show time limit for each proof
-  \end{itemize}
-\item the policy for saving session:
+\item option to disallow source editing within the GUI
+\item the policy for saving sessions:
   \begin{itemize}
   \item always save on exit (default): the current state of the proof session is saving on exit
   \item never save on exit: the current state of the session is never saved
@@ -466,6 +467,20 @@ are grouped together under several tabs.
     want to save or not.
   \end{itemize}
 \end{itemize}
+
+\item[\textsf{Appearance settings} tab]\emptyitem
+  \begin{itemize}
+  \item show full task context: by default, only the local context of
+    formulas is shown, that is only the declarations comming from the
+    same module
+  \item show attributes in formulas
+  \item show corecions in formulas
+  \item show source locations in formulas
+  \item show time and memory limits for each proof
+  \end{itemize}
+  Finally, it is possible to choose an alternative icon set, provided,
+  one is installed first.
+
 \item[\textsf{Editors} tab] allows one to customize the use
   of external editors for proof scripts.
 \begin{itemize}
@@ -481,7 +496,7 @@ are grouped together under several tabs.
 \end{itemize}
 \item[\textsf{Provers} tab]
   allows to select which of the installed provers one wants to see
-  as buttons in the left toolbar.
+  in the context menu.
 \item[\textsf{Uninstalled Provers} tab] presents all the
   decision previously taken for missing provers, as described in
   Section~\ref{sec:uninstalledprovers}. You can remove any recorded
@@ -490,122 +505,22 @@ are grouped together under several tabs.
 
 \subsection{Displaying Counterexamples}
 
-When the selected prover finds (counterexample) model, it is possible to
-display parts of this model in the terms of the original Why3 input.
-Currently, this is supported for CVC4 prover version 1.5 and Z3.
+Why3 provides some support for extracting a potential counterexample
+from failing proof attempts. It is possible to display parts of this
+model in the terms of the original Why3 input.  Currently, this is
+supported for CVC4 prover version 1.5 and Z3.
 
-To display the counterexample in Why3 IDE, the counterexample model generation
-must be enabled in File -/> Preferences -/> get
-counter-example.
-After running the prover and clicking on the prover result in, the
-counterexample can be displayed in the tab
-Counter-example.
-The counterexample is displayed with the original Why3 code in comments.
-Counterexample values for Why3 source code elements at given line are
-displayed in a comment at the line below.
-%An alternative way how to display a counterexample is to use the option
-%\texttt{-{}-get-ce} of the \texttt{prove} command.
+The counterexamples are enable when using a prover under the
+alternative form called ``coutnerexamples''. After running the prover
+and clicking on the prover result in, the counterexample can be
+displayed in the tab Counter-example.  The counterexample is displayed
+with the original Why3 code in comments.  Counterexample values for
+Why3 source code elements at given line are displayed in a comment at
+the line below.
 
-Why3 source code elements that should be a part of counterexample must be
-explicitly marked with \texttt{"model"} label. The following example shows a
-Why3 theory with some terms annotated with the \texttt{model} label and the
-generated counterexample in comments:
-
-\begin{whycode}
-theory T
-
-  use import int.Int
-
-  goal g_no_lab_ex : forall x:int. x >= 42 -> x + 3 <= 50
-
-  goal g_lab_ex : forall x "model":int. ("model" x >= 42) ->
-    ("model" "model_trace:x+3<=50" x + 3 <= 50)
-
-  goal computation_ex : forall x1 "model" x2 "model" x3 "model" .
-  (* x1 = 1; x2 = 1; x3 = 1 *)
-  ("model" "model_trace: x1 + 1 = 2" x1 + 1 = 2) ->
-  (*  x1 + 1 = 2 = true *)
-  ("model" x2 + 1 = 2) ->
-  (* (= (+ x2 1) 2) = true *)
-  ("model" x3 + 1 = 2) ->
-  (* (= (+ x3 1) 2) = true *)
-  ("model" x1 + x2 + x3  = 5)
-  (* (= (+ (+ x1 x2) x3) 5) = false *)
-\end{whycode}
-
-To display counterexample values in assertions the term being asserted must be
-labeled with the label \texttt{"model\_vc"}. To display counterexample values
-in postconditions, the term in the postcondition must be labeled with the
-label \texttt{"model\_vc\_post"}.
-The following example shows a counterexample of a function with postcondition:
-
-\begin{whycode}
-  let incr_ex ( x "model" : ref int ) (y "model" : ref int): unit
-  (* x = -2; y = -2 *)
-  ensures { !x = old !x + 2 + !y }
-  =
-  y := !y + 1;
-  (* y = -1 *)
-  x := !x + 1;
-  (* x = -1 *)
-  x := !x + 1
-  (* x = 0 *)
-\end{whycode}
-
-It is also possible to rename counterexample elements using the lable
-\texttt{"model\_trace:"}. The following example shows the use of renaming a
-counterexample element in order to print the counterexample in infix notation
-instead of default prefix notation:
-
-\begin{whycode}
-  goal g_lab_ex : forall x "model":int. ("model" x >= 42) ->
-  (* x = 48; (<= 42 x) = true *)
-    ("model" "model_trace:x+3<=50" x + 3 <= 50)
-    (* x+3<=50 = false *)
-\end{whycode}
-
-Renaming counterexample elements is in particular useful when Why3 is used as
-intermediate language and to show names of counterexample elements in the
-source language instead of showing names of Why3 elements.
-Note that if the counterexample element is of a record type, it is also
-possible to rename names of the record fields by putting the label
-\texttt{model\_trace:} to definitions of record fields. For example:
-
-\begin{whycode}
-  type r = {f "model_trace:.F" :int; g "model_trace:G" :bool}
-\end{whycode}
-
-When a prover is queried for a counterexample value of a term of an abstract
-type=, an internal representation of the value is get. To get the concrete
-representation, the term must be marked with the label
-\texttt{"model\_projected"} and a projection function from the abstract type
-to a concrete type must be defined, marked as a projection using the meta
-\texttt{"model\_projection"}, and inlining of this function must be disabled
-using the meta \texttt{"inline : no"}. The following example shows a
-counterexample of an abstract value:
-
-\begin{whycode}
-  theory A
-
-    use import int.Int
-
-    type byte
-    function to_rep byte : int
-    predicate in_range (x : int) = -128 <= x <= 127
-    axiom range_axiom : forall x:byte.
-      in_range (to_rep x)
-    meta "model_projection" function to_rep
-    meta "inline : no" function to_rep
-
-    goal abstr : forall x "model_projected" :byte. to_rep x >= 42 -> to_rep x
-    + 3 <= 50
-    (* x = 48 *)
-\end{whycode}
-
-More examples of using counterexample feature of Why3 can be found in the file
-examples/tests/cvc4-models.mlw and examples/tests/cvc4-models.mlw.
 More information how counterexamples in Why3 works can be found
-in~\cite{hauzar16sefm}.
+in~\cite{hauzar16sefm} and in~\cite{dailler18jlamp}.
+
 
 %
 % how to use counterexamples - explain labels, projections, the option --get-ce of why3prove and the setting in why3ide
