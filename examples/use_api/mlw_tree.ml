@@ -61,7 +61,7 @@ let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
 
 let mk_pat p = { pat_desc = p; pat_loc = Loc.dummy_position }
-let pat_var id = mk_pat (Pvar (id,false))
+let pat_var id = mk_pat (Pvar id)
 
 let mk_var id = mk_term (Tident (Qident id))
 
