@@ -2244,7 +2244,11 @@ let check_uninstalled_prover =
       let callback p u =
         send_request (Set_prover_policy(p,u))
       in
-      uninstalled_prover_dialog ~callback gconfig p
+      (* The gconfig.window_height is always the height of the window thanks to
+         the callback to size_allocate. By default, this dialog has 3/4 the
+         height of the main window. *)
+      let height = 3 * gconfig.window_height / 4 in
+      uninstalled_prover_dialog ~height ~callback gconfig p
     end
 
 let treat_notification n =
