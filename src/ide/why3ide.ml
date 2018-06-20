@@ -1308,8 +1308,8 @@ let () =
             "Collapse proven goals"
             ~callback:(fun () -> collapse_proven_goals ())
   in
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
-  i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
+  i#add_accelerator ~group:tools_accel_group GdkKeysyms._exclam;
+  i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: !)";
 
   let i = view_factory#add_item
             "Expand all"
@@ -1346,12 +1346,12 @@ let get_selected_row_references () =
 (**********************)
 (* Contextual actions *)
 (**********************)
-let expand_row ~all =
+let expand_row () =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let path = goals_model#get_path row#iter in
-      goals_view#expand_row path ~all
+      goals_view#expand_row path ~all:(goals_view#row_expanded path)
   | _ -> ()
 
 let collapse_row () =
@@ -1398,28 +1398,20 @@ let move_to_next_unproven_node_id () =
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
 
-(* TODO random shortcut: to be set. *)
 let () =
   let i = view_factory#add_item
-            "Collapse under node"
-            ~key:GdkKeysyms._Left
-            ~callback:(fun () -> collapse_row ())
+            "Collapse current node"
+            ~callback:collapse_row
   in
-  i#misc#set_tooltip_markup "Collapse current node";
+  i#add_accelerator ~group:tools_accel_group GdkKeysyms._minus;
+  i#misc#set_tooltip_markup "Collapse current node (shortcut: -)";
 
   let i = view_factory#add_item
-            "Expand below node "
-            ~key:GdkKeysyms._Right
-            ~callback:(fun () -> expand_row ~all:false)
+            "Expand current node "
+            ~callback:expand_row
   in
-  i#misc#set_tooltip_markup "Expand only one node";
-
-  let i = view_factory#add_item
-            "Expand all below node "
-            ~callback:(fun () -> expand_row ~all:true)
-  in
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E;
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view";
+  i#add_accelerator ~group:tools_accel_group GdkKeysyms._plus;
+  i#misc#set_tooltip_markup "Expand current node, or its children when already expanded (shortcut: +)";
 
   let i = view_factory#add_item
             "Go to parent node"
@@ -1472,9 +1464,7 @@ let interp_ide cmd =
   | "next" ->
       move_to_next_unproven_node_id ()
   | "expand" ->
-      expand_row ~all:false
-  | "ex_all" ->
-      expand_row ~all:true
+      expand_row ()
   | "collapse" ->
       collapse_row ()
   | "list_ide_command" ->
@@ -2124,10 +2114,15 @@ let unfocus_item =
 
 let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
 
-let copy_item = create_menu_item tools_factory "Copy" "Copy the current tree node"
+let copy_item = create_menu_item tools_factory "Copy"
+  "Copy the current tree node (shortcut: Ctrl-c)"
+let () =
+  copy_item#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._c
 
 let paste_item = create_menu_item tools_factory "Paste"
-                                  "Paste the copied node below the current node"
+  "Paste the copied node below the current node (shortcut: Ctrl-v)"
+let () =
+  paste_item#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._v
 
 
 let complete_context_menu () =
