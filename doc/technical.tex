@@ -21,7 +21,7 @@ file is reproduced below.
 %BEGIN LATEX
 {\footnotesize
 %END LATEX
-\lstinputlisting{../share/provers-detection-data.conf}
+\lstinputlisting[language={},morecomment={[l]\#},morestring={[b]"}]{../share/provers-detection-data.conf}
 %BEGIN LATEX
 }
 %END LATEX
@@ -42,91 +42,17 @@ tools look for it in the following order:
 \end{enumerate}
 If none of these files exist, a built-in default configuration is used.
 
-The configuration file is a human-readable text file, which consists
-of association pairs arranged in sections.
-%BEGIN LATEX
-Figure~\ref{fig:why3conf} shows an example of configuration file.
-%END LATEX
-%HEVEA Below is an example of configuration file.
-
-%BEGIN LATEX
-\begin{figure}[p]
-{\footnotesize
-%END LATEX
-\begin{verbatim}
-[main]
-loadpath = "/usr/local/share/why3/theories"
-loadpath = "/usr/local/share/why3/modules"
-magic = 14
-memlimit = 0
-plugin = "/usr/local/lib/why3/plugins/tptp"
-plugin = "/usr/local/lib/why3/plugins/genequlin"
-plugin = "/usr/local/lib/why3/plugins/hypothesis_selection"
-running_provers_max = 4
-timelimit = 2
-
-[ide]
-default_editor = "editor %f"
-error_color = "orange"
-goal_color = "gold"
-iconset = "fatcow"
-intro_premises = true
-premise_color = "chartreuse"
-print_attributes = false
-print_locs = false
-print_time_limit = false
-saving_policy = 2
-task_height = 404
-tree_width = 512
-verbose = 0
-window_height = 1173
-window_width = 1024
-
-[prover]
-command = "'why3-cpulimit' 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
-driver = "/usr/local/share/why3/drivers/coq.drv"
-editor = "coqide"
-in_place = false
-interactive = true
-name = "Coq"
-shortcut = "coq"
-version = "8.3pl4"
-
-[prover]
-command = "'why3-cpulimit' %t %m -s alt-ergo %f"
-driver = "/usr/local/share/why3/drivers/alt_ergo_0.93.drv"
-editor = ""
-in_place = false
-interactive = false
-name = "Alt-Ergo"
-shortcut = "altergo"
-shortcut = "alt-ergo"
-version = "0.93.1"
-
-[editor coqide]
-command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
-name = "CoqIDE"
-\end{verbatim}
-%BEGIN LATEX
-}
-\caption{Sample \texttt{why3.conf} file}
-\label{fig:why3conf}
-\end{figure}
-%END LATEX
-
 A section begins with a header inside square brackets and ends at the
-beginning of the next section. The header of a
-section can be only one identifier, \texttt{main} and \texttt{ide} in
-the example, or it can be composed by a family name and one family
-argument, \texttt{prover} is one family name, \texttt{coq} and
-\texttt{alt-ergo} are the family argument.
+beginning of the next section. The header of a section can be a single
+identifier, \eg \texttt{[main]}, or it can be composed by a family name
+and a single family argument, \eg \texttt{[prover alt-ergo]}.
 
 Sections contain associations \texttt{key=value}. A value is either
 an integer (\eg \texttt{-555}), a boolean (\texttt{true}, \texttt{false}),
 or a string (\eg \texttt{"emacs"}). Some specific keys can be attributed
 multiple values and are
 thus allowed to occur several times inside a given section. In that
-case, the relative order of these associations matter.
+case, the relative order of these associations matters.
 
 \section{Drivers for External Provers}
 \label{sec:drivers}
