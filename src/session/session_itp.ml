@@ -39,7 +39,7 @@ type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
   theory_parent_name            : string;
-  theory_is_detached            : bool;
+  mutable theory_is_detached    : bool;
 }
 
 let theory_name t = t.theory_name
@@ -1345,12 +1345,10 @@ let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
   in
-  { theory_name = detached_theory.theory_name;
-    theory_is_detached = true;
-    theory_goals = goalsID;
-    theory_parent_name = parent_name }
-
-
+  assert (detached_theory.theory_parent_name = parent_name);
+  detached_theory.theory_goals <- goalsID;
+  detached_theory.theory_is_detached <- true;
+  detached_theory
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
