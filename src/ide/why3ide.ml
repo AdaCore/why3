@@ -1064,12 +1064,60 @@ let update_monitor =
   let text = Printf.sprintf "%s %d/%d/%d" f t s r in
   monitor#set_text text
 
+(**********************)
+(* Cursor positioning *)
+(**********************)
+
+(* Current position in the source files *)
+let current_cursor_loc = ref None
+
+let move_to_line ~yalign (v : GSourceView2.source_view) line =
+  let line = max 0 (line - 1) in
+  let line = min line v#buffer#line_count in
+  let it = v#buffer#get_iter (`LINE line) in
+  v#buffer#place_cursor ~where:it;
+  let mark = `MARK (v#buffer#create_mark it) in
+  v#scroll_to_mark ~use_align:true ~yalign mark
+
+(* Scroll to a specific locations *)
+let scroll_to_loc ~force_tab_switch loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some loc ->
+    let f, l, _, _ = Loc.get loc in
+    try
+      let (n, v, _, _) = get_source_view_table f in
+      if force_tab_switch then
+        begin
+          Debug.dprintf debug "tab switch to page %d@." n;
+          notebook#goto_page n;
+        end;
+      move_to_line ~yalign:0.0 v l
+    with Nosourceview f ->
+      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
+
+(* Reposition the cursor to the place it was saved *)
+let reposition_ide_cursor () =
+  scroll_to_loc ~force_tab_switch:false !current_cursor_loc
+
+(* Save the current location of the cursor to be reused after reload *)
+let save_cursor_loc () =
+  let n = notebook#current_page in
+  let acc = ref None in
+  Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
+  match !acc with
+  | None -> ()
+  | Some (cur_file, view) ->
+    (* Get current line *)
+    let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
+    current_cursor_loc := Some (Loc.user_position cur_file line 1 1)
 
 (*********************)
 (* Reaload Menu Item *)
 (*********************)
 
-let reload_unsafe () = clear_message_zone (); send_request Reload_req
+let reload_unsafe () =
+  save_cursor_loc (); clear_message_zone (); send_request Reload_req
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
@@ -1164,14 +1212,6 @@ let convert_color (color: color): string =
   | Error_color -> "error_tag"
   | Error_line_color -> "error_line_tag"
 
-let move_to_line ~yalign (v : GSourceView2.source_view) line =
-  let line = max 0 (line - 1) in
-  let line = min line v#buffer#line_count in
-  let it = v#buffer#get_iter (`LINE line) in
-  v#buffer#place_cursor ~where:it;
-  let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign mark
-
 let color_line ~color loc =
   let color_line (v:GSourceView2.source_view) ~color l =
     let buf = v#buffer in
@@ -1221,23 +1261,6 @@ let color_loc ?(ce=false) ~color loc =
      print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
      Debug.dprintf debug "color_loc: no source view for file %s@." f
 
-(* Scroll to a specific locations *)
-let scroll_to_loc ~force_tab_switch loc_of_goal =
-  match loc_of_goal with
-  | None -> ()
-  | Some (loc, _) ->
-    let f, l, _, _ = Loc.get loc in
-    try
-      let (n, v, _, _) = get_source_view_table f in
-      if force_tab_switch then
-        begin
-          Debug.dprintf debug "tab switch to page %d@." n;
-          notebook#goto_page n;
-        end;
-      move_to_line ~yalign:0.0 v l
-    with Nosourceview f ->
-      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
-
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) =
@@ -1251,7 +1274,7 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
     with Not_found -> None
   in
-  scroll_to_loc ~force_tab_switch:false loc_of_goal
+  scroll_to_loc ~force_tab_switch:false (Opt.map fst loc_of_goal)
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
@@ -1684,7 +1707,7 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
+         scroll_to_loc ~force_tab_switch:true (Some rel_loc);
          color_line ~color:Error_line_color rel_loc;
          color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
@@ -2380,6 +2403,7 @@ let treat_notification n =
         sc_view#source_buffer#end_not_undoable_action ();
         update_label_saved l;
         b := false;
+        reposition_ide_cursor ()
       with
       | Not_found -> create_source_view file_name content
     end
