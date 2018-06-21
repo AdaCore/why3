@@ -423,91 +423,12 @@ let menubar = GMenu.menu_bar
 
 let hb = GPack.hbox ~packing:vbox#add ()
 
-(* 1. Menu *)
-
-let menu_factory ~accel_path:ap ~accel_group:ag menu =
-  fun ?key ?accel_path ?(accel_group=ag) ?(modi=[]) ?submenu ?(use_mnemonic=true) ?tooltip ?callback label ->
-  let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
-  let item = new GMenu.menu_item item in
-  item#misc#show ();
-  menu#append item;
-  let ap = match accel_path with None -> ap ^ label | Some ap -> ap in
-  GtkData.AccelMap.add_entry ap ?key ~modi;
-  GtkBase.Widget.set_accel_path item#as_widget ap accel_group;
-  Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
-  Opt.iter item#set_submenu submenu;
-  Opt.iter item#misc#set_tooltip_markup tooltip;
-  item
-
 let accel_group = GtkData.AccelGroup.create ()
-
-let factory = new GMenu.factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
-
-let create_menu_item (factory:GMenu.menu GMenu.factory)
-                     ?key label tooltip =
-  let i = factory#add_item ?key label in
-  i#misc#set_tooltip_markup tooltip;
-  i
-
-let connect_menu_item i ~callback =
-  let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
-
-(* 1.1 "File" menu items *)
-
-let file_menu = factory#add_submenu "_File"
-let file_factory = new GMenu.factory file_menu
-  ~accel_path:"<Why3-Main>/File/" ~accel_group
-let menu_add_file =
-  create_menu_item file_factory "Add file to session"
-                   "Insert another file in the current session"
-let menu_preferences =
-  create_menu_item file_factory "Preferences"
-                   "Open Preferences Window"
-let menu_save_session =
-  create_menu_item file_factory "Save session"
-                   "Save the current proof session on disk"
-let menu_save_files =
-  create_menu_item file_factory "Save files"
-                   "Save the edited source files on disk"
-let menu_save_session_and_files =
-  create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
-                   "Save the current proof session and the source files"
-let menu_refresh =
-  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
-                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
-
-let menu_quit =
-  create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
-                   "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
-
-(* 1.2 "Tools" menu items *)
-
-let tools_menu = factory#add_submenu "_Tools"
-let tools_accel_group = GtkData.AccelGroup.create ()
-let tools_factory = new GMenu.factory tools_menu
-  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group ~accel_modi:[]
-
-let strategies_factory =
-  let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  new GMenu.factory tools_submenu_strategies
-    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group ~accel_modi:[]
-
-let provers_factory =
-  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  new GMenu.factory tools_submenu_provers
-    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
 
 (* context_tools : simplified tools menu for mouse-3 *)
 
 let context_tools_menu = GMenu.menu ()
 let context_tools_factory = new GMenu.factory context_tools_menu ~accel_group
-
-
-(* 1.3 "View" menu items *)
-
-
 
 (****************************)
 (* actions of the interface *)
@@ -527,56 +448,6 @@ let send_session_config_to_server () =
   send_request (Set_config_param("timelimit",nb));
   let nb = gconfig.session_mem_limit in
   send_request (Set_config_param("memlimit",nb))
-
-let () =
-  let callback () =
-    Gconfig.preferences gconfig;
-    (* TODO:
-      begin
-        match !current_env_session with
-          | None -> ()
-          | Some e ->
-              Session.update_env_session_config e gconfig.config;
-              Session.unload_provers e
-      end;
-      recreate_gui ();
-(*
-      Mprover.iter
-        (fun p pi ->
-          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
-            pi.editor)
-        (Whyconf.get_provers gconfig.config);
-     *)
-     *)
-    Hstr.iter
-      (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing;
-       source_view#set_auto_indent gconfig.allow_source_editing)
-      source_view_table;
-    send_session_config_to_server ()
-  in
-  connect_menu_item menu_preferences ~callback
-
-let () =
-  connect_menu_item
-    menu_save_session
-    ~callback:(fun () -> send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_session_and_files
-    ~callback:(fun () -> save_sources(); send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_files
-    ~callback:(fun () -> save_sources())
-
-
-let () =
-  connect_menu_item
-    menu_quit
-    ~callback:exit_function_safe
 
 let (_ : GtkSignal.id) =
   main_window#connect#destroy
@@ -1130,9 +1001,9 @@ let save_cursor_loc () =
     let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
     current_cursor_loc := Some (Loc.user_position cur_file line 1 1)
 
-(*********************)
-(* Reaload Menu Item *)
-(*********************)
+(******************)
+(* Reload actions *)
+(******************)
 
 let reload_unsafe () =
   save_cursor_loc (); clear_message_zone (); send_request Reload_req
@@ -1154,13 +1025,6 @@ let reload_safe () =
     | _ -> ()
   else
     reload_unsafe ()
-
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
-
-
-
-
-
 
 (****************************)
 (* command entry completion *)
@@ -1301,22 +1165,6 @@ let apply_loc_on_ce (l: (Loc.position * color) list) =
   List.iter (fun (loc, color) ->
     color_loc ~ce:true ~color loc) l
 
-
-(*******************)
-(* The "View" menu *)
-(*******************)
-
-let view_menu = factory#add_submenu "_View"
-let view_factory = menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
-
-let (_ : GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._plus
-    ~callback:enlarge_fonts "Enlarge font"
-
-let (_ : GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._minus
-    ~callback:reduce_fonts "Reduce font"
-
 let collapse_iter iter =
   let path = goals_model#get_path iter in
   goals_view#collapse_row path
@@ -1336,18 +1184,6 @@ let collapse_proven_goals () =
   match goals_model#get_iter_first with
   | None -> ()
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
-
-let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
-    ~tooltip:"Collapse all the proven nodes under the current node"
-    ~callback:collapse_proven_goals
-    "Collapse proven goals"
-
-let (_: GMenu.menu_item) =
-  view_factory
-    ~tooltip:"Expand all nodes of the tree view"
-    ~callback:goals_view#expand_all
-    "Expand all"
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
@@ -1428,32 +1264,6 @@ let move_to_next_unproven_node_id () =
       let row_id = get_node_id row#iter in
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
-
-let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
-    ~callback:collapse_row
-    "Collapse current node"
-
-let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
-    ~tooltip:"Expand current node, or its children when already expanded"
-    ~callback:expand_row
-    "Expand current node"
-
-let (_: GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Up
-    ~callback:move_current_row_selection_to_parent
-    "Go to parent node"
-
-let (_: GMenu.menu_item) =
-  view_factory
-    ~callback:move_current_row_selection_to_first_child
-    "Go to first child"
-
-let (_: GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Down
-    ~callback:move_to_next_unproven_node_id
-    "Select next unproven goal"
 
 (* unused
 let rec update_status_column_from_iter cont iter =
@@ -1657,10 +1467,6 @@ let select_file ~request =
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
   d#destroy ()
-
-let (_ : GtkSignal.id) =
-  menu_add_file#connect#activate ~callback:(fun () ->
-      select_file ~request:(fun f -> send_request (Add_file_req f)))
 
 (*************************)
 (* Notification Handling *)
@@ -1927,10 +1733,195 @@ let new_node ?parent id name typ detached =
   else
     Hint.find node_id_to_gtree id
 
+(**************************)
+(* Helpers for menu items *)
+(**************************)
 
-(**************************************************)
-(* tools submenus for strategies, provers and transformations *)
-(**************************************************)
+let menu_factory ~accel_path:ap ~accel_group:ag menu =
+  fun ?key ?accel_path ?(accel_group=ag) ?(modi=[]) ?submenu ?(use_mnemonic=true) ?tooltip ?callback label ->
+  let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
+  let item = new GMenu.menu_item item in
+  item#misc#show ();
+  menu#append item;
+  let ap = match accel_path with None -> ap ^ label | Some ap -> ap in
+  GtkData.AccelMap.add_entry ap ?key ~modi;
+  GtkBase.Widget.set_accel_path item#as_widget ap accel_group;
+  Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
+  Opt.iter item#set_submenu submenu;
+  Opt.iter item#misc#set_tooltip_markup tooltip;
+  item
+
+(*************)
+(* Main menu *)
+(*************)
+
+let factory = new GMenu.factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
+
+let create_menu_item (factory:GMenu.menu GMenu.factory)
+                     ?key label tooltip =
+  let i = factory#add_item ?key label in
+  i#misc#set_tooltip_markup tooltip;
+  i
+
+let connect_menu_item i ~callback =
+  let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
+
+(* "File" menu items *)
+
+let file_menu = factory#add_submenu "_File"
+let file_factory = new GMenu.factory file_menu
+  ~accel_path:"<Why3-Main>/File/" ~accel_group
+let menu_add_file =
+  create_menu_item file_factory "Add file to session"
+                   "Insert another file in the current session"
+
+let (_ : GtkSignal.id) =
+  menu_add_file#connect#activate ~callback:(fun () ->
+      select_file ~request:(fun f -> send_request (Add_file_req f)))
+
+let menu_preferences =
+  create_menu_item file_factory "Preferences"
+                   "Open Preferences Window"
+let menu_save_session =
+  create_menu_item file_factory "Save session"
+                   "Save the current proof session on disk"
+let menu_save_files =
+  create_menu_item file_factory "Save files"
+                   "Save the edited source files on disk"
+let menu_save_session_and_files =
+  create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
+                   "Save the current proof session and the source files"
+let menu_refresh =
+  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
+                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
+
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
+
+let menu_quit =
+  create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
+                   "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
+
+(* "Tools" menu items *)
+
+let tools_menu = factory#add_submenu "_Tools"
+let tools_accel_group = GtkData.AccelGroup.create ()
+let tools_factory = new GMenu.factory tools_menu
+  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group ~accel_modi:[]
+
+let strategies_factory =
+  let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  new GMenu.factory tools_submenu_strategies
+    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group ~accel_modi:[]
+
+let provers_factory =
+  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  new GMenu.factory tools_submenu_provers
+    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
+
+let () =
+  let callback () =
+    Gconfig.preferences gconfig;
+    Hstr.iter
+      (fun _ (_,source_view,_,_) ->
+       source_view#set_editable gconfig.allow_source_editing;
+       source_view#set_auto_indent gconfig.allow_source_editing)
+      source_view_table;
+    send_session_config_to_server ()
+  in
+  connect_menu_item menu_preferences ~callback
+
+let () =
+  connect_menu_item
+    menu_save_session
+    ~callback:(fun () -> send_request Save_req)
+
+let () =
+  connect_menu_item
+    menu_save_session_and_files
+    ~callback:(fun () -> save_sources(); send_request Save_req)
+
+let () =
+  connect_menu_item
+    menu_save_files
+    ~callback:save_sources
+
+
+let () =
+  connect_menu_item
+    menu_quit
+    ~callback:exit_function_safe
+
+(* "View" menu items *)
+
+let view_menu = factory#add_submenu "_View"
+let view_factory = menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
+
+let (_ : GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._plus
+    ~callback:enlarge_fonts "Enlarge font"
+
+let (_ : GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._minus
+    ~callback:reduce_fonts "Reduce font"
+
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
+    ~tooltip:"Collapse all the proven nodes under the current node"
+    ~callback:collapse_proven_goals
+    "Collapse proven goals"
+
+let (_: GMenu.menu_item) =
+  view_factory
+    ~tooltip:"Expand all nodes of the tree view"
+    ~callback:goals_view#expand_all
+    "Expand all"
+
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
+    ~callback:collapse_row
+    "Collapse current node"
+
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
+    ~tooltip:"Expand current node, or its children when already expanded"
+    ~callback:expand_row
+    "Expand current node"
+
+let (_: GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:move_current_row_selection_to_parent
+    "Go to parent node"
+
+let (_: GMenu.menu_item) =
+  view_factory
+    ~callback:move_current_row_selection_to_first_child
+    "Go to first child"
+
+let (_: GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Down
+    ~callback:move_to_next_unproven_node_id
+    "Select next unproven goal"
+
+(* "Help" menu items *)
+
+let help_menu = factory#add_submenu "_Help"
+let help_factory = new GMenu.factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
+
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "Legend"
+    ~callback:show_legend_window
+
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "About"
+    ~callback:show_about_window
+
+(*****************************************************************)
+(* "Tools" submenus for strategies, provers, and transformations *)
+(*****************************************************************)
 
 let sanitize_markup x =
   let remove = function
@@ -2232,8 +2223,6 @@ let complete_context_menu () =
                                 (fun id -> Command_req (id, "interrupt")));
   ()
 
-
-
 (*************************************)
 (* Copy paste                        *)
 (*************************************)
@@ -2264,8 +2253,9 @@ let () =
   connect_menu_item copy_item ~callback:copy;
   connect_menu_item paste_item ~callback:paste
 
-
-(* the command-line *)
+(**********************************)
+(* Notification handling (part 2) *)
+(**********************************)
 
 let check_uninstalled_prover =
   let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
@@ -2434,27 +2424,6 @@ let treat_notification n =
         print_notify n
   end;
   ()
-
-
-
-(*************)
-(* Help menu *)
-(*************)
-
-
-let help_menu = factory#add_submenu "_Help"
-let help_factory = new GMenu.factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
-
-let (_ : GMenu.menu_item) =
-  help_factory#add_item
-    "Legend"
-    ~callback:show_legend_window
-
-let (_ : GMenu.menu_item) =
-  help_factory#add_item
-    "About"
-    ~callback:show_about_window
-
 
 (***********************************)
 (* accel group switching           *)
