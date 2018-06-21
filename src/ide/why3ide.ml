@@ -425,9 +425,9 @@ let hb = GPack.hbox ~packing:vbox#add ()
 
 (* 1. Menu *)
 
-let factory = new GMenu.factory menubar
+let accel_group = GtkData.AccelGroup.create ()
 
-let accel_group = factory#accel_group
+let factory = new GMenu.factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
 
 let create_menu_item (factory:GMenu.menu GMenu.factory)
                      ?key label tooltip =
@@ -441,7 +441,8 @@ let connect_menu_item i ~callback =
 (* 1.1 "File" menu items *)
 
 let file_menu = factory#add_submenu "_File"
-let file_factory = new GMenu.factory file_menu ~accel_group
+let file_factory = new GMenu.factory file_menu
+  ~accel_path:"<Why3-Main>/File/" ~accel_group
 let menu_add_file =
   create_menu_item file_factory "Add file to session"
                    "Insert another file in the current session"
@@ -468,18 +469,21 @@ let menu_quit =
 (* 1.2 "Tools" menu items *)
 
 let tools_menu = factory#add_submenu "_Tools"
-let tools_factory = new GMenu.factory tools_menu ~accel_group
 let tools_accel_group = GtkData.AccelGroup.create ()
+let tools_factory = new GMenu.factory tools_menu
+  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group ~accel_modi:[]
 
 let strategies_factory =
   let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
   new GMenu.factory tools_submenu_strategies
+    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group ~accel_modi:[]
 
 let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
   new GMenu.factory tools_submenu_provers
+    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
 
 (* context_tools : simplified tools menu for mouse-3 *)
 
@@ -1289,7 +1293,8 @@ let apply_loc_on_ce (l: (Loc.position * color) list) =
 (*******************)
 
 let view_menu = factory#add_submenu "_View"
-let view_factory = new GMenu.factory view_menu ~accel_group
+let view_factory = new GMenu.factory view_menu
+  ~accel_path:"<Why3-Main>/View/" ~accel_group
 
 (* goals view is not yet multi-selectable
 let (_ : GMenu.image_menu_item) =
@@ -2054,7 +2059,8 @@ let () =
   let transformations = Server_utils.list_transforms () in
   let add_submenu_transform name filter =
     let submenu = tools_factory#add_submenu name in
-    let submenu = new GMenu.factory submenu ~accel_group in
+    let submenu = new GMenu.factory submenu
+      ~accel_path:("<Why3-Main>/Tools/" ^ name) ~accel_group:tools_accel_group ~accel_modi:[] in
     let iter ((name,_) as desc) =
       let callback () = interp name in
       let i = create_menu_item submenu (sanitize_markup name) (string_of_desc desc) in
@@ -2080,42 +2086,29 @@ let () =
 (* complete the tools menu *)
 
 let edit_menu_item =
-  create_menu_item tools_factory "Edit"
-                   "View or edit proof script (shortcut: e)"
-let () =
-  edit_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._e
+  create_menu_item tools_factory "Edit" ~key:GdkKeysyms._e
+    "View or edit proof script"
 
 let replay_menu_item =
-  create_menu_item tools_factory "Replay valid obsolete proofs"
-                   "Replay valid obsolete proofs below the current node (shortcut: r)"
+  create_menu_item tools_factory "Replay valid obsolete proofs" ~key:GdkKeysyms._r
+    "Replay valid obsolete proofs undex the current node"
 
 let replay_all_menu_item =
   create_menu_item tools_factory "Replay all obsolete proofs"
                    "Replay all obsolete proofs below the current node"
 
-let () =
-  replay_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._r
-
 let clean_menu_item =
-  create_menu_item tools_factory  "Clean"
-                   "Remove unsuccessful proofs or transformations that are below a proved goal (shortcut: c)"
-let () =
-  clean_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._c
-
+  create_menu_item tools_factory "Clean" ~key:GdkKeysyms._c
+    "Remove unsuccessful proofs or transformations that are under a proved goal"
 
 let remove_item =
-  create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations (shortcut: del)"
-let () =
-  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._Delete
+  create_menu_item tools_factory "Remove" ~key:GdkKeysyms._Delete
+    "Remove the selected proof attempts or transformations"
 
 
 let mark_obsolete_item =
-  create_menu_item tools_factory "Mark obsolete"
-                   "Mark all proof nodes below the current selected nodes as obsolete (shortcut: o)"
-let () =
-  mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
-
+  create_menu_item tools_factory "Mark obsolete" ~key:GdkKeysyms._o
+    "Mark all proof nodes below the current selected nodes as obsolete"
 
 let interrupt_item =
   create_menu_item tools_factory "Interrupt"
@@ -2456,7 +2449,7 @@ let treat_notification n =
 
 
 let help_menu = factory#add_submenu "_Help"
-let help_factory = new GMenu.factory help_menu ~accel_group
+let help_factory = new GMenu.factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
 
 let (_ : GMenu.menu_item) =
   help_factory#add_item
