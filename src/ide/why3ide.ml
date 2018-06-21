@@ -357,6 +357,12 @@ let update_label_saved (label: GMisc.label) =
   if (Strings.has_prefix "*" s) then
     label#set_text (String.sub s 1 (String.length s - 1))
 
+let make_sources_editable b =
+  Hstr.iter
+    (fun _ (_,source_view,_,_) ->
+      source_view#set_editable b;
+      source_view#set_auto_indent b)
+    source_view_table
 
 (**********************)
 (* Graphical elements *)
@@ -1775,37 +1781,51 @@ let connect_menu_item i ~callback =
 (* "File" menu items *)
 
 let file_menu = factory#add_submenu "_File"
-let file_factory = new GMenu.factory file_menu
-  ~accel_path:"<Why3-Main>/File/" ~accel_group
-let menu_add_file =
-  create_menu_item file_factory "Add file to session"
-                   "Insert another file in the current session"
+let file_factory = new menu_factory file_menu ~accel_path:"<Why3-Main>/File/" ~accel_group
 
-let (_ : GtkSignal.id) =
-  menu_add_file#connect#activate ~callback:(fun () ->
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Add file to session"
+    ~tooltip:"Insert another file in the current session"
+    ~callback:(fun () ->
       select_file ~request:(fun f -> send_request (Add_file_req f)))
 
-let menu_preferences =
-  create_menu_item file_factory "Preferences"
-                   "Open Preferences Window"
-let menu_save_session =
-  create_menu_item file_factory "Save session"
-                   "Save the current proof session on disk"
-let menu_save_files =
-  create_menu_item file_factory "Save files"
-                   "Save the edited source files on disk"
-let menu_save_session_and_files =
-  create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
-                   "Save the current proof session and the source files"
-let menu_refresh =
-  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
-                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
+let (_: GMenu.menu_item) =
+  let callback () =
+    Gconfig.preferences gconfig;
+    make_sources_editable gconfig.allow_source_editing;
+    send_session_config_to_server ()
+  in
+  file_factory#add_item "Preferences"
+    ~tooltip:"Open Preferences Window"
+    ~callback
 
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save session"
+    ~tooltip:"Save the current proof session on disk"
+    ~callback:(fun () -> send_request Save_req)
 
-let menu_quit =
-  create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
-                   "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save files"
+    ~tooltip:"Save the edited source files on disk"
+    ~callback:save_sources
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "_Save session and files"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._S
+    ~tooltip:"Save the current proof session and the source files"
+    ~callback:(fun () -> save_sources(); send_request Save_req)
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save all and _Refresh session"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._R
+    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files."
+    ~callback:save_and_reload
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "_Quit"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Q
+    ~tooltip:"See the Preferences for setting the policy on automatic file saving at exit."
+    ~callback:exit_function_safe
 
 (* "Tools" menu items *)
 
@@ -1825,39 +1845,6 @@ let provers_factory =
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
   new GMenu.factory tools_submenu_provers
     ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
-
-let () =
-  let callback () =
-    Gconfig.preferences gconfig;
-    Hstr.iter
-      (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing;
-       source_view#set_auto_indent gconfig.allow_source_editing)
-      source_view_table;
-    send_session_config_to_server ()
-  in
-  connect_menu_item menu_preferences ~callback
-
-let () =
-  connect_menu_item
-    menu_save_session
-    ~callback:(fun () -> send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_session_and_files
-    ~callback:(fun () -> save_sources(); send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_files
-    ~callback:save_sources
-
-
-let () =
-  connect_menu_item
-    menu_quit
-    ~callback:exit_function_safe
 
 (* "View" menu items *)
 
