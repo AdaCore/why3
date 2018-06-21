@@ -124,7 +124,8 @@
       | [] -> assert false (* never *)
       | [q] -> case q
       | q::ql -> mk_t (Tbinop (case q, Dterm.DTand_asym, join ql)) in
-    let bl = [any_loc, Some (ri any_loc), false, Some ty] in
+    let id = add_attr (ri any_loc) [ATstr Ity.break_attr] in
+    let bl = [any_loc, Some id, false, Some ty] in
     let p = mk_t (Tquant (Dterm.DTexists, bl, [], join ql)) in
     [mk_t (Tattr (ATstr we_attr, p))]
 
