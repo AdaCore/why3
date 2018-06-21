@@ -1751,7 +1751,7 @@ object (self)
     GtkBase.Widget.set_accel_path item#as_widget accel_path accel_group;
     Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
     Opt.iter item#misc#set_tooltip_markup tooltip
-  method add_item ?key ?accel_path ?accel_group ?modi ?submenu
+  method add_item ?key ?accel_path ?accel_group ?modi
     ?(use_mnemonic=true) ?tooltip ?callback label =
     let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
     let item = new GMenu.menu_item item in
@@ -1759,8 +1759,20 @@ object (self)
     menu#append item;
     let ap = match accel_path with None -> menu_path ^ label | Some ap -> ap in
     self#aux ?key ~accel_path:ap ?accel_group ?modi ?tooltip ?callback item;
-    Opt.iter item#set_submenu submenu;
     item
+  method add_separator () =
+    let item = GtkMenu.MenuItem.separator_create () in
+    let item = new GMenu.menu_item item in
+    item#misc#show ();
+    menu#append item;
+    ()
+  method add_submenu ?use_mnemonic label =
+    let m = GtkMenu.Menu.create [] in
+    let m = new GMenu.menu m in
+    m#misc#show ();
+    let item = self#add_item ?use_mnemonic label in
+    item#set_submenu m;
+    m
 end
 
 (*************)
