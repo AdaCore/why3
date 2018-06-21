@@ -1889,8 +1889,8 @@ let strategies_factory =
 let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
   tools_factory#add_separator ();
-  new GMenu.factory tools_submenu_provers
-    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
+  new menu_factory tools_submenu_provers
+    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group
 
 (* "View" menu items *)
 
@@ -1967,9 +1967,6 @@ let string_of_desc desc =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
   in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
 
-
-let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
-
 let parse_shortcut_as_key s =
   let (key,modi) as r = GtkData.AccelGroup.parse s in
   begin if key = 0 then
@@ -2002,24 +1999,23 @@ let add_submenu_strategy (shortcut,strategy) =
 
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
-  let  i = create_menu_item
-             provers_factory
-             prover_name
-             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
-  in
-  let (key,modi) = parse_shortcut_as_key shortcut in
-  if key > 0 then i#add_accelerator ~group:tools_accel_group ~modi key;
   let callback () =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
-  connect_menu_item i ~callback;
+  let (key,modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
+    ~use_mnemonic:false
+    ~key ~modi
+    ~tooltip:("run prover " ^ prover_name ^ " on selected goal")
+    ~callback
+  in
   if not (List.mem prover_parseable_name gconfig.hidden_provers) then
     begin
       let  i = create_menu_item
              context_tools_factory
              prover_name
-             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
+             ("run prover " ^ prover_name ^ " on selected goal")
       in
       connect_menu_item i ~callback;
     end
