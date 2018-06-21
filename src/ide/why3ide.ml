@@ -1448,7 +1448,7 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   view_factory
     ~callback:move_current_row_selection_to_first_child
-    "Go to parent node"
+    "Go to first child"
 
 let (_: GMenu.menu_item) =
   view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Down
