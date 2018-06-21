@@ -80,14 +80,14 @@ and Guillaume Melquiond (Inria) who entered the competition as "team Why3".
 
 module RelaxedPrefix
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   type char
   val eq (x y : char) : bool ensures { result = True <-> x = y }
 
-  (** [a1[ofs1..ofs1+len]] and [a2[ofs2..ofs2+len]] are valid sub-arrays
+  (** `a1[ofs1..ofs1+len]` and `a2[ofs2..ofs2+len]` are valid sub-arrays
       and they are equal *)
   predicate eq_array (a1: array char) (ofs1: int)
                      (a2: array char) (ofs2: int) (len: int) =
@@ -110,7 +110,7 @@ module RelaxedPrefix
   exception NoPrefix
 
   (** Note regarding the code: the suggested pseudo-code is buggy, as it
-      may access [a] out of bounds. We fix it by strengthening the
+      may access `a` out of bounds. We fix it by strengthening the
       test in the conditional. *)
 
   let is_relaxed_prefix (pat a: array char) : bool

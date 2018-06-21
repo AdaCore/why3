@@ -1,7 +1,7 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   let test (a: (ref int, int))
     ensures { let (x, _) = a in !x = (old !x) + 1 }

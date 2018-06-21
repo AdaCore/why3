@@ -1,7 +1,7 @@
 module M
 
-  use import int.Int
-  use import int.EuclideanDivision
+  use int.Int
+  use int.EuclideanDivision
 
   predicate even (x : int) = x = 2 * (div x 2)
   predicate odd  (x : int) = x = 2 * (div x 2) + 1

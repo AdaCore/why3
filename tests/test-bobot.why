@@ -16,7 +16,7 @@ end
 
 (*
 theory Test_encoding
-  use import int.Int
+  use int.Int
   function id(x: int) : int = x
   function id2(x: int) : int = id(x)
   function succ(x:int) : int = id(x+1)
@@ -32,8 +32,8 @@ end
 *)
 
 theory Test_simplify_array
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
   goal G1 : forall x y:int. forall m: map int int.
     get (set m y x) y = x
   goal G2 : forall x y:int. forall m: map int int.
@@ -43,8 +43,8 @@ theory Test_simplify_array
 end
 
 theory Test_simplify_array2
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
   type t2 'a
   goal G1 : forall y:int. forall x:t2 int. forall m: map int (t2 int).
     get (set m y x) y = x
@@ -59,7 +59,7 @@ theory Test_guard
 end
 
 theory Test_conjunction
-  use import int.Int
+  use int.Int
   axiom Trivial : 2 * 2 = 4 /\ 4 * 2 = 8
   goal G : 
     forall x:int. x*x=4 -> ((x*x*x=8 \/ x*x*x = -8) /\ x*x*2 = 8)
@@ -82,7 +82,7 @@ end
 
 
 theory TestEnco
-  use import int.Int
+  use int.Int
   meta "encoding : kept" type int
   type mytype 'a
   function id(x: int) : int = x
@@ -104,7 +104,7 @@ theory TestEnco
 end
 
 theory TestIte
-  use import int.Int
+  use int.Int
   use list.Length
   use list.Mem
   function abs(x:int) : int = if x >= 0 then x else -x 
@@ -113,14 +113,14 @@ theory TestIte
 end
 
 theory TestBuiltin_real
-  use import real.Real
+  use real.Real
   goal G1 : 5.5 * 10. = 55. 
   goal G2 : 9. / 3. = 3. 
   goal G3 : inv(5.) = 0.2
 end
 
 theory TestBuiltin_bool
-  use import bool.Bool
+  use bool.Bool
   goal G : xorb True False = True 
   goal G_false : xorb True False = False
 end

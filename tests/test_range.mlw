@@ -1,5 +1,5 @@
 theory T
-  use import int.Int
+  use int.Int
 
   type q
 
@@ -11,7 +11,7 @@ theory T
 end
 
 theory U
-  use import bv.BV8
+  use bv.BV8
 
   type q
 
@@ -21,8 +21,8 @@ theory U
 end
 
 module M
-  use import bv.BV16
-  use import int.Int
+  use bv.BV16
+  use int.Int
 
   let f (x : t) : t
    ensures { ule result (12 : t) }
@@ -31,10 +31,10 @@ module M
 end
 
 module N
-  use import bv.BV8
-  use import int.Int
+  use bv.BV8
+  use int.Int
 
-  use import int.NumOf
+  use int.NumOf
 
   meta "encoding : kept" type t
 

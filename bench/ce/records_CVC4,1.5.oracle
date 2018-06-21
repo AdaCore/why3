@@ -1,118 +1,73 @@
 bench/ce/records.mlw M VC record_match_eval_test1: Unknown (other)
-Counter-example model:File records.mlw:
-Line 27:
-x = {"type" : "Integer" , "val" : "0" }
-Line 28:
-old x = {"type" : "Integer" ,
-"val" : "0" }
-
 bench/ce/records.mlw M VC record_match_eval_test1: Valid
 bench/ce/records.mlw M VC record_match_eval_test2: Unknown (other)
-Counter-example model:File records.mlw:
-Line 35:
-x = {"type" : "Integer" , "val" : "0" }
-x.f = {"type" : "Integer" ,
-"val" : "0" }
-x.g = {"type" : "Boolean" ,
-"val" : false }
-Line 36:
-old x = {"type" : "Integer" , "val" : "0" }
-old x.f = {"type" : "Integer" ,
-"val" : "0" }
-old x.g = {"type" : "Boolean" ,
-"val" : false }
-
 bench/ce/records.mlw M VC record_match_eval_test3: Unknown (other)
-Counter-example model:File records.mlw:
-Line 40:
-x = {"type" : "Integer" , "val" : "6" }
-Line 41:
-old x = {"type" : "Integer" ,
-"val" : "6" }
-
 bench/ce/records.mlw M VC record_match_eval_test4: Unknown (other)
-Counter-example model:File records.mlw:
-Line 45:
-x = {"type" : "Integer" , "val" : "6" }
-Line 46:
-old x = {"type" : "Integer" ,
-"val" : "6" }
-
 bench/ce/records.mlw M VC test_record_match_eval_test5: Unknown (other)
+bench/ce/records.mlw Mutable VC record_match_eval_test1: Unknown (other)
 Counter-example model:File records.mlw:
-Line 51:
-re = {"type" : "Integer" , "val" : "0" }
-re.f = {"type" : "Integer" ,
-"val" : "0" }
-re.g = {"type" : "Boolean" ,
-"val" : false }
-Line 53:
-x = {"type" : "Integer" , "val" : "6" }
-Line 54:
-old re = {"type" : "Integer" , "val" : "0" }
-old re.f = {"type" : "Integer" ,
-"val" : "0" }
-old re.g = {"type" : "Boolean" ,
-"val" : false }
-old x = {"type" : "Integer" ,
-"val" : "6" }
+Line 57:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : true } }] } }
+Line 58:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : true } }] } }
 
-bench/ce/records.mlw M VC record_match_eval_test1: Unknown (other)
+bench/ce/records.mlw Mutable VC record_match_eval_test1: Valid
+bench/ce/records.mlw Mutable VC record_match_eval_test2: Unknown (other)
 Counter-example model:File records.mlw:
-Line 27:
-x = {"type" : "Integer" , "val" : "0" }
-Line 28:
-old x = {"type" : "Integer" ,
-"val" : "0" }
+Line 65:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
+Line 66:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 
-bench/ce/records.mlw M VC record_match_eval_test1: Valid
-bench/ce/records.mlw M VC record_match_eval_test2: Unknown (other)
+bench/ce/records.mlw Mutable VC record_match_eval_test3: Unknown (other)
 Counter-example model:File records.mlw:
-Line 35:
-x = {"type" : "Integer" , "val" : "0" }
-x.f = {"type" : "Integer" ,
-"val" : "0" }
-x.g = {"type" : "Boolean" ,
-"val" : false }
-Line 36:
-old x = {"type" : "Integer" , "val" : "0" }
-old x.f = {"type" : "Integer" ,
-"val" : "0" }
-old x.g = {"type" : "Boolean" ,
-"val" : false }
+Line 70:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
+Line 71:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
+Line 73:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 
-bench/ce/records.mlw M VC record_match_eval_test3: Unknown (other)
+bench/ce/records.mlw Mutable VC record_match_eval_test4: Unknown (other)
 Counter-example model:File records.mlw:
-Line 40:
-x = {"type" : "Integer" , "val" : "6" }
-Line 41:
-old x = {"type" : "Integer" ,
-"val" : "6" }
-
-bench/ce/records.mlw M VC record_match_eval_test4: Unknown (other)
-Counter-example model:File records.mlw:
-Line 45:
-x = {"type" : "Integer" , "val" : "6" }
-Line 46:
-old x = {"type" : "Integer" ,
-"val" : "6" }
-
-bench/ce/records.mlw M VC test_record_match_eval_test5: Unknown (other)
-Counter-example model:File records.mlw:
-Line 51:
-re = {"type" : "Integer" , "val" : "0" }
-re.f = {"type" : "Integer" ,
-"val" : "0" }
-re.g = {"type" : "Boolean" ,
-"val" : false }
-Line 53:
-x = {"type" : "Integer" , "val" : "6" }
-Line 54:
-old re = {"type" : "Integer" , "val" : "0" }
-old re.f = {"type" : "Integer" ,
-"val" : "0" }
-old re.g = {"type" : "Boolean" ,
-"val" : false }
-old x = {"type" : "Integer" ,
-"val" : "6" }
+Line 75:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
+Line 76:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
+Line 78:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 

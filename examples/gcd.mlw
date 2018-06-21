@@ -3,8 +3,8 @@
 
 module EuclideanAlgorithm
 
-  use import mach.int.Int
-  use import number.Gcd
+  use mach.int.Int
+  use number.Gcd
 
   let rec euclid (u v: int) : int
     variant  { v }
@@ -20,9 +20,9 @@ end
 
 module EuclideanAlgorithmIterative
 
-  use import mach.int.Int
-  use import ref.Ref
-  use import number.Gcd
+  use mach.int.Int
+  use ref.Ref
+  use number.Gcd
 
   let euclid (u0 v0: int) : int
     requires { u0 >= 0 /\ v0 >= 0 }
@@ -44,10 +44,9 @@ end
 
 module BinaryGcd
 
-  use import mach.int.Int
-  use import int.Lex2
-  use import number.Parity
-  use import number.Gcd
+  use mach.int.Int
+  use number.Parity
+  use number.Gcd
 
   lemma even1: forall n: int. 0 <= n -> even n <-> n = 2 * div n 2
   lemma odd1: forall n: int. 0 <= n -> not (even n) <-> n = 2 * div n 2 + 1
@@ -74,7 +73,7 @@ module BinaryGcd
     odd u -> odd v -> gcd u v = gcd (div (u - v) 2) v
 
   let rec binary_gcd (u v: int) : int
-    variant  { (v, u) with lex }
+    variant  { v, u }
     requires { u >= 0 /\ v >= 0 }
     ensures  { result = gcd u v }
   =
@@ -96,8 +95,8 @@ end
 (* does not work with extraction driver ocaml64
 module EuclideanAlgorithm31
 
-  use import mach.int.Int31
-  use import number.Gcd
+  use mach.int.Int31
+  use number.Gcd
 
   let rec euclid (u v: int31) : int31
     variant  { to_int v }
@@ -114,8 +113,8 @@ end
 
 module EuclideanAlgorithm63
 
-  use import mach.int.Int63
-  use import number.Gcd
+  use mach.int.Int63
+  use number.Gcd
 
   let rec euclid (u v: int63) : int63
     variant  { to_int v }

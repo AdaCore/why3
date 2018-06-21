@@ -1,7 +1,7 @@
 
 module TestInt32
 
-  use import mach_int.Int32
+  use mach_int.Int32
 
   let mean_wrong (a:int32) (b:int32) : int32 =
     div (add a b) (of_int 2)
@@ -15,7 +15,7 @@ end
 
 module TestUInt32
 
-  use import mach_int.UInt32
+  use mach_int.UInt32
 
   let mean_wrong (a:uint32) (b:uint32) : uint32 =
     div (add a b) (of_int 2)

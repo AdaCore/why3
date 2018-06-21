@@ -39,6 +39,7 @@ why3.conf
 /why3regtests.err
 /why3regtests.out
 /.merlin
+/src/jessie/.merlin
 
 # /bench/
 /bench/programs/good/booleans/
@@ -119,16 +120,19 @@ why3.conf
 /doc/manual.synctex.gz
 /doc/*.haux
 /doc/*.pdf
+/doc/generated/
 /doc/html/
 /doc/*.hind
 /doc/*.htoc
 /doc/bnf
 /doc/bnf.ml
-/doc/*_bnf.tex
 /doc/apidoc.tex
 /doc/apidoc/
 /doc/stdlibdoc/
 /doc/texput.log
+/doc/extract_ocaml_code
+/doc/*__*.ml
+/doc/*_bnf.tex
 
 # /lib
 /lib/why3-cpulimit
@@ -152,9 +156,6 @@ why3.conf
 
 # /src/
 /src/config.sh
-
-# Coq tactic
-/src/coq-tactic/why3tac.ml
 
 # Coq
 /lib/coq/version
@@ -197,6 +198,8 @@ pvsbin/
 /src/parser/parser.ml
 /src/parser/parser.mli
 /src/parser/parser.conflicts
+/src/parser/handcrafted.messages.temp
+/src/parser/parser_messages.ml
 
 # /src/why3doc/
 /src/why3doc/doc_lexer.ml
@@ -294,13 +297,16 @@ pvsbin/
 /examples/in_progress/bigInt/*__*.ml
 /examples/in_progress/mp/jsmain.js
 /examples/in_progress/mp/*__*.ml
-/examples/prover/build/*__*.ml
 /examples/prover/.depend
-/examples/prover/build/prover
+/examples/prover/prover
+/examples/prover/prover.ml
 /examples/prover/bench/*/*.out
 /examples/prover/bench/*/*.txt
 /examples/prover/bench1
 /examples/prover/bench2
+/examples/prover/macro_generator/depend
+/examples/prover/macro_generator/build
+/examples/in_progress/multiprecision/build/
 
 # Try Why3
 /src/trywhy3/trywhy3.byte

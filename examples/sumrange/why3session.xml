@@ -46,7 +46,7 @@
 </theory>
 <theory name="Simple" proved="true">
  <goal name="VC query" expl="VC for query" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC query.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -156,7 +156,7 @@
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC tree_of_array" expl="VC for tree_of_array" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC tree_of_array.0" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -185,20 +185,20 @@
     <goal name="VC tree_of_array.7.0.0" expl="assertion" proved="true">
     <transf name="destruct_alg" proved="true" arg1="r">
      <goal name="VC tree_of_array.7.0.0.0" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC tree_of_array.7.0.0.1" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.06"/></proof>
+     <proof prover="3"><result status="valid" time="0.08"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="VC tree_of_array.7.0.1" expl="assertion" proved="true">
     <transf name="destruct_alg" proved="true" arg1="r">
      <goal name="VC tree_of_array.7.0.1.0" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     <proof prover="3"><result status="valid" time="0.05"/></proof>
      </goal>
      <goal name="VC tree_of_array.7.0.1.1" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.08"/></proof>
+     <proof prover="3"><result status="valid" time="0.06"/></proof>
      </goal>
     </transf>
     </goal>
@@ -207,7 +207,7 @@
   </transf>
   </goal>
   <goal name="VC tree_of_array.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC tree_of_array.8.0" expl="postcondition" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -250,7 +250,7 @@
  </transf>
  </goal>
  <goal name="VC update_aux" expl="VC for update_aux" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC update_aux.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -294,10 +294,10 @@
   <goal name="VC update.0" expl="VC for update" proved="true">
   <transf name="destruct_alg" proved="true" arg1="t">
    <goal name="VC update.0.0" expl="VC for update" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC update.0.1" expl="VC for update" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
@@ -314,7 +314,7 @@
  <proof prover="1"><result status="valid" time="0.77" steps="889"/></proof>
  </goal>
  <goal name="VC update_aux_complexity" expl="VC for update_aux_complexity" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC update_aux_complexity.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -369,7 +369,7 @@
  </transf>
  </goal>
  <goal name="VC query_aux_complexity" expl="VC for query_aux_complexity" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC query_aux_complexity.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>

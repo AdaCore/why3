@@ -119,7 +119,7 @@ type binop =
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : Slab.t;
+  t_attrs : Sattr.t;
   t_loc   : Loc.position option;
 }
 
@@ -152,8 +152,9 @@ module Hterm : Exthtbl.S with type key = term
 val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
-(* Equality modulo labels and triggers *)
-val t_equal_nt_nl : term -> term -> bool
+(* Equality modulo attributes and triggers *)
+val t_equal_nt_na : term -> term -> bool
+module Hterm_nt_na : Exthtbl.S with type key = term
 
 (** {2 Bindings} *)
 
@@ -233,8 +234,8 @@ val t_nat_const : int -> term
     n must be non-negative *)
 val t_bigint_const : BigInt.t -> term
 
-val stop_split : label
-val asym_split : label
+val stop_split : attribute
+val asym_split : attribute
 
 val t_and_l : term list -> term
 val t_or_l : term list -> term
@@ -252,10 +253,10 @@ val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
 
-val t_label : ?loc:Loc.position -> Slab.t -> term -> term
-val t_label_add : label -> term -> term
-val t_label_remove : label -> term -> term
-val t_label_copy : term -> term -> term
+val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
+val t_attr_add : attribute -> term -> term
+val t_attr_remove : attribute -> term -> term
+val t_attr_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 

@@ -7,11 +7,11 @@
    another module. *)
 module Trace "W:non_conservative_extension:N" (* => TraceDef *)
 
-  use import int.Int
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import order.Ordered
-  use import order.Chain
+  use int.Int
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
 
   (* FIXME: weird that witness obligation is generated here
      (cause abstract type anyway),
@@ -84,14 +84,14 @@ end
    catenation, pre/suffix extraction and chain supremum. *)
 module TraceConstructors
 
-  use import int.Int
-  use import option.Option
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import order.Ordered
-  use import order.Chain
-  use import choice.Choice
+  use int.Int
+  use option.Option
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
+  use choice.Choice
   use export Trace
 
   let ghost function singleton_trace (r:erel {'a}) (x:{'a}) : trace {'a}
@@ -233,15 +233,15 @@ end
 
 module TraceDef
 
-  use import int.Int
-  use import fn.Fun
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import order.Ordered
-  use import order.Chain
-  use import option.Option
-  use import choice.Choice
+  use int.Int
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
+  use option.Option
+  use choice.Choice
 
   (* FIXME: not possible to use 'by' witness introduction because
      [witness] is purely logical, and cannot be used in code. *)
@@ -304,12 +304,12 @@ end
 (* Trace conversion from transition systems to games. *)
 module TraceGameCommon
 
-  use import int.Int
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import game.Game
-  use import Trace
+  use int.Int
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use game.Game
+  use Trace
 
   predicate next_trace (t1 t2:trace 'a) =
     subtrace t1 t2 /\ t2.finite /\ t2.length = t1.length + 1
@@ -332,8 +332,8 @@ end
 
 module TraceGame "W:non_conservative_extension:N" (* => TraceGameProof *)
 
-  use import Trace
-  use import game.Game
+  use Trace
+  use game.Game
   use export TraceGameCommon
 
   axiom trace_enforce_ex : forall t:trace 'a,q.
@@ -348,21 +348,21 @@ end
 
 module TraceGameProof
 
-  use import int.Int
-  use import TraceConstructors
-  use import TraceGameCommon
-  use import fn.Fun
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import game.Game
-  use import game.BasicStrats
-  use import game_no_strat.WinAlt
-  use import choice.Choice
-  use import transfinite.Extension
-  use import order.LimUniq
-  use import order.Chain
-  use import order.SubChain
+  use int.Int
+  use TraceConstructors
+  use TraceGameCommon
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use game.Game
+  use game.BasicStrats
+  use game_no_strat.WinAlt
+  use choice.Choice
+  use transfinite.Extension
+  use order.LimUniq
+  use order.Chain
+  use order.SubChain
 
   constant gex : game (trace 'a) = game_ex_trace
   constant gun : game (trace 'a) = game_unv_trace

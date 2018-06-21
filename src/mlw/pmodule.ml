@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -172,6 +172,7 @@ and mod_inst = {
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mxs.t;
+  mi_df  : prop_kind;
 }
 
 let empty_mod_inst m = {
@@ -184,6 +185,7 @@ let empty_mod_inst m = {
   mi_pv  = Mvs.empty;
   mi_rs  = Mrs.empty;
   mi_xs  = Mxs.empty;
+  mi_df  = Plemma;
 }
 
 (** {2 Module under construction} *)
@@ -618,7 +620,7 @@ let clone_decl inst cl uc d = match d.d_node with
         | Plemma, Some Pgoal -> true, Pgoal
         | Plemma, _ -> false, Plemma
         | Paxiom, Some k -> false, k
-        | Paxiom, None -> false, Paxiom (* TODO: Plemma *) in
+        | Paxiom, None -> false, inst.mi_df in
       if skip then uc else
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
@@ -751,9 +753,9 @@ let clone_ppat cl sm pp mask =
   let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
   Svs.fold save pp.pp_pat.pat_vars sm, pp'
 
-let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
+let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
-  | Econst c -> e_const c e.e_ity
+  | Econst c -> e_const c (clone_ity cl e.e_ity)
   | Eexec (c,_) -> e_exec (clone_cexp cl sm c)
   | Eassign asl ->
       let conv (r,f,v) =
@@ -830,8 +832,8 @@ and clone_let_defn cl sm ld = match ld with
         ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
       sm_save_rs cl sm s s', ld
   | LDrec rdl ->
-      let conv_rs mrs {rec_rsym = {rs_name = id} as rs; rec_varl = varl} =
-        let cty = clone_cty cl sm ~drop_decr:(varl <> []) rs.rs_cty in
+      let conv_rs mrs {rec_rsym = {rs_name = id} as rs} =
+        let cty = clone_cty cl sm ~drop_decr:true rs.rs_cty in
         let rs' = create_rsymbol (id_clone id) ~ghost:(rs_ghost rs) cty in
         Mrs.add rs rs' mrs, rs' in
       let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in
@@ -995,8 +997,8 @@ let clone_type_decl inst cl tdl kn =
 
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
-  let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 
@@ -1013,10 +1015,20 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = List.fold_left add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
-      if tdl = [] then List.fold_left add_vc uc vcl else
-        let add uc d = add_pdecl ~warn:false ~vc:false uc d in
-        List.fold_left add uc (create_type_decl tdl)
+      let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
+      let uc = List.fold_left add_vc uc vcl in
+      let dl = if ndl <> [] then create_type_decl ndl else [] in
+      let save_special_ls d d' = match d.d_node, d'.d_node with
+        | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
+            cl.ls_table <- Mls.add ls ls' cl.ls_table;
+        | Dtype _, Dtype _ -> ()
+        | _ -> assert false in
+      begin match tdl, dl with
+      | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
+          List.iter2 save_special_ls d.pd_pure d'.pd_pure
+      | _ -> () end;
+      let add uc d = add_pdecl ~warn:false ~vc:false uc d in
+      List.fold_left add uc dl
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
@@ -1111,7 +1123,8 @@ let clone_export uc m inst =
           mi_pk = mi.mi_pk;
           mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
-          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs}
+          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs;
+          mi_df = mi.mi_df}
         with Not_found -> uc end
     | Umeta (m,al) ->
         begin try add_meta uc m (List.map (function
@@ -1135,7 +1148,8 @@ let clone_export uc m inst =
     mi_pk  = inst.mi_pk;
     mi_pv  = cl.pv_table;
     mi_rs  = cl.rs_table;
-    mi_xs  = cl.xs_table} in
+    mi_xs  = cl.xs_table;
+    mi_df  = inst.mi_df} in
   add_clone uc mi
 
 (** {2 WhyML language} *)
@@ -1215,9 +1229,9 @@ let get_rs_name nm =
   if nm = "mixfix []" then "([])" else
   if nm = "mixfix []<-" then "([]<-)" else
   if nm = "mixfix [<-]" then "([<-])" else
+  if nm = "mixfix [..]" then "([..])" else
   if nm = "mixfix [_..]" then "([_..])" else
   if nm = "mixfix [.._]" then "([.._])" else
-  if nm = "mixfix [_.._]" then "([_.._])" else
   try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
   try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
   nm

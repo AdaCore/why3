@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -32,11 +32,16 @@ let debug_sp = Debug.register_flag "vc_sp"
 let no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
-let case_split = Ident.create_label "case_split"
-let add_case t = t_label_add case_split t
+let case_split = Ident.create_attribute "case_split"
+let add_case t = t_attr_add case_split t
 
-let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
-let clone_pv v = clone_vs v.pv_vs
+let clone_pv loc {pv_vs = {vs_name = id; vs_ty = ty}} =
+  (* we do not preserve the location of the initial pv
+     in the new variable for SP, because we do not want
+     to require a model for it and rely on "model_vc_*"
+     attributes to produce new, correctly located, variables *)
+  let id = id_fresh ~attrs:id.id_attrs ?loc id.id_string in
+  create_vsymbol id ty
 
 let pv_is_unit v = ity_equal v.pv_ity ity_unit
 
@@ -49,17 +54,19 @@ let res_of_post ity = function
 let res_of_cty cty = res_of_post cty.cty_result cty.cty_post
 
 let proxy_of_expr =
-  let label = Slab.singleton proxy_label in fun e ->
-  let id = id_fresh ?loc:e.e_loc ~label "o" in
+  let attrs = Sattr.singleton proxy_attr in fun e ->
+  let id = id_fresh ?loc:e.e_loc ~attrs "o" in
   create_pvsymbol id e.e_ity
 
-let sp_label = Ident.create_label "vc:sp"
-let wp_label = Ident.create_label "vc:wp"
-let wb_label = Ident.create_label "vc:white_box"
-let kp_label = Ident.create_label "vc:keep_precondition"
+let sp_attr = Ident.create_attribute "vc:sp"
+let wp_attr = Ident.create_attribute "vc:wp"
+let wb_attr = Ident.create_attribute "vc:white_box"
+let kp_attr = Ident.create_attribute "vc:keep_precondition"
+let nt_attr = Ident.create_attribute "vc:divergent"
 
-let vc_labels = Slab.add kp_label (Slab.add wb_label
-  (Slab.add sp_label (Slab.add wp_label Slab.empty)))
+let vc_attrs =
+  Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
+  (Sattr.add sp_attr (Sattr.add wp_attr Sattr.empty))))
 
 (* VCgen environment *)
 
@@ -72,20 +79,32 @@ type vc_env = {
   ps_int_gt : lsymbol;
   fs_int_pl : lsymbol;
   fs_int_mn : lsymbol;
+  ps_wf_acc : lsymbol;
   exn_count : int ref;
+  divergent : bool;
 }
 
-let mk_env {Theory.th_export = ns} kn tuc = {
+let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc = {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
-  ps_int_le = Theory.ns_find_ls ns ["infix <="];
-  ps_int_ge = Theory.ns_find_ls ns ["infix >="];
-  ps_int_lt = Theory.ns_find_ls ns ["infix <"];
-  ps_int_gt = Theory.ns_find_ls ns ["infix >"];
-  fs_int_pl = Theory.ns_find_ls ns ["infix +"];
-  fs_int_mn = Theory.ns_find_ls ns ["infix -"];
+  ps_int_le = Theory.ns_find_ls ns_int ["infix <="];
+  ps_int_ge = Theory.ns_find_ls ns_int ["infix >="];
+  ps_int_lt = Theory.ns_find_ls ns_int ["infix <"];
+  ps_int_gt = Theory.ns_find_ls ns_int ["infix >"];
+  fs_int_pl = Theory.ns_find_ls ns_int ["infix +"];
+  fs_int_mn = Theory.ns_find_ls ns_int ["infix -"];
+  ps_wf_acc = Theory.ns_find_ls ns_acc ["acc"];
   exn_count = ref 0;
+  divergent = false;
 }
+
+let acc env r t =
+  let ps = env.ps_wf_acc in
+  if not (Mid.mem ps.ls_name env.known_map) then
+    Loc.errorm ?loc:t.t_loc "please import relations.WellFounded";
+  let ty = t_type t in
+  let r = t_closure r [ty; ty] None in
+  ps_app ps [r; t]
 
 (* every exception-catching clause is represented by
    a unique integer, so that we can move code inside
@@ -95,35 +114,42 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
 (* FIXME: cannot verify int.why because of a cyclic dependency.
    int.Int is used for the "for" loops and for integer variants.
    We should be able to extract the necessary lsymbols from kn. *)
-let mk_env env kn tuc = mk_env (Env.read_theory env ["int"] "Int") kn tuc
+let mk_env env kn tuc =
+  let th_int = Env.read_theory env ["int"] "Int" in
+  let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
+  mk_env th_int th_wf kn tuc
 
-(* explanation labels *)
+(* explanation attributes *)
 
-let expl_pre       = Ident.create_label "expl:precondition"
-let expl_post      = Ident.create_label "expl:postcondition"
-let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
-let expl_assume    = Ident.create_label "expl:assumption"
-let expl_assert    = Ident.create_label "expl:assertion"
-let expl_check     = Ident.create_label "expl:check"
-let expl_lemma     = Ident.create_label "expl:lemma"
-let expl_absurd    = Ident.create_label "expl:unreachable point"
-let expl_for_bound = Ident.create_label "expl:loop bounds"
-let expl_off_bound = Ident.create_label "expl:out of loop bounds"
-let expl_loop_init = Ident.create_label "expl:loop invariant init"
-let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
-let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
-let expl_variant   = Ident.create_label "expl:variant decrease"
-let expl_type_inv  = Ident.create_label "expl:type invariant"
+let expl_pre       = Ident.create_attribute "expl:precondition"
+let expl_post      = Ident.create_attribute "expl:postcondition"
+let expl_xpost     = Ident.create_attribute "expl:exceptional postcondition"
+let expl_assume    = Ident.create_attribute "expl:assumption"
+let expl_assert    = Ident.create_attribute "expl:assertion"
+let expl_check     = Ident.create_attribute "expl:check"
+let expl_lemma     = Ident.create_attribute "expl:lemma"
+let expl_absurd    = Ident.create_attribute "expl:unreachable point"
+let expl_for_bound = Ident.create_attribute "expl:loop bounds"
+let expl_off_bound = Ident.create_attribute "expl:out of loop bounds"
+let expl_loop_init = Ident.create_attribute "expl:loop invariant init"
+let expl_loop_keep = Ident.create_attribute "expl:loop invariant preservation"
+let expl_loop_vari = Ident.create_attribute "expl:loop variant decrease"
+let expl_variant   = Ident.create_attribute "expl:variant decrease"
+let expl_type_inv  = Ident.create_attribute "expl:type invariant"
+let expl_divergent = Ident.create_attribute "expl:termination"
 
-let lab_has_expl lab =
-  Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
+let attrs_has_expl attrs =
+  Sattr.exists (fun a -> Strings.has_prefix "expl:" a.attr_string) attrs
 
-let annot_labels = Slab.add stop_split (Slab.singleton annot_label)
+let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
-let vc_expl loc lab expl f =
-  let lab = Slab.union annot_labels (Slab.union lab f.t_label) in
-  let lab = if lab_has_expl lab then lab else Slab.add expl lab in
-  t_label ?loc:(if loc = None then f.t_loc else loc) lab f
+(* TODO: remove this line, and use "annot_attr" instead *)
+let annot_attrs = Sattr.add Ident.model_vc_attr annot_attrs
+
+let vc_expl loc attrs expl f =
+  let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
+  let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
+  t_attr_set ?loc:(if loc = None then f.t_loc else loc) attrs f
 
 (* propositional connectives with limited simplification *)
 
@@ -157,7 +183,7 @@ let sp_case t bl =
   if List.for_all isfalse bl then t_false else add_case (t_case t bl)
 
 let can_simp wp = match wp.t_node with
-  | Ttrue -> not (Slab.mem annot_label wp.t_label)
+  | Ttrue -> not (Sattr.mem annot_attr wp.t_attrs)
   | _ -> false
 
 let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
@@ -232,11 +258,12 @@ let decrease_def env loc old_t t =
              (ps_app env.ps_int_lt [t; old_t])
   else decrease_alg env loc old_t t
 
-let decrease env loc lab expl olds news =
+let decrease env loc attrs expl olds news =
+  if olds = [] && news = [] then t_true else
   let rec decr olds news = match olds, news with
     | (old_t, Some old_r)::olds, (t, Some r)::news
       when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
-        let dt = ps_app r [t; old_t] in
+        let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::olds, (t, None)::news
       when oty_equal old_t.t_ty t.t_ty ->
@@ -245,7 +272,7 @@ let decrease env loc lab expl olds news =
     | (old_t, None)::_, (t, None)::_ ->
         decrease_def env loc old_t t
     | _ -> t_false in
-  vc_expl loc lab expl (decr olds news)
+  vc_expl loc attrs expl (decr olds news)
 
 let old_of_pv {pv_vs = v; pv_ity = ity} =
   create_pvsymbol (id_clone v.vs_name) (ity_purify ity)
@@ -267,31 +294,31 @@ let renew_oldies o2v =
 
 (* convert user specifications into goals (wp) and premises (sp) *)
 
-let wp_of_inv loc lab expl pl =
-  t_and_asym_l (List.map (vc_expl loc lab expl) pl)
+let wp_of_inv loc attrs expl pl =
+  t_and_asym_l (List.map (vc_expl loc attrs expl) pl)
 
-let wp_of_pre loc lab pl = wp_of_inv loc lab expl_pre pl
+let wp_of_pre loc attrs pl = wp_of_inv loc attrs expl_pre pl
 
 let wp_of_post expl ity ql =
   let v = res_of_post ity ql in let t = t_var v.pv_vs in
-  let make q = vc_expl None Slab.empty expl (open_post_with t q) in
+  let make q = vc_expl None Sattr.empty expl (open_post_with t q) in
   v, t_and_asym_l (List.map make ql)
 
-let push_stop loc lab expl f =
+let push_stop loc attrs expl f =
   let rec push f = match f.t_node with
     | Tbinop (Tand,g,h)
-      when not (Slab.mem annot_label f.t_label) ->
-        t_label_copy f (t_and (push g) (push h))
-    | _ -> vc_expl loc lab expl f in
+      when not (Sattr.mem annot_attr f.t_attrs) ->
+        t_attr_copy f (t_and (push g) (push h))
+    | _ -> vc_expl loc attrs expl f in
   push f
 
-let sp_of_inv loc lab expl pl =
-  t_and_l (List.map (push_stop loc lab expl) pl)
+let sp_of_inv loc attrs expl pl =
+  t_and_l (List.map (push_stop loc attrs expl) pl)
 
-let sp_of_pre pl = sp_of_inv None Slab.empty expl_pre pl
+let sp_of_pre pl = sp_of_inv None Sattr.empty expl_pre pl
 
-let sp_of_post loc lab expl v ql = let t = t_var v.pv_vs in
-  let push q = push_stop loc lab expl (open_post_with t q) in
+let sp_of_post loc attrs expl v ql = let t = t_var v.pv_vs in
+  let push q = push_stop loc attrs expl (open_post_with t q) in
   t_and_l (List.map push ql)
 
 (* definitions of local let-functions are inserted in the VC
@@ -322,14 +349,15 @@ let cty_enrich_post c = match c with
 
 (* k-expressions: simplified code *)
 
-type ktag = WP | SP | Out of bool Mint.t | Push of bool | Off of label
+type ktag = WP | SP | Out of bool Mint.t | Push of bool | Off of attribute
 
 type kode =
   | Kseq   of kode * int * kode           (* 0: sequence, N: try-with *)
   | Kpar   of kode * kode                 (* non-deterministic choice *)
   | Kif    of pvsymbol * kode * kode          (* deterministic choice *)
   | Kcase  of pvsymbol * (pattern * kode) list    (* pattern matching *)
-  | Khavoc of pvsymbol option Mpv.t Mreg.t  (* writes and assignments *)
+  | Khavoc of pvsymbol option Mpv.t Mreg.t *
+              Loc.position option           (* writes and assignments *)
   | Klet   of pvsymbol * term * term         (* let v = t such that f *)
   | Kval   of pvsymbol list * term        (* let vl = any such that f *)
   | Kcut   of term                        (* assert: check and assume *)
@@ -361,7 +389,7 @@ let rec k_print fmt k = match k with
         "@[<hov 4>| %a ->@ %a@]" Pretty.print_pat p k_print k in
       Format.fprintf fmt "@[CASE %a\n@[%a@]@]"
         Ity.print_pv v (Pp.print_list Pp.newline branch) bl
-  | Khavoc _wr -> Format.fprintf fmt "HAVOC" (* TODO *)
+  | Khavoc _ -> Format.fprintf fmt "HAVOC" (* TODO *)
   | Klet (v, t, {t_node = Ttrue}) -> Format.fprintf fmt
       "@[<hov 4>LET %a = %a@]" Ity.print_pv v Pretty.print_term t
   | Klet (v,t,f) -> Format.fprintf fmt
@@ -385,8 +413,8 @@ let rec k_print fmt k = match k with
       (Pp.print_list Pp.space Pp.int) (Mint.keys out) k_print k
   | Ktag (Push cl, k) -> Format.fprintf fmt "@[<hov 4>PUSH %s %a@]"
       (if cl then "CLOSED" else "OPEN") k_print k
-  | Ktag (Off lab, k) -> Format.fprintf fmt "@[<hov 4>OFF %s %a@]"
-      lab.lab_string k_print k
+  | Ktag (Off attr, k) -> Format.fprintf fmt "@[<hov 4>OFF %s %a@]"
+      attr.attr_string k_print k
 
 (* check if a pure k-expression can be converted to a term.
    We need this for simple conjunctions, disjunctions, and
@@ -433,10 +461,10 @@ let k_unit res = Kval ([res], t_true)
 let bind_oldies o2v k = Mpv.fold (fun o v k ->
   Kseq (Klet (o, t_var v.pv_vs, t_true), 0, k)) o2v k
 
-let k_havoc eff k =
+let k_havoc loc eff k =
   if Sreg.is_empty eff.eff_covers then k else
   let conv wr = Mpv.map (fun () -> None) wr in
-  Kseq (Khavoc (Mreg.map conv eff.eff_writes), 0, k)
+  Kseq (Khavoc (Mreg.map conv eff.eff_writes, loc), 0, k)
 
 (* missing exceptional postconditions are set to True,
    unless we skip them altogether and let the exception
@@ -447,12 +475,12 @@ let complete_xpost cty {eff_raises = xss} skip =
 
 let wp_solder expl wp =
   if can_simp wp then wp else
-  let wp = t_label_add stop_split wp in
-  if lab_has_expl wp.t_label then wp else t_label_add expl wp
+  let wp = t_attr_add stop_split wp in
+  if attrs_has_expl wp.t_attrs then wp else t_attr_add expl wp
 
 let rec explain_inv loc f = match f.t_node with
-  | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
-  | _ -> t_map (explain_inv loc) (t_label ?loc Slab.empty f)
+  | Tapp _ -> vc_expl loc Sattr.empty expl_type_inv f
+  | _ -> t_map (explain_inv loc) (t_attr_set ?loc Sattr.empty f)
 
 let inv_of_pvs, inv_of_loop =
   let a = create_tvsymbol (id_fresh "a") in
@@ -481,47 +509,54 @@ let inv_of_pure {known_map = kn} loc fl k =
    - [xres] names the value carried by the exception
    [case_xmap] is used for match-with-exceptions *)
 let rec k_expr env lps e res xmap =
-  let loc = e.e_loc in
-  let lab = Slab.diff e.e_label vc_labels in
-  let t_lab t = t_label ?loc lab t in
+  let loc = e.e_loc and eff = e.e_effect in
+  let attrs = Sattr.diff e.e_attrs vc_attrs in
+  let t_tag t = t_attr_set ?loc attrs t in
   let var_or_proxy_case xmap e k =
     match e.e_node with
     | Evar v -> k v
     | _ -> let v = proxy_of_expr e in
            Kseq (k_expr env lps e v xmap, 0, k v) in
   let var_or_proxy = var_or_proxy_case xmap in
+  let check_divergence k =
+    if eff.eff_oneway && not env.divergent then begin
+      Warning.emit ?loc "termination@ of@ this@ expression@ \
+        cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
+        clause@ in@ the@ outer@ specification";
+      Kpar (Kstop (vc_expl loc attrs expl_divergent t_false), k)
+    end else k in
   let k = match e.e_node with
     | Evar v ->
-        Klet (res, t_lab (t_var v.pv_vs), t_true)
+        Klet (res, t_tag (t_var v.pv_vs), t_true)
     | Econst c ->
-        Klet (res, t_lab (t_const c (ty_of_ity e.e_ity)), t_true)
+        Klet (res, t_tag (t_const c (ty_of_ity e.e_ity)), t_true)
     | Eexec ({c_node = Cfun e1; c_cty = {cty_args = []} as cty}, _)
-      when Slab.mem wb_label e.e_label ->
+      when Sattr.mem wb_attr e.e_attrs ->
         (* white-box blocks do not hide their contents from the external
            computation. Instead, their pre and post are simply added as
            assertions at the beginning and the end of the expression.
-           All preconditions are thus preserved (as with kp_label).
+           All preconditions are thus preserved (as with kp_attr).
            White-box blocks do not force type invariants. *)
         let k_of_post expl v ql =
           let make = let t = t_var v.pv_vs in fun q ->
-            vc_expl None lab expl (open_post_with t q) in
+            vc_expl None attrs expl (open_post_with t q) in
           let sp = t_and_asym_l (List.map make ql) in
           let k = match sp.t_node with
             | Tfalse -> Kstop sp | _ -> Kcut sp in
           inv_of_pure env loc [sp] k in
         (* normal pre- and postcondition *)
-        let pre = wp_of_pre None lab cty.cty_pre in
+        let pre = wp_of_pre None attrs cty.cty_pre in
         let pre = inv_of_pure env loc [pre] (Kcut pre) in
         let post = k_of_post expl_post res cty.cty_post in
         (* handle exceptions that pass through *)
-        let xs_pass = e.e_effect.eff_raises in
+        let xs_pass = eff.eff_raises in
         let xq_pass = Mxs.set_inter cty.cty_xpost xs_pass in
         let xq_pass = Mxs.inter (fun _ ql (i,v) ->
           let xq = k_of_post expl_xpost v ql in
           Some ((i,v), Kseq (xq, 0, Kcont i))) xq_pass xmap in
         (* each exception raised in e1 but not in e is hidden
            due to an exceptional postcondition False in xpost *)
-        let bot = Kstop (vc_expl loc lab expl_absurd t_false) in
+        let bot = Kstop (vc_expl loc attrs expl_absurd t_false) in
         let xs_lost = Sxs.diff e1.e_effect.eff_raises xs_pass in
         let xq_lost = Mxs.set_inter cty.cty_xpost xs_lost in
         let xq_lost = Mxs.mapi (fun xs ql ->
@@ -535,6 +570,9 @@ let rec k_expr env lps e res xmap =
         let k = Mxs.fold add_xq xq_lost k in
         let k = Mxs.fold add_xq xq_pass k in
         let k = bind_oldies cty.cty_oldies k in
+        (* ignore divergence here if we check it later *)
+        let k = if Sattr.mem nt_attr e1.e_attrs
+                then check_divergence k else k in
         if cty.cty_pre = [] then k else Kseq (pre, 0, k)
     | Eexec (ce, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
         (* [ VC(ce) (if ce is a lambda executed in-place)
@@ -546,9 +584,9 @@ let rec k_expr env lps e res xmap =
           | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
               let ovl, rll = Mls.find ls lps in
               let nvl = List.combine tl rll in
-              let d = decrease env loc lab expl_variant ovl nvl in
-              wp_and d (wp_of_pre loc lab pl), renew_oldies oldies
-          | pl -> wp_of_pre loc lab pl, (oldies, Mvs.empty) in
+              let d = decrease env loc attrs expl_variant ovl nvl in
+              wp_and d (wp_of_pre loc attrs pl), renew_oldies oldies
+          | pl -> wp_of_pre loc attrs pl, (oldies, Mvs.empty) in
         let trusted = match ce.c_node with
           | (Capp ({rs_logic = RLls ls}, _) | Cpur (ls, _))
             when ce.c_cty.cty_args = [] (* fully applied *) ->
@@ -560,13 +598,13 @@ let rec k_expr env lps e res xmap =
         let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
         let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
-          let sp = sp_of_post loc lab expl v ql in
+          let sp = sp_of_post loc attrs expl v ql in
           let sp = t_subst sbs sp (* rename oldies *) in
           let rinv = if trusted then [] else
             inv_of_pvs env e.e_loc (Spv.singleton v) in
           match term_of_post ~prop:false v.pv_vs sp with
           | Some (t, sp) ->
-              Klet (v, t_lab t, List.fold_right sp_and rinv sp)
+              Klet (v, t_tag t, List.fold_right sp_and rinv sp)
           | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
@@ -575,15 +613,19 @@ let rec k_expr env lps e res xmap =
            with the xpost assumed and the exception raised. *)
         let skip = match ce.c_node with
           | Cfun _ -> xmap | _ -> Mxs.empty in
-        let xq = complete_xpost cty e.e_effect skip in
+        let xq = complete_xpost cty eff skip in
         let k = Mxs.fold2_inter (fun _ ql (i,v) k ->
           let xk = k_of_post expl_xpost v ql in
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
-        let k = bind_oldies oldies (k_havoc e.e_effect k) in
+        let k = bind_oldies oldies (k_havoc loc eff k) in
+        (* ignore divergence here if we check it later *)
+        let k = match ce.c_node with
+          | Cfun e when not (Sattr.mem nt_attr e.e_attrs) -> k
+          | _ -> check_divergence k in
         let k = if pre = [] then k else
-          if Slab.mem kp_label e.e_label
+          if Sattr.mem kp_attr e.e_attrs
             then Kseq (Kcut p, 0, k)
             else Kpar (Kstop p, k) in
         let k = List.fold_right assert_inv pinv k in
@@ -591,7 +633,7 @@ let rec k_expr env lps e res xmap =
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
           | _ -> k end
     | Eassign asl ->
-        let cv = e.e_effect.eff_covers in
+        let cv = eff.eff_covers in
         if Sreg.is_empty cv then k_unit res else
         (* compute the write effect *)
         let add wr (r,f,v) =
@@ -623,7 +665,7 @@ let rec k_expr env lps e res xmap =
         let add_write r wfs acc =
           try Mreg.add (Mreg.find r t2f) (Mpv.map (fun v -> Some v) wfs) acc
           with Not_found -> acc in
-        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty), 0, k_unit res)
+        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty, loc), 0, k_unit res)
     | Elet (LDvar (v, e0), e1) ->
         let k = k_expr env lps e1 res xmap in
         Kseq (k_expr env lps e0 v xmap, 0, k)
@@ -639,16 +681,16 @@ let rec k_expr env lps e res xmap =
         let add_axiom cty q k = if can_simp q then k else
           let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
-          Kseq (Kaxiom (k_havoc eff ax), 0, k) in
+          Kseq (Kaxiom (k_havoc loc eff ax), 0, k) in
         let add_axiom cty q k =
-          let pinv = inv_of_pvs env e.e_loc (cty_reads cty) in
+          let pinv = inv_of_pvs env loc (cty_reads cty) in
           List.fold_right assert_inv pinv (add_axiom cty q k) in
         let add_rs sm s c (vl,k) = match s.rs_logic with
           | RLls _ -> assert false (* not applicable *)
           | RLnone -> vl, k
           | RLlemma ->
               let v = res_of_cty c.c_cty and q = c.c_cty.cty_post in
-              let q = sp_of_post None Slab.empty expl_post v q in
+              let q = sp_of_post None Sattr.empty expl_post v q in
               let q = if pv_is_unit v
                 then t_subst_single v.pv_vs t_void q
                 else t_exists_close_simp [v.pv_vs] [] q in
@@ -656,7 +698,7 @@ let rec k_expr env lps e res xmap =
           | RLpv v ->
               let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
               let q = cty_exec_post (cty_enrich_post c) in
-              let q = sp_of_post None Slab.empty expl_post v q in
+              let q = sp_of_post None Sattr.empty expl_post v q in
               v::vl, add_axiom c.c_cty q k in
         let vl, k = match ld with
           | LDrec rdl ->
@@ -673,9 +715,9 @@ let rec k_expr env lps e res xmap =
               let rec k_par = function
                 | [k] -> k | [] -> assert false
                 | k::kl -> Kpar (k, k_par kl) in
-              Kpar (k_havoc eff (k_par (k_rec env lps rdl)), k)
+              Kpar (k_havoc loc eff (k_par (k_rec env lps rdl)), k)
           | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
-              Kpar (k_havoc eff (k_fun env lps cty e), k)
+              Kpar (k_havoc loc eff (k_fun env lps cty e), k)
           | _ -> k end
     | Eif (e0, e1, e2) ->
         (* with both branches pure, switch to SP to avoid splitting *)
@@ -746,39 +788,37 @@ let rec k_expr env lps e res xmap =
         let i, v = Mxs.find xs xmap in
         Kseq (k_expr env lps e0 v xmap, 0, Kcont i)
     | Eassert (Assert, f) ->
-        let f = vc_expl None lab expl_assert f in
+        let f = vc_expl None attrs expl_assert f in
         let k = Kseq (Kcut f, 0, k_unit res) in
         inv_of_pure env e.e_loc [f] k
     | Eassert (Assume, f) ->
-        let f = vc_expl None lab expl_assume f in
+        let f = vc_expl None attrs expl_assume f in
         let k = Kval ([res], f) in
         inv_of_pure env e.e_loc [f] k
     | Eassert (Check, f) ->
-        let f = vc_expl None lab expl_check f in
+        let f = vc_expl None attrs expl_check f in
         let k = Kpar (Kstop f, k_unit res) in
         inv_of_pure env e.e_loc [f] k
     | Eghost e0
     | Eexn (_,e0) ->
         k_expr env lps e0 res xmap
     | Epure t ->
-        let t = if t.t_ty <> None then t_lab t else
-          t_if_simp (t_lab t) t_bool_true t_bool_false in
+        let t = if t.t_ty <> None then t_tag t else
+          t_if_simp (t_tag t) t_bool_true t_bool_false in
         let k = Klet (res, t, t_true) in
         inv_of_pure env e.e_loc [t] k
     | Eabsurd ->
-        Kstop (vc_expl loc lab expl_absurd t_false)
+        Kstop (vc_expl loc attrs expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
         (* [ STOP inv
            | HAVOC ; ASSUME inv ; IF e0 THEN e1 ; STOP inv
                                         ELSE SKIP ] *)
-        let init = wp_of_inv None lab expl_loop_init invl in
-        let prev = sp_of_inv None lab expl_loop_init invl in
-        let keep = wp_of_inv None lab expl_loop_keep invl in
-        let keep, oldies =
-          if varl = [] then keep, Mpv.empty else
-          let oldies, ovarl = oldify_variant varl in
-          let d = decrease env loc lab expl_loop_vari ovarl varl in
-          wp_and d keep, oldies in
+        let init = wp_of_inv None attrs expl_loop_init invl in
+        let prev = sp_of_inv None attrs expl_loop_init invl in
+        let keep = wp_of_inv None attrs expl_loop_keep invl in
+        let oldies, ovarl = oldify_variant varl in
+        let decr = decrease env loc attrs expl_loop_vari ovarl varl in
+        let keep = wp_and decr keep in
         let iinv = inv_of_loop env e.e_loc invl varl in
         let j = List.fold_right assert_inv iinv (Kstop init) in
         let k = List.fold_right assert_inv iinv (Kstop keep) in
@@ -786,7 +826,8 @@ let rec k_expr env lps e res xmap =
         let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
-        Kpar (j, k_havoc e.e_effect k)
+        let k = check_divergence k in
+        Kpar (j, k_havoc loc eff k)
     | Efor (vx, (a, d, b), vi, invl, e1) ->
         let int_of_pv = match vx.pv_vs.vs_ty.ty_node with
           | Tyapp (s,_) when ts_equal s ts_int ->
@@ -800,14 +841,14 @@ let rec k_expr env lps e res xmap =
           | Tyvar _ -> assert false (* never *) in
         let a = int_of_pv a and i = t_var vi.pv_vs in
         let b = int_of_pv b and one = t_nat_const 1 in
-        let init = wp_of_inv None lab expl_loop_init invl in
-        let prev = sp_of_inv None lab expl_loop_init invl in
-        let keep = wp_of_inv None lab expl_loop_keep invl in
+        let init = wp_of_inv None attrs expl_loop_init invl in
+        let prev = sp_of_inv None attrs expl_loop_init invl in
+        let keep = wp_of_inv None attrs expl_loop_keep invl in
         let gt, le, pl = match d with
           | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
           | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
         let bounds = t_and (ps_app le [a; i]) (ps_app le [i; b]) in
-        let expl_bounds f = vc_expl loc lab expl_for_bound f in
+        let expl_bounds f = vc_expl loc attrs expl_for_bound f in
         let i_pl_1 = fs_app pl [i; one] ty_int in
         let b_pl_1 = fs_app pl [b; one] ty_int in
         let init = t_subst_single vi.pv_vs a init in
@@ -826,7 +867,8 @@ let rec k_expr env lps e res xmap =
         in
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
-        let k = Kpar (j, k_havoc e.e_effect k) in
+        let k = Kpar (j, k_havoc loc eff k) in
+        let k = check_divergence k in
         (* [ ASSUME a <= b+1 ;
              [ STOP inv[a]
              | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
@@ -836,8 +878,8 @@ let rec k_expr env lps e res xmap =
            Kseq (Kval ([res], expl_bounds (ps_app gt [a; b_pl_1])), 0,
                  Ktag (Off expl_off_bound, Kcont 0)))
   in
-  if Slab.mem sp_label e.e_label then Ktag (SP, k) else
-  if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
+  if Sattr.mem sp_attr e.e_attrs then Ktag (SP, k) else
+  if Sattr.mem wp_attr e.e_attrs then Ktag (WP, k) else k
 
 and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   (* ASSUME pre ; LET o = arg ; TRY e ; STOP post WITH STOP xpost *)
@@ -859,12 +901,16 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
     let rinv = inv_of_pvs env e.e_loc (Spv.singleton v) in
     let k = List.fold_right assert_inv rinv (Kstop q) in
     List.fold_right assert_inv qinv k in
-  let k = Kseq (k_expr env lps e res xmap, 0, add_qinv res q) in
+  (* do not check termination if asked nicely *)
+  let env = if Sattr.mem nt_attr e.e_attrs then
+    { env with divergent = true } else env in
+  let k = k_expr env lps e res xmap in
+  let k = Kseq (k, 0, add_qinv res q) in
   let k = Mxs.fold (fun _ ((i,r), xq) k ->
     Kseq (k, i, add_qinv r xq)) xq k in
   (* move the postconditions under the VCgen tag *)
-  let k = if Slab.mem sp_label e.e_label then Ktag (SP, k) else
-          if Slab.mem wp_label e.e_label then Ktag (WP, k) else k in
+  let k = if Sattr.mem sp_attr e.e_attrs then Ktag (SP, k) else
+          if Sattr.mem wp_attr e.e_attrs then Ktag (WP, k) else k in
   let k = bind_oldies oldies (bind_oldies cty.cty_oldies k) in
   let p = List.fold_right sp_and pinv (sp_of_pre cty.cty_pre) in
   Kseq (Kval (cty.cty_args, p), 0, k)
@@ -873,7 +919,6 @@ and k_rec env lps rdl =
   let k_rd {rec_fun = c; rec_varl = varl} =
     let e = match c.c_node with
       | Cfun e -> e | _ -> assert false in
-    if varl = [] then k_fun env lps c.c_cty e else
     (* store in lps our variant at the entry point
        and the list of well-founded orderings
        for each function in the let-rec block *)
@@ -1006,10 +1051,10 @@ let reflow vc_wp k =
 (* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
-let dst_of_wp wr wp =
+let dst_of_wp loc wr wp =
   if Mreg.is_empty wr then Mpv.empty else
   let clone_affected v _ =
-    if pv_affected wr v then Some (clone_pv v) else None in
+    if pv_affected wr v then Some (clone_pv loc v) else None in
   Mpv.mapi_filter clone_affected (t_freepvs Spv.empty wp)
 
 let adjustment dst = Mpv.fold (fun o n sbs ->
@@ -1030,7 +1075,7 @@ let rec explore_paths kn aff regs t ity =
   | Ityreg ({reg_its = s; reg_args = tl; reg_regs = rl} as r) ->
       let rec height t = match t.t_node with
         (* prefer user variables to proxy variables *)
-        | Tvar v when Slab.mem proxy_label v.vs_name.id_label -> 65536
+        | Tvar v when Sattr.mem proxy_attr v.vs_name.id_attrs -> 65536
         | Tvar _ -> 0 | Tapp (_,[t]) -> height t + 1
         | _ -> assert false (* shouldn't happen *) in
       let min t o = if height t < height o then t else o in
@@ -1219,9 +1264,9 @@ let rec sp_expr kn k rdm dst = match k with
          and for every variable read by k2 that is not in dst *)
       let get_wr _ (_, w) m = Mpv.set_union w m in
       let wr2 = Mint.fold get_wr sp2 Mpv.empty in
-      let fresh_wr2 v _ = clone_pv v in
+      let fresh_wr2 v _ = clone_pv None v in
       let fresh_rd2 v _ = if v.pv_ity.ity_pure then None
-                          else Some (clone_pv v) in
+                          else Some (clone_pv None v) in
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
@@ -1307,7 +1352,7 @@ let rec sp_expr kn k rdm dst = match k with
         Mint.merge (join p) sp spm) spl spm in
       let sp_case (bl, wr) = sp_case t bl, wr in
       wp_case t wpl, Mint.map sp_case spm, Spv.add v rds
-  | Khavoc wr ->
+  | Khavoc (wr, loc) ->
       let rd = Mint.find 0 rdm in
       let dst = Mpv.set_inter dst (pvs_affected wr rd) in
       if Mpv.is_empty dst then sp_expr kn (Kcont 0) rdm dst else
@@ -1321,6 +1366,9 @@ let rec sp_expr kn k rdm dst = match k with
         sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
+      let attrs = Ident.model_vc_havoc_attr in
+      let attrs = Sattr.add attrs sp.t_attrs in
+      let sp = t_attr_set ?loc attrs sp in
       let add_rhs _ rhs rd = match rhs with
         | Some v -> Spv.add v rd | None -> rd in
       let add_rhs _ = Mpv.fold add_rhs in
@@ -1346,7 +1394,7 @@ let rec sp_expr kn k rdm dst = match k with
       t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kaxiom k ->
       let f = wp_expr kn k Mint.empty in
-      let f = vc_expl None Slab.empty expl_lemma f in
+      let f = vc_expl None Sattr.empty expl_lemma f in
       let rd = t_freepvs (Mint.find 0 rdm) f in
       t_true, Mint.singleton 0 (f, Mpv.empty), rd
   | Ktag (Off expl, k) ->
@@ -1371,9 +1419,9 @@ and wp_expr kn k q = match k with
   | Kcase ({pv_vs = v}, bl) ->
       let branch (p,k) = t_close_branch p (wp_expr kn k q) in
       wp_case (t_var v) (List.map branch bl)
-  | Khavoc wr ->
+  | Khavoc (wr, loc) ->
       let q = Mint.find 0 q in
-      let dst = dst_of_wp wr q in
+      let dst = dst_of_wp loc wr q in
       if Mpv.is_empty dst then q else
       let regs = name_regions kn wr dst in
       let () = print_dst dst; print_regs regs in
@@ -1400,7 +1448,7 @@ and wp_expr kn k q = match k with
       Mint.find i q
   | Kaxiom k ->
       let f = wp_expr kn k Mint.empty in
-      let f = vc_expl None Slab.empty expl_lemma f in
+      let f = vc_expl None Sattr.empty expl_lemma f in
       sp_implies f (Mint.find 0 q)
   | Ktag (Off expl, k) ->
       wp_solder expl (wp_expr kn k q)
@@ -1428,10 +1476,10 @@ let vc_rec env vc_wp rdl =
   List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
 
 let mk_vc_decl kn id f =
-  let {id_string = nm; id_label = label; id_loc = loc} = id in
-  let label = if lab_has_expl label then label else
-    Slab.add (Ident.create_label ("expl:VC for " ^ nm)) label in
-  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
+  let attrs = if attrs_has_expl attrs then attrs else
+    Sattr.add (Ident.create_attribute ("expl:VC for " ^ nm)) attrs in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag no_eval then f else
@@ -1457,7 +1505,7 @@ let vc env kn tuc d = match d.pd_node with
         let mv, ldl = List.fold_left2 add_fd
           (Mvs.empty, []) d.itd_fields d.itd_witness in
         let e = List.fold_right (fun f e ->
-          let f = vc_expl None Slab.empty expl_type_inv (t_subst mv f) in
+          let f = vc_expl None Sattr.empty expl_type_inv (t_subst mv f) in
           let ld, _ = let_var (id_fresh "_") (e_assert Assert f) in
           e_let ld e) d.itd_invariant e_void in
         let e = List.fold_right e_let ldl e in
@@ -1468,7 +1516,7 @@ let vc env kn tuc d = match d.pd_node with
       let add_invariant d vcl =
         let vs_of_rs fd = (fd_of_rs fd).pv_vs in
         let vl = List.map vs_of_rs d.itd_fields in
-        let expl f = vc_expl None Slab.empty expl_type_inv f in
+        let expl f = vc_expl None Sattr.empty expl_type_inv f in
         let f = t_and_asym_l (List.map expl d.itd_invariant) in
         let f = t_exists_close_simp vl [] f in
         mk_vc_decl kn d.itd_its.its_ts.ts_name f :: vcl in

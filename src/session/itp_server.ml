@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Session_itp
 open Controller_itp
 open Server_utils
@@ -218,7 +218,7 @@ let bypass_pretty s id =
 
 let get_exception_message ses id e =
   match e with
-  | Controller_itp.Noprogress ->
+  | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
@@ -226,7 +226,11 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
       Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
+  | Generic_arg_trans_utils.Arg_trans_term (s, t) ->
+      Pp.sprintf "Error in transformation %s during with term:\n %a : %a " s
+        (print_term ses id) t (print_opt_type ses id) t.Term.t_ty,
+      Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_term2 (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
         (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
@@ -243,6 +247,8 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
+  | Args_wrapper.Arg_pr_not_found pr ->
+      Pp.sprintf "Property not found: %a" (print_pr ses id) pr, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
       Pp.sprintf "Transformation raised a general error: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_theory_not_found s ->
@@ -273,6 +279,8 @@ module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
+let debug_attrs = Debug.register_info_flag "print_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
 
 (****************)
 (* Command list *)
@@ -280,9 +288,9 @@ let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
 let interrupt_query _cont _args = C.interrupt (); "interrupted"
 
-let commands_table = Stdlib.Hstr.create 17
+let commands_table = Hstr.create 17
 
-let register_command c d f = Stdlib.Hstr.add commands_table c (d,f)
+let register_command c d f = Hstr.add commands_table c (d,f)
 
 let () =
   List.iter (fun (c,d,f) -> register_command c d f)
@@ -587,14 +595,15 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
     capture_parse_or_type_errors
-      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
+      (fun c ->
+        try let (_,_) = reload_files ~use_shapes c in [] with
+        | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
     capture_parse_or_type_errors
       (fun c ->
-       match add_file c ?format fname with
-       | None -> []
-       | Some e -> [e]) cont
+        try add_file c ?format fname; [] with
+        | Errors_list le -> le) cont
 
 
   (* -----------------------------------   ------------------------------------- *)
@@ -621,6 +630,10 @@ end
        else full
     | APn pn ->
        let name = (get_proof_name d.cont.controller_session pn).Ident.id_string in
+       (* Reduce the name of the goal to the minimum, by taking the
+          part after the last dot: "0" instead of "WP_Parameter.0" for
+          example.  *)
+       let name = List.hd (Strings.rev_split '.' name) in
        let expl = get_proof_expl d.cont.controller_session pn in
        if expl = "" then name else name ^ " [" ^ expl ^ "]"
     | APa pa ->
@@ -785,7 +798,7 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
-    Stdlib.Hstr.iter
+    Hstr.iter
       (fun _ file ->
        on_file file;
        iter_subtree_from_file on_subtree file)
@@ -826,13 +839,13 @@ end
     in
     task_text, loc_color_list
 
-  let create_ce_tab s res any list_loc =
+  let create_ce_tab ~print_attrs s res any list_loc =
     let f = get_encapsulating_file s any in
     let filename = Sysutil.absolutize_filename
       (Session_itp.get_dir s) (file_name f)
     in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ?start_comment:None ?end_comment:None
+    Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
       ~source_code:source_code ~locations:list_loc
 
@@ -866,6 +879,7 @@ end
       | ATh t ->
           P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
       | APa pid ->
+          let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
@@ -880,7 +894,7 @@ end
                     res.Call_provers.pr_answer
                 in
                 let ce_result =
-                  Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                  Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
                   res.Call_provers.pr_model
                 in
                 if ce_result = "" then
@@ -894,7 +908,7 @@ end
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
                     let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session res any old_list_loc
+                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc
                     in
                     P.notify (Source_and_ce (source_result, list_loc));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
@@ -970,7 +984,9 @@ end
          (s,n,p) :: acc) (Whyconf.get_provers config) []
     in
     load_strategies c;
-    let transformation_list = List.map (fun (a, b) -> (a, Format.sprintf "%( %)" b)) (list_transforms ()) in
+    let transformation_list = List.map
+      (fun (a, b) -> (a, Format.sprintf "@[%(%)@]" b))
+      (list_transforms ()) in
     let strategies_list = list_strategies c in
     let infos =
       {
@@ -1050,12 +1066,12 @@ end
       Format.eprintf "Fatal anomaly in Itp_server.notify_change_proved@.";
       exit 1
 
-  let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
+  let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover ~counterexmp
+    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
@@ -1090,6 +1106,8 @@ end
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
       send_new_subtree_from_trans nid trans_id
+    | TSfailed (_, NoProgress) ->
+        P.notify (Message (Information "The transformation made no progress"))
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
@@ -1158,7 +1176,7 @@ end
 
   let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
 
-  let run_strategy_on_task ~counterexmp nid s =
+  let run_strategy_on_task nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     try
@@ -1170,7 +1188,7 @@ end
       let callback_pa = callback_update_tree_proof d.cont in
       let callback_tr tr args st = callback_update_tree_transform tr args st in
       List.iter (fun id ->
-                 C.run_strategy_on_goal d.cont id st ~counterexmp
+                 C.run_strategy_on_goal d.cont id st
                     ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                 unproven_goals
     with
@@ -1284,13 +1302,11 @@ end
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
-     | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
-     | Get_global_infos -> true
+     | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
+     | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
+     | Exit_req | Get_global_infos -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
-     | Focus_req nid ->
-         Hint.mem model_any nid
      | Remove_subtree nid ->
          Hint.mem model_any nid
      | Copy_paste (from_id, to_id) ->
@@ -1308,7 +1324,6 @@ end
 
   let treat_request r =
     let d = get_server_data () in
-    let config = d.cont.controller_config in
     (* Check that the request does not refer to obsolete node_ids *)
     if not (request_is_valid r) then
       begin
@@ -1335,18 +1350,6 @@ end
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
-    | Focus_req nid ->
-        let d = get_server_data () in
-        let s = d.cont.controller_session in
-        let any = any_from_node_ID nid in
-        let focus_on =
-          match any with
-          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-          | _ -> any
-        in
-        focused_node := Focus_on [focus_on];
-        reset_and_send_the_whole_tree ()
-    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
@@ -1365,7 +1368,7 @@ end
         read_and_send f
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b,loc)         -> send_task nid b loc
+    | Get_task(nid,b,loc)          -> send_task nid b loc
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
@@ -1374,16 +1377,26 @@ end
         | Transform (s, _t, args) -> apply_transform nid s args
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
-            schedule_proof_attempt ~counterexmp nid p limit
+            schedule_proof_attempt nid p limit
         | Strategies st           ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
-            run_strategy_on_task ~counterexmp nid st
+            run_strategy_on_task nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
         | Replay valid_only       -> replay ~valid_only snid
         | Clean                   -> clean snid
         | Mark_Obsolete           -> mark_obsolete snid
+        | Focus_req ->
+            let d = get_server_data () in
+            let s = d.cont.controller_session in
+            let any = any_from_node_ID nid in
+            let focus_on =
+              match any with
+              | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+              | _ -> any
+            in
+            focused_node := Focus_on [focus_on];
+            reset_and_send_the_whole_tree ()
+        | Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
@@ -1411,6 +1424,9 @@ end
          | "memlimit" -> Server_utils.set_session_memlimit i
          | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
        end
+    | Set_prover_policy(p,u)   ->
+       let c = d.cont in
+       Controller_itp.set_session_prover_upgrade_policy c p u
     | Exit_req                -> exit 0
      )
     with

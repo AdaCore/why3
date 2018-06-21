@@ -110,6 +110,9 @@ val get_used_provers_goal : Session_itp.session -> Session_itp.proofNodeID
 (** [get_used_provers_goal s g] returns the set of provers used
     somewhere under the goal [g] of session [s] *)
 
+val get_transf_string : Session_itp.session -> Session_itp.transID -> string
+(** [get_transf_string s tr] concatenates the name of transformation [tr]
+    in session [s] with its arguments *)
 
 val goal_depth : Session_itp.session -> Session_itp.proofNodeID -> int
 (** [goal_depth s g] returns the depth of the tree under goal

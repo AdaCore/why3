@@ -99,7 +99,7 @@ let ls_of_const_format = Number.({
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
   Hty.memo 3 (fun ty_base ->
-    let cst = Stdlib.Hstr.memo 63 (fun s ->
+    let cst = Wstdlib.Hstr.memo 63 (fun s ->
       let s = "const_" ^ s in
       create_fsymbol (id_fresh s) [] ty_base) in
     Hterm.memo 63 (fun t ->
@@ -110,14 +110,14 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label = Ident.create_label "encoding:unprotected"
-let unprotecting_label = Ident.create_label "encoding:unprotecting"
+let unprotected_attr = Ident.create_attribute "encoding:unprotected"
+let unprotecting_attr = Ident.create_attribute "encoding:unprotecting"
 
-let id_unprotected n = id_fresh ~label:(Slab.singleton unprotected_label) n
-let id_unprotecting n = id_fresh ~label:(Slab.singleton unprotecting_label) n
+let id_unprotected n = id_fresh ~attrs:(Sattr.singleton unprotected_attr) n
+let id_unprotecting n = id_fresh ~attrs:(Sattr.singleton unprotecting_attr) n
 
-let is_protected_id id = not (Slab.mem unprotected_label id.id_label)
-let is_protecting_id id = not (Slab.mem unprotecting_label id.id_label)
+let is_protected_id id = not (Sattr.mem unprotected_attr id.id_attrs)
+let is_protecting_id id = not (Sattr.mem unprotecting_attr id.id_attrs)
 
 let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
@@ -132,7 +132,7 @@ let vs_monomorph ty_base kept vs =
   then vs else create_vsymbol (id_clone vs.vs_name) ty_base
 
 let t_monomorph ty_base kept lsmap consts vmap t =
-  let rec t_mono vmap t = t_label_copy t (match t.t_node with
+  let rec t_mono vmap t = t_attr_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
     | Tconst _ when ty_equal (t_type t) ty_base ||
@@ -208,7 +208,7 @@ let d_monomorph ty_base kept lsmap d =
   let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
 
-module OHTyl = Stdlib.OrderedHashedList(struct
+module OHTyl = Wstdlib.OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)

@@ -1,6 +1,6 @@
 module M
 
-use import int.Int
+use int.Int
 
 function (+) (x: int) (y : int) : int = x * y
 
@@ -10,8 +10,8 @@ end
 
 module M1
 
-use import real.RealInfix
-use import int.Int
+use real.RealInfix
+use int.Int
 
 constant x: int = 0 + 0
 (* constant y: real = 0.0 + 0.0     typing error*)
@@ -22,7 +22,7 @@ end
 
 module M2
 
-use import real.RealInfix
+use real.RealInfix
 
 (* constant y: real = 0.0 + 0.0     typing error*)
 
@@ -32,7 +32,7 @@ end
 
 module M3
 
-use import real.RealInfix
+use real.RealInfix
 
 (*constant x: int = 0 + 0          'unbound symbol infix +' *)
 

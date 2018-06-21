@@ -9,23 +9,23 @@
 
 module BinomialHeap
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Reverse
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Reverse
+  use list.Append
 
   (** The type of elements, together with a total pre-order *)
 
   type elt
 
   val predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (** Trees.
 
       These are arbitrary trees, not yet constrained
-      to be binomial trees. Field [rank] is used later to store the rank
+      to be binomial trees. Field `rank` is used later to store the rank
       of the binomial tree, for access in constant time. *)
 
   type tree = {
@@ -50,7 +50,7 @@ module BinomialHeap
 
   (** Heaps. *)
 
-  (* [e] is no greater than the roots of the trees in [l] *)
+  (* `e` is no greater than the roots of the trees in `l` *)
   predicate le_roots (e: elt) (l: list tree) =
     match l with
     | Nil      -> true
@@ -106,7 +106,7 @@ module BinomialHeap
     | Cons { children = c } r -> heaps_mem c; heaps_mem r
     end
 
-  (** Binomial tree of rank [k]. *)
+  (** Binomial tree of rank `k`. *)
 
   predicate has_order (k: int) (l: list tree) =
     match l with
@@ -127,8 +127,8 @@ module BinomialHeap
 
   type heap = list tree
 
-  (** A heap [h] is a list of binomial trees in strict increasing order of
-      ranks, those ranks being no smaller than [m]. *)
+  (** A heap `h` is a list of binomial trees in strict increasing order of
+      ranks, those ranks being no smaller than `m`. *)
 
   predicate inv (m: int) (h: heap) =
     match h with
@@ -287,7 +287,7 @@ module BinomialHeap
 
   (** Complexity analysis. *)
 
-  use import int.Power
+  use int.Power
 
   let rec lemma has_order_size (k: int) (l: list tree)
     requires { has_order k l }

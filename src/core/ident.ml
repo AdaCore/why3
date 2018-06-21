@@ -9,43 +9,43 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 
-(** Labels *)
+(** Attributes *)
 
-type label = {
-  lab_string : string;
-  lab_tag    : int;
+type attribute = {
+  attr_string : string;
+  attr_tag    : int;
 }
 
-module Lab = MakeMSH (struct
-  type t = label
-  let tag lab = lab.lab_tag
+module Attr = MakeMSH (struct
+  type t = attribute
+  let tag a = a.attr_tag
 end)
 
-module Slab = Lab.S
-module Mlab = Lab.M
+module Sattr = Attr.S
+module Mattr = Attr.M
 
-module Hslab = Hashcons.Make (struct
-  type t = label
-  let equal lab1 lab2 = lab1.lab_string = lab2.lab_string
-  let hash lab = Hashtbl.hash lab.lab_string
-  let tag n lab = { lab with lab_tag = n }
+module Hsattr = Hashcons.Make (struct
+  type t = attribute
+  let equal a1 a2 = a1.attr_string = a2.attr_string
+  let hash a = Hashtbl.hash a.attr_string
+  let tag n a = { a with attr_tag = n }
 end)
 
-let create_label s = Hslab.hashcons {
-  lab_string = s;
-  lab_tag    = -1
+let create_attribute s = Hsattr.hashcons {
+  attr_string = s;
+  attr_tag    = -1
 }
 
-let list_label () =
+let list_attributes () =
   let acc = ref [] in
-  Hslab.iter (fun label -> acc := label.lab_string :: !acc);
+  Hsattr.iter (fun a -> acc := a.attr_string :: !acc);
   !acc
 
-let lab_equal : label -> label -> bool = (==)
-let lab_hash lab = lab.lab_tag
-let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
+let attr_equal : attribute -> attribute -> bool = (==)
+let attr_hash a = a.attr_tag
+let attr_compare a1 a2 = Pervasives.compare a1.attr_tag a2.attr_tag
 
 (** Naming convention *)
 
@@ -69,7 +69,7 @@ let kind_of_fix s =
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : Slab.t;               (* identifier labels *)
+  id_attrs  : Sattr.t;              (* identifier attributes *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
@@ -86,7 +86,7 @@ module Wid = Id.W
 
 type preid = {
   pre_name  : string;
-  pre_label : Slab.t;
+  pre_attrs : Sattr.t;
   pre_loc   : Loc.position option;
 }
 
@@ -98,33 +98,33 @@ let id_compare id1 id2 = Pervasives.compare (id_hash id1) (id_hash id2)
 
 let id_register = let r = ref 0 in fun id -> {
   id_string = id.pre_name;
-  id_label  = id.pre_label;
+  id_attrs  = id.pre_attrs;
   id_loc    = id.pre_loc;
   id_tag    = (incr r; Weakhtbl.create_tag !r);
 }
 
-let create_ident name labels loc = {
+let create_ident name attrs loc = {
   pre_name  = name;
-  pre_label = labels;
+  pre_attrs = attrs;
   pre_loc   = loc;
 }
 
-let id_fresh ?(label = Slab.empty) ?loc nm =
-  create_ident nm label loc
+let id_fresh ?(attrs = Sattr.empty) ?loc nm =
+  create_ident nm attrs loc
 
-let id_user ?(label = Slab.empty) nm loc =
-  create_ident nm label (Some loc)
+let id_user ?(attrs = Sattr.empty) nm loc =
+  create_ident nm attrs (Some loc)
 
-let id_lab label id =
-  create_ident id.id_string label id.id_loc
+let id_attr id attrs =
+  create_ident id.id_string attrs id.id_loc
 
-let id_clone ?(label = Slab.empty) id =
-  let ll = Slab.union label id.id_label in
-  create_ident id.id_string ll id.id_loc
+let id_clone ?(attrs = Sattr.empty) id =
+  let aa = Sattr.union attrs id.id_attrs in
+  create_ident id.id_string aa id.id_loc
 
-let id_derive ?(label = Slab.empty) nm id =
-  let ll = Slab.union label id.id_label in
-  create_ident nm ll id.id_loc
+let id_derive ?(attrs = Sattr.empty) nm id =
+  let aa = Sattr.union attrs id.id_attrs in
+  create_ident nm aa id.id_loc
 
 let preid_name id = id.pre_name
 
@@ -261,54 +261,54 @@ let sanitizer' head rest last n =
 let sanitizer head rest n = sanitizer' head rest rest n
 
 
+(** {2 functions for working with counterexample attributes} *)
 
-(** {2 functions for working with counterexample model labels} *)
+let model_attr = create_attribute "model"
+let model_projected_attr = create_attribute "model_projected"
+let model_vc_attr = create_attribute "model_vc"
+let model_vc_post_attr = create_attribute "model_vc_post"
+let model_vc_havoc_attr = create_attribute "model_vc_havoc"
 
-let model_label = create_label "model"
-let model_projected_label = create_label "model_projected"
-let model_vc_label = create_label "model_vc"
-let model_vc_post_label = create_label "model_vc_post"
+let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 
-let create_model_trace_label s = create_label ("model_trace:" ^ s)
+let is_counterexample_attr l =
+  l = model_attr || l = model_projected_attr
 
-let is_counterexample_label l =
-  l = model_label || l = model_projected_label
+let has_a_model_attr id =
+  Sattr.exists is_counterexample_attr id.id_attrs
 
-let has_a_model_label id =
-  Slab.exists is_counterexample_label id.id_label
+let remove_model_attrs ~attrs =
+  Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
 
-let remove_model_labels ~labels =
-  Slab.filter (fun l -> not (is_counterexample_label l)) labels
+let is_model_trace_attr a =
+  Strings.has_prefix "model_trace:" a.attr_string
 
-let is_model_trace_label label =
-  Strings.has_prefix "model_trace:" label.lab_string
+let get_model_trace_attr ~attrs =
+  Sattr.choose (Sattr.filter is_model_trace_attr attrs)
 
-let get_model_trace_label ~labels =
-  Slab.choose (Slab.filter is_model_trace_label labels)
-
-let transform_model_trace_label labels trans_fun =
+let transform_model_trace_attr attrs trans_fun =
   try
-    let trace_label = get_model_trace_label ~labels in
-    let labels_without_trace = Slab.remove trace_label labels in
-    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
-    Slab.add new_trace_label labels_without_trace
-  with Not_found -> labels
+    let trace_attr = get_model_trace_attr ~attrs in
+    let attrs_without_trace = Sattr.remove trace_attr attrs in
+    let new_trace_attr = create_attribute (trans_fun trace_attr.attr_string) in
+    Sattr.add new_trace_attr attrs_without_trace
+  with Not_found -> attrs
 
-let append_to_model_element_name ~labels ~to_append =
-  let trans lab_str =
-    let splitted = Strings.bounded_split '@' lab_str 2 in
+let append_to_model_element_name ~attrs ~to_append =
+  let trans attr_str =
+    let splitted = Strings.bounded_split '@' attr_str 2 in
     match splitted with
     | [before; after] -> before ^ to_append ^ "@" ^ after
-    | _ -> lab_str^to_append in
-  transform_model_trace_label labels trans
+    | _ -> attr_str^to_append in
+  transform_model_trace_attr attrs trans
 
-let append_to_model_trace_label ~labels ~to_append =
-    let trans lab_str = lab_str ^ to_append in
-    transform_model_trace_label labels trans
+let append_to_model_trace_attr ~attrs ~to_append =
+    let trans attr_str = attr_str ^ to_append in
+    transform_model_trace_attr attrs trans
 
-let get_model_element_name ~labels =
-  let trace_label = get_model_trace_label ~labels in
-  let splitted1 = Strings.bounded_split ':' trace_label.lab_string 2 in
+let get_model_element_name ~attrs =
+  let trace_attr = get_model_trace_attr ~attrs in
+  let splitted1 = Strings.bounded_split ':' trace_attr.attr_string 2 in
   match splitted1 with
   | [_; content] ->
     begin
@@ -321,41 +321,41 @@ let get_model_element_name ~labels =
   | [_] -> ""
   | _ -> assert false
 
-let get_model_trace_string ~labels =
-  let tl = get_model_trace_label ~labels in
-  let splitted = Strings.bounded_split ':' tl.lab_string 2 in
+let get_model_trace_string ~attrs =
+  let tl = get_model_trace_attr ~attrs in
+  let splitted = Strings.bounded_split ':' tl.attr_string 2 in
   match splitted with
   | [_; t_str] -> t_str
   | _ -> ""
 
 
-(* Functions for working with ITP labels *)
+(* Functions for working with ITP attributes *)
 
-let is_name_label label =
-  Strings.has_prefix "name:" label.lab_string
+let is_name_attr a =
+  Strings.has_prefix "name:" a.attr_string
 
-let get_name_label ~labels =
-  try Some (Slab.choose (Slab.filter is_name_label labels))
+let get_name_attr ~attrs =
+  try Some (Sattr.choose (Sattr.filter is_name_attr attrs))
   with Not_found -> None
 
-let get_element_name ~labels =
-  match get_name_label ~labels with
+let get_element_name ~attrs =
+  match get_name_attr ~attrs with
   | None -> None
-  | Some name_label ->
-    let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+  | Some name_attr ->
+    let splitted1 = Strings.bounded_split ':' name_attr.attr_string 2 in
     let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
     match splitted1 with
     | ["name"; content] when Str.string_match correct_word content 0 ->
         Some content
     | _ -> None
 
-let id_unique_label printer ?(sanitizer = same) id =
+let id_unique_attr printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id
   with Not_found ->
-    let labels = id.id_label in
+    let attrs = id.id_attrs in
     let name =
-      match (get_element_name ~labels) with
+      match (get_element_name ~attrs) with
       | Some x -> x
       | None -> printer.sanitizer id.id_string
     in

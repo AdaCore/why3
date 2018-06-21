@@ -15,8 +15,8 @@ end
 
 module Size
 
-  use import Tree
-  use import int.Int
+  use Tree
+  use int.Int
 
   let rec function size (t: tree 'a) : int = match t with
     | Empty -> 0
@@ -33,8 +33,8 @@ end
 
 module Occ
 
-  use import Tree
-  use import int.Int
+  use Tree
+  use int.Int
 
   function occ (x: 'a) (t: tree 'a) : int = match t with
     | Empty      -> 0
@@ -53,9 +53,9 @@ end
 
 module Height
 
-  use import Tree
-  use import int.Int
-  use import int.MinMax
+  use Tree
+  use int.Int
+  use int.MinMax
 
   let rec function height (t: tree 'a) : int = match t with
     | Empty      -> 0
@@ -71,9 +71,9 @@ end
 
 module Inorder
 
-  use import Tree
-  use import list.List
-  use import list.Append
+  use Tree
+  use list.List
+  use list.Append
 
   let rec function inorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
@@ -86,9 +86,9 @@ end
 
 module Preorder
 
-  use import Tree
-  use import list.List
-  use import list.Append
+  use Tree
+  use list.List
+  use list.Append
 
   let rec function preorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
@@ -99,11 +99,11 @@ end
 
 module InorderLength
 
-  use import Tree
-  use import Size
-  use import Inorder
-  use import list.List
-  use import list.Length
+  use Tree
+  use Size
+  use Inorder
+  use list.List
+  use list.Length
 
   lemma inorder_length: forall t: tree 'a. length (inorder t) = size t
 
@@ -113,7 +113,7 @@ end
 
 module Zipper
 
-  use import Tree
+  use Tree
 
   type zipper 'a =
     | Top

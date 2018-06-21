@@ -2,8 +2,8 @@
 
 module Matrix
 
-  use import int.Int
-  use import map.Map as M
+  use int.Int
+  use map.Map as M
 
   type matrix 'a = private {
     ghost mutable elts: int -> int -> 'a;
@@ -14,14 +14,14 @@ module Matrix
   predicate valid_index (a: matrix 'a) (r c: int) =
     0 <= r < a.rows /\ 0 <= c < a.columns
 
-  val get (a: matrix 'a) (r c: int) : 'a
+  val function get (a: matrix 'a) (r c: int) : 'a
     requires { [@expl:index in matrix bounds] valid_index a r c }
     ensures  { result = a.elts r c }
 
   val set (a: matrix 'a) (r c: int) (v: 'a) : unit
     requires { [@expl:index in matrix bounds] valid_index a r c }
     writes   { a }
-    ensures  { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
+    ensures  { a.elts = M.((old a.elts)[r <- (old a.elts r)[c <- v]]) }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -36,7 +36,7 @@ module Matrix
 
   let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
     ensures { [@expl:index in matrix bounds] valid_index a r c }
-    ensures { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
+    ensures { a.elts = M.((old a.elts)[r <- (old a.elts r)[c <- v]]) }
     raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     set a r c v

@@ -16,7 +16,7 @@ open Theory
 open Task
 
 let rec relocate loc t =
-  t_map (relocate loc) (t_label ?loc t.t_label t)
+  t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
 
 let t_unfold loc env fs tl ty =
   match Mls.find_opt fs env with
@@ -33,7 +33,7 @@ let t_unfold loc env fs tl ty =
 let rec t_replace_all env t =
   let t = t_map (t_replace_all env) t in
   match t.t_node with
-  | Tapp (fs,tl) -> t_label_copy t (t_unfold t.t_loc env fs tl t.t_ty)
+  | Tapp (fs,tl) -> t_attr_copy t (t_unfold t.t_loc env fs tl t.t_ty)
   | _ -> t
 
 (* inline the top-most symbol *)
@@ -42,7 +42,7 @@ let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,_) when ls_equal ps ps_equ ->
       t_map (f_replace_top env) f
   | Tapp (ls,tl) ->
-    t_label_copy f (t_unfold f.t_loc env ls tl f.t_ty)
+    t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty)
   | _ when f.t_ty = None ->
       TermTF.t_map (fun t -> t) (f_replace_top env) f
   | _ ->

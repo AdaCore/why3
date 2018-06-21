@@ -12,7 +12,7 @@
 </theory>
 <theory name="FibOnlyEven" sum="18fb29655c875df92ecb0b4d485a5684">
  <goal name="VC fib_even_3n" expl="VC for fib_even_3n">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC fib_even_3n.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -396,7 +396,7 @@
 </theory>
 <theory name="Solve" sum="5cd75c151f3b01e3b99722d523005fee" expanded="true">
  <goal name="VC f" expl="VC for f" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC f.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>

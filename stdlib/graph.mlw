@@ -3,8 +3,8 @@
 
 module Path
 
-  use import list.List
-  use import list.Append
+  use list.List
+  use list.Append
 
   type vertex
 
@@ -16,8 +16,8 @@ module Path
   | Path_cons:
       forall x y z: vertex, l: list vertex.
       edge x y -> path y l z -> path x (Cons x l) z
-  (** [path v0 [v0; v1; ...; vn-1] vn]
-     means a path from [v0] to [vn] composed of [n] edges [(vi,vi+1)]. *)
+  (** `path v0 [v0; v1; ...; vn-1] vn`
+     means a path from `v0` to `vn` composed of `n` edges `(vi,vi+1)`. *)
 
   lemma path_right_extension:
     forall x y z: vertex, l: list vertex.
@@ -45,9 +45,9 @@ end
 module IntPathWeight
 
   clone export Path
-  use import int.Int
-  use import list.List
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Append
 
   val function weight vertex vertex : int
 
@@ -56,7 +56,7 @@ module IntPathWeight
     | Cons x Nil -> weight x dst
     | Cons x ((Cons y _) as r) -> weight x y + path_weight r dst
   end
-  (** the total weight of a path [path _ l dst] *)
+  (** the total weight of a path `path _ l dst` *)
 
   lemma path_weight_right_extension:
     forall x y: vertex, l: list vertex.
@@ -72,8 +72,8 @@ end
 (***
 module SimplePath
 
-  use import list.List
-  use import list.Mem
+  use list.List
+  use list.Mem
 
   type graph
 
@@ -81,7 +81,7 @@ module SimplePath
 
   predicate edge graph vertex vertex
 
-  (** [simple_path g src [x1;...;xn] dst] is a path
+  (** `simple_path g src [x1;...;xn] dst` is a path
      src --> x1 --> x2 --> ... --> xn --> dst without repetition. *)
   inductive simple_path graph vertex (list vertex) vertex =
   | Path_empty :

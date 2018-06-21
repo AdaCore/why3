@@ -8,7 +8,7 @@
 <file name="../transition.mlw">
 <theory name="Trace" sum="494f9d21134cfced6f9fa11e2515d0f2">
  <goal name="existence" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="existence.1" expl="">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -35,9 +35,9 @@
  <proof prover="0"><result status="valid" time="0.04" steps="253"/></proof>
  </goal>
  <goal name="VC cat_trace" expl="VC for cat_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC cat_trace.1" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC cat_trace.1.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
    </goal>
@@ -82,7 +82,7 @@
  </transf>
  </goal>
  <goal name="VC prefix_trace" expl="VC for prefix_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC prefix_trace.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
   </goal>
@@ -98,9 +98,9 @@
  </transf>
  </goal>
  <goal name="VC suffix_trace" expl="VC for suffix_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC suffix_trace.1" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC suffix_trace.1.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
    </goal>
@@ -139,9 +139,9 @@
  </transf>
  </goal>
  <goal name="VC sup_chain_trace" expl="VC for sup_chain_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC sup_chain_trace.1" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.1.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.04" steps="108"/></proof>
    </goal>
@@ -151,7 +151,7 @@
   </transf>
   </goal>
   <goal name="VC sup_chain_trace.2" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.2.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
    </goal>
@@ -176,7 +176,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.4" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.4.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
    </goal>
@@ -198,7 +198,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="1"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.9" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.9.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
    </goal>
@@ -214,7 +214,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.11" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.11.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.04" steps="186"/></proof>
    </goal>
@@ -230,7 +230,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="60"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.14" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.14.1" expl="assertion">
    <proof prover="1"><result status="valid" time="1.88"/></proof>
    </goal>
@@ -255,7 +255,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="278"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.18" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.18.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
    </goal>
@@ -307,7 +307,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="113"/></proof>
   </goal>
   <goal name="VC sup_chain_trace.24" expl="postcondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC sup_chain_trace.24.1" expl="postcondition">
    <proof prover="1"><result status="valid" time="0.54"/></proof>
    </goal>
@@ -321,7 +321,7 @@
 </theory>
 <theory name="TraceDef" sum="c4482dff163076cc405a8ab226fad44d">
  <goal name="existence" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="existence.1" expl="">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
@@ -343,7 +343,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="sorder" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="sorder.1" expl="">
   <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
@@ -353,7 +353,7 @@
  </transf>
  </goal>
  <goal name="VC create_trace" expl="VC for create_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC create_trace.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
@@ -406,7 +406,7 @@
 </theory>
 <theory name="TraceGameProof" sum="d2f2cad89577eb329613d6aa4bc0d9df">
  <goal name="trace_enforce_ex_1" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trace_enforce_ex_1.1" expl="">
   <proof prover="0"><result status="valid" time="0.05" steps="3"/></proof>
   </goal>
@@ -452,7 +452,7 @@
  </transf>
  </goal>
  <goal name="trace_enforce_ex_2" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trace_enforce_ex_2.1" expl="">
   <proof prover="0"><result status="valid" time="0.05" steps="6"/></proof>
   </goal>
@@ -488,7 +488,7 @@
    <goal name="trace_enforce_ex_2.11.1" expl="">
    <transf name="inline_goal">
     <goal name="trace_enforce_ex_2.11.1.1" expl="">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="trace_enforce_ex_2.11.1.1.1" expl="">
      <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
      </goal>
@@ -516,12 +516,12 @@
  </transf>
  </goal>
  <goal name="VC uacc_prefix" expl="VC for uacc_prefix">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC uacc_prefix.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
   </goal>
   <goal name="VC uacc_prefix.2" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC uacc_prefix.2.1" expl="VC for uacc_prefix">
    <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
    </goal>
@@ -552,7 +552,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="41"/></proof>
   </goal>
   <goal name="VC uacc_prefix.9" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC uacc_prefix.9.1" expl="VC for uacc_prefix">
    <proof prover="0"><result status="valid" time="0.15" steps="357"/></proof>
    </goal>
@@ -583,7 +583,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="63"/></proof>
   </goal>
   <goal name="VC uacc_prefix.11" expl="assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC uacc_prefix.11.1" expl="assertion">
    <proof prover="0" timelimit="5"><result status="valid" time="1.78" steps="2510"/></proof>
    </goal>
@@ -607,7 +607,7 @@
  </transf>
  </goal>
  <goal name="trace_enforce_unv_1" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trace_enforce_unv_1.1" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
   </goal>
@@ -651,7 +651,7 @@
   <proof prover="0"><result status="valid" time="0.34" steps="682"/></proof>
   </goal>
   <goal name="trace_enforce_unv_1.15" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="trace_enforce_unv_1.15.1" expl="">
    <proof prover="0"><result status="valid" time="0.05" steps="27"/></proof>
    </goal>
@@ -727,7 +727,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="23"/></proof>
   </goal>
   <goal name="trace_enforce_unv_1.23" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="trace_enforce_unv_1.23.1" expl="">
    <proof prover="0"><result status="valid" time="0.15" steps="265"/></proof>
    </goal>
@@ -823,7 +823,7 @@
  </transf>
  </goal>
  <goal name="trace_enforce_unv_2" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="trace_enforce_unv_2.1" expl="">
   <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
   </goal>

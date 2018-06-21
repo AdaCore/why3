@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ty
 open Term
 open Decl
@@ -100,6 +100,13 @@ let fold fn v =
   accum []
 
 let fold_l fn v = fold (fun task -> Lists.apply (fn task)) [v]
+
+let fold_decl fn v =
+  fold (fun task v ->
+        match task.task_decl.td_node with
+        | Decl d -> fn d v
+        | _ -> v)
+       v
 
 let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
 let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))

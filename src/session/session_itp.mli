@@ -53,7 +53,7 @@ type notifier = any -> unit
 (** Session *)
 
 (* Get all the files in the session *)
-val get_files : session -> file Stdlib.Hstr.t
+val get_files : session -> file Wstdlib.Hstr.t
 (* Get a single file in the session using its name *)
 val get_file: session -> string -> file
 (* Get directory containing the session *)
@@ -155,7 +155,7 @@ val empty_session : ?from:session -> string -> session
     argument *)
 
 val add_file_section :
-  session -> string -> Theory.theory list option ->
+  session -> string -> file_is_detached:bool -> Theory.theory list->
   Env.fformat option -> file
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
@@ -251,6 +251,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
 
 (** {2 proved status} *)
 
+val pa_proved : session -> proofAttemptID -> bool
 val th_proved : session -> theory -> bool
 val pn_proved : session -> proofNodeID -> bool
 val tn_proved : session -> transID -> bool

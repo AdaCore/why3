@@ -5,12 +5,12 @@
 
 module Set
 
-  use import map.Map
-  use import map.Const
+  use map.Map
+  use map.Const
 
   type set 'a = map 'a bool
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
   meta "material_type_arg" type set, 0
 
   (** membership *)
@@ -98,7 +98,7 @@ module SetMap
 
   use export Set
 
-  (** { f x | x in U } *)
+  (** `{ f x | x in U }` *)
   function map (f: 'a  -> 'b) (u: set 'a) : set 'b =
     fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x
 
@@ -112,13 +112,13 @@ end
 
 module Fset
 
-  use import int.Int
+  use int.Int
 
   (* TODO: monomorphize to fix issue with equality *)
 
   type set 'a
 
-  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
   meta "material_type_arg" type set, 0
 
   (** membership *)
@@ -220,7 +220,7 @@ end
 module FsetComprehension
 
   use export Fset
-  use import int.Int
+  use int.Int
 
   (** { x | x in U and p(x) } *)
   function filter (p: 'a -> bool) (u: set 'a) : set 'a
@@ -252,8 +252,8 @@ end
 
 module FsetNth
 
-  use import int.Int
-  use import Fset
+  use int.Int
+  use Fset
 
   function nth (i: int) (s: set 'a) : 'a
 
@@ -271,7 +271,7 @@ end
 
 module FsetInduction
 
-  use import Fset
+  use Fset
 
   type t
 
@@ -314,8 +314,8 @@ end
 
 module Min
 
-  use import Fset
-  use import int.Int
+  use Fset
+  use int.Int
 
   type param
 
@@ -338,11 +338,11 @@ end
 
 module FsetSum
 
-  use import int.Int
+  use int.Int
   use import Fset as S
 
   function sum (set 'a) ('a -> int) : int
-  (** [sum s f] is the sum Sum_{S.mem x s} f x *)
+  (** `sum s f` is the sum `\sum_{S.mem x s} f x` *)
 
   axiom Sum_def_empty :
     forall f. sum (S.empty: set 'a) f = 0

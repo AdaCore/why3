@@ -1,33 +1,18 @@
 \begin{syntax}
-  lalpha ::= "a"-"z" | "_"
+  lqualid ::= (uident ".")* lident
   \
-  ualpha ::= "A"-"Z"
+  uqualid ::= (uident ".")* uident
   \
-  alpha ::= lalpha | ualpha
+  qualid ::= (uident ".")* (lident-ext | uident)
   \
-  suffix ::= (alpha | digit | "'")*
+  lident-ext ::= lident | "(" lident-op ")"
   \
-  lident ::= lalpha suffix
-  \
-  uident ::= ualpha suffix
-  \
-  ident ::= lident | uident
-  \
-  lqualid ::= lident | uqualid "." lident
-  \
-  uqualid ::= uident | uqualid "." uident
-  \
-  qualid ::= ident | uqualid "." ident
-  \
-  digit-or-us ::= "0"-"9" | "_"
-  \
-  alpha-no-us ::= "a"-"z" | "A"-"Z"
-  \
-  suffix-nq ::= (alpha-no-us | "'"* digit-or-us)* "'"*
-  \
-  lident-nq ::= lalpha suffix-nq
-  \
-  uident-nq ::= ualpha suffix-nq
-  \
-  ident-nq ::= lident-nq | uident-nq  ;%
+  lident-op ::= op-char-1234+     ;   infix or bang operator
+              | op-char-1234+ "_" ;   prefix (non-bang) operator
+              | "[]"              ;   collection access
+              | "[<-]"            ;   collection update
+              | "[]<-"            ;   in-place collection update
+              | "[..]"            ;   collection slice
+              | "[_..]"           ;   right-open slice
+              | "[.._]"           ;   left-open slice %
 \end{syntax}

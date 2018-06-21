@@ -3,11 +3,11 @@
 
 module Bag
 
-  use import int.Int
+  use int.Int
 
   type bag 'a
 
-  (** whatever ['a], the type [bag 'a] is always infinite *)
+  (** whatever `'a`, the type `bag 'a` is always infinite *)
   meta "infinite_type" type bag
 
   (** the most basic operation is the number of occurrences *)
@@ -52,7 +52,7 @@ module Bag
     forall x: 'a, a b: bag 'a.
     nb_occ x (union a b) = nb_occ x a + nb_occ x b
 
-  (** [union] is commutative, associative with identity [empty_bag] *)
+  (** `union` is commutative, associative with identity `empty_bag` *)
 
   lemma Union_comm: forall a b: bag 'a. union a b = union b a
 
@@ -92,7 +92,7 @@ module Bag
 
   (** bag difference *)
 
-  use import int.MinMax
+  use int.MinMax
 
   function diff (bag 'a) (bag 'a) : bag 'a
 

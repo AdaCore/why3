@@ -1,6 +1,6 @@
 module Horror
 
-  use import ref.Ref
+  use ref.Ref
 
   let bad (ghost i : int) : ref int
     ensures { !result = i }

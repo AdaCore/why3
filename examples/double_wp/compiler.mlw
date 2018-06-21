@@ -7,15 +7,15 @@
 module Compile_aexpr
 
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
 
   (* Compilation scheme: the generated code for arithmetic expressions
      put the result of the expression on the stack. *)
@@ -50,16 +50,16 @@ end
 (* Compiler for boolean expressions. *)
 module Compile_bexpr
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
 
   (* Compilation scheme: the generated code perform a jump
      iff the boolean expression evaluate to cond. *)
@@ -109,17 +109,17 @@ end
 
 module Compile_com
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
-  use import Compile_bexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
+  use Compile_bexpr
 
   (* Compilation scheme: the generated code for a command
      simulates the command on the memory part of the machine state. *)

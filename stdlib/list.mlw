@@ -18,8 +18,8 @@ end
 
 module Length
 
-  use import int.Int
-  use import List
+  use int.Int
+  use List
 
   let rec function length (l: list 'a) : int =
     match l with
@@ -37,7 +37,7 @@ end
 
 module Quant
 
-  use import List
+  use List
 
   let rec function for_all (p: 'a -> bool) (l:list 'a) : bool =
     match l with
@@ -59,7 +59,7 @@ end
 (** {2 Membership in a list} *)
 
 module Mem
-  use import List
+  use List
 
   predicate mem (x: 'a) (l: list 'a) = match l with
     | Nil      -> false
@@ -70,8 +70,8 @@ end
 
 module Elements
 
-  use import List
-  use import Mem
+  use List
+  use Mem
   use set.Fset as S
 
   function elements (l: list 'a) : S.set 'a =
@@ -89,9 +89,9 @@ end
 
 module Nth
 
-  use import List
-  use import option.Option
-  use import int.Int
+  use List
+  use option.Option
+  use int.Int
 
   let rec function nth (n: int) (l: list 'a) : option 'a =
     match l with
@@ -103,8 +103,8 @@ end
 
 module NthNoOpt
 
-  use import List
-  use import int.Int
+  use List
+  use int.Int
 
   function nth (n: int) (l: list 'a) : 'a
 
@@ -116,9 +116,9 @@ end
 
 module NthLength
 
-  use import int.Int
-  use import option.Option
-  use import List
+  use int.Int
+  use option.Option
+  use List
   use export Nth
   use export Length
 
@@ -137,8 +137,8 @@ end
 
 module HdTl
 
-  use import List
-  use import option.Option
+  use List
+  use option.Option
 
   let function hd (l: list 'a) : option 'a = match l with
     | Nil      -> None
@@ -154,7 +154,7 @@ end
 
 module HdTlNoOpt
 
-  use import List
+  use List
 
   function hd (l: list 'a) : 'a
 
@@ -170,11 +170,11 @@ end
 
 module NthHdTl
 
-  use import int.Int
-  use import option.Option
-  use import List
-  use import Nth
-  use import HdTl
+  use int.Int
+  use option.Option
+  use List
+  use Nth
+  use HdTl
 
   lemma Nth_tl:
     forall l1 l2: list 'a. tl l1 = Some l2 ->
@@ -189,7 +189,7 @@ end
 
 module Append
 
-  use import List
+  use List
 
   let rec function (++) (l1 l2: list 'a) : list 'a =
     match l1 with
@@ -204,13 +204,13 @@ module Append
   lemma Append_l_nil:
     forall l: list 'a. l ++ Nil = l
 
-  use import Length
-  use import int.Int
+  use Length
+  use int.Int
 
   lemma Append_length:
     forall l1 [@induction] l2: list 'a. length (l1 ++ l2) = length l1 + length l2
 
-  use import Mem
+  use Mem
 
   lemma mem_append:
     forall x: 'a, l1 [@induction] l2: list 'a.
@@ -224,8 +224,8 @@ end
 
 module NthLengthAppend
 
-  use import int.Int
-  use import List
+  use int.Int
+  use List
   use export NthLength
   use export Append
 
@@ -243,8 +243,8 @@ end
 
 module Reverse
 
-  use import List
-  use import Append
+  use List
+  use Append
 
   let rec function reverse (l: list 'a) : list 'a =
     match l with
@@ -268,12 +268,12 @@ module Reverse
   lemma reverse_reverse:
     forall l: list 'a. reverse (reverse l) = l
 
-  use import Mem
+  use Mem
 
   lemma reverse_mem:
     forall l: list 'a, x: 'a. mem x l <-> mem x (reverse l)
 
-  use import Length
+  use Length
 
   lemma Reverse_length:
     forall l: list 'a. length (reverse l) = length l
@@ -284,7 +284,7 @@ end
 
 module RevAppend
 
-  use import List
+  use List
 
   let rec function rev_append (s t: list 'a) : list 'a =
     match s with
@@ -292,20 +292,20 @@ module RevAppend
     | Nil -> t
     end
 
-  use import Append
+  use Append
 
   lemma rev_append_append_l:
     forall r [@induction] s t: list 'a.
       rev_append (r ++ s) t = rev_append s (rev_append r t)
 
-  use import int.Int
-  use import Length
+  use int.Int
+  use Length
 
   lemma rev_append_length:
     forall s [@induction] t: list 'a.
       length (rev_append s t) = length s + length t
 
-  use import Reverse
+  use Reverse
 
   lemma rev_append_def:
     forall r [@induction] s: list 'a. rev_append r s = reverse r ++ s
@@ -320,7 +320,7 @@ end
 
 module Combine
 
-  use import List
+  use List
 
   let rec function combine (x: list 'a) (y: list 'b) : list ('a, 'b)
   = match x, y with
@@ -334,11 +334,12 @@ end
 
 module Sorted
 
-  use import List
+  use List
 
   type t
   predicate le t t
-  clone relations.Transitive with type t = t, predicate rel = le
+  clone relations.Transitive with
+    type t = t, predicate rel = le, axiom Trans
 
   inductive sorted (l: list t) =
     | Sorted_Nil:
@@ -349,13 +350,13 @@ module Sorted
         forall x y: t, l: list t.
         le x y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
-  use import Mem
+  use Mem
 
   lemma sorted_mem:
     forall x: t, l: list t.
     (forall y: t. mem y l -> le x y) /\ sorted l <-> sorted (Cons x l)
 
-  use import Append
+  use Append
 
   lemma sorted_append:
     forall  l1 [@induction] l2: list t.
@@ -369,7 +370,7 @@ end
 
 module SortedInt
 
-  use import int.Int
+  use int.Int
   clone export Sorted with type t = int, predicate le = (<=), goal Transitive.Trans
 
 end
@@ -378,13 +379,14 @@ module RevSorted
 
   type t
   predicate le t t
-  clone import relations.Transitive with type t = t, predicate rel = le
+  clone relations.Transitive with
+    type t = t, predicate rel = le, axiom Trans
   predicate ge (x y: t) = le y x
 
-  use import List
+  use List
 
-  clone Sorted as Incr with type t = t, predicate le = le, goal Transitive.Trans
-  clone Sorted as Decr with type t = t, predicate le = ge, goal Transitive.Trans
+  clone Sorted as Incr with type t = t, predicate le = le, goal .
+  clone Sorted as Decr with type t = t, predicate le = ge, goal .
 
   predicate compat (s t: list t) =
     match s, t with
@@ -392,7 +394,7 @@ module RevSorted
     | _, _ -> true
     end
 
-  use import RevAppend
+  use RevAppend
 
   lemma rev_append_sorted_incr:
     forall s [@induction] t: list t.
@@ -410,30 +412,30 @@ end
 
 module NumOcc
 
-  use import int.Int
-  use import List
+  use int.Int
+  use List
 
   function num_occ (x: 'a) (l: list 'a) : int =
     match l with
     | Nil      -> 0
     | Cons y r -> (if x = y then 1 else 0) + num_occ x r
     end
-  (** number of occurrences of [x] in [l] *)
+  (** number of occurrences of `x` in `l` *)
 
   lemma Num_Occ_NonNeg: forall x:'a, l: list 'a. num_occ x l >= 0
 
-  use import Mem
+  use Mem
 
   lemma Mem_Num_Occ :
     forall x: 'a, l: list 'a. mem x l <-> num_occ x l > 0
 
-  use import Append
+  use Append
 
   lemma Append_Num_Occ :
     forall x: 'a, l1 [@induction] l2: list 'a.
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
 
-  use import Reverse
+  use Reverse
 
   lemma reverse_num_occ :
     forall x: 'a, l: list 'a.
@@ -445,8 +447,8 @@ end
 
 module Permut
 
-  use import NumOcc
-  use import List
+  use NumOcc
+  use List
 
   predicate permut (l1: list 'a) (l2: list 'a) =
     forall x: 'a. num_occ x l1 = num_occ x l2
@@ -465,7 +467,7 @@ module Permut
   lemma Permut_swap:
     forall x y: 'a, l: list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
 
-  use import Append
+  use Append
 
   lemma Permut_cons_append:
     forall x : 'a, l1 l2 : list 'a.
@@ -483,15 +485,15 @@ module Permut
     forall l1 l2 : list 'a.
     permut (l1 ++ l2) (l2 ++ l1)
 
-  use import Mem
+  use Mem
 
   lemma Permut_mem:
     forall x: 'a, l1 l2: list 'a. permut l1 l2 -> mem x l1 -> mem x l2
 
-  use import Length
+  use Length
 
   lemma Permut_length:
-    forall l1 l2: list 'a. permut l1 l2 -> length l1 = length l2
+    forall l1 [@induction] l2: list 'a. permut l1 l2 -> length l1 = length l2
 
 end
 
@@ -499,8 +501,8 @@ end
 
 module Distinct
 
-  use import List
-  use import Mem
+  use List
+  use Mem
 
   inductive distinct (l: list 'a) =
     | distinct_zero: distinct (Nil: list 'a)
@@ -509,7 +511,7 @@ module Distinct
         forall x:'a, l: list 'a.
         not (mem x l) -> distinct l -> distinct (Cons x l)
 
-  use import Append
+  use Append
 
   lemma distinct_append:
     forall l1 [@induction] l2: list 'a.
@@ -520,8 +522,8 @@ end
 
 module Prefix
 
-  use import List
-  use import int.Int
+  use List
+  use int.Int
 
   let rec function prefix (n: int) (l: list 'a) : list 'a =
     if n <= 0 then Nil else
@@ -534,8 +536,8 @@ end
 
 module Sum
 
-  use import List
-  use import int.Int
+  use List
+  use int.Int
 
   let rec function sum (l: list int) : int =
     match l with
@@ -550,7 +552,7 @@ end
 
 module Induction
 
-  use import List
+  use List
 
   (* type elt *)
 
@@ -569,7 +571,7 @@ end
 
 module Map
 
-  use import List
+  use List
 
   function map (f: 'a -> 'b) (l: list 'a) : list 'b =
     match l with
@@ -582,7 +584,7 @@ end
 
 module FoldLeft
 
-  use import List
+  use List
 
   function fold_left (f: 'b -> 'a -> 'b) (acc: 'b) (l: list 'a) : 'b =
     match l with
@@ -590,7 +592,7 @@ module FoldLeft
     | Cons x r -> fold_left f (f acc x) r
     end
 
-  use import Append
+  use Append
 
   lemma fold_left_append:
     forall l1 [@induction] l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
@@ -600,7 +602,7 @@ end
 
 module FoldRight
 
-  use import List
+  use List
 
   function fold_right (f: 'a -> 'b -> 'b) (l: list 'a) (acc: 'b) : 'b =
     match l with
@@ -608,7 +610,7 @@ module FoldRight
     | Cons x r -> f x (fold_right f r acc)
     end
 
-  use import Append
+  use Append
 
   lemma fold_right_append:
     forall l1 [@induction] l2: list 'a, f: 'a -> 'b -> 'b, acc : 'b.

@@ -368,7 +368,9 @@ type info = Pdriver.printer_args = private {
   literal     : Printer.syntax_map; (*TODO handle literals*)
 }
 
-let debug = false
+let debug_c_extraction = Debug.register_info_flag
+                           ~desc:"C extraction"
+                           "c_extraction"
 
 module Print = struct
 
@@ -436,7 +438,7 @@ module Print = struct
     | Bge -> fprintf fmt ">="
 
   and print_expr ~paren fmt = function
-    | Enothing -> if debug then Format.printf "enothing"; ()
+    | Enothing -> Debug.dprintf debug_c_extraction "enothing"; ()
     | Eunop(u,e) ->
        if unop_postfix u
        then fprintf fmt (protect_on paren "%a%a")
@@ -486,7 +488,7 @@ module Print = struct
     | id,e -> fprintf fmt "%a = %a" print_ident id (print_expr ~paren:false) e
 
   let rec print_stmt ~braces fmt = function
-    | Snop -> if debug then Format.printf "snop"; ()
+    | Snop -> Debug.dprintf debug_c_extraction "snop"; ()
     | Sexpr e -> fprintf fmt "%a;" (print_expr ~paren:false) e;
     | Sblock ([] ,s) when (not braces || (one_stmt s && not (is_nop s))) ->
       (print_stmt ~braces:false) fmt s
@@ -644,12 +646,12 @@ module MLToC = struct
     else Sexpr e
 
 
-  let likely = create_label "ex:likely"
-  let unlikely = create_label "ex:unlikely"
+  let likely = create_attribute "ex:likely"
+  let unlikely = create_attribute "ex:unlikely"
 
-  let handle_likely lbl (e:C.expr) =
-    let lkl = Slab.mem likely lbl in
-    let ulk = Slab.mem unlikely lbl in
+  let handle_likely attrs (e:C.expr) =
+    let lkl = Sattr.mem likely attrs in
+    let ulk = Sattr.mem unlikely attrs in
     if lkl
     then (if ulk then e else Elikely e)
     else (if ulk then Eunlikely e else e)
@@ -825,7 +827,7 @@ module MLToC = struct
           | Mltree.Econst ic ->
             let n = Number.compute_int_constant ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
-	    if debug then Format.printf "propagate constant %s for var %s@."
+	    Debug.dprintf debug_c_extraction "propagate constant %s for var %s@."
 			  (BigInt.to_string n) (pv_name pv).id_string;
             C.propagate_in_block (pv_name pv) ce (expr info env e)
           | Eapp (rs,_) when Mid.mem rs.rs_name info.converter ->
@@ -840,7 +842,7 @@ module MLToC = struct
             match expr info {env with computes_return_value = false} le with
             | [], C.Sexpr((C.Esyntax(_,_,_,_,b) as se))
                 when b (* converter *) ->
-              if debug then Format.printf "propagate converter for var %s@."
+              Debug.dprintf debug_c_extraction "propagate converter for var %s@."
                 (pv_name pv).id_string;
               C.propagate_in_block (pv_name pv) se (expr info env e)
             | d,s ->
@@ -858,7 +860,7 @@ module MLToC = struct
        let e = expr info env el in
        begin match simplify_cond (cd, cs) with
        | [], C.Sexpr c ->
-          let c = handle_likely cond.e_label c in
+          let c = handle_likely cond.e_attrs c in
           if is_false th && is_true el
 	  then C.([], Sexpr(Eunop(Unot, c)))
 	  else [], C.Sif(c,C.Sblock t, C.Sblock e)
@@ -866,11 +868,11 @@ module MLToC = struct
 	  let cid = id_register (id_fresh "cond") in (* ? *)
 	  C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
 	  C.Sseq (C.assignify (Evar cid) cs,
-                  C.Sif ((handle_likely cond.e_label (C.Evar cid)),
+                  C.Sif ((handle_likely cond.e_attrs (C.Evar cid)),
                          C.Sblock t, C.Sblock e))
        end
     | Ewhile (c,b) ->
-       if debug then Format.printf "while@.";
+       Debug.dprintf debug_c_extraction "while@.";
       let cd, cs = expr info {env with computes_return_value = false} c in
       (* this is needed so that the extracted expression has all
          needed variables in its scope *)
@@ -885,12 +887,12 @@ module MLToC = struct
                      then Sid.empty else env.breaks } in
       let b = expr info  env' b in
       begin match (C.simplify_cond (cd,cs)) with
-      | cd, C.Sexpr ce -> cd, C.Swhile (handle_likely c.e_label ce, C.Sblock b)
+      | cd, C.Sexpr ce -> cd, C.Swhile (handle_likely c.e_attrs ce, C.Sblock b)
       | _ ->
         begin match C.get_last_expr cs with
-        | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_label e, C.Sblock b))
+        | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_attrs e, C.Sblock b))
         | s,e ->
-           let brc = reverse_likely (handle_likely c.e_label (Eunop(Unot,e))) in
+           let brc = reverse_likely (handle_likely c.e_attrs (Eunop(Unot,e))) in
            cd, C.(Swhile(Econst (Cint "1"),
                          Sseq(s,
                               Sseq(Sif(brc, Sbreak, Snop),
@@ -898,7 +900,7 @@ module MLToC = struct
         end
       end
     | Ematch (b, [], (_::_ as xl)) ->
-      if debug then Format.printf "TRY@.";
+      Debug.dprintf debug_c_extraction "TRY@.";
       let is_while = match b.e_node with Ewhile _ -> true | _-> false in
       let breaks, returns = List.fold_left
         (fun (bs,rs) (xs, pvsl, r) ->
@@ -920,10 +922,10 @@ module MLToC = struct
                  } in
       expr info env' b
     | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
-      if debug then Format.printf "BREAK@.";
+      Debug.dprintf debug_c_extraction "BREAK@.";
       ([], C.Sbreak)
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
-      if debug then Format.printf "RETURN@.";
+      Debug.dprintf debug_c_extraction "RETURN@.";
       expr info {env with computes_return_value = true} r
     | Eraise (_, None) -> assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
@@ -1023,7 +1025,7 @@ module MLToC = struct
     match d with
     | Dlet (Lsym(rs, _, vl, e)) ->
        if rs_ghost rs
-       then begin if debug then Format.printf "is ghost@."; [] end
+       then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
        else
          begin try
            let params =
@@ -1071,7 +1073,7 @@ module MLToC = struct
              Format.printf "Unsupported : %s@." s; []
          end
     | Dtype [{its_name=id; its_def=idef}] ->
-      if debug then Format.printf "PDtype %s@." id.id_string;
+      Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
       begin
         match idef with
         | Some (Dalias ty) -> [C.Dtypedef (ty_of_mlty info ty, id)]
@@ -1091,10 +1093,13 @@ module MLToC = struct
     let decide_print id = query_syntax info.syntax id = None in
     match Mltree.get_decl_name d with
     | [id] when decide_print id ->
-       if debug then Format.printf "print %s@." id.id_string;
+       Debug.dprintf debug_c_extraction "print %s@." id.id_string;
        translate_decl info d
-    | [_] -> []
-    | _ -> raise (Unsupported "no name or recursive defs")
+    | [_] | [] -> []
+    | l -> Debug.dprintf debug_c_extraction "%d defs: %a@."
+             (List.length l)
+             (Pp.print_list Pp.space Pretty.print_id_attrs) l;
+           []
 
 
 end

@@ -15,14 +15,14 @@ one</a>}: it does not use any Coq proofs, but lemma functions instead.
 
 module InPlaceRev
 
-  use import map.Map
-  use import ref.Ref
-  use import int.Int
-  use import list.List
-  use list.Quant
-  use import list.Append
-  use import list.Mem
-  use import list.Length
+  use map.Map
+  use ref.Ref
+  use int.Int
+  use list.List
+  use list.Quant as Q
+  use list.Append
+  use list.Mem
+  use list.Length
   use export list.Reverse
 
   type loc
@@ -42,10 +42,10 @@ module InPlaceRev
     end
 
   let rec ghost mem_decomp (x: loc) (l: list loc)
-    : (list loc, list loc)
+    : (l1: list loc, l2: list loc)
     requires { mem x l }
     variant  { l }
-    returns { (l1,l2) -> l = l1 ++ Cons x l2 }
+    ensures  { l = l1 ++ Cons x l2 }
   = match l with
     | Nil -> absurd
     | Cons h t -> if eq_loc h x then (Nil,t) else
@@ -199,11 +199,11 @@ end
 
 module InPlaceRevSeq
 
-  use import int.Int
-  use map.Map
-  use import seq.Seq
-  use import seq.Mem
-  use import seq.Reverse
+  use int.Int
+  use map.Map as Map
+  use seq.Seq
+  use seq.Mem
+  use seq.Reverse
 
   type loc
 
@@ -219,24 +219,24 @@ module InPlaceRevSeq
     s1[i1] <> s2[i2]
 
   predicate no_repet (s: seq loc) =
-    forall i. 0 <= i < length s -> not (mem s[i] s[i+1 ..])
+    forall i. 0 <= i < length s -> not (mem s[i] s[i+1..])
 
   lemma non_empty_seq:
     forall s: seq 'a. length s > 0 ->
-    s == cons s[0] s[1 .. ]
+    s == cons s[0] s[1..]
 
-  let rec ghost mem_decomp (x: loc) (s: seq loc) : (seq loc, seq loc)
+  let rec ghost mem_decomp (x: loc) (s: seq loc) : (s1: seq loc, s2: seq loc)
     requires { mem x s }
     variant  { length s }
-    returns  { (s1,s2) -> s == s1 ++ cons x s2 }
+    ensures  { s == s1 ++ cons x s2 }
   =
-    if eq_loc s[0] x then (empty, s[1 ..])
+    if eq_loc s[0] x then (empty, s[1..])
     else begin
-      assert { s == cons s[0] s[1 .. ] };
-      let (s1, s2) = mem_decomp x s[1 .. ] in (cons s[0] s1, s2)
+      assert { s == cons s[0] s[1..] };
+      let (s1, s2) = mem_decomp x s[1..] in (cons s[0] s1, s2)
     end
 
-  use import ref.Ref
+  use ref.Ref
 
   type memory 'a = ref (Map.map loc 'a)
 
@@ -273,16 +273,16 @@ module InPlaceRevSeq
     ensures  { l1 == l2 }
   = if length l1 > 0 && length l2 > 0 then begin
       assert { l1[0] = l2[0] = p };
-      list_seg_functional next l1[1 ..] l2[1 ..] (Map.get next p)
+      list_seg_functional next l1[1..] l2[1..] (Map.get next p)
     end
 
   let rec lemma list_seg_tail (next: next) (l1: seq loc) (p q: loc)
     requires { list_seg next p l1 q }
     requires { length l1 > 0 }
     variant  { length l1 }
-    ensures  { list_seg next (Map.get next p)l1[1 .. ] q }
+    ensures  { list_seg next (Map.get next p)l1[1..] q }
   = if length l1 > 1 then
-      list_seg_tail next l1[1 ..] (Map.get next p) q
+      list_seg_tail next l1[1..] (Map.get next p) q
 
   let rec lemma list_seg_append (next: next) (p q r: loc) (pM qM: seq loc)
     requires { list_seg next p pM q }
@@ -290,11 +290,11 @@ module InPlaceRevSeq
     variant  { length pM }
     ensures  { list_seg next p (pM ++ qM) r }
   =  if length pM > 0 then
-      list_seg_append next (Map.get next p) q r pM[1 .. ] qM
+      list_seg_append next (Map.get next p) q r pM[1..] qM
 
   lemma seq_tail_append:
     forall l1 l2: seq 'a.
-    length l1 > 0 -> (l1 ++ l2)[1 .. ] == l1[1 .. ] ++ l2
+    length l1 > 0 -> (l1 ++ l2)[1..] == l1[1..] ++ l2
 
   let rec lemma list_seg_prefix (next: next) (l1 l2: seq loc) (p q: loc)
     requires { list_seg next p (l1 ++ cons q l2) null }
@@ -302,7 +302,7 @@ module InPlaceRevSeq
     ensures  { list_seg next p l1 q }
   = if length l1 > 0 then begin
       list_seg_tail next (l1 ++ cons q l2) p null;
-      list_seg_prefix next l1[1 ..] l2 (Map.get next p) q
+      list_seg_prefix next l1[1..] l2 (Map.get next p) q
     end
 
   let rec lemma list_seg_sublistl (next: next) (l1 l2: seq loc) (p q: loc)
@@ -312,13 +312,13 @@ module InPlaceRevSeq
   = assert { list_seg next p l1 q };
     if length l1 > 0 then begin
       list_seg_tail next l1 p q;
-      list_seg_sublistl next l1[1 ..] l2 (Map.get next p) q
+      list_seg_sublistl next l1[1..] l2 (Map.get next p) q
     end
 
   lemma get_tail:
-    forall i: int, s: seq 'a. 0 <= i < length s - 1 -> s[1 .. ][i] = s[i+1]
+    forall i: int, s: seq 'a. 0 <= i < length s - 1 -> s[1..][i] = s[i+1]
   lemma tail_suffix:
-    forall i: int, s: seq 'a. 0 <= i < length s -> s[1 .. ][i .. ] == s[i+1 ..]
+    forall i: int, s: seq 'a. 0 <= i < length s -> s[1..][i..] == s[i+1..]
 
   let rec lemma list_seg_no_repet (next: next) (p: loc) (pM: seq loc)
     requires { list_seg next p pM null }
@@ -326,7 +326,7 @@ module InPlaceRevSeq
     ensures  { no_repet pM }
   = if length pM > 0 then begin
       let h = pM[0] in
-      let t = pM[1 .. ] in
+      let t = pM[1..] in
       if mem h t then
          (* absurd case *)
          let (l1,l2) = mem_decomp h t in
@@ -334,9 +334,9 @@ module InPlaceRevSeq
          list_seg_functional next pM (cons h l2) p;
          assert { length pM > length (cons h l2) }
       else begin
-        assert { not (mem pM[0] pM[0+1 .. ]) };
+        assert { not (mem pM[0] pM[0+1..]) };
         list_seg_no_repet next (Map.get next p) t;
-        assert { forall i. 1 <= i < length pM -> not (mem pM[i] pM[i+1 .. ]) }
+        assert { forall i. 1 <= i < length pM -> not (mem pM[i] pM[i+1..]) }
       end
     end
 
@@ -362,7 +362,7 @@ module InPlaceRevSeq
       variant   { length !pM }
       assert { length !pM > 0 };
       assert { not (mem !p !l1pM) };
-      let ghost t = !pM[ 1 .. ] in
+      let ghost t = !pM[1..] in
       ghost l1pM := !l1pM ++ cons !p empty;
       ghost pM := t;
       p := acc next !p
@@ -392,7 +392,7 @@ module InPlaceRevSeq
       r := !p;
       p := n;
       rM := cons !pM[0] !rM;
-      pM := !pM[ 1 .. ]
+      pM := !pM[1..]
     done;
     !r
 

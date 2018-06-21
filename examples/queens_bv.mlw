@@ -6,8 +6,8 @@
 Verification of the following 2-lines C program solving the N-queens problem:
 
 {h <pre>
-   t(a,b,c){int d=0,e=a&~b&~c,f=1;if(a)for(f=0;d=(e-=d)&-e;f+=t(a-d,(b+d)*2,(
-   c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
+   t(a,b,c){int d=0,e=a&amp;~b&amp;~c,f=1;if(a)for(f=0;d=(e-=d)&amp;-e;f+=t(a-d,(b+d)*2,(
+   c+d)/2));return f;}main(q){scanf("%d",&amp;q);printf("%d\n",t(~(~0&lt;&lt;q),0,0));}
 </pre>}
 
 *)
@@ -38,7 +38,7 @@ end
 
 theory Solution
 
-  use import int.Int
+  use int.Int
   use export map.Map
 
   (** the number of queens *)
@@ -46,13 +46,13 @@ theory Solution
 
   type solution = map int int
 
-  (** solutions [t] and [u] have the same prefix [[0..i[] *)
+  (** solutions `t` and `u` have the same prefix `[0..i[` *)
   predicate eq_prefix (t u: map int 'a) (i: int) =
     forall k: int. 0 <= k < i -> t[k] = u[k]
 
   predicate eq_sol (t u: solution) = eq_prefix t u n
 
-  (** [s] stores a partial solution, for the rows [0..k-1] *)
+  (** `s` stores a partial solution, for the rows `0..k-1` *)
   predicate partial_solution (k: int) (s: solution) =
     forall i: int. 0 <= i < k ->
       0 <= s[i] < n /\
@@ -71,7 +71,7 @@ theory Solution
 
   type solutions = map int solution
 
-  (** [s[a..b[] is sorted for [lt_sol] *)
+  (** `s[a..b[` is sorted for `lt_sol` *)
   predicate sorted (s: solutions) (a b: int) =
     forall i j: int. a <= i < j < b -> lt_sol s[i] s[j]
 
@@ -86,7 +86,7 @@ end
 
 module BitsSpec
 
-  use import S
+  use S
 
   constant size : int = 32
 
@@ -121,14 +121,14 @@ module BitsSpec
   val diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
 
-  use import ref.Ref
+  use ref.Ref
   val rightmost_bit_trick (a: t) (ghost min : ref int) : t
     requires { not (is_empty a.mdl) }
     writes   { min }
     ensures  { !min = min_elt a.mdl }
     ensures  { result.mdl = singleton !min }
 
-  use bv.BV32
+  use bv.BV32 as BV32
   val below (n: BV32.t) : t
     requires { BV32.ule n (32:BV32.t) }
     ensures  { result.mdl = interval 0 (BV32.t'int n) }
@@ -138,8 +138,8 @@ end
 
 module Bits
 
-  use import S
-  use import bv.BV32
+  use S
+  use bv.BV32
 
   constant size : int = 32
 
@@ -236,13 +236,13 @@ end
 
 module NQueensBits
 
-  use import BitsSpec
-  use import ref.Ref
-  use import Solution
-  use import int.Int
+  use BitsSpec
+  use ref.Ref
+  use Solution
+  use int.Int
 
   val ghost col: ref solution  (* solution under construction *)
-  (* val ghost k  : ref int       (\* current row in the current solution *\) *)
+  (* val ghost k  : ref int       (* current row in the current solution *) *)
 
   val ghost sol: ref solutions (* all solutions *)
   val ghost s  : ref int       (* next slot for a solution =

@@ -26,7 +26,7 @@
 <theory name="CEK">
  <goal name="WP_parameter eval" expl="VC for eval">
  <proof prover="0" obsolete="true"><result status="unknown" time="0.53"/></proof>
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter eval.0" expl="postcondition">
   <proof prover="0" obsolete="true"><result status="unknown" time="0.81"/></proof>
   </goal>
@@ -42,9 +42,9 @@
  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter compute" expl="VC for compute">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter compute.0" expl="postcondition">
-  <transf name="split_goal_wp" >
+  <transf name="split_goal_right" >
    <goal name="WP_parameter compute.0.0" expl="VC for compute">
    <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
    <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
@@ -60,7 +60,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_wp" >
+ <transf name="split_goal_right" >
   <goal name="WP_parameter test.0" expl="precondition">
   <proof prover="2" obsolete="true"><result status="valid" time="2.55"/></proof>
   </goal>

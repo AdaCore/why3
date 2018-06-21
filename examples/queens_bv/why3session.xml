@@ -37,9 +37,9 @@
  <proof prover="0"><result status="valid" time="0.03" steps="95"/></proof>
  </goal>
  <goal name="VC is_empty" expl="VC for is_empty" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC is_empty.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC is_empty.0.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.10" steps="99"/></proof>
    </goal>
@@ -60,12 +60,12 @@
  <proof prover="6"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="VC mul2" expl="VC for mul2" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul2.0" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.32" steps="405"/></proof>
   </goal>
   <goal name="VC mul2.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC mul2.1.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
    </goal>
@@ -80,7 +80,7 @@
  <proof prover="0"><result status="valid" time="0.26" steps="310"/></proof>
  </goal>
  <goal name="VC rightmost_bit_trick" expl="VC for rightmost_bit_trick" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC rightmost_bit_trick.0" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -106,7 +106,7 @@
   <proof prover="0"><result status="valid" time="0.56" steps="422"/></proof>
   </goal>
   <goal name="VC rightmost_bit_trick.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC rightmost_bit_trick.8.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.05" steps="80"/></proof>
    </goal>
@@ -120,7 +120,7 @@
 </theory>
 <theory name="NQueensBits" proved="true">
  <goal name="VC t" expl="VC for t" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC t.0" expl="assertion" proved="true">
   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.82" steps="537"/></proof>
   </goal>
@@ -180,7 +180,7 @@
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC t.19" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t.19.0" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.31"/></proof>
    </goal>
@@ -193,7 +193,7 @@
   <proof prover="9"><result status="valid" time="0.40"/></proof>
   </goal>
   <goal name="VC t.21" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t.21.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.52" steps="424"/></proof>
    </goal>
@@ -266,7 +266,7 @@
   <proof prover="3"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="VC t.43" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t.43.0" expl="loop invariant preservation" proved="true">
    <proof prover="3" timelimit="60"><result status="valid" time="0.23"/></proof>
    <proof prover="6" timelimit="60"><result status="valid" time="0.25"/></proof>
@@ -277,7 +277,7 @@
   <proof prover="3"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="VC t.45" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t.45.0" expl="loop invariant preservation" proved="true">
    <proof prover="2"><result status="valid" time="0.24" steps="164"/></proof>
    </goal>
@@ -293,7 +293,7 @@
   </transf>
   </goal>
   <goal name="VC t.46" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC t.46.0" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.80"/></proof>
    </goal>
@@ -354,7 +354,7 @@
  </transf>
  </goal>
  <goal name="VC queens" expl="VC for queens" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC queens.0" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -394,7 +394,7 @@
  </transf>
  </goal>
  <goal name="VC test8" expl="VC for test8" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC test8.0" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>

@@ -1,7 +1,5 @@
 theory Map
-  use import list.List
-
-  use HighOrd as HO
+  use list.List
 
   function map (fn : 'a -> 'b) (l : list 'a) : list 'b = match l with
     | Cons x r -> Cons (fn x) (map fn r)
@@ -26,8 +24,8 @@ theory Map
 end
 
 theory Induction2
-  use import list.List
-  use import list.Length
+  use list.List
+  use list.Length
 
   predicate p (list 'a) (list 'b)
 

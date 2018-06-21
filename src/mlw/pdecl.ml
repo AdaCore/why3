@@ -445,14 +445,14 @@ let rec t_insert hd t = match t.t_node with
   | _ when hd.t_ty = None -> t_iff_simp hd t
   | _ -> t_equ_simp hd t
 
-let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
+let rec t_subst_fmla v t f = t_attr_copy f (match f.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t1])
     when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t1 = 0 ->
       t_iff_simp t (t_equ_simp t1 t_bool_true)
   | Tvar u when vs_equal u v -> t_if t t_bool_true t_bool_false
   | _ -> t_map (t_subst_fmla v t) f)
 
-let lab_w_nce_no = Slab.singleton Theory.lab_w_non_conservative_extension_no
+let sattr_w_nce_no = Sattr.singleton Theory.attr_w_non_conservative_extension_no
 
 let create_let_decl ld =
   let conv_post t ql =
@@ -461,7 +461,7 @@ let create_let_decl ld =
       | None -> let v,f = open_post q in
                 t_subst_fmla v t f in
     List.map conv ql in
-  let label = lab_w_nce_no in
+  let attrs = sattr_w_nce_no in
   let cty_axiom id cty f axms =
     if t_equal f t_true then axms else
     (* we do not care about aliases for pure symbols *)
@@ -485,13 +485,13 @@ let create_let_decl ld =
               let fl = f :: conv_post (t_var v) ql in
               t_exists_close [v] [] (t_and_simp_l fl)
           | [] -> t_true in
-        abst, defn, cty_axiom (id_clone ~label s.rs_name) cty f axms
+        abst, defn, cty_axiom (id_clone ~attrs s.rs_name) cty f axms
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
         let f = t_and_simp_l (conv_post hd cty.cty_post) in
         let nm = id.id_string ^ "_spec" in
-        let axms = cty_axiom (id_derive ~label nm id) cty f axms in
+        let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
@@ -508,13 +508,13 @@ let create_let_decl ld =
                 abst, (ls, vl, f) :: defn, axms
             | Some f ->
                 let f = t_insert hd f and nm = id.id_string ^ "_def" in
-                let axms = cty_axiom (id_derive ~label nm id) cty f axms in
+                let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
                 create_param_decl ls :: abst, defn, axms
             | None when cty.cty_post = [] ->
                 let axms = match post_of_expr hd e with
                   | Some f ->
                       let nm = id.id_string ^ "_def" in
-                      cty_axiom (id_derive ~label nm id) cty f axms
+                      cty_axiom (id_derive ~attrs nm id) cty f axms
                   | None -> axms in
                 create_param_decl ls :: abst, defn, axms
             | None ->
@@ -548,7 +548,7 @@ let create_let_decl ld =
     let abst = List.map (fun (s,_) -> create_param_decl s) dl in
     let mk_ax ({ls_name = id} as s, vl, t) =
       let nm = id.id_string ^ "_def" in
-      let pr = create_prsymbol (id_derive ~label nm id) in
+      let pr = create_prsymbol (id_derive ~attrs nm id) in
       let hd = t_app s (List.map t_var vl) t.t_ty in
       let ax = t_forall_close vl [] (t_insert hd t) in
       create_prop_decl Paxiom pr ax in
@@ -592,7 +592,7 @@ let pd_bool = match bool_theory.th_decls with
       mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] [] []]) [db]
   | _ -> assert false
 
-let pd_tuple = Stdlib.Hint.memo 17 (fun n ->
+let pd_tuple = Wstdlib.Hint.memo 17 (fun n ->
   match (tuple_theory n).th_decls with
   | [{td_node = Decl dt}] ->
       mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] [] []]) [dt]
@@ -647,7 +647,7 @@ let print_its_defn fst fmt itd =
   let print_field fmt f = fprintf fmt "%s%s%a%a : %a"
     (if List.exists (pv_equal (fd_of_rs f)) s.its_mfields
       then "mutable " else "") (if rs_ghost f then "ghost " else "")
-    print_rs f Pretty.print_id_labels f.rs_name
+    print_rs f Pretty.print_id_attrs f.rs_name
     print_ity f.rs_cty.cty_result in
   let is_big ity = match ity.ity_node with
     | Ityreg {reg_args = []; reg_regs = []}
@@ -660,7 +660,7 @@ let print_its_defn fst fmt itd =
     | _ when is_big f.pv_ity -> fprintf fmt "@ (%a)" print_ity f.pv_ity
     | _ -> fprintf fmt "@ %a" print_ity f.pv_ity in
   let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4>| %a%a%a@]"
-    print_rs c Pretty.print_id_labels c.rs_name
+    print_rs c Pretty.print_id_attrs c.rs_name
     (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
   let print_defn fmt () =
     match s.its_def, itd.itd_fields, itd.itd_constructors with
@@ -685,7 +685,7 @@ let print_its_defn fst fmt itd =
   fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"
     (if fst then "type" else "with")
     print_its s
-    Pretty.print_id_labels s.its_ts.ts_name
+    Pretty.print_id_attrs s.its_ts.ts_name
     (print_args Pretty.print_tv) s.its_ts.ts_args
     (print_regs print_reg) s.its_regions
     print_defn ()
@@ -696,5 +696,5 @@ let print_pdecl fmt d = match d.pd_node with
   | PDlet ld -> print_let_defn fmt ld
   | PDexn xs -> fprintf fmt
       "@[<hov 2>exception %a%a of@ %a@]"
-        print_xs xs Pretty.print_id_labels xs.xs_name print_ity xs.xs_ity
+        print_xs xs Pretty.print_id_attrs xs.xs_name print_ity xs.xs_ity
   | PDpure -> Pp.print_list Pp.newline2 Pretty.print_decl fmt d.pd_pure

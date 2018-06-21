@@ -1,7 +1,7 @@
 
 (** {1 References}
 
-   A mutable variable, or ``reference'' in ML terminology, is simply a
+   A mutable variable, or "reference" in ML terminology, is simply a
    record with a single mutable field [contents].
 *)
 
@@ -31,7 +31,7 @@ a few operations specific to integer references *)
 
 module Refint
 
-  use import int.Int
+  use int.Int
   use export Ref
 
   let incr (r: ref int) ensures { !r = old !r + 1 } = r := !r + 1

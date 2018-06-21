@@ -1,7 +1,7 @@
 module PGCD
-  use import int.Int
-  use import ref.Refint
-  use import int.EuclideanDivision
+  use int.Int
+  use ref.Refint
+  use int.EuclideanDivision
 
   predicate divides (m: int) (n: int) =
     exists k: int. n = k * m

@@ -58,7 +58,7 @@ end
 
 module DirectSem
 
-use import Expr
+use Expr
 
 (** Values:
 {h <blockquote><pre>
@@ -133,11 +133,11 @@ end
 
 module CPS
 
-use import Expr
+use Expr
 
 (** {4 Exercise 0.1}
 
-  CPS-transform (call by value, left to right) the function [eval_0],
+  CPS-transform (call by value, left to right) the function `eval_0`,
   and call it from the main interpreter with the identity function as
   initial continuation
 {h <blockquote><pre>
@@ -147,7 +147,7 @@ use import Expr
 
 *)
 
-use import DirectSem
+use DirectSem
 
 let rec eval_1 (e:expr) (k: int->'a) : 'a
   variant { e }
@@ -170,12 +170,12 @@ end
 
 module Defunctionalization
 
-use import Expr
-use import DirectSem
+use Expr
+use DirectSem
 
 (** {4 Exercise 0.2}
 
-  De-functionalize the continuation of [eval_1].
+  De-functionalize the continuation of `eval_1`.
 {h <blockquote><pre>
          cont ::= ...
 
@@ -183,9 +183,9 @@ use import DirectSem
        eval_2 : expression -> cont -> value
   interpret_2 : program -> value
 </pre></blockquote>}
-  The data type [cont] represents the grammar of contexts.
+  The data type `cont` represents the grammar of contexts.
 
-  The two mutually recursive functions [eval_2] and [continue_2]
+  The two mutually recursive functions `eval_2` and `continue_2`
   implement an abstract machine, that is a state transition system.
 
 *)
@@ -239,8 +239,8 @@ function size_c (c:cont) : int =
 
 lemma size_c_pos: forall c: cont. size_c c >= 0
 
-(** WhyML programs (declared with "let" instead of "function"),
-   mutually recursive, resulting from de-functionalization *)
+(** WhyML programs (declared with `let` instead of `function`),
+    mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int
   variant { size_c c }
@@ -262,7 +262,7 @@ with eval_2 (e:expr) (c:cont) : int
   end
 
 (** The interpreter. The post-condition specifies that this program
-    computes the same thing as [eval_0] *)
+    computes the same thing as `eval_0` *)
 
 let interpret_2 (p:prog) : int
   ensures { result = eval_0 p }
@@ -282,12 +282,12 @@ end
 
 module Defunctionalization2
 
-use import Expr
-use import DirectSem
+use Expr
+use DirectSem
 
 (** {4 Exercise 0.2}
 
-  De-functionalize the continuation of [eval_1].
+  De-functionalize the continuation of `eval_1`.
 {h <blockquote><pre>
          cont ::= ...
 
@@ -295,9 +295,9 @@ use import DirectSem
        eval_2 : expression -> cont -> value
   interpret_2 : program -> value
 </pre></blockquote>}
-  The data type [cont] represents the grammar of contexts.
+  The data type `cont` represents the grammar of contexts.
 
-  The two mutually recursive functions [eval_2] and [continue_2]
+  The two mutually recursive functions `eval_2` and `continue_2`
   implement an abstract machine, that is a state transition system.
 
 *)
@@ -349,7 +349,7 @@ function size_c (c:cont) (acc:nat) : nat =
   | A2 _ k -> S (size_c k acc)
   end
 
-(** WhyML programs (declared with "let" instead of "function"),
+(** WhyML programs (declared with `let` instead of `function`),
    mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int
@@ -372,7 +372,7 @@ with eval_2 (e:expr) (c:cont) : int
   end
 
 (** The interpreter. The post-condition specifies that this program
-    computes the same thing as [eval_0] *)
+    computes the same thing as `eval_0` *)
 
 let interpret_2 (p:prog) : int
   ensures { result = eval_0 p }
@@ -392,7 +392,7 @@ end
 
 module SemWithError
 
-use import Expr
+use Expr
 
 (** Errors:
 {h <blockquote><pre>
@@ -429,11 +429,11 @@ e1 => n1   e2 => n2   n1 >= n2   n1 - n2 = n3
 ---------------------------------------------
       e1 - e2 => n3
 </pre></blockquote>}
-We interpret the program [e] into value [n] if the judgement
+We interpret the program `e` into value `n` if the judgement
 {h <blockquote><pre>
   e => n
 </pre></blockquote>}
-holds, and into error [s] if the judgement
+holds, and into error `s` if the judgement
 {h <blockquote><pre>
   e => s
 </pre></blockquote>}
@@ -470,7 +470,7 @@ function interpret_0 (p:prog) : value = eval_0 p
 
 (** {4 Exercise 1.1}
   CPS-transform (call by value, from left to right)
-  the function [eval_0], call it from the main interpreter
+  the function `eval_0`, call it from the main interpreter
   with the identity function as initial continuation.
 {h <blockquote><pre>
       eval_1 : expr -> (expressible_value -> 'a) -> 'a
@@ -513,7 +513,7 @@ lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 {h <blockquote><pre>
     (value -> 'a) * (error -> 'a)
 </pre></blockquote>}
-  and adapt [eval_1] and [interpret_1] as
+  and adapt `eval_1` and `interpret_1` as
 {h <blockquote><pre>
        eval_2 : expr -> (value -> 'a) -> (error -> 'a) -> 'a
   interpret_2 : program -> expressible_value
@@ -566,7 +566,7 @@ lemma cps2_correct: forall p. interpret_2 p = interpret_0 p
 (** {4 Exercise 1.3}
 
   Specialize the codomain of the continuations and of the evaluation function
-  so that it is not polymorphic anymore but is [expressible_value], and
+  so that it is not polymorphic anymore but is `expressible_value`, and
   then short-circuit the second continuation to stop in case of error
 {h <blockquote><pre>
        eval_3 : expr -> (value -> expressible_value) -> expressible_value
@@ -610,7 +610,7 @@ lemma cps3_correct: forall p. interpret_3 p = interpret_0 p
 
 
 (** {4 Exercise 1.4}
-  De-functionalize the continuation of [eval_3].
+  De-functionalize the continuation of `eval_3`.
 {h <blockquote><pre>
          cont ::= ...
 
@@ -618,10 +618,10 @@ lemma cps3_correct: forall p. interpret_3 p = interpret_0 p
         eval_4 : expr -> cont -> expressible_value
   interprete_4 : program -> expressible_value
 </pre></blockquote>}
-  The data type [cont] represents the grammar of contexts.
+  The data type `cont` represents the grammar of contexts.
   (NB. has it changed w.r.t to previous exercise?)
 
-  The two mutually recursive functions [eval_4] and [continue_4]
+  The two mutually recursive functions `eval_4` and `continue_4`
   implement an abstract machine, that is a transition system that
   stops immediately in case of error, or and the end of computation.
 
@@ -675,12 +675,12 @@ function size_e (e:expr) : int =
 
 lemma size_e_pos: forall e: expr. size_e e >= 1
 
-use Defunctionalization
+use Defunctionalization as D
 
 function size_c (c:cont) : int =
   match c with
   | I -> 0
-  | A e2 k -> 2 + Defunctionalization.size_e e2 + size_c k
+  | A e2 k -> 2 + D.size_e e2 + size_c k
   | B _ k -> 1 + size_c k
   end
 
@@ -698,7 +698,7 @@ let rec continue_4 (c:cont) (v:int) : value
   end
 
 with eval_4 (e:expr) (c:cont) : value
-  variant { size_c c + Defunctionalization.size_e e }
+  variant { size_c c + D.size_e e }
   ensures { eval_cont c (eval_0 e) result }
   =
   match e with
@@ -707,7 +707,7 @@ with eval_4 (e:expr) (c:cont) : value
   end
 
 (** The interpreter. The post-condition specifies that this program
-    computes the same thing as [eval_0] *)
+    computes the same thing as `eval_0` *)
 
 let interpret_4 (p:prog) : value
   ensures { result = eval_0 p }
@@ -734,8 +734,8 @@ module ReductionSemantics
 A small step semantics, defined iteratively with reduction contexts
 *)
 
-  use import Expr
-  use import DirectSem
+  use Expr
+  use DirectSem
 
 (**
 Expressions:
@@ -886,9 +886,9 @@ predicate is_empty_context (c:context) =
   end
 
 
-use Defunctionalization (* for size_e *)
+use Defunctionalization as D (* for size_e *)
 
-function size_e (e:expr) : int = Defunctionalization.size_e e
+function size_e (e:expr) : int = D.size_e e
 
 function size_c (c:context) : int =
   match c with
@@ -995,7 +995,7 @@ let rec itere (e:expr) : int
 
 (** {4 Exercise 2.1}
   Optimize the step recomposition / decomposition
-  into a single function [refocus].
+  into a single function `refocus`.
 *)
 
 
@@ -1076,8 +1076,8 @@ end
 
 module RWithError
 
-use import Expr
-use import SemWithError
+use Expr
+use SemWithError
 
 (** {4 Exercise 2.3}
   An abstract machine for the case with errors
@@ -1099,9 +1099,9 @@ use import SemWithError
 
 type context = Empty | Left context expr | Right int context
 
-use Defunctionalization (* for size_e *)
+use Defunctionalization as D (* for size_e *)
 
-function size_e (e:expr) : int = Defunctionalization.size_e e
+function size_e (e:expr) : int = D.size_e e
 
 function size_c (c:context) : int =
   match c with

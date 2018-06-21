@@ -8,7 +8,7 @@
 <file name="../ordered_transition.mlw">
 <theory name="OrderedTransition" sum="0743565b22722e7dc4ac74b58a52df30">
  <goal name="existence" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="existence.1" expl="">
   <proof prover="1" timelimit="5"><result status="valid" time="1.27"/></proof>
   </goal>
@@ -35,7 +35,7 @@
 </theory>
 <theory name="OTGameCommon" sum="3f2be8421d6088399935de893fc2b373">
  <goal name="substate_order" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="substate_order.1" expl="">
   <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
@@ -97,7 +97,7 @@
 </theory>
 <theory name="OTGameProof" sum="8318c0ecf6f69026d834159e01c812ca">
  <goal name="VC increasing_trace" expl="VC for increasing_trace">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC increasing_trace.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.04" steps="6"/></proof>
   </goal>
@@ -113,9 +113,9 @@
  </transf>
  </goal>
  <goal name="simulations" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="simulations.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.1.1" expl="">
    <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
    </goal>
@@ -140,7 +140,7 @@
   </transf>
   </goal>
   <goal name="simulations.2" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.2.1" expl="">
    <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
    </goal>
@@ -162,7 +162,7 @@
   </transf>
   </goal>
   <goal name="simulations.3" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.3.1" expl="">
    <proof prover="0"><result status="valid" time="0.06" steps="29"/></proof>
    </goal>
@@ -181,7 +181,7 @@
   </transf>
   </goal>
   <goal name="simulations.4" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.4.1" expl="">
    <proof prover="0"><result status="valid" time="0.06" steps="26"/></proof>
    </goal>
@@ -200,7 +200,7 @@
   </transf>
   </goal>
   <goal name="simulations.5" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.5.1" expl="">
    <proof prover="0"><result status="valid" time="0.04" steps="20"/></proof>
    </goal>
@@ -219,7 +219,7 @@
   </transf>
   </goal>
   <goal name="simulations.6" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.6.1" expl="">
    <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
    </goal>
@@ -238,7 +238,7 @@
   </transf>
   </goal>
   <goal name="simulations.7" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.7.1" expl="">
    <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
    </goal>
@@ -386,7 +386,7 @@
   </transf>
   </goal>
   <goal name="simulations.8" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="simulations.8.1" expl="">
    <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
    </goal>
@@ -497,7 +497,7 @@
  </transf>
  </goal>
  <goal name="det_ecart" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="det_ecart.1" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
   </goal>
@@ -528,7 +528,7 @@
  </transf>
  </goal>
  <goal name="ot_enforce_ex" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="ot_enforce_ex.1" expl="">
   <proof prover="0"><result status="valid" time="0.05" steps="23"/></proof>
   </goal>
@@ -588,7 +588,7 @@
    <goal name="ot_enforce_ex.19.1" expl="">
    <transf name="inline_goal">
     <goal name="ot_enforce_ex.19.1.1" expl="">
-    <transf name="split_goal_wp">
+    <transf name="split_goal_right">
      <goal name="ot_enforce_ex.19.1.1.1" expl="">
      <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
      </goal>
@@ -646,7 +646,7 @@
  </transf>
  </goal>
  <goal name="ot_enforce_unv" expl="">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="ot_enforce_unv.1" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>

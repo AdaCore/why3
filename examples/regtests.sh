@@ -74,14 +74,11 @@ run_dir foveoos11-cm
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"
 run_dir WP_revisited
+run_dir prover "-L prover --debug ignore_unused_vars"
+run_dir multiprecision "-L multiprecision"
 echo ""
 
 echo "Score on ported programs : $success/$total"
-echo ""
-
-echo "=== Programs that remain to be ported ==="
-echo ""
-run_dir prover "-L prover --debug ignore_unused_vars"
 echo ""
 
 echo "=== Standard Library ==="

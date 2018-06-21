@@ -24,18 +24,16 @@ tags: [
 available: [ ocaml-version >= "4.02.3" ]
 
 build: [
-  ["autoconf"]
-  ["dash" "-c" "automake --add-missing || true"]
   ["./configure"
    "--prefix" prefix
    "--disable-why3-lib"
    "--disable-frama-c"
    "--disable-ide"
    "--disable-js-of-ocaml"]
-  [make "-j%{jobs}%" "coq" "coq-tactic"]
+  [make "-j%{jobs}%" "coq"]
 ]
 
-install: [make "install-coq" "install-coq-tactic"]
+install: [make "install-coq"]
 
 remove: ["rm" "-rf" "%{lib}%/why3/coq"]
 
@@ -44,10 +42,14 @@ flags: [ light-uninstall ]
 depends: [
   "ocamlfind" {build}
   "why3"
-  "coq"
+  "coq" {>= "8.5" & < "8.9~"}
+]
+
+depopts: [
+  "coq-flocq"
 ]
 
 conflicts: [
-  "coq" {< "8.4"}
-  "coq" {>= "8.8"}
+  "coq-flocq" {< "2.5"}
+  "coq-flocq" {>= "3.0~"}
 ]

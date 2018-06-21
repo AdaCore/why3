@@ -134,12 +134,10 @@ let print_const fmt c =
 let constant_value =
   fun t -> match t.t_node with
     | Tconst c ->
-        fprintf str_formatter "%a" print_const c;
-        flush_str_formatter ()
+        asprintf "%a" print_const c
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" print_const c;
-        flush_str_formatter ()
+        asprintf "-%a" print_const c
     | _ -> raise Not_found
 
 

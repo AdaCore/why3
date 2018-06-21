@@ -71,14 +71,14 @@ let controller = Controller_itp.create_controller config env session
 (* adds a file in the new session *)
 let file : Session_itp.file =
   let file_name = "examples/logic/hello_proof.why" in
-  let errors = Controller_itp.add_file controller file_name in
-  match errors with
-  | None ->
-     Session_itp.get_file session file_name
-  | Some e ->
-     eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name
-             Exn_printer.exn_printer e;
-     exit 1
+  try
+    Controller_itp.add_file controller file_name;
+    Session_itp.get_file session file_name
+  with
+  | Controller_itp.Errors_list le ->
+      eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name
+              (Pp.print_list Pp.space Exn_printer.exn_printer) le;
+      exit 1
 
 (* explore the theories in that file *)
 let theories = Session_itp.file_theories file

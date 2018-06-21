@@ -225,7 +225,8 @@ struct __add64_with_carry_result
   uint64_t __field_1;
 };
 
-struct __add64_with_carry_result add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
+struct __add64_with_carry_result 
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
 {
   struct __add64_with_carry_result result;
   uint64_t r = x + y + c;
@@ -235,12 +236,26 @@ struct __add64_with_carry_result add64_with_carry(uint64_t x, uint64_t y, uint64
   return result;
 }
 
+struct __add64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __add64_double_result 
+add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
+{
+  struct __add64_double_result result;
+  add_ssaaaa(result.__field_0, result.__field_1, a1, a0, b1, b0);
+  return result;
+}
+
 struct __sub64_with_borrow_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __sub64_with_borrow_result sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
+struct __sub64_with_borrow_result 
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
 {
   struct __sub64_with_borrow_result result;
   uint64_t r = x - y - b;
@@ -248,6 +263,19 @@ struct __sub64_with_borrow_result sub64_with_borrow(uint64_t x, uint64_t y, uint
   if (r > x) result.__field_1 = 1;
   else if (r == x) result.__field_1 = b;
   else result.__field_1 = 0;
+  return result;
+}
+
+struct __sub64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __sub64_double_result 
+sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
+{
+  struct __sub64_double_result result;
+  sub_ddmmss(result.__field_0, result.__field_1, a1, a0, b1, b0);
   return result;
 }
 
@@ -317,6 +345,12 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val (>)     "%1 > %2"
 
   syntax val add_with_carry "add64_with_carry"
+  syntax val add_double "add64_double"
+  syntax val add_double_nc "add64_double"
+  syntax val add_double_gc "add64_double"
+  syntax val sub_double "sub64_double"
+  syntax val sub_double_nb "sub64_double"
+  syntax val sub_double_gb "sub64_double"
   syntax val sub_with_borrow "sub64_with_borrow"
   syntax val mul_double "mul64_double"
   syntax val div2by1 "div64_2by1"

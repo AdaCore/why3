@@ -3,13 +3,13 @@
 
 module SelectionSort
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   let selection_sort (a: array int)
     ensures { sorted a /\ permut_all (old a) a } =

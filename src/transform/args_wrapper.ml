@@ -22,6 +22,7 @@ exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
 exception Arg_qid_not_found of Ptree.qualid
+exception Arg_pr_not_found of prsymbol
 exception Arg_error of string
 
 let () = Exn_printer.register
@@ -37,7 +38,7 @@ let () = Exn_printer.register
           Format.fprintf fmt "Argument expected of type %s. None were given." s
       | _ -> raise e)
 
-open Stdlib
+open Wstdlib
 
 (* Use symb to encapsulate ids into correct categories of symbols *)
 type symb =
@@ -61,7 +62,7 @@ let add_unsafe (s: string) (id: symb) (tables: naming_table) : naming_table =
         namespace = {tables.namespace with ns_pr = Mstr.add s pr tables.namespace.ns_pr};
 }
 
-let id_unique tables id = id_unique_label tables.printer id
+let id_unique tables id = id_unique_attr tables.printer id
 
 (* Adds symbols that are introduced to a constructor *)
 let constructor_add (cl: constructor list) tables : naming_table =
@@ -179,11 +180,12 @@ let build_naming_tables task : naming_table =
     This only works for things defined in .why/.mlw because things
     added by the user are renamed on the fly. *)
   (* TODO:imported theories should be added in the namespace too *)
-  let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
-  let tables = List.fold_left (fun tables d -> add d tables) tables l in
+  let tables = Task.task_fold
+    (fun t d ->
+     match d.td_node with Decl d -> add d t | _ -> t) tables task
+  in
   let crc_map = build_coercion_map km_meta in
   {tables with coercion = crc_map}
-
 
 (************* wrapper  *************)
 
@@ -380,29 +382,29 @@ let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Topt (s,t)     -> "?" ^ s ^ (string_of_trans_typ t)
     | Toptbool (s,_) -> "?" ^ s ^ ":bool"
 
-let rec print_type : type a b. (a, b) trans_typ -> string =
-  fun t ->
+let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
+  fun fmt t ->
     match t with
-    | Ttrans         -> "task"
-    | Ttrans_l       -> "list task"
-    | Tenvtrans      -> "env -> task"
-    | Tenvtrans_l    -> "env -> list task"
-    | Tint t         -> "integer -> " ^ print_type t
-    | Tstring t      -> "string -> " ^ print_type t
-    | Tty t          -> "type -> " ^ print_type t
-    | Ttysymbol t    -> "type_symbol -> " ^ print_type t
-    | Tprsymbol t    -> "prsymbol -> " ^ print_type t
-    | Tprlist t      -> "list prsymbol -> " ^ print_type t
-    | Tlsymbol t     -> "lsymbol -> " ^ print_type t
-    | Tsymbol t      -> "symbol -> " ^ print_type t
-    | Tlist t        -> "list symbol -> " ^ print_type t
-    | Tterm t        -> "term -> " ^ print_type t
-    | Tformula t     -> "formula -> " ^ print_type t
-    | Tidentlist t   -> "list ident -> " ^ print_type t
-    | Ttermlist t    -> "list term -> " ^ print_type t
-    | Ttheory t      -> "theory -> " ^ print_type t
-    | Topt (s,t)     -> "?" ^ s ^ ":" ^ print_type t
-    | Toptbool (s,t) -> "?" ^ s ^ ":bool -> " ^ print_type t
+    | Ttrans         -> Format.fprintf fmt "task"
+    | Ttrans_l       -> Format.fprintf fmt "list task"
+    | Tenvtrans      -> Format.fprintf fmt "env -> task"
+    | Tenvtrans_l    -> Format.fprintf fmt "env -> list task"
+    | Tint t         -> Format.fprintf fmt "integer -> %a" print_type t
+    | Tstring t      -> Format.fprintf fmt "string -> %a" print_type t
+    | Tty t          -> Format.fprintf fmt "type -> %a" print_type t
+    | Ttysymbol t    -> Format.fprintf fmt "type_symbol -> %a" print_type t
+    | Tprsymbol t    -> Format.fprintf fmt "prsymbol -> %a" print_type t
+    | Tprlist t      -> Format.fprintf fmt "list prsymbol -> %a" print_type t
+    | Tlsymbol t     -> Format.fprintf fmt "lsymbol -> %a" print_type t
+    | Tsymbol t      -> Format.fprintf fmt "symbol -> %a" print_type t
+    | Tlist t        -> Format.fprintf fmt "list symbol -> %a" print_type t
+    | Tterm t        -> Format.fprintf fmt "term -> %a" print_type t
+    | Tformula t     -> Format.fprintf fmt "formula -> %a" print_type t
+    | Tidentlist t   -> Format.fprintf fmt "list ident -> %a" print_type t
+    | Ttermlist t    -> Format.fprintf fmt "list term -> %a" print_type t
+    | Ttheory t      -> Format.fprintf fmt "theory -> %a" print_type t
+    | Topt (s,t)     -> Format.fprintf fmt "?%s -> %a" s print_type t
+    | Toptbool (s,t) -> Format.fprintf fmt "?%s:bool -> %a" s print_type t
 
 exception Unnecessary_arguments of string list
 
@@ -527,15 +529,20 @@ let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env ->
                     Trans.naming_table -> b trans =
   fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
+(* the one in Scanf is awfully broken with respect to backslashes *)
+let format_from_string s fmt =
+  Scanf.sscanf_format (Printf.sprintf "%S" s) fmt (fun s -> s)
+
 let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =
   fun ~desc name t f  ->
-    let type_desc = Scanf.format_from_string ("type : " ^ print_type t ^ "\n") Pp.empty_formatted in
+    (* "%@\n" is escaped on purpose *)
+    let type_desc = Format.asprintf "type: %a%@\n" print_type t in
+    let type_desc = format_from_string type_desc Pp.empty_formatted in
+    let desc = type_desc ^^ desc in
     let trans = wrap_any t f in
     match is_trans_typ_l t with
-    | Yes ->
-      Trans.register_transform_with_args_l ~desc:(type_desc ^^ desc) name trans
-    | No ->
-      Trans.register_transform_with_args ~desc:(type_desc ^^ desc) name trans
+    | Yes -> Trans.register_transform_with_args_l ~desc name trans
+    | No  -> Trans.register_transform_with_args   ~desc name trans
 
 
 let find_symbol s tables = find_symbol (parse_qualid s) tables

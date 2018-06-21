@@ -2,8 +2,8 @@
 
 (** {1 Removing duplicate elements in an array, using a mutable set}
 
-    Given an array [a] of size [n], returns a fresh array containing
-    the elements of [a] without duplicates, using a mutable set
+    Given an array `a` of size `n`, returns a fresh array containing
+    the elements of `a` without duplicates, using a mutable set
     (typically a hash table).
 
 *)
@@ -15,11 +15,11 @@ module Spec
   use export int.Int
   use export array.Array
 
-  (** v appears in [a[0..s-1]] *)
+  (** `v` appears in `a[0..s-1]` *)
   predicate appears (v: 'a) (a: array 'a) (s: int) =
     exists i: int. 0 <= i < s /\ a[i] = v
 
-  (** [a[0..s-1]] contains no duplicate element *)
+  (** `a[0..s-1]` contains no duplicate element *)
   predicate nodup (a: array 'a) (s: int) =
     forall i: int. 0 <= i < s -> not (appears a[i] a i)
 
@@ -27,7 +27,7 @@ end
 
 module MutableSet
 
-  use import set.Fset
+  use set.Fset
 
   type elt
 
@@ -56,11 +56,11 @@ end
 
 module RemoveDuplicate
 
-  use import Spec
-  use import set.Fset
-  use import MutableSet
-  use import ref.Refint
-  use import array.Array
+  use Spec
+  use set.Fset
+  use MutableSet
+  use ref.Refint
+  use array.Array
 
   let remove_duplicate (a: array elt) : array elt
     requires { 1 <= length a }

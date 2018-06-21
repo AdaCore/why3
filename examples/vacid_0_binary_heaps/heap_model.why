@@ -1,11 +1,11 @@
 theory Model
 
-use import int.Int
-(*use import map.Map*)
+use int.Int
+(*use map.Map*)
 
-use import bag.Bag
-use import elements.Elements
-use import heap.Heap
+use bag.Bag
+use elements.Elements
+use heap.Heap
 
 function model (h:logic_heap): (bag int) =
    let (a,n) = h in elements a.A.contents 0 n

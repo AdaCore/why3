@@ -1,7 +1,7 @@
 theory Test
        type t
        function f t t : t
-       clone algebra.AC with type t = t, function op = f
+       clone algebra.AC with type t = t, function op = f, axiom .
        goal G1 : forall x y : t. f x y = f y x
        goal G2 : forall x y z : t. f (f x y) z = f x (f y z)
 end

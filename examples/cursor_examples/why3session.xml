@@ -41,7 +41,7 @@
  <goal name="sum_of_list" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="sum_of_list.0" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="sum_of_list.0.0" proved="true">
    <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
@@ -53,7 +53,7 @@
  </transf>
  </goal>
  <goal name="VC list_sum" expl="VC for list_sum" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC list_sum.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
@@ -116,9 +116,9 @@
  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
  <goal name="ArrayCursor.C.VC next" expl="VC for next" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC next.0" expl="precondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC next.0.0" expl="precondition" proved="true">
    <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
    </goal>
@@ -138,7 +138,7 @@
 </theory>
 <theory name="TestArrayCursor" proved="true">
  <goal name="VC array_sum" expl="VC for array_sum" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC array_sum.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>

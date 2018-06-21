@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Ity
@@ -58,7 +58,7 @@ type dbinder = preid option * ghost * dity
 
 exception UnboundLabel of string
 
-val old_mark : string
+val old_label : string
 
 type register_old = string -> pvsymbol -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
@@ -128,10 +128,10 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
+  | DElabel of preid * dexpr
   | DEcast of dexpr * dity
-  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
-  | DElabel of dexpr * Slab.t
+  | DEattr of dexpr * Sattr.t
 
 and dreg_branch = dpattern * dexpr
 
@@ -156,7 +156,9 @@ val denv_add_let : denv -> dlet_defn -> denv
 
 val denv_add_args : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dity -> denv
+val denv_add_expr_pat : denv -> dpattern -> dexpr -> denv
+val denv_add_exn_pat : denv -> dpattern -> dxsymbol -> denv
 
 val denv_add_for_index : denv -> preid -> dvty -> denv
 

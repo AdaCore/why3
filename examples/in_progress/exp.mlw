@@ -1,10 +1,10 @@
 
 module Exp
 
-  use import ieee_float.Float64
-  use import real.Abs
-  use import real.ExpLog
-  use import real.Real
+  use ieee_float.Float64
+  use real.Abs
+  use real.ExpLog
+  use real.Real
 
   val ( +. ) (x y : t) : t
     requires {t'isFinite x}

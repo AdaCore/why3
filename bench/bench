@@ -62,6 +62,7 @@ drivers () {
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
+        if [[ $f == drivers/cakeml.drv ]]; then continue; fi
 	printf "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
@@ -77,14 +78,13 @@ valid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
 	printf "  $f... "
-	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
-	    echo "valid test $f failed!"
-	    echo "$pgm -P alt-ergo $f"
-	    $pgm -t 10 -P alt-ergo $f
+        if ! $pgm -t 15 -P alt-ergo $f > /dev/null 2>&1; then
+            echo "FAILED!"
+            echo "$pgm -t 15 -P alt-ergo $f"
+            $pgm -t 15 -P alt-ergo $f
 	    exit 1
-       else
-	    echo "ok"
        fi
+       echo "ok"
     done
 }
 
@@ -269,8 +269,8 @@ goods examples/avl "-L examples/avl"
 goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication"
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
+goods examples/multiprecision "-L examples/multiprecision"
 goods examples/in_progress
-goods examples/in_progress/multiprecision "-L examples/in_progress/multiprecision"
 echo ""
 
 echo "=== Checking replay (no prover) ==="
@@ -287,9 +287,10 @@ replay examples/WP_revisited --merging-only
 replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
 replay examples/bitvectors "-L examples/bitvectors --merging-only"
 replay examples/avl "-L examples/avl --merging-only"
-#replay examples/to_port/verifythis_2016_matrix_multiplication "-L examples/to_port/verifythis_2016_matrix_multiplication --merging-only"
+replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
 replay examples/double_wp "-L examples/double_wp --merging-only"
 replay examples/ring_decision "-L examples/ring_decision --merging-only"
+replay examples/multiprecision "-L examples/multiprecision --merging-only"
 #replay examples/in_progress --merging-only
 #replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
 echo ""

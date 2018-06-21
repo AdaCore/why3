@@ -26,20 +26,22 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  let is_keyword1 = make_table [ "as"; "axiom"; "clone"; "coinductive";
-    "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
-    "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
-    "lemma"; "let"; "match"; "meta"; "not"; "predicate"; "prop";
-    "scope"; "then"; "theory"; "true"; "type"; "use"; "with";
-    (* programs *) "abstract"; "any";
-    "begin"; "do"; "done"; "downto"; "exception";
-    "for"; "fun"; "ghost"; "loop"; "model"; "module";
-    "mutable"; "private"; "raise"; "rec";
+  let is_keyword1 = make_table [ "as"; "axiom"; "by";
+    "clone"; "coinductive"; "constant";
+    "else"; "end"; "epsilon"; "exists"; "export";
+    "false"; "float"; "forall"; "function";
+    "goal"; "if"; "import"; "in"; "inductive";
+    "lemma"; "let"; "match"; "meta"; "not"; "predicate";
+    "range"; "scope"; "so"; "then"; "theory"; "true"; "type"; "use"; "with";
+    (* programs *) "abstract"; "any"; "at";
+    "begin"; "break"; "continue"; "do"; "done"; "downto"; "exception";
+    "for"; "fun"; "ghost"; "label"; "module"; "mutable";
+    "old"; "private"; "pure"; "raise"; "rec"; "return";
     "to"; "try"; "val"; "while"; ]
 
   let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
-    "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
-    "returns"; "variant"; "writes"; "diverges"; ]
+    "check"; "diverges"; "ensures"; "invariant";
+    "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
@@ -152,8 +154,7 @@ and scan_isolated fmt empty in_pre delayed = parse
           { comment fmt false lexbuf;
             scan_isolated fmt empty in_pre delayed lexbuf }
   | space* "(**"
-          { doc str_formatter false [] lexbuf;
-            let d = delayed ^ flush_str_formatter () in
+          { let d = asprintf "%s%a" delayed (fun fmt -> doc fmt false []) lexbuf in
             scan_isolated fmt false in_pre d lexbuf }
   | eof   { if in_pre then pp_print_string fmt "</pre>\n";
             if delayed <> "" then pp_print_string fmt delayed }
@@ -169,27 +170,27 @@ and scan_isolated fmt empty in_pre delayed = parse
   | ""    { if not in_pre then pp_print_string fmt "<pre>";
             scan fmt empty delayed lexbuf }
 
-and scan_embedded fmt depth = parse
-  | '['   { pp_print_char fmt '[';
-            scan_embedded fmt (depth + 1) lexbuf }
-  | ']'   { if depth > 0 then begin
-              pp_print_char fmt ']';
-              scan_embedded fmt (depth - 1) lexbuf
+and scan_embedded fmt ldelim = parse
+  | ' '* ('`' '`'* as delim) as s
+          { if String.length delim <> ldelim then begin
+              pp_print_string fmt s;
+              scan_embedded fmt ldelim lexbuf
             end }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
   | ident as s
           { print_ident fmt lexbuf s;
-            scan_embedded fmt depth lexbuf }
-  | "\n"   { new_line lexbuf;
-             pp_print_char fmt '\n';
-             scan_embedded fmt depth lexbuf }
-  | '"'    { pp_print_string fmt "&quot;";
-             string fmt true lexbuf;
-             scan_embedded fmt depth lexbuf }
+            scan_embedded fmt ldelim lexbuf }
+  | "\n"  { new_line lexbuf;
+            pp_print_char fmt '\n';
+            scan_embedded fmt ldelim lexbuf }
+  | '"'   { pp_print_string fmt "&quot;";
+            string fmt true lexbuf;
+            scan_embedded fmt ldelim lexbuf }
   | "'\"'"
-  | _ as s { pp_print_string fmt s;
-             scan_embedded fmt depth lexbuf }
+  | _ as s
+          { pp_print_string fmt s;
+            scan_embedded fmt ldelim lexbuf }
 
 and comment fmt do_output = parse
   | "(*"   { if do_output then pp_print_string fmt "(*";
@@ -257,9 +258,12 @@ and doc fmt block headings = parse
                   doc fmt (r <> []) r lexbuf
                 end else brace r
            }
-  | '['    { if not block then pp_print_string fmt "<p>";
+  | "\\`"  { pp_print_char fmt '`';
+             doc fmt true headings lexbuf }
+  | ('`' '`'* as delim) ' '*
+           { if not block then pp_print_string fmt "<p>";
              pp_print_string fmt "<code>";
-             scan_embedded fmt 0 lexbuf;
+             scan_embedded fmt (String.length delim) lexbuf;
              pp_print_string fmt "</code>";
              doc fmt true headings lexbuf }
   | ' '    { if block then pp_print_char fmt ' ';

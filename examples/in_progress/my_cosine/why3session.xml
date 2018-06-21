@@ -11,7 +11,7 @@
 <file name="../my_cosine.mlw">
 <theory name="M">
  <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.17"/></proof>
   <proof prover="3" timelimit="5" memlimit="1000" edited="my_cosine_M_WP_parameter_my_cosine_1.v"><result status="valid" time="1.79"/></proof>
@@ -33,7 +33,7 @@
 </theory>
 <theory name="IEEEfloat">
  <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.99" steps="1636"/></proof>
   </goal>
@@ -63,7 +63,7 @@
 </theory>
 <theory name="Combined">
  <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter my_cosine.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.51" steps="1636"/></proof>
   </goal>

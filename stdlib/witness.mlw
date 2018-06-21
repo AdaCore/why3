@@ -1,0 +1,60 @@
+
+(** {1 Witnesses of existential proofs} *)
+
+(** {2 Non-constructive existence of a witness} *)
+
+module Witness
+
+  val ghost function witness (p: 'a -> bool) : 'a
+    requires { exists x. p x }
+    ensures  { p result }
+
+end
+
+(** {2 Constructive existence of a witness}
+
+    Given a predicate `p` over integers and the existence of
+    a nonnegative integer `n` such that `p n`, one can build
+    a witness using a linear search starting from 0.
+
+    The difficulty here is to prove termination. We use a custom
+    variant predicate and we prove the accessibility of all
+    integers for which there exists a witnes above.
+
+    This proof is adapted from Coq's standard library
+    (file ConstructiveEpsilon.v contributed by Yevgeniy Makarov
+    and Jean-François Monin).
+*)
+
+module Nat
+
+  use int.Int
+  use relations.WellFounded
+
+  (** since a custom variant relation has to be a toplevel predicate symbol,
+      we store the predicate `p` inside the variant expression *)
+  predicate r (x y: ((int->bool),int)) =
+    let p, x = x in
+    let q, y = y in
+    p = q && x = y+1 > 0 && not (p y)
+
+  let function witness (p: int -> bool) : int
+    requires { exists n. n >= 0 /\ p n }
+    ensures  { result >= 0 /\ p result }
+  = let lemma l1 (x: int)
+      requires { x >= 0 /\ p x } ensures { acc r (p,x) }
+      = let lemma l11 (y: (int->bool,int))
+          requires { r y (p,x) } ensures { acc r y } = () in
+      () in
+    let rec lemma l2 (x n: int) variant { n }
+      requires { x >= 0 /\ n >= 0 /\ p (x + n) }
+      ensures  { acc r (p,x) }
+      = if n > 0 then l2 (x+1) (n-1) in
+    let rec search (n: int) : int
+      requires { n >= 0 /\ exists x. x >= n && p x }
+      variant  { (p,n) with r }
+      ensures  { result >= 0 /\ p result }
+      = if p n then n else search (n+1) in
+    search 0
+
+end

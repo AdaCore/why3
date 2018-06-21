@@ -8,11 +8,11 @@
 
 module SearchingALinkedList
 
-  use import int.Int
-  use import option.Option
-  use import list.List
-  use import list.Length
-  use import list.Nth
+  use int.Int
+  use option.Option
+  use list.List
+  use list.Length
+  use list.Nth
 
   predicate zero_at (l: list int) (i: int) =
     nth i l = Some 0 /\ forall j. 0 <= j < i -> nth j l <> Some 0
@@ -37,8 +37,8 @@ module SearchingALinkedList
 
   (* imperative version, with a loop *)
 
-  use import ref.Ref
-  use import list.HdTl
+  use ref.Ref
+  use list.HdTl
 
   let head (l: list 'a) : 'a
     requires { l <> Nil } ensures { hd l = Some result }

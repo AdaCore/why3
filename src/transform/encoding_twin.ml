@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -81,12 +81,12 @@ let conv_app tenv fs tl tty =
    with unnecessary bridge functions over them *)
 let rec rewrite tenv t = match t.t_node with
   | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
-      t_label_copy t (t_equ (rewrite tenv t1) (rewrite tenv t2))
+      t_attr_copy t (t_equ (rewrite tenv t1) (rewrite tenv t2))
   | Tapp (ls,tl) ->
       let tl = List.map (rewrite tenv) tl in
       let tl = List.map2 (conv_arg tenv) tl ls.ls_args in
-      if t.t_ty = None then t_label_copy t (ps_app ls tl)
-      else t_label_copy t (conv_app tenv ls tl (t_type t))
+      if t.t_ty = None then t_attr_copy t (ps_app ls tl)
+      else t_attr_copy t (conv_app tenv ls tl (t_type t))
   | _ -> t_map (rewrite tenv) t
 
 let decl tenv d = match d.d_node with

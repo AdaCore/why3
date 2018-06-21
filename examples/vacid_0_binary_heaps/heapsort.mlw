@@ -2,15 +2,15 @@
 module HeapSort
 
 (**** logic declarations *****)
-use import int.Int
-use import elements.Elements
-use import bag.Bag
-use import bag_of_integers.Bag_integers
+use int.Int
+use elements.Elements
+use bag.Bag
+use bag_of_integers.Bag_integers
 
-use import ref.Ref
-use import array.Array
-use import array.IntArraySorted
-use import abstract_heap.AbstractHeap
+use ref.Ref
+use array.Array
+use array.IntArraySorted
+use abstract_heap.AbstractHeap
 
 let rec lemma min_of_sorted (a:M.map int int) (i n :int)
    requires { 0 <= i < n }

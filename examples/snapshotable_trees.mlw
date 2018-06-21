@@ -38,7 +38,7 @@ end
 
 module Enum
 
-  use import Tree
+  use Tree
 
   type enum =
     | Done
@@ -62,8 +62,8 @@ end
 
 module Iterator
 
-  use import Tree
-  use import Enum
+  use Tree
+  use Enum
 
   type iterator = { mutable it: enum }
 
@@ -165,7 +165,7 @@ end
 
 module Harness
 
-  use import ITree
+  use ITree
 
   let test () =
      let t = create () in

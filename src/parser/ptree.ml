@@ -11,13 +11,13 @@
 
 (*s Parse trees. *)
 
-type label =
-  | Lstr of Ident.label
-  | Lpos of Loc.position
+type attr =
+  | ATstr of Ident.attribute
+  | ATpos of Loc.position
 
 type ident = {
   id_str : string;
-  id_lab : label list;
+  id_ats : attr list;
   id_loc : Loc.position;
 }
 
@@ -46,13 +46,15 @@ type pattern = {
 
 and pat_desc =
   | Pwild
-  | Pvar of ident * ghost
+  | Pvar of ident
   | Papp of qualid * pattern list
   | Prec of (qualid * pattern) list
   | Ptuple of pattern list
   | Pas of pattern * ident * ghost
   | Por of pattern * pattern
   | Pcast of pattern * pty
+  | Pghost of pattern
+  | Pparen of pattern
 
 (*s Logical terms and formulas *)
 
@@ -78,7 +80,7 @@ and term_desc =
   | Tnot of term
   | Tif of term * term * term
   | Tquant of Dterm.dquant * binder list * term list list * term
-  | Tnamed of label * term
+  | Tattr of attr * term
   | Tlet of ident * term * term
   | Tcase of term * (pattern * term) list
   | Tcast of term * pty
@@ -149,11 +151,11 @@ and expr_desc =
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of Expr.assertion_kind * term
-  | Emark of ident * expr
+  | Escope of qualid * expr
+  | Elabel of ident * expr
   | Ecast of expr * pty
   | Eghost of expr
-  | Enamed of label * expr
-  | Escope of qualid * expr
+  | Eattr of attr * expr
 
 and reg_branch = pattern * expr
 
@@ -223,6 +225,7 @@ type clone_subst =
   | CSpsym  of qualid * qualid
   | CSvsym  of qualid * qualid
   | CSxsym  of qualid * qualid
+  | CSprop  of Decl.prop_kind
   | CSaxiom of qualid
   | CSlemma of qualid
   | CSgoal  of qualid

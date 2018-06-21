@@ -113,6 +113,15 @@ target_name = "Coq"
 target_version = "$COQVER"
 version = "8.6.1"
 
+[uninstalled_prover coq872]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.7.2"
+
 EOF
 fi
 

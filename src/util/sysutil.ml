@@ -170,23 +170,25 @@ let normalize_filename f =
                                *)
 
 let relativize_filename base f =
-  let rec aux ab af =
+  let rec aux abs ab af =
     match ab,af with
-      | x::rb, y::rf when x=y -> aux rb rf
+      | x::rb, y::rf when x=y -> aux (x::abs) rb rf
       | _ ->
-          let rec aux2 acc p =
+          let rec aux2 abs rel p =
             match p with
-              | [] -> acc
+              | [] -> rel
               | x::rb ->
                 (if x = Filename.current_dir_name then
-                   aux2 acc rb
+                   aux2 abs rel rb
                  else if x = Filename.parent_dir_name then
-                   failwith "cannot relativize filename"
+                   match abs with
+                   | x::rem -> aux2 rem (x::rel) rb
+                   | [] -> aux2 [] rel rb
                  else
-                   aux2 (Filename.parent_dir_name::acc) rb)
-          in aux2 af ab
+                   aux2 (x::abs) (Filename.parent_dir_name::rel) rb)
+          in aux2 abs af ab
   in
-  file_of_path (aux (path_of_file base) (path_of_file f))
+  file_of_path (aux [] (path_of_file base) (path_of_file f))
 
 let absolutize_filename dirname f =
   if Filename.is_relative f then

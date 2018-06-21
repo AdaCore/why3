@@ -13,11 +13,11 @@
 
 module BinarySort
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
+  use array.ArrayPermut
 
   let lemma occ_shift (m1 m2: M.map int 'a) (mid k: int) (x: 'a) : unit
     requires { 0 <= mid <= k }

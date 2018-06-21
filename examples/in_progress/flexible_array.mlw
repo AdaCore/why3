@@ -22,16 +22,16 @@
 
 module FlexibleArray
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import bintree.Tree
+  use int.Int
+  use int.ComputerDivision
+  use bintree.Tree
   use export bintree.Size
-  use import ref.Ref
+  use ref.Ref
   use import seq.Seq as S
   use import queue.Queue as Q
-  use import list.List
-  use import list.Append
-  use import list.Mem
+  use list.List
+  use list.Append
+  use list.Mem
 
   (* to be a Braun tree *)
   predicate inv (t: tree 'a) = match t with

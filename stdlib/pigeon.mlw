@@ -1,16 +1,43 @@
 
-(** {1 Pigeon hole principle}
-
-    Contributed by Yuto Takei (University of Tokyo) *)
+(** {1 Pigeon hole principle} *)
 
 module Pigeonhole
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use list.Mem
-  use import set.Fset
+  use int.Int
+  use map.Map
+
+  let rec lemma pigeonhole (n m: int) (f: int -> int)
+    requires { 0 <= m < n }
+    requires { forall i. 0 <= i < n -> 0 <= f i < m }
+    ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }
+    variant  { m }
+  = for i = 0 to n - 1 do
+      invariant { forall k. 0 <= k < i -> f k < m - 1 }
+      if f i = m - 1 then begin
+        for j = i + 1 to n - 1 do
+          invariant { forall k. i < k < j -> f k < m - 1 }
+          if f j = m - 1 then return
+        done;
+        let function g k = if k < i then f k else f (k + 1) in
+        pigeonhole (n - 1) (m - 1) g;
+        return end
+    done;
+    pigeonhole n (m - 1) f
+
+end
+
+(* An instance where a list is included into a set with fewer elements.
+
+   Contributed by Yuto Takei (University of Tokyo) *)
+
+module ListAndSet
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Mem as Mem
+  use set.Fset
 
   type t
 
@@ -21,7 +48,8 @@ module Pigeonhole
     exists e: t, l1 l2 l3: list t.
     l = l1 ++ (Cons e (l2 ++ (Cons e l3)))
 
-  clone set.FsetInduction with type t = t, predicate p = pigeon_set
+  clone set.FsetInduction as FSI with
+    type t = t, predicate p = pigeon_set
 
   lemma corner:
     forall s: set t, l: list t.

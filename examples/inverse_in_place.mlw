@@ -17,10 +17,10 @@
 
 module InverseInPlace
 
-  use import int.Int
+  use int.Int
   use int.NumOf
-  use import ref.Ref
-  use import array.Array
+  use ref.Ref
+  use array.Array
 
   let function (~_) (x: int) : int = -x-1
 
@@ -84,8 +84,8 @@ end
 
 module Harness
 
-  use import array.Array
-  use import InverseInPlace
+  use array.Array
+  use InverseInPlace
 
   (* (0 2) (1) *)
   let test1 () =

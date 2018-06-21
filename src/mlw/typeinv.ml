@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -403,7 +403,7 @@ let cap_of_term kn uf pins caps t =
   let rec unroll t = function
     | (pj,t0)::pjl ->
         let t = t_app pj [t] t0.t_ty in
-        unroll (t_label_copy t0 t) pjl
+        unroll (t_attr_copy t0 t) pjl
     | []  -> t in
   let rec unwind t c pjl0 = match c, pjl0 with
     | _, [] -> t, c
@@ -413,18 +413,18 @@ let cap_of_term kn uf pins caps t =
         if n = 0 then unroll t pjl0, V
         else let pin = Mint.find n pins in
           let v, c = Mls.find pj pin.p_vars in
-          unwind (t_label_copy t0 (t_var v)) c pjl
+          unwind (t_attr_copy t0 (t_var v)) c pjl
     | C css, (pj,t0)::pjl when Mls.cardinal css = 1 ->
         let cs, fl = Mls.choose css in
         let fdl = Eval_match.cs_fields kn cs in
         let c = Eval_match.select_field pj fdl fl in
         let t = t_app pj [t] t0.t_ty in
-        unwind (t_label_copy t0 t) c pjl
+        unwind (t_attr_copy t0 t) c pjl
     | C css, (pj,t0)::pjl ->
         let ty = Opt.get t.t_ty in
         let sbs = Ty.ty_match_args ty in
         let v0 = create_vsymbol (id_fresh "q") (Opt.get t0.t_ty) in
-        let t0 = t_label_copy t0 (t_var v0) and p0 = pat_var v0 in
+        let t0 = t_attr_copy t0 (t_var v0) and p0 = pat_var v0 in
         let add_branch cs fdl fl (bl, cj) =
           let mk_pat fd_ty fd = match fd with
             | Some ls when ls_equal pj ls -> p0
@@ -449,7 +449,7 @@ let cap_of_term kn uf pins caps t =
     | R pjs, (pj,t0)::pjl ->
         let c = Mls.find pj pjs in
         let t = t_app pj [t] t0.t_ty in
-        unwind (t_label_copy t0 t) c pjl
+        unwind (t_attr_copy t0 t) c pjl
   in
   let rec down caps pjl t = match t.t_node with
     | Tvar v -> (* projection propagation *)
@@ -460,7 +460,7 @@ let cap_of_term kn uf pins caps t =
         let t1, c1 = down caps pjl t1 in
         let t2, c2 = down caps pjl t2 in
         ignore (cap_join uf c1 c2);
-        t_label_copy t (t_equ t1 t2), V
+        t_attr_copy t (t_equ t1 t2), V
     | Tapp (ls,[t1]) when is_trusted_projection_t kn ls t ->
         down caps ((ls,t)::pjl) t1
     | Tapp (ls,tl) when is_trusted_constructor kn ls ->
@@ -468,27 +468,27 @@ let cap_of_term kn uf pins caps t =
         | (pj,t0)::pjl ->
             let fdl = Eval_match.cs_fields kn ls in
             let t = Eval_match.select_field pj fdl tl in
-            down caps pjl (t_label_copy t0 t)
+            down caps pjl (t_attr_copy t0 t)
         | [] ->
             let tl, cl = List.split (List.map (down caps []) tl) in
-            let t = t_label_copy t (t_app ls tl t.t_ty) in
+            let t = t_attr_copy t (t_app ls tl t.t_ty) in
             t, mkC (Mls.singleton ls cl) end
     | Tapp (ls,tl) ->
         let tl = List.map (fun t ->
           let t, c = down caps [] t in
           assert (cap_valid uf c); t) tl in
-        unroll (t_label_copy t (t_app ls tl t.t_ty)) pjl, V
+        unroll (t_attr_copy t (t_app ls tl t.t_ty)) pjl, V
     | Tif (t0,t1,t2) ->
         let t0, _  = down caps [] t0 in
         let t1, c1 = down caps pjl t1 in
         let t2, c2 = down caps pjl t2 in
-        t_label_copy t (t_if t0 t1 t2), cap_join uf c1 c2
+        t_attr_copy t (t_if t0 t1 t2), cap_join uf c1 c2
     | Tlet (t0,tb) ->
         let t0, c0 = down caps [] t0 in
         let v, t1 = t_open_bound tb in
         let caps = add_cap v c0 caps in
         let t1, c1 = down caps pjl t1 in
-        t_label_copy t (t_let_close v t0 t1), c1
+        t_attr_copy t (t_let_close v t0 t1), c1
     | Tcase (t0,bl) ->
         let t0, c0 = down caps [] t0 in
         let add_branch b (bl, cj) =
@@ -498,24 +498,24 @@ let cap_of_term kn uf pins caps t =
           let b = t_close_branch p t1 in
           b::bl, Some (Opt.fold (cap_join uf) c cj) in
         let bl, c = List.fold_right add_branch bl ([], None) in
-        t_label_copy t (t_case t0 bl), Opt.get c
+        t_attr_copy t (t_case t0 bl), Opt.get c
     | Teps tb ->
         let v, f = t_open_bound tb in
         let f, _ = down caps [] f in
-        unroll (t_label_copy t (t_eps_close v f)) pjl, V
+        unroll (t_attr_copy t (t_eps_close v f)) pjl, V
     | Tquant (q,tq) ->
         let vl, tt, t0 = t_open_quant tq in
         let down t = fst (down caps [] t) in
         let tt = List.map (List.map down) tt in
         let tq = t_close_quant vl tt (down t0) in
-        t_label_copy t (t_quant q tq), V
+        t_attr_copy t (t_quant q tq), V
     | Tbinop (op,f1,f2) ->
         let f1, _ = down caps [] f1 in
         let f2, _ = down caps [] f2 in
-        t_label_copy t (t_binary op f1 f2), V
+        t_attr_copy t (t_binary op f1 f2), V
     | Tnot f ->
         let f, _ = down caps [] f in
-        t_label_copy t (t_not f), V
+        t_attr_copy t (t_not f), V
     | Ttrue | Tfalse ->
         t, V
   in
@@ -656,7 +656,7 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let p = Mint.find n pins in
       let check _ (_,c) = assert (cap_valid uf c) in
       Mls.iter check p.p_vars;
-      let inv = List.map (t_label_copy f) p.p_inv in
+      let inv = List.map (t_attr_copy f) p.p_inv in
       t_and_asym_l inv, uf
   | Tapp (ls,[t]) when not pos && ls_equal ls ls_valid ->
       let t, c = cap_of_term kn uf pins caps t in
@@ -671,13 +671,13 @@ let rec inject kn uf pins caps pos f = match f.t_node with
         assert (cap_valid uf c);
         let t = t_app_infer pj [t] in
         t_equ (t_var v) t :: fl in
-      t_label_copy f (t_and_l (Mls.fold add p.p_vars [])), uf
+      t_attr_copy f (t_and_l (Mls.fold add p.p_vars [])), uf
   | Tapp (ls,[t1;t2]) when not pos && ls_equal ls ps_equ ->
       let t1, c1 = cap_of_term kn uf pins caps t1 in
       let t2, c2 = cap_of_term kn uf pins caps t2 in
-      let f = t_label_copy f (t_equ t1 t2) in
+      let f = t_attr_copy f (t_equ t1 t2) in
       cap_equality kn uf pins f t1 c1 t2 c2
-  | _ when Slab.mem annot_label f.t_label ->
+  | _ when Sattr.mem annot_attr f.t_attrs ->
       fst (cap_of_term kn uf pins caps f), uf
   | Tapp _ ->
       fst (cap_of_term kn uf pins caps f), uf
@@ -685,13 +685,13 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let f0, _ = cap_of_term kn uf pins caps f0 in
       let f1, uf1 = inject kn uf pins caps pos f1 in
       let f2, uf2 = inject kn uf pins caps pos f2 in
-      t_label_copy f (t_if f0 f1 f2), uf_inter uf1 uf2
+      t_attr_copy f (t_if f0 f1 f2), uf_inter uf1 uf2
   | Tlet (t0,fb) ->
       let t0, c0 =  cap_of_term kn uf pins caps t0 in
       let v, f1 = t_open_bound fb in
       let caps = add_cap v c0 caps in
       let f1, uf = inject kn uf pins caps pos f1 in
-      t_label_copy f (t_let_close v t0 f1), uf
+      t_attr_copy f (t_let_close v t0 f1), uf
   | Tcase (t0,bl) ->
       let t0, c0 = cap_of_term kn uf pins caps t0 in
       let add_branch b (bl, ufj) =
@@ -701,7 +701,7 @@ let rec inject kn uf pins caps pos f = match f.t_node with
         let b = t_close_branch p f1 in
         b::bl, Some (Opt.fold uf_inter uf1 ufj) in
       let bl, uf = List.fold_right add_branch bl ([], None) in
-      t_label_copy f (t_case t0 bl), Opt.get uf
+      t_attr_copy f (t_case t0 bl), Opt.get uf
   | Tquant (q,fq) ->
       let vl, tt, f0 = t_open_quant fq in
       let down t = fst (cap_of_term kn uf pins caps t) in
@@ -717,24 +717,24 @@ let rec inject kn uf pins caps pos f = match f.t_node with
         List.fold_right add vl (caps, pins, []) in
       let f0, uf = inject kn uf pins caps pos f0 in
       let f0 = t_quant_close_simp q vl tt f0 in
-      t_label_copy f f0, uf
+      t_attr_copy f f0, uf
   | Tbinop (Tand,f1,f2) ->
       let f1, uf1 = inject kn uf  pins caps pos f1 in
       let f2, uf2 = inject kn uf1 pins caps pos f2 in
-      t_label_copy f (t_and f1 f2), uf2
+      t_attr_copy f (t_and f1 f2), uf2
   | Tbinop (Timplies,f1,f2) ->
       let f1, uf1 = inject kn uf  pins caps (not pos) f1 in
       let f2, _   = inject kn uf1 pins caps pos f2 in
-      t_label_copy f (t_implies f1 f2), uf
+      t_attr_copy f (t_implies f1 f2), uf
   | Tbinop (Tor,f1,f2) ->
       let f1, uf1 = inject kn uf pins caps pos f1 in
       let f2, uf2 = inject kn uf pins caps pos f2 in
-      t_label_copy f (t_or f1 f2), uf_inter uf1 uf2
+      t_attr_copy f (t_or f1 f2), uf_inter uf1 uf2
   | Tbinop (Tiff,_,_) ->
       fst (cap_of_term kn uf pins caps f), uf
   | Tnot f1 ->
       let f1, _ = inject kn uf pins caps (not pos) f1 in
-      t_label_copy f (t_not f1), uf
+      t_attr_copy f (t_not f1), uf
   | Ttrue | Tfalse ->
       f, uf
 

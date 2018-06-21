@@ -7,7 +7,7 @@
 <file name="../binary_sqrt.mlw" proved="true">
 <theory name="BinarySqrt" proved="true">
  <goal name="VC sqrt" expl="VC for sqrt" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC sqrt.0" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
@@ -36,12 +36,12 @@
   <proof prover="1"><result status="valid" time="0.22" steps="135"/></proof>
   </goal>
   <goal name="VC sqrt.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC sqrt.9.0" expl="VC for sqrt" proved="true">
    <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
    <goal name="VC sqrt.9.1" expl="VC for sqrt" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="VC sqrt.9.1.0" expl="VC for sqrt" proved="true">
     <proof prover="0"><result status="valid" time="0.02"/></proof>
     </goal>

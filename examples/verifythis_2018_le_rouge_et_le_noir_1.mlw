@@ -1,0 +1,329 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 2: Le rouge et le noir}
+
+Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
+*)
+
+module ColoredTiles
+
+use int.Int
+use set.Fset
+use set.FsetComprehension
+use seq.Seq
+
+type color = Red | Black
+
+type coloring = seq color
+
+predicate tworedneighbors (c: coloring) (i:int)
+  = ((c[i-2] = Red /\ c[i-1] = Red /\ 2 <= i)
+     \/ (c[i-1] = Red /\ c[i+1] = Red /\ 1 <= i <= length c - 2)
+     \/ (c[i+1] = Red /\ c[i+2] = Red /\ i <= length c - 3))
+
+predicate valid (c:coloring) =
+  forall i. 0 <= i < length c -> c[i] = Red -> tworedneighbors c i
+
+function black (n:int) : color = Black
+function red (n:int) : color = Red
+
+function colorings0 : set coloring = add (create 0 black) Fset.empty
+function colorings1 : set coloring = add (create 1 black) Fset.empty
+function colorings2 : set coloring = add (create 2 black) Fset.empty
+function colorings3: set coloring =
+         add (create 3 red) (add (create 3 black) Fset.empty)
+
+lemma valid_contr:
+  forall c i. valid c -> 0 <= i < length c -> not (tworedneighbors c i) -> c[i] = Black
+
+lemma colo_0 : forall c: coloring. length c = 0 ->
+      (valid c <-> mem c colorings0 by Seq.(==) c (create 0 black))
+
+lemma colo_1 : forall c: coloring. length c = 1 ->
+      (valid c <-> mem c colorings1
+                   by c[0] = Black
+                   so Seq.(==) c (create 1 black))
+
+lemma colo_2 : forall c: coloring. length c = 2 ->
+      (valid c <-> mem c colorings2
+                   by c[0] = Black = c[1]
+                   so Seq.(==) c (create 2 black)
+                   so c = create 2 black)
+
+lemma colo_3 : forall c: coloring. length c = 3 ->
+      (valid c <-> mem c colorings3
+                   by if c[0] = Black
+                      then (c[0]=c[1]=c[2]=Black
+                            so c == create 3 black
+                            so c = create 3 black)
+                      else (c[0]=c[1]=c[2]=Red
+                            so c == create 3 red
+                            so c = create 3 red))
+
+let lemma valid_split_fb (c:coloring) (k: int)
+  requires { 3 <= k < length c }
+  requires { forall i. 0 <= i < k -> c[i] = Red }
+  requires { valid c[k+1 ..] }
+  ensures  { valid c }
+= let c' = c[k+1 ..] in
+  assert { forall i. k+1 <= i < length c -> c[i] = Red ->
+             (tworedneighbors c i
+              by c'[i - (k+1)] = Red
+              so [@case_split] tworedneighbors c' (i - (k+1))) }
+
+let lemma valid_restrict (c: coloring) (k: int)
+  requires { valid c }
+  requires { 0 <= k < length c }
+  requires { c[k] = Black }
+  ensures  { valid c[k+1 ..] }
+= ()
+
+(*1st black tile starting at i *)
+let rec function first_black_tile (c:coloring) : int
+  ensures { 0 <= result <= length c }
+  ensures { forall j. 0 <= j < result <= length c
+            -> c[j] = Red }
+  ensures { result < length c -> c[result] = Black }
+  ensures { valid c -> result = 0 \/ 3 <= result }
+  variant { length c }
+= if Seq.length c = 0 then 0
+  else match c[0] with
+       | Black -> 0
+       | Red ->
+           assert { valid c -> c[1]=Red /\ c[2] = Red };
+           let r = first_black_tile c[1 ..] in
+           assert { forall j. 1 <= j < 1+r
+                    -> c[j] = Red
+                       by c[1 ..][j-1] = Red };
+           1+r end
+
+let rec function addleft (nr:int) (c:coloring) : coloring
+  variant { nr }
+  ensures { nr >= 0 -> Seq.length result = Seq.length c + nr + 1 }
+= if nr <= 0 then cons Black c
+  else cons Red (addleft (nr-1) c)
+
+(* add nr red tiles and a black tile to the left of each coloring *)
+function mapaddleft (s:set coloring) (nr:int) : set coloring
+=  map (addleft nr) s
+
+lemma addleft_fb:
+  forall c nr. 0 <= nr -> first_black_tile (addleft nr c) = nr
+
+lemma mapaddleft_fb:
+  forall s c nr. 0 <= nr -> mem c (mapaddleft s nr) -> first_black_tile c = nr
+
+predicate reciprocal (f: 'a -> 'b) (g: 'b -> 'a)
+  = forall y. g (f y) = y
+
+let lemma bij_image (u: set 'a) (f: 'a -> 'b) (g: 'b -> 'a)
+  requires { reciprocal f g }
+  ensures  { subset u (map g (map f u)) }
+= assert { forall x. mem x u -> mem (f x) (map f u)
+                     -> mem (g (f x)) (map g (map f u))
+                     -> mem x (map g (map f u)) }
+
+let lemma bij_cardinal (u: set 'a) (f: 'a -> 'b) (g: 'b -> 'a)
+  requires { reciprocal f g }
+  ensures  { cardinal (map f u) = cardinal u }
+= assert { cardinal (map f u) <= cardinal u };
+  assert { cardinal (map g (map f u)) <= cardinal (map f u) };
+  assert { cardinal u <= cardinal (map g (map f u)) }
+
+function rmleft (nr:int) (c:coloring) : coloring = c[nr+1 ..]
+
+use seq.FreeMonoid
+
+lemma ext: forall c1 c2: coloring. Seq.(==) c1 c2 -> c1 = c2
+lemma app_eq: forall c1 c2 c3 c4: coloring. c1 = c2 -> c3 = c4 -> c1 ++ c3 = c2 ++ c4
+
+let rec lemma addleft_result (c:coloring) (nr:int)
+  requires { 0 <= nr }
+  ensures  { addleft nr c = (Seq.create nr red) ++ (cons Black c) }
+  variant  { nr }
+= if nr = 0 then assert { addleft nr c = (Seq.create nr red) ++ (cons Black c) }
+  else begin
+    let cnr = create nr red in
+    let cnrm = create (nr - 1) red in
+    addleft_result c (nr-1);
+    assert { addleft (nr-1) c = cnrm ++ cons Black c };
+    assert { cons Red cnrm = cnr
+               by Seq.(==) (cons Red cnrm) cnr };
+    assert { addleft nr c = cnr ++ cons Black c
+             by addleft nr c
+                = cons Red (addleft (nr-1) c)
+                = cons Red (cnrm ++ cons Black c)
+                = (cons Red cnrm) ++ cons Black c
+                = cnr ++ cons Black c }
+  end
+
+let lemma addleft_bijective (nr:int)
+  requires { 0 <= nr }
+  ensures  { reciprocal (addleft nr) (rmleft nr) }
+= assert { forall c i. 0 <= i < length c -> (rmleft nr (addleft nr c))[i] = c[i] };
+  assert { forall c. Seq.(==) (rmleft nr (addleft nr c)) c }
+
+let lemma mapaddleft_card (s: set coloring) (nr: int)
+  requires { 0 <= nr }
+  ensures  { cardinal (mapaddleft s nr) = cardinal s }
+= addleft_bijective nr;
+  bij_cardinal s (addleft nr) (rmleft nr)
+
+let lemma addleft_valid (c:coloring) (nr:int)
+  requires { nr = 0 \/ 3 <= nr }
+  requires { valid c }
+  ensures  { valid (addleft nr c) }
+= addleft_result c nr;
+  if nr = 0 then assert { valid (addleft 0 c) }
+  else valid_split_fb (addleft nr c) nr
+
+let lemma mapaddleft_valid (s: set coloring) (nr: int)
+  requires { forall c. mem c s -> valid c }
+  requires { nr = 0 \/ 3 <= nr }
+  ensures  { forall c. mem c (mapaddleft s nr) -> valid c }
+= assert { forall c. mem c (mapaddleft s nr) ->
+                     valid c
+                     by mem c (map (addleft nr) s)
+                     so (exists y. mem y s /\ c = addleft nr y) }
+
+let lemma mapaddleft_length (s: set coloring) (nr: int) (l1 l2: int)
+  requires { forall c. mem c s -> Seq.length c = l1 }
+  requires { 0 <= nr }
+  requires { l2 = l1 + nr + 1 }
+  ensures  { forall c. mem c (mapaddleft s nr) -> Seq.length c = l2 }
+= ()
+
+let rec disjoint_union (s1 s2: set coloring) : set coloring
+  requires { forall x. mem x s1 -> not mem x s2 }
+  ensures  { result = union s1 s2 }
+  ensures  { cardinal result = cardinal s1 + cardinal s2 }
+  variant  { cardinal s1 }
+= if is_empty s1
+  then begin
+    assert { union s1 s2 = s2
+             by (forall x. mem x (union s1 s2)
+                -> mem x s1 \/ mem x s2 -> mem x s2)
+             so subset (union s1 s2) s2 };
+    s2
+  end
+  else
+    let x = choose s1 in
+    let s1' = remove x s1 in
+    let s2' = add x s2 in
+    let u = disjoint_union s1' s2' in
+    assert { u = union s1 s2
+             by u = union s1' s2'
+             so (forall y. (mem y s2' <-> (mem y s2 \/ y = x)))
+             so (forall y. ((mem y s1' \/ y = x) <-> mem y s1))
+             so (forall y. mem y u <-> mem y s1' \/ mem y s2'
+                       <-> mem y s1' \/ mem y s2 \/ y = x
+                       <-> mem y s1 \/ mem y s2
+                       <-> mem y (union s1 s2))
+             so (forall y. mem y u <-> mem y (union s1 s2))
+             so Fset.(==) u (union s1 s2)};
+    u
+
+use array.Array
+
+let enum () : (count: array int, ghost sets: array (set coloring))
+  ensures { Array.length count = 51 = Array.length sets
+            /\ (forall i. 0 <= i <= 50 ->
+               (forall c: coloring. Seq.length c = i ->
+                          (valid c <-> mem c (sets[i]))))
+            /\ (forall i. 0 <= i < 50 ->
+                          count[i] = cardinal (sets[i])) }
+= let count = Array.make 51 0 in
+  let ghost sets : array (set coloring) = Array.make 51 Fset.empty in
+  count[0] <- 1;
+  sets[0] <- colorings0;
+  assert { forall c. ((Seq.length c = 0 /\ valid c) <-> mem c (sets[0])) };
+  count[1] <- 1;
+  sets[1] <- colorings1;
+  assert { forall i c. (i=0 \/ i=1)
+           -> ((Seq.length c = i /\ valid c) <-> mem c (sets[i])) };
+  count[2] <- 1;
+  sets[2] <- colorings2;
+  assert { forall i c. (i=0 \/ i=1 \/ i=2)
+           -> ((Seq.length c = i /\ valid c) <-> mem c (sets[i])) };
+  count[3] <- 2;
+  sets[3] <- colorings3;
+  assert { sets[3] = colorings3 };
+  assert { forall i c. (i=0 \/ i=1 \/ i=2 \/ i = 3)
+           -> ((Seq.length c = i /\ valid c) <-> mem c (sets[i])) };
+  assert { cardinal colorings3 = 2 };
+  for n = 4 to 50 do
+    invariant { forall c i. 0 <= i < n -> Seq.length c = i ->
+                         valid c -> mem c (sets[i]) }
+    invariant { forall c i. 0 <= i < n -> mem c (sets[i]) ->
+                         (Seq.length c = i /\ valid c) }
+    invariant { forall i. 0 <= i < n ->
+                         count[i] = cardinal (sets[i]) }
+    label StartLoop in
+    (* colorings with first_black_tile = 0 *)
+    count[n] <- count[n-1];
+    mapaddleft_valid (sets[n-1]) 0;
+    sets[n] <- mapaddleft (sets[n-1]) 0;
+    assert { forall i. 0 <= i < n -> sets[i] = sets[i] at StartLoop };
+    assert { forall i. 0 <= i < n -> count[i] = count[i] at StartLoop };
+    assert { forall c. Seq.length c = n -> valid c -> first_black_tile c < 3 ->
+                       mem c sets[n]
+                       by first_black_tile c = 0
+                       so valid c[1 ..]
+                       so mem c[1 ..] (sets[n-1])
+                       so addleft 0 c[1 ..] = c
+                       so mem c (mapaddleft sets[n-1] 0) };
+    for k = 3 to n-1 do
+      invariant { forall c i. 0 <= i < n -> Seq.length c = i ->
+                           valid c -> mem c (sets[i]) }
+      invariant { forall c i. 0 <= i < n -> mem c (sets[i]) ->
+                             (Seq.length c = i /\ valid c) }
+      invariant { forall i. 0 <= i < n ->
+                            count[i] = cardinal (sets[i]) }
+      invariant { forall c. (mem c (sets[n]) <->
+                            (Seq.length c = n /\ valid c
+                            /\ first_black_tile c < k)) }
+      invariant { count[n] = cardinal (sets[n]) }
+      label InnerLoop in
+      (* colorings with first_black_tile = k *)
+      count[n] <- count [n] + count [n-k-1];
+      mapaddleft_length (sets[n-k-1]) k (n-k-1) n;
+      mapaddleft_valid  (sets[n-k-1]) k;
+      mapaddleft_card   (sets[n-k-1]) k;
+      let ghost ns = mapaddleft sets[n-k-1] k in
+      assert { forall c. mem c ns -> first_black_tile c = k };
+      assert { forall c. Seq.length c = n -> valid c -> first_black_tile c = k
+                         -> mem c ns
+                         by valid c[k+1 ..]
+                         so mem c[k+1 ..] (sets[n-k-1])
+                         so let c' = addleft k c[k+1 ..] in
+                            ((forall i. 0 <= i < n -> Seq.get c i = Seq.get c' i)
+                             by c[k+1 ..] = c'[k+1 ..])
+                         so Seq.(==) c' c
+                         so c' = c
+                         so mem c (mapaddleft sets[n-k-1] k) };
+      sets[n] <- disjoint_union (sets[n]) ns;
+      assert { forall i. 0 <= i < n -> sets[i] = sets[i] at InnerLoop };
+      assert { forall i. 0 <= i < n -> count[i] = count[i] at InnerLoop };
+    done;
+    (* coloring with first_black_tile = n *)
+    label LastAdd in
+    let ghost r = Seq.create n red in
+    let ghost sr = Fset.singleton r in
+    assert { forall c. mem c sets[n] -> first_black_tile c < n };
+    assert { first_black_tile r = n };
+    assert { valid r /\ Seq.length r = n };
+    count[n] <- count[n]+1;
+    sets[n] <- disjoint_union (sets[n]) sr;
+    assert { forall c. mem c sets[n] -> valid c /\ Seq.length c = n
+                       by [@case_split] mem c (sets[n] at LastAdd) \/ mem c sr };
+    assert { forall c. Seq.length c = n -> first_black_tile c = n ->
+                       mem c sets[n]
+                       by (forall k. 0 <= k < n -> Seq.get c k = Red)
+                       so c == r so c = r };
+    assert { forall i. 0 <= i < n -> sets[i] = sets[i] at LastAdd };
+    assert { forall i. 0 <= i < n -> count[i] = count[i] at LastAdd };
+  done;
+  count, sets
+
+end

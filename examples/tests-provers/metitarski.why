@@ -1,6 +1,6 @@
 theory P
 
-  use import real.Real
+  use real.Real
 
   goal x_mul_x_pos :
     forall x:real. x * x >= 0.0
@@ -14,8 +14,8 @@ end
 
 theory P2
 
-  use import real.Real
-  use import real.Square
+  use real.Real
+  use real.Square
 
   goal sqr_pos :
     forall x:real. sqr x >= 0.0
@@ -24,8 +24,8 @@ end
 
 theory P3
 
-  use import real.Real
-  use import real.Trigonometry
+  use real.Real
+  use real.Trigonometry
 
   (* unprovable without cos-constant.ax, which causes failures for more interesting goals *)
   goal cos_bound :
@@ -35,7 +35,7 @@ theory P3
     forall x:real. -0.7 <= x <= 0.7 -> 0.7 <= cos x <= 1.0
 
 
-  use import real.Abs
+  use real.Abs
 
   goal MethodErrorOK: forall x:real. abs x <= 0x1p-5 ->
     abs (1.0 - 0.5 * (x * x) - cos x) <= 0x1p-24
@@ -48,8 +48,8 @@ end
 
 theory Power
 
-use import real.RealInfix
-use import real.PowerReal
+use real.RealInfix
+use real.PowerReal
 
 goal G: false
 
@@ -62,8 +62,8 @@ end
 
 theory PolyPaverExamples
 
-  use import real.Real
-  use import real.ExpLog
+  use real.Real
+  use real.ExpLog
 
   goal g1: forall a b : real.
     -10.0 <= a <= 10.0 ->

@@ -1,6 +1,6 @@
 
-use import int.Int
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 val incr (x:ref int) : unit writes {x} ensures { !x = old !x + 1 }
 

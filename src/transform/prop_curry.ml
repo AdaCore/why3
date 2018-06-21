@@ -18,7 +18,7 @@ let rec curry t = match t.t_node with
 
 and expand orig l r = match l.t_node with
   | Tbinop (Tand, a, b) -> expand orig a (expand orig b r)
-  | _  -> t_label_copy orig (t_implies (curry l) r)
+  | _  -> t_attr_copy orig (t_implies (curry l) r)
 
 let curry = Trans.goal (fun pr t -> [create_prop_decl Pgoal pr (curry t)])
 

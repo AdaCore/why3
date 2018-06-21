@@ -1,7 +1,7 @@
 
 theory FibonacciTest
 
-  use import int.Fibonacci
+  use int.Fibonacci
 
   lemma isfib_2_1 : fib 2 = 1
   lemma isfib_6_8 : fib 6 = 8
@@ -12,9 +12,9 @@ end
 
 module FibonacciLinear
 
-  use import int.Fibonacci
-  use import int.Int
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use ref.Ref
 
   let fib (n:int) : int
     requires { n >= 0 }
@@ -35,8 +35,8 @@ end
 
 module FibRecGhost
 
-  use import int.Fibonacci
-  use import int.Int
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
     requires { k >= 0 }
@@ -63,8 +63,8 @@ end
 
 module FibRecNoGhost
 
-  use import int.Fibonacci
-  use import int.Int
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (a b k: int) : int
     requires { k >= 0 }
@@ -83,10 +83,10 @@ end
 
 module SmallestFibAbove
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
 
   let smallest_fib_above (x: int) : int
     requires { 0 <= x }
@@ -117,12 +117,12 @@ Cf https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem
 
 module Zeckendorf
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
-  use import list.List
-  use import SmallestFibAbove
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
+  use list.List
+  use SmallestFibAbove
 
   function sum (l: list int) : int = match l with
   | Nil -> 0
@@ -239,12 +239,12 @@ module Zeckendorf
     requires { sum l1 = sum l2 }
     ensures { l1 = l2 }
     variant { sum l1 }
-  = let rec decomp (k acc:int) (lc lb:list int) : (int,list int)
+  = let rec decomp (k acc:int) (lc lb:list int) : (x: int, p: list int)
       requires { wf k lc }
       requires { k >= 2 /\ lc <> Nil }
       requires { 0 <= acc = sum lb - sum lc < fib (k-1) }
-      returns { x,p -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
-      returns { x,p -> wf k p /\ x >= k /\ lc = snoc p x }
+      ensures { fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
+      ensures { wf k p /\ x >= k /\ lc = snoc p x }
       variant { lc }
     = match lc with
       | Nil -> absurd
@@ -265,7 +265,7 @@ end
 
 theory Mat22
 
-  use import int.Int
+  use int.Int
 
   type t = { a11: int; a12: int; a21: int; a22: int }
 
@@ -280,16 +280,17 @@ theory Mat22
   clone export
     int.Exponentiation with
       type t = t, function one = id, function (*) = mult,
-      goal Assoc, goal Unit_def_l, goal Unit_def_r
+      goal Assoc, goal Unit_def_l, goal Unit_def_r,
+      axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 
 module FibonacciLogarithmic
 
-  use import int.Int
-  use import int.Fibonacci
-  use import int.ComputerDivision
-  use import Mat22
+  use int.Int
+  use int.Fibonacci
+  use int.ComputerDivision
+  use Mat22
 
   val constant m1110 : t
     ensures { result = { a11 = 1; a12 = 1;

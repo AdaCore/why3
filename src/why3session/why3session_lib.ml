@@ -88,16 +88,14 @@ let read_update_session ~allow_obsolete env config fname =
   S.update_session ~ctxt session env config
  *)
   let cont = Controller_itp.create_controller config env session in
-  let errors, found_obs, some_merge_miss =
-    Controller_itp.reload_files cont ~use_shapes
+  let found_obs, some_merge_miss =
+    try
+      Controller_itp.reload_files cont ~use_shapes
+    with
+    | Controller_itp.Errors_list l ->
+        List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
+        exit 1
   in
-  begin
-    match errors with
-    | [] -> ()
-    | l ->
-       List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
-       exit 1
-  end;
   if (found_obs || some_merge_miss) && not allow_obsolete then raise Exit;
   cont, found_obs, some_merge_miss
 
@@ -332,6 +330,8 @@ let get_used_provers session =
      session;
   !sprover
 
+let get_transf_string s tr =
+  String.concat " " (Session_itp.get_transf_name s tr :: Session_itp.get_transf_args s tr)
 
 let rec transf_depth s tr =
   List.fold_left

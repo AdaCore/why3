@@ -75,25 +75,15 @@ end
 module TreeReconstruction
 
   use export Tree
-  use import list.Length
-
-  (* termination of build_rec (below) requires a lexicographic order *)
-  predicate lex (x1 x2: (list int, int)) =
-    let s1, d1 = x1 in
-    let s2, d2 = x2 in
-    length s1 < length s2 ||
-    length s1 = length s2 &&
-      match s1, s2 with
-      | Cons h1 _, Cons h2 _ -> d2 < d1 <= h1 = h2
-      | _ -> false
-      end
+  use list.Length
+  use list.HdTlNoOpt
 
   exception Failure
     (* used to signal the algorithm's failure i.e. there is no tree *)
 
-  let rec build_rec (d: int) (s: list int) : (tree, list int)
-    variant { (s, d) with lex }
-    returns { t, s' -> s = depths d t ++ s' }
+  let rec build_rec (d: int) (s: list int) : (t: tree, s': list int)
+    variant { length s, hd s - d }
+    ensures { s = depths d t ++ s' }
     raises  { Failure -> forall t: tree, s' : list int. depths d t ++ s' <> s }
   = match s with
     | Nil ->
@@ -121,7 +111,7 @@ end
 
 module Harness
 
-  use import TreeReconstruction
+  use TreeReconstruction
 
   let harness ()
     ensures { result = Node Leaf (Node (Node Leaf Leaf) Leaf) }
@@ -156,9 +146,9 @@ end
 
 module ZipperBasedTermination
 
-  use import Tree
-  use import list.Length
-  use import list.Reverse
+  use Tree
+  use list.Length
+  use list.Reverse
 
   exception Failure
 
@@ -183,9 +173,9 @@ end
 
 module ZipperBased
 
-  use import Tree
-  use import list.Length
-  use import list.Reverse
+  use Tree
+  use list.Length
+  use list.Reverse
 
   (* the following function generalizes function [depths] to a forest, that
      is a list of pairs (depth, tree) *)
@@ -222,7 +212,7 @@ module ZipperBased
   (* an easy lemma on [g] *)
 
   lemma g_append:
-    forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l1
+    forall l1 [@induction] l2: list (int, tree). g (l1 ++ l2) -> g l1
 
   (* key lemma for completeness: whenever we fail because [right] is empty,
      we have to prove that there is no solution
@@ -230,6 +220,14 @@ module ZipperBased
      Note: the proof first generalizes the statement as follows:
        forest_depths ((d1,t1) :: l) <> depths d t + s
      whenever d < d1 (see the corresponding Coq file) *)
+
+  lemma depths_length: forall t d. length (depths d t) >= 1
+  lemma forest_depths_length: forall l. length (forest_depths l) >= 0
+  lemma g_tail: forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l2
+
+  lemma key_lemma : forall t l d d1 t1 s. d < d1 ->
+    1 <= length l -> g (reverse (Cons (d1, t1) l)) ->
+    not (forest_depths (Cons (d1, t1) l) = (depths d t) ++ s)
 
   lemma right_nil:
     forall l: list (int, tree). length l >= 2 -> g l ->

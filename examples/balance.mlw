@@ -45,10 +45,10 @@ end
 
 module Puzzle8
 
-  use import Roberval
-  use import array.Array
+  use Roberval
+  use array.Array
 
-  (** All values in [balls(lo..hi-1)] are equal to [w], apart from balls[lb]
+  (** All values in `balls[lo..hi-1]` are equal to `w`, apart from `balls[lb]`
      which is smaller. *)
   predicate spec (balls: array int) (lo hi: int) (lb w: int) =
     0 <= lo <= lb < hi <= length balls &&
@@ -56,7 +56,7 @@ module Puzzle8
     balls[lb] < w
 
   (** Solve the problem for 3 balls, using exactly one weighing.
-      The solution [lb] is passed as a ghost argument. *)
+      The solution `lb` is passed as a ghost argument. *)
   let solve3 (balls: array int) (lo: int) (ghost lb: int) (ghost w: int) : int
     requires { !counter >= 1 }
     requires { spec balls lo (lo + 3) lb w }
@@ -70,7 +70,7 @@ module Puzzle8
     end
 
   (** Solve the problem for 8 balls, using exactly two weighings.
-      The solution [lb] is passed as a ghost argument. *)
+      The solution `lb` is passed as a ghost argument. *)
   let solve8 (balls: array int) (ghost lb: int) (ghost w: int) : int
     requires { !counter = 2 }
     requires { spec balls 0 8 lb w }
@@ -97,11 +97,11 @@ end
 
 module Puzzle12
 
-  use import Roberval
-  use import array.Array
+  use Roberval
+  use array.Array
 
-  (** The index [j] of the intruder, its status [b] (whether it is
-      lighter or heavier), and the weight [w] of the other balls are
+  (** The index `j` of the intruder, its status `b` (whether it is
+      lighter or heavier), and the weight `w` of the other balls are
       all passed as ghost arguments. *)
  let solve12 (balls: array int) (ghost w j: int) (ghost b: bool) : (int, bool)
     requires { !counter = 3 }

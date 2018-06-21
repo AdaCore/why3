@@ -45,7 +45,7 @@ module TermCmp = struct
 	    else false
 
   let compare a b =
-    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
+    if (a.t_loc = b.t_loc) && (a.t_attrs = b.t_attrs)
     then 0 else
       (* Order the terms accoridng to their source code locations  *)
       if before a.t_loc b.t_loc then 1
@@ -57,7 +57,7 @@ module S = Set.Make(TermCmp)
 
 let add_model_element (el: term) info_model =
  (* Add element el (term) to info_model.
-    If an element with the same hash (the same set of labels + the same
+    If an element with the same hash (the same set of attributes + the same
     location) as the element el already exists in info_model, replace it with el.
 
     The reason is that  we do not want to display two model elements with the same
@@ -77,38 +77,40 @@ let add_model_element (el: term) info_model =
   let info_model = S.remove el info_model in
   S.add el info_model
 
-let add_old lab_str =
+        (*
+let add_old attr_str =
   try
-    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
-    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
+    let pos = Str.search_forward (Str.regexp "@") attr_str 0 in
+    let after = String.sub attr_str pos ((String.length attr_str)-pos) in
     if after = "@init" then
-      (String.sub lab_str 0 pos) ^ "@old"
-    else lab_str
-  with Not_found -> lab_str ^ "@old"
+      (String.sub attr_str 0 pos) ^ "@old"
+    else attr_str
+  with Not_found -> attr_str ^ "@old"
 
-let model_trace_for_postcondition ~labels (info: vc_term_info)  =
-  (* Modifies the  model_trace label of a term in the postcondition:
+let model_trace_for_postcondition ~attrs (info: vc_term_info)  =
+  (* Modifies the model_trace attribute of a term in the postcondition:
      - if term corresponds to the initial value of a function
-     parameter, model_trace label will have postfix @old
-     - if term corresponds to the return value of a function, add
-     model_trace label in a form function_name@result
+     parameter, model_trace attribute will have postfix @old
+     - if term corresponds to the return value of a function,
+     add model_trace attribute in a form function_name@result
   *)
   try
-    let trace_label = get_model_trace_label ~labels in
-    let lab_str = add_old trace_label.lab_string in
-    if lab_str = trace_label.lab_string then
-      labels
+    let trace_attr = get_model_trace_attr ~attrs in
+    let attr_str = add_old trace_attr.attr_string in
+    if attr_str = trace_attr.attr_string then
+      attrs
     else
-      let other_labels = Slab.remove trace_label labels in
-      Slab.add
-	(Ident.create_label lab_str)
-	other_labels
+      let other_attrs = Sattr.remove trace_attr attrs in
+      Sattr.add
+	(Ident.create_attribute attr_str)
+	other_attrs
   with Not_found ->
-    (* no model_trace label => the term represents the return value *)
-    Slab.add
-      (Ident.create_model_trace_label
+    (* no model_trace attribute => the term represents the return value *)
+    Sattr.add
+      (Ident.create_model_trace_attr
 	 ((Opt.get_def "" info.vc_func_name)  ^ "@result"))
-      labels
+      attrs
+         *)
 
 let get_fun_name name =
   let splitted = Strings.bounded_split ':' name 2 in
@@ -124,24 +126,25 @@ let check_enter_vc_term t in_goal vc_term_info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
+  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc;
     try
-      (* Label "model_func" => the VC is postcondition or precondition *)
-      (* Extract the function name from "model_func" label *)
-      let fun_label =
-        Slab.choose (Slab.filter (fun l -> Strings.has_prefix "model_func:" l.lab_string)
-                                 t.t_label)
+      (* Attribute "model_func" => the VC is postcondition or precondition *)
+      (* Extract the function name from "model_func" attribute *)
+      let fun_attr =
+        Sattr.choose (Sattr.filter
+          (fun a -> Strings.has_prefix "model_func:" a.attr_string)
+          t.t_attrs)
       in
-      vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
+      vc_term_info.vc_func_name <- Some (get_fun_name fun_attr.attr_string);
     with Not_found ->
-      (* No label "model_func" => the VC is not postcondition or precondition *)
+      (* No "model_func" => the VC is not postcondition or precondition *)
       ()
   end
 
 let check_exit_vc_term t in_goal info =
   (* Check whether the term triggering VC is exited. *)
-  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
+  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
     info.vc_inside <- false;
   end

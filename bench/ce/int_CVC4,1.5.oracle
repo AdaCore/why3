@@ -1,70 +1,48 @@
-bench/ce/int.mlw T g_no_lab: Unknown (other)
+bench/ce/int.mlw T g_lab: Unknown (other)
 Counter-example model:File int.mlw:
 Line 5:
-x = {"type" : "Integer" ,
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "48" }
 
-bench/ce/int.mlw T g_lab0: Unknown (other)
+bench/ce/int.mlw T g_no_lab: Unknown (other)
 Counter-example model:File int.mlw:
 Line 7:
-x = {"type" : "Integer" ,
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "48" }
 
 bench/ce/int.mlw T g2_lab: Unknown (other)
 Counter-example model:File int.mlw:
-Line 12:
-x = {"type" : "Integer" ,
+Line 9:
+g, [[@model], [@model_trace:g]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 11:
+x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/int.mlw T newgoal: Unknown (other)
 Counter-example model:File int.mlw:
-Line 14:
-x2 = {"type" : "Integer" , "val" : "1" }
-x3 = {"type" : "Integer" ,
-"val" : "1" }
-x4 = {"type" : "Integer" ,
-"val" : "1" }
-x5 = {"type" : "Integer" ,
-"val" : "1" }
-x6 = {"type" : "Integer" ,
-"val" : "1" }
-x7 = {"type" : "Integer" ,
-"val" : "1" }
-x8 = {"type" : "Integer" ,
-"val" : "1" }
-
-bench/ce/int.mlw T g_no_lab: Unknown (other)
-Counter-example model:File int.mlw:
-Line 5:
-x = {"type" : "Integer" ,
-"val" : "48" }
-
-bench/ce/int.mlw T g_lab0: Unknown (other)
-Counter-example model:File int.mlw:
-Line 7:
-x = {"type" : "Integer" ,
-"val" : "48" }
-
-bench/ce/int.mlw T g2_lab: Unknown (other)
-Counter-example model:File int.mlw:
-Line 12:
-x = {"type" : "Integer" ,
+Line 9:
+g, [[@model], [@model_trace:g]] = {"type" : "Integer" ,
 "val" : "0" }
-
-bench/ce/int.mlw T newgoal: Unknown (other)
-Counter-example model:File int.mlw:
-Line 14:
-x2 = {"type" : "Integer" , "val" : "1" }
-x3 = {"type" : "Integer" ,
+Line 13:
+X, [[@model], [@introduced], [@model_trace:X]] = {"type" : "Integer" ,
 "val" : "1" }
-x4 = {"type" : "Integer" ,
+x2, [[@model], [@introduced],
+[@model_trace:x2]] = {"type" : "Integer" , "val" : "1" }
+x3, [[@model],
+[@introduced], [@model_trace:x3]] = {"type" : "Integer" ,
 "val" : "1" }
-x5 = {"type" : "Integer" ,
+x4, [[@model], [@introduced],
+[@model_trace:x4]] = {"type" : "Integer" , "val" : "1" }
+x5, [[@model],
+[@introduced], [@model_trace:x5]] = {"type" : "Integer" ,
 "val" : "1" }
-x6 = {"type" : "Integer" ,
+x6, [[@model], [@introduced],
+[@model_trace:x6]] = {"type" : "Integer" , "val" : "1" }
+x7, [[@model],
+[@introduced], [@model_trace:x7]] = {"type" : "Integer" ,
 "val" : "1" }
-x7 = {"type" : "Integer" ,
-"val" : "1" }
-x8 = {"type" : "Integer" ,
+x8, [[@model], [@introduced],
+[@model_trace:x8]] = {"type" : "Integer" ,
 "val" : "1" }
 

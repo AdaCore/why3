@@ -16,7 +16,7 @@ let debug_refl = Debug.register_info_flag
                      ~desc:"Reflection transformations"
                      "reflection"
 
-let expl_reification_check = Ident.create_label "expl:reification check"
+let expl_reification_check = Ident.create_attribute "expl:reification check"
 
 type reify_env = { kn: known_map;
                    store: (vsymbol * int) Mterm.t;
@@ -27,6 +27,7 @@ type reify_env = { kn: known_map;
                    crc_map: Coercion.t;
                    ty_to_map: vsymbol Mty.t;
                    env: Env.env;
+                   interps: Sls.t; (* functions that were inverted*)
                    task: Task.task;
                    bound_vars: Svs.t; (* bound variables, do not map them in a var map*)
                    bound_fr: int; (* separate, negative index for bound vars*)
@@ -42,6 +43,7 @@ let init_renv kn crc lv env task =
     crc_map = crc;
     ty_to_map = Mty.empty;
     env = env;
+    interps = Sls.empty;
     task = task;
     bound_vars = Svs.empty;
     bound_fr = -1;
@@ -103,7 +105,7 @@ let rec reify_term renv t rt =
     if is_eq_true f && not (is_eq_true t)
     then invert_nonvar_pat vl renv (p, lhs_eq_true f) t else
     match p.pat_node, f.t_node, t.t_node with
-    | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_nl f t ->
+    | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_na f t ->
        Debug.dprintf debug_reification "case equal@.";
        renv, t
     | Papp (cs, pl), _,_
@@ -250,10 +252,10 @@ let rec reify_term renv t rt =
            | Ttrue | Tfalse -> t
            | _ -> t (* FIXME some cases missing *)
          in
-         t_label ?loc:t.t_loc Slab.empty t
+         t_attr_set ?loc:t.t_loc Sattr.empty t
        in
        let t = rm t in
-       (* remove labels to identify terms that are equal modulo labels *)
+       (* remove attributes to identify terms modulo attributes *)
        if Mterm.mem t renv.store
        then
          begin
@@ -309,7 +311,7 @@ let rec reify_term renv t rt =
     let vl, f = open_ls_defn ld in
     Debug.dprintf debug_reification "invert_interp ls %a t %a@."
                                 Pretty.print_ls ls Pretty.print_term t;
-    invert_body renv ls vl f t
+    invert_body { renv with interps = Sls.add ls renv.interps } ls vl f t
   and invert_body renv ls vl f t =
     match f.t_node with
     | Tvar v when vs_equal v (List.hd vl) -> renv, t
@@ -345,6 +347,7 @@ let rec reify_term renv t rt =
     let vl, f = open_ls_defn ld in
     Debug.dprintf debug_reification "invert_ctx_interp ls %a @."
                                 Pretty.print_ls ls;
+    let renv = { renv with interps = Sls.add ls renv.interps } in
     invert_ctx_body renv ls vl f t l g
   and invert_ctx_body renv ls vl f t l g =
     match f.t_node with
@@ -520,7 +523,7 @@ let build_vars_map renv prev =
       renv.store (prev,[]) in
   subst, prev, mapdecls, defdecls
 
-let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
+let build_goals do_trans renv prev mapdecls defdecls subst env lp g rt =
   Debug.dprintf debug_refl "building goals@.";
   let inst_rt = t_subst subst rt in
   Debug.dprintf debug_refl "reified goal instantiated@.";
@@ -530,12 +533,12 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
   let d_r = create_prop_decl Paxiom hr inst_rt in
   let pr = create_prsymbol
              (id_fresh "GR"
-                       ~label:(Slab.singleton expl_reification_check)) in
+                       ~attrs:(Sattr.singleton expl_reification_check)) in
   let d = create_prop_decl Pgoal pr g in
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
   Debug.dprintf debug_refl "building cut indication rt %a g %a@."
     Pretty.print_term rt Pretty.print_term g;
-  let compute_hyp pr = Compute.normalize_hyp None (Some pr) env in
+  let compute_hyp_few pr = Compute.normalize_hyp_few None (Some pr) env in
   let compute_in_goal = Compute.normalize_goal_transf_all env in
   let ltask_r =
     try let ci =
@@ -556,7 +559,13 @@ let build_goals do_trans prev mapdecls defdecls subst env lp g rt =
          Debug.dprintf debug_refl "no cut found@.";
          if do_trans
          then
-           let t = Trans.apply (compute_hyp hr) task_r in
+           let g, prev = task_separate_goal task_r in
+           let prev = Sls.fold
+                     (fun ls t ->
+                       Task.add_meta t Compute.meta_rewrite_def [Theory.MAls ls])
+                     renv.interps prev in
+           let t = Task.add_tdecl prev g in
+           let t = Trans.apply (compute_hyp_few hr) t in
            match t with
            | [t] ->
               let rewrite = Apply.rewrite_list None false true
@@ -579,20 +588,22 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
   Debug.dprintf debug_refl "start@.";
-  let d = Apply.find_hypothesis pr.pr_name prev in
-  if d = None then raise (Exit "lemma not found");
-  let d = Opt.get d in
-  let l = Apply.term_decl d in
+  let l =
+    let kn' = task_known prev in (* TODO Do we want kn here ? *)
+    match find_prop_decl kn' pr with
+    | (_, t) -> t
+    | exception Not_found -> raise (Exit "lemma not found")
+  in
   let (lp, lv, rt) = Apply.intros l in
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
   let subst, prev, mds, dds = build_vars_map renv prev in
-  build_goals true prev mds dds subst env lp g rt)
+  build_goals true renv prev mds dds subst env lp g rt)
 
 open Expr
 open Ity
-open Stdlib
+open Wstdlib
 open Mlinterp
 
 exception ReductionFail of reify_env
@@ -675,7 +686,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
     let rinfo, lp, _lv, rt = reify_post lpost in
     let lp = (rs.rs_cty.cty_pre)@lp in
     let subst, prev, mds, dds = build_vars_map rinfo prev in
-    build_goals do_trans prev mds dds subst env lp g rt
+    build_goals do_trans rinfo prev mds dds subst env lp g rt
   with
     ReductionFail renv ->
     (* proof failed, show reification context for debugging *)

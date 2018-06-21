@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Rc
 
 (* magicnumber for the configuration :
@@ -51,11 +51,13 @@ let default_conf_file =
 
 (* Prover *)
 
+(* BEGIN{provertype} anchor for automatic documentation, do not remove *)
 type prover =
     { prover_name : string;
       prover_version : string;
       prover_altern : string;
     }
+(* END{provertype} anchor for automatic documentation, do not remove *)
 
 let print_altern fmt s =
   if s <> "" then Format.fprintf fmt " (%s)" s
@@ -116,6 +118,14 @@ type prover_upgrade_policy =
   | CPU_upgrade of prover
   | CPU_duplicate of prover
 
+let print_prover_upgrade_policy fmt p =
+  match p with
+  | CPU_keep -> Format.fprintf fmt "keep"
+  | CPU_upgrade p -> Format.fprintf fmt "upgrade to %a" print_prover p
+  | CPU_duplicate p -> Format.fprintf fmt "copy to %a" print_prover p
+
+
+
 type config_prover = {
   prover  : prover;
   command : string;
@@ -174,8 +184,6 @@ type main = {
   (* max number of running prover processes *)
   plugins : string list;
   (* plugins to load, without extension, relative to [libdir]/plugins *)
-  cntexample : bool;
-  (* true provers should be asked for counter-example model *)
   default_editor : string;
   (* editor name used when no specific editor known for a prover *)
 }
@@ -208,7 +216,6 @@ let set_loadpath m l = { m with loadpath = l}
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
-let cntexample m = m.cntexample
 let default_editor m = m.default_editor
 
 exception StepsCommandNotSpecified of string
@@ -225,9 +232,6 @@ let get_complete_command pc ~with_steps =
 
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }
-
-let set_cntexample m cntexample =
-  { m with cntexample = cntexample }
 
 let set_default_editor m e = { m with default_editor = e }
 
@@ -270,7 +274,6 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    cntexample = false;  (* no counter-examples by default *)
     default_editor = (try Sys.getenv "EDITOR" ^ " %f"
                       with Not_found -> "editor %f");
   }
@@ -291,7 +294,6 @@ let set_main rc main =
   let section =
     set_int section "running_provers_max" main.running_provers_max in
   let section = set_stringl section "plugin" main.plugins in
-  let section = set_bool section "cntexample" main.cntexample in
   let section = set_string section "default_editor" main.default_editor in
   set_section rc "main" section
 
@@ -530,7 +532,6 @@ let load_main dirname section =
     running_provers_max = get_int ~default:default_main.running_provers_max
                                   section "running_provers_max";
     plugins = get_stringl ~default:[] section "plugin";
-    cntexample = get_bool ~default:default_main.cntexample section "cntexample";
     default_editor = get_string ~default:default_main.default_editor section "default_editor";
   }
 
@@ -593,8 +594,8 @@ let read_config conf_file =
   try
     get_config filenamerc
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    Format.fprintf str_formatter "%a" Exn_printer.exn_printer e;
-    raise (ConfigFailure (fst filenamerc, flush_str_formatter ()))
+    let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+    raise (ConfigFailure (fst filenamerc, s))
 
 (** filter prover *)
 type regexp_desc = { reg : Str.regexp; desc : string}

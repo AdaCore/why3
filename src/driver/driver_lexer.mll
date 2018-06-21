@@ -53,7 +53,6 @@
         "literal", LITERAL;
         "use", USE;
       ]
-
 }
 
 let space = [' ' '\t' '\r']
@@ -66,11 +65,11 @@ let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
 
 rule token = parse
   | '\n'
-      { new_line lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | "(*)"
-      { LEFTPAR_STAR_RIGHTPAR }
+      { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
   | '_'
@@ -91,6 +90,8 @@ rule token = parse
       { RIGHTPAR }
   | "."
       { DOT }
+  | ".."
+      { DOTDOT }
   | ","
       { COMMA }
   | "'"

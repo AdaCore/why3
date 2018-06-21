@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" proved="true">
@@ -13,7 +14,11 @@
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC testVariant" expl="VC for testVariant" proved="true">
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="VC testVariant.0" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.40" steps="582"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="ttt" proved="true">
  <proof prover="4"><result status="valid" time="0.05"/></proof>
@@ -157,7 +162,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC add" expl="VC for add" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC add.0" expl="array creation size" proved="true">
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>

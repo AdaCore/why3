@@ -8,12 +8,12 @@
 
 module Seq
 
-  use import int.Int
+  use int.Int
 
   (** the polymorphic type of sequences *)
   type seq 'a
 
-  (** [seq 'a] is an infinite type *)
+  (** `seq 'a` is an infinite type *)
   meta "infinite_type" type seq
 
   val function length (seq 'a) : int
@@ -22,7 +22,7 @@ module Seq
     forall s: seq 'a. 0 <= length s
 
   val function get (seq 'a) int : 'a
-  (** [get s i] is the ([i]+1)-th element of sequence [s]
+  (** `get s i` is the `i+1`-th element of sequence `s`
       (the first element has index 0) *)
 
   let function ([]) (s: seq 'a) (i: int) : 'a =
@@ -52,8 +52,8 @@ module Seq
   val constant empty : seq 'a
     ensures { length result = 0 }
 
-  (** [set s i v] is a new sequence [u] such that
-      [u[i] = v] and [u[j] = s[j]] otherwise *)
+  (** `set s i v` is a new sequence `u` such that
+      `u[i] = v` and `u[j] = s[j]` otherwise *)
   let function set (s:seq 'a) (i:int) (v:'a) : seq 'a
     requires { 0 <= i < length s }
     ensures { length result = length s }
@@ -89,9 +89,9 @@ module Seq
   = while false do variant { 0 } () done;
     create (1 + length s) (fun i -> if i = length s then x else s[i])
 
-  (** [s[i..j]] is the sub-sequence of [s] from element [i] included
-      to element [j] excluded *)
-  let function ([_.._]) (s:seq 'a) (i:int) (j:int) : seq 'a
+  (** `s[i..j]` is the sub-sequence of `s` from element `i` included
+      to element `j` excluded *)
+  let function ([..]) (s:seq 'a) (i:int) (j:int) : seq 'a
     requires { 0 <= i <= j <= length s }
     ensures { length result = j - i }
     ensures { forall k. 0 <= k < j - i -> result[k] = s[i + k] }
@@ -122,12 +122,12 @@ module Seq
 end
 
 (** {2 Lemma library about algebraic interactions between
-       [empty]/[singleton]/[cons]/[snoc]/[++]/[[ .. ]]} *)
+       `empty`/`singleton`/`cons`/`snoc`/`++`/`[ .. ]`} *)
 
 module FreeMonoid
 
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   (* Monoidal properties/simplification. *)
 
@@ -208,9 +208,9 @@ module FreeMonoid
 end
 
 module ToList
-  use import int.Int
-  use import Seq
-  use import list.List
+  use int.Int
+  use Seq
+  use list.List
 
   val function to_list (a: seq 'a) : list 'a
 
@@ -227,7 +227,7 @@ module ToList
     forall s: seq 'a. ListLength.length (to_list s) = length s
 
   use list.Nth as ListNth
-  use import option.Option
+  use option.Option
 
   lemma to_list_nth:
     forall s: seq 'a, i: int. 0 <= i < length s ->
@@ -241,13 +241,13 @@ module ToList
 end
 
 module OfList
-  use import int.Int
-  use import option.Option
-  use import list.List
-  use import list.Length as L
-  use import list.Nth
-  use import Seq
-  use import list.Append
+  use int.Int
+  use option.Option
+  use list.List
+  use list.Length as L
+  use list.Nth
+  use Seq
+  use list.Append
 
   let rec function of_list (l: list 'a) : seq 'a = match l with
     | Nil -> empty
@@ -287,7 +287,7 @@ module OfList
 
   meta coercion function of_list
 
-  use import ToList
+  use ToList
 
   lemma convolution_to_of_list: forall l: list 'a.
     to_list (of_list l) = l
@@ -296,8 +296,8 @@ end
 
 module Mem
 
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   predicate mem (x: 'a) (s: seq 'a) =
     exists i: int. 0 <= i < length s && s[i] = x
@@ -312,8 +312,8 @@ module Mem
 end
 
 module Distinct
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   predicate distinct (s : seq 'a) =
     forall i j. 0 <= i < length s -> 0 <= j < length s ->
@@ -323,8 +323,8 @@ end
 
 module Reverse
 
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   let function reverse (s: seq 'a) : seq 'a =
     create (length s) (fun i -> s[length s - 1 - i])
@@ -332,14 +332,14 @@ module Reverse
 end
 
 module ToFset
-  use import int.Int
-  use import Seq as S
-  use import Mem as SM
-  use import set.Fset
+  use int.Int
+  use set.Fset
+  use Mem
+  use Seq
 
   val function to_set (s: seq 'a) : set 'a
 
-  axiom to_set_empty: to_set (S.empty: seq 'a) = (empty: set 'a)
+  axiom to_set_empty: to_set (empty: seq 'a) = (Fset.empty: set 'a)
 
   axiom to_set_add: forall s: seq 'a. length s > 0 ->
     to_set s = add s[0] (to_set s[1 ..])
@@ -348,12 +348,12 @@ module ToFset
     cardinal (to_set s) <= length s
 
   lemma to_set_mem: forall s: seq 'a, e: 'a.
-    SM.mem e s <-> mem e (to_set s)
+    mem e s <-> Fset.mem e (to_set s)
 
   lemma to_set_snoc: forall s: seq 'a, x: 'a.
     to_set (snoc s x) = add x (to_set s)
 
-  use import Distinct
+  use Distinct
 
   lemma to_set_cardinal_distinct: forall s: seq 'a. distinct s ->
     cardinal (to_set s) = length s
@@ -364,21 +364,22 @@ end
 
 module Sorted
 
-  use import Seq
-  use import int.Int
+  use int.Int
+  use Seq
 
   type t
   predicate le t t
-  clone relations.TotalOrder with type t = t, predicate rel = le
+  clone relations.TotalOrder as TO with
+    type t = t, predicate rel = le, axiom .
 
   predicate sorted_sub (s: seq t) (l u: int) =
     forall i1 i2. l <= i1 <= i2 < u -> le s[i1] s[i2]
-  (** [sorted_sub s l u] is true whenever the sub-sequence [s[l .. u-1]] is
-      sorted  w.r.t. order relation [le] *)
+  (** `sorted_sub s l u` is true whenever the sub-sequence `s[l .. u-1]` is
+      sorted  w.r.t. order relation `le` *)
 
   predicate sorted (s: seq t) =
     sorted_sub s 0 (length s)
-  (** [sorted s] is true whenever the sequence [s] is sorted w.r.t [le]  *)
+  (** `sorted s` is true whenever the sequence `s` is sorted w.r.t `le`  *)
 
   lemma sorted_cons:
     forall x: t, s: seq t.
@@ -400,10 +401,8 @@ end
 
 module SortedInt (** sorted sequences of integers *)
 
-  use import int.Int
-  clone export Sorted with type t = int, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  use int.Int
+  clone export Sorted with type t = int, predicate le = (<=), goal .
 
 end
 
@@ -411,12 +410,13 @@ end
 
 module Occ
 
-  use import int.Int
+  use int.Int
   use int.NumOf as N
-  use import Seq
+  use Seq
 
-  function occ (x: 'a) (s: seq 'a) (l u: int) : int =
-    N.numof (fun i -> s[i] = x) l u
+  function iseq (x: 'a) (s: seq 'a) : int->bool = fun i -> s[i] = x
+
+  function occ (x: 'a) (s: seq 'a) (l u: int) : int = N.numof (iseq x s) l u
 
   (* TODO: lemmas for cons, snoc, etc. *)
 
@@ -432,8 +432,8 @@ end
 
 module SeqEq
 
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   predicate seq_eq_sub (s1 s2: seq 'a) (l u: int) =
     forall i. l <= i < u -> s1[i] = s2[i]
@@ -442,8 +442,8 @@ end
 
 module Exchange
 
-  use import int.Int
-  use import Seq
+  use int.Int
+  use Seq
 
   predicate exchange (s1 s2: seq 'a) (i j: int) =
     length s1 = length s2 /\
@@ -462,32 +462,32 @@ end
 
 module Permut
 
-  use import int.Int
-  use import Seq
-  use import Occ
-  use import SeqEq
+  use int.Int
+  use Seq
+  use Occ
+  use SeqEq
   use export Exchange
 
   predicate permut (s1 s2: seq 'a) (l u: int) =
     length s1 = length s2 /\
     0 <= l <= length s1 /\ 0 <= u <= length s1 /\
     forall v: 'a. occ v s1 l u = occ v s2 l u
-  (** [permut s1 s2 l u] is true when the segment [s1[l..u-1]] is a
-  permutation of the segment [s2[l..u-1]]. Values outside this range are
+  (** `permut s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]`. Values outside this range are
   ignored. *)
 
   predicate permut_sub (s1 s2: seq 'a) (l u: int) =
     seq_eq_sub s1 s2 0 l /\
     permut s1 s2 l u /\
     seq_eq_sub s1 s2 u (length s1)
-  (** [permut_sub s1 s2 l u] is true when the segment [s1[l..u-1]] is a
-  permutation of the segment [s2[l..u-1]] and values outside this range
+  (** `permut_sub s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]` and values outside this range
   are equal. *)
 
   predicate permut_all (s1 s2: seq 'a) =
     length s1 = length s2 /\ permut s1 s2 0 (length s1)
-  (** [permut_all s1 s2] is true when sequence [s1] is a permutation of
-  sequence [s2] *)
+  (** `permut_all s1 s2` is true when sequence `s1` is a permutation of
+  sequence `s2` *)
 
   lemma exchange_permut_sub:
     forall s1 s2: seq 'a, i j l u: int.
@@ -520,7 +520,7 @@ module Permut
 
   (** {3 Lemmas about permut_all} *)
 
-  use import Mem
+  use Mem
 
   lemma permut_all_mem: forall s1 s2: seq 'a. permut_all s1 s2 ->
     forall x. mem x s1 <-> mem x s2
@@ -533,10 +533,10 @@ end
 
 module FoldLeft
 
-  use import Seq
-  use import int.Int
+  use Seq
+  use int.Int
 
-  (** [fold_left f a [b1; ...; bn]] is [f (... (f (f a b1) b2) ...) bn] *)
+  (** `fold_left f a [b1; ...; bn]` is `f (... (f (f a b1) b2) ...) bn` *)
   let rec function fold_left (f: 'a -> 'b -> 'a) (acc: 'a) (s: seq 'b) : 'a
     variant { length s }
   = if length s = 0 then acc else fold_left f (f acc s[0]) s[1 ..]
@@ -556,10 +556,10 @@ end
 
 module FoldRight
 
-  use import Seq
-  use import int.Int
+  use Seq
+  use int.Int
 
-  (** [fold_right f [a1; ...; an] b] is [f a1 (f a2 (... (f an b) ...))] *)
+  (** `fold_right f [a1; ...; an] b` is `f a1 (f a2 (... (f an b) ...))` *)
   let rec function fold_right (f: 'b -> 'a -> 'a) (s: seq 'b) (acc: 'a) : 'a
     variant { length s }
   = if length s = 0 then acc

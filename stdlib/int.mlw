@@ -28,9 +28,7 @@ module Int
   clone export algebra.OrderedUnitaryCommutativeRing with
     type t = int, constant zero = zero, constant one = one,
     function (-_) = (-_), function (+) = (+),
-    function (*) = (*), predicate (<=) = (<=),
-    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
-    lemma NonTrivialRing, lemma ZeroLessOne
+    function (*) = (*), predicate (<=) = (<=)
 
 end
 
@@ -38,7 +36,7 @@ end
 
 module Abs
 
-  use import Int
+  use Int
 
   let function abs (x:int) : int = if x >= 0 then x else -x
 
@@ -56,12 +54,9 @@ end
 
 module MinMax
 
-  use import Int
+  use Int
 
-  clone export relations.MinMax with
-    type t = int, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  clone export relations.MinMax with type t = int, predicate le = (<=), goal .
 
   let min (x y : int) : int
     ensures { result = min x y }
@@ -78,7 +73,7 @@ end
 
 module Lex2
 
-  use import Int
+  use Int
 
   predicate lt_nat (x y: int) = 0 <= y /\ x < y
 
@@ -99,8 +94,8 @@ rounds up when divisor is negative.
 
 module EuclideanDivision
 
-  use import Int
-  use import Abs
+  use Int
+  use Abs
 
   function div (x y: int) : int
   function mod (x y: int) : int
@@ -162,7 +157,7 @@ The particular case of Euclidean division by 2
 
 module Div2
 
-  use import Int
+  use Int
 
   lemma div2:
     forall x: int. exists y: int. x = 2*y \/ x = 2*y+1
@@ -173,14 +168,14 @@ end
 
 Division and modulo operators with the same conventions as mainstream
 programming language such as C, Java, OCaml, that is, division rounds
-towards zero, and thus [mod x y] has the same sign as [x].
+towards zero, and thus `mod x y` has the same sign as `x`.
 
 *)
 
 module ComputerDivision
 
-  use import Int
-  use import Abs
+  use Int
+  use Abs
 
   function div (x y: int) : int
   function mod (x y: int) : int
@@ -239,14 +234,14 @@ end
 
 module Exponentiation
 
-  use import Int
+  use Int
 
   type t
   constant one : t
   function (*) t t : t
 
   clone export algebra.Monoid
-    with type t = t, constant unit = one, function op = (*)
+    with type t = t, constant unit = one, function op = (*), axiom .
 
   (* TODO: implement with let rec once let cloning is done *)
   function power t int : t
@@ -275,7 +270,7 @@ module Exponentiation
 
 (* TODO
 
-  use import ComputerDivision
+  use ComputerDivision
 
   lemma Power_even : forall x:t, n:int. n >= 0 -> mod n 2 = 0 ->
     power x n = power (x*x) (div n 2)
@@ -290,7 +285,7 @@ end
 
 module Power
 
-  use import Int
+  use Int
 
   (* TODO: remove once power is implemented in Exponentiation *)
   val function power int int : int
@@ -298,7 +293,8 @@ module Power
   clone export Exponentiation with
     type t = int, constant one = one,
     function (*) = (*), function power = power,
-    goal Assoc, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r,
+    axiom Power_0, axiom Power_s
 
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
@@ -312,9 +308,9 @@ end
 
 module NumOf
 
-  use import Int
+  use Int
 
-  (** number of [n] such that [a <= n < b] and [p n] *)
+  (** number of `n` such that `a <= n < b` and `p n` *)
   let rec function numof (p: int -> bool) (a b: int) : int
     variant { b - a }
   = if b <= a then 0 else
@@ -381,9 +377,9 @@ end
 
 module Sum
 
-  use import Int
+  use Int
 
-  (** sum of [f n] for [a <= n < b] *)
+  (** sum of `f n` for `a <= n < b` *)
   let rec function sum (f: int -> int) (a b: int) : int
     variant { b - a }
   = if b <= a then 0 else sum f a (b - 1) + f (b - 1)
@@ -429,7 +425,7 @@ end
 
 module Fact
 
-  use import Int
+  use Int
 
   let rec function fact (n: int) : int
     requires { n >= 0 }
@@ -442,9 +438,9 @@ end
 
 module Iter
 
-  use import Int
+  use Int
 
-  (** [iter k x] is [f^k(x)] *)
+  (** `iter k x` is `f^k(x)` *)
   let rec function iter (f: 'a -> 'a) (k: int) (x: 'a) : 'a
     requires { k >= 0 }
     variant  { k }
@@ -460,7 +456,7 @@ end
 
 module IntInf
 
-  use import Int
+  use Int
 
   type t = Finite int | Infinite
 
@@ -508,7 +504,7 @@ integers greater or equal a given bound.
 
 module SimpleInduction
 
-  use import Int
+  use Int
 
   predicate p int
 
@@ -522,7 +518,7 @@ end
 
 module Induction
 
-  use import Int
+  use Int
 
   predicate p int
 
@@ -539,11 +535,24 @@ module Induction
 
 end
 
+module HOInduction
+
+  use Int
+
+  let lemma induction (p: int -> bool)
+    requires { p 0 }
+    requires { forall n. 0 <= n >= 0 -> p n -> p (n+1) }
+    ensures  { forall n. 0 <= n -> p n }
+  = let rec lemma f (n: int) requires { n >= 0 } ensures  { p n } variant {n}
+    = if n > 0 then f (n-1) in f 0
+
+end
+
 (** {2 Fibonacci numbers} *)
 
 module Fibonacci
 
-  use import Int
+  use Int
 
   let rec function fib (n: int) : int
     requires { n >= 0 }
@@ -551,5 +560,26 @@ module Fibonacci
   = if n = 0 then 0 else
     if n = 1 then 1 else
     fib (n-1) + fib (n-2)
+
+end
+
+module WFltof
+  use Int
+  use relations.WellFounded
+
+  type t
+  function f t : int
+
+  axiom f_nonneg: forall x. 0 <= f x
+
+  predicate ltof (x y: t) = f x < f y
+
+  let rec lemma acc_ltof (n: int)
+    requires { 0 <= n }
+    ensures  { forall x. f x < n -> acc ltof x }
+    variant  { n }
+  = if n > 0 then acc_ltof (n-1)
+
+  lemma wf_ltof: well_founded ltof
 
 end

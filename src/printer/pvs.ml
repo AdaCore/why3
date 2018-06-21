@@ -276,7 +276,7 @@ let print_binop fmt = function
 
 (* TODO: labels are lost, but we could print them as "% label \n",
    it would result in an ugly output, though *)
-let print_label _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
+let print_attr _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -287,10 +287,10 @@ and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
 and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
-and print_lrterm opl opr info fmt t = match t.t_label with
+and print_lrterm opl opr info fmt t = match t.t_attrs with
   | _ -> print_tnode opl opr info fmt t
 
-and print_lrfmla opl opr info fmt f = match f.t_label with
+and print_lrfmla opl opr info fmt f = match f.t_attrs with
   | _ -> print_fnode opl opr info fmt f
 
 and print_tnode opl opr info fmt t = match t.t_node with

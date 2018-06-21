@@ -161,25 +161,31 @@
 * The next commit : add +git to the version in file Version
 
 * prepare the OPAM package
- - update opam/why3-base/url: url and checksum of why-0.86.tar.gz
-   (use "md5sum distrib/why3-0.86.tar.gz")
- - update opam/why3-base/descr and opam/why3/descr if necessary
- - update opam/why3-base/opam with correct dependencies
- - update opam/why3/opam with the dependency on why3-base
- - test with "opam pin add why3 --kind=git .../why3/.git"
-   (it runs "opam install why3")
+ - update why3{,-ide,-coq}.opam/descr if necessary
+ - update why3{,-ide,-coq}.opam/opam with correct dependencies on external packages
 
 * upload the OPAM package
- - clone https://github.com/ocaml/opam-repository
+ - clone https://github.com/ocaml/opam-repository if not already done:
    git clone git@github.com:.../opam-repository.git
    cd opam-repository/
    git remote add opam https://github.com/ocaml/opam-repository.git
+   opam repository add --kind=git local .
  - reinitialize the repository if not fresh:
    git fetch opam
    git reset --hard opam/master
    git push
- - cd packages/why3-base; cp -r .../opam/why3-base why3-base.0.86
- - cd packages/why3; cp -r .../opam/why3 why3.0.86
+ - create version directories:
+   cp -r .../why3.opam packages/why3/why3.1.0.0
+   cp -r .../why3-ide.opam packages/why3-ide/why3-ide.1.0.0
+   cp -r .../why3-coq.opam why3-coq/why3-coq.1.0.0
+ - update why3{-ide,-coq}.1.0.0/opam with the dependency on why3
+ - create why3/why3.1.0.0/url: url and checksum of why-1.0.0.tar.gz
+   md5sum .../distrib/why3-1.0.0.tar.gz
+   cp why3/why3.1.0.0/url why3-ide/why3-ide.1.0.0/url
+   cp why3/why3.1.0.0/url why3-coq/why3-coq.1.0.0/url
+ - test opam files:
+   opam update local
+   opam install why3 why3-ide why3-coq
  - commit and push
  - make a pull request on github
 
@@ -215,9 +221,6 @@ and no epsilon
 ** quand une definition logique recursive ne peut pas etre verifiee
    bien-fondee statiquement, generer une obligation de preuve
    (feature wish de F Besson)
-
-* Coq tactic
-** ajout de bases de hint
 
 * replayer
 ** deplacer option -bench dans une commande de why3session

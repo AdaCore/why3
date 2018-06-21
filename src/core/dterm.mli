@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -83,7 +83,7 @@ and dterm_node =
   | DTfalse
   | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
-  | DTlabel of dterm * Slab.t
+  | DTattr of dterm * Sattr.t
 
 (** Environment *)
 
@@ -102,7 +102,8 @@ val denv_add_let : denv -> dterm -> preid -> denv
 
 val denv_add_quant : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dty -> denv
+val denv_add_term_pat : denv -> dpattern -> dterm -> denv
 
 val denv_get : denv -> string -> dterm_node (** raises UnboundVar *)
 
@@ -117,6 +118,7 @@ val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
 (** Final stage *)
 
 val debug_ignore_unused_var : Debug.flag
+val attr_w_unused_var_no : Ident.attribute
 
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 

@@ -2,8 +2,8 @@
 
 module ArrayUpdate
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   let test (a:array int)
     requires { a.length >= 1 } 
@@ -18,7 +18,7 @@ end
 
 module ImpMapUpdate
 
-  clone import impmap.ImpmapNoDom with type key = int
+  clone impmap.ImpmapNoDom with type key = int
 
   let test (m:t int) =
     label L in 
@@ -31,8 +31,8 @@ end
 
 module ArrayFunctionalUpdate
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   predicate p (array int)
   

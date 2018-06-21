@@ -25,7 +25,7 @@ let get_global ident =
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 let blob_url_of_string s =
-  let s = JSU.inject (Js.string (Sys_js.file_content s)) in
+  let s = JSU.inject (Js.string (Sys_js.read_file ~name:s)) in
   let _Blob  = get_global "Blob" in
   let blob =
     jsnew _Blob (Js.array [| s |])
@@ -341,9 +341,9 @@ module ExampleList =
     let set_loading_label b =
       select_example ## disabled <- (Js.bool b);
       if b then
-	example_label ## className <- Js.string "fa fa-spin fa-refresh why3-icon"
+	example_label ## className <- Js.string "fas fa-spin fa-refresh why3-icon"
       else
-	example_label ## className <- Js.string "fa-book why3-icon"
+	example_label ## className <- Js.string "fas fa-book why3-icon"
 
     let selected_index = ref 0
     let unselect () =
@@ -573,10 +573,10 @@ module TaskList =
 	   let span_msg = getElement AsHtml.span (id ^ "_msg") in
            let cls =
              match st with
-               `New -> "fa fa-fw fa-cog fa-spin fa-fw why3-task-pending"
+               `New -> "fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
              | `Valid -> span_msg ## innerHTML <- Js.string "";
-			 "fa-check-circle why3-task-valid"
-             | `Unknown -> "fa-question-circle why3-task-unknown"
+			 "fas fa-check-circle why3-task-valid"
+             | `Unknown -> "fas fa-question-circle why3-task-unknown"
            in
            span_icon ## className <- Js.string cls
          with
@@ -682,22 +682,24 @@ module ToolBar =
 
     let open_ = getElement AsHtml.input "why3-open"
     let () =
-      open_ ## onchange <-
-	Dom.handler
-	  (fun _e ->
-           ExampleList.unselect ();
-	   match Js.Optdef.to_option (open_ ## files) with
-	     None -> Js._false
-	   | Some (f) -> match Js.Opt.to_option (f ## item (0)) with
-			  None -> Js._false
-			| Some f ->
-			   ignore (
-			       Lwt.bind (File.readAsText f)
-					(fun str ->
-					 Editor.name := File.filename f;
-					 Editor.set_value str;
-					 Lwt.return_unit));
-			       Js._true
+      open_ ## onchange <- Dom.handler (fun _e ->
+        ExampleList.unselect ();
+	match Js.Optdef.to_option (open_ ## files) with
+	| None -> Js._false
+	| Some (f) ->
+          match Js.Opt.to_option (f ## item (0)) with
+	  | None -> Js._false
+	  | Some f ->
+            let reader = jsnew File.fileReader () in
+            reader##onloadend <- Dom.handler (fun _ ->
+              match Js.Opt.to_option (File.CoerceTo.string (reader##result)) with
+              | None -> Js._true
+              | Some content ->
+                Editor.name := File.filename f;
+                Editor.set_value content;
+                Js._true);
+            reader##readAsText ((f :> File.blob Js.t));
+	    Js._true
           )
     let open_ () = if Editor.confirm_unsaved () then open_ ## click ()
 
@@ -960,7 +962,7 @@ module Controller =
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
-      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Generating tasks … ";
+      TaskList.print_msg "<span class='fas fa-cog fa-spin'></span> Generating tasks … ";
       reset_workers ();
       first_task := true;
       let code = Js.to_string (Editor.get_value ()) in
@@ -972,7 +974,7 @@ module Controller =
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
-      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Compiling buffer … ";
+      TaskList.print_msg "<span class='fas fa-cog fa-spin'></span> Compiling buffer … ";
       reset_workers ();
       let code = Js.to_string (Editor.get_value ()) in
       (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
@@ -1063,7 +1065,7 @@ let () =
 	                 ));
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
-  KeyBinding.add_global Keycode.esc  Dialogs.close;
+  (*KeyBinding.add_global Keycode.esc  Dialogs.close;*)
 
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))

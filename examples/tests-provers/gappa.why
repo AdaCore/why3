@@ -1,12 +1,12 @@
 
 theory TestGappa
 
-   use import real.Real
-   use import real.Abs
-   use import real.Square
-   use import floating_point.Rounding
-   use floating_point.Single
-   use import floating_point.Double
+   use real.Real
+   use real.Abs
+   use real.Square
+   use floating_point.Rounding
+   use floating_point.Single as Single
+   use floating_point.Double
 
   lemma Round_single_01:
     Single.round NearestTiesToEven 0.1 = 0x1.99999ap-4
@@ -40,10 +40,10 @@ end
 
 theory GappaEq
 
-  use import real.Real
-  use import real.Abs
-  use import floating_point.Rounding
-  use import floating_point.Double
+  use real.Real
+  use real.Abs
+  use floating_point.Rounding
+  use floating_point.Double
 
   constant a : double
   constant r : double
@@ -71,10 +71,10 @@ end
 
 theory GappaEq2
 
-  use import real.Real
+  use real.Real
 
-  use import floating_point.Rounding
-  use import floating_point.Double
+  use floating_point.Rounding
+  use floating_point.Double
 
   constant q1 : double
   constant q2 : double
@@ -98,7 +98,7 @@ end
 
 theory GappaNumbers
 
-  use import int.Int
+  use int.Int
 
   goal G1 : 0x1f - 0o37 = 0
   goal G2 : 0b1001 - 9 = 0

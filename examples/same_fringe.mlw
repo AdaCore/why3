@@ -7,10 +7,10 @@
 
 module SameFringe
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
 
   (* binary trees with elements at the nodes *)
 
@@ -83,8 +83,8 @@ end
 
 module Test
 
-  use import int.Int
-  clone import SameFringe with type elt = int
+  use int.Int
+  clone SameFringe with type elt = int
 
   let test1 () = enum Empty Done
   let test2 () = eq_enum Done Done

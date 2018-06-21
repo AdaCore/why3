@@ -6,14 +6,14 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../isqrt_von_neumann.mlw" proved="true">
 <theory name="VonNeumann16" proved="true">
  <goal name="sqr_add2" proved="true">
  <proof prover="2" timelimit="1"><result status="valid" time="0.16"/></proof>
  </goal>
  <goal name="VC isqrt16" expl="VC for isqrt16" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC isqrt16.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -155,7 +155,7 @@
  </transf>
  </goal>
  <goal name="VC isqrt32" expl="VC for isqrt32" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC isqrt32.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -312,7 +312,7 @@
  </transf>
  </goal>
  <goal name="VC isqrt64" expl="VC for isqrt64" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC isqrt64.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -371,7 +371,7 @@
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.47"/></proof>
   </goal>
   <goal name="VC isqrt64.19" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC isqrt64.19.0" expl="VC for isqrt64" proved="true">
    <proof prover="3"><result status="valid" time="0.43"/></proof>
    </goal>
@@ -426,7 +426,7 @@
   <proof prover="3"><result status="valid" time="0.72"/></proof>
   </goal>
   <goal name="VC isqrt64.30" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC isqrt64.30.0" expl="VC for isqrt64" proved="true">
    <proof prover="3"><result status="valid" time="0.42"/></proof>
    </goal>
@@ -471,7 +471,7 @@
      <goal name="VC isqrt64.40.0.0.0" expl="VC for isqrt64" proved="true">
      <transf name="assert" proved="true" arg1="(x = add (sqr res_g) num)">
       <goal name="VC isqrt64.40.0.0.0.0" proved="true">
-      <proof prover="3" timelimit="5"><result status="valid" time="0.58"/></proof>
+      <proof prover="3" timelimit="5"><result status="valid" time="0.42"/></proof>
       </goal>
       <goal name="VC isqrt64.40.0.0.0.1" expl="VC for isqrt64" proved="true">
       <transf name="unfold" proved="true" arg1="sqr">
@@ -490,7 +490,7 @@
            <proof prover="3"><result status="valid" time="0.01"/></proof>
            </goal>
            <goal name="VC isqrt64.40.0.0.0.1.0.0.0.1.1" proved="true">
-           <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.14" steps="267"/></proof>
+           <proof prover="4"><result status="valid" time="0.14" steps="267"/></proof>
            </goal>
           </transf>
           </goal>
@@ -522,14 +522,14 @@
                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0" expl="true case" proved="true">
                 <transf name="unfold" proved="true" arg1="sqr" arg2="in" arg3="h">
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.0.0" expl="true case" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.14"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="1.98"/></proof>
                  </goal>
                 </transf>
                 </goal>
                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1" expl="false case" proved="true">
                 <transf name="case" proved="true" arg1="(res_g = (0:t))">
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.0" expl="false case (true case)" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.69"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="2.82"/></proof>
                  </goal>
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1" expl="false case" proved="true">
                  <transf name="rewrite" proved="true" arg1="to_uint_sub_bounded">
@@ -552,7 +552,7 @@
                         <proof prover="2"><result status="valid" time="0.01"/></proof>
                         </goal>
                         <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1" proved="true">
-                        <transf name="split_all_wp" proved="true" >
+                        <transf name="split_all_right" proved="true" >
                          <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0" proved="true">
                          <transf name="assert" proved="true" arg1="(0 &lt;= t&#39;int b - t&#39;int (1:t))">
                           <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.0.0.1.0.1.0.0" proved="true">
@@ -598,10 +598,10 @@
                             <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0" proved="true">
                             <transf name="rewrite" proved="true" arg1="&lt;-" arg2="to_uint_add_bounded">
                              <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.0" proved="true">
-                             <proof prover="4"><result status="valid" time="2.80" steps="571"/></proof>
+                             <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.80" steps="571"/></proof>
                              </goal>
                              <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" proved="true">
-                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.78"/></proof>
+                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.88"/></proof>
                              </goal>
                             </transf>
                             </goal>
@@ -625,7 +625,7 @@
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.1" proved="true">
-                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.44"/></proof>
+                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.96"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -654,16 +654,17 @@
                                <proof prover="2"><result status="valid" time="0.01"/></proof>
                                </goal>
                                <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1" proved="true">
-                               <transf name="rewrite" proved="true" arg1="h">
+                               <transf name="rewrite" proved="true" arg1="h1">
                                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1.0" proved="true">
-                                <proof prover="1"><result status="valid" time="0.02" steps="119"/></proof>
+                                <proof prover="3"><result status="timeout" time="1.00"/></proof>
+                                <proof prover="4"><result status="valid" time="0.02" steps="132"/></proof>
                                 </goal>
                                </transf>
                                </goal>
                               </transf>
                               </goal>
                               <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.1" proved="true">
-                              <proof prover="3" timelimit="5"><result status="valid" time="2.76"/></proof>
+                              <proof prover="3" timelimit="5"><result status="valid" time="1.84"/></proof>
                               </goal>
                              </transf>
                              </goal>
@@ -687,12 +688,12 @@
                         </transf>
                         </goal>
                         <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.1" proved="true">
-                        <proof prover="3" timelimit="5"><result status="valid" time="1.74"/></proof>
+                        <proof prover="3" timelimit="5"><result status="valid" time="1.21"/></proof>
                         </goal>
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.1" proved="true">
-                       <proof prover="3" timelimit="5"><result status="valid" time="2.68"/></proof>
+                       <proof prover="3" timelimit="5"><result status="valid" time="1.85"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -711,12 +712,12 @@
                   </transf>
                   </goal>
                   <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1" proved="true">
-                  <transf name="split_all_wp" proved="true" >
+                  <transf name="split_all_right" proved="true" >
                    <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.0" proved="true">
                    <proof prover="1"><result status="valid" time="0.02" steps="124"/></proof>
                    </goal>
                    <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.1.1" proved="true">
-                   <proof prover="3" timelimit="5"><result status="valid" time="0.64"/></proof>
+                   <proof prover="3" timelimit="5"><result status="valid" time="0.47"/></proof>
                    </goal>
                   </transf>
                   </goal>

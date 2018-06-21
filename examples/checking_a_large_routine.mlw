@@ -6,9 +6,9 @@
 
 module CheckingALargeRoutine
 
-  use import int.Int
-  use import int.Fact
-  use import ref.Ref
+  use int.Int
+  use int.Fact
+  use ref.Ref
 
   (* using 'while' loops, to keep close to Turing's flowchart *)
   let routine (n: int) requires { n >= 0 } ensures { result = fact n } =

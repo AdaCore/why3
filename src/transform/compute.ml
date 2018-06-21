@@ -34,15 +34,15 @@ let meta_begin_compute_context =
            transformation@ 'compute_in_context'."
 *)
 
-let rule_label = Ident.create_label "rewrite"
+let rule_attr = Ident.create_attribute "rewrite"
 
 let collect_rules p env km prs t =
   let acc = Task.task_fold
     (fun acc td -> match td.Theory.td_node with
       | Theory.Decl { d_node = Dprop((Plemma|Paxiom), pr, t) }
         when Decl.Spr.mem pr prs ||
-           Ident.Slab.mem rule_label pr.pr_name.Ident.id_label ||
-             Ident.Slab.mem rule_label t.t_label ->
+           Ident.Sattr.mem rule_attr pr.pr_name.Ident.id_attrs ||
+             Ident.Sattr.mem rule_attr t.t_attrs ->
           (pr,t) :: acc
       | _ -> acc)
     [] t
@@ -145,3 +145,15 @@ let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
     hypothesis@ including@ by@ declared@ rewrite@ rules"
     "compute_hyp"
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp None)
+
+let normalize_hyp_few step_limit pr_norm env =
+  let p = { compute_defs = false;
+            compute_builtin = true;
+            compute_def_set = Term.Mls.empty;
+          } in
+  normalize_goal_transf ?pr_norm ?step_limit p env
+
+let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
+    hypothesis@ using@ specified@ rules"
+    "compute_hyp_specified"
+    (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp_few None)

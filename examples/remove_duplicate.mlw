@@ -2,9 +2,9 @@
 
 (** {1 Removing duplicate elements in an array}
 
-    Given an array [a] of size [n], removes its duplicate elements,
-    in-place, as follows: return [r] such that [a[0..r-1]] contains the same
-    elements as [a[0..n-1]] and no duplicate
+    Given an array `a` of size `n`, removes its duplicate elements,
+    in-place, as follows: return `r` such that `a[0..r-1]` contains the same
+    elements as `a[0..n-1]` and no duplicate
 
 *)
 
@@ -16,11 +16,11 @@ module Spec
   use export int.Int
   use export array.Array
 
-  (** v appears in [a[0..s-1]] *)
+  (** `v` appears in `a[0..s-1]` *)
   predicate appears (v: 'a) (a: array 'a) (s: int) =
     exists i: int. 0 <= i < s /\ a[i] = v
 
-  (** [a[0..s-1]] contains no duplicate element *)
+  (** `a[0..s-1]` contains no duplicate element *)
   predicate nodup (a: array 'a) (s: int) =
     forall i: int. 0 <= i < s -> not (appears a[i] a i)
 
@@ -30,8 +30,8 @@ end
 
 module RemoveDuplicateQuadratic
 
-  use import Spec
-  use import ref.Refint
+  use Spec
+  use ref.Refint
 
   type t
   val predicate eq (x y: t)

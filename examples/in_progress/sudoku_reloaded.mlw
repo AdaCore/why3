@@ -9,9 +9,9 @@
 
 module Grid
 
-  use import int.Int
-  use import map.Map
-  use import mach.int.Int31
+  use int.Int
+  use map.Map
+  use mach.int.Int31
   function t (n:int31) : int = to_int n
 
   (** A grid is a map from integers to integers *)
@@ -48,7 +48,7 @@ module Grid
 
   *)
 
-  use import mach.array.Array31
+  use mach.array.Array31
 
   type sudoku_chunks =
     { column_start : array int31;
@@ -145,13 +145,13 @@ end
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
 module TheClassicalSudokuGrid
 
-  use import Grid
-  use import map.Map
-  use import int.Int
+  use Grid
+  use map.Map
+  use int.Int
 
-  use import mach.int.Int31
+  use mach.int.Int31
 
-  use import mach.array.Array31
+  use mach.array.Array31
 
   let classical_sudoku () : sudoku_chunks
     ensures { well_formed_sudoku result }
@@ -337,12 +337,12 @@ end
 
 module Solver
 
-  use import Grid
-  use import array.Array
+  use Grid
+  use array.Array
 
-  use import mach.int.Int31
-  use import int.Int
-  use import mach.array.Array31
+  use mach.int.Int31
+  use int.Int
+  use mach.array.Array31
 
   (** predicate for the loop invariant of next function *)
   predicate valid_chunk_up_to (g:grid) (i:int)
@@ -357,7 +357,7 @@ module Solver
 
   exception Invalid
 
-  use import ref.Ref
+  use ref.Ref
 
   (** [check_valid_chunk g i start offsets] checks the validity
       of the chunk that includes [i] *)
@@ -658,13 +658,13 @@ end
 
 module Test
 
-  use import Grid
-  use import TheClassicalSudokuGrid
+  use Grid
+  use TheClassicalSudokuGrid
 
-  use import Solver
+  use Solver
   use mach.array.Array31
-  use import map.Map
-  use import mach.int.Int31
+  use map.Map
+  use mach.int.Int31
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()

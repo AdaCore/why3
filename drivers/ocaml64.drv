@@ -10,7 +10,7 @@ end
 
 module HighOrd
   syntax type (->) "%1 -> %2"
-  syntax val  (@)  "%1 %2"
+  syntax val  ( @ )  "%1 %2"
 end
 
 theory option.Option
@@ -167,8 +167,6 @@ end
 module array.Array
   syntax type array "%1 array"
 
-  syntax function ([]) "%1.(Z.to_int %2)"
-
   (* syntax exception OutOfBounds "Why3__Array.OutOfBounds" *) (* FIXME *)
 
   syntax val ([])          "%1.(Z.to_int %2)"
@@ -182,6 +180,10 @@ module array.Array
   syntax val copy          "Array.copy %1"
   syntax val fill          "Array.fill %1 (Z.to_int %2) (Z.to_int %3) %4"
   syntax val blit          "Array.blit %1 (Z.to_int %2) %3 (Z.to_int %4) (Z.to_int %5)"
+end
+
+module array.Init
+  syntax val init "Array.init (Z.to_int %1) (fun i -> %2 (Z.of_int i))"
 end
 
 module matrix.Matrix
@@ -327,8 +329,8 @@ end
 
 module io.StdIO
   syntax val print_char "Pervasives.print_char %1"
-  syntax val print_int "Pervasives.print_int (Z.to_int %1)"
-  syntax val print_newline "Pervasives.print_newline"
+  syntax val print_int "Pervasives.print_string (Z.to_string %1)"
+  syntax val print_newline "Pervasives.print_newline %1"
 end
 
 module random.Random
@@ -351,8 +353,8 @@ module mach.array.Array63
   syntax type array "(%1 array)"
 
   syntax val  make   "Array.make %1 %2"
-  syntax val  ([])   "Array.get %1 %2"
-  syntax val  ([]<-) "Array.set %1 %2 %3"
+  syntax val  ([])   "%1.(%2)"
+  syntax val  ([]<-) "%1.(%2) <- %3"
   syntax val  length "Array.length %1"
   syntax val  append "Array.append %1 %2"
   syntax val  sub    "Array.sub %1 %2 %3"
@@ -360,6 +362,14 @@ module mach.array.Array63
   syntax val  fill   "Array.fill %1 %2 %3 %4"
   syntax val  blit   "Array.blit %1 %2 %3 %4 %5"
   syntax val  self_blit "Array.blit %1 %2 %1 %3 %4"
+end
+module mach.array.ArrayInt63
+  syntax type array63 "(int array)"
+  syntax val  make   "Array.make %1 %2"
+  syntax val  ([])   "%1.(%2)"
+  syntax val  ([]<-) "%1.(%2) <- %3"
+  syntax val  length "Array.length %1"
+  syntax val  copy   "Array.copy %1"
 end
 
 module mach.matrix.Matrix63
@@ -370,11 +380,11 @@ module mach.matrix.Matrix63
   syntax function rows     "Array.length %1"
   syntax function columns  "Array.length %1.(0)"
   syntax val rows          "Array.length %1"
-  syntax val columns       "Array.length m.(0)"
-  syntax val get           "m.(%1).(%2)"
-  syntax val set           "m.(%1).(%2) <- %3"
-  syntax val defensive_get "m.(%1).(%2)"
-  syntax val defensive_set "m.(%1).(%2) <- %3"
+  syntax val columns       "Array.length %1.(0)"
+  syntax val get           "%1.(%2).(%3)"
+  syntax val set           "%1.(%2).(%3) <- %4"
+  syntax val defensive_get "%1.(%2).(%3)"
+  syntax val defensive_set "%1.(%2).(%3) <- %4"
   syntax val make          "Array.make_matrix %1 %2 %3"
   syntax val copy          "Array.map Array.copy %1"
 end

@@ -16,12 +16,14 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
-let keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
+let debug_attrs = Debug.register_info_flag "print_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
 
 type reason_unknown =
   | Resourceout
   | Other
 
+(* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
   | Invalid
@@ -31,7 +33,9 @@ type prover_answer =
   | Unknown of (string * reason_unknown option)
   | Failure of string
   | HighFailure
+(* END{proveranswer} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
 type prover_result = {
   pr_answer : prover_answer;
   pr_status : Unix.process_status;
@@ -40,12 +44,15 @@ type prover_result = {
   pr_steps  : int;		(* -1 if unknown *)
   pr_model  : model;
 }
+(* END{proverresult} anchor for automatic documentation, do not remove *)
 
+(* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
 type resource_limit = {
   limit_time  : int;
   limit_mem   : int;
   limit_steps : int;
 }
+(* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
 let empty_limit = { limit_time = 0 ; limit_mem = 0; limit_steps = 0 }
 
@@ -132,7 +139,7 @@ let grep_reason_unknown out =
     Other
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
@@ -167,10 +174,11 @@ let print_steps fmt s =
 let print_prover_result fmt {pr_answer = ans; pr_status = status;
                              pr_output = out; pr_time   = t;
                              pr_steps  = s;   pr_model  = m} =
+  let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if not (Model_parser.is_model_empty m) then begin
     fprintf fmt "\nCounter-example model:";
-    Model_parser.print_model fmt m
+    Model_parser.print_model ~print_attrs fmt m
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
@@ -189,22 +197,98 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-let backup_file f = f ^ ".save"
+(*
+let rec grep out l = match l with
+  | [] ->
+      HighFailure
+  | (re,pa) :: l ->
+      begin try
+        ignore (Str.search_forward re out 0);
+        match pa with
+        | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
+        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
+        | Failure s -> Failure (Str.replace_matched s out)
+        | HighFailure -> assert false
+      with Not_found -> grep out l end
+*)
 
-let debug_print_model model =
-  let model_str = Model_parser.model_to_string model in
+(* Create a regexp matching the same as the union of all regexp of the list. *)
+let craft_efficient_re l =
+  let s = Format.asprintf "%a"
+    (Pp.print_list_delim
+       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
+       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
+       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
+       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
+  in
+  Str.regexp s
+
+(*
+let print_delim fmt d =
+  match d with
+  | Str.Delim s -> Format.fprintf fmt "Delim %s" s
+  | Str.Text s -> Format.fprintf fmt "Text %s" s
+ *)
+let debug_print_model ~print_attrs model =
+  let model_str = Model_parser.model_to_string ~print_attrs model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
-let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
+let analyse_result res_parser printer_mapping out =
+  let list_re = res_parser.prp_regexps in
+  let re = craft_efficient_re list_re in
+  let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
+  let result_list = Str.full_split re out in
+(*  Format.eprintf "[incremental model parsing] results list is @[[%a]@]@."
+                 (Pp.print_list Pp.semi print_delim) result_list;
+*)
+  let rec analyse saved_model saved_res l =
+    match l with
+    | [] ->
+        if saved_res = None then
+          (HighFailure, saved_model)
+        else
+          (Opt.get saved_res, saved_model)
+    | Str.Delim res :: Str.Text model :: tl ->
+        (* Parse the text of the result *)
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          (* get model if possible *)
+          let m = res_parser.prp_model_parser model printer_mapping in
+          Debug.dprintf debug "Call_provers: model:@.";
+          debug_print_model ~print_attrs:false m;
+          let m = if is_model_empty m then saved_model else (Some m) in
+          analyse m (Some res) tl
+    | Str.Delim res :: tl ->
+        let res = grep res list_re in
+        if res = Valid then
+          (Valid, None)
+        else
+          analyse saved_model (Some res) tl
+    | Str.Text _fail :: tl -> analyse saved_model saved_res tl
+  in
+
+  analyse None None result_list
+
+let backup_file f = f ^ ".save"
+
+
+let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans =
-    try List.assoc int_exitcode res_parser.prp_exitcodes
-    with Not_found -> grep out res_parser.prp_regexps in
+  let ans, model =
+    if signaled then HighFailure, None else
+    try List.assoc int_exitcode res_parser.prp_exitcodes, None
+    with Not_found -> analyse_result res_parser printer_mapping out
+      (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
+      t, None *)
+  in
+  let model = match model with | Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -218,38 +302,17 @@ let parse_prover_run res_parser time out exitcode limit ~printer_mapping =
   (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
   let tlimit = float limit.limit_time in
   let ans, time =
-    if tlimit > 0.0 && time >= 0.9 *. tlimit then
+    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
     match ans with
     | HighFailure | Unknown _ | Timeout ->
        Debug.dprintf debug
-         "[Call_provers.parse_prover_run] answer after %f >= 0.9 timelimit -> Timeout@." time;
+         "[Call_provers.parse_prover_run] answer after %f >= 0.9 timelimit - 0.1 -> Timeout@." time;
        Timeout, tlimit
     | _ -> ans,time
     else ans, time
   in
-  (* attempt to fix early timeouts *)
-  (* does not work well. Let's give the answer and time without change instead, and let
-     Session_scheduler.fuzzy_proof_time do the job instead
-  Debug.dprintf
-    debug
-    "[Call_provers.parse_prover_run] fixing timeout versus unknown answers (time=%f, tlimit=%f)@."
-    time tlimit;
-  let ans,time =
-    match ans with
-    | Timeout when time < tlimit ->
-       Debug.dprintf
-	 debug
-	 "[Call_provers.parse_prover_run] timeout answer after %f <= timelimit -> set to Unknown@." time;
-       Unknown("early timeout",Some Resourceout), time
-    | _ -> ans, time
-  in
-   ***)
-  (* get counterexample if any *)
-  let model = res_parser.prp_model_parser out printer_mapping in
-  Debug.dprintf debug "Call_provers: model:@.";
-  debug_print_model model;
   { pr_answer = ans;
-    pr_status = Unix.WEXITED int_exitcode;
+    pr_status = if signaled then Unix.WSIGNALED int_exitcode else Unix.WEXITED int_exitcode;
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
@@ -305,8 +368,8 @@ let adapt_limits limit on_timelimit =
       (* for steps limit use 2 * t + 1 time *)
       if limit.limit_steps <> empty_limit.limit_steps
       then (2 * limit.limit_time + 1)
-      (* if prover implements time limit, use 16t + 1 *)
-      else if on_timelimit then 16 * limit.limit_time + 1
+      (* if prover implements time limit, use 4t + 1 *)
+      else if on_timelimit then 4 * limit.limit_time + 1
       (* otherwise use t *)
       else limit.limit_time }
 
@@ -335,27 +398,32 @@ let read_and_delete_file fn =
   if Debug.test_noflag debug then Sys.remove fn;
   out
 
+open Prove_client
+
 let handle_answer answer =
   match answer with
-  | Prove_client.Finished answer ->
-      let id = answer.Prove_client.id in
+  | Finished { id; time; timeout; out_file; exit_code } ->
       let save = Hashtbl.find saved_data id in
       Hashtbl.remove saved_data id;
-      if Debug.test_noflag debug && Debug.test_noflag keep_vcs then begin
+      let keep_vcs =
+        try let flag = Debug.lookup_flag "keep_vcs" in Debug.test_flag flag with
+        | _ -> false
+      in
+      if Debug.test_noflag debug && not keep_vcs then begin
         Sys.remove save.vc_file;
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
-      let out = read_and_delete_file answer.Prove_client.out_file in
-      let ret = answer.Prove_client.exit_code in
+      let out = read_and_delete_file out_file in
+      let ret = exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-          answer.Prove_client.time out ret save.limit ~printer_mapping in
+          timeout time out ret save.limit ~printer_mapping in
       id, Some ans
-  | Prove_client.Started id ->
+  | Started id ->
       id, None
 
 let wait_for_server_result ~blocking =
-  List.map handle_answer (Prove_client.read_answers ~blocking)
+  List.map handle_answer (read_answers ~blocking)
 
 type prover_call =
   | ServerCall of server_id
@@ -380,7 +448,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
-  Prove_client.send_request ~use_stdin ~id
+  send_request ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
                             ~cmd;

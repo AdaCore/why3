@@ -4,10 +4,10 @@
 (* Partie I *)
 module Search_in_array
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
- (* use import int.MinMax*)
+  use int.Int
+  use ref.Ref
+  use array.Array
+ (* use int.MinMax*)
 
   (* Qeustion 1 *)
  let nombreZeroDroite i tab n
@@ -238,9 +238,9 @@ let _ = res col *)
 (*
 module Recherche_bidimensionnelle
 
-use import int.Int
-use import ref.Ref
-use import array.Array
+use int.Int
+use ref.Ref
+use array.Array
 
 
 let rec calculeL_aux i histo l
@@ -380,9 +380,9 @@ with aux i j k
 (*(* Partie II. De la 1D vers la 2D *)
 module recherche_bidimen
 
-use import int.Int
-use import ref.Ref
-use import array.Array
+use int.Int
+use ref.Ref
+use array.Array
 
 predicate is_li (i j: int) (histo : array int) =
   0 <= j <= i < histo.length /\
@@ -441,10 +441,10 @@ end
 
 module Histo_loop
 
-use import int.Int
-use import int.Lex2
-use import ref.Ref
-use import array.Array
+use int.Int
+use int.Lex2
+use ref.Ref
+use array.Array
 
 predicate is_li (i j: int) (histo : array int) =
   0 <= j <= i < histo.length /\

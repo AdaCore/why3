@@ -34,7 +34,10 @@ module S : Set.S with type elt = term and type t = Set.Make(TermCmp).t
 
 val add_model_element: Term.term -> S.t -> S.t
 
-val model_trace_for_postcondition: labels: unit Ident.Mlab.t -> vc_term_info -> unit Ident.Mlab.t
+(*
+val model_trace_for_postcondition:
+  attrs:Ident.Sattr.t -> vc_term_info -> Ident.Sattr.t
+ *)
 
 val check_enter_vc_term: Term.term -> bool -> vc_term_info -> unit
 

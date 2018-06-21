@@ -3,8 +3,8 @@
 theory BitVector
 
   use export bool.Bool
-  use import int.Int
-  use import power2.Pow2int
+  use int.Int
+  use power2.Pow2int
 
   function size : int
   (* size at least 2 since we need 2-complement representation *)
@@ -198,14 +198,16 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. size > j /\ i >= 0 ->
+    forall b:bv, j i:int. size > j /\ i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
-  lemma to_nat_of_one:
-    forall b:bv, i j:int. size > j >= i >= 0 ->
-      (forall k:int. j >= k >= i -> nth b k = True) ->
-      to_nat_sub b j i = pow2 (j-i+1) - 1
+  let rec lemma to_nat_of_one (b: bv) i j
+    requires { size > j >= i >= 0 }
+    requires { forall k:int. j >= k >= i -> nth b k = True }
+    ensures  { to_nat_sub b j i = pow2 (j-i+1) - 1 }
+    variant  { j - i }
+  = if j > i then to_nat_of_one b i (j-1)
 
   lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int. size > j /\ i >=0 ->
     (forall k:int. i <= k <= j -> nth b1 k = nth b2 k) ->
@@ -273,7 +275,7 @@ theory BitVector
      integer n on size bits. *)
   function from_int (n:int) : bv
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
 
 (*  axiom nth_from_int_high:
@@ -356,7 +358,7 @@ theory BV32
 
   function size : int = 32
 
-  clone export BitVector with function size, lemma size_positive
+  clone export BitVector with function size, lemma size_positive, axiom .
 
 end
 
@@ -365,16 +367,16 @@ theory BV64
 
   function size : int = 64
 
-  clone export BitVector with function size, lemma size_positive
+  clone export BitVector with function size, lemma size_positive, axiom .
 
 end
 
 theory BV32_64
 
-  use import int.Int
+  use int.Int
 
-  use BV32
-  use BV64
+  use BV32 as BV32
+  use BV64 as BV64
 
   function concat BV32.bv BV32.bv : BV64.bv
 
@@ -389,8 +391,8 @@ end
 
 theory TestBv32
 
-  use import BV32
-  use import int.Int
+  use BV32
+  use int.Int
 
   goal Test1:
     let b = bw_and bvzero bvone in nth b 1 = False

@@ -3,9 +3,10 @@
 config=src/util/config.ml
 makefileconfig=share/Makefile.config
 
-bindir="\"$BINDIR\""
-libdir="\"$LIBDIR/why3\""
-datadir="\"$DATADIR/why3\""
+bindir="$BINDIR"
+libdir="$LIBDIR/why3"
+datadir="$DATADIR/why3"
+ocamllib="@OCAMLINSTALLLIB@/why3"
 localdir="None"
 
 if [ "@enable_relocation@" = "yes" ]; then
@@ -15,33 +16,34 @@ if [ "@enable_relocation@" = "yes" ]; then
         (Filename.dirname Sys.executable_name)) "share") "why3"'
     localdir="None"
 elif [ "@enable_local@" = "yes" ]; then
-    bindir="\"@LOCALDIR@/bin\""
-    libdir="\"@LOCALDIR@/lib\""
-    datadir="\"@LOCALDIR@/share\""
+    bindir="@LOCALDIR@/bin"
+    libdir="@LOCALDIR@/lib"
+    datadir="@LOCALDIR@/share"
+    ocamllib="$libdir/why3"
     localdir="Some \"@LOCALDIR@\""
 fi
 
 echo "
 let version   = \"@VERSION@\"
 
-let libdir    = $libdir
-let datadir   = $datadir
+let libdir    = \"$libdir\"
+let datadir   = \"$datadir\"
 let localdir  = $localdir
 " > $config
 
 echo "
 OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
-INCLUDE     = @BIGINTINCLUDE@ -I @OCAMLINSTALLLIB@/why3
-INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I @OCAMLINSTALLLIB@/why3
+INCLUDE     = @BIGINTINCLUDE@ -I \"$ocamllib\"
+INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I \"$ocamllib\"
 " > $makefileconfig
 
 if [ "@enable_relocation@" = "no" ]; then
 
 echo "
-BINDIR      = $bindir
-LIBDIR      = $libdir
-DATADIR     = $datadir
+BINDIR      = \"$bindir\"
+LIBDIR      = \"$libdir\"
+DATADIR     = \"$datadir\"
 " >> $makefileconfig
 
 fi

@@ -12,7 +12,7 @@
 open Why3
 open Format
 open Gconfig
-open Stdlib
+open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
@@ -247,18 +247,18 @@ let try_convert s =
 let create_colors v =
   let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-
   let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-
   let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-
+  let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
+      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
+  let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
   ()
 
@@ -268,7 +268,8 @@ let erase_color_loc (v:GSourceView2.source_view) =
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter
 
 
 
@@ -480,6 +481,10 @@ let provers_factory =
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
   new GMenu.factory tools_submenu_provers
 
+(* context_tools : simplified tools menu for mouse-3 *)
+
+let context_tools_menu = GMenu.menu ()
+let context_tools_factory = new GMenu.factory context_tools_menu ~accel_group
 
 
 (* 1.3 "View" menu items *)
@@ -527,7 +532,8 @@ let () =
      *)
     Hstr.iter
       (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing)
+       source_view#set_editable gconfig.allow_source_editing;
+       source_view#set_auto_indent gconfig.allow_source_editing)
       source_view_table;
     send_session_config_to_server ()
   in
@@ -732,30 +738,6 @@ let clear_tree_and_table goals_model =
 (* Menu items *)
 (**************)
 
-
-let reload_unsafe () = send_request Reload_req
-
-let save_and_reload () = save_sources (); reload_unsafe ()
-
-(* Same as reload_safe but propose to save edited sources before reload *)
-let reload_safe () =
-  if files_need_saving () then
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving source files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
-    in
-    match answer with
-    | 1 -> save_and_reload ()
-    | 2 -> reload_unsafe ()
-    | _ -> ()
-  else
-    reload_unsafe ()
-
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
-
-
 (* vpan222 contains:
    2.2.2.1 a notebook containing view of the current task, source code etc
    2.2.2.2 a vertical pan which contains [vbox2222]
@@ -822,7 +804,7 @@ let create_source_view =
             ~packing:scrolled_source_view#add () in
         let source_view =
           GSourceView2.source_view
-            ~auto_indent:true
+            ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
@@ -976,7 +958,7 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error" [`BACKGROUND gconfig.neg_premise_color]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
 
 (**** Message-zone printing functions *****)
 
@@ -1002,51 +984,56 @@ let add_to_log =
   log_zone#buffer#insert ("] " ^ s ^ "\n");
   log_zone#scroll_to_mark `INSERT
 
+let clear_message_zone () =
+  let buf = message_zone#buffer in
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#delete ~start:buf#start_iter ~stop:buf#end_iter
+
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
+  (* TODO: use kasprintf once OCaml 4.03 is used *)
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               let s = try_convert s in
               add_to_log notif_kind s;
+              let buf = message_zone#buffer in
               if kind>0 then
                 begin
-                  message_zone#buffer#insert (s ^ "\n");
-                  messages_notebook#goto_page error_page
+                  if Strings.ends_with notif_kind "error" ||
+                     Strings.ends_with notif_kind "Error"
+                  then
+                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                  else
+                    buf#insert (s ^ "\n");
+                  messages_notebook#goto_page error_page;
                 end)
     str_formatter
     fmt
 
-let display_warnings () =
-  if Queue.is_empty warnings then () else
-    begin
-      let nwarn = ref 0 in
-      begin try
-      Queue.iter
-        (fun (loc,msg) ->
-         if !nwarn = 4 then
-           begin
-             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
-             raise Exit
-           end
-         else
-           begin
-             incr nwarn;
-             match loc with
-             | None ->
-                Format.fprintf Format.str_formatter "%s@\n@\n" msg
-             | Some l ->
-                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
-                               Loc.gen_report_position l msg
-           end) warnings;
-        with Exit -> ();
+let display_warnings fmt warnings =
+  let nwarn = ref 0 in
+  try
+    Queue.iter (fun (loc,msg) ->
+      if !nwarn = 4 then begin
+        Format.fprintf fmt "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+        raise Exit
       end;
-      Queue.clear warnings;
-      let msg =
-        Format.flush_str_formatter ()
-      in
-      print_message ~kind:1 ~notif_kind:"warning" "%s" msg
-    end
+      incr nwarn;
+      match loc with
+      | None ->
+        Format.fprintf fmt "%s@\n@\n" msg
+      | Some l ->
+        (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+        Format.fprintf fmt "%a: %s@\n@\n" Loc.gen_report_position l msg
+    ) warnings;
+  with Exit -> ()
+
+let display_warnings () =
+  if Queue.is_empty warnings then ()
+  else begin
+    print_message ~kind:1 ~notif_kind:"warning" "%a" display_warnings warnings;
+    Queue.clear warnings;
+  end
 
 let print_message ~kind ~notif_kind fmt =
   display_warnings (); print_message ~kind ~notif_kind fmt
@@ -1078,6 +1065,34 @@ let update_monitor =
   monitor#set_text text
 
 
+(*********************)
+(* Reaload Menu Item *)
+(*********************)
+
+let reload_unsafe () = clear_message_zone (); send_request Reload_req
+
+let save_and_reload () = save_sources (); reload_unsafe ()
+
+(* Same as reload_safe but propose to save edited sources before reload *)
+let reload_safe () =
+  if files_need_saving () then
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving source files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
+    in
+    match answer with
+    | 1 -> save_and_reload ()
+    | 2 -> reload_unsafe ()
+    | _ -> ()
+  else
+    reload_unsafe ()
+
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
+
+
+
 
 
 
@@ -1091,12 +1106,12 @@ let completion_desc = completion_cols#add Gobject.Data.string
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
-  GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
+  GEdit.entry_completion ~model:completion_model ~minimum_key_length:2 ~entry:command_entry ()
 
 let add_completion_entry (s,desc) =
   let row = completion_model#append () in
   completion_model#set ~row ~column:completion_col s;
-  completion_model#set ~row ~column:completion_desc ("("^desc^")")
+  completion_model#set ~row ~column:completion_desc desc
 
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
@@ -1105,7 +1120,7 @@ let match_function s iter =
     true
   with Not_found -> false
 
-(* see also init_compeltion below *)
+(* see also init_completion below *)
 
 (*********************)
 (* Terminal history  *)
@@ -1141,21 +1156,13 @@ let () = send_session_config_to_server ()
 (* Locations colors *)
 (********************)
 
-(* This apply a background [color] on a location given by its file view [v] line
-   [l] beginning char [b] and end char [e]. *)
-let color_loc (v:GSourceView2.source_view) ~color l b e =
-  let buf = v#buffer in
-  let top = buf#start_iter in
-  let start = top#forward_lines (l-1) in
-  let start = start#forward_chars b in
-  let stop = start#forward_chars (e-b) in
-  buf#apply_tag_by_name ~start ~stop color
-
 let convert_color (color: color): string =
   match color with
   | Neg_premise_color -> "neg_premise_tag"
   | Premise_color -> "premise_tag"
   | Goal_color -> "goal_tag"
+  | Error_color -> "error_tag"
+  | Error_line_color -> "error_line_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let line = max 0 (line - 1) in
@@ -1165,9 +1172,41 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
+let color_line ~color loc =
+  let color_line (v:GSourceView2.source_view) ~color l =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let stop = start#forward_lines 1 in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
+  let f, l, _, _ = Loc.get loc in
+  try
+    let (_, v, _, _) = get_source_view_table f in
+    let color = convert_color color in
+    color_line ~color v l
+  with
+  | Nosourceview f ->
+    (* If the file is not present do nothing *)
+    print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
+    Debug.dprintf debug "color_loc: no source view for file %s@." f
+
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ?(ce=false) ~color loc =
+
+  (* This apply a background [color] on a location given by its file view [v] line
+     [l] beginning char [b] and end char [e]. *)
+  let color_loc (v:GSourceView2.source_view) ~color l b e =
+    let buf = v#buffer in
+    let top = buf#start_iter in
+    let start = top#forward_lines (l-1) in
+    let start = start#forward_chars b in
+    let stop = start#forward_chars (e-b) in
+    buf#apply_tag_by_name ~start ~stop color
+  in
+
   let f, l, b, e = Loc.get loc in
   try
     let v = if ce then counterexample_view else
@@ -1492,7 +1531,6 @@ let on_selected_row r =
     let typ = get_node_type id in
     match typ with
     | NGoal ->
-        let _b = gconfig.intro_premises in
         let c = gconfig.show_full_context in
         send_request (Get_task(id,c,true))
     | NProofAttempt ->
@@ -1520,11 +1558,9 @@ let on_selected_row r =
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
        counterexample_view#scroll_to_mark `INSERT;
-       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
        send_request (Get_task(id,c,true))
     | _ ->
-       let _b = gconfig.intro_premises in
        let c = gconfig.show_full_context in
        send_request (Get_task(id,c,true))
   with
@@ -1559,7 +1595,7 @@ let (_ : GtkSignal.id) =
           sel#select_path path
         | _ -> ()
         end;
-        tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+        context_tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
         true
       | _ -> (* Other buttons *) false
     end
@@ -1629,12 +1665,12 @@ let treat_message_notification msg = match msg with
       else
         begin
           let buf = message_zone#buffer in
-          (* remove all coloration in message_zone *)
-          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
           print_message ~kind:1 ~notif_kind:"Transformation Error"
                         "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
-          let color = "error" in
+          (* remove all coloration in message_zone before coloring *)
+          buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+          let color = "error_tag" in
           let _, _, beg_char, end_char = Loc.get loc in
           let start = buf#start_iter#forward_lines 3 in
           buf#apply_tag_by_name
@@ -1658,9 +1694,9 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
-         color_loc ~color:Goal_color rel_loc;
+         color_line ~color:Error_line_color rel_loc;
+         color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else
@@ -1914,13 +1950,20 @@ let add_submenu_strategy (shortcut,strategy) =
              (String.map (function '_' -> ' ' | c -> c) strategy)
              ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
   let callback () =
     Debug.dprintf debug "interp command '%s'@." strategy;
     interp strategy
   in
+  connect_menu_item i ~callback;
+  let  i = create_menu_item
+             context_tools_factory
+             (String.map (function '_' -> ' ' | c -> c) strategy)
+             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
+  in
+  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
+          (parse_shortcut_as_key shortcut);
   connect_menu_item i ~callback
+
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
   let  i = create_menu_item
@@ -1934,7 +1977,16 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
-  connect_menu_item i ~callback
+  connect_menu_item i ~callback;
+  if not (List.mem prover_parseable_name gconfig.hidden_provers) then
+    begin
+      let  i = create_menu_item
+             context_tools_factory
+             prover_name
+             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
+      in
+      connect_menu_item i ~callback;
+    end
 
 
 
@@ -1960,7 +2012,7 @@ let init_completion provers transformations strategies commands =
               provers
   in
   List.iter add_submenu_prover provers_sorted;
-
+  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
@@ -2021,8 +2073,13 @@ let () =
   edit_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._e
 
 let replay_menu_item =
-  create_menu_item tools_factory "Replay obsolete"
-                   "Replay all obsolete proofs (shortcut: r)"
+  create_menu_item tools_factory "Replay valid obsolete proofs"
+                   "Replay valid obsolete proofs below the current node (shortcut: r)"
+
+let replay_all_menu_item =
+  create_menu_item tools_factory "Replay all obsolete proofs"
+                   "Replay all obsolete proofs below the current node"
+
 let () =
   replay_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._r
 
@@ -2047,6 +2104,10 @@ let () =
   mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
 
 
+let interrupt_item =
+  create_menu_item tools_factory "Interrupt"
+                   "Stop all running proof attempts"
+
 let bisect_item =
   create_menu_item tools_factory "Bisect on external proof"
                    "Search for a maximal set of hypotheses to remove before calling a prover"
@@ -2069,7 +2130,7 @@ let paste_item = create_menu_item tools_factory "Paste"
                                   "Paste the copied node below the current node"
 
 
-let () =
+let complete_context_menu () =
   let on_selected_rows ~multiple ~notif_kind ~action f () =
     match get_selected_row_references () with
     | [] ->
@@ -2086,6 +2147,10 @@ let () =
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
                                 (fun id -> Command_req (id, "replay")));
   connect_menu_item
+    replay_all_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+                                (fun id -> Command_req (id, "replay all")));
+  connect_menu_item
     clean_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
                                 (fun id -> Command_req (id, "clean")));
@@ -2093,6 +2158,10 @@ let () =
     mark_obsolete_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
                                 (fun id -> Command_req (id, "mark")));
+  connect_menu_item
+    interrupt_item
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+                                (fun id -> Command_req (id, "interrupt")));
   connect_menu_item
     edit_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
@@ -2104,14 +2173,32 @@ let () =
   connect_menu_item
     focus_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Focus_req id));
+                                (fun id -> Command_req (id, "Focus")));
   connect_menu_item
     remove_item
     ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
-    ~callback:(fun () -> send_request Unfocus_req)
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+                                (fun id -> Command_req (id, "Unfocus")));
+  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
+  let replay_context_menu_item =
+    create_menu_item context_tools_factory "Replay valid obsolete proofs"
+                     "Replay valid obsolete proofs below the current node (shortcut: r)" in
+  connect_menu_item
+    replay_context_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+                                (fun id -> Command_req (id, "replay")));
+  let replay_all_context_menu_item =
+    create_menu_item context_tools_factory "Replay all obsolete proofs"
+                     "Replay all obsolete proofs below the current node" in
+  connect_menu_item
+    replay_all_context_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+                                (fun id -> Command_req (id, "replay all")));
+  ()
+
 
 
 (*************************************)
@@ -2151,9 +2238,17 @@ let check_uninstalled_prover =
   let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
   fun p ->
   if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
-  then begin
+  then
+    begin
       Whyconf.Hprover.add uninstalled_prover_seen p ();
-      uninstalled_prover_dialog gconfig p
+      let callback p u =
+        send_request (Set_prover_policy(p,u))
+      in
+      (* The gconfig.window_height is always the height of the window thanks to
+         the callback to size_allocate. By default, this dialog has 3/4 the
+         height of the main window. *)
+      let height = 3 * gconfig.window_height / 4 in
+      uninstalled_prover_dialog ~height ~callback gconfig p
     end
 
 let treat_notification n =
@@ -2218,24 +2313,6 @@ let treat_notification n =
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
-       let name =
-         (* Reduce the name of the goals to the minimum: "0" instead of
-            "WP_Parameter.0" for example.
-            In cases where we want the explanation to be printed, and the
-            explanation contains filename (with '.'), this does not work. So, we
-            additionally check that the first part of the name is a number.
-         *)
-         if typ = NGoal then
-           let new_name = List.hd (Strings.rev_split '.' name) in
-           try
-             let name_number = List.hd (Strings.split ' ' new_name) in
-             ignore (int_of_string name_number);
-             new_name
-           with _ ->
-             (* The name is empty or the first part is not a number *)
-             name
-         else name
-       in
        try
          let parent = get_node_row parent_id in
          ignore (new_node ~parent id name typ detached);
@@ -2278,6 +2355,7 @@ let treat_notification n =
      main_window#show ();
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
+     complete_context_menu ();
      Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;
@@ -2290,7 +2368,10 @@ let treat_notification n =
      if is_selected_alone id then
        begin
          task_view#source_buffer#set_text s;
-         apply_loc_on_source list_loc;
+         (* Avoid erasing colors at startup when selecting the first node. In
+            all other cases, it should change nothing. *)
+         if list_loc != [] then
+           apply_loc_on_source list_loc;
          (* scroll to end of text *)
          task_view#scroll_to_mark `INSERT
        end

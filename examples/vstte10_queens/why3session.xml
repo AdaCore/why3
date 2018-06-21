@@ -30,7 +30,7 @@
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="VC bt_queens" expl="VC for bt_queens" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC bt_queens.0" expl="exceptional postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -96,13 +96,13 @@
 </theory>
 <theory name="NQueens63" proved="true">
  <goal name="VC check_is_consistent" expl="VC for check_is_consistent" proved="true">
- <proof prover="1"><result status="valid" time="0.36" steps="1122"/></proof>
+ <proof prover="1"><result status="valid" time="1.10" steps="1105"/></proof>
  </goal>
  <goal name="VC count_bt_queens" expl="VC for count_bt_queens" proved="true">
- <proof prover="1"><result status="valid" time="0.44" steps="1121"/></proof>
+ <proof prover="1"><result status="valid" time="1.96" steps="1483"/></proof>
  </goal>
  <goal name="VC count_queens" expl="VC for count_queens" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="VC test_count_8" expl="VC for test_count_8" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>

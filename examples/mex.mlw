@@ -1,0 +1,134 @@
+
+(** {1 Minimum excludant, aka mex}
+
+   Author: Jean-Christophe Filliâtre (CNRS)
+
+   Given a finite set of integers, find the smallest nonnegative integer
+   that does not belong to this set.
+
+   In the following, the set is given as an array A.
+   If N is the size of this array, it is clear that we have 0 <= mex <= N
+   for we cannot have the N+1 first natural numbers in the N cells of
+   array A (pigeon hole principle).
+*)
+
+(**
+   A simple algorithm is thus to mark values that belong to [0..N[ in
+   some external Boolean array of length N, ignoring any value that is
+   negative or greater or equal than N. Then a second loop scans the
+   marks until we find some unused value. If don't find any, then it means
+   that A contains exactly the integers 0,...,N-1 and the answer is N.
+
+   The very last step in this reasoning requires to invoke the pigeon hole
+   principle (imported from the standard library).
+
+   Time O(N) and space O(N).
+*)
+module MexArray
+
+  use int.Int
+  use map.Map
+  use array.Array
+  use ref.Refint
+  use pigeon.Pigeonhole
+
+  predicate mem (x: int) (a: array int) =
+    exists i. 0 <= i < length a && a[i] = x
+
+  let mex (a: array int) : int
+    ensures { 0 <= result <= length a }
+    ensures { not (mem result a) }
+    ensures { forall x. 0 <= x < result -> mem x a }
+  = let n = length a in
+    let used = make n false in
+    let ghost idx = ref (fun i -> i) in (* the position of each marked value *)
+    for i = 0 to n - 1 do
+      invariant { forall x. 0 <= x < n -> used[x] ->
+                    mem x a && 0 <= !idx x < n && a[!idx x] = x }
+      invariant { forall j. 0 <= j < i -> 0 <= a[j] < n ->
+                    used[a[j]] && 0 <= !idx a[j] < n && a[!idx a[j]] = a[j] }
+      let x = a[i] in
+      if 0 <= x && x < n then begin used[x] <- true; idx := set !idx x i end
+    done;
+    let r = ref 0 in
+    let ghost posn = ref (-1) in
+    while !r < n && used[!r] do
+      invariant { 0 <= !r <= n }
+      invariant { forall j. 0 <= j < !r -> used[j] && 0 <= !idx j < n }
+      invariant { if !posn >= 0 then 0 <= !posn < n && a[!posn] = n
+                                else forall j. 0 <= j < !r -> a[j] <> n }
+      variant   { n - !r }
+      if a[!r] = n then posn := !r;
+      incr r
+    done;
+    (* we cannot have !r=n (all values marked) and !posn>=0 at the same time *)
+    if !r = n && !posn >= 0 then pigeonhole (n+1) n (set !idx n !posn);
+    !r
+
+end
+
+(**
+  In this second implementation, we assume we are free to mutate array A.
+
+  The idea is then to scan the array from left to right, while
+  swapping elements to put any value in 0..N-1 at its place in the
+  array.  When we are done, a second loop looks for the mex, advancing
+  as long as a[i]=i holds.
+
+  Since we perform only swaps, it is obvious that the mex of the final
+  array is equal to the mex of the original array.
+
+  Time O(N) and space O(1). The argument for a linear time complexity is as
+  follows: whenever we do not advance, we swap the element to its place,
+  which is further and did not contain that element; so we can do this only
+  N times.
+
+  Surprinsingly, proving that N is the answer whenever array A contains a
+  permutation of 0..N-1 is now easy (no need for a pigeon hole
+  principle or any kind of proof by induction).
+ *)
+module MexArrayInPlace
+
+  use int.Int
+  use int.NumOf
+  use array.Array
+  use array.ArraySwap
+  use ref.Refint
+
+  predicate mem (x: int) (a: array int) =
+    exists i. 0 <= i < length a && a[i] = x
+
+  function placed (a: array int) : int -> bool =
+    fun i -> a[i] = i
+
+  let mex (a: array int) : int
+    ensures { 0 <= result <= length a }
+    ensures { not (mem result (old a)) }
+    ensures { forall x. 0 <= x < result -> mem x (old a) }
+  = let n = length a in
+    let i = ref 0 in
+    while !i < n do
+      invariant { 0 <= !i <= n }
+      invariant { forall x. mem x a <-> mem x (old a) }
+      invariant { forall j. 0 <= j < !i -> 0 <= a[j] < n -> a[a[j]] = a[j] }
+      variant   { n - !i, n - numof (placed a) 0 n }
+      let x = a[!i] in
+      if x < 0 || x >= n then
+        incr i
+      else if x < !i then begin
+        swap a !i x; incr i
+      end else if a[x] = x then
+        incr i
+      else
+        swap a !i x
+    done;
+    assert { forall j. 0 <= j < n -> let x = (old a)[j] in
+             0 <= x < n -> a[x] = x };
+    for i = 0 to n - 1 do
+      invariant { forall j. 0 <= j < i -> a[j] = j }
+      if a[i] <> i then return i
+    done;
+    n
+
+end
+

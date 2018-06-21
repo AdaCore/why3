@@ -687,8 +687,8 @@ let print_data_whytype_and_implicits info fmt (name,ts,csl) =
       let _, _, all_ty_params = ls_ty_vars cs in
       if not (Stv.is_empty all_ty_params) then
         let print fmt tv =
-          fprintf fmt "[%a]" (print_tv info ~whytypes:false) tv in
-        fprintf fmt "@[<2>Implicit Arguments %a@ [%a].@]@\n"
+          fprintf fmt "{%a}" (print_tv info ~whytypes:false) tv in
+        fprintf fmt "@[<2>Arguments %a@ %a.@]@\n"
           print_ls cs
           (print_list space print) ts.ts_args)
     csl;

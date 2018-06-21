@@ -175,8 +175,8 @@ and rewriteF kn state av sign f = match f.t_node with
                       (rewriteF kn state Svs.empty sign) tr in
       let av = List.fold_right Svs.add vl av in
       let f1 = rewriteF kn state av sign f1 in
-      (* Preserve labels and location of f *)
-      t_label_copy f (t_quant_simp q (close vl tr f1))
+      (* Preserve attributes and location of f *)
+      t_attr_copy f (t_quant_simp q (close vl tr f1))
   | Tbinop (o, _, _) when (o = Tand && sign) || (o = Tor && not sign) ->
       TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f

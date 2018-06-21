@@ -4,16 +4,16 @@
 (**************************************************************************)
 module Compile_aexpr
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import vm.VMClock
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use vm.VMClock
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
 
   function aexpr_post (a:aexpr) (len:pos) : post 'a =
     \x p ms ms'. let VMC _ s m c = ms in
@@ -38,17 +38,17 @@ end
 
 module Compile_bexpr
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import vm.VMClock
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use vm.VMClock
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
 
   function bexpr_post (b:bexpr) (cond: bool) (out_t:pos) (out_f:pos) : post 'a =
     \x p ms ms'. let VMC _ s m c = ms in
@@ -86,18 +86,18 @@ end
 
 module Compile_com
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import vm.VMClock
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
-  use import Compile_bexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use vm.VMClock
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
+  use Compile_bexpr
 
   function com_post (cmd:com) (len:pos) : post 'a =
     \x p ms ms'. let VMC _ s m c = ms in

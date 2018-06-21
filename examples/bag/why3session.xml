@@ -38,12 +38,12 @@
  <proof prover="4"><result status="valid" time="0.01" steps="48"/></proof>
  </goal>
  <goal name="VC add" expl="VC for add" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC add.1" expl="precondition">
   <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC add.2" expl="assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <transf name="split_goal_right" expanded="true">
    <goal name="VC add.2.1" expl="assertion">
    <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
    </goal>
@@ -82,7 +82,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="VC remove" expl="VC for remove" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC remove.1" expl="precondition">
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
@@ -96,7 +96,7 @@
   <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC remove.5" expl="assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <transf name="split_goal_right" expanded="true">
    <goal name="VC remove.5.1" expl="assertion">
    <proof prover="4"><result status="valid" time="2.88" steps="1309"/></proof>
    </goal>
@@ -1066,7 +1066,7 @@
 </theory>
 <theory name="Harness" sum="ecb5cf2aa45279cfc0a7afcb4f5bd104">
  <goal name="VC test1" expl="VC for test1">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC test1.1" expl="assertion">
   <proof prover="4"><result status="valid" time="0.15" steps="244"/></proof>
   </goal>

@@ -37,7 +37,9 @@
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
 %token <string> BITVECTOR_EXTRACT
+%token <string> INT_TO_BV
 %token BITVECTOR_TYPE
+%token <string * string> FLOAT_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
 %token <string * string> DEC_STR
@@ -48,11 +50,12 @@
 
 
 output:
-| EOF { Stdlib.Mstr.empty }
+| EOF { Wstdlib.Mstr.empty }
+| LPAREN MODEL RPAREN { Wstdlib.Mstr.empty }
 | LPAREN MODEL list_decls RPAREN { $3 }
 
 list_decls:
-| LPAREN decl RPAREN { Smt2_model_defs.add_element $2 Stdlib.Mstr.empty false}
+| LPAREN decl RPAREN { Smt2_model_defs.add_element $2 Wstdlib.Mstr.empty false}
 | LPAREN decl RPAREN list_decls { Smt2_model_defs.add_element $2 $4 false }
 | COMMENT list_decls  { $2 } (* Lines beginning with ';' are ignored *)
 
@@ -128,6 +131,10 @@ list_smt_term:
 application:
 | LPAREN name list_smt_term RPAREN { Smt2_model_defs.Apply($2, List.rev $3) }
 | LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
+(* This should not happen in relevant part of the model *)
+| LPAREN INT_TO_BV smt_term RPAREN {
+  Smt2_model_defs.Apply($2, [$3]) }
+
 
 binop:
 | LE { "<=" }
@@ -142,6 +149,9 @@ array:
 | LPAREN
     STORE array smt_term smt_term
   RPAREN { Smt2_model_defs.Store ($3, $4, $5) }
+| LPAREN
+    STORE name smt_term smt_term
+  RPAREN { Smt2_model_defs.Store (Smt2_model_defs.Array_var $3, $4, $5) }
 (* When array is of type int -> bool, Cvc4 returns something that looks like:
    (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
 | LPAREN
@@ -163,6 +173,7 @@ name:
 (* Should not happen in relevant part of the model (ad hoc) *)
 | BITVECTOR_TYPE { "" }
 | BITVECTOR_EXTRACT { $1 }
+| FLOAT_TYPE { "" }
 
 (* Z3 specific boolean expression. This should maybe be used in the future as
    it may give some information on the counterexample. *)

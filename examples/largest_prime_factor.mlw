@@ -9,13 +9,13 @@ What is the largest prime factor of the number 600851475143 ?
 
 module PrimeFactor
 
-  use import mach.int.Int
-  use import number.Divisibility
-  use import number.Prime
-  use import number.Coprime
+  use mach.int.Int
+  use number.Divisibility
+  use number.Prime
+  use number.Coprime
 
-  (** returns the smallest divisor of [n] greater than or equal to [d],
-      assuming no divisor between 2 and [d]. *)
+  (** returns the smallest divisor of `n` greater than or equal to `d`,
+      assuming no divisor between 2 and `d`. *)
   let rec smallest_divisor (d n:int) : int
     requires { 2 <= n }
     requires { 2 <= d <= n }
@@ -32,8 +32,8 @@ module PrimeFactor
     end else if d >= 2 && n % d = 0 then d else
   smallest_divisor (d+1) n
 
-  use import ref.Ref
-  use import list.List
+  use ref.Ref
+  use list.List
 
   let largest_prime_factor (n:int) : int
     requires { 2 <= n }

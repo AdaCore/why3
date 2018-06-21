@@ -5,19 +5,20 @@
 
 module MergesortQueue
 
-  use import int.Int
-  use import list.List
-  use import list.Mem
-  use import list.Length
-  use import list.Append
-  use import list.Permut
-  use import queue.Queue
+  use int.Int
+  use list.List
+  use list.Mem
+  use list.Length
+  use list.Append
+  use list.Permut
+  use queue.Queue
 
   type elt
   val predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
-  clone export list.Sorted      with type t = elt, predicate le  = le,
-  goal Transitive.Trans
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+  clone export list.Sorted with
+    type t = elt, predicate le  = le, goal Transitive.Trans
 
   let merge (q1: t elt) (q2: t elt) (q: t elt)
     requires { q.elts = Nil /\ sorted q1.elts /\ sorted q2.elts }

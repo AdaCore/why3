@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -468,11 +468,11 @@ let warn_dubious_axiom uc k p syms =
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
     with Exit -> ()
 
-let lab_w_non_conservative_extension_no =
-  Ident.create_label "W:non_conservative_extension:N"
+let attr_w_non_conservative_extension_no =
+  Ident.create_attribute "W:non_conservative_extension:N"
 
 let should_be_conservative id =
-  not (Slab.mem lab_w_non_conservative_extension_no id.id_label)
+  not (Sattr.mem attr_w_non_conservative_extension_no id.id_attrs)
 
 let add_decl ?(warn=true) uc d =
   let uc = add_tdecl uc (create_decl d) in
@@ -542,6 +542,7 @@ type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
+  inst_df : prop_kind;
 }
 
 let empty_inst = {
@@ -549,6 +550,7 @@ let empty_inst = {
   inst_ts = Mts.empty;
   inst_ls = Mls.empty;
   inst_pr = Mpr.empty;
+  inst_df = Plemma;
 }
 
 exception CannotInstantiate of ident
@@ -731,7 +733,7 @@ let cl_prop cl inst (k,pr,f) =
     | Plemma, Some Pgoal -> raise EmptyDecl
     | Plemma, _ -> Plemma
     | Paxiom, Some k -> k
-    | Paxiom, None -> Paxiom (* TODO: Plemma *) in
+    | Paxiom, None -> inst.inst_df in
   let pr' = cl_clone_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'

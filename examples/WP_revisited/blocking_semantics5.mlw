@@ -135,7 +135,7 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   end
 
 
-(** [valid_fmla f] is true when [f] is valid in any environment *)
+(** `valid_fmla f` is true when `f` is valid in any environment *)
 predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
 
@@ -201,7 +201,7 @@ end
 
 theory TestSemantics
 
-use import SemOp
+use SemOp
 use map.Const
 
 function my_sigma : env = Const.const (Vint 0)
@@ -358,8 +358,8 @@ end
 
 theory TypingAndSemantics
 
-use import SemOp
-use import Typing
+use SemOp
+use Typing
 
 (*
 inductive compatible datatype value =
@@ -406,8 +406,8 @@ end
 
 theory FreshVariables
 
-use import SemOp
-use import list.Append
+use SemOp
+use list.Append
 
 lemma Cons_append: forall a: 'a, l1 l2: list 'a.
   Cons a (l1 ++ l2) = (Cons a l1) ++ l2
@@ -415,8 +415,8 @@ lemma Cons_append: forall a: 'a, l1 l2: list 'a.
 lemma Append_nil_l:
   forall l: list 'a. Nil ++ l = l
 
-(** substitution of a reference [x] by a logic variable [v]
-   warning: proper behavior only guaranted if [v] is fresh *)
+(** substitution of a reference `x` by a logic variable `v`
+   warning: proper behavior only guaranted if `v` is fresh *)
 
 function msubst_term (t:term) (x:mident) (v:ident) : term =
   match t with
@@ -437,7 +437,7 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   end
 
 
-(** [fresh_in_term id t] is true when [id] does not occur in [t] *)
+(** `fresh_in_term id t` is true when `id` does not occur in `t` *)
 predicate fresh_in_term (id:ident) (t:term) =
   match t with
   | Tvalue _ | Tderef _  -> true
@@ -509,9 +509,9 @@ end
 
 theory HoareLogic
 
-use import Syntax
-use import SemOp
-use import FreshVariables
+use Syntax
+use SemOp
+use FreshVariables
 
 (* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:
@@ -594,10 +594,10 @@ end
 
 theory WP
 
-use import SemOp
-use import Typing
-use import TypingAndSemantics
-use import FreshVariables
+use SemOp
+use Typing
+use TypingAndSemantics
+use FreshVariables
 
 
 function fresh_from (f:fmla) : ident

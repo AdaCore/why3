@@ -124,12 +124,12 @@ let rec lift_f el acc t0 =
               t_map_fold (lift_f el) acc t0
             else
               let f = t_let_close_simp vs t2 f in
-              lift_f el acc (t_label_copy t0 f)
+              lift_f el acc (t_attr_copy t0 f)
         | _ ->
             t_map_fold (lift_f el) acc t0
       else
         let f = t_let_close_simp vs t1 f in
-        lift_f el acc (t_label_copy t0 f)
+        lift_f el acc (t_attr_copy t0 f)
   in
   match t0.t_node with
     (* cannot merge the 2 patterns because of warning 57 *)
@@ -168,7 +168,7 @@ let rec lift_f el acc t0 =
             let ax = create_prop_decl Paxiom (create_prsymbol id) f in
             (create_param_decl ls :: abst, ax :: axml), t
       in
-      acc, t_label_copy t0 t
+      acc, t_attr_copy t0 t
   | _ ->
       t_map_fold (lift_f el) acc t0
 

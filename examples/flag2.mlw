@@ -6,9 +6,9 @@
 
 module Flag
 
-  use import int.Int
-  use import map.Map
-  use import ref.Ref
+  use int.Int
+  use map.Map
+  use ref.Ref
 
   type color = Blue | White | Red
 
@@ -73,7 +73,7 @@ module Flag
   = nb_occ_split a i k j c; nb_occ_split (set a k c') i k j c;
     nb_occ_split a k (k + 1) j c; nb_occ_split (set a k c') k (k+1) j c
 
-  use import array.Array
+  use array.Array
 
  let swap (a:array color) (i: int) (j: int) : unit
    requires { 0 <= i < a.length }

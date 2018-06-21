@@ -12,7 +12,6 @@ why3 [general options...] <command> [specific options...]
 
 The following commands are available:
 \begin{description}
-\item[\texttt{bench}] produces benchmarks.
 \item[\texttt{config}] manages the user's configuration,
   including the detection of installed provers.
 \item[\texttt{doc}] produces HTML versions of \why source codes.
@@ -22,7 +21,7 @@ The following commands are available:
   \whyml input files.
 \item[\texttt{ide}] provides a graphical interface to display goals
   and to run provers and transformations on them.
-\item[\texttt{prove}] reads \why and \whyml input files and calls
+\item[\texttt{prove}] reads \whyml input files and calls
   provers, on the command-line.
 \item[\texttt{realize}] generates interactive proof skeletons for
   \why input files.
@@ -30,8 +29,8 @@ The following commands are available:
   for regression test purposes.
 \item[\texttt{session}] dumps various informations from a proof
   session, and possibly modifies the session.
-\item[\texttt{wc}] gives some token statistics about \why and \whyml
-  source codes.
+\item[\texttt{wc}] gives some token statistics about \whyml
+  source files.
 \end{description}
 
 All these commands are also available as standalone executable files,
@@ -56,8 +55,23 @@ particular, option \verb|--help| displays the usage and options.
   reads additional configuration from the given file.
   \index{extra-config@\verb+--extra-config+}
 \item[\texttt{-{}-list-debug-flags}]
-  lists known debug flags.
+    list known debug flags.
   \index{list-debug-flags@\verb+--list-debug-flags+}
+\item[\texttt{-{}-list-transforms}]
+    list known transformations.
+  \index{list-transforms@\verb+--list-transforms+}
+\item[\texttt{-{}-list-printers}]
+  list known printers.
+  \index{list-printers@\verb+--list-printers+}
+\item[\texttt{-{}-list-provers}]
+  list known provers
+  \index{list-provers@\verb+--list-provers+}
+\item[\texttt{-{}-list-formats}]
+  list known input formats
+  \index{list-formats@\verb+--list-formats+}
+\item[\texttt{-{}-list-metas}]
+  list known metas
+  \index{list-metas@\verb+--list-metas+}
 \item[\texttt{-{}-debug-all}]
   sets all debug flags (except flags which change the behavior).
   \index{debug-all@\verb+--debug-all+}
@@ -127,8 +141,8 @@ can be obtained by the option \verb|--list-prover-ids|.
 \label{sec:why3ref}
 
 \why is primarily used to call provers on goals contained in an
-input file. By default, such a file must be written either in \why language
-(extension \texttt{.why}) or in \whyml language (extension \texttt{.mlw}).
+input file. By default, such a file must be written in \whyml language
+(extension \texttt{.mlw}).
 However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg TPTP or SMT-LIB.
@@ -217,8 +231,8 @@ The provers can give the following output:
 \label{sec:proveoptions}
 
 \begin{description}
-\item[\texttt{-{}-get-ce}] activates the generation of a potential
-counter-example when a proof does not succeed (experimental).
+%\item[\texttt{-{}-get-ce}] activates the generation of a potential
+%counter-example when a proof does not succeed (experimental).
 \item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}] specifies
   \textsl{s} as an additional prefix for labels that denotes VC
   explanations. The option can be used several times to specify
@@ -229,16 +243,21 @@ counter-example when a proof does not succeed (experimental).
 \label{sec:ideref}
 
 The basic usage of the GUI is described by the tutorial of
-Section~\ref{sec:gui}. There are no specific command-line options,
-apart from the common options detailed in introduction to this
-chapter. However at least one anonymous argument must be specified on
-the command line. More precisely, the first anonymous argument must be
-the directory of the session. If the directory does not exist, it is
+Section~\ref{sec:gui}. The command-line options are the common options
+detailed in introduction to this chapter, plus the specific option
+already described for the command \texttt{prove} in
+Section~\ref{sec:proveoptions}.
+\begin{description}
+\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
+\end{description}
+At least one anonymous argument must be specified on the command
+line. More precisely, the first anonymous argument must be the
+directory of the session. If the directory does not exist, it is
 created. The other arguments should be existing files that are going
-to be added to the session. For convenience,
-if there is only one anonymous argument, it can be an existing file and
-in this case the session directory is obtained by removing the extension
-from the file name.
+to be added to the session. For convenience, if there is only one
+anonymous argument, it can be an existing file and in this case the
+session directory is obtained by removing the extension from the file
+name.
 
 We describe the actions of the various menus and buttons of the
 interface.
@@ -277,47 +296,61 @@ Additionally, a proof attempt can have the following attributes:
   attempt, \ie run the prover with the current task of the proof
   attempt, in order to update the answer of the prover and remove this
   attribute.
-\item[archived]\index{archived!proof attempt} The proof attempt is not useful
-  anymore; it is kept for history; no \why tools will select it by
-  default. Section \ref{sec:uninstalledprovers} shows an example
-  of this usage.
+\item[detached]\index{detached!proof attempt} The proof attempt is not
+  associated to a proof task anymore. The reason might be that a proof
+  goal disappeared, or that there is a syntax or typing error in the
+  current file, that makes all nodes temporarily detached until the
+  parsing error is fixed. Detached nodes of the session tree are kept
+  until they are explicitly removed, either using a remove command or
+  the clean command. They can be reused, as any other nodes, using the
+  copy/paste operation.
 \end{description}
 
 Generally, proof attempts are marked obsolete just after
 the start of the user interface. Indeed, when you load a session in order to
 modify it (not with \texttt{why3session info} for instance), \why
 rebuilds the goals to prove by using the information provided in the
-session. If you modify the original file (\texttt{.why}, \texttt{.mlw}) or if the
+session. If you modify the original file (\texttt{.mlw}) or if the
 transformations have changed (new version of \why), \why will detect
 that. Since the provers might answer differently on these new
 proof obligations, the corresponding proof attempts are marked obsolete.
 
-% non
-% We say that a session is obsolete if new
-% goals are made obsolete by this method during start-up.
 
-% Claude: Alors la je ne vois pas pourquoi
-% A session can
-% be not obsolete even if it contains obsolete goals.
-
-\subsection{Left toolbar actions}
+\subsection{Menus}
 
 \begin{description}
-\item[Context] presents the context in which the other tools below will
-  apply. If ``only unproved goals'' is selected, no action will ever
-  be applied to an already proved goal.  If ``all goals'', then
-  actions are performed even if the goal is already proved. The second
-  choice allows to compare provers on the same goal.
+\item[Context menu]\emptyitem This menu is selected by the mouse right button on some row of the task tree view.
+\begin{description}
+\item[provers] The detected provers are listed. Note that you can hide some provers of that list using the preferences, tab \textsf{Provers}.
+\item[strategies] the set of known strategies is listed
+\item[Replay valid obsolete proofs] all proof nodes below the selected nodes that are obsolete but whose former status was Valid are replayed.
+\item[Replay all obsolete proofs] all proof nodes below the selected nodes that are obsolete are replayed.
+\end{description}
 
+\item[Menu \textsf{File}]\emptyitem
+\begin{description}
+\item[Add File to session] adds a file in the current proof session.
+%\item[Detect provers] runs provers auto-detection
+\item[Preferences] opens a window for modifying preferred
+  configuration parameters, see details below.
+\item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
+\item[Save files] saves edited soruce files on disk.
+\item[Save session and files] saves both current session state and edited files on disk.
+\item[Save all and Refresh session] save session and edited files, and refresh the current session tree.
+\item[Quit] exits the GUI.
+\end{description}
+
+\item[Menu \textsf{Tools}]\emptyitem
+\begin{description}
 \item[Strategies] section provides a set of actions that are
   performed on the selected goal(s):
   \begin{description}
-  \item[Split] splits the current goal into subgoals if it is a
-    conjunction of two or more goals. It corresponds to the
-    \verb|split_goal_wp| transformation.
-  \item[Inline] inlines the definitions in the conclusion of the goal.
-    It corresponds to the \verb|introduce_premises| transformation
-    follwoed by \verb|inline_goal|.
+  \item[Split VC] splits the current goal into subgoals.
+  % \item[Inline] inlines the definitions in the conclusion of the goal.
+  %   It corresponds to the \verb|introduce_premises| transformation
+  %   follwoed by \verb|inline_goal|.
+  \item[Auto level 0] is a basic proof search strategy that applies a few provers
+    on the goal with a short time limit.
   \item[Auto level 1] is a strategy that first applies a few provers
     on the goal with a short time limit, then splits the goal and
     tries again on the subgoals
@@ -329,16 +362,15 @@ proof obligations, the corresponding proof attempts are marked obsolete.
   Section~\ref{sec:strategies}, as well as a description on how to
   design strategies of your own.
 
-\item[Provers] provide a button for each detected prover. Clicking on such a
-  button starts the corresponding prover on the selected goal(s).
+\item[Provers] provide a menu item for each detected prover. Clicking on
+  such an item starts the corresponding prover on the selected
+  goal(s). To start a prover with a different time limit, you may
+  either change the default time limit in the Preferences, or using
+  the text command field and type the prover name followed by the time
+  limit.
 
-% \item[Inline] replaces the head predicate symbol of the goal with its
-%   definition. It corresponds to the
-%   \verb|inline_goal| transformation.
+\item[Transformations] gives access to all the known transformations.
 
-\item[Tools] section provides a set of specific action that are
-  typically performed on the selected goal(s). :
-  \begin{description}
 \item[Edit] starts an editor on the selected task.
 
   For automatic provers, this allows to see the file sent to the
@@ -348,67 +380,83 @@ proof obligations, the corresponding proof attempts are marked obsolete.
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Replay] replays all the obsolete proofs.
+\item[Replay valid obsolete proofs] replays all the obsolete proofs below the current node whose former state was Valid.
 
-  If ``only unproved goals'' is selected, only formerly successful
-  proofs are rerun. If ``all goals'', then all obsolete proofs are
-  rerun, successful or not.
-
-\item[Remove] removes a proof attempt or a transformation.
+\item[Replay all obsolete proofs] replays all the obsolete proofs below the current node.
 
 \item[Clean] removes any unsuccessful proof attempt for which there is
   another successful proof attempt for the same goal
 
+\item[Remove] removes a proof attempt or a transformation.
+
+\item[Mark obsolete] marks all the proof as
+  obsolete.  This allows to replay every proof.
+
 \item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
-\end{description}
 
-\end{description}
+\item[Bisect] performs a reduction of the context for the the current selected proof attempt, which must be a Valid one.
 
-\subsection{Menus}
+\item[Focus] focus the tree session view to the current node
 
-\begin{description}
-\item[Menu \textsf{File}]\emptyitem
-\begin{description}
-\item[Add File] adds a file in the GUI.
-%\item[Detect provers] runs provers auto-detection
-]\item[Preferences] opens a window for modifying preferred
-  configuration parameters, see details below.
-\item[Reload] reloads the input files from disk, and update the session state accordingly.
-\item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
-\item[Quit] exits the GUI.
+\item[Unfocus] undoes the Focus action
+
+\item[Copy] Marks of proof sub-tree for copy/past action
+
+\item[Paste] Paste the previously selected sub-tree under the current node
+
 \end{description}
 
 \item[Menu \textsf{View}]\emptyitem
 \begin{description}
-\item[Expand All] expands all the rows of the tree view.
+\item[Enlarge font] selects a large font
+\item[Reduce font] selects a smaller font
 \item[Collapse proved goals] closes all the rows of the tree view
   that are proved.
-% \item[Hide proved goals] completely hides the proved rows of the tree
-%   view [EXPERIMENTAL]
+\item[Expand All] expands all the rows of the tree view.
+\item[Collapse under node] closes all the rows of the tree view under the given node
+  that are proved.
+\item[Expand below node] expands the children below the current node
+\item[Expand all below node] expands the whole subtree of the current node
+\item[Go to parent node] move to the parent of the current node
+\item[Go to first child] mode to the first child of the current node
+\item[Select next unproven goal] go to the next unproven goal after the current node
 \end{description}
 
-\item[Menu \textsf{Tools}]
-A copy of the tools already available in the left toolbar, plus:
+
+\item[Menu \textsf{Help}]\emptyitem
 \begin{description}
-\item[Mark as obsolete] marks all the proof as
-  obsolete.
-  This allows to replay every proof.
-\item[Non-splitting transformation] applies one of the available
-  transformations, as listed in Section~\ref{sec:transformations}.
-\item[Splitting transformation] is the same as above, but for
-  splitting transformations, \ie those that can generate
-  several sub-goals.
+\item[Legend]
+Explanations of the meaning of the various icons
+\item[About]
+some information about this software.
 \end{description}
 
-\item[Menu \textsf{Help}]
-A very short online help, and some information about this software.
 \end{description}
+
+\subsection{Command-line interface}
+
+Between the top-right zone containing source files and task, and the
+bottom-right zone containing various messages, a text input field
+allows the user to invoke commands using a textual interface (see
+Figure~\ref{fig:gui1}). The 'help' command displays a basic list of
+available commands. All commands available in the menus are also
+available as a textual command. However the textual interface allows
+for much more possibilities, including the ability to invoke
+transformations with arguments.
+
 
 \subsection{Preferences Dialog}
 
 The preferences dialog allows you to customize various settings. They
 are grouped together under several tabs.
+
+Note that there are to different buttons to close that dialog. The
+``Close'' button will make modifications of any of these settings
+effective only for the current run of the GUI. The ``Save\&Close''
+button will save the modified settings in Why3 configuration file, to
+make them permanent.
+
 
 \begin{description}
 \item[\textsf{General Settings} tab] allows one to set
@@ -420,28 +468,8 @@ are grouped together under several tabs.
   \item the memory given to provers, in megabytes
   \item the maximal number of simultaneous provers allowed to run in parallel
   \end{itemize}
-  By default, modification of any of these settings has effect only
-  for the current run of the GUI. A checkbox allows you to save these
-  settings also for future sessions.
-\item a few display settings:
-  \begin{itemize}
-  \item introduce premises: if selected, the goal of the task shown in
-    top-right window is displayed after introduction of universally
-    quantified variables and implications, \eg a goal of the form
-    $\forall x: t. P \rightarrow Q$ is displayed as
-    \[
-    \begin{array}{l}
-      x : t \\
-      H : P \\
-      \hline
-      Q
-    \end{array}
-    \]
-  \item show labels in formulas
-  \item show source locations in formulas
-  \item show time limit for each proof
-  \end{itemize}
-\item the policy for saving session:
+\item option to disallow source editing within the GUI
+\item the policy for saving sessions:
   \begin{itemize}
   \item always save on exit (default): the current state of the proof session is saving on exit
   \item never save on exit: the current state of the session is never saved
@@ -450,6 +478,20 @@ are grouped together under several tabs.
     want to save or not.
   \end{itemize}
 \end{itemize}
+
+\item[\textsf{Appearance settings} tab]\emptyitem
+  \begin{itemize}
+  \item show full task context: by default, only the local context of
+    formulas is shown, that is only the declarations comming from the
+    same module
+  \item show attributes in formulas
+  \item show corecions in formulas
+  \item show source locations in formulas
+  \item show time and memory limits for each proof
+  \end{itemize}
+  Finally, it is possible to choose an alternative icon set, provided,
+  one is installed first.
+
 \item[\textsf{Editors} tab] allows one to customize the use
   of external editors for proof scripts.
 \begin{itemize}
@@ -465,7 +507,7 @@ are grouped together under several tabs.
 \end{itemize}
 \item[\textsf{Provers} tab]
   allows to select which of the installed provers one wants to see
-  as buttons in the left toolbar.
+  in the context menu.
 \item[\textsf{Uninstalled Provers} tab] presents all the
   decision previously taken for missing provers, as described in
   Section~\ref{sec:uninstalledprovers}. You can remove any recorded
@@ -474,122 +516,22 @@ are grouped together under several tabs.
 
 \subsection{Displaying Counterexamples}
 
-When the selected prover finds (counterexample) model, it is possible to
-display parts of this model in the terms of the original Why3 input.
-Currently, this is supported for CVC4 prover version 1.5 and Z3.
+Why3 provides some support for extracting a potential counterexample
+from failing proof attempts. It is possible to display parts of this
+model in the terms of the original Why3 input.  Currently, this is
+supported for CVC4 prover version 1.5 and Z3.
 
-To display the counterexample in Why3 IDE, the counterexample model generation
-must be enabled in File -/> Preferences -/> get
-counter-example.
-After running the prover and clicking on the prover result in, the
-counterexample can be displayed in the tab
-Counter-example.
-The counterexample is displayed with the original Why3 code in comments.
-Counterexample values for Why3 source code elements at given line are
-displayed in a comment at the line below.
-An alternative way how to display a counterexample is to use the option
-\texttt{-{}-get-ce} of the \texttt{prove} command.
+The counterexamples are enable when using a prover under the
+alternative form called ``coutnerexamples''. After running the prover
+and clicking on the prover result in, the counterexample can be
+displayed in the tab Counter-example.  The counterexample is displayed
+with the original Why3 code in comments.  Counterexample values for
+Why3 source code elements at given line are displayed in a comment at
+the line below.
 
-Why3 source code elements that should be a part of counterexample must be
-explicitly marked with \texttt{"model"} label. The following example shows a
-Why3 theory with some terms annotated with the \texttt{model} label and the
-generated counterexample in comments:
-
-\begin{whycode}
-theory T
-
-  use import int.Int
-
-  goal g_no_lab_ex : forall x:int. x >= 42 -> x + 3 <= 50
-
-  goal g_lab_ex : forall x "model":int. ("model" x >= 42) ->
-    ("model" "model_trace:x+3<=50" x + 3 <= 50)
-
-  goal computation_ex : forall x1 "model" x2 "model" x3 "model" .
-  (* x1 = 1; x2 = 1; x3 = 1 *)
-  ("model" "model_trace: x1 + 1 = 2" x1 + 1 = 2) ->
-  (*  x1 + 1 = 2 = true *)
-  ("model" x2 + 1 = 2) ->
-  (* (= (+ x2 1) 2) = true *)
-  ("model" x3 + 1 = 2) ->
-  (* (= (+ x3 1) 2) = true *)
-  ("model" x1 + x2 + x3  = 5)
-  (* (= (+ (+ x1 x2) x3) 5) = false *)
-\end{whycode}
-
-To display counterexample values in assertions the term being asserted must be
-labeled with the label \texttt{"model\_vc"}. To display counterexample values
-in postconditions, the term in the postcondition must be labeled with the
-label \texttt{"model\_vc\_post"}.
-The following example shows a counterexample of a function with postcondition:
-
-\begin{whycode}
-  let incr_ex ( x "model" : ref int ) (y "model" : ref int): unit
-  (* x = -2; y = -2 *)
-  ensures { !x = old !x + 2 + !y }
-  =
-  y := !y + 1;
-  (* y = -1 *)
-  x := !x + 1;
-  (* x = -1 *)
-  x := !x + 1
-  (* x = 0 *)
-\end{whycode}
-
-It is also possible to rename counterexample elements using the lable
-\texttt{"model\_trace:"}. The following example shows the use of renaming a
-counterexample element in order to print the counterexample in infix notation
-instead of default prefix notation:
-
-\begin{whycode}
-  goal g_lab_ex : forall x "model":int. ("model" x >= 42) ->
-  (* x = 48; (<= 42 x) = true *)
-    ("model" "model_trace:x+3<=50" x + 3 <= 50)
-    (* x+3<=50 = false *)
-\end{whycode}
-
-Renaming counterexample elements is in particular useful when Why3 is used as
-intermediate language and to show names of counterexample elements in the
-source language instead of showing names of Why3 elements.
-Note that if the counterexample element is of a record type, it is also
-possible to rename names of the record fields by putting the label
-\texttt{model\_trace:} to definitions of record fields. For example:
-
-\begin{whycode}
-  type r = {f "model_trace:.F" :int; g "model_trace:G" :bool}
-\end{whycode}
-
-When a prover is queried for a counterexample value of a term of an abstract
-type=, an internal representation of the value is get. To get the concrete
-representation, the term must be marked with the label
-\texttt{"model\_projected"} and a projection function from the abstract type
-to a concrete type must be defined, marked as a projection using the meta
-\texttt{"model\_projection"}, and inlining of this function must be disabled
-using the meta \texttt{"inline : no"}. The following example shows a
-counterexample of an abstract value:
-
-\begin{whycode}
-  theory A
-
-    use import int.Int
-
-    type byte
-    function to_rep byte : int
-    predicate in_range (x : int) = -128 <= x <= 127
-    axiom range_axiom : forall x:byte.
-      in_range (to_rep x)
-    meta "model_projection" function to_rep
-    meta "inline : no" function to_rep
-
-    goal abstr : forall x "model_projected" :byte. to_rep x >= 42 -> to_rep x
-    + 3 <= 50
-    (* x = 48 *)
-\end{whycode}
-
-More examples of using counterexample feature of Why3 can be found in the file
-examples/tests/cvc4-models.mlw and examples/tests/cvc4-models.mlw.
 More information how counterexamples in Why3 works can be found
-in~\cite{hauzar16sefm}.
+in~\cite{hauzar16sefm} and in~\cite{dailler18jlamp}.
+
 
 %
 % how to use counterexamples - explain labels, projections, the option --get-ce of why3prove and the setting in why3ide
@@ -604,88 +546,7 @@ in~\cite{hauzar16sefm}.
 %
 % example
 
-\subsection{Additional Command-Line Options}
 
-The \texttt{ide} command also accepts the following options described for the command \texttt{prove} in Section~\ref{sec:proveoptions}.
-\begin{description}
-\item[\texttt{-{}-extra-expl-prefix \textsl{<s>}}]
-\end{description}
-
-
-\section{The \texttt{bench} Command}
-
-The \texttt{bench} command adds a scheduler on top of the \why
-library. It is designed to compare various components
-of automatic proofs: automatic provers, transformations, definitions
-of a theory. For that purpose, it tries to prove predefined goals using
-each component to compare. Various formats can be used as outputs:
-\begin{description}
-\item[\texttt{csv}] the simpler and more informative format; the results are
-  represented in an array; the rows correspond to the
-  compared components, the columns correspond to the result
-  (Valid, Unknown, Timeout, Failure, Invalid) and the CPU time taken in seconds.
-\item[\texttt{average}] it summarizes the number of the five different answers
-  for each component. It also gives the average time taken.
-\item[\texttt{timeline}] for each component, it gives the number of valid goals
-  along the time (10 slices between 0 and the longest time a component
-  takes to prove a goal)
-\end{description}
-
-The compared components can be defined in an \emph{rc-file};
-\texttt{examples/misc/prgbench.rc} is an example of such a file. More
-generally, a bench configuration file looks like
-\begin{verbatim}
-[probs "myprobs"]
-   file = "examples/mygoal.why" #relatives to the rc file
-   file = "examples/myprogram.mlw"
-   theory = "myprogram.T"
-   goal = "mygoal.T.G"
-
-   transform = "split_goal" #applied in this order
-   transform = "..."
-   transform = "..."
-
-[tools "mytools"]
-   prover = cvc3
-   prover = altergo
-   #or only one
-   driver = "..."
-   command = "..."
-
-   loadpath = "..." #added to the one in why3.conf
-   loadpath = "..."
-
-   timelimit = 30
-   memlimit = 300
-
-   use = "toto.T" #use the theory toto (allow to add metas)
-
-   transform = "simplify_array" #only 1 to 1 transformation
-
-[bench "mybench"]
-   tools = "mytools"
-   tools = ...
-   probs = "myprobs"
-   probs = ...
-   timeline = "prgbench.time"
-   average = "prgbench.avg"
-   csv = "prgbench.csv"
-\end{verbatim}
-
-Such a file can define three families \texttt{tools}, \texttt{probs},
-\texttt{bench}. A \texttt{tools} section defines a set of components to
-compare. A \texttt{probs} section defines a set of goals on which to compare some
-components. A \texttt{bench} section defines which components to
-compare using which goals. It refers by name to some sections
-\texttt{tools} and \texttt{probs} defined in the same file. The order
-of the definitions is irrelevant. Notice that one can use
-\texttt{loadpath} in a \texttt{tools} section to compare different
-axiomatizations.
-
-One can run all the bench given in one bench configuration file with
-\begin{verbatim}
-why3 bench -B path_to_my_bench.rc
-\end{verbatim}
 
 \section{The \texttt{replay} Command}
 \label{sec:why3replayer}
@@ -808,8 +669,6 @@ The available subcommands are as follows:
 \item[\texttt{html}] outputs session contents in HTML format.
 \item[\texttt{mod}] modifies some of the proofs, selected by a filter.
 \item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
-\item[\texttt{copy-archive}] same as copy but also archives the
-  original proofs\index{archived!proof attempt}.
 \item[\texttt{rm}] removes some of the proofs, selected by a filter.
 \end{description}
 
@@ -861,7 +720,7 @@ the one hand if the proof suffers from an internal failure we mark it
 with an exclamation mark \verb|!|, otherwise if it is not valid we
 mark it with a question mark \verb|?|, finally if it is valid we add
 nothing. On the other hand if the proof is obsolete we mark it with an
-\verb|O| and if it is archived we mark it with an \verb|A|.
+\verb|O|.
 
 For example, here are the session tree produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
@@ -1075,86 +934,6 @@ Specific options for this command are as follows.
 
 \end{description}
 
-\subsection{Commands modifying the proof attempts}
-
-The commands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
-and \texttt{rm}, share the same set of options for selecting the proof
-attempts to work on:
-\begin{description}
-\item[\texttt{-{}-filter-prover \textsl{<prover>}}] selects only the proof attempt with
-  the given prover. This option can be specified multiple times in order
-  to select all the proofs that corresponds to any of the given
-  provers.
-\item[\texttt{-{}-filter-verified yes}] selects only
-  the proofs that are valid and not obsolete, while option
-  \verb|--filter-verified no| selects the ones that are not verified.
-  \verb|--filter-verified all|, the default, does not perform such a selection.
-\item[\texttt{-{}-filter-verified-goal yes}] restricts the selection
-  to the proofs of verified goals (that does not mean that the proof is
-  verified). Same for the other cases \verb|no| and \verb|all|.
-\item[\texttt{-{}-filter-archived yes}] restricts the selection
-  to the proofs that are archived.
-  Same for the other cases \verb|no|
-  and \verb|all| except the default is \verb|no|.
-\end{description}
-
-\noindent
-The commands \texttt{mod}, \texttt{copy}, and \texttt{copy-archive},
-share the same set of options to specify the modification. The
-command \texttt{mod} modifies directly the proof attempt,
-\texttt{copy} copies the proof attempt before doing the modification,
-\texttt{copy-archive} marks the original proof attempt as
-archived.
-The options are:
-\begin{description}
-\item[\texttt{-{}-set-obsolete}] marks the selected proofs as
-  obsolete.
-\item[\texttt{-{}-set-archived}] marks the selected proofs as archived.
-\item[\texttt{-{}-unset-archived}] removes the archived attribute
-  from the selected proofs.
-\item[\texttt{-{}-to-prover \textsl{<prover>}}] modifies the prover, for example
-  \texttt{-{}-to-prover Alt-Ergo,0.94}. A conflict arises if a proof
-  with this prover already exists. In this case, you can choose between four
-  behaviors:
-\begin{itemize}
-\item replace the proof (\verb|-f|, \verb|--force|);
-\item do not replace the proof (\verb|-n|, \verb|--never|);
-\item replace the proof unless it is verified (valid and not
-  obsolete) (\verb|-c|, \verb|--conservative|); this is the default;
-\item ask the user each time the case arises (\verb|-i|, \verb|--interactive|).
-\end{itemize}
-\end{description}
-
-The command \texttt{rm} removes the selected proof
-attempts. The options \verb|--interactive|, \verb|--force|, and
-\verb|--conservative|, can also be used to respectively ask before
-each suppression, suppress all the selected proofs (default), and remove
-only the proofs that are not verified. The macro option \verb|--clean|
-corresponds to \verb|--filter-verified-goal --conservative| and
-removes the proof attempts that are not verified but which correspond
-to verified goals.
-
-The commands of this section do not accept by default to modify an
-obsolete session (as defined in \ref{sec:idref:session}). You need to
-add the option \verb|-F| to force this behavior.
-
-
-% pour l'instant on ne documente pas parce que commenté dans le code
-% \todo{A adapter en fonction de la decision sur l'upgrade de prover}
-
-% If you just want to update one session with updated provers you can
-% use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
-% \begin{verbatim}
-% why3session copy  --convert-unknown
-% \end{verbatim}
-% For each proof attempt associated to an unknown prover (a prover not in
-% \verb|.why3.conf|) and not archived, it will try to find a known prover
-% with the same name. If it finds one, the proof attempt is copied to this
-% prover and the old proof is set to archived. The corresponding edited
-% files, if any, are copied and regenerated for the new prover An archived
-% proof is not replayed by why3replayer.
-
-
 
 \section{The \texttt{doc} Command}
 \label{sec:why3doc}
@@ -1203,7 +982,7 @@ Some constructs are interpreted:
   \item[1-6] a heading of level 1 to 6 respectively
   \item[h] raw HTML
   \end{description}
-\item \texttt{[\textsl{code}]} is a code escape: the text
+\item \texttt{`\textsl{code}`} is a code escape: the text
   \textsl{code} is typeset as \why code.
 \end{itemize}
 
@@ -1236,7 +1015,7 @@ realize the given theories. See also Section~\ref{sec:realizations}.
 \section{The \texttt{wc} Command}
 \label{sec:why3wc}
 
-\why can give some token statistics about \why and \whyml source codes.
+\why can give some token statistics about \whyml source files.
 \index{wc@\texttt{wc}}
 
 %%% Local Variables:

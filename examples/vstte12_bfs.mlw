@@ -7,7 +7,7 @@
 
 theory Graph
 
-  use import int.Int
+  use int.Int
   use export set.Fset
 
   type vertex
@@ -51,10 +51,10 @@ end
 
 module BFS
 
-  use import int.Int
-  use import Graph
+  use int.Int
+  use Graph
   clone impset.Impset as B with type elt = vertex
-  use import ref.Refint
+  use ref.Refint
 
   exception Found int
 

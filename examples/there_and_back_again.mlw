@@ -13,12 +13,12 @@
 
 module Convolution
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import list.Reverse
-  use import list.Combine
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Reverse
+  use list.Combine
 
   let rec convolution_rec (x y: list 'a) : (list ('a, 'a), list 'a)
     variant  { x }
@@ -50,14 +50,14 @@ end
 
 module Palindrome
 
-  use import int.Int
-  use import option.Option
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import list.Nth
-  use import list.NthLength
-  use import list.NthLengthAppend
+  use int.Int
+  use option.Option
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Nth
+  use list.NthLength
+  use list.NthLengthAppend
 
   predicate pal (x: list 'a) (n: int) =
     forall i: int. 0 <= i < n -> nth i x = nth (n - 1 - i) x

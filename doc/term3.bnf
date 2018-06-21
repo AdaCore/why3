@@ -1,0 +1,27 @@
+\begin{syntax}
+  term ::= ...                ; see Fig.~\ref{fig:bnf:term1} and \ref{fig:bnf:term2}
+    | "if" term "then" term "else" term
+                              ; conditional
+    | "fun" binders "->" term ; mapping
+    | "let" term-let "in" term  ; local binding
+    | "match" term "with" term-case+ "end"  ; pattern matching
+  \
+  binders ::= ~... ;
+  \
+  term-let ::= pattern "=" term ;
+    | ~...
+  \
+  term-case ::= "|" pattern "->" term
+  \
+  pattern ::= "_"           ; catch-all
+    | "()"                  ; empty tuple
+    | "(" pattern ")"       ; parentheses
+    | "{" pat-field+ "}"    ; record
+    | "ghost"? tag? lident  ; variable
+    | uident pattern*       ; constructor
+    | pattern "," pattern   ; tuple
+    | pattern "as" lident   ; binding
+    | pattern "|" pattern   ; ``or'' pattern
+  \
+  pat-field ::= lqualid "=" pattern ";"
+\end{syntax}

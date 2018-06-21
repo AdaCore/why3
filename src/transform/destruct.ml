@@ -117,7 +117,7 @@ let destruct_alg replace (x: term) : Task.task Trans.tlist =
           | _ -> [[d]]) None
         in
         if replace && is_lsymbol x then
-          Trans.compose_l trans (Trans.singleton (Apply.subst [x]))
+          Trans.compose_l trans (Trans.singleton (Subst.subst [x]))
         else
           trans
     end

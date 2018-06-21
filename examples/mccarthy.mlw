@@ -1,5 +1,5 @@
 
-(** {1 McCarthy's ``91'' function}
+(** {1 McCarthy's "91" function}
 
 authors: Jean-Christophe Filliâtre, Martin Clochard, Claude Marché
 witness: Andrei Paskevich
@@ -8,7 +8,7 @@ witness: Andrei Paskevich
 
 module McCarthy91
 
-  use import int.Int
+  use int.Int
 
   (** {2 Specification} *)
 
@@ -25,8 +25,8 @@ module McCarthy91
 
   (** {2 non-recursive implementation using a while loop} *)
 
-  use import ref.Ref
-  use import int.Iter
+  use ref.Ref
+  use int.Iter
 
   let f91_nonrec (n0: int) ensures { result = spec n0 }
   = let e = ref 1 in
@@ -88,8 +88,8 @@ end
 module McCarthyWithCoroutines
 
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   function spec (x: int) : int = if x <= 100 then 91 else x-10
 
@@ -214,8 +214,8 @@ end
 
 module McCarthy91Mach
 
-  use import int.Int
-  use import mach.int.Int63
+  use int.Int
+  use mach.int.Int63
 
   function spec (x: int) : int = if x <= 100 then 91 else x-10
 
@@ -227,9 +227,9 @@ module McCarthy91Mach
     else
       n - 10
 
-  use import mach.peano.Peano
-  use import mach.int.Refint63
-  use import int.Iter
+  use mach.peano.Peano
+  use mach.int.Refint63
+  use int.Iter
 
   let f91_nonrec (n0: int63) : int63
     ensures { result = spec n0 }

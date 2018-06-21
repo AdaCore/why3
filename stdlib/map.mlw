@@ -21,7 +21,7 @@ end
 
 module Const
 
-  use import Map
+  use Map
 
   let function const (v: 'b) : map 'a 'b = fun _ -> v
 
@@ -42,8 +42,8 @@ end
 
 module MapSorted
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   type elt
 
@@ -51,8 +51,8 @@ module MapSorted
 
   predicate sorted_sub (a : map int elt) (l u : int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
-  (** [sorted_sub a l u] is true whenever the array segment [a(l..u-1)]
-      is sorted w.r.t order relation [le] *)
+  (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
+      is sorted w.r.t order relation `le` *)
 
 end
 
@@ -60,8 +60,8 @@ end
 
 module MapEq
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   predicate map_eq_sub (a1 a2 : map int 'a) (l u : int) =
     forall i:int. l <= i < u -> a1[i] = a2[i]
@@ -70,8 +70,8 @@ end
 
 module MapExchange
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   predicate exchange (a1 a2: map int 'a) (l u i j: int) =
     l <= i < u /\ l <= j < u /\
@@ -89,13 +89,14 @@ end
 
 module MapSum
 
-  use import int.Int
+  use int.Int
   use export Map
 
-  (** [sum m l h] is the sum of [m[i]] for [l <= i < h] *)
+  (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
 
   type container = map int int
-  clone export sum.Sum with type container = container, function f = get
+  clone export sum.Sum with
+    type container = container, function f = get, axiom .
 
 end
 
@@ -104,11 +105,11 @@ end
 (* TODO: we could define Occ using theory int.NumOf *)
 module Occ
 
-  use import int.Int
-  use import Map
+  use int.Int
+  use Map
 
   function occ (v: 'a) (m: map int 'a) (l u: int) : int
-    (** number of occurrences of [v] in [m] between [l] included and [u] excluded *)
+    (** number of occurrences of `v` in `m` between `l` included and `u` excluded *)
 
   axiom occ_empty:
     forall v: 'a, m: map int 'a, l u: int.
@@ -168,9 +169,9 @@ end
 
 module MapPermut
 
-  use import int.Int
-  use import Map
-  use import Occ
+  use int.Int
+  use Map
+  use Occ
 
   predicate permut (m1 m2: map int 'a) (l u: int) =
     forall v: 'a. occ v m1 l u = occ v m2 l u
@@ -191,31 +192,31 @@ end
 
 module MapInjection
 
-  use import int.Int
+  use int.Int
   use export Map
 
   predicate injective (a: map int int) (n: int) =
     forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
-  (** [injective a n] is true when [a] is an injection
-      on the domain [(0..n-1)] *)
+  (** `injective a n` is true when `a` is an injection
+      on the domain `(0..n-1)` *)
 
   predicate surjective (a: map int int) (n: int) =
     forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
-  (** [surjective a n] is true when [a] is a surjection
-      from [(0..n-1)] to [(0..n-1)] *)
+  (** `surjective a n` is true when `a` is a surjection
+      from `(0..n-1)` to `(0..n-1)` *)
 
   predicate range (a: map int int) (n: int) =
     forall i: int. 0 <= i < n -> 0 <= a[i] < n
-  (** [range a n] is true when [a] maps the domain
-      [(0..n-1)] into [(0..n-1)] *)
+  (** `range a n` is true when `a` maps the domain
+      `(0..n-1)` into `(0..n-1)` *)
 
   lemma injective_surjective:
     forall a: map int int, n: int.
     injective a n -> range a n -> surjective a n
-  (** main lemma: an injection on [(0..n-1)] that
-      ranges into [(0..n-1)] is also a surjection *)
+  (** main lemma: an injection on `(0..n-1)` that
+      ranges into `(0..n-1)` is also a surjection *)
 
-  use import Occ
+  use Occ
 
   lemma injection_occ:
     forall m: map int int, n: int.
@@ -233,7 +234,7 @@ module MapParam
   type elt
   type map
 
-  (** if ['b] is an infinite type, then [map 'a 'b] is infinite *)
+  (** if `'b` is an infinite type, then `map 'a 'b` is infinite *)
   meta "material_type_arg" type map, 1
 
   function get (map 'a 'b) 'a : 'b

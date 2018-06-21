@@ -1,4 +1,4 @@
-open Stdlib
+open Wstdlib
 
 type value =
   | Vconstr of Expr.rsymbol * field list

@@ -40,8 +40,6 @@ type strategy_status = STSgoto of proofNodeID * int | STShalt
 
 val print_strategy_status : Format.formatter -> strategy_status -> unit
 
-exception Noprogress
-
 (** {2 Signature for asynchronous schedulers} *)
 
 (** Default delay for the scheduler timeout *)
@@ -85,10 +83,10 @@ end
 
 type controller = private
   { mutable controller_session : Session_itp.session;
-    controller_config : Whyconf.config;
+    mutable controller_config : Whyconf.config;
     mutable controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Wstdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
@@ -101,13 +99,17 @@ val set_session_max_tasks : int -> unit
 (** sets the maximum number of proof tasks that can be running at the
     same time. Initially set to 1. *)
 
+val set_session_prover_upgrade_policy :
+  controller -> Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit
+
 
 val print_session : Format.formatter -> controller -> unit
 
 
 
+exception Errors_list of exn list
 
-val reload_files : controller -> use_shapes:bool -> exn list * bool * bool
+val reload_files : controller -> use_shapes:bool -> bool * bool
 (** reload the files of the given session:
 
   - each file is parsed again and theories/goals extracted from it. If
@@ -152,17 +154,18 @@ val reload_files : controller -> use_shapes:bool -> exn list * bool * bool
       it, neither to its subgoals.
 
 
-  [reload_files] It returns a triple (e, o, d): o true means there are
+  [reload_files] It returns a pair (o, d): o true means there are
     obsolete goals, d means there are missed objects (goals, transformations,
     theories or files) that are now detached in the session returned.
-   [e] is the list of parsing of typing errors
+   If parsing or typing errors occurs, a list of errors is raised inside
+   exception Errors_list.
 
 *)
 
-val add_file : controller -> ?format:Env.fformat -> string -> exn option
+val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont].
-    parsing or typing errors are signaled by a non-none result
+    parsing or typing errors are raised inside exception Errors_list
  *)
 
 val remove_subtree: notification:notifier -> removed:notifier ->
@@ -198,7 +201,6 @@ val schedule_proof_attempt :
   proofNodeID ->
   Whyconf.prover ->
   ?save_to:string ->
-  counterexmp:bool ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
@@ -252,7 +254,6 @@ val run_strategy_on_goal :
   controller ->
   proofNodeID ->
   Strategy.t ->
-  counterexmp:bool ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(string -> string list -> transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->

@@ -1,22 +1,22 @@
 module UnitaryCommutativeRingDecision
 
-clone algebra.UnitaryCommutativeRing as C
+clone algebra.UnitaryCommutativeRing as C with axiom .
 
-clone algebra.UnitaryCommutativeRing as Z
+clone algebra.UnitaryCommutativeRing as Z with axiom .
 
 function morph Z.t : C.t
 
 axiom morph_zero: morph Z.zero = C.zero
 axiom morph_one: morph Z.one = C.one
 axiom morph_add: forall z1 z2:Z.t. morph (Z.(+) z1 z2) = C.(+) (morph z1) (morph z2)
-axiom morph_mul: forall z1 z2:Z.t. morph (Z.( *) z1 z2)
-                                   = C.( *) (morph z1) (morph z2)
+axiom morph_mul: forall z1 z2:Z.t. morph (Z.(*) z1 z2)
+                                   = C.(*) (morph z1) (morph z2)
 axiom morph_inv: forall z:Z.t. morph (Z.(-_) z) = C.(-_) (morph z)
 
 val predicate eq0 (x:Z.t) ensures { result <-> x = Z.zero }
 
-use import int.Int
-use import list.List
+use int.Int
+use list.List
 
 type t = Var int | Add t t | Mul t t | Cst Z.t
 
@@ -26,7 +26,7 @@ function interp (x:t) (y:vars) : C.t =
   match x with
   | Var n -> y n
   | Add x1 x2 -> C.(+) (interp x1 y) (interp x2 y)
-  | Mul x1 x2 -> C.( *) (interp x1 y) (interp x2 y)
+  | Mul x1 x2 -> C.(*) (interp x1 y) (interp x2 y)
   | Cst c -> morph c end
 
 predicate eq (x1 x2:t) = forall y: vars. interp x1 y = interp x2 y
@@ -39,21 +39,21 @@ type t' = list m (* sum of monomials *)
 function mon (x:list int) (y:vars) : C.t =
   match x with
   | Nil -> C.one
-  | Cons x r -> C.( *) (y x) (mon r y) end
+  | Cons x r -> C.(*) (y x) (mon r y) end
 
 function interp' (x:t') (y:vars) : C.t =
   match x with
   | Nil -> C.zero
-  | Cons (M a m) r -> C.(+) (C.( *) (morph a) (mon m y)) (interp' r y) end
+  | Cons (M a m) r -> C.(+) (C.(*) (morph a) (mon m y)) (interp' r y) end
 
 predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
 predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
 
-use import list.Append
-use import list.Length
+use list.Append
+use list.Length
 
 let rec lemma mon_append (x1 x2: list int) (y:vars)
-  ensures { mon (x1 ++ x2) y = C.( *) (mon x1 y) (mon x2 y) }
+  ensures { mon (x1 ++ x2) y = C.(*) (mon x1 y) (mon x2 y) }
   variant { x1 }
 =
   match x1 with Nil -> () | Cons _ x -> mon_append x x2 y end
@@ -72,12 +72,12 @@ let rec lemma interp_sum (x1 x2:t') (y:vars)
 
 let ghost function append_mon (m1 m2:m)
   ensures { forall y. interp' (Cons result Nil) y
-              = C.( *) (interp' (Cons m1 Nil) y) (interp' (Cons m2 Nil) y) }
-= match m1,m2 with M a1 l1, M a2 l2 -> M (Z.( *) a1 a2) (l1 ++ l2) end
+              = C.(*) (interp' (Cons m1 Nil) y) (interp' (Cons m2 Nil) y) }
+= match m1,m2 with M a1 l1, M a2 l2 -> M (Z.(*) a1 a2) (l1 ++ l2) end
 
 let rec ghost function mul_mon (x:t') (mon:m) : t'
   ensures { forall y.
-            interp' result y = C.( *) (interp' x y) (interp' (Cons mon Nil) y) }
+            interp' result y = C.(*) (interp' x y) (interp' (Cons mon Nil) y) }
 = match x with
   | Nil -> Nil
   | Cons m r ->
@@ -87,7 +87,7 @@ let rec ghost function mul_mon (x:t') (mon:m) : t'
 end
 
 let rec ghost function mul_devel (x1 x2:t') : t'
-  ensures { forall y. interp' result y = C.( *) (interp' x1 y) (interp' x2 y) } =
+  ensures { forall y. interp' result y = C.(*) (interp' x1 y) (interp' x2 y) } =
   match x1 with
   | Nil -> Nil
   | Cons (M a m) r -> (mul_mon x2 (M a m)) ++ (mul_devel r x2)
@@ -205,13 +205,14 @@ end
 (** Tests *)
 module Tests
 
-use import int.Int
+use int.Int
 
 function id (x:int) : int = x
 let predicate eq0_int (x:int) = x = 0
 
 
-clone export UnitaryCommutativeRingDecision with type C.t = int, constant C.zero = zero, constant C.one = one, function C.(-_) = (-_), function C.(+) = (+), function C.(*) = (*), type Z.t = int, constant Z.zero = zero, constant Z.one = one, function Z.(-_) = (-_), function Z.(+) = (+), function Z.(*) = (*), function morph = id, goal morph_zero, goal morph_one, goal morph_add, goal morph_mul, goal morph_inv, val eq0 = eq0_int
+clone export UnitaryCommutativeRingDecision with type C.t = int, constant C.zero = zero, constant C.one = one, function C.(-_) = (-_), function C.(+) = (+), function C.(*) = (*), type Z.t = int, constant Z.zero = zero, constant Z.one = one, function Z.(-_) = (-_), function Z.(+) = (+), function Z.(*) = (*), function morph = id, goal morph_zero, goal morph_one, goal morph_add, goal morph_mul, goal morph_inv, val eq0 = eq0_int,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 meta "compute_max_steps" 0x10000000
 
@@ -226,10 +227,10 @@ type r
 type a
 
 function (+) a a : a
-function ( *) a a : a
+function (*) a a : a
 
-clone algebra.UnitaryCommutativeRing as R with type t = r
-clone algebra.Ring as A with type t = a, function (+) = (+), function (*) = (*)
+clone algebra.UnitaryCommutativeRing as R with type t = r, axiom .
+clone algebra.Ring as A with type t = a, function (+) = (+), function (*) = (*), axiom .
 constant one : a
 constant zero : a = A.zero
 axiom AUnitary : forall x:a. one * x = x * one = x
@@ -242,7 +243,7 @@ val function ($) r a : a
 
 axiom ExtDistSumA : forall r: r, x y: a. r $ (x + y) = r $ x + r $ y
 axiom ExtDistSumR : forall r s: r, x: a. (R.(+) r s)$x = r$x + s$x
-axiom AssocMulExt : forall r s: r, x: a. (R.( *) r s)$x = r$(s$x)
+axiom AssocMulExt : forall r s: r, x: a. (R.(*) r s)$x = r$(s$x)
 axiom UnitExt     : forall x: a.         R.one $ x = x
 axiom CommMulExt  : forall r: r, x y: a. r$(x*y) = (r$x)*y = x*(r$y)
 
@@ -253,8 +254,8 @@ end
 module AssocAlgebraDecision
 
 
-use import int.Int
-use import list.List
+use int.Int
+use list.List
 
 type r
 type a
@@ -272,7 +273,7 @@ val function aplus a a : a
 val function atimes a a : a
 val function aopp a : a
 
-clone export AssocAlgebra with type r = r, type a = a, constant one = aone, constant A.zero = azero, constant R.zero = rzero, constant R.one = rone, function R.(+) = rplus, function R.( *) = rtimes, function R.(-_) = ropp, function (+) = aplus, function ( *) = atimes, function A.(-_) = aopp
+clone export AssocAlgebra with type r = r, type a = a, constant one = aone, constant A.zero = azero, constant R.zero = rzero, constant R.one = rone, function R.(+) = rplus, function R.(*) = rtimes, function R.(-_) = ropp, function (+) = aplus, function (*) = atimes, function A.(-_) = aopp, axiom .
 
 (*axiom azero_def: azero = A.zero*) (* FIXME *)
 
@@ -316,8 +317,8 @@ let rec ghost function interp' (x: t') (y: vars) : a =
 predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
 predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
 
-use import list.Append
-use import list.Length
+use list.Append
+use list.Length
 
 let rec lemma mon_append (x1 x2: list int) (y: vars)
   ensures { mon (x1 ++ x2) y = atimes (mon x1 y) (mon x2 y) }
@@ -458,13 +459,14 @@ end
 
 module ReifyTests
 
-use import int.Int
+use int.Int
 
 let predicate eq0_int (x:int) = x=0
 
 let function ($$) (x y:int) :int = x * y
 
-clone export AssocAlgebraDecision with type r = int, type a = int, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = ( *), val azero = Int.zero, val aone = Int.one, val aplus = (+), val aopp = (-_), val atimes = ( *), val ($) = ($$), goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc
+clone export AssocAlgebraDecision with type r = int, type a = int, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = Int.zero, val aone = Int.one, val aplus = (+), val aopp = (-_), val atimes = (*), val ($) = ($$), goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc,
+  axiom . (* FIXME: replace with "goal" and prove *)
 
 
 goal g: forall x y. x + y = y + x

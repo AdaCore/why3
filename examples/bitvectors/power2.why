@@ -1,6 +1,6 @@
 theory Pow2int
 
-  use import int.Int
+  use int.Int
 
   function pow2 (i:int) : int
 
@@ -81,7 +81,7 @@ theory Pow2int
   lemma pow2_63: pow2 63 =  9223372036854775808
 
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   lemma Div_mult_inst: forall x z:int.
           x > 0 ->
@@ -112,8 +112,8 @@ end
 
 theory Pow2real
 
-  use import int.Int
-  use import real.RealInfix
+  use int.Int
+  use real.RealInfix
 
   function pow2 (i:int) : real
 
@@ -139,20 +139,14 @@ theory Pow2real
 
   lemma Power_neg : forall n:int. pow2 (-n) = 1.0 /. pow2 n
 
-  lemma Power_sum_aux : forall n m: int. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m
+  lemma Power_sum_aux : forall m n. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m
 
   lemma Power_sum : forall n m: int. pow2 (n+m) = pow2 n *. pow2 m
 
-  use Pow2int
-  use import real.FromInt
+  use Pow2int as P2I
+  use real.FromInt
 
   lemma Pow2_int_real:
-    forall x:int. x >= 0 -> pow2 x = from_int (Pow2int.pow2 x)
+    forall x:int. x >= 0 -> pow2 x = from_int (P2I.pow2 x)
 
 end
-
-(*
-Local Variables:
-compile-command: "why3 ide power2.why"
-End:
-*)

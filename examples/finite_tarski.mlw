@@ -10,8 +10,8 @@ Authors:  Martin Clochard
 
 module Tarski
 
-  use import set.Fset
-  clone export relations.PartialOrder
+  use set.Fset
+  clone export relations.PartialOrder with axiom .
 
   constant a : set t
 
@@ -27,8 +27,8 @@ module Tarski
 end
 
 module Tarski_rec
-  use import set.Fset
-  clone export Tarski
+  use set.Fset
+  clone export Tarski with axiom .
 
   let lemma least_fix_point () : unit
    ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }
@@ -44,9 +44,9 @@ module Tarski_rec
 end
 
 module Tarski_while
-  use import set.Fset
-  clone export Tarski
-  use import ref.Ref
+  use set.Fset
+  clone export Tarski with axiom .
+  use ref.Ref
 
   let lemma least_fix_point () : unit
    ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }

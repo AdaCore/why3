@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -1229,7 +1229,7 @@ let clone_post_result q = match q.t_node with
   | Teps bf -> t_clone_bound_id bf
   | _ -> invalid_arg "Ity.clone_post_result"
 
-let annot_label = Ident.create_label "vc:annotation"
+let annot_attr = Ident.create_attribute "vc:annotation"
 
 type cty = {
   cty_args   : pvsymbol list;
@@ -1455,7 +1455,7 @@ let cty_exec_post_raw c =
           let ty = Opt.map (Util.const v.vs_ty) s.ls_value in
           t_equ (t_var res) (t_app_partial s (List.rev el) tyl ty)
       | _ -> t_subst_single v res_al h in
-    let rec conv h = t_label_copy h (match h.t_node with
+    let rec conv h = t_attr_copy h (match h.t_node with
       | Tapp (ps, [{t_node = Tvar u}; {t_node = Tapp(s, tl)} as t])
         when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t = 0 ->
           down h s (List.rev tl) (List.rev al)
@@ -1618,7 +1618,7 @@ let print_pv fmt v = print_vs fmt v.pv_vs
 
 let print_pvty fmt v = fprintf fmt "@[(%s%a%a:@,%a)@]"
   (if v.pv_ghost then "ghost " else "")
-  print_pv v print_id_labels v.pv_vs.vs_name
+  print_pv v print_id_attrs v.pv_vs.vs_name
   print_ity v.pv_ity
 
 let forget_pv v = forget_var v.pv_vs
@@ -1662,8 +1662,7 @@ let print_spec args pre post xpost oldies eff fmt ity =
     fprintf fmt "@\nold { %a -> %a }" print_pv o print_pv v in
   let print_post fmt q =
     let v, q = open_post q in
-    fprintf str_formatter "%a" print_vs v;
-    let n = flush_str_formatter () in
+    let n = asprintf "%a" print_vs v in
     if n = "result" || t_v_occurs v q = 0 then
       fprintf fmt "@\nensures  { @[%a@] }" print_term q else
       fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q;

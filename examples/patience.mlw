@@ -40,8 +40,8 @@ input sequence.
 module PigeonHole
 
 (** The Why standard library provides a lemma
-    [map.MapInjection.injective_surjective] stating that a map from
-    [(0..n-1)] to [(0..n-1)] that is an injection is also a
+    `map.MapInjection.injective_surjective` stating that a map from
+    `(0..n-1)` to `(0..n-1)` that is an injection is also a
     surjection.
 
     This is more or less equivalent to the pigeon-hole lemma. However, we need such a lemma more generally on functions instead of maps.
@@ -50,17 +50,17 @@ module PigeonHole
 
 *)
 
-  use import int.Int
+  use int.Int
 
   predicate range (f: int -> int) (n: int) (m:int) =
     forall i: int. 0 <= i < n -> 0 <= f i < m
-  (** [range f n m] is true when [f] maps the domain
-      [(0..n-1)] into [(0..m-1)] *)
+  (** `range f n m` is true when `f` maps the domain
+      `(0..n-1)` into `(0..m-1)` *)
 
   predicate injective (f: int -> int) (n: int) (m:int) =
     forall i j: int. 0 <= i < j < n -> f i <> f j
-  (** [injective f n m] is true when [f] is an injection
-      from [(0..n-1)] to [(0..m-1)] *)
+  (** `injective f n m` is true when `f` is an injection
+      from `(0..n-1)` to `(0..m-1)` *)
 
 
 
@@ -116,9 +116,9 @@ end
 
 module PatienceCode
 
-  use import int.Int
-  use import list.List
-  use import list.RevAppend
+  use int.Int
+  use list.List
+  use list.RevAppend
 
   (** this code was the one written initially, without any
       specification, except for termination, ans unreachability
@@ -148,9 +148,9 @@ module PatienceCode
     | Cons s rem -> wf_rev_append_stacks rem (Cons s s2)
     end
 
-  (** [push_card c stacks acc] pushes card [c] on stacks [stacks],
-      assuming [acc] is an accumulator (in reverse order) of stacks
-      where [c] could not be pushed.
+  (** `push_card c stacks acc` pushes card `c` on stacks `stacks`,
+      assuming `acc` is an accumulator (in reverse order) of stacks
+      where `c` could not be pushed.
   *)
   let rec push_card (c:card) (stacks : list (list card))
      (acc : list (list card)) : list (list card)
@@ -161,11 +161,11 @@ module PatienceCode
   =
     match stacks with
     | Nil ->
-      (* we put card [c] in a new stack *)
+      (* we put card `c` in a new stack *)
       rev_append (Cons (Cons c Nil) acc) Nil
     | Cons stack remaining_stacks ->
         match stack with
-        | Nil -> absurd (* because [wf_stacks stacks] *)
+        | Nil -> absurd (* because `wf_stacks stacks` *)
         | Cons c' _ ->
            if c <= c' then
              (* card is placed on the leftmost stack where its card
@@ -196,7 +196,7 @@ module PatienceCode
     play_cards input Nil
 
 
-  (** test, can be run using [why3 patience.mlw --exec PatienceCode.test] *)
+  (** test, can be run using `why3 patience.mlw --exec PatienceCode.test` *)
   let test () =
     (** the list given in the problem description
        9, 7, 10, 9, 5, 4, and 10 *)
@@ -210,7 +210,7 @@ end
 
 module PatienceAbstract
 
-  use import int.Int
+  use int.Int
 
 (** To specify the expected property of the Patience game, we first
     provide an abstract version, working on a abstract state that
@@ -228,8 +228,8 @@ module PatienceAbstract
 
   (** {3 Abstract state} *)
 
-  use import map.Map
-  use import map.Const
+  use map.Map
+  use map.Const
 
   type state = {
     ghost mutable num_stacks : int;
@@ -238,18 +238,18 @@ module PatienceAbstract
     (** number of cards already seen *)
     ghost mutable values : map int card;
     (** cards values seen, indexed in the order they have been seen,
-        from [0] to [num_elts-1] *)
+        from `0` to `num_elts-1` *)
     ghost mutable stack_sizes : map int int;
-    (** sizes of these stacks, numbered from [0] to [num_stacks - 1] *)
+    (** sizes of these stacks, numbered from `0` to `num_stacks - 1` *)
     ghost mutable stacks : map int (map int int);
     (** indexes of the cards in respective stacks *)
     ghost mutable positions : map int (int,int);
     (** table that given a card index, provides its position, i.e. in
         which stack it is and at which height *)
     ghost mutable preds : map int int;
-    (** predecessors of cards, i.e. for each card index [i], [preds[i]]
+    (** predecessors of cards, i.e. for each card index `i`, `preds[i]`
         provides an index of a card in the stack on the immediate left,
-        whose value is smaller. Defaults to [-1] if the card is on the
+        whose value is smaller. Defaults to `-1` if the card is on the
         leftmost stack. *)
   }
 
@@ -273,8 +273,8 @@ module PatienceAbstract
          0 <= ip < s.stack_sizes[is] &&
          st[ip] = i)
      (** the position table of cards is correct, i.e. when
-        [(is,ip) = s.positions[i]] then card [i] indeed
-        occurs in stack [is] at height [ip] *)
+        `(is,ip) = s.positions[i]` then card `i` indeed
+        occurs in stack `is` at height `ip` *)
   /\ (forall is. 0 <= is < s.num_stacks ->
         forall ip. 0 <= ip < s.stack_sizes[is] ->
         let idx = s.stacks[is][ip] in
@@ -293,15 +293,15 @@ module PatienceAbstract
   /\ (forall i. 0 <= i < s.num_elts ->
        let pred = s.preds[i] in
        -1 <= pred < s.num_elts &&
-       (** the predecessor is a valid index or [-1] *)
+       (** the predecessor is a valid index or `-1` *)
        pred < i /\
        (** predecessor is always a smaller index *)
        let is,_ip = s.positions[i] in
        if pred < 0 then is = 0
-         (** if predecessor is [-1] then [i] is in leftmost stack *)
+         (** if predecessor is `-1` then `i` is in leftmost stack *)
        else
          s.values[pred] < s.values[i] /\
-         (** if predecessor is not [-1], it denotes a card with smaller value... *)
+         (** if predecessor is not `-1`, it denotes a card with smaller value... *)
          is > 0 &&
          (** ...the card is not on the leftmost stack... *)
          let ps,_pp = s.positions[pred] in
@@ -312,10 +312,10 @@ module PatienceAbstract
 
   (** {2 Programs} *)
 
-  use import ref.Ref
+  use ref.Ref
   exception Return int
 
-  (** [play_card c i s] pushes the card [c] on state [s] *)
+  (** `play_card c i s` pushes the card `c` on state `s` *)
   let ghost play_card (c:card) (s:state) : unit
     requires { inv s }
     writes   { s }
@@ -380,9 +380,9 @@ module PatienceAbstract
 
 
 
-  use import list.List
-  use import list.Length
-  use import list.NthNoOpt
+  use list.List
+  use list.Length
+  use list.NthNoOpt
 
 
 
@@ -424,7 +424,7 @@ module PatienceAbstract
 
 
 
-  use import PigeonHole
+  use PigeonHole
 
 
 
@@ -539,16 +539,16 @@ end
 
 module PatienceFull
 
-  use import int.Int
-  use import PatienceAbstract
+  use int.Int
+  use PatienceAbstract
 
 
 (** glue between the ghost state and the stacks of cards *)
 
-  use import list.List
-  use import list.Length
-  use import list.NthNoOpt
-  use import map.Map
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+  use map.Map
 
   predicate glue_stack (s:state) (i:int) (st:list card) =
       length st = s.stack_sizes[i] /\
@@ -566,12 +566,12 @@ module PatienceFull
 
 (** {3 playing a card} *)
 
-  use import list.RevAppend
-  use import ref.Ref
+  use list.RevAppend
+  use ref.Ref
   exception Return
 
 
-(** FIXME: not proved
+(*** FIXME: not proved
 
   let play_card (c:card) (old_stacks : list (list card)) (ghost state:state) : list (list card)
     requires { inv state }
@@ -676,7 +676,7 @@ module PatienceFull
 *)
 
 
-(*i a version closer to the original code
+(*** a version closer to the original code
   let play_card (c:card) (old_stacks : list (list card)) (ghost state:state) : list (list card)
     requires { inv state }
     requires { glue state old_stacks }
@@ -721,11 +721,11 @@ module PatienceFull
 *)
 
 
-(** {3 playing cards} *)
+(*** {3 playing cards} *)
 
 
 
-(*
+(***
 
 
   let rec play_cards (input: list card) (stacks: list (list card))
@@ -756,9 +756,9 @@ module PatienceFull
 
 
 
-(** {3 playing a whole game} *)
+(*** {3 playing a whole game} *)
 
-(*
+(***
 
   type seq 'a = { seqlen: int; seqval: map int 'a }
   (** a sequence is defined by a length and a mapping *)
@@ -775,7 +775,7 @@ module PatienceFull
           nth sigma.seqval[i] l < nth sigma.seqval[j] l)
        (** the card values denoted by [sigma] are increasing *)
 
-  use import PigeonHole
+  use PigeonHole
 
   let play_game (input: list card) : list (list card)
     requires { length input > 0 }

@@ -49,13 +49,13 @@ val print_json_field :
 (* given a field name, a value and a printer for the value, print a json
    mapping (field assignment). Do not print anything else. *)
 
-val convert_record : (string * 'a) list -> 'a Stdlib.Mstr.t
+val convert_record : (string * 'a) list -> 'a Wstdlib.Mstr.t
 
 (* for more complex applications it may be convenient to build a an
    explicit JSON object. Use this type for that and the print_json
    function to print it *)
 type json =
-  | Record of json Stdlib.Mstr.t
+  | Record of json Wstdlib.Mstr.t
   | List of json list
   | String of string
   | Int of int

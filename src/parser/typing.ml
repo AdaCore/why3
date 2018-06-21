@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ptree
 open Ty
@@ -141,11 +141,11 @@ let dty_of_opt ns = function
 
 (** Typing patterns, terms, and formulas *)
 
-let create_user_id {id_str = n; id_lab = label; id_loc = loc} =
-  let get_labels (label, loc) = function
-    | Lstr lab -> Slab.add lab label, loc | Lpos loc -> label, loc in
-  let label,loc = List.fold_left get_labels (Slab.empty,loc) label in
-  id_user ~label n loc
+let create_user_id {id_str = n; id_ats = attrs; id_loc = loc} =
+  let get_attrs (attrs, loc) = function
+    | ATstr attr -> Sattr.add attr attrs, loc | ATpos loc -> attrs, loc in
+  let attrs, loc = List.fold_left get_attrs (Sattr.empty, loc) attrs in
+  id_user ~attrs n loc
 
 let parse_record ~loc ns km get_val fl =
   let fl = List.map (fun (q,e) -> find_lsymbol_ns ns q, e) fl in
@@ -154,10 +154,14 @@ let parse_record ~loc ns km get_val fl =
   cs, List.map get_val pjl
 
 let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
+  match desc with
+    | Ptree.Pparen p -> dpattern ns km p
+    | _ -> (* creative indentation ahead *)
   Dterm.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar (x, false) -> DPvar (create_user_id x)
-    | Ptree.Papp (q, pl) ->
+    | Ptree.Pparen _ -> assert false (* never *)
+    | Ptree.Pvar x -> DPvar (create_user_id x)
+    | Ptree.Papp (q,pl) ->
         let pl = List.map (dpattern ns km) pl in
         DPapp (find_lsymbol_ns ns q, pl)
     | Ptree.Ptuple pl ->
@@ -169,11 +173,11 @@ let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
           | None -> Dterm.dpattern DPwild in
         let cs,fl = parse_record ~loc ns km get_val fl in
         DPapp (cs,fl)
-    | Ptree.Pas (p, x, false) -> DPas (dpattern ns km p, create_user_id x)
-    | Ptree.Por (p, q) -> DPor (dpattern ns km p, dpattern ns km q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern ns km p, dty_of_pty ns ty)
-    | Ptree.Pvar (_, true) | Ptree.Pas (_, _, true) -> Loc.errorm ~loc
-        "ghost variables are only allowed in programs")
+    | Ptree.Pas (p,x,false) -> DPas (dpattern ns km p, create_user_id x)
+    | Ptree.Por (p,q) -> DPor (dpattern ns km p, dpattern ns km q)
+    | Ptree.Pcast (p,ty) -> DPcast (dpattern ns km p, dty_of_pty ns ty)
+    | Ptree.Pghost _ | Ptree.Pas (_,_,true) ->
+        Loc.errorm ~loc "ghost patterns are only allowed in programs")
 
 let quant_var ns (loc, id, gh, ty) =
   if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
@@ -294,7 +298,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let e1 = dterm ns km crcmap gvars at denv e1 in
       let branch (p, e) =
         let p = dpattern ns km p in
-        let denv = denv_add_pat denv p in
+        let denv = denv_add_term_pat denv p e1 in
         p, dterm ns km crcmap gvars at denv e in
       DTcase (e1, List.map branch bl)
   | Ptree.Tif (e1, e2, e3) ->
@@ -360,14 +364,14 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       if not (Hstr.find at_uses l) then Loc.errorm ~loc
         "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
-      DTlabel (e1, Slab.empty)
+      DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
       let ns = import_namespace ns (string_list_of_qualid q) in
-      DTlabel (dterm ns km crcmap gvars at denv e1, Slab.empty)
-  | Ptree.Tnamed (Lpos uloc, e1) ->
+      DTattr (dterm ns km crcmap gvars at denv e1, Sattr.empty)
+  | Ptree.Tattr (ATpos uloc, e1) ->
       DTuloc (dterm ns km crcmap gvars at denv e1, uloc)
-  | Ptree.Tnamed (Lstr lab, e1) ->
-      DTlabel (dterm ns km crcmap gvars at denv e1, Slab.singleton lab)
+  | Ptree.Tattr (ATstr attr, e1) ->
+      DTattr (dterm ns km crcmap gvars at denv e1, Sattr.singleton attr)
   | Ptree.Tcast ({term_desc = Ptree.Tconst c}, pty) ->
       DTconst (c, dty_of_pty ns pty)
   | Ptree.Tcast (e1, pty) ->
@@ -491,24 +495,30 @@ let find_constructor muc q =
     | _ -> false in
   find_special muc test "constructor" q
 
-let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
+let rec dpattern muc gh { pat_desc = desc; pat_loc = loc } =
+  match desc with
+    | Ptree.Pparen p -> dpattern muc gh p
+    | Ptree.Pghost p -> dpattern muc true p
+    | _ -> (* creative indentation ahead *)
   Dexpr.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
-    | Ptree.Pvar (x, gh) -> DPvar (create_user_id x, gh)
-    | Ptree.Papp (q, pl) ->
-        DPapp (find_constructor muc q, List.map (dpattern muc) pl)
+    | Ptree.Pparen _ | Ptree.Pghost _ -> assert false
+    | Ptree.Pvar x -> DPvar (create_user_id x, gh)
+    | Ptree.Papp (q,pl) ->
+        DPapp (find_constructor muc q, List.map (dpattern muc gh) pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
-          | Some p -> dpattern muc p
+          | Some p -> dpattern muc gh p
           | None -> Dexpr.dpattern DPwild in
         let cs,fl = parse_record ~loc muc get_val fl in
         DPapp (cs,fl)
     | Ptree.Ptuple pl ->
-        DPapp (rs_tuple (List.length pl), List.map (dpattern muc) pl)
-    | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, dity_of_pty muc pty)
-    | Ptree.Pas (p, x, gh) -> DPas (dpattern muc p, create_user_id x, gh)
-    | Ptree.Por (p, q) -> DPor (dpattern muc p, dpattern muc q))
+        DPapp (rs_tuple (List.length pl), List.map (dpattern muc gh) pl)
+    | Ptree.Pcast (p,pty) -> DPcast (dpattern muc gh p, dity_of_pty muc pty)
+    | Ptree.Pas (p,x,g) -> DPas (dpattern muc gh p, create_user_id x, gh || g)
+    | Ptree.Por (p,q) -> DPor (dpattern muc gh p, dpattern muc gh q))
 
+let dpattern muc pat = dpattern muc false pat
 
 (* specifications *)
 
@@ -547,17 +557,19 @@ let dpre muc pl lvm old =
   List.map dpre pl
 
 let dpost muc ql lvm old ity =
-  let dpost (loc,pfl) = match pfl with
+  let rec dpost (loc,pfl) = match pfl with
+    | [{ pat_desc = Ptree.Pparen p; pat_loc = loc}, f] ->
+        dpost (loc, [p,f])
     | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
         let v = create_pvsymbol (id_fresh "result") ity in
         v, Loc.try3 ~loc type_fmla muc lvm old f
-    | [{ pat_desc = Ptree.Pvar (id,false) }, f] ->
+    | [{ pat_desc = Ptree.Pvar id }, f] ->
         let v = create_pvsymbol (create_user_id id) ity in
         let lvm = Mstr.add id.id_str v lvm in
         v, Loc.try3 ~loc type_fmla muc lvm old f
     | _ ->
         let v = create_pvsymbol (id_fresh "result") ity in
-        let i = { id_str = "(null)"; id_loc = loc; id_lab = [] } in
+        let i = { id_str = "(null)"; id_loc = loc; id_ats = [] } in
         let t = { term_desc = Tident (Qident i); term_loc = loc } in
         let f = { term_desc = Ptree.Tcase (t, pfl); term_loc = loc } in
         let lvm = Mstr.add "(null)" v lvm in
@@ -680,11 +692,11 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tscope (q, e1) ->
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
-      DElabel (eff_dterm muc denv e1, Slab.empty)
-  | Ptree.Tnamed (Lpos uloc, e1) ->
+      DEattr (eff_dterm muc denv e1, Sattr.empty)
+  | Ptree.Tattr (ATpos uloc, e1) ->
       DEuloc (eff_dterm muc denv e1, uloc)
-  | Ptree.Tnamed (Lstr lab, e1) ->
-      DElabel (eff_dterm muc denv e1, Slab.singleton lab)
+  | Ptree.Tattr (ATstr attr, e1) ->
+      DEattr (eff_dterm muc denv e1, Sattr.singleton attr)
   | Ptree.Tcast (e1, pty) ->
       let d1 = eff_dterm muc denv e1 in
       DEcast (d1, dity_of_pty muc pty)
@@ -834,7 +846,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let e1 = dexpr muc denv e1 in
       let rbranch (pp, e) =
         let pp = dpattern muc pp in
-        let denv = denv_add_pat denv pp in
+        let denv = denv_add_expr_pat denv pp e1 in
         pp, dexpr muc denv e in
       let xbranch (q, pp, e) =
         let xs = find_dxsymbol q in
@@ -845,7 +857,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
           | Some pp -> dpattern muc pp
           | None when mb_unit -> Dexpr.dpattern ~loc (DPapp (rs_void, []))
           | _ -> Loc.errorm ~loc "exception argument expected" in
-        let denv = denv_add_pat denv pp in
+        let denv = denv_add_exn_pat denv pp xs in
         let e = dexpr muc denv e in
         xs, pp, e in
       DEmatch (e1, List.map rbranch bl, List.map xbranch xl)
@@ -918,16 +930,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let id = create_user_id id in
       let denv = denv_add_exn denv id dity in
       DEoptexn (id, dity, mask, dexpr muc denv e1)
-  | Ptree.Emark (id, e1) ->
-      DEmark (create_user_id id, dexpr muc denv e1)
+  | Ptree.Elabel (id, e1) ->
+      DElabel (create_user_id id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
-      DElabel (dexpr muc denv e1, Slab.empty)
-  | Ptree.Enamed (Lpos uloc, e1) ->
+      DEattr (dexpr muc denv e1, Sattr.empty)
+  | Ptree.Eattr (ATpos uloc, e1) ->
       DEuloc (dexpr muc denv e1, uloc)
-  | Ptree.Enamed (Lstr lab, e1) ->
-      DElabel (dexpr muc denv e1, Slab.singleton lab)
+  | Ptree.Eattr (ATstr attr, e1) ->
+      DEattr (dexpr muc denv e1, Sattr.singleton attr)
   | Ptree.Ecast ({expr_desc = Ptree.Econst c}, pty) ->
       DEconst (c, dity_of_pty muc pty)
   | Ptree.Ecast (e1, pty) ->
@@ -1293,6 +1305,9 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
         let pr = find_prop_ns t.th_export p in
         { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new
             (ClashSymbol pr.pr_name.id_string) pr Pgoal s.mi_pk }
+    | CSprop k ->
+        (* TODO: check for multiple settings *)
+        { s with mi_df = k }
   in
   List.fold_left add_inst (empty_mod_inst m) s
 

@@ -10,12 +10,12 @@
 
 module RandomAccessList
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
+  use int.Int
+  use int.ComputerDivision
+  use list.List
+  use list.Length
+  use list.Nth
+  use option.Option
 
   type ral 'a =
   | Empty
@@ -142,12 +142,12 @@ end
 
 module RAL
 
-  use import int.Int
-  use import RandomAccessList as R
-  use import list.List
-  use import list.Length
-  use import option.Option
-  use import list.Nth
+  use int.Int
+  use list.List
+  use list.Length
+  use option.Option
+  use list.Nth
+  use RandomAccessList
 
   type t 'a = { r: ral 'a; ghost l: list 'a }
     invariant { l = elements r }
@@ -179,9 +179,9 @@ end
 
 module RandomAccessListWithSeq
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import seq.Seq
+  use int.Int
+  use int.ComputerDivision
+  use seq.Seq
 
   type ral 'a =
   | Empty
@@ -240,10 +240,10 @@ module RandomAccessListWithSeq
                   if mod i 2 = 0 then x0 else x1
     end
 
-  let rec tail (l: ral 'a) : ral 'a
+   let rec tail (l: ral 'a) : ral 'a
     requires { 0 < length (elements l) }
     variant  { l }
-    ensures  { elements result == (elements l)[1 .. ] }
+    ensures  { elements result == (elements l)[1..] }
     =
     match l with
     | Empty    -> absurd

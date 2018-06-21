@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-type prover = string
+
 (* Name and description *)
 type transformation = (string * string)
 type strategy = string
@@ -74,6 +74,8 @@ type color =
   | Neg_premise_color
   | Premise_color
   | Goal_color
+  | Error_color
+  | Error_line_color
 
 type update_info =
   | Proved of bool
@@ -119,15 +121,13 @@ type ide_request =
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
   | Set_config_param        of string * int
+  | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
   (** [Get_task(id,b,loc)] requests for the text of the task in node
       [id].  When [b] is true then the
       full context is show.  When [loc] is false the locations are not
       returned *)
-  | Focus_req               of node_ID
-  (** Focus on a node. The server only sends info about descendants of this ID *)
-  | Unfocus_req
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string

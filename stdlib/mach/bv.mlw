@@ -1,6 +1,6 @@
 (* Reasoning on bitvectors with precondition enforcing absence of overflow *)
 module BVCheck_Gen
-  use import int.Int
+  use int.Int
 
   type t
 
@@ -60,7 +60,7 @@ module BVCheck_Gen
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   val udiv_check (a b:t) : t
     requires {b <> zeros}

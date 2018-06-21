@@ -28,9 +28,7 @@ module Real
   clone export algebra.OrderedField with type t = real,
     constant zero = zero, constant one = one,
     function (-_) = (-_), function (+) = (+),
-    function (*) = (*), predicate (<=) = (<=),
-    lemma Refl, lemma Trans, lemma Antisymm, lemma Total,
-    lemma NonTrivialRing, lemma ZeroLessOne
+    function (*) = (*), predicate (<=) = (<=)
 
   val (/) (x y:real) : real
     requires { y <> 0.0 }
@@ -51,7 +49,7 @@ integer and real binary operators.
 
 module RealInfix
 
-  use import Real
+  use Real
 
   let function (+.) (x:real) (y:real) : real = x + y
   let function (-.) (x:real) (y:real) : real = x - y
@@ -75,7 +73,7 @@ end
 
 module Abs
 
-  use import Real
+  use Real
 
   function abs(x : real) : real = if x >= 0.0 then x else -x
 
@@ -100,10 +98,8 @@ end
 
 module MinMax
 
-  use import Real
-  clone export relations.MinMax with type t = real, predicate le = (<=),
-    goal TotalOrder.Refl, goal TotalOrder.Trans,
-    goal TotalOrder.Antisymm, goal TotalOrder.Total
+  use Real
+  clone export relations.MinMax with type t = real, predicate le = (<=), goal .
 
 end
 
@@ -111,8 +107,8 @@ end
 
 module FromInt
 
-  use int.Int
-  use import Real
+  use int.Int as Int
+  use Real
 
   function from_int int : real
 
@@ -139,8 +135,8 @@ end
 
 module Truncate
 
-  use import Real
-  use import FromInt
+  use Real
+  use FromInt
 
   (** truncate: rounds towards zero *)
 
@@ -198,7 +194,7 @@ end
 
 module Square
 
-  use import Real
+  use Real
 
   function sqr (x : real) : real = x * x
 
@@ -226,7 +222,7 @@ end
 
 module ExpLog
 
-  use import Real
+  use Real
 
   function exp real : real
   axiom Exp_zero : exp(0.0) = 1.0
@@ -252,12 +248,12 @@ end
 
 module PowerInt
 
-  use import int.Int
-  use import RealInfix
+  use int.Int
+  use RealInfix
 
   clone export int.Exponentiation with
     type t = real, constant one = Real.one, function (*) = Real.(*),
-    goal Assoc, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r, axiom Power_0, axiom Power_s
 
   lemma Pow_ge_one:
     forall x:real, n:int. 0 <= n /\ 1.0 <=. x -> 1.0 <=. power x n
@@ -268,8 +264,8 @@ end
 
 module PowerReal
 
-  use import Real
-  use import ExpLog
+  use Real
+  use ExpLog
 
   function pow real real : real
 
@@ -294,7 +290,7 @@ module PowerReal
   lemma Pow_one_y:
     forall y:real. pow 1.0 y = 1.0
 
-  use import Square
+  use Square
 
   lemma Pow_x_two:
     forall x:real. x > 0.0 -> pow x 2.0 = sqr x
@@ -302,8 +298,8 @@ module PowerReal
   lemma Pow_half:
     forall x:real. x > 0.0 -> pow x 0.5 = sqrt x
 
-  use import FromInt
-  use import int.Power
+  use FromInt
+  use int.Power
 
   lemma pow_from_int: forall x y: int. Int.(<) 0 x -> Int.(<=) 0 y ->
                       pow (from_int x) (from_int y) = from_int (power x y)
@@ -319,9 +315,9 @@ See the {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikiped
 
 module Trigonometry
 
-  use import Real
-  use import Square
-  use import Abs
+  use Real
+  use Square
+  use Abs
 
   function cos real : real
   function sin real : real
@@ -383,9 +379,9 @@ See the {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia 
 
 module Hyperbolic
 
-  use import Real
-  use import Square
-  use import ExpLog
+  use Real
+  use Square
+  use ExpLog
 
   function sinh (x : real) : real = 0.5 * (exp x - exp (-x))
   function cosh (x : real) : real = 0.5 * (exp x + exp (-x))
@@ -409,9 +405,9 @@ See the {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}.
 
 module Polar
 
-  use import Real
-  use import Square
-  use import Trigonometry
+  use Real
+  use Square
+  use Trigonometry
 
   function hypot (x y : real) : real = sqrt (sqr x + sqr y)
   function atan2 real real : real

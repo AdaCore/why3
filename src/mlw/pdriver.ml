@@ -226,7 +226,7 @@ let load_driver env file extra_files =
 
 (* registering printers for programs *)
 
-open Stdlib
+open Wstdlib
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 

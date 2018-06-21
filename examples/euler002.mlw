@@ -13,9 +13,9 @@ exceed four million, find the sum of the even-valued terms. *)
 
 theory FibSumEven
 
-  use import int.Int
-  use import int.Fibonacci
-  use import int.ComputerDivision
+  use int.Int
+  use int.Fibonacci
+  use int.ComputerDivision
 
   (* [fib_sum_even m n] is the sum of even-valued terms of the
       Fibonacci sequence from index 0 to n-1, that do not exceed m *)
@@ -45,9 +45,9 @@ end
 
 module FibOnlyEven
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Fibonacci
+  use int.Int
+  use int.ComputerDivision
+  use int.Fibonacci
 
   let rec lemma fib_even_3n (n:int)
     requires { n >= 0 }
@@ -67,11 +67,11 @@ end
 
 module Solve
 
-  use import int.Int
-  use import ref.Ref
-  use import int.Fibonacci
-  use import FibSumEven
-  use import FibOnlyEven
+  use int.Int
+  use ref.Ref
+  use int.Fibonacci
+  use FibSumEven
+  use FibOnlyEven
 
   let f m : int
     requires { m >= 0 }

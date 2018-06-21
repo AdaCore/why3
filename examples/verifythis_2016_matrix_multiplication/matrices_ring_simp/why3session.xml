@@ -49,10 +49,10 @@
  <proof prover="1"><result status="valid" time="0.34" steps="772"/></proof>
  </goal>
  <goal name="LOCAL.VC lm_opp_ok" expl="VC for lm_opp_ok" proved="true">
- <proof prover="1" timelimit="5" edited="matrices_ring_simp-Symb-VC_lm_opp_ok_1.why"><result status="valid" time="1.51" steps="3322"/></proof>
+ <proof prover="1" timelimit="5"><result status="valid" time="1.51" steps="3322"/></proof>
  </goal>
  <goal name="extends_rw" proved="true">
- <proof prover="1" edited="matrices_ring_simp-Symb-extends_rw_1.why"><result status="valid" time="0.01" steps="4"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC symb_env" expl="VC for symb_env" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
@@ -73,7 +73,7 @@
  <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
  </goal>
  <goal name="VC harness" expl="VC for harness" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC harness.0" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
    <goal name="VC harness.0.0" expl="precondition" proved="true">

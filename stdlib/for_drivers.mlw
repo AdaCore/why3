@@ -1,8 +1,8 @@
 theory ComputerOfEuclideanDivision
 
-  use import int.Int
-  use import int.EuclideanDivision as ED
-  use import int.ComputerDivision as CD
+  use int.Int
+  use int.EuclideanDivision as ED
+  use int.ComputerDivision as CD
 
   lemma cdiv_cases : forall n d:int [CD.div n d].
     ((n >= 0) -> (d > 0) -> CD.div n d = ED.div n d) /\

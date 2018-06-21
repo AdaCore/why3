@@ -14,10 +14,10 @@
 
 module CoincidenceCount
 
-  use import array.Array
-  use import ref.Refint
-  use import set.Fsetint
-  use import set.FsetComprehension
+  use array.Array
+  use ref.Refint
+  use set.Fsetint
+  use set.FsetComprehension
 
   function setof (a: array 'a) : set 'a =
     map (fun x -> a[x]) (interval 0 (length a))

@@ -13,6 +13,7 @@
 
 open Format
 open Pp
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -23,6 +24,9 @@ open Cntexmp_printer
 let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
+
+let debug_incremental = Debug.register_info_flag "force_incremental"
+    ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
 
 (* Meta to tag projection functions *)
 let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
@@ -128,12 +132,15 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
-  mutable list_projs : Stdlib.Sstr.t;
+  mutable list_projs : Sstr.t;
   info_version : version;
   meta_model_projection : Sls.t;
-  mutable list_records : ((string * string) list) Stdlib.Mstr.t;
+  mutable list_records : ((string * string) list) Mstr.t;
   info_cntexample_need_push : bool;
-  info_cntexample: bool
+  info_cntexample: bool;
+  info_incremental: bool;
+  info_set_incremental: bool;
+  mutable incr_list: (prsymbol * term) list;
 }
 
 let debug_print_term message t =
@@ -187,13 +194,13 @@ let print_var_list info fmt vsl =
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
-  Slab.mem Ident.model_projected_label ls.ls_name.id_label) then
+    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+  if ls.ls_args = [] && (Sattr.mem model_attr ls.ls_name.id_attrs ||
+  Sattr.mem Ident.model_projected_attr ls.ls_name.id_attrs) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 let number_format = {
   Number.long_int_support = true;
@@ -216,7 +223,7 @@ let number_format = {
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
 
-  if Slab.mem model_label t.t_label then
+  if Sattr.mem model_attr t.t_attrs then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -264,12 +271,14 @@ let rec print_term info fmt t =
 	      match vc_term_info.vc_loc with
 	      | None -> ()
 	      | Some loc ->
-		let labels = match vc_term_info.vc_func_name with
-		  | None ->
-		    ls.ls_name.id_label
-		  | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
-		let _t_check_pos = t_label ~loc labels t in
+                let attrs = (* match vc_term_info.vc_func_name with
+                  | None -> *)
+                    ls.ls_name.id_attrs
+                  (* | Some _ ->
+                    model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
+                   *)
+in
+		let _t_check_pos = t_attr_set ~loc attrs t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
@@ -313,7 +322,7 @@ let rec print_term info fmt t =
 
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
-  if Slab.mem model_label f.t_label then
+  if Sattr.mem model_attr f.t_attrs then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
@@ -483,20 +492,17 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model fmt info =
+let print_info_model info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
   if not (S.is_empty info_model) && info.info_cntexample then
     begin
-      fprintf fmt "@[(get-model ";
       let model_map =
 	S.fold (fun f acc ->
-          fprintf str_formatter "%a" (print_fmla info) f;
-          let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+          let s = asprintf "%a" (print_fmla info) f in
+	  Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in
-      fprintf fmt ")@]@\n";
+	Mstr.empty in
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -504,13 +510,51 @@ let print_info_model fmt info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Mstr.empty
+
+(* TODO factor out print_prop ? *)
+let print_prop info fmt pr f =
+  fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
+    pr.pr_name.id_string (* FIXME? collisions *)
+    (print_fmla info) f
+
+let add_check_sat info fmt =
+  if info.info_cntexample && info.info_cntexample_need_push then
+    fprintf fmt "@[(push)@]@\n";
+  fprintf fmt "@[(check-sat)@]@\n";
+  if info.info_cntexample then
+    fprintf fmt "@[(get-model)@]@\n"
+
+let rec property_on_incremental2 _ f =
+  match f.t_node with
+  | Tquant _ -> true
+  | Teps _ -> true
+  | _ -> Term.t_fold property_on_incremental2 false f
+
+let property_on_incremental2 f =
+  property_on_incremental2 false f
+
+(* TODO if the property doesnt begin with quantifier, then we print it first.
+   Else, we print it afterwards. *)
+let print_incremental_axiom info fmt =
+  let l = info.incr_list in
+  List.iter (fun (pr, f) ->
+    if not (property_on_incremental2 f) then
+      print_prop info fmt pr f;
+            ) l;
+  add_check_sat info fmt;
+  List.iter (fun (pr, f) ->
+    if property_on_incremental2 f then
+      print_prop info fmt pr f)
+    l;
+  add_check_sat info fmt
 
 let print_prop_decl vc_loc args info fmt k pr f = match k with
   | Paxiom ->
-      fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
-        pr.pr_name.id_string (* FIXME? collisions *)
-        (print_fmla info) f
+      if info.info_incremental then
+        info.incr_list <- (pr, f) :: info.incr_list
+      else
+        print_prop info fmt pr f
   | Pgoal ->
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" (print_ident info) pr.pr_name;
@@ -521,17 +565,20 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      if info.info_cntexample && info.info_cntexample_need_push then fprintf fmt "@[(push)@]@\n";
-      fprintf fmt "@[(check-sat)@]@\n";
-      let model_list = print_info_model fmt info in
+      add_check_sat info fmt;
+
+      (* If in incremental mode, we empty the list of axioms we stored *)
+      if info.info_incremental then
+        print_incremental_axiom info fmt;
+
+      let model_list = print_info_model info in
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = vc_loc;
+                                vc_term_loc = vc_loc;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 Printer.list_records = info.list_records}
   | Plemma -> assert false
-
 
 let print_constructor_decl info fmt (ls,args) =
   let field_names =
@@ -549,9 +596,10 @@ let print_constructor_decl info fmt (ls,args) =
                   fprintf fmt "(%s" field_name;
                   let trace_name =
                     try
-                      let lab = Slab.choose (Slab.filter (fun x ->
-                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
-                      Strings.remove_prefix "model_trace:" lab.lab_string
+                      let attr = Sattr.choose (Sattr.filter (fun l ->
+                        Strings.has_prefix "model_trace:" l.attr_string)
+                        pr.ls_name.id_attrs) in
+                      Strings.remove_prefix "model_trace:" attr.attr_string
                     with
                       Not_found -> ""
                   in
@@ -570,7 +618,7 @@ let print_constructor_decl info fmt (ls,args) =
 
   if Strings.has_prefix "mk " ls.ls_name.id_string then
     begin
-      info.list_records <- Stdlib.Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
+      info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
     end
 
 let print_data_decl info fmt (ts,cl) =
@@ -623,12 +671,25 @@ let set_produce_models fmt info =
   if info.info_cntexample then
     fprintf fmt "(set-option :produce-models true)@\n"
 
+let set_incremental fmt info =
+  if info.info_set_incremental then
+    fprintf fmt "(set-option :incremental true)@\n"
+
 let meta_counterexmp_need_push =
   Theory.register_meta_excl "counterexample_need_smtlib_push" [Theory.MTstring]
                             ~desc:"Internal@ use@ only"
 
+let meta_incremental =
+  Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
+                            ~desc:"Internal@ use@ only"
+
 let print_task version args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let incremental =
+    let incr_meta = Task.find_meta_tds task meta_incremental in
+    not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)
+  in
+  let incremental = Debug.test_flag debug_incremental || incremental in
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
     not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
@@ -643,16 +704,23 @@ let print_task version args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
-    list_projs = Stdlib.Sstr.empty;
+    list_projs = Sstr.empty;
     info_version = version;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
-    list_records = Stdlib.Mstr.empty;
+    list_records = Mstr.empty;
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
+    info_incremental = incremental;
+    (* info_set_incremental add the incremental option to the header. It is not
+       needed for some provers
+    *)
+    info_set_incremental = not need_push && incremental;
+    incr_list = [];
     }
   in
   print_prelude fmt args.prelude;
   set_produce_models fmt info;
+  set_incremental fmt info;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
     | Some t ->

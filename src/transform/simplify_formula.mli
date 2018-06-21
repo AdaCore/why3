@@ -18,15 +18,15 @@ val fmla_remove_quant : keep_model_vars:bool -> Term.term -> Term.term
 (** transforms \exists x. x == y /\ F into F[y/x]
     and \forall x. x <> y \/ F into F[y/x]
 
-    if [keep_model_vars] is true, then variables that hold a label for
-    counterexamples are always kept.
+    if [keep_model_vars] is true, then variables that hold an attribute
+    for counterexamples are always kept.
  *)
 
 val simplify_trivial_quantification : Task.task Trans.trans
 
 val simplify_trivial_wp_quantification : Task.task Trans.trans
 (** same as [simplify_trivial_quantification] but keep variables that
-    hold a counterexample label *)
+    hold a counterexample attribute *)
 
 val fmla_cond_subst: (Term.term -> Term.term -> bool) -> Term.term -> Term.term
 (** given a formula [f] containing some equality or disequality [t1] ?= [t2]

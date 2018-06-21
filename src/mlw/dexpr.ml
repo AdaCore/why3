@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -339,6 +339,14 @@ let specialize_ls {ls_args = args; ls_value = res} =
   let spec_arg ty = dity_sim (spec_val () ty) in
   List.map spec_arg args, Opt.fold spec_val dity_bool res
 
+type dxsymbol =
+  | DElexn of string * dity
+  | DEgexn of xsymbol
+
+let specialize_dxs = function
+  | DEgexn xs -> specialize_single xs.xs_ity
+  | DElexn (_,dity) -> dity
+
 (** Patterns *)
 
 type dpattern = {
@@ -385,15 +393,11 @@ type dspec = ity -> dspec_final
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
 
-let old_mark = "'Old"
+let old_label = "'Old"
 
 (** Expressions *)
 
 type dinvariant = term list
-
-type dxsymbol =
-  | DElexn of string * dity
-  | DEgexn of xsymbol
 
 type dexpr = {
   de_node : dexpr_node;
@@ -430,10 +434,10 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
+  | DElabel of preid * dexpr
   | DEcast of dexpr * dity
-  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
-  | DElabel of dexpr * Slab.t
+  | DEattr of dexpr * Sattr.t
 
 and dreg_branch = dpattern * dexpr
 
@@ -445,6 +449,29 @@ and drec_defn = { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind * dbinder list *
   dity * mask * dspec later * variant list later * dexpr
+
+(** Unification tools *)
+
+let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
+  try List.iter2 fn l1 l2 with Invalid_argument _ ->
+    raise (BadArity (ls, List.length l1))
+
+let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
+  try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
+    "This pattern has type %a,@ but is expected to have type %a"
+    print_dity dp_dity print_dity dity
+
+let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
+  try dity_unify res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
+
+let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
+  try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
 
 (** Environment *)
 
@@ -521,7 +548,7 @@ let denv_add_for_index denv id dvty =
 let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
-    | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
+    | DEghost de | DEuloc (de,_) | DEattr (de,_) -> is_value de
     | DEvar _ | DEsym _ | DEls_pure _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
@@ -537,10 +564,17 @@ let denv_add_args { frozen = fz; locals = ls; excpts = xs } bl =
   let s = List.fold_left add Mstr.empty bl in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
-let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp =
+let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp dity =
+  dpat_expected_type dp dity;
   let l = Mstr.fold (fun _ t l -> t::l) dp.dp_vars fz in
   let s = Mstr.map (fun t -> false, None, ([], t)) dp.dp_vars in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
+
+let denv_add_expr_pat denv dp de =
+  denv_add_pat denv dp (dity_of_dvty de.de_dvty)
+
+let denv_add_exn_pat denv dp dxs =
+  denv_add_pat denv dp (specialize_dxs dxs)
 
 let mk_node n = function
   | _, Some tvs, dvty -> DEvar (n, specialize_scheme tvs dvty)
@@ -590,29 +624,6 @@ let denv_pure denv get_dty =
   let fnI i = try Hint.find hi i with Not_found ->
     let d = dity_fresh () in Hint.add hi i d; d in
   dity_pur (Dterm.dty_fold fnS fnV fnI dty)
-
-(** Unification tools *)
-
-let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
-  try List.iter2 fn l1 l2 with Invalid_argument _ ->
-    raise (BadArity (ls, List.length l1))
-
-let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
-  try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
-    "This pattern has type %a,@ but is expected to have type %a"
-    print_dity dp_dity print_dity dity
-
-let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
-  let res = dity_of_dvty dvty in
-  try dity_unify res dity with Exit -> Loc.errorm ?loc
-    "This expression has type %a,@ but is expected to have type %a"
-    print_dity res print_dity dity
-
-let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
-  let res = dity_of_dvty dvty in
-  try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
-    "This expression has type %a,@ but is expected to have type %a"
-    print_dity res print_dity dity
 
 (** Generation of letrec blocks *)
 
@@ -688,10 +699,6 @@ let dpattern ?loc node =
   in
   Loc.try1 ?loc dpat node
 
-let specialize_dxs = function
-  | DEgexn xs -> specialize_single xs.xs_ity
-  | DElexn (_,dity) -> dity
-
 let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
@@ -763,15 +770,9 @@ let dexpr ?loc node =
         invalid_arg "Dexpr.dexpr: empty branch list in DEmatch"
     | DEmatch (de,bl,xl) ->
         let res = dity_fresh () in
-        let ety = if bl = [] then
-          res else dity_fresh () in
-        dexpr_expected_type de ety;
-        List.iter (fun (dp,de) ->
-          dpat_expected_type dp ety;
-          dexpr_expected_type de res) bl;
-        List.iter (fun (xs,dp,de) ->
-          dpat_expected_type dp (specialize_dxs xs);
-          dexpr_expected_type de res) xl;
+        if bl = [] then dexpr_expected_type de res;
+        List.iter (fun (_,de) -> dexpr_expected_type de res) bl;
+        List.iter (fun (_,_,de) -> dexpr_expected_type de res) xl;
         [], res
     | DEassign al ->
         List.iter (fun (de1,rs,de2) ->
@@ -812,9 +813,9 @@ let dexpr ?loc node =
     | DEcast (de,dity) ->
         dexpr_expected_type de dity;
         de.de_dvty
-    | DEmark (_,de)
+    | DElabel (_,de)
     | DEuloc (de,_)
-    | DElabel (de,_) ->
+    | DEattr (de,_) ->
         de.de_dvty in
   let dvty = Loc.try1 ?loc get_dvty node in
   { de_node = node; de_dvty = dvty; de_loc = loc }
@@ -936,11 +937,7 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
-      print_xs xs) (Sxs.diff eeff.eff_raises ueff.eff_raises);
-  if eeff.eff_oneway && not ueff.eff_oneway then
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> eff.eff_oneway) e)
-      "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
-        stated@ in@ the@ specification"
+      print_xs xs) (Sxs.diff eeff.eff_raises ueff.eff_raises)
 
 let check_aliases recu c =
   let rds_regs = c.cty_freeze.isb_reg in
@@ -973,8 +970,8 @@ let check_aliases recu c =
   let regs = List.fold_left add_arg rds_regs c.cty_args in
   if recu then ignore (add_ity regs c.cty_result)
 
-let check_fun inr rsym dsp e =
-  let c,e = match e with
+let check_fun inr rsym dsp ce =
+  let c,e = match ce with
     | { c_node = Cfun e; c_cty = c } -> c,e
     | _ -> invalid_arg "Dexpr.check_fun" in
   let c = match rsym with
@@ -1049,7 +1046,7 @@ let rebase_old {pvm = pvm} preold old fvs =
     if not (Mvs.mem o fvs) then sbs else match preold with
       | Some preold ->
           Mvs.add o (t_var (find_old pvm preold v).pv_vs) sbs
-      | None -> raise (UnboundLabel old_mark) in
+      | None -> raise (UnboundLabel old_label) in
   Hpv.fold rebase old Mvs.empty
 
 let rebase_pre env preold old pl =
@@ -1093,8 +1090,8 @@ let cty_of_spec env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
-  let preold = Mstr.find_opt old_mark env.old in
-  let env, old = add_label env old_mark in
+  let preold = Mstr.find_opt old_label env.old in
+  let env, old = add_label env old_label in
   let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_ghostify env.ghs eff in
@@ -1106,22 +1103,24 @@ let cty_of_spec env bl mask dsp dity =
 
 (** Expressions *)
 
-let warn_unused s loc =
-  if s = "" || s.[0] <> '_' then
-  Warning.emit ?loc "unused variable %s" s
-
-let check_used_pv e pv = if not (Spv.mem pv e.e_effect.eff_reads) then
-  warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
+let check_used_pv e pv =
+  if not (Sattr.mem Dterm.attr_w_unused_var_no pv.pv_vs.vs_name.id_attrs) &&
+      Debug.test_noflag Dterm.debug_ignore_unused_var then
+    begin
+      let s = pv.pv_vs.vs_name.id_string in
+      if (s = "" || s.[0] <> '_') && not (Spv.mem pv e.e_effect.eff_reads) then
+        Warning.emit ?loc:pv.pv_vs.vs_name.id_loc "unused variable %s" s
+    end
 
 let e_let_check e ld = match ld with
   | LDvar (v,_) -> check_used_pv e v; e_let ld e
   | _           -> e_let ld e
 
-let rec strip uloc labs de = match de.de_node with
-  | DEcast (de,_) -> strip uloc labs de
-  | DEuloc (de,loc) -> strip (Some (Some loc)) labs de
-  | DElabel (de,s) -> strip uloc (Slab.union labs s) de
-  | _ -> uloc, labs, de
+let rec strip uloc attrs de = match de.de_node with
+  | DEcast (de,_) -> strip uloc attrs de
+  | DEuloc (de,loc) -> strip (Some (Some loc)) attrs de
+  | DEattr (de,s) -> strip uloc (Sattr.union attrs s) de
+  | _ -> uloc, attrs, de
 
 let get_pv env n = Mstr.find_exn (Dterm.UnboundVar n) n env.pvm
 let get_rs env n = Mstr.find_exn (Dterm.UnboundVar n) n env.rsm
@@ -1130,7 +1129,7 @@ let get_xs env = function
   | DElexn (n,_) -> Mstr.find_exn (UnboundExn n) n env.xsm
   | DEgexn xs -> xs
 
-let proxy_labels = Slab.singleton proxy_label
+let proxy_attrs = Sattr.singleton proxy_attr
 
 type header =
   | LS of let_defn
@@ -1166,17 +1165,17 @@ let e_of_vl = function
   | vl -> e_tuple (List.map e_var vl)
 
 let rec expr uloc env ({de_loc = loc} as de) =
-  let uloc, labs, de = strip uloc Slab.empty de in
+  let uloc, attrs, de = strip uloc Sattr.empty de in
   let env = {env with lgh = false; cgh = false} in
   let e = Loc.try3 ?loc try_expr uloc env de in
   let loc = Opt.get_def loc uloc in
-  if loc = None && Slab.is_empty labs
-  then e else e_label_push ?loc labs e
+  if loc = None && Sattr.is_empty attrs
+  then e else e_attr_push ?loc attrs e
 
 and cexp uloc env ({de_loc = loc} as de) lpl =
-  let uloc, labs, de = strip uloc Slab.empty de in
-  if not (Slab.is_empty labs) then Warning.emit ?loc
-    "Ignoring labels over a higher-order expression";
+  let uloc, attrs, de = strip uloc Sattr.empty de in
+  if not (Sattr.is_empty attrs) then Warning.emit ?loc
+    "Ignoring attributes over a higher-order expression";
   Loc.try4 ?loc try_cexp uloc env de lpl
 
 and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
@@ -1194,10 +1193,10 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     | _, [] -> ghost, plp in
   let rec proxy_args ghost ldl vl = function
     | EA (_, ({e_node = Evar v} as e)) :: plp
-      when Slab.is_empty e.e_label ->
+      when Sattr.is_empty e.e_attrs ->
         proxy_args ghost ldl (v::vl) plp
     | EA (gh, e) :: plp ->
-        let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+        let id = id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o" in
         let ld, v = let_var ~ghost:(ghost || gh) id e in
         proxy_args ghost (LS ld :: ldl) (v::vl) plp
     | HD hd :: plp ->
@@ -1268,7 +1267,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       env.cgh, List.map ld_of_lp lpl, c
     with Exit ->
       let loc = Opt.get_def de0.de_loc uloc in
-      let id = id_fresh ?loc ~label:proxy_labels "h" in
+      let id = id_fresh ?loc ~attrs:proxy_attrs "h" in
       let ld, s = let_sym id ~ghost:(env.ghs || env.lgh) c in
       c_app s (LD (LS ld) :: lpl) in
   match de0.de_node with
@@ -1307,14 +1306,14 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let mask = if env.ghs then MaskGhost else mask in
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
       cexp uloc (add_xsymbol env xs) de (LD (LX xs) :: lpl)
-  | DEmark (id,de) ->
+  | DElabel (id,de) ->
       let env, old = add_label env id.pre_name in
       cexp uloc env de (LD (LL old) :: lpl)
   | DEvar_pure _ | DEpv_pure _ | DEoptexn _
   | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _
   | DEmatch _ | DEassign _ | DEwhile _ | DEfor _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
-  | DEcast _ | DEuloc _ | DElabel _ -> assert false (* already stripped *)
+  | DEcast _ | DEuloc _ | DEattr _ -> assert false (* already stripped *)
 
 and try_expr uloc env ({de_dvty = argl,res} as de0) =
   match de0.de_node with
@@ -1474,11 +1473,11 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
       let branches = Mxs.singleton xs (vl, e_of_vl vl) in
       e_exn xs (e_match e [] branches)
-  | DEmark (id,de) ->
+  | DElabel (id,de) ->
       let env, old = add_label env id.pre_name in
       let put _ (ld,_) e = e_let ld e in
       Hpv.fold put old (expr uloc env de)
-  | DEcast _ | DEuloc _ | DElabel _ ->
+  | DEcast _ | DEuloc _ | DEattr _ ->
       assert false (* already stripped *)
 
 and var_defn uloc env (id,gh,kind,de) =
@@ -1535,8 +1534,8 @@ and rec_defn uloc ({inr = inr} as env0) {fds = dfdl} =
 and lambda uloc env pvl mask dsp dvl de =
   let ugh = env.ugh || mask = MaskGhost in
   let env = add_binders {env with ugh} pvl in
-  let preold = Mstr.find_opt old_mark env.old in
-  let env, old = add_label env old_mark in
+  let preold = Mstr.find_opt old_label env.old in
+  let env, old = add_label env old_label in
   let e = expr uloc env de in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
@@ -1544,6 +1543,8 @@ and lambda uloc env pvl mask dsp dvl de =
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post e.e_ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
+  let e = if not dsp.ds_diverge then e
+          else e_attr_add Vc.nt_attr e in
   c_fun ~mask pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =
@@ -1553,7 +1554,7 @@ let rec_defn ?(keep_loc=true) drdf =
 let rec mask_of_fun de = match de.de_node with
   | DEfun (_,_,msk,_,_) -> msk
   | DEghost de | DEcast (de,_)
-  | DEuloc (de,_) | DElabel (de,_) -> mask_of_fun de
+  | DEuloc (de,_) | DEattr (de,_) -> mask_of_fun de
   | _ -> MaskGhost (* a safe default for checking *)
 
 let let_defn ?(keep_loc=true) (id, ghost, kind, de) =

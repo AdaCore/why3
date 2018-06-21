@@ -70,7 +70,6 @@ int poll_len = 0;
 plist processes;
 plist clients;
 char *current_dir;
-pqueue queue;
 
 static int cpipe[2];
 
@@ -235,7 +234,7 @@ void server_init_listening(char* socketname, int parallel) {
   }
 
   init_logging();
-  queue = init_queue(100);
+  init_request_queue();
   clients = init_list(parallel);
   addr.sun_family = AF_UNIX;
   poll_len = 2 + parallel;
@@ -450,8 +449,8 @@ void handle_child_events() {
     is_timeout = false;
     if (WIFSIGNALED(status)) {
       is_timeout = true;
-    }
-    if (WIFEXITED(status)) {
+      exit_code = WTERMSIG(status);
+    } else if (WIFEXITED(status)) {
       exit_code = WEXITSTATUS(status);
     }
     child = (pproc) list_lookup(processes, pid);
@@ -502,20 +501,6 @@ void run_request (prequest r) {
   send_started_msg_to_client(client, r->id);
 }
 
-void remove_from_queue(pqueue p, char *id) {
-  // inefficient, but what else?
-  pqueue tmp = init_queue(p->capacity);
-  while (!queue_is_empty(p)) {
-    prequest r = queue_pop(p);
-    if (strcmp(r->id,id)) queue_push(tmp, r);
-  }
-  while (!queue_is_empty(tmp)) {
-    prequest r = queue_pop(tmp);
-    queue_push(p, r);
-  }
-  free_queue(tmp);
-}
-
 void handle_msg(pclient client, int key) {
   prequest r;
   char* buf;
@@ -546,7 +531,7 @@ void handle_msg(pclient client, int key) {
         break;
       case REQ_INTERRUPT:
         // removes all occurrences of r->id from the queue
-        remove_from_queue(queue, r->id);
+        remove_from_queue(r->id);
         // kill all processes whose id is r->id;
         // TODO kill_processes(processes, r->id);
         free_request(r);

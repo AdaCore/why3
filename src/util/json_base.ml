@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Format
+open Wstdlib
 
 let string fmt s =
   let b = Buffer.create (2 * String.length s) in
@@ -57,10 +58,10 @@ let map_bindings key_to_str value_pr fmt map_bindings =
 
 (* Convert a list of bindings into a map *)
 let convert_record l =
-  List.fold_left (fun m (k, x) -> Stdlib.Mstr.add k x m) Stdlib.Mstr.empty l
+  List.fold_left (fun m (k, x) -> Mstr.add k x m) Mstr.empty l
 
 type json =
-  | Record of json Stdlib.Mstr.t
+  | Record of json Mstr.t
   | List of json list
   | String of string
   | Int of int
@@ -70,7 +71,7 @@ type json =
 
 let rec print_json fmt v =
   match v with
-  | Record r -> map_bindings (fun x -> x) print_json fmt (Stdlib.Mstr.bindings r)
+  | Record r -> map_bindings (fun x -> x) print_json fmt (Mstr.bindings r)
   | List l -> list print_json fmt l
   | String s -> string fmt s
   | Int i -> int fmt i
@@ -82,7 +83,7 @@ let rec print_json fmt v =
 (* Get json fields. Return Not_found if no fields or field missing *)
 let get_field j s =
   match j with
-  | Record r -> Stdlib.Mstr.find s r
+  | Record r -> Mstr.find s r
   | _ -> raise Not_found
 
 let get_string j =

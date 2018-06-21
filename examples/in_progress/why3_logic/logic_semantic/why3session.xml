@@ -69,7 +69,7 @@
  <proof prover="0"><result status="valid" time="0.21" steps="20"/></proof>
  </goal>
  <goal name="WP_parameter t_map_sem" expl="VC for t_map_sem">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_map_sem.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.11" steps="25"/></proof>
   </goal>
@@ -196,9 +196,9 @@
  <proof prover="0"><result status="valid" time="0.13" steps="86"/></proof>
  </goal>
  <goal name="WP_parameter t_sem_lift" expl="VC for t_sem_lift">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_sem_lift.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_lift.1.1" expl="1. assertion">
    <proof prover="2"><result status="valid" time="0.48"/></proof>
    </goal>
@@ -225,7 +225,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter t_subst_sem" expl="VC for t_subst_sem">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_subst_sem.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.09" steps="16"/></proof>
   </goal>
@@ -424,7 +424,7 @@
  <proof prover="2"><result status="valid" time="2.82"/></proof>
  </goal>
  <goal name="WP_parameter t_sem_congruence" expl="VC for t_sem_congruence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_sem_congruence.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.12" steps="38"/></proof>
   </goal>
@@ -495,7 +495,7 @@
   <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter t_sem_congruence.24" expl="24. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.24.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.09" steps="23"/></proof>
    </goal>
@@ -538,7 +538,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter t_sem_congruence.36" expl="36. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.36.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.14" steps="21"/></proof>
    </goal>
@@ -566,7 +566,7 @@
   <proof prover="0"><result status="valid" time="0.12" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter t_sem_congruence.42" expl="42. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.42.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.09" steps="35"/></proof>
    </goal>
@@ -579,7 +579,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter t_sem_congruence.43" expl="43. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.43.1" expl="1. assertion">
    <proof prover="4"><result status="valid" time="2.34"/></proof>
    </goal>
@@ -613,7 +613,7 @@
   <proof prover="0"><result status="valid" time="0.15" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter t_sem_congruence.52" expl="52. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.52.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.12" steps="35"/></proof>
    </goal>
@@ -632,7 +632,7 @@
   <proof prover="0"><result status="valid" time="0.22" steps="47"/></proof>
   </goal>
   <goal name="WP_parameter t_sem_congruence.55" expl="55. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_sem_congruence.55.1" expl="1. assertion">
    <proof prover="4"><result status="valid" time="4.46"/></proof>
    </goal>
@@ -749,7 +749,7 @@
  <proof prover="0"><result status="valid" time="0.14" steps="86"/></proof>
  </goal>
  <goal name="WP_parameter br_sem_congruence" expl="VC for br_sem_congruence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_sem_congruence.1" expl="1. precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="22"/></proof>
   </goal>
@@ -757,7 +757,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter br_sem_congruence.3" expl="3. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter br_sem_congruence.3.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.09" steps="20"/></proof>
    </goal>
@@ -805,7 +805,7 @@
 </theory>
 <theory name="WellTypedProofs">
  <goal name="WP_parameter ty_sem_inst" expl="VC for ty_sem_inst">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter ty_sem_inst.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.40" steps="144"/></proof>
   </goal>
@@ -819,7 +819,7 @@
   <goal name="WP_parameter coherence_extension.1" expl="1. VC for coherence_extension">
   <transf name="inline_goal">
    <goal name="WP_parameter coherence_extension.1.1" expl="1. VC for coherence_extension">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter coherence_extension.1.1.1" expl="1. postcondition">
     <proof prover="1"><result status="valid" time="4.02"/></proof>
     </goal>
@@ -833,7 +833,7 @@
  <proof prover="0"><result status="valid" time="0.48" steps="157"/></proof>
  </goal>
  <goal name="WP_parameter patl_refine_self" expl="VC for patl_refine_self">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter patl_refine_self.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.34" steps="25"/></proof>
   </goal>
@@ -876,7 +876,7 @@
  <proof prover="0"><result status="valid" time="2.12" steps="1359"/></proof>
  </goal>
  <goal name="WP_parameter nth_extensional" expl="VC for nth_extensional">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter nth_extensional.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.15" steps="6"/></proof>
   </goal>
@@ -884,7 +884,7 @@
   <proof prover="4"><result status="valid" time="1.32"/></proof>
   </goal>
   <goal name="WP_parameter nth_extensional.3" expl="3. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter nth_extensional.3.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.18" steps="21"/></proof>
    </goal>
@@ -914,7 +914,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter pat_refine_unaccepted" expl="VC for pat_refine_unaccepted">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter pat_refine_unaccepted.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.25" steps="94"/></proof>
   </goal>
@@ -968,7 +968,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.17" expl="17. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.17.1" expl="1. VC for pat_refine_unaccepted">
    <proof prover="0"><result status="valid" time="0.40" steps="132"/></proof>
    </goal>
@@ -1034,7 +1034,7 @@
   <proof prover="0"><result status="valid" time="0.29" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.28" expl="28. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.28.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.24" steps="42"/></proof>
    </goal>
@@ -1068,7 +1068,7 @@
   <proof prover="0"><result status="valid" time="0.30" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.30" expl="30. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.30.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.36" steps="163"/></proof>
    </goal>
@@ -1111,7 +1111,7 @@
   <proof prover="0"><result status="valid" time="0.35" steps="133"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.43" expl="43. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.43.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.34"/></proof>
    </goal>
@@ -1195,7 +1195,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.64" expl="64. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.64.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.14" steps="4"/></proof>
    </goal>
@@ -1277,7 +1277,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.75" expl="75. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.75.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.16" steps="4"/></proof>
    </goal>
@@ -1380,7 +1380,7 @@
   <proof prover="0"><result status="valid" time="0.25" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.93" expl="93. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.93.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.28" steps="70"/></proof>
    </goal>
@@ -1462,7 +1462,7 @@
   <proof prover="0"><result status="valid" time="0.26" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter pat_refine_unaccepted.111" expl="111. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter pat_refine_unaccepted.111.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.34" steps="71"/></proof>
    </goal>
@@ -1513,7 +1513,7 @@
  <proof prover="0"><result status="valid" time="0.32" steps="69"/></proof>
  </goal>
  <goal name="WP_parameter pat_coherent_type" expl="VC for pat_coherent_type">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter pat_coherent_type.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.51" steps="144"/></proof>
   </goal>
@@ -1583,7 +1583,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter patl_coherent_type" expl="VC for patl_coherent_type">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter patl_coherent_type.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.32" steps="51"/></proof>
   </goal>
@@ -1629,7 +1629,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter t_coherent_type" expl="VC for t_coherent_type">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_coherent_type.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.63" steps="194"/></proof>
   </goal>
@@ -1673,7 +1673,7 @@
   <proof prover="0"><result status="valid" time="0.24" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter t_coherent_type.15" expl="15. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_coherent_type.15.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.34" steps="69"/></proof>
    </goal>
@@ -1712,7 +1712,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter tl_coherent_type" expl="VC for tl_coherent_type">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter tl_coherent_type.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.22" steps="62"/></proof>
   </goal>
@@ -1726,7 +1726,7 @@
   <proof prover="0"><result status="valid" time="0.28" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter tl_coherent_type.5" expl="5. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter tl_coherent_type.5.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.25" steps="4"/></proof>
    </goal>
@@ -1753,12 +1753,12 @@
  <proof prover="0"><result status="valid" time="0.51" steps="165"/></proof>
  </goal>
  <goal name="WP_parameter br_coherent_type" expl="VC for br_coherent_type">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_coherent_type.1" expl="1. precondition">
   <proof prover="0"><result status="valid" time="0.14" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter br_coherent_type.2" expl="2. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter br_coherent_type.2.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.24" steps="91"/></proof>
    </goal>

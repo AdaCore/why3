@@ -37,7 +37,7 @@ end
 
 module Bounded_int
 
-  use import int.Int
+  use int.Int
 
   type t
 
@@ -67,7 +67,7 @@ module Bounded_int
     requires { [@expl:integer overflow] in_bounds (a - b) }
     ensures  { result = a - b }
 
-  val ( * ) (a:t) (b:t) : t
+  val (*) (a:t) (b:t) : t
     requires { [@expl:integer overflow] in_bounds (a * b) }
     ensures  { result = a * b }
 
@@ -93,7 +93,7 @@ module Bounded_int
   val (>) (a:t) (b:t) : bool
     ensures  { result <-> to_int a > to_int b }
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   val (/) (a:t) (b:t) : t
     requires { [@expl:division by zero] b <> 0 }
@@ -109,12 +109,12 @@ end
 
 module Unsigned
 
-  use import int.Int
+  use int.Int
 
   let constant min_unsigned : int = 0
 
   clone export Bounded_int with
-    constant min = min_unsigned
+    constant min = min_unsigned, axiom .
 
   constant zero_unsigned : t
 
@@ -130,9 +130,9 @@ module UnsignedGMP
 
   (** Additional GMP-inspired arithmetic primitives *)
 
-  use import int.Int
-  clone export Unsigned
-  use import int.EuclideanDivision
+  use int.Int
+  clone export Unsigned with axiom .
+  use int.EuclideanDivision
 
   val add_mod (x y:t) : t
     ensures { to_int result = mod (to_int x + to_int y) (max+1) }
@@ -144,6 +144,22 @@ module UnsignedGMP
       to_int x + to_int y + to_int c
       /\ 0 <= to_int d <= 1 }
 
+  (* add_ssaaaa *)
+  val add_double (a1 a0 b1 b0:t) : (t,t)
+    returns { (h,l) -> l + radix * h
+                     = mod (a0 + radix * a1 + b0 + radix * b1) (radix * radix) }
+
+  (* add_ssaaaa with no overflow *)
+  val add_double_nc (a1 a0 b1 b0:t) : (t,t)
+    requires { a0 + radix * a1 + b0 + radix * b1 < radix * radix }
+    returns  { (h, l) -> l + radix * h = a0 + radix * a1 + b0 + radix * b1 }
+
+  (* add_ssaaaa with ghost carry *)
+  val add_double_gc (a1 a0 b1 b0:t) : (ghost t, t, t)
+    returns  { (c,h,l) -> l + radix * h + radix * radix * c
+                          = a0 + radix * a1 + b0 + radix * b1
+                        /\ 0 <= to_int c <= 1 }
+
   val sub_mod (x y:t) : t
     ensures { to_int result = mod (to_int x - to_int y) radix }
 
@@ -154,6 +170,23 @@ module UnsignedGMP
       to_int x - to_int y - to_int b
       /\ 0 <= to_int d <= 1 }
 
+  (* sub_ddmmss *)
+  val sub_double (a1 a0 b1 b0:t) : (t,t)
+    returns { (h,l) -> l + radix * h
+                       = mod ((a0 + radix * a1) - (b0 + radix * b1))
+                             (radix * radix) }
+
+  (* sub_ddmmss with no underflow *)
+  val sub_double_nb (a1 a0 b1 b0:t) : (t,t)
+    requires { 0 <= ((a0 + radix * a1) - (b0 + radix * b1)) }
+    returns { (h,l) -> l + radix * h = ((a0 + radix * a1) - (b0 + radix * b1)) }
+
+  (* sub_ddmmss with ghost borrow *)
+  val sub_double_gb (a1 a0 b1 b0:t) : (ghost t,t,t)
+    returns { (b,h,l) -> l + radix * h - radix*radix*b
+                         = ((a0 + radix * a1) - (b0 + radix * b1))
+                      /\ 0 <= b <= 1 }
+
   val add3 (x y z:t) : (t,t)
     returns { (r,d) ->
       to_int r + radix * to_int d =
@@ -163,7 +196,7 @@ module UnsignedGMP
   val mul_mod (x y:t) : t
     ensures { to_int result = mod (to_int x * to_int y) radix }
 
-  val mul_double (x y:t) : (t,t)
+  val mul_double (x y:t) : (t,t) (* umul_ppmm *)
     returns { (r,d) ->
       to_int r + radix * to_int d =
       to_int x * to_int y }
@@ -172,7 +205,7 @@ end
 
 module Int31
 
-  use import int.Int
+  use int.Int
 
   type int31 = < range -0x4000_0000 0x3fff_ffff >
 
@@ -188,7 +221,7 @@ module Int31
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV31
+(*  use bv.BV31 as BV31
 
   val to_bv (x: int31) : BV31.t
     ensures { BV31.to_int result = to_int x }
@@ -199,7 +232,7 @@ end
 
 module Int32
 
-  use import int.Int
+  use int.Int
 
   type int32 = < range -0x8000_0000 0x7fff_ffff >
 
@@ -214,8 +247,9 @@ module Int32
     function to_int = int32'int,
     lemma to_int_in_bounds,
     lemma extensionality
+
 (*
-  use bv.BV32
+  use bv.BV32 as BV32
 
   val to_bv (x: int32) : BV32.t
     ensures { BV32.to_int result = to_int x }
@@ -228,7 +262,7 @@ module Int32BV
 
   use export Int32
 
-  use bv.BV32
+  use bv.BV32 as BV32
 
   val to_bv (x: int32) : BV32.t
     ensures { BV32.to_int result = to_int x }
@@ -239,7 +273,7 @@ end
 
 module UInt32Gen
 
-  use import int.Int
+  use int.Int
 
   type uint32 = < range 0 0xffff_ffff >
 
@@ -268,10 +302,10 @@ end
 
 module UInt32GMP
 
-  use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
+  use int.Int
+  use int.EuclideanDivision
+  use int.Power
+  use Int32
   use export UInt32Gen
 
   clone export UnsignedGMP with
@@ -325,7 +359,7 @@ module UInt32GMP
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
 
-(*  use bv.BV32
+(*  use bv.BV32 as BV32
 
   val to_bv (x: uint32) : BV32.t
     ensures { BV32.to_uint result = to_int x }
@@ -336,7 +370,7 @@ end
 
 module Int63
 
-  use import int.Int
+  use int.Int
 
   type int63 = < range -0x4000_0000_0000_0000 0x3fff_ffff_ffff_ffff >
 
@@ -357,7 +391,7 @@ module Int63
   let constant max_int = of_int max_int63
   let constant min_int = of_int min_int63
 
-(*  use bv.BV63
+(*  use bv.BV63 as BV63
 
   val to_bv (x: int63) : BV63.t
     ensures { BV63.to_int result = to_int x }
@@ -368,8 +402,8 @@ end
 
 module Refint63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
   use export ref.Ref
 
   let incr (r: ref int63) : unit
@@ -400,8 +434,8 @@ end
 
 module MinMax63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
 
   let min (x y: int63) : int63
     ensures { result = if to_int x <= to_int y then x else y }
@@ -420,8 +454,8 @@ end
 
 module State63
 
-  use import int.Int
-  use import Int63
+  use int.Int
+  use Int63
 
   type state = private mutable { }
 
@@ -443,9 +477,9 @@ end
 
 module Random63
 
-  use import int.Int
-  use import Int63
-  use import State63
+  use int.Int
+  use Int63
+  use State63
 
   val s: state
 
@@ -467,7 +501,7 @@ end
 
 module Int64
 
-  use import int.Int
+  use int.Int
 
   type int64 = < range -0x8000_0000_0000_0000 0x7fff_ffff_ffff_ffff >
 
@@ -483,7 +517,7 @@ module Int64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64
+(*  use bv.BV64 as BV64
 
   val to_bv (x: int64) : BV64.t
     ensures { BV64.to_int result = to_int x }
@@ -494,7 +528,7 @@ end
 
 module UInt64Gen
 
-  use import int.Int
+  use int.Int
 
   type uint64 = < range 0 0xffff_ffff_ffff_ffff >
 
@@ -520,7 +554,7 @@ module UInt64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64
+(*  use bv.BV64 as BV64
 
   val to_bv (x: uint64) : BV64.t
     ensures { BV64.to_uint result = to_int x }
@@ -531,10 +565,10 @@ end
 
 module UInt64GMP
 
-  use import int.Int
-  use import int.EuclideanDivision
-  use import int.Power
-  use import Int32
+  use int.Int
+  use int.EuclideanDivision
+  use int.Power
+  use Int32
   use export UInt64Gen
 
   clone export UnsignedGMP with

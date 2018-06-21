@@ -14,7 +14,7 @@
 </theory>
 <theory name="MaxAndSum2" proved="true">
  <goal name="VC max_sum" expl="VC for max_sum" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC max_sum.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -28,7 +28,7 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC max_sum.4" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC max_sum.4.0" expl="VC for max_sum" proved="true">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -68,7 +68,7 @@
 </theory>
 <theory name="TestCase" proved="true">
  <goal name="VC test" expl="VC for test" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC test.0" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>

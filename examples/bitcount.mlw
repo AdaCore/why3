@@ -1,9 +1,9 @@
 module BitCount8bit_fact
 
-  use import int.Int
-  use import int.NumOf
-  use import bv.BV8
-  use import ref.Ref
+  use int.Int
+  use int.NumOf
+  use bv.BV8
+  use ref.Ref
 
   function nth_as_bv (a i : t) : t =
     if nth_bv a i
@@ -18,7 +18,7 @@ module BitCount8bit_fact
   lemma nth_as_bv_is_int : forall a i.
     t'int (nth_as_bv a i) = nth_as_int a (t'int i)
 
-    use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   let ghost step1 (n x1 : t) (i : int) : unit
     requires { 0 <= i < 4 }
@@ -100,10 +100,10 @@ end
 
 module BitCounting32
 
-  use import int.Int
-  use import int.NumOf
-  use import bv.BV32
-  use import ref.Ref
+  use int.Int
+  use int.NumOf
+  use bv.BV32
+  use ref.Ref
 
   predicate step0 (n x1 : t) =
     x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55555555 : t))
@@ -249,10 +249,10 @@ end
 
 
 module Hamming
-  use import int.Int
-  use import int.NumOf
-  use import mach.bv.BVCheck32
-  use import BitCounting32
+  use int.Int
+  use int.NumOf
+  use mach.bv.BVCheck32
+  use BitCounting32
 
   predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
@@ -306,12 +306,12 @@ end
     value. Let's prove it! *)
 
 module AsciiCode
-  use import int.Int
-  use import int.NumOf
-  use import number.Parity
-  use import bool.Bool
-  use import mach.bv.BVCheck32
-  use import BitCounting32
+  use int.Int
+  use int.NumOf
+  use number.Parity
+  use bool.Bool
+  use mach.bv.BVCheck32
+  use BitCounting32
 
   constant one : t = 1 : t
   constant lastbit : t = sub size_bv one
@@ -358,7 +358,7 @@ module AsciiCode
     assert { numof (fun_or (nth b) (nth c)) 0 32 = numof (nth b) 0 32 + numof (nth c) 0 32 };
     assert { numof (nth (bw_or b c)) 0 32 = numof (fun_or (nth b) (nth c)) 0 32 }
 
-  (** The [ascii] function makes any character valid in the
+  (** The `ascii` function makes any character valid in the
       sense that we just defined. One way to implement it is to count
       the number of 1-bits of a character encoded on 7 bits, and if this
       number is odd, set the 8th bit to 1 if not, do nothing. *)
@@ -410,12 +410,12 @@ end
 (*** unfinished
 
 module GrayCode
-  use import int.Int
-  use import int.NumOf
-  use import number.Parity
-  use import bool.Bool
-  use import mach.bv.BVCheck32
-  use import BitCounting32
+  use int.Int
+  use int.NumOf
+  use number.Parity
+  use bool.Bool
+  use mach.bv.BVCheck32
+  use BitCounting32
   use Hamming
 
   constant one : t = 1 : t

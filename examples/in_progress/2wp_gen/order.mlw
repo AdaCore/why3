@@ -63,8 +63,8 @@ end
 
 module LimUniqProof
 
-  use import Ordered
-  use import choice.Choice
+  use Ordered
+  use choice.Choice
 
   function inf (o:erel 'a) (s:'a -> bool) : 'a =
     let l = choice (minimum o s) in
@@ -97,7 +97,7 @@ end
 (* Definitions about chains in orders, e.g totally ordered subsets. *)
 module Chain
 
-  use import ho_set.Set
+  use ho_set.Set
   use export LimUniq
   use export Ordered
 
@@ -151,8 +151,8 @@ end
 
 module WfChainAccProof
 
-  use import ho_set.Set
-  use import Chain
+  use ho_set.Set
+  use Chain
 
   (* Proof that everything is accessible: by contradiction
      take minimal not accessible, and it must be accessible by definition. *)
@@ -195,8 +195,8 @@ end
 module SubChain "W:non_conservative_extension:N" (* => SubChainProof *)
 
   use export Chain
-  use import ho_set.Set
-  use import ho_set.SetBigOps
+  use ho_set.Set
+  use ho_set.SetBigOps
 
   axiom subchain_complete_order : forall o:erel 'a.
     transitive o -> order (subchain o) /\ chain_complete (subchain o)
@@ -232,9 +232,9 @@ end
 
 module SubChainProof
 
-  use import ho_set.SubsetOrder
-  use import ho_set.SetBigOps
-  use import Chain
+  use ho_set.SubsetOrder
+  use ho_set.SetBigOps
+  use Chain
 
   lemma subchain_order : forall o:erel 'a.
     transitive o -> order (subchain o)
@@ -320,10 +320,10 @@ end
     to the same on projections) *)
 module Product "W:non_conservative_extension:N" (* => ProductProof *)
 
-  use import Ordered
-  use import ho_rel.Prod
-  use import fn.Fun
-  use import fn.Image
+  use Ordered
+  use ho_rel.Prod
+  use fn.Fun
+  use fn.Image
 
   axiom order_product : forall o1:erel 'a,o2:erel 'b.
     order o1 /\ order o2 <-> order (rprod o1 o2)
@@ -348,10 +348,10 @@ end
 
 module ProductProof
 
-  use import Ordered
-  use import ho_rel.Prod
-  use import fn.Fun
-  use import fn.Image
+  use Ordered
+  use ho_rel.Prod
+  use fn.Fun
+  use fn.Image
 
   lemma order_product : forall o1:erel 'a,o2:erel 'b.
     order o1 /\ order o2 -> order (rprod o1 o2)
@@ -443,10 +443,10 @@ end
 (* Interation between product order and chains *)
 module ProductChain "W:non_conservative_extension:N" (* => ProductChainProof *)
 
-  use import Chain
-  use import ho_rel.Prod
-  use import fn.Fun
-  use import fn.Image
+  use Chain
+  use ho_rel.Prod
+  use fn.Fun
+  use fn.Image
 
   axiom prod_chain : forall o1:erel 'a,o2:erel 'b,ch.
     chain (rprod o1 o2) ch ->
@@ -470,12 +470,12 @@ end
 
 module ProductChainProof
 
-  use import Chain
-  use import Product
-  use import ho_set.Set
-  use import ho_rel.Prod
-  use import fn.Fun
-  use import fn.Image
+  use Chain
+  use Product
+  use ho_set.Set
+  use ho_rel.Prod
+  use fn.Fun
+  use fn.Image
 
   lemma prod_chain : forall o1:erel 'a,o2:erel 'b,ch.
     let op = rprod o1 o2 in
@@ -549,11 +549,11 @@ end
 
 module SubFunLimit
 
-  use import pfn.SubFunOrder
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import Chain
+  use pfn.SubFunOrder
+  use fn.Image
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use Chain
 
   val ghost function pbigunion (h:{set (pfun 'a 'b)}) : {pfun 'a 'b}
     requires { chain subfun h }
@@ -573,12 +573,12 @@ end
 
 module SubFunLimitProof
 
-  use import pfn.SubFunOrder
-  use import fn.Image
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import Chain
-  use import choice.Choice
+  use pfn.SubFunOrder
+  use fn.Image
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use Chain
+  use choice.Choice
 
   let ghost function pbigunion (h:{set (pfun 'a 'b)}) : {pfun 'a 'b}
     requires { chain subfun h }

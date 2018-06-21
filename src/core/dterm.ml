@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -219,47 +219,12 @@ and dterm_node =
   | DTfalse
   | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
-  | DTlabel of dterm * Slab.t
+  | DTattr of dterm * Sattr.t
 
-(** Environment *)
-
-type denv = dterm_node Mstr.t
+(** Unification tools *)
 
 exception TermExpected
 exception FmlaExpected
-exception DuplicateVar of string
-exception UnboundVar of string
-
-let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
-
-let denv_get_opt denv n = Mstr.find_opt n denv
-
-let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
-
-let denv_empty = Mstr.empty
-
-let denv_add_var denv {pre_name = n} dty =
-  Mstr.add n (DTvar (n, dty)) denv
-
-let denv_add_let denv dt {pre_name = n} =
-  Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
-
-let denv_add_quant denv vl =
-  let add acc (id,dty,_) = match id with
-    | Some ({pre_name = n} as id) ->
-        let exn = match id.pre_loc with
-          | Some loc -> Loc.Located (loc, DuplicateVar n)
-          | None     -> DuplicateVar n in
-        Mstr.add_new exn n (DTvar (n,dty)) acc
-    | None -> acc in
-  let s = List.fold_left add Mstr.empty vl in
-  Mstr.set_union s denv
-
-let denv_add_pat denv dp =
-  let s = Mstr.mapi (fun n dty -> DTvar (n, dty)) dp.dp_vars in
-  Mstr.set_union s denv
-
-(** Unification tools *)
 
 let dty_unify_app ls unify (l1: 'a list) (l2: dty list) =
   try List.iter2 unify l1 l2 with Invalid_argument _ ->
@@ -294,6 +259,46 @@ let dexpr_expected_type dt dty = match dty with
   | Some dty -> dterm_expected_type dt dty
   | None -> dfmla_expected_type dt
 
+(** Environment *)
+
+type denv = dterm_node Mstr.t
+
+exception DuplicateVar of string
+exception UnboundVar of string
+
+let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
+
+let denv_get_opt denv n = Mstr.find_opt n denv
+
+let dty_of_dterm dt = Opt.get_def dty_bool dt.dt_dty
+
+let denv_empty = Mstr.empty
+
+let denv_add_var denv {pre_name = n} dty =
+  Mstr.add n (DTvar (n, dty)) denv
+
+let denv_add_let denv dt {pre_name = n} =
+  Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
+
+let denv_add_quant denv vl =
+  let add acc (id,dty,_) = match id with
+    | Some ({pre_name = n} as id) ->
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n (DTvar (n,dty)) acc
+    | None -> acc in
+  let s = List.fold_left add Mstr.empty vl in
+  Mstr.set_union s denv
+
+let denv_add_pat denv dp dty =
+  dpat_expected_type dp dty;
+  let s = Mstr.mapi (fun n dty -> DTvar (n, dty)) dp.dp_vars in
+  Mstr.set_union s denv
+
+let denv_add_term_pat denv dp dt =
+  denv_add_pat denv dp (Opt.get_def dty_bool dt.dt_dty)
+
 (** Constructors *)
 
 let dpattern ?loc node =
@@ -325,14 +330,14 @@ let dpattern ?loc node =
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
-let slab_coercion = Slab.singleton Pretty.label_coercion
+let coercion_attrs = Sattr.singleton Pretty.coercion_attr
 
 let apply_coercion l ({dt_loc = loc} as dt) =
   let apply dt ls =
     let dtyl, dty = specialize_ls ls in
     dterm_expected_type dt (List.hd dtyl);
     let dt = { dt_node = DTapp (ls, [dt]); dt_dty = dty; dt_loc = loc } in
-    { dt with dt_node = DTlabel (dt, slab_coercion) } in
+    { dt with dt_node = DTattr (dt, coercion_attrs) } in
   List.fold_left apply dt l
 
 (* coercions using just head tysymbols without type arguments: *)
@@ -455,11 +460,8 @@ let dterm crcmap ?loc node =
         mk_dty df.dt_dty
     | DTcase (_,[]) ->
         raise EmptyCase
-    | DTcase (dt,(dp1,df1)::bl) ->
-        dterm_expected_type dt dp1.dp_dty;
-        let check (dp,df) =
-          dpat_expected_type dp dp1.dp_dty;
-          dexpr_expected_type df df1.dt_dty in
+    | DTcase (_,(_,df1)::bl) ->
+        let check (_,df) = dexpr_expected_type df df1.dt_dty in
         List.iter check bl;
         let is_fmla (_,df) = df.dt_dty = None in
         if List.exists is_fmla bl then mk_dty None else mk_dty df1.dt_dty
@@ -489,7 +491,7 @@ let dterm crcmap ?loc node =
     | DTcast (dt,dty) ->
         dterm_expected_dterm crcmap dt dty
     | DTuloc (dt,_)
-    | DTlabel (dt,_) ->
+    | DTattr (dt,_) ->
         mk_dty (dt.dt_dty)
   in Loc.try1 ?loc (dterm_node loc) node
 
@@ -557,8 +559,12 @@ let quant_vars ~strict env vl =
 let debug_ignore_unused_var = Debug.register_info_flag "ignore_unused_vars"
   ~desc:"Suppress@ warnings@ on@ unused@ variables"
 
+let attr_w_unused_var_no =
+  Ident.create_attribute "W:unused_variable:N"
+
 let check_used_var t vs =
-  if Debug.test_noflag debug_ignore_unused_var then
+  if not (Sattr.mem attr_w_unused_var_no vs.vs_name.id_attrs) &&
+      Debug.test_noflag debug_ignore_unused_var then
     begin
       let s = vs.vs_name.id_string in
       if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
@@ -567,32 +573,32 @@ let check_used_var t vs =
 
 let check_exists_implies f = match f.t_node with
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
-    when Slab.mem Term.asym_split f.t_label -> ()
+    when Sattr.mem Term.asym_split f.t_attrs -> ()
   | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let t_label loc labs t =
-  if loc = None && Slab.is_empty labs
-  then t else t_label ?loc labs t
+let t_attr_set loc attrs t =
+  if loc = None && Sattr.is_empty attrs
+  then t else t_attr_set ?loc attrs t
 
-let rec strip uloc labs dt = match dt.dt_node with
-  | DTcast (dt,_) -> strip uloc labs dt
-  | DTuloc (dt,loc) -> strip (Some loc) labs dt
-  | DTlabel (dt,s) -> strip uloc (Slab.union labs s) dt
-  | _ -> uloc, labs, dt
+let rec strip uloc attrs dt = match dt.dt_node with
+  | DTcast (dt,_) -> strip uloc attrs dt
+  | DTuloc (dt,loc) -> strip (Some loc) attrs dt
+  | DTattr (dt,s) -> strip uloc (Sattr.union attrs s) dt
+  | _ -> uloc, attrs, dt
 
 let rec term ~strict ~keep_loc uloc env prop dt =
-  let uloc, labs, dt = strip uloc Slab.empty dt in
+  let uloc, attrs, dt = strip uloc Sattr.empty dt in
   let tloc = if keep_loc then dt.dt_loc else None in
   let tloc = if uloc <> None then uloc else tloc in
   let t = Loc.try7 ?loc:dt.dt_loc
     try_term strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
-  let t = t_label tloc labs t in
+  let t = t_attr_set tloc attrs t in
   match t.t_ty with
-  | Some _ when prop -> t_label tloc Slab.empty
+  | Some _ when prop -> t_attr_set tloc Sattr.empty
       (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
-  | None when not prop -> t_label tloc Slab.empty
+  | None when not prop -> t_attr_set tloc Sattr.empty
       (t_if t t_bool_true t_bool_false)
   | _ -> t
 
@@ -675,13 +681,13 @@ and try_term strict keep_loc uloc env prop dty node =
       t_iff (get env true df1) (get env true df2)
   | DTbinop (DTby,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_label t2.t_loc Slab.empty t_true in
-      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
       t_implies t2 (get env true df1)
   | DTbinop (DTso,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_label t2.t_loc Slab.empty t_true in
-      let t2 = t_label t2.t_loc Slab.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
       t_and (get env true df1) t2
   | DTnot df ->
       t_not (get env true df)
@@ -689,7 +695,7 @@ and try_term strict keep_loc uloc env prop dty node =
       if prop then t_true else t_bool_true
   | DTfalse ->
       if prop then t_false else t_bool_false
-  | DTcast _ | DTuloc _ | DTlabel _ ->
+  | DTcast _ | DTuloc _ | DTattr _ ->
       assert false (* already stripped *)
 
 let fmla ?(strict=true) ?(keep_loc=true) dt =

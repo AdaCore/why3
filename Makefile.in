@@ -19,6 +19,8 @@ else
   HIDE = @
 endif
 
+.DELETE_ON_ERROR:
+
 # install the binaries
 DESTDIR =
 
@@ -52,15 +54,8 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-COQCAMLP  = @COQCAMLP@
-COQCAMLPLIB = @COQCAMLPLIB@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
-
-ifeq (@enable_menhirLib@,yes)
-MENHIR	  = @MENHIR@ --table
-else
 MENHIR	  = @MENHIR@
-endif
 
 DEPFLAGS = -slash
 
@@ -80,7 +75,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@
+INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -117,7 +112,7 @@ CMIHACK = -intf-suffix .cmi
 
 # external libraries common to all binaries
 
-EXTOBJS = @MENHIRLIB@
+EXTOBJS = menhirLib
 EXTLIBS = str unix nums dynlink @ZIPLIB@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
@@ -164,7 +159,6 @@ endif
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
 .PHONY: ide install-ide uninstall-ide
 .PHONY: coq install-coq uninstall-coq
-.PHONY: coq-tactic install-coq-tactic uninstall-coq-tactic
 .PHONY: pvs install-pvs uninstall-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
@@ -183,6 +177,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/util/json_lexer.ml \
 	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
+	       src/parser/parser_messages.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
 	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
@@ -193,13 +188,13 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer \
+	   hashcons wstdlib exn_printer \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl coercion theory \
-	   task pretty_sig pretty dterm env trans printer model_parser
+	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection \
@@ -208,13 +203,17 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		parse_smtv2_model
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr \
-          pinterp mltree compile mlinterp pdriver cprinter ocaml_printer
+          pinterp mltree compile mlinterp pdriver cprinter ml_printer \
+	  ocaml_printer cakeml_printer
 
-LIB_PARSER = ptree glob typing parser lexer
+LIB_PARSER = ptree glob typing parser_messages parser typing report lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
+		abstract_quantifiers eliminate_unknown_types \
+		eliminate_unknown_lsymbols \
+		eliminate_symbol \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
 		encoding_guards_full encoding_tags_full \
@@ -225,7 +224,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		instantiate_predicate smoke_detector \
 		prop_curry eliminate_literal \
-		generic_arg_trans_utils case apply \
+		generic_arg_trans_utils case apply subst \
 		ind_itp destruct cut \
 		induction induction_pr matching reflection
 
@@ -280,6 +279,33 @@ src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
 
+.PHONY: initialize_messages
+
+initialize_messages: src/parser/parser.mly
+	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages
+
+src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
+src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp;
+# If the update fails, the exit code is 0 so we also try to compile-errors directly
+# before replacing handcrafted.messages. If the following line fails, exit code
+# 1 is returned stopping the command. And empty file parser_messages.ml is
+# deleted by .DELETE_ON_ERROR. This behavior ensures that second run of make
+# will not continue with a fake parser_messages.ml.
+	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
+src/parser/handcrafted.messages.temp > src/parser/parser_messages.ml;
+	if cmp -s src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; then \
+	echo "parser_messages.ml OK"; \
+	else \
+	echo "Regenerating handcrafted.messages"; \
+	rm -f src/parser/parser_messages.ml; \
+	cp src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; \
+	rm -f src/parser/handcrafted.messages.temp; \
+	fi
+
+clean ::
+	rm -f src/parser/handcrafted.messages.temp
+
 # hide deprecated warnings for strings
 
 src/util/strings.cmo: WARNINGS:=$(WARNINGS)-3
@@ -296,10 +322,6 @@ src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
 src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
 src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
 endif
-
-# hide warning 'no cmx file was found in path for module ..., and its interface was not compiled with -opaque' for the coq tactic
-
-src/coq-tactic/why3tac.cmx: WARNINGS:=$(WARNINGS)-58
 
 # build targets
 
@@ -934,98 +956,9 @@ install-bin::
 
 install_local:: bin/why3shell
 
-
-##############
-# Coq plugin
-##############
-
-ifeq (@enable_coq_tactic@,yes)
-
-COQPGENERATED = src/coq-tactic/why3tac.ml
-
-COQP_FILES = why3tac
-
-COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
-
-COQPDEP = $(addsuffix .dep, $(COQPMODULES))
-COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
-COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
-
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
-COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
-
-$(COQPDEP): DEPFLAGS += -I src/coq-tactic
-$(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
-$(COQPCMO) $(COQPCMX): BFLAGS += -rectypes
-$(COQPCMX): OFLAGS += -rectypes
-
-$(COQPDEP): $(COQPGENERATED)
-
-byte: lib/coq-tactic/why3tac.cma
-opt:  lib/coq-tactic/why3tac.cmxs
-
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@ @WHY3LIB@)
-
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@ @WHY3LIB@)
-
-lib/coq-tactic/why3tac.cmxs: $(WHY3CMXA) $(COQPCMX)
-lib/coq-tactic/why3tac.cma: $(WHY3CMA) $(COQPCMO)
-
-src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
-	$(SHOW) 'Camlp    $<'
-	$(HIDE)$(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
-
-COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3 -I lib/coq-tactic
-
-ifeq "$(OCAMLBEST)" "opt"
-COQTACEXT = cmxs
-else
-COQTACEXT = cma
-COQRTAC += -byte
-endif
-
-lib/coq-tactic/Why3.vo: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.$(COQTACEXT)
-	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) $(COQRTAC) $<
-
-coq-tactic: lib/coq-tactic/Why3.vo
-
-all: coq-tactic
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(COQPDEP)
-endif
-
-depend: $(COQPDEP)
-
-CLEANDIRS += src/coq-tactic
-CLEANLIBS += lib/coq-tactic/why3tac
-GENERATED += $(COQPGENERATED)
-
-clean::
-	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
-
-uninstall-coq-tactic:
-	rm -rf $(LIBDIR)/why3/coq-tactic
-
-install-coq-tactic:
-	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
-	$(INSTALL_DATA) lib/coq-tactic/Why3.vo lib/coq-tactic/why3tac.$(COQTACEXT) $(LIBDIR)/why3/coq-tactic
-
-install:: install-coq-tactic
-
-endif
-
 ####################
 # Coq realizations
 ####################
-
-lib/coq/version: lib/coq/version.in config.status
-	./config.status chmod --file $@
 
 COQVERSIONSPECIFIC=
 
@@ -1070,11 +1003,7 @@ COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
 COQLIBS_OPTION_FILES = Option
 COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 
-ifeq (@coq_compat_version@,COQ84)
-COQLIBS_BV_FILES = Pow2int
-else
 COQLIBS_BV_FILES = Pow2int BV_Gen
-endif
 COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
@@ -1140,7 +1069,7 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory for_driver.'"$$f"' meta "realized_theory" "for_driver.'"$$f"'", "" end'; done; \
 	) > $@
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float update-coq-for-drivers
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float update-coq-for-drivers
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/int.mlw
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done
@@ -1240,9 +1169,6 @@ clean::
 ####################
 # PVS realizations
 ####################
-
-lib/pvs/version: lib/pvs/version.in config.status
-	./config.status chmod --file $@
 
 ifeq (@enable_pvs_libs@,yes)
 
@@ -1479,6 +1405,7 @@ endif
 
 install-isabelle: $(GENERATED_PREFIX_ISABELLE)/last_build
 
+install_local:: install-isabelle
 install:: install-isabelle
 
 clean::
@@ -1639,43 +1566,83 @@ endif
 ALTERGODIR=src/trywhy3/alt-ergo
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
-        -package ocplib-simplex -syntax camlp4o -I src/trywhy3 \
-	-I $(ALTERGODIR)/src/util \
-	-I $(ALTERGODIR)/src/structures \
-	-I $(ALTERGODIR)/src/parsing \
-	-I $(ALTERGODIR)/src/preprocess \
-	-I $(ALTERGODIR)/src/theories \
-	-I $(ALTERGODIR)/src/instances \
-	-I $(ALTERGODIR)/src/sat \
-	-I $(ALTERGODIR)/src/main
+        -package ocplib-simplex -I src/trywhy3 \
+	-I $(ALTERGODIR)/lib/util \
+	-I $(ALTERGODIR)/lib/structures \
+	-I $(ALTERGODIR)/lib/parsing \
+	-I $(ALTERGODIR)/lib/frontend \
+	-I $(ALTERGODIR)/lib/reasoners \
+	-I $(ALTERGODIR)/parsers/why
 
-ALTERGOMODS=util/config util/version util/emap util/myUnix util/myDynlink \
-	util/myZip util/util util/lists util/numsNumbers util/numbers \
-	util/timers util/options util/gc_debug util/loc util/hashcons \
+ALTERGOLIBS = \
+	util/config \
+	util/version \
+	util/emap \
+	util/myUnix \
+	util/myDynlink \
+	util/myZip \
+	util/util \
+	util/lists \
+	util/numsNumbers \
+	util/numbers \
+	util/options \
+	util/cmdline_parser \
+	util/timers \
+	util/gc_debug \
+	util/loc \
+	util/hconsing \
 	util/hstring \
-	structures/exception structures/symbols structures/ty \
-	structures/parsed structures/typed structures/term structures/literal \
-	structures/formula structures/explanation structures/errors \
-	util/profiling_default util/profiling \
-	parsing/why_parser parsing/why_lexer \
-	preprocess/existantial preprocess/triggers preprocess/why_typing \
-	preprocess/cnf \
-	instances/matching instances/instances \
-	theories/polynome theories/ac theories/uf theories/use \
-	theories/intervals theories/inequalities theories/intervalCalculus \
-	theories/arith theories/records theories/bitv theories/arrays \
-	theories/sum theories/combine theories/ccx theories/theory \
-	sat/sat_solvers \
-	main/frontend
+	structures/exception \
+	structures/symbols \
+	structures/ty \
+	structures/parsed \
+	structures/errors \
+	structures/typed \
+	structures/term \
+	structures/fpa_rounding \
+	structures/literal \
+	structures/formula \
+	structures/explanation \
+	structures/commands \
+	structures/profiling \
+	reasoners/matching \
+	reasoners/instances \
+	reasoners/polynome \
+	reasoners/ac \
+	reasoners/uf \
+	reasoners/use \
+	reasoners/intervals \
+	reasoners/inequalities \
+	reasoners/intervalCalculus \
+	reasoners/arith \
+	reasoners/records \
+	reasoners/bitv \
+	reasoners/arrays \
+	reasoners/sum \
+	reasoners/combine \
+	reasoners/ccx \
+	reasoners/theory \
+	reasoners/fun_sat \
+	reasoners/sat_solver \
+	frontend/triggers \
+	frontend/typechecker \
+	frontend/cnf \
+	frontend/parsed_interface \
+	frontend/frontend \
+	frontend/parsers
 
-ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
+ALTERGOPARSERS = \
+	why/why_parser \
+	why/why_lexer
+
+ALTERGOCMO = \
+	$(addprefix $(ALTERGODIR)/lib/, $(addsuffix .cmo,$(ALTERGOLIBS))) \
+	$(addprefix $(ALTERGODIR)/parsers/, $(addsuffix .cmo,$(ALTERGOPARSERS)))
+
 TRYWHY3CMO=lib/why3/why3.cma
 TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	README examples/ \
-	trywhy3_custom.css gen_index.sh fontawesome/css/font-awesome.min.css \
-	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
-	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
-	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
+	trywhy3_custom.css gen_index.sh \
 	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
@@ -1695,7 +1662,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
-src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
+src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 		`find stdlib \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
@@ -1719,6 +1686,10 @@ src/trywhy3/%.cmo: src/trywhy3/%.ml
 
 src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
+
+src/trywhy3/%.cmo: BFLAGS += -w -48
+
+src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo: BFLAGS += -syntax camlp4o
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
@@ -1761,20 +1732,22 @@ endif
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.@OCAMLBEST@
 	bash bench/bench ".@OCAMLBEST@"
+	$(MAKE) bench-api
+	@echo ""
+	@echo "=== Checking extraction ==="
+	$(MAKE) test-ocaml-extraction
+# desactivé car requiert findlib
+# if test -d examples/runstrat ; then \
+#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
+
+bench-api:
 	@echo ""
 	@echo "=== Checking Why3 API ==="
 	$(MAKE) test-api-logic.@OCAMLBEST@
-#	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
+	$(MAKE) test-api-transform.@OCAMLBEST@
+	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
 #	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
-	$(MAKE) test-ocaml-extraction
-	# desactivé car requiert findlib
-	# if test -d examples/runstrat ; then \
-	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
-	@if test "@enable_coq_tactic@" = "yes"; then \
-	   echo ; \
-	   echo "=== Checking the Coq tactic ==="; \
-	   $(MAKE) test-coq-tactic; fi
 
 ###############
 # test targets
@@ -1796,6 +1769,19 @@ test-api-logic.opt: examples/use_api/logic.ml lib/why3/why3.cmxa
 	&& ./test-api-logic.opt > /dev/null) \
 	|| (rm -f test-api-logic.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-logic.opt
+
+test-api-transform.byte: examples/use_api/transform.ml lib/why3/why3.cma
+	$(SHOW) 'Ocaml    $<'
+	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null \
+	|| (rm -f test-api-transform.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-transform.byte;
+
+test-api-transform.opt: examples/use_api/transform.ml lib/why3/why3.cmxa
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-api-transform.opt > /dev/null) \
+	|| (rm -f test-api-transform.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-transform.opt
 
 test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
@@ -1841,9 +1827,6 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
-test-coq-tactic: lib/coq-tactic/Why3.vo
-	$(COQC) $(COQRTAC) bench/coq-tactic/test.v
-
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
@@ -1874,24 +1857,67 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/manual.pdf doc/html/index.html
 
-BNF = qualid label constant operator term type formula theory theory2 \
+BNF = ident qualid attribute constant operator type formula term1 term2 term3 \
+	theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(BNF:%=doc/%_bnf.tex)
+BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
 
-doc/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
+doc/generated/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
 	doc/bnf$(EXE) $< > $@
 
 doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/extract_ocaml_code: doc/extract_ocaml_code.ml
+	$(OCAMLC) str.cma -o $@ $<
+
+doc/generated/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+doc/generated/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+doc/generated/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
+	buildtask printtask buildtask2 \
+	getconf getanyaltergo getaltergo200 \
+	getdriver callprover calltimelimit \
+	buildfmla buildtermalt buildtaskimport \
+	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
+	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
+	printtheory splittheory printalltasks
+
+OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
+
+OCAMLCODE_TRANSFORM = negate register
+
+OCAMLCODE_MLWTREE = buildenv openmodule useimport \
+	source1 code1 helper1 source2 code2 source3 code3 \
+	closemodule checkingvcs
+
+OCAMLCODE = \
+	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
+	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
+	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
+	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
+	doc/generated/whyconf__provertype.ml
+
 DOC = api glossary ide intro exec macros manpages install \
       manual starting syntax syntaxref technical version whyml \
-      itp pvs coq coq_tactic isabelle
+      itp pvs coq isabelle
 
 DOCTEX = $(DOC:%=doc/%.tex)
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
+doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 update-doc-png:
@@ -1939,9 +1965,10 @@ endif
 MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
-	util/weakhtbl util/stdlib util/rc util/debug \
+	util/weakhtbl util/wstdlib util/rc util/debug \
+	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
-	core/env core/task core/trans \
+	core/env core/task core/trans core/pretty core/printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
@@ -2089,7 +2116,6 @@ clean::
 
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
-# same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
 src/tools/why3extract.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
@@ -2116,7 +2142,7 @@ src/tools/why3extract.cmx: %.cmx: %.ml
 
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --explain --strict $<
+	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
@@ -2207,7 +2233,7 @@ headers:
 		Makefile.in configure.in \
 		src/*/*.ml src/*/*.ml[iyl4] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
-		lib/coq-tactic/*.v lib/coq/*.v lib/coq/*/*.v \
+		lib/coq/*.v lib/coq/*/*.v \
 		src/server/*.c src/server/*.h \
 		src/ide/resetgc.c \
 		examples/use_api/*.ml
@@ -2216,16 +2242,18 @@ headers:
 # myself
 #########
 
-Makefile: Makefile.in config.status
-	./config.status chmod --file $@
+AUTOCONF_FILES = \
+	Makefile \
+	src/jessie/Makefile \
+	src/config.sh \
+	.merlin \
+	src/jessie/.merlin \
+	lib/why3/META \
+	lib/coq/version \
+	lib/pvs/version \
+	doc/version.tex
 
-src/jessie/Makefile: src/jessie/Makefile.in config.status
-	./config.status chmod --file $@
-
-src/config.sh: src/config.sh.in config.status
-	./config.status chmod --file $@
-
-.merlin: .merlin.in config.status
+$(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@
 
 src/util/config.ml share/Makefile.config: src/config.sh
@@ -2235,16 +2263,8 @@ src/util/config.ml share/Makefile.config: src/config.sh
 clean::
 	rm -f share/Makefile.config
 
-doc/version.tex: doc/version.tex.in config.status
-	./config.status chmod --file $@
-
 config.status: configure
 	./config.status --recheck
-
-all: lib/why3/META .merlin
-
-lib/why3/META: lib/why3/META.in config.status
-	./config.status chmod --file $@
 
 configure: configure.in Version
 	autoconf -f
@@ -2256,9 +2276,8 @@ configure: configure.in Version
 .PHONY: distclean
 
 distclean: clean
-	rm -f config.status config.cache config.log .merlin \
-	    Makefile src/util/config.ml doc/version.tex \
-	    src/jessie/Makefile src/config.sh lib/why3/META
+	rm -f config.status config.cache config.log \
+	    src/util/config.ml $(AUTOCONF_FILES)
 
 depend:
 	rm -f $^

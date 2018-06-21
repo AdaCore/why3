@@ -29,7 +29,7 @@
  <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="28"/></proof>
  </goal>
  <goal name="VC mul_mon" expl="VC for mul_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul_mon.0" expl="postcondition" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="VC mul_mon.0.0" expl="VC for mul_mon" proved="true">
@@ -43,7 +43,7 @@
  </transf>
  </goal>
  <goal name="VC mul_devel" expl="VC for mul_devel" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul_devel.0" expl="postcondition" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="VC mul_devel.0.0" expl="VC for mul_devel" proved="true">
@@ -61,7 +61,7 @@
  </transf>
  </goal>
  <goal name="VC conv" expl="VC for conv" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC conv.0" expl="postcondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="VC conv.0.0" expl="postcondition" proved="true">
@@ -91,7 +91,7 @@
  <proof prover="0" timelimit="15"><result status="valid" time="0.01" steps="50"/></proof>
  </goal>
  <goal name="VC sort_mon" expl="VC for sort_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC sort_mon.0" expl="postcondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="VC sort_mon.0.0" expl="postcondition" proved="true">
@@ -121,9 +121,9 @@
  <proof prover="0" timelimit="15"><result status="valid" time="0.60" steps="93"/></proof>
  </goal>
  <goal name="VC insert_mon" expl="VC for insert_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC insert_mon.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert_mon.0.0" expl="VC for insert_mon" proved="true">
    <proof prover="0"><result status="valid" time="0.05" steps="66"/></proof>
    </goal>
@@ -139,7 +139,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="VC insert_mon.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert_mon.2.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
@@ -220,7 +220,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="ext_minone" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="ext_minone.0" proved="true">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -255,7 +255,7 @@
  <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="VC mul_mon" expl="VC for mul_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul_mon.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   </goal>
@@ -269,7 +269,7 @@
  </transf>
  </goal>
  <goal name="VC mul_devel" expl="VC for mul_devel" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC mul_devel.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
@@ -279,7 +279,7 @@
  </transf>
  </goal>
  <goal name="VC ext" expl="VC for ext" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC ext.0" expl="postcondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="VC ext.0.0" expl="postcondition" proved="true">
@@ -300,7 +300,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="VC conv" expl="VC for conv" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC conv.0" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="2.14"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -352,9 +352,9 @@
  </transf>
  </goal>
  <goal name="VC insert_mon" expl="VC for insert_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC insert_mon.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert_mon.0.0" expl="VC for insert_mon" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="VC insert_mon.0.0.0" expl="VC for insert_mon" proved="true">
@@ -374,7 +374,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC insert_mon.2" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert_mon.2.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
    </goal>
@@ -386,7 +386,7 @@
  </transf>
  </goal>
  <goal name="VC insertion_sort_mon" expl="VC for insertion_sort_mon" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC insertion_sort_mon.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
@@ -408,7 +408,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
  </goal>
  <goal name="VC norm_f" expl="VC for norm_f" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC norm_f.0" expl="postcondition" proved="true">
   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="5.04"/></proof>
   </goal>
@@ -505,7 +505,7 @@
    <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
    </goal>
    <goal name="g.0.1" proved="true">
-   <transf name="split_goal_wp" proved="true" >
+   <transf name="split_goal_right" proved="true" >
     <goal name="g.0.1.0" proved="true">
     <transf name="compute_in_goal" proved="true" >
      <goal name="g.0.1.0.0" proved="true">

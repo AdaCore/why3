@@ -27,8 +27,8 @@ type fmla =
   | Flet ident term fmla
   | Fforall ident datatype fmla
 
-use import int.Int
-use import bool.Bool
+use int.Int
+use bool.Bool
 
 type value =
   | Vint int
@@ -77,8 +77,8 @@ predicate eval_fmla (sigma:env) (pi:env) (f:fmla) =
         eval_fmla sigma (IdMap.set pi x (Vbool b)) f
   end
 
-(** substitution of a reference [r] by a logic variable [v]
-   warning: proper behavior only guaranted if [v] is fresh *)
+(** substitution of a reference `r` by a logic variable `v`
+   warning: proper behavior only guaranted if `v` is fresh *)
 
 let rec function subst_term (e:term) (r:ident) (v:ident) : term =
   match e with
@@ -261,7 +261,7 @@ end
 
 theory TestSemantics
 
-use import Imp
+use Imp
 use map.Const
 
 function my_sigma : env = Const.const (Vint 0)
@@ -302,7 +302,7 @@ end
 
 theory HoareLogic
 
-use import Imp
+use Imp
 
 
 (** Hoare logic rules (partial correctness) *)
@@ -360,7 +360,7 @@ end
 
 module WP
 
-use import Imp
+use Imp
 
 use set.Fset as Set
 

@@ -3,11 +3,11 @@
 
    The Art of Computer Programming, vol 1, page 147.
 
-   The following code computes a table of the first [m] prime numbers.
+   The following code computes a table of the first `m` prime numbers.
    Though there are more efficient ways of computing prime numbers,
    the nice thing about this code is that it requires not less than
-   Bertrand's postulate (for [n > 1], there is always a prime [p] such that
-   [n < p < 2n]) to be proved correct.
+   Bertrand's postulate (for `n > 1`, there is always a prime `p` such that
+   `n < p < 2n`) to be proved correct.
 
    This program had been proved correct using Coq and an early version of
    Why back in 2003, by Laurent Théry (INRIA Sophia-Antipolis): Laurent Théry,
@@ -18,27 +18,26 @@
    posing Bertrand's postulate as a lemma that we do not prove.
 
    Note: Knuth's code is entering the loop where a new prime number is
-   added, thus resulting into the immediate addition of 3 as [prime[1]].
-   It allows subsequent division tests to start at [prime[1]=3], thus
-   saving the division by [prime[0]=2]. We did something similar in the
+   added, thus resulting into the immediate addition of 3 as `prime[1]`.
+   It allows subsequent division tests to start at `prime[1]=3`, thus
+   saving the division by `prime[0]=2`. We did something similar in the
    code below, though the use of a while loop looks like we did a
    special case for 3 as well.  *)
 
 module PrimeNumbers
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Lex2
-  use import number.Parity
-  use import number.Divisibility
-  use import number.Prime
-  use import ref.Refint
-  use import map.Map
+  use int.Int
+  use int.ComputerDivision
+  use number.Parity
+  use number.Divisibility
+  use number.Prime
+  use ref.Refint
+  use map.Map
 
   predicate no_prime_in (l u: int) =
     forall x: int. l < x < u -> not (prime x)
 
-  (** [p[0]..p[u-1]] are the first u prime numbers *)
+  (** `p[0]..p[u-1]` are the first u prime numbers *)
   predicate first_primes (p: int -> int) (u: int) =
     p[0] = 2 /\
     (* sorted *)
@@ -58,9 +57,9 @@ module PrimeNumbers
   axiom Bertrand_postulate [@W:non_conservative_extension:N] :
     forall p: int. prime p -> not (no_prime_in p (2*p))
 
-  use import array.Array
+  use array.Array
 
-  (** [prime_numbers m] returns an array containing the first [m]
+  (** `prime_numbers m` returns an array containing the first `m`
   prime numbers *)
   let prime_numbers (m: int)
     requires { m >= 2 }

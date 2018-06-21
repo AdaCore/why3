@@ -8,9 +8,9 @@
 
 module Array32
 
-  use import int.Int
-  use import mach.int.Int32
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int32
+  use map.Map as M
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -25,7 +25,7 @@ module Array32
 
   val ([]<-) (a: array 'a) (i: int32) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < a.length }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = M.set (old a.elts) i v }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -40,7 +40,7 @@ module Array32
 
   let defensive_set (a: array 'a) (i: int32) (v: 'a)
     ensures { 0 <= i < a.length }
-    ensures { a.elts = (old a.elts)[i <- v] }
+    ensures { a.elts = M.set (old a.elts) i v }
     raises  { OutOfBounds -> (i < 0 \/ i >= a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
@@ -108,9 +108,9 @@ end
 
 module Array31
 
-  use import int.Int
-  use import mach.int.Int31
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int31
+  use map.Map as M
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -125,7 +125,7 @@ module Array31
 
   val ([]<-) (a: array 'a) (i: int31) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < a.length }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = M.set (old a.elts) i v }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -140,7 +140,7 @@ module Array31
 
   let defensive_set (a: array 'a) (i: int31) (v: 'a)
     ensures { 0 <= i < a.length }
-    ensures { a.elts = (old a.elts)[i <- v] }
+    ensures { a.elts = M.set (old a.elts) i v }
     raises  { OutOfBounds -> (i < 0 \/ i >= a.length) /\ a = old a }
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
@@ -204,20 +204,31 @@ module Array31
 
 end
 
-(** {2 Arrays with 63-bit indices} *)
+(** {2 Arrays with 63-bit indices}
+
+    Contrary to arrays from module `Array`, the contents of the array
+    is here modeled as a sequence. It makes it easier to resuse existing
+    functions over sequences. (We may consider doing this for regular arrays
+    as well in the future.)
+
+    A coercion is declared so that an array `a` can be used
+    as a sequence. As a consequence, notation `a[i]` in the logic is
+    directly that of sequences. You have to import module `seq.Seq` to be
+    able to use it.
+*)
 
 module Array63
 
-  use import int.Int
-  use import mach.int.Int63
-  use import map.Map as M
+  use int.Int
+  use mach.int.Int63
+  use seq.Seq
 
   type array 'a = private {
-    mutable ghost elts : int -> 'a;
+    mutable ghost elts : seq 'a;
                 length : int63;
-  } invariant { 0 <= length }
+  } invariant { 0 <= length = Seq.length elts }
 
-  function ([]) (a: array 'a) (i: int) : 'a = a.elts i
+  meta coercion function elts
 
   val ([]) (a: array 'a) (i: int63) : 'a
     requires { [@expl:index in array bounds] 0 <= i < a.length }
@@ -302,28 +313,38 @@ module Array63
       ofs2 <= i < ofs2 + len ->
       a[i] = (old a)[ofs1 + i - ofs2] }
 
+  let init (n: int63) (f: int63 -> 'a) : array 'a
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i: int63. 0 <= i < n -> result[i] = f i }
+    ensures  { length result = n }
+  = let a = make n (f 0) in
+    for i = 1 to n - 1 do
+      invariant { forall j: int63. 0 <= j < i -> a[j] = f j }
+      a[i] <- f i
+    done;
+    a
+
 end
 
 module Array63Exchange
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
-  use import map.MapExchange as M
+  use int.Int
+  use mach.int.Int63
+  use Array63
+  use seq.Exchange as SE
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
-    a1.length = a2.length /\
-    M.exchange a1.elts a2.elts 0 a1.length i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
+    SE.exchange a1.elts a2.elts i j
+  (** `exchange a1 a2 i j` means that arrays `a1` and `a2` only differ
+      by the swapping of elements at indices `i` and `j` *)
 
 end
 
 module Array63Swap
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
+  use int.Int
+  use mach.int.Int63
+  use Array63
   use export Array63Exchange
 
   let swap (a:array 'a) (i j:int63) : unit
@@ -338,47 +359,41 @@ end
 
 module Array63Permut
 
-  use import int.Int
-  use import mach.int.Int63
-  use import Array63
-  use import map.MapPermut as MP
-  use import map.MapExchange as MX
-  use import map.MapEq
+  use int.Int
+  use mach.int.Int63
+  use Array63
+  use seq.Seq
+  use seq.SeqEq
+  use seq.Permut as SP
+  use Array63Exchange
 
   predicate permut (a1 a2: array 'a) (l u: int) =
-    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
-    MP.permut a1.elts a2.elts l u
-  (** [permut a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
-      Values outside of the interval [(l..u-1)] are ignored. *)
+    SP.permut a1.elts a2.elts l u
+  (** `permut a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`.
+      Values outside of the interval `(l..u-1)` are ignored. *)
 
   predicate array_eq (a1 a2: array 'a) (l u: int) =
-    map_eq_sub a1.elts a2.elts l u
+    seq_eq_sub a1.elts a2.elts l u
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
-    map_eq_sub a1.elts a2.elts 0 l /\
+    seq_eq_sub a1.elts a2.elts 0 l /\
     permut a1 a2 l u /\
-    map_eq_sub a1.elts a2.elts u (length a1)
-  (** [permut_sub a1 a2 l u] is true when the segment
-      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
-      and values outside of the interval [(l..u-1)] are equal. *)
+    seq_eq_sub a1.elts a2.elts u (length a1)
+  (** `permut_sub a1 a2 l u` is true when the segment
+      `a1(l..u-1)` is a permutation of the segment `a2(l..u-1)`
+      and values outside of the interval `(l..u-1)` are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
-    a1.length = a2.length /\ MP.permut a1.elts a2.elts 0 a1.length
-  (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
-      of array [a2]. *)
+    SP.permut a1.elts a2.elts 0 a1.length
+  (** `permut_all a1 a2 l u` is true when array `a1` is a permutation
+      of array `a2`. *)
 
   (** we can always enlarge the interval *)
   lemma permut_sub_weakening:
     forall a1 a2: array 'a, l1 u1 l2 u2: int.
     permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
     permut_sub a1 a2 l2 u2
-
-  predicate exchange (a1 a2: array 'a) (i j: int) =
-    a1.length = a2.length /\
-    MX.exchange a1.elts a2.elts 0 a1.length i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
 
   lemma exchange_permut_sub:
     forall a1 a2: array 'a, i j l u: int.
@@ -388,5 +403,64 @@ module Array63Permut
   lemma exchange_permut_all:
     forall a1 a2: array 'a, i j: int.
     exchange a1 a2 i j -> permut_all a1 a2
+
+end
+
+(** {2 Arrays of 63-bit integers}
+
+    Here the model is simply a sequence of integers (of type `int`),
+    instead of being a sequence of values of type `int63`.
+
+    As a consequence, we have to provide the additional information
+    that each of the element fits within the bounds of 63-bit integers.
+
+    Caveat: type `array63` below is not compatible with type
+    `Array63.array int63`.
+*)
+
+module ArrayInt63
+
+  use int.Int
+  use mach.int.Int63
+  use seq.Seq
+
+  type array63 = private {
+    mutable ghost elts: seq int;
+            ghost size: int;
+  } invariant { 0 <= size = length elts <= max_int }
+    invariant { forall i. 0 <= i < length elts -> in_bounds elts[i] }
+
+  meta coercion function elts
+
+  val length (a: array63) : int63
+    ensures { to_int result = a.length }
+
+  val ([]) (a: array63) (i: int63) : int63
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { to_int result = a[i] }
+
+  val ([]<-) (a: array63) (i: int63) (v: int63) : unit
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    writes   { a }
+    ensures  { a.elts = (old a.elts)[i <- to_int v] }
+
+  val make (n: int63) (v: int63) : array63
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i. 0 <= i < n -> result[i] = to_int v }
+    ensures  { result.length = n }
+
+  val copy (a: array63) : array63
+    ensures  { result.length = a.length }
+    ensures  { forall i. 0 <= i < result.length -> result[i] = a[i] }
+
+  use seq.Exchange
+
+  let swap (a:array63) (i j:int63) : unit
+    requires { 0 <= i < length a /\ 0 <= j < length a }
+    writes   { a }
+    ensures  { exchange (old a) a i j }
+  = let v = a[i] in
+    a[i] <- a[j];
+    a[j] <- v
 
 end

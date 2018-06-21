@@ -11,7 +11,7 @@
 <file name="../heapsort.mlw" proved="true">
 <theory name="HeapSort" proved="true" sum="b24b0ba972d2009dd0e19718fd0706ed">
  <goal name="VC min_of_sorted" expl="VC for min_of_sorted" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC min_of_sorted.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -27,7 +27,7 @@
  </transf>
  </goal>
  <goal name="VC heapSort" expl="VC for heapSort" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC heapSort.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -38,7 +38,7 @@
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC heapSort.3" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC heapSort.3.0" expl="VC for heapSort" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -66,7 +66,7 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.03" steps="110"/></proof>
   </goal>
   <goal name="VC heapSort.8" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC heapSort.8.0" expl="VC for heapSort" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -151,7 +151,7 @@
  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="VC is_heap_relation" expl="VC for is_heap_relation" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC is_heap_relation.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
@@ -184,7 +184,7 @@
 <file name="../test_harness.mlw" proved="true">
 <theory name="TestHarness" proved="true" sum="45070028561c41a332fde761f12fd18d">
  <goal name="VC testHarness" expl="VC for testHarness" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC testHarness.0" expl="array creation size" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
@@ -246,7 +246,7 @@
  <proof prover="6" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="VC elements_set_outside" expl="VC for elements_set_outside" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC elements_set_outside.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
@@ -270,7 +270,7 @@
 <file name="../heap_implem.mlw" proved="true">
 <theory name="Implementation" proved="true" sum="0eae515d4d680526289e3239fb2beb41">
  <goal name="VC is_heap_min" expl="VC for is_heap_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC is_heap_min.0" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
@@ -290,7 +290,7 @@
  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="VC insert" expl="VC for insert" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC insert.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
@@ -307,7 +307,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="79"/></proof>
   </goal>
   <goal name="VC insert.4" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert.4.0" expl="VC for insert" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="32"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="31"/></proof>
@@ -323,7 +323,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="43"/></proof>
   </goal>
   <goal name="VC insert.6" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert.6.0" expl="VC for insert" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
@@ -363,7 +363,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="116"/></proof>
   </goal>
   <goal name="VC insert.9" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC insert.9.0" expl="VC for insert" proved="true">
    <proof prover="2"><result status="valid" time="0.05" steps="175"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="118"/></proof>
@@ -377,7 +377,7 @@
  </transf>
  </goal>
  <goal name="VC extractMin" expl="VC for extractMin" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC extractMin.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
@@ -387,7 +387,7 @@
   <proof prover="3"><result status="valid" time="0.16" steps="286"/></proof>
   </goal>
   <goal name="VC extractMin.2" expl="loop invariant init" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.2.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
    <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
@@ -427,7 +427,7 @@
   <proof prover="3"><result status="valid" time="0.48" steps="359"/></proof>
   </goal>
   <goal name="VC extractMin.7" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.7.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
@@ -455,7 +455,7 @@
   <proof prover="3"><result status="valid" time="3.26" steps="766"/></proof>
   </goal>
   <goal name="VC extractMin.11" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.11.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
@@ -471,7 +471,7 @@
   </transf>
   </goal>
   <goal name="VC extractMin.12" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.12.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
    <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
@@ -491,7 +491,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="VC extractMin.14" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.14.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
@@ -531,7 +531,7 @@
   <proof prover="3"><result status="valid" time="2.77" steps="761"/></proof>
   </goal>
   <goal name="VC extractMin.18" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.18.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="24"/></proof>
@@ -555,7 +555,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="VC extractMin.21" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.21.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
@@ -595,7 +595,7 @@
   <proof prover="3"><result status="valid" time="2.42" steps="801"/></proof>
   </goal>
   <goal name="VC extractMin.25" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.25.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
    <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
@@ -619,7 +619,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC extractMin.28" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.28.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
@@ -663,7 +663,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC extractMin.33" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.33.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
@@ -679,7 +679,7 @@
   </transf>
   </goal>
   <goal name="VC extractMin.34" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC extractMin.34.0" expl="VC for extractMin" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
    <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>

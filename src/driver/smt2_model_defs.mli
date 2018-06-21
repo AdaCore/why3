@@ -9,11 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 
 type variable = string
 
 type array =
+  (* Array_var is used by let-bindings only *)
+  | Array_var of variable
   | Const of term
   | Store of array * term * term
 

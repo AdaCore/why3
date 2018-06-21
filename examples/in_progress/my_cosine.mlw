@@ -3,11 +3,11 @@
 
 module M
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import floating_point.Rounding
-  use import floating_point.Single
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use floating_point.Rounding
+  use floating_point.Single
 
   val single_of_real_exact (x: real) : single
     ensures { value result = x }
@@ -41,10 +41,10 @@ end
 
 module IEEEfloat
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import ieee_float.Float32
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use ieee_float.Float32
 
   val add (x y: t) : t
     requires { [@expl:floating-point overflow] t'isFinite (x .+ y) }
@@ -72,10 +72,10 @@ end
 
 module Combined
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import mach.float.Single
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use mach.float.Single
 
   let my_cosine (x:t) : t
     requires { abs x .<= (0x1p-5:t) }

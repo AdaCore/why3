@@ -52,11 +52,11 @@ proceedings, Springer LNCS.
 
 module N
 
-  use import array.Array
-  use import map.Map
+  use array.Array
+  use map.Map
   use map.MapEq
   use map.Const
-  use import int.Int
+  use int.Int
 
   (** {3 complements to map standard library} *)
 
@@ -84,11 +84,11 @@ module N
     end
     else ()
 
-  use import mach.int.Int32
-  use import ref.Ref
+  use mach.int.Int32
+  use ref.Ref
   use import mach.int.UInt64GMP as Limb
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
 
   meta compute_max_steps 0x100000
 
@@ -242,7 +242,7 @@ module N
     ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
   = value_sub_upper_bound x x1 (x2-1)
 
-  use import mach.c.C
+  use mach.c.C
   type t = ptr limb
 
   function value (x:t) (sz:int) : int =
@@ -836,7 +836,7 @@ module N
       end
     end
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   (** [incr x y sz] adds to [x] the value of the limb [y] in place.
       [x] has size [sz]. The addition must not overflow. This corresponds
@@ -2081,7 +2081,7 @@ module N
 
   (** {3 Logical operations} *)
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
  let lemma pow2_64 ()
    ensures { power 2 64 = radix }
@@ -2519,16 +2519,12 @@ module N
     returns { q, r -> l2i q * d + l2i r = ul + radix * uh }
     returns { _q, r -> 0 <= l2i r < d }
   =
-    let zero = Limb.of_int 0 in
     let one = Limb.of_int 1 in
     let ghost k = radix * radix - (radix + l2i v) * l2i d in
     let ghost u = l2i ul + radix * l2i uh in
     assert { 1 <= k <= d };
     let l,h = mul_double v uh in
-    let sl,c = add_with_carry l ul zero in
-    let (sh,ghost c') = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
-    assert { sl + radix * sh + radix * radix * c'
-             = l + radix * h + ul + radix * uh };
+    let (ghost c', sh, sl) = add_double_gc h l uh ul in
     assert { c' = 0
              by
              uh < d
@@ -3038,8 +3034,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let r0 = ref zero in
     let r1 = ref zero in
     let l,h = mul_double v uh in
-    let sl, c = add_with_carry um l zero in
-    let sh, ghost c' = add_with_carry uh h c in
+    let (ghost c', sh, sl) = add_double_gc uh um h l in
     assert { sl + radix * sh + radix * radix * c'
              = um + radix * uh + v * uh };
     assert { c' = 0
@@ -3069,14 +3064,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     (*assert { um - dh * sh = a * radix + !r1
              by !r1 = mod (um - dh * sh) radix  };*)
     let tl, th = mul_double sh dl in
-    let il, b = sub_with_borrow ul tl zero in
-    let (ih, ghost b') = sub_with_borrow !r1 th b in
+    let (ghost b', ih, il) = sub_double_gb !r1 ul th tl in
     assert { il + radix * ih - radix * radix * b'
              = ul + radix * !r1 - sh * dl };
-    let bl,b2 = sub_with_borrow il dl zero in
-    let bh, ghost b2' = sub_with_borrow ih dh b2 in
-    assert { bl + radix * bh - radix * radix * b2'
-             = il + radix * ih - dl - radix * dh };
+    let (bh, bl) = sub_double ih il dh dl in
     mod_mult (radix * radix) (l2i b')
              (l2i ul + radix * l2i !r1 - l2i sh * l2i dl - l2i dl
                 - radix * l2i dh);
@@ -3445,8 +3436,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  so (!q1 at PreCorrections) = cq
                  so !q1 = mod (cq - 1) radix = cq - 1
                  };
-      let rl, c = add_with_carry !r0 dl zero in
-      let rh, ghost c' = add_with_carry !r1 dh c in
+      let (ghost c', rh, rl) = add_double_gc !r1 !r0 dh dl in
       assert { rl + radix * rh = mod (r' + d) (radix * radix)
                by radix * radix * c' + rl + radix * rh
                   = r' + d
@@ -3502,9 +3492,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     label PreRemAdjust in
     if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin
-      let bl, b = sub_with_borrow !r0 dl zero in
-      let bh, ghost b'= sub_with_borrow !r1 dh b in
-      assert { b' = 0 };
+      let (bh, bl) = sub_double_nb !r1 !r0 dh dl in
       assert { bl + radix * bh = !r0 + radix * !r1 - d };
       assert { !q1 < radix - 1
                by !q1 * d + !r0 + radix * !r1 = u
@@ -5962,9 +5950,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     + power radix !i * (!rl + radix * !rh) }
         ensures { !rl + radix * !rh < dl + radix * dh }
         ensures { !qh = 1 }
-        let (r0, b) = sub_with_borrow !rl dl uzero in
-        let (r1, ghost b') = sub_with_borrow !rh dh b in
-        assert { b' = 0 };
+        let (r1,r0) = sub_double_nb !rh !rl dh dl in
         assert { r0 + radix * r1 = !rl + radix * !rh - (dl + radix * dh) };
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
@@ -6162,7 +6148,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     !qh
 
 
-  val sub_limb_in_place (x:t) (y:limb) (sz:int32) : limb
+(*  val sub_limb_in_place (x:t) (y:limb) (sz:int32) : limb*)
 
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
     in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to

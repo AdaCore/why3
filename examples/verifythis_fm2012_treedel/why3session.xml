@@ -22,7 +22,7 @@
 </theory>
 <theory name="Treedel" proved="true">
  <goal name="VC extensionality" expl="VC for extensionality" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC extensionality.0" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
@@ -70,7 +70,7 @@
  </transf>
  </goal>
  <goal name="VC in_zip_tree" expl="VC for in_zip_tree" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC in_zip_tree.0" expl="variant decrease" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
@@ -83,12 +83,12 @@
  </transf>
  </goal>
  <goal name="VC subst_zip_tree" expl="VC for subst_zip_tree" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC subst_zip_tree.0" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC subst_zip_tree.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC subst_zip_tree.1.0" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
@@ -127,12 +127,12 @@
  </transf>
  </goal>
  <goal name="VC main_lemma" expl="VC for main_lemma" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC main_lemma.0" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
   <goal name="VC main_lemma.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC main_lemma.1.0" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.02" steps="78"/></proof>
    </goal>
@@ -174,7 +174,7 @@
  </transf>
  </goal>
  <goal name="VC search_tree_delete_min" expl="VC for search_tree_delete_min" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC search_tree_delete_min.0" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
@@ -272,7 +272,7 @@
   <proof prover="6"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="VC search_tree_delete_min.32" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
+  <transf name="split_goal_right" proved="true" >
    <goal name="VC search_tree_delete_min.32.0" expl="VC for search_tree_delete_min" proved="true">
    <proof prover="6"><result status="valid" time="0.27" steps="761"/></proof>
    </goal>

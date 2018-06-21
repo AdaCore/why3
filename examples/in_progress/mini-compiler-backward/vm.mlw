@@ -31,11 +31,11 @@ end
 
 module Vm "Virtual Machine for IMP language"
 
-  use import state.State
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
 
   type pos = int                           (* read position on stack        *)
   type stack = list int                    (* stack contains just integers  *)
@@ -147,55 +147,54 @@ module Vm "Virtual Machine for IMP language"
 end
 
 module VMClock
-  
-  use import HighOrd
-  use import state.State
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import list.Nth
-  use import list.NthLengthAppend
-  use import option.Option
-  use import Vm
-  
+
+  use state.State
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Nth
+  use list.NthLengthAppend
+  use option.Option
+  use Vm
+
   type clock_state = VMC pos stack state int
   type parameter = (code,clock_state -> bool)
-  
+
   predicate transition_out (p:(code,clock_state -> bool))
     (mc1 mc2:clock_state) =
     let (c,inside) = p in
     not inside mc1 /\ not inside mc2 /\
     let VMC p1 s1 m1 c1 = mc1 in let VMC p2 s2 m2 c2 = mc2 in
     transition c (VMS p1 s1 m1) (VMS p2 s2 m2) /\ c2 = c1 + 1
-  
+
   clone ReflTransClosure as C with type parameter = parameter,
     type state = clock_state, predicate transition = transition_out
-  
+
   lemma transition_star_endpoints : forall c p s0 s1.
     C.transition_star (c,p) s0 s1 -> s0 <> s1 -> not p s0 /\ not p s1
-  
+
   lemma transition_star_weakening : forall c p q s0 s1.
     (forall x. q x -> p x) ->
     C.transition_star (c,p) s0 s1 ->
     C.transition_star (c,q) s0 s1
-  
+
   let lemma transition_deterministic (c:code) (ms ms' ms'':machine_state) : unit
     requires { transition c ms ms' }
     requires { transition c ms ms'' }
     ensures { ms' = ms'' }
   = assert { forall p i.
       ("inversion" codeseq_at c p (Cons i Nil)) -> nth p c = Some i }
-  
+
   lemma transition_out_deterministic : forall p mc1 mc2 mc3.
     transition_out p mc1 mc2 /\ transition_out p mc1 mc3 -> mc2 = mc3
-  
-  
+
+
   let lemma halt_stuck (c:code) (p:pos) (s:stack) (m:state) : unit
     requires { codeseq_at c p ihalt }
     ensures { forall ms'. not transition c (VMS p s m) ms' }
   = assert { forall p i. codeseq_at c p (Cons i Nil) -> nth p c = Some i }
-  
+
 end
 
 (*

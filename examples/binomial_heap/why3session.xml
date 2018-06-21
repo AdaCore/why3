@@ -21,7 +21,7 @@
  <goal name="heaps_append" expl="">
  <transf name="induction_ty_lex">
   <goal name="heaps_append.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="heaps_append.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
    </goal>
@@ -35,7 +35,7 @@
  <goal name="heaps_reverse" expl="">
  <transf name="induction_ty_lex">
   <goal name="heaps_reverse.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="heaps_reverse.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
@@ -52,7 +52,7 @@
  <goal name="occ_append" expl="">
  <transf name="induction_ty_lex">
   <goal name="occ_append.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="occ_append.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
    </goal>
@@ -80,7 +80,7 @@
  <goal name="has_order_length" expl="">
  <transf name="induction_ty_lex">
   <goal name="has_order_length.1" expl="">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="has_order_length.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
@@ -112,7 +112,7 @@
  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
  <goal name="VC get_min" expl="VC for get_min" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <transf name="split_goal_right" expanded="true">
   <goal name="VC get_min.1" expl="unreachable point">
   <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -146,7 +146,7 @@
  <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="VC add_tree" expl="VC for add_tree">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC add_tree.1" expl="assertion">
   <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
@@ -180,7 +180,7 @@
  <proof prover="3"><result status="valid" time="0.04" steps="259"/></proof>
  </goal>
  <goal name="VC merge" expl="VC for merge">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC merge.1" expl="variant decrease">
   <proof prover="3"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>

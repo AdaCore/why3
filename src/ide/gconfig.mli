@@ -19,9 +19,8 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable intro_premises : bool;
       mutable show_full_context : bool;
-      mutable show_labels : bool;
+      mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -32,6 +31,8 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_color_bg : string;
+      mutable error_line_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
@@ -41,7 +42,6 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
 val load_config : Whyconf.config -> Whyconf.config -> unit
@@ -117,6 +117,8 @@ val show_about_window : unit -> unit
 val preferences : t -> unit
 
 val uninstalled_prover_dialog :
+  height:int ->
+  callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
   t -> Whyconf.prover -> unit
 
 

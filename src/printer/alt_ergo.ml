@@ -13,6 +13,7 @@
 
 open Format
 open Pp
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -31,14 +32,10 @@ let meta_invalid_trigger =
   Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
   ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
 
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
-  info_show_labels : bool;
+  info_show_attrs : bool;
   info_type_casts : bool;
   info_csm : lsymbol list Mls.t;
   info_pjs : Sls.t;
@@ -48,7 +45,7 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
-  mutable list_projs: Stdlib.Sstr.t;
+  mutable list_projs: Sstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -82,13 +79,13 @@ let ident_printer () =
 let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
-let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 
-let print_ident_label info fmt id =
-  if info.info_show_labels then
+let print_ident_attr info fmt id =
+  if info.info_show_attrs then
     fprintf fmt "%s %a"
       (id_unique info.info_printer id)
-      (print_list space print_label) (Slab.elements id.id_label)
+      (print_list space print_attr) (Sattr.elements id.id_attrs)
   else
     print_ident info fmt id
 
@@ -96,12 +93,12 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Stdlib.Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+  if ls.ls_args = [] && Sattr.mem model_attr ls.ls_name.id_attrs then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 (*
 let tv_printer =
@@ -152,7 +149,7 @@ let unambig_fs fs =
   inspect (Opt.get fs.ls_value)
 
 let rec print_term info fmt t =
-  if Slab.mem model_label t.t_label then
+  if Sattr.mem model_attr t.t_attrs then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -177,10 +174,11 @@ let rec print_term info fmt t =
       Number.print number_format fmt c
   | Tvar { vs_name = id } ->
       print_ident info fmt id
-  | Tapp (ls, tl) -> begin
-      (match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None ->
+  | Tapp (ls, tl) ->
+     begin
+       match query_syntax info.info_syn ls.ls_name with
+       | Some s -> syntax_arguments s (print_term info) fmt tl
+       | None ->
 	  begin
 	    if (tl = []) then
 	      begin
@@ -189,12 +187,14 @@ let rec print_term info fmt t =
 		  match vc_term_info.vc_loc with
 		  | None -> ()
 		  | Some loc ->
-		      let labels = match vc_term_info.vc_func_name with
-		      | None ->
-			  ls.ls_name.id_label
-		      | Some _ ->
-			  model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
-		      let _t_check_pos = t_label ~loc labels t in
+                    let attrs = (*match vc_term_info.vc_func_name with
+                      | None ->*)
+                          ls.ls_name.id_attrs
+                      (*| Some _ ->
+                          model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
+                       *)
+                    in
+                    let _t_check_pos = t_attr_set ~loc attrs t in
 		      (* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		      (*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		      ()
@@ -221,7 +221,7 @@ let rec print_term info fmt t =
 	      fprintf fmt "(%a%a : %a)" (print_ident info) ls.ls_name
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
-      ) end
+     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo: you must eliminate let in term"
   | Tif _ -> unsupportedTerm t
@@ -240,17 +240,17 @@ and print_tapp info fmt = function
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
 let rec print_fmla info fmt f =
-  if Slab.mem model_label f.t_label then
+  if Sattr.mem model_attr f.t_attrs then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
 
-  let () = if info.info_show_labels then
-    match Slab.elements f.t_label with
+  let () = if info.info_show_attrs then
+    match Sattr.elements f.t_attrs with
       | [] -> print_fmla_node info fmt f
       | l ->
         fprintf fmt "(%a : %a)"
-          (print_list colon print_label) l
+          (print_list colon print_attr) l
           (print_fmla_node info) f
   else
     print_fmla_node info fmt f
@@ -272,7 +272,7 @@ and print_fmla_node info fmt f = match f.t_node with
         | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
-        fprintf fmt "%s %a:%a" q (print_ident_label info) v.vs_name
+        fprintf fmt "%s %a:%a" q (print_ident_attr info) v.vs_name
           (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
@@ -397,11 +397,10 @@ let print_info_model info =
     begin
       let model_map =
 	S.fold (fun f acc ->
-          fprintf str_formatter "%a" (print_fmla info) f;
-	  let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+          let s = asprintf "%a" (print_fmla info) f in
+	  Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in ();
+	Mstr.empty in ();
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -409,7 +408,7 @@ let print_info_model info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Mstr.empty
 
 let print_prop_decl vc_loc args info fmt k pr f =
   match k with
@@ -422,7 +421,7 @@ let print_prop_decl vc_loc args info fmt k pr f =
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
                                 list_projections = info.list_projs;
-                                list_records = Stdlib.Mstr.empty};
+                                list_records = Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
@@ -454,7 +453,7 @@ let add_projection (csm,pjs,axs) = function
   | _ -> assert false
 
 let check_options ((show,cast) as acc) = function
-  | [Theory.MAstr "show_labels"] -> true, cast
+  | [Theory.MAstr "show_attrs"] -> true, cast
   | [Theory.MAstr "no_type_cast"] -> show, false
   | [Theory.MAstr _] -> acc
   | _ -> assert false
@@ -471,7 +470,7 @@ let print_task args ?old:_ fmt task =
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;
-    info_show_labels = show;
+    info_show_attrs = show;
     info_type_casts = cast;
     info_csm = Mls.map Array.to_list csm;
     info_pjs = pjs;
@@ -481,8 +480,8 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Stdlib.Sstr.empty;
-    meta_model_projection = Task.on_tagged_ls meta_projection task;
+    list_projs = Sstr.empty;
+    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

@@ -13,7 +13,7 @@ open Why3
 open Pmodule
 open Py_ast
 open Ptree
-open Stdlib
+open Wstdlib
 
 let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"
@@ -25,7 +25,7 @@ let () = Debug.set_flag Dterm.debug_ignore_unused_var
 *)
 
 let mk_id ~loc name =
-  { id_str = name; id_lab = []; id_loc = loc }
+  { id_str = name; id_ats = []; id_loc = loc }
 
 let infix  ~loc s = Qident (mk_id ~loc (Ident.infix s))
 let prefix ~loc s = Qident (mk_id ~loc (Ident.prefix s))
@@ -63,7 +63,7 @@ let return ~loc =
   Qident (mk_id ~loc "Return")
 let return_handler ~loc =
   let x = mk_id ~loc "x" in
-  [return ~loc, Some (mk_pat ~loc (Pvar (x, false))), mk_var ~loc x]
+  [return ~loc, Some (mk_pat ~loc (Pvar x)), mk_var ~loc x]
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))
@@ -286,7 +286,7 @@ and block env ~loc = function
   | [] ->
     mk_unit ~loc
   | Dstmt { stmt_loc = loc; stmt_desc = Slabel id } :: sl ->
-    mk_expr ~loc (Emark (id, block env ~loc sl))
+    mk_expr ~loc (Elabel (id, block env ~loc sl))
   | Dstmt { Py_ast.stmt_loc = loc; stmt_desc = Py_ast.Sassign (id, e) } :: sl
     when not (Mstr.mem id.id_str env.vars) ->
     let e = expr env e in (* check e *before* adding id to environment *)
@@ -325,7 +325,7 @@ and block env ~loc = function
 let fresh_type_var =
   let r = ref 0 in
   fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_lab = [] }
+    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
 let logic_param id =
   id.id_loc, Some id, false, fresh_type_var id.id_loc

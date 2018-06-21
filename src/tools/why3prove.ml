@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Stdlib
+open Wstdlib
 open Whyconf
 open Theory
 open Task
@@ -94,8 +94,6 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
-let opt_cntexmp = ref false
-
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
@@ -147,9 +145,7 @@ let option_list = [
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
     "type_only" "--type-only" " stop after type checking";
-  Termcode.arg_extra_expl_prefix;
-  "--get-ce", Arg.Set opt_cntexmp,
-      " gets the counter-example model" ]
+  Termcode.arg_extra_expl_prefix ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
@@ -244,6 +240,8 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let unproved = ref false
+
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
@@ -252,13 +250,14 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =
-          Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv task in
+          Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
-          Call_provers.print_prover_result res
+          Call_provers.print_prover_result res;
+        if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
-        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
+        Driver.print_task drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =
@@ -357,7 +356,8 @@ let () =
   try
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
-    Queue.iter (do_input env drv) opt_queue
+    Queue.iter (do_input env drv) opt_queue;
+    if !unproved then exit 1
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

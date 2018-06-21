@@ -21,7 +21,7 @@ open Expr
 open Ty
 open Theory
 open Pmodule
-open Stdlib
+open Wstdlib
 open Pdecl
 open Printer
 
@@ -42,19 +42,19 @@ module Print = struct
 
   open Mltree
 
-  (* extraction labels *)
-  let optional_arg = create_label "ocaml:optional"
-  let named_arg = create_label "ocaml:named"
-  let ocaml_remove = create_label "ocaml:remove"
+  (* extraction attributes *)
+  let optional_arg = create_attribute "ocaml:optional"
+  let named_arg = create_attribute "ocaml:named"
+  let ocaml_remove = create_attribute "ocaml:remove"
 
-  let is_optional ~labels =
-    Slab.mem optional_arg labels
+  let is_optional ~attrs =
+    Sattr.mem optional_arg attrs
 
-  let is_named ~labels =
-    Slab.mem named_arg labels
+  let is_named ~attrs =
+    Sattr.mem named_arg attrs
 
-  let is_ocaml_remove ~labels =
-    Ident.Slab.mem ocaml_remove labels
+  let is_ocaml_remove ~attrs =
+    Ident.Sattr.mem ocaml_remove attrs
 
   let ocaml_keywords =
     ["and"; "as"; "assert"; "asr"; "begin";
@@ -205,9 +205,9 @@ module Print = struct
       (print_ty ~paren:false info) ty
 
   let print_vsty info fmt (id, ty, _) =
-    let labels = id.id_label in
-    if is_optional ~labels then print_vsty_opt info fmt id ty
-    else if is_named ~labels then print_vsty_named info fmt id ty
+    let attrs = id.id_attrs in
+    if is_optional ~attrs then print_vsty_opt info fmt id ty
+    else if is_named ~attrs then print_vsty_named info fmt id ty
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
         (print_ty ~paren:false info) ty
 
@@ -302,13 +302,13 @@ module Print = struct
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
-        if is_optional ~labels:(pv_name pv).id_label then
+        if is_optional ~attrs:(pv_name pv).id_attrs then
           begin match expr.e_node with
             | Eapp (rs, _)
               when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
             | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
                      (print_expr ~paren:true info) expr end
-        else if is_named ~labels:(pv_name pv).id_label then
+        else if is_named ~attrs:(pv_name pv).id_attrs then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
             (print_expr ~paren:true info) expr
         else fprintf fmt "%a" (print_expr ~paren:true info) expr;
@@ -352,13 +352,11 @@ module Print = struct
                 (print_expr ~paren:true info) t
           | [], tl ->
               fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-                (print_list comma (print_expr info)) tl
-          | pjl, tl ->
-              let equal fmt () = fprintf fmt " = " in
-              fprintf fmt "@[<hov 2>{ @[%a@] }@]"
-                (print_list2 semi equal (print_rs info) (print_expr info))
-                (pjl, tl)
-        end
+                (print_list comma (print_expr ~paren:true info)) tl
+          | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
+              fprintf fmt "@[<hov 2>{ %a }@]"
+                (print_list2 semi equal (print_rs info)
+                   (print_expr ~paren:true info)) (pjl, tl) end
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
     | _, _, tl ->
@@ -435,6 +433,8 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
+         | None when n = "0" -> fprintf fmt "Z.zero"
+         | None when n = "1" -> fprintf fmt "Z.one"
          | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
@@ -449,8 +449,7 @@ module Print = struct
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  ->
-        (* avoids parenthesis around values *)
+    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
     | Eapp (rs, pvl) ->
         begin match query_syntax info.info_convert rs.rs_name, pvl with
@@ -460,8 +459,7 @@ module Print = struct
               fprintf fmt (protect_on paren "%a")
                 (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e1, [p, e2], []) ->
-        fprintf fmt
-          (protect_on paren "let %a =@ %a in@ %a")
+        fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
     | Ematch (e, pl, []) ->
         fprintf fmt
@@ -476,17 +474,18 @@ module Print = struct
           | [] -> assert false | [a] -> assign fmt a
           | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
-        fprintf fmt (protect_on paren
-                       "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
+        fprintf fmt
+          (protect_on paren
+             "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
           (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
         fprintf fmt (protect_on paren "not %a") (print_expr info ~paren:true) e1
     | Eif (e1, e2, e3) when is_true e2 ->
         fprintf fmt (protect_on paren "@[<hv>%a || %a@]")
-          (print_expr info) e1 (print_expr info) e3
+          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e3
     | Eif (e1, e2, e3) when is_false e3 ->
         fprintf fmt (protect_on paren "@[<hv>%a && %a@]")
-          (print_expr info) e1 (print_expr info) e2
+          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e2
     | Eif (e1, e2, e3) ->
         fprintf fmt (protect_on paren
                        "@[<hv>@[<hov 2>if@ %a@ then@ begin@ @[%a@] end@]\
@@ -586,7 +585,7 @@ module Print = struct
       | l -> fprintf fmt "@[<hov 4>| %a of %a@]" (print_uident info) id
                (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
-      fprintf fmt "%s%a: %a;" (if is_mutable then "mutable " else "")
+      fprintf fmt "%s%a: @[%a@];" (if is_mutable then "mutable " else "")
         (print_lident info) id (print_ty ~paren:false info) ty in
     let print_def fmt = function
       | None ->
@@ -604,8 +603,8 @@ module Print = struct
       | Some (Dfloat _) ->
           assert false (*TODO*)
     in
-    let labels = its.its_name.id_label in
-    if not (is_ocaml_remove ~labels) then
+    let attrs = its.its_name.id_attrs in
+    if not (is_ocaml_remove ~attrs) then
       fprintf fmt "@[<hov 2>@[%s %a%a@]%a@]"
         (if fst then "type" else "and") print_tv_args its.its_args
         (print_lident info) its.its_name print_def its.its_def

@@ -24,8 +24,8 @@ module Regexp
 
   type word = list char
 
-  (** Inductive predicate [mem w r] means
-    ``word [w] belongs to the language of [r]''. *)
+  (** Inductive predicate `mem w r` means
+      "word `w` belongs to the language of `r`". *)
 
   inductive mem (w: word) (r: regexp) =
     | mem_eps:

@@ -7,7 +7,7 @@
 
 module HashedTypeWithDummy
 
-  use import int.Int
+  use int.Int
 
   type key
   type keym (** the logic model of a key *)
@@ -30,27 +30,27 @@ end
 
 module LinearProbing
 
-  clone import HashedTypeWithDummy
+  clone HashedTypeWithDummy with axiom .
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import option.Option
-  use import list.Mem
-  use import map.Map
+  use int.Int
+  use int.ComputerDivision
+  use option.Option
+  use list.Mem
+  use map.Map
   use map.Const
-  use import ref.Ref
-  use import array.Array
+  use ref.Ref
+  use array.Array
 
   let function bucket (k: key) (n: int) : int
     requires { 0 < n }
     ensures { 0 <= result < n }
   = mod (hash k) n
 
-  (** j lies between l and r, cyclically *)
+  (** `j` lies between `l` and `r`, cyclically *)
   predicate between (l j r: int) =
     l <= j < r || r < l <= j || j < r < l
 
-  (** number of dummy values in array [a] between [l] and [u] *)
+  (** number of dummy values in array `a` between `l` and `u` *)
   scope NumOfDummy
     use int.NumOf
 

@@ -18,8 +18,8 @@ theory List
 end
 
 theory SortedList
-  use import List
-  clone import Order as O
+  use List
+  clone import Order as O with axiom .
 
   inductive sorted (l : list t) =
     | sorted_nil :
@@ -43,9 +43,9 @@ theory SortedList
 end
 
 theory SortedIntList
-  use import int.Int
-  use import List
-  clone import SortedList with
+  use int.Int
+  use List
+  clone SortedList with
     type O.t = int, predicate O.(<=) = (<=),
     lemma O.le_refl, lemma O.le_asym, lemma O.le_trans
 

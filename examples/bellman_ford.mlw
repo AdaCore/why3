@@ -9,7 +9,6 @@ theory Graph
   use export list.List
   use export list.Append
   use export list.Length
-  use list.Mem
   use export int.Int
   use export set.Fset
 
@@ -61,7 +60,7 @@ theory Graph
        Two cases depending on l3=[] (and thus u=v) conclude the proof. Qed.
   *)
 
-  clone pigeon.Pigeonhole with type t = vertex
+  clone pigeon.ListAndSet with type t = vertex
 
   predicate cyc_decomp (v: vertex) (l: list vertex)
                        (vi: vertex) (l1 l2 l3: list vertex) =
@@ -142,11 +141,11 @@ end
 
 module BellmanFord
 
-  use import Graph
+  use Graph
   use int.IntInf as D
-  use import ref.Ref
+  use ref.Ref
   clone impset.Impset as S with type elt = (vertex, vertex)
-  clone import impmap.ImpmapNoDom with type key = vertex
+  clone impmap.ImpmapNoDom with type key = vertex
 
   type distmap = ImpmapNoDom.t D.t
 

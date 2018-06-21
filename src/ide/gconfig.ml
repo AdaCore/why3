@@ -37,9 +37,8 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable intro_premises : bool;
       mutable show_full_context : bool;
-      mutable show_labels : bool;
+      mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -51,18 +50,18 @@ type t =
       mutable neg_premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable error_color_bg : string;
+      mutable error_line_color : string;
       mutable iconset : string;
       (** colors *)
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
-      (* hidden prover buttons *)
       mutable hidden_provers : string list;
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
 
@@ -74,9 +73,8 @@ type ide = {
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
-  ide_intro_premises : bool;
   ide_show_full_context : bool;
-  ide_show_labels : bool;
+  ide_show_attributes : bool;
   ide_show_coercions : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
@@ -87,6 +85,8 @@ type ide = {
   ide_neg_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_error_color_bg : string;
+  ide_error_line_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -100,9 +100,8 @@ let default_ide =
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
-    ide_intro_premises = true;
     ide_show_full_context = false;
-    ide_show_labels = false;
+    ide_show_attributes = false;
     ide_show_coercions = true;
     ide_show_locs = false;
     ide_show_time_limit = false;
@@ -112,7 +111,9 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
-    ide_error_color = "orange";
+    ide_error_color_bg = "yellow";
+    ide_error_color = "red";
+    ide_error_line_color = "yellow";
     ide_iconset = "fatcow";
     ide_hidden_provers = [];
   }
@@ -132,16 +133,13 @@ let load_ide section =
       get_int section ~default:default_ide.ide_font_size "font_size";
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
-    ide_intro_premises =
-      get_bool section ~default:default_ide.ide_intro_premises
-        "intro_premises";
     ide_show_full_context =
       get_bool section ~default:default_ide.ide_show_full_context
         "show_full_context";
-    ide_show_labels =
-      get_bool section ~default:default_ide.ide_show_labels "print_labels";
+    ide_show_attributes =
+      get_bool section ~default:default_ide.ide_show_attributes "print_attributes";
     ide_show_coercions =
-      get_bool section ~default:default_ide.ide_show_labels "print_coercions";
+      get_bool section ~default:default_ide.ide_show_attributes "print_coercions";
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_show_time_limit =
@@ -166,6 +164,12 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_error_color_bg =
+      get_string section ~default:default_ide.ide_error_color_bg
+        "error_color_bg";
+    ide_error_line_color =
+      get_string section ~default:default_ide.ide_error_line_color
+        "error_line_color";
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
@@ -173,8 +177,8 @@ let load_ide section =
   }
 
 
-let set_labels_flag =
-  let fl = Debug.lookup_flag "print_labels" in
+let set_attr_flag =
+  let fl = Debug.lookup_flag "print_attributes" in
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
@@ -194,7 +198,7 @@ let load_config config original_config =
     | None -> default_ide
     | Some s -> load_ide s
   in
-  set_labels_flag ide.ide_show_labels;
+  set_attr_flag ide.ide_show_attributes;
   set_coercions_flag ide.ide_show_coercions;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
@@ -204,9 +208,8 @@ let load_config config original_config =
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
-    intro_premises= ide.ide_intro_premises ;
     show_full_context= ide.ide_show_full_context ;
-    show_labels   = ide.ide_show_labels ;
+    show_attributes   = ide.ide_show_attributes ;
     show_coercions = ide.ide_show_coercions ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
@@ -217,6 +220,8 @@ let load_config config original_config =
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    error_color_bg = ide.ide_error_color_bg;
+    error_line_color = ide.ide_error_line_color;
     iconset = ide.ide_iconset;
     config         = config;
     original_config = original_config;
@@ -224,7 +229,6 @@ let load_config config original_config =
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
     session_nb_processes = Whyconf.running_provers_max main;
-    session_cntexample = Whyconf.cntexample main;
 }
 
 let save_config t =
@@ -237,9 +241,6 @@ let save_config t =
   let mem = Whyconf.memlimit new_main in
   let nb = Whyconf.running_provers_max new_main in
   let config = set_main config (set_limits (get_main config) time mem nb) in
-  let new_main = Whyconf.get_main t.config in
-  let cntexample = Whyconf.cntexample new_main in
-  let config = set_main config (set_cntexample (get_main config) cntexample) in
   (* copy also provers section since it may have changed (the editor
      can be set via the preferences dialog) *)
   let config = set_provers config (get_provers t.config) in
@@ -253,9 +254,8 @@ let save_config t =
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
-  let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "show_full_context" t.show_full_context in
-  let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_attributes" t.show_attributes in
   let ide = set_bool ide "print_coercions" t.show_coercions in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
@@ -266,7 +266,10 @@ let save_config t =
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_color_bg" t.error_color_bg in
+  let ide = set_string ide "error_line_color" t.error_line_color in
   let ide = set_string ide "iconset" t.iconset in
+  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
@@ -705,6 +708,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
   in
   (* counter-example *)
+(*
   let cntexample_check = GButton.check_button ~label:"get counter-example"
     ~packing:vb#add ()
     ~active:c.session_cntexample
@@ -713,6 +717,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     cntexample_check#connect#toggled ~callback:
       (fun () -> c.session_cntexample <- not c.session_cntexample)
   in
+*)
   (* source editing allowed *)
   let source_editing_check = GButton.check_button ~label:"allow editing source files"
     ~packing:vb#add ()
@@ -800,15 +805,6 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:vb#add ()
   in
-  let intropremises =
-    GButton.check_button ~label:"introduce premises"
-      ~packing:display_options_box#add ()
-      ~active:c.intro_premises
-  in
-  let (_ : GtkSignal.id) =
-    intropremises#connect#toggled ~callback:
-      (fun () -> c.intro_premises <- not c.intro_premises)
-  in
   let showfullcontext =
     GButton.check_button ~label:"show full task context"
       ~packing:display_options_box#add ()
@@ -818,17 +814,17 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     showfullcontext#connect#toggled ~callback:
       (fun () -> c.show_full_context <- not c.show_full_context)
   in
-  let showlabels =
+  let showattrs =
     GButton.check_button
-      ~label:"show labels in formulas"
+      ~label:"show attributes in formulas"
       ~packing:display_options_box#add ()
-      ~active:c.show_labels
+      ~active:c.show_attributes
   in
   let (_ : GtkSignal.id) =
-    showlabels#connect#toggled ~callback:
+    showattrs#connect#toggled ~callback:
       (fun () ->
-         c.show_labels <- not c.show_labels;
-         set_labels_flag c.show_labels)
+         c.show_attributes <- not c.show_attributes;
+         set_attr_flag c.show_attributes)
   in
   let showcoercions =
     GButton.check_button
@@ -954,7 +950,7 @@ let provers_page c (notebook:GPack.notebook) =
   let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   (* show/hide provers *)
   let frame =
-    GBin.frame ~label:"Prover button in the left toolbar" ~packing:hbox_pack ()
+    GBin.frame ~label:"Provers visible in the context menu" ~packing:hbox_pack ()
   in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -1006,11 +1002,10 @@ let provers_page c (notebook:GPack.notebook) =
  *)
   ()
 
-
 (* Page "Uninstalled provers" *)
 
 let alternatives_frame c (notebook:GPack.notebook) =
-  let label = GMisc.label ~text:"Uninstalled provers" () in
+  let label = GMisc.label ~text:"Uninstalled provers policies" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
@@ -1025,7 +1020,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   in
   let remove button p () =
     button#destroy ();
-    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config));
   in
   let iter p policy =
     let label =
@@ -1171,9 +1166,6 @@ let preferences (c : t) =
       c.config <- Whyconf.set_main c.config
         (Whyconf.set_limits (Whyconf.get_main c.config)
            c.session_time_limit c.session_mem_limit c.session_nb_processes);
-      c.config <- Whyconf.set_main c.config
-	(Whyconf.set_cntexample (Whyconf.get_main c.config)
-	   c.session_cntexample);
       save_config ()
     | `CLOSE | `DELETE_EVENT -> ()
   end;
@@ -1193,7 +1185,7 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-let uninstalled_prover_dialog c unknown =
+let uninstalled_prover_dialog ~height ~callback c unknown =
   let others,names,versions =
     Whyconf.unknown_to_known_provers
       (Whyconf.get_provers c.config) unknown
@@ -1203,104 +1195,116 @@ let uninstalled_prover_dialog c unknown =
                  ~title:"Why3: Uninstalled prover" ()
   in
   let vbox = dialog#vbox in
-(* Does not work: why ??
-    let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
-    let hbox = GPack.hbox ~packing:vbox_pack () in
-    let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
-    let scrollview =
-      GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-        ~packing:hbox_pack ()
+  let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let hbox = GPack.hbox ~packing:vbox_pack () in
+  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let scrollview =
+    GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC ~height
+      ~packing:hbox_pack ()
+  in
+  let () = scrollview#set_shadow_type `OUT in
+  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+  (* header *)
+  let hb = GPack.hbox ~packing:vbox#add () in
+  let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
+  let (_:GMisc.label) =
+    let text =
+      Pp.sprintf "The prover %a is not installed"
+        Whyconf.print_prover unknown
     in
-    let () = scrollview#set_shadow_type `OUT in
-    let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
-*)
-    (* header *)
-    let hb = GPack.hbox ~packing:vbox#add () in
-    let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
-    let _ =
-      let text =
-        Pp.sprintf "The prover %a is not installed"
-          Whyconf.print_prover unknown
-      in
-      GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
+    GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
+  in
+  let (_:GMisc.label) =
+    let text =
+      "WARNING: this policy will not be taken into account immediately \
+        but only if you replay again the proofs."
     in
-    (* choices *)
-    let vbox_pack =
-      vbox#pack ~fill:true ~expand:true ?from:None ?padding:None
+    GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
+  in
+  let (_:GMisc.label) =
+    let text =
+      "WARNING: do not forget to save preferences to keep this policy in future sessions"
     in
-    let label = "Please select a policy for associated proof attempts" in
-    let policy_frame = GBin.frame ~label ~packing:vbox_pack () in
-    let choice = ref 1 in
-    let prover_choosed = ref None in
-    let set_prover prover () = prover_choosed := Some prover in
-    let box =
-      GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-        ~packing:policy_frame#add ()
-    in
-    let choice1 = GButton.radio_button
+    GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
+  in
+  (* choices *)
+  let vbox_pack =
+    vbox#pack ~fill:true ~expand:true ?from:None ?padding:None
+  in
+  let label = "Please select a policy for associated proof attempts" in
+  let policy_frame = GBin.frame ~label ~packing:vbox_pack () in
+  let choice = ref 1 in
+  let prover_choosed = ref None in
+  let set_prover prover () = prover_choosed := Some prover in
+  let box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:policy_frame#add ()
+  in
+  let choice1 = GButton.radio_button
       ~label:"move proofs to the selected prover below"
       ~active:true
       ~packing:box#add () in
-    let choice2 = GButton.radio_button
+  let choice2 = GButton.radio_button
       ~label:"duplicate proofs to the selected prover below"
       ~active:false ~group:choice1#group
       ~packing:box#add () in
-    let choice0 = GButton.radio_button
+  let choice0 = GButton.radio_button
       ~label:"keep proofs as they are, do not try to play them"
       ~active:false  ~group:choice1#group
       ~packing:box#add () in
-    let first = ref None in
-    let alternatives_section acc label alternatives =
-      if alternatives <> [] then
-        let frame = GBin.frame ~label ~packing:vbox#add () in
-        let box =
-          GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-            ~packing:frame#add ()
+  let first = ref None in
+  let alternatives_section acc label alternatives =
+    if alternatives <> [] then
+      let frame = GBin.frame ~label ~packing:vbox#add () in
+      let box =
+        GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+          ~packing:frame#add ()
+      in
+      let iter_alter prover =
+        let choice_button =
+          let label = Pp.string_of_wnl print_prover prover in
+          match !first with
+          | None ->
+              let choice_button =
+                GButton.radio_button ~label ~active:true ~packing:box#add ()
+              in
+              prover_choosed := Some prover;
+              first := Some choice_button;
+              choice_button
+          | Some first ->
+              GButton.radio_button ~label ~group:first#group
+                ~active:false ~packing:box#add ()
         in
-        let iter_alter prover =
-          let choice_button =
-            let label = Pp.string_of_wnl print_prover prover in
-            match !first with
-              | None ->
-                let choice_button =
-                  GButton.radio_button ~label ~active:true ~packing:box#add ()
-                in
-                prover_choosed := Some prover;
-                first := Some choice_button;
-                choice_button
-              | Some first ->
-                GButton.radio_button ~label ~group:first#group
-                  ~active:false ~packing:box#add ()
-          in
-          ignore (choice_button#connect#toggled ~callback:(set_prover prover))
-        in
-        List.iter iter_alter alternatives;
-        frame#misc :: (* box#misc :: *) acc
-      else acc
-    in
-    let boxes = alternatives_section [] "Same name and same version" versions in
-    let boxes = alternatives_section boxes "Same name and different version" names in
-    let boxes = alternatives_section boxes "Different name" others in
-    let hide_provers () = List.iter (fun b -> b#set_sensitive false) boxes in
-    let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
-    ignore (choice0#connect#toggled
-              ~callback:(fun () -> choice := 0; hide_provers ()));
-    ignore (choice1#connect#toggled
-              ~callback:(fun () -> choice := 1; show_provers ()));
-    ignore (choice2#connect#toggled
-              ~callback:(fun () -> choice := 2; show_provers ()));
-    dialog#add_button "Ok" `CLOSE ;
-    ignore (dialog#run ());
-    dialog#destroy ();
-    let policy =
-      match !choice, !prover_choosed with
-        | 0,_ -> CPU_keep
-        | 1, Some p -> CPU_upgrade p
-        | 2, Some p -> CPU_duplicate p
-        | _ -> assert false
-    in
-    c.config <- set_prover_upgrade_policy c.config unknown policy;
-    ()
+        ignore (choice_button#connect#toggled ~callback:(set_prover prover))
+      in
+      List.iter iter_alter alternatives;
+      frame#misc :: (* box#misc :: *) acc
+    else acc
+  in
+  let boxes = alternatives_section [] "Same name and same version" versions in
+  let boxes = alternatives_section boxes "Same name and different version" names in
+  let boxes = alternatives_section boxes "Different name" others in
+  let hide_provers () = List.iter (fun b -> b#set_sensitive false) boxes in
+  let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
+  ignore (choice0#connect#toggled
+            ~callback:(fun () -> choice := 0; hide_provers ()));
+  ignore (choice1#connect#toggled
+            ~callback:(fun () -> choice := 1; show_provers ()));
+  ignore (choice2#connect#toggled
+            ~callback:(fun () -> choice := 2; show_provers ()));
+  dialog#add_button "Ok" `CLOSE ;
+  ignore (dialog#run ());
+  dialog#destroy ();
+  let policy =
+    match !choice, !prover_choosed with
+    | 0,_ -> CPU_keep
+    | 1, Some p -> CPU_upgrade p
+    | 2, Some p -> CPU_duplicate p
+    | _ -> assert false
+  in
+  c.config <- set_prover_upgrade_policy c.config unknown policy;
+  let () = callback unknown policy in
+  ()
 
 
 (*

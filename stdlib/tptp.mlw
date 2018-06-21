@@ -41,7 +41,7 @@ module IntDivF
 end
 
 module Rat
-  use int.Int
+  use int.Int as Int
 
   type rat
 
@@ -80,7 +80,7 @@ module Rat
 end
 
 module RatTrunc
-  use import Rat
+  use Rat
 
   (* TODO: axiomatize *)
   function floor (x : rat) : rat
@@ -92,7 +92,7 @@ module RatTrunc
 end
 
 module RatDivE
-  use import Rat
+  use Rat
 
   (* TODO: euclidean division *)
   function div (x y : rat) : rat
@@ -100,7 +100,7 @@ module RatDivE
 end
 
 module RatDivT
-  use import Rat
+  use Rat
 
   (* TODO: divide and truncate *)
   function div_t (x y : rat) : rat
@@ -108,7 +108,7 @@ module RatDivT
 end
 
 module RatDivF
-  use import Rat
+  use Rat
 
   (* TODO: divide and floor *)
   function div_f (x y : rat) : rat
@@ -121,9 +121,9 @@ module Real
 end
 
 module RealTrunc
-  use import Real
-  use real.FromInt
-  use real.Truncate
+  use Real
+  use real.FromInt as FromInt
+  use real.Truncate as Truncate
 
   function floor (x : real) : real = FromInt.from_int (Truncate.floor x)
   function ceiling (x : real) : real = FromInt.from_int (Truncate.ceil x)
@@ -158,28 +158,28 @@ module RealDivF
 end
 
 module IntToRat
-  use import Rat
+  use Rat
 
   function to_rat (x : int) : rat = frac x 1
 end
 
 module IntToReal
-  use real.FromInt
+  use real.FromInt as FromInt
 
   function to_real (x : int) : real = FromInt.from_int x
 end
 
 module RealToRat
-  use import Rat
+  use Rat
 
   (* TODO: axiomatize *)
   function to_rat (x : real) : rat
 end
 
 module RatToReal
-  use import Rat
-  use import real.Real
-  use real.FromInt
+  use Rat
+  use real.Real
+  use real.FromInt as FromInt
 
   function to_real (x : rat) : real =
     FromInt.from_int (numerator x) / FromInt.from_int (denominator x)

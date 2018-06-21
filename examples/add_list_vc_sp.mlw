@@ -27,11 +27,11 @@ end
 
 module AddListRec
 
-use import SumList
+use SumList
 
-let rec sum (l: list or_integer_float) : (int, real) =
+let rec sum (l: list or_integer_float) : (si: int, sf: real) =
     variant { l }
-    returns { si, sf -> si = add_int l /\ sf = add_real l }
+    ensures { si = add_int l /\ sf = add_real l }
   [@vc:sp]
   match l with
   | Nil -> 0, 0.0
@@ -58,11 +58,11 @@ end
 
 module AddListImp
 
-use import SumList
-use import ref.Ref
+use SumList
+use ref.Ref
 
-let sum (l: list or_integer_float) : (int, real) =
-    returns { si, sf -> si = add_int l /\ sf = add_real l }
+let sum (l: list or_integer_float) : (si: int, sf: real) =
+    ensures { si = add_int l /\ sf = add_real l }
   [@vc:sp]
   let si = ref 0 in
   let sf = ref 0.0 in

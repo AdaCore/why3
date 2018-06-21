@@ -5,12 +5,12 @@
 
 module PQueue
 
-  use import int.Int
-  use import avl.SelectionTypes
-  use import option.Option
-  use import ref.Ref
+  use int.Int
+  use avl.SelectionTypes
+  use option.Option
+  use ref.Ref
   use import seq.Seq as S
-  use import seq.FreeMonoid
+  use seq.FreeMonoid
   use mach.peano.Peano as I
 
   (** {2 Implementation parameters} *)
@@ -24,7 +24,7 @@ module PQueue
   scope D type t 'a end
   scope K type t end
   clone export key_type.KeyType with type t = D.t, type key = K.t
-  clone preorder.Computable as CO with type t = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
 
   (** {2 Instantiation of the AVL tree module} *)
 
@@ -213,7 +213,7 @@ module PQueue
 
   (** Conversion from sequences to bags:
       from number of occurences. *)
-  use import seq.Occ
+  use seq.Occ
 
   let ghost function to_bag (s:seq 'a) : 'a -> int =
     fun x -> occ x s 0 (length s)

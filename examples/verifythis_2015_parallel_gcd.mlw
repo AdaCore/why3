@@ -79,9 +79,9 @@ terminates with probability 1).
 
 module ParallelGCD
 
-  use import int.Int
-  use import number.Gcd
-  use import ref.Ref
+  use int.Int
+  use number.Gcd
+  use ref.Ref
 
   (** the following lemma is easily derived from a more general
       lemma in library [number.Gcd], namely [gcd_euclid].*)
@@ -113,9 +113,9 @@ end
     *)
 module Interleaving
 
-  use import int.Int
-  use import number.Gcd
-  use import ref.Ref
+  use int.Int
+  use number.Gcd
+  use ref.Ref
 
   lemma gcd_sub: forall a b: int. gcd a b = gcd a (b - a)
 

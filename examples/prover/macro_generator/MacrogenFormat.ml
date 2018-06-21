@@ -327,7 +327,7 @@ let print_type_defs fmt dm =
   let print_decl = make_first_case_sprinter "type" "with" in
   List.iter (fun ( tn , ( td , _ ) ) ->
     match td with ITypeAssumption _ -> ()
-      | ITypeDef ( c , v ) -> 
+      | ITypeDef ( c , v ) ->
         let tname = type_name tn dm in
         fprintf fmt "@[<hov 2>%t @[<hov 2>%a@] =@ " print_decl (print_type_app dm "b") tn ;
         begin if c.var_present
@@ -502,9 +502,9 @@ let print_lift sub dm prefix blv fmt tn =
 
 let print_subst_type sub dm p1 p2 fmt tn =
   if sub
-  then fprintf fmt "func '%s%a @[<hov 2>(%a)@]"
+  then fprintf fmt "'%s%a -> @[<hov 2>(%a)@]"
     p1 print_tindex tn (print_type_app dm p2) tn
-  else fprintf fmt "func '%s%a '%s%a" p1 print_tindex tn p2 print_tindex tn
+  else fprintf fmt "'%s%a -> '%s%a" p1 print_tindex tn p2 print_tindex tn
 
 let print_subst_def dm fmt sub =
   let print_kw = make_first_case_sprinter "function" "with" in
@@ -524,11 +524,11 @@ let print_subst_def dm fmt sub =
     let cons_case = reconstruct_cons_case dm (fun blv tn fmt vname ->
       let tname = type_name tn dm in
       let v = bvar_list (type_def tn dm) in
-      fprintf fmt "@[<hov 2>%s_%s@ %s%a@]" fprefix tname vname 
+      fprintf fmt "@[<hov 2>%s_%s@ %s%a@]" fprefix tname vname
       (print_args blv) v) in
     fprintf fmt "@[<hov 2>%t %s_%s @[<hov 2>(t:@[<hov 2>%a@])" print_kw fprefix tname
     (print_type_app dm "b") tn ;
-    List.iter (fun tn -> 
+    List.iter (fun tn ->
       fprintf fmt "@ (s%a : %a)"
       print_tindex tn (print_subst_type sub dm "b" "c") tn) v ;
     fprintf fmt "@] : %a =@ %a@]@\n@\n" (print_type_app dm "c") tn
@@ -777,7 +777,7 @@ let print_subst_lifting fmt dm =
       @[<hov 2>match x with@\n| None -> Var_%s None@ | Some x -> %t@]@\nend@]@\n@\n"
       tname mytype tn print_tindex tn (print_type_app dm ~blevels "c") tn
       tname print_lhs1 ;
-    fprintf fmt "@[<hov 2>function olifts_%s (s:%a) :@ func (option 'b%a) (%a) =@ \
+    fprintf fmt "@[<hov 2>function olifts_%s (s:%a) :@ (option 'b%a) -> (%a) =@ \
       ocase (%t) (Var_%s None)@]@\n@\n"
       tname mytype tn
       print_tindex tn (print_type_app dm ~blevels "c") tn
@@ -819,13 +819,20 @@ let print_subst_ids fmt dm =
         tname tname (print_subst_type true dm "b" "b") tn in
     let print_second fmt =
       fprintf fmt "subst_id_%s" tname in
-    fprintf fmt "@[<hov 2>let lemma olifts_identity_%s (u:unit) : unit@ \
+    let print_dummy_args fmt =
+        let td = type_def tn dm in
+        let v = bvar_list td in
+        List.iter (fun vn ->
+                   fprintf fmt "@ (_:'b%a)" print_tindex vn) v
+    in
+    fprintf fmt "@[<hov 2>let lemma olifts_identity_%s (_:'b%a) (* %t *) : unit@ \
       @[<hov 2>ensures { %t =@ %t }@]@]@\n
       @[<hov 2>=@ \
       @[<hov 2>assert { forall x:'b%a. eval (%t) (Some x) =@ eval (%t) (Some x) };@]@\n\
       @[<hov 2>assert { eval (%t) None =@ eval (%t) None };@]@\n\
       @[<hov 2>assert { extensionalEqual (%t)@ (%t) }@]@]@\n@\n"
-      tname print_first print_second print_tindex tn
+            tname print_tindex tn print_dummy_args
+            print_first print_second print_tindex tn
       print_first print_second print_first print_second print_first print_second in
   make_for_vdefs dm print_decl
 
@@ -932,12 +939,12 @@ let print_free_var_equivalence_def fmt dm =
   let print_decl tnv tn c v =
     let tname = type_name tn dm in
     let tnamev = type_name tnv dm in
-    fprintf fmt "@[<hov 2>predicate %s_free_var_%s_equivalence (t:%a) (f g:func 'b%a 'c) =@\n\
+    fprintf fmt "@[<hov 2>predicate %s_free_var_%s_equivalence (t:%a) (f g: 'b%a -> 'c) =@\n\
       @[<hov 2>forall x:'b%a. is_%s_free_var_in_%s x t ->@ f x = g x@]@]@\n@\n"
       tnamev tname (print_type_app dm "b") tn
       print_tindex tnv print_tindex tnv tnamev tname (*;
     fprintf fmt "@[<hov 2>lemma %s_free_var_%s_equivalence_reflexive :@\n\
-      @[<hov 2>forall t:%a,f:func 'b%a 'c. %s_free_var_%s_equivalence t f f@]@]@\n@\n"
+      @[<hov 2>forall t:%a,f: 'b%a -> 'c. %s_free_var_%s_equivalence t f f@]@]@\n@\n"
       tnamev tname (print_type_app dm "b") tn
       print_tindex tnv tnamev tname*)
   in
@@ -1435,7 +1442,7 @@ let print_open_close fmt dm =
    26) Caracterise free variables of application of lifted substitution
        (some kind of inversion lemma)
    2X) Prove the caracterisation of free variables in a substituted term.
-   
+
    (* TODO list *)
    ) !!! find which variables are preserved under renaming/subst,etc.
    ) !!! show the free_var_equivalence lemmaes (including reflexivity this time !)
@@ -1562,6 +1569,3 @@ let _ =
   let l = { var_parameters = l1 ; binder_types = l2 } in
   until_print fmt l ;
   fprintf fmt "lemma incoherence : false@\n@]@\nend@\n@\n"
-
-
-

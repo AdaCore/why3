@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
+
 let debug = Debug.register_flag ~desc:"ITP server" "itp_server"
 
 let has_extension f =
@@ -19,7 +21,6 @@ let has_extension f =
 let get_session_dir ~allow_mkdir files =
   if Queue.is_empty files then invalid_arg "no files given";
   let first = Queue.pop files in
-  (* The remaining files in [files] are going to be open *)
   let dir =
     if Sys.file_exists first then
       if Sys.is_directory first then
@@ -36,75 +37,22 @@ let get_session_dir ~allow_mkdir files =
             with Invalid_argument _ ->
               invalid_arg ("'" ^ first ^ "' has no extension and is not a directory")
           in
-          Queue.push first files; (* we need to open [first] *)
+          Queue.push first files;
           d
         else
           invalid_arg ("'" ^ first ^ "' is not a directory")
     else
-      (* first does not exists *)
+      (* first does not exist *)
       if has_extension first then
         invalid_arg ("file not found: " ^ first)
       else first
   in
   if not (Sys.file_exists dir) then
     begin
-      if allow_mkdir then Unix.mkdir dir 0o777 else
+      if allow_mkdir then Unix.mkdir dir 0o700 else
         invalid_arg ("session directory '" ^ dir ^ "' not found")
     end;
   dir
-
-
-
-
-(******************************)
-(* Creation of the controller *)
-(******************************)
-
-(* [cont_from_session]: returns an option to a boolean which returns None in
-   case of failure, true if nothing is left to do and false if sessions was
-   loaded but [f] should still be added to the session as a file. *)
-(*
-let cont_from_session ~notify cont f : bool option =
-  (* If a file is given, find the corresponding directory *)
-  let dir = try (Filename.chop_extension f) with
-  | Invalid_argument _ -> f in
-  (* create project directory if needed *)
-  if Sys.file_exists dir then
-    begin
-      (* Case of user giving a file that gets chopped to an other file *)
-      if not (Sys.is_directory dir) then
-        begin
-          Format.eprintf "Not a directory: %s@." dir;
-          exit 1
-        end
-    end
-  else
-    begin
-      Format.dprintf debug "'%s' does not exist. \
-               Creating directory of that name for the Why3 session@." dir;
-      Unix.mkdir dir 0o777
-    end;
-  (* we load the session *)
-  let ses,use_shapes = load_session dir in
-  Format.dprintf debug "using shapes: %b@." use_shapes;
-  (* temporary, this should not be donne like this ! *)
-  Controller_itp.set_session cont ses;
-  (* update the session *)
-  try (Controller_itp.reload_files cont ~use_shapes;
-    (* Check if the initial file given was a file or not. If it was, we return
-       that it should be added to the session.  *)
-    if Sys.file_exists f && not (Sys.is_directory f) then
-      Some false
-    else
-      Some true) with
-  | e ->
-    begin
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      notify (Message (Parse_Or_Type_Error s));
-      None
-    end
-*)
-
 
 
 (******************)
@@ -143,7 +91,7 @@ let load_strategies cont =
   let config = cont.Controller_itp.controller_config in
   let env = cont.Controller_itp.controller_env in
   let strategies = Whyconf.get_strategies config in
-  Stdlib.Mstr.iter
+  Mstr.iter
     (fun _ st ->
      let name = st.Whyconf.strategy_name in
      try
@@ -151,7 +99,7 @@ let load_strategies cont =
        let code = Strategy_parser.parse env config code in
        let shortcut = st.Whyconf.strategy_shortcut in
        Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
-       Stdlib.Hstr.add cont.Controller_itp.controller_strategies name
+       Hstr.add cont.Controller_itp.controller_strategies name
                        (name, shortcut, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
        Format.eprintf "Fatal: loading strategy '%s' failed: %s \nSolve this problem in your why3.conf file and retry.@." name msg;
@@ -159,7 +107,7 @@ let load_strategies cont =
     strategies
 
 let list_strategies cont =
-  Stdlib.Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
+  Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
 
 
 let symbol_name s =
@@ -269,7 +217,7 @@ type query =
 
 
 let help_on_queries fmt commands =
-  let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
+  let l = Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
@@ -295,30 +243,38 @@ let set_session_timelimit n = session_timelimit := n
 let set_session_memlimit n = session_memlimit := n
 
 
+type command_prover =
+  | Bad_Arguments of Whyconf.prover
+  | Not_Prover
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
-let parse_prover_name config name args :
-  (Whyconf.config_prover * Call_provers.resource_limit) option =
+let parse_prover_name config name args : command_prover =
   match (return_prover name config) with
-  | None -> None
+  | None -> Not_Prover
   | Some prover_config ->
     begin
-      if (List.length args > 2) then None else
-      match args with
-      | [] ->
-        let default_limit = Call_provers.{empty_limit with
-                                          limit_time = !session_timelimit;
-                                          limit_mem = !session_memlimit} in
-          Some (prover_config, default_limit)
-      | [timeout] -> Some (prover_config,
-                           Call_provers.{empty_limit with
-                                          limit_time = int_of_string timeout;
-                                          limit_mem = !session_memlimit})
-      | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom})
-      | _ -> None
+      let prover = prover_config.Whyconf.prover in
+      try
+        if (List.length args > 2) then Bad_Arguments prover else
+        match args with
+        | [] ->
+            let default_limit = Call_provers.{empty_limit with
+                                              limit_time = !session_timelimit;
+                                              limit_mem = !session_memlimit} in
+            Prover (prover_config, default_limit)
+        | [timeout] -> Prover (prover_config,
+                               Call_provers.{empty_limit with
+                                             limit_time = int_of_string timeout;
+                                             limit_mem = !session_memlimit})
+        | [timeout; oom ] ->
+            Prover (prover_config, Call_provers.{empty_limit with
+                                                 limit_time = int_of_string timeout;
+                                                 limit_mem = int_of_string oom})
+        | _ -> Bad_Arguments prover
+      with
+      | Failure _ -> Bad_Arguments prover
     end
 
 (*******************************)
@@ -366,6 +322,8 @@ type command =
   | Replay       of bool
   | Clean
   | Mark_Obsolete
+  | Focus_req
+  | Unfocus_req
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -377,11 +335,30 @@ let query_on_task cont f id args =
     | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
     | Number_of_arguments -> QError "Bad number of arguments"
 
+let help_message commands_table =
+  Pp.sprintf
+    "Please type a command among the following (automatic completion available)@\n\
+     @\n\
+     @ <transformation name> [arguments]@\n\
+     @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+     @ <query> [arguments]@\n\
+     @ <strategy shortcut>@\n\
+     @ bisect @\n\
+     @ clean @\n\
+     @ edit @\n\
+     @ Focus @\n\
+     @ help <transformation_name> @\n\
+     @ list_ide_command @ \n\
+     @ mark @\n\
+     @ replay [all]@\n\
+     @ Unfocus @\n\
+     @\n\
+     Available queries are:@\n@[%a@]" help_on_queries commands_table
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   (* We first try to apply a command from commands_table (itp_server.ml) *)
-  match Stdlib.Hstr.find commands_table cmd with
+  match Hstr.find commands_table cmd with
   | (_, f) ->
     begin
       match f,id with
@@ -405,44 +382,28 @@ let interp commands_table cont id s =
    then
       match cmd, args with
       | "help", _ ->
-        let text = Pp.sprintf
-                         "Please type a command among the following (automatic completion available)@\n\
-                          @\n\
-                          @ <transformation name> [arguments]@\n\
-                          @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                          @ <query> [arguments]@\n\
-                          @ <strategy shortcut>@\n\
-                          @ mark @\n\
-                          @ clean @\n\
-                          @ replay @\n\
-                          @ bisect @\n\
-                          @ help <transformation_name> @\n\
-                          @ list_ide_command @ \n\
-                          @\n\
-                          Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
-                  Help_message text
+          let text = help_message commands_table in
+          Help_message text
       | _ -> QError ("Command cannot be applied on a detached node")
    else
      begin
        try
          let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
          match id with
-         | Some (Session_itp.APn _id) -> Transform (cmd,t,args)
-         | Some (Session_itp.ATn _tid) -> Transform (cmd, t, args)
-         | Some (Session_itp.AFile _f) -> Transform (cmd, t, args)
-         | Some (Session_itp.ATh _th) ->  Transform (cmd, t, args)
-         | _ -> QError ("Please select a goal or trans node in the task tree")
+         | Some _ -> Transform (cmd,t,args)
+         | None -> QError ("Please select a goal or trans node in the task tree")
        with
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
-          | Some (prover_config, limit) ->
+          | Prover (prover_config, limit) ->
              if prover_config.Whyconf.interactive then
                Edit prover_config.Whyconf.prover
              else
                Prove (prover_config, limit)
-          | None ->
-             if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
+          | Bad_Arguments prover ->
+              QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
+          | Not_Prover ->
+             if Hstr.mem cont.Controller_itp.controller_strategies cmd then
                Strategies cmd
              else
                match cmd, args with
@@ -471,6 +432,10 @@ let interp commands_table cont id s =
                    end
                | "mark", _ ->
                    Mark_Obsolete
+               | "Focus", _ ->
+                   Focus_req
+               | "Unfocus", _ ->
+                   Unfocus_req
                | "clean", _ ->
                    Clean
                | "help", [trans] ->
@@ -483,22 +448,7 @@ let interp commands_table cont id s =
                     with
                     | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
                | "help", _ ->
-                  let text = Pp.sprintf
-                               "Please type a command among the following (automatic completion available)@\n\
-                                @\n\
-                                @ <transformation name> [arguments]@\n\
-                                @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                                @ <query> [arguments]@\n\
-                                @ <strategy shortcut>@\n\
-                                @ mark @\n\
-                                @ clean @\n\
-                                @ replay @\n\
-                                @ bisect @\n\
-                                @ help <transformation_name> @\n\
-                                @ list_ide_command @ \n\
-                                @\n\
-                                Available queries are:@\n@[%a@]" help_on_queries commands_table
-                  in
+                  let text = help_message commands_table in
                   Help_message text
                | _ ->
                   Other (cmd, args)
