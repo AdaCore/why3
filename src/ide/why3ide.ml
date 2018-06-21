@@ -1782,11 +1782,11 @@ object (self)
     let item = new GMenu.menu_item item in
     item#misc#show ();
     menu#append item;
-    if add_accel then begin
+    if add_accel || accel_path <> None then begin
       let accel_path = match accel_path with
         | None -> menu_path ^ (if use_mnemonic then remove_mnemonic label else label)
         | Some ap -> ap in
-      GtkData.AccelMap.add_entry accel_path ?key ?modi;
+      if add_accel then GtkData.AccelMap.add_entry accel_path ?key ?modi;
       GtkBase.Widget.set_accel_path item#as_widget accel_path accel_group
     end;
     Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
@@ -1811,8 +1811,10 @@ end
 (* Main menu *)
 (*************)
 
+let tools_accel_group = GtkData.AccelGroup.create ()
 let factory = new menu_factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
-let context_factory = new menu_factory context_tools_menu ~accel_path:"" ~accel_group
+let context_factory = new menu_factory context_tools_menu
+  ~accel_path:"" ~accel_group:tools_accel_group
 
 let connect_menu_item i ~callback =
   let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
@@ -1869,7 +1871,6 @@ let (_: GMenu.menu_item) =
 (* "Tools" menu items *)
 
 let tools_menu = factory#add_submenu "_Tools"
-let tools_accel_group = GtkData.AccelGroup.create ()
 let tools_factory = new menu_factory tools_menu
   ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group
 
@@ -1977,11 +1978,12 @@ let add_submenu_strategy (shortcut,strategy) =
   in
   let name = String.map (function '_' -> ' ' | c -> c) strategy in
   let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
   let (key, modi) = parse_shortcut_as_key shortcut in
   let (_ : GMenu.menu_item) = strategies_factory#add_item name
-    ~use_mnemonic:false ~key ~modi ~tooltip ~callback in
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
   let (_ : GMenu.menu_item) = context_factory#add_item name
-    ~use_mnemonic:false ~add_accel:false ~tooltip ~callback in
+    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
   ()
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
@@ -1989,13 +1991,14 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
-  let (key,modi) = parse_shortcut_as_key shortcut in
   let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
+  let (key,modi) = parse_shortcut_as_key shortcut in
   let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
-    ~use_mnemonic:false ~key ~modi ~tooltip ~callback in
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
   if not (List.mem prover_parseable_name gconfig.hidden_provers) then
     let (_ : GMenu.menu_item) = context_factory#add_item prover_name
-      ~use_mnemonic:false ~add_accel:false ~tooltip ~callback in
+      ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
     ()
 
 let init_completion provers transformations strategies commands =
