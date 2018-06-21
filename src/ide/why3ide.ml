@@ -1739,6 +1739,17 @@ let new_node ?parent id name typ detached =
   else
     Hint.find node_id_to_gtree id
 
+let on_selected_rows ~multiple ~notif_kind ~action f () =
+  match get_selected_row_references () with
+  | [] ->
+    print_message ~kind:1 ~notif_kind
+      "Select at least one node to perform the '%s' action" action
+  | _ :: _ :: _ when not multiple ->
+    print_message ~kind:1 ~notif_kind
+      "Select at most one node to perform the '%s' action" action
+  | l ->
+    List.iter (fun r -> send_request (f (get_node_id r#iter))) l
+
 (**************************)
 (* Helpers for menu items *)
 (**************************)
@@ -1843,18 +1854,18 @@ let (_: GMenu.menu_item) =
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_accel_group = GtkData.AccelGroup.create ()
-let tools_factory = new GMenu.factory tools_menu
-  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group ~accel_modi:[]
+let tools_factory = new menu_factory tools_menu
+  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group
 
 let strategies_factory =
   let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  tools_factory#add_separator ();
   new GMenu.factory tools_submenu_strategies
     ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group ~accel_modi:[]
 
 let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  tools_factory#add_separator ();
   new GMenu.factory tools_submenu_provers
     ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group ~accel_modi:[]
 
@@ -1912,7 +1923,7 @@ let (_: GMenu.menu_item) =
 (* "Help" menu items *)
 
 let help_menu = factory#add_submenu "_Help"
-let help_factory = new GMenu.factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
+let help_factory = new menu_factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
 
 let (_ : GMenu.menu_item) =
   help_factory#add_item
@@ -2070,119 +2081,109 @@ let () =
     (fun (x,_) -> x >= "eliminatf" && x < "s");
   add_submenu_transform "transformations (s-z)"
                         (fun (x,_) -> x >= "s");
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  ()
+  tools_factory#add_separator ()
 
 (* complete the tools menu *)
 
-let edit_menu_item =
-  create_menu_item tools_factory "Edit" ~key:GdkKeysyms._e
-    "View or edit proof script"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
+      (fun id -> Command_req (id, "edit")) in
+  tools_factory#add_item "_Edit"
+    ~key:GdkKeysyms._E
+    ~tooltip:"View or edit proof script"
+    ~callback
 
-let replay_menu_item =
-  create_menu_item tools_factory "Replay valid obsolete proofs" ~key:GdkKeysyms._r
-    "Replay valid obsolete proofs undex the current node"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+      (fun id -> Command_req (id, "replay")) in
+  tools_factory#add_item "_Replay valid obsolete proofs"
+    ~key:GdkKeysyms._R
+    ~tooltip:"Replay valid obsolete proofs under the current node"
+    ~callback
 
-let replay_all_menu_item =
-  create_menu_item tools_factory "Replay all obsolete proofs"
-                   "Replay all obsolete proofs below the current node"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+      (fun id -> Command_req (id, "replay all")) in
+  tools_factory#add_item "Replay all obsolete proofs"
+    ~tooltip:"Replay all obsolete proofs under the current node"
+    ~callback
 
-let clean_menu_item =
-  create_menu_item tools_factory "Clean" ~key:GdkKeysyms._c
-    "Remove unsuccessful proofs or transformations that are under a proved goal"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
+      (fun id -> Command_req (id, "clean")) in
+  tools_factory#add_item "_Clean node"
+    ~key:GdkKeysyms._C
+    ~tooltip:"Remove unsuccessful proofs or transformations that are under a proved goal"
+    ~callback
 
-let remove_item =
-  create_menu_item tools_factory "Remove" ~key:GdkKeysyms._Delete
-    "Remove the selected proof attempts or transformations"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
+      (fun id -> Remove_subtree id) in
+  tools_factory#add_item "Remove node"
+    ~key:GdkKeysyms._Delete
+    ~tooltip:"Remove the selected proof attempts or transformations"
+    ~callback
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
+      (fun id -> Command_req (id, "mark")) in
+  tools_factory#add_item "Mark _obsolete"
+    ~key:GdkKeysyms._O
+    ~tooltip:"Mark all proof attempts under the current node as obsolete"
+    ~callback
 
-let mark_obsolete_item =
-  create_menu_item tools_factory "Mark obsolete" ~key:GdkKeysyms._o
-    "Mark all proof nodes below the current selected nodes as obsolete"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+      (fun id -> Command_req (id, "interrupt")) in
+  tools_factory#add_item "_Interrupt"
+    ~tooltip:"Stop all running proof attempts"
+    ~callback
 
-let interrupt_item =
-  create_menu_item tools_factory "Interrupt"
-                   "Stop all running proof attempts"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Bisect error" ~action:"bisect"
+      (fun id -> Command_req (id, "bisect")) in
+  tools_factory#add_item "_Bisect hypotheses"
+    ~tooltip:"Remove useless hypotheses from a proved goal by bisection"
+    ~callback
 
-let bisect_item =
-  create_menu_item tools_factory "Bisect on external proof"
-                   "Search for a maximal set of hypotheses to remove before calling a prover"
+let () = tools_factory#add_separator ()
 
-let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
+      (fun id -> Command_req (id, "Focus")) in
+  tools_factory#add_item "_Focus"
+    ~tooltip:"Focus view on the current node"
+    ~callback
 
-let focus_item =
-  create_menu_item tools_factory "Focus"
-    "Focus on proof node"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
+      (fun id -> Command_req (id, "Unfocus")) in
+  tools_factory#add_item "_Unfocus"
+    ~callback
 
-let unfocus_item =
-  create_menu_item tools_factory "Unfocus"
-    "Unfocus"
+let () = tools_factory#add_separator ()
 
-let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+let copy_item =
+  tools_factory#add_item "Copy node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._C
+    ~tooltip:"Copy the current node"
 
-let copy_item = create_menu_item tools_factory "Copy"
-  "Copy the current tree node (shortcut: Ctrl-c)"
-let () =
-  copy_item#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._c
-
-let paste_item = create_menu_item tools_factory "Paste"
-  "Paste the copied node below the current node (shortcut: Ctrl-v)"
-let () =
-  paste_item#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._v
-
+let paste_item =
+  tools_factory#add_item "Paste node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._V
+    ~tooltip:"Paste the copied node below the current node"
 
 let complete_context_menu () =
-  let on_selected_rows ~multiple ~notif_kind ~action f () =
-    match get_selected_row_references () with
-    | [] ->
-      print_message ~kind:1 ~notif_kind
-                    "Select at least one node to perform the '%s' action" action
-    | _ :: _ :: _ when not multiple ->
-       print_message ~kind:1 ~notif_kind
-        "Select at most one node to perform the '%s' action" action
-    | l ->
-      List.iter (fun r -> send_request (f (get_node_id r#iter))) l
-  in
-  connect_menu_item
-    replay_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
-                                (fun id -> Command_req (id, "replay")));
-  connect_menu_item
-    replay_all_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
-                                (fun id -> Command_req (id, "replay all")));
-  connect_menu_item
-    clean_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
-                                (fun id -> Command_req (id, "clean")));
-  connect_menu_item
-    mark_obsolete_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
-                                (fun id -> Command_req (id, "mark")));
-  connect_menu_item
-    interrupt_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
-                                (fun id -> Command_req (id, "interrupt")));
-  connect_menu_item
-    edit_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
-                                (fun id -> Command_req (id, "edit")));
-  connect_menu_item
-    bisect_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Bisect error" ~action:"bisect"
-                                (fun id -> Command_req (id, "bisect")));
-  connect_menu_item
-    focus_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Command_req (id, "Focus")));
-  connect_menu_item
-    remove_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
-                                (fun id -> Remove_subtree id));
-  connect_menu_item
-    unfocus_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
-                                (fun id -> Command_req (id, "Unfocus")));
   let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
   let context_edit_menu_item =
     create_menu_item context_tools_factory "Edit"
