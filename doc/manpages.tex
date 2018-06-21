@@ -315,18 +315,27 @@ transformations have changed (new version of \why), \why will detect
 that. Since the provers might answer differently on these new
 proof obligations, the corresponding proof attempts are marked obsolete.
 
+\subsection{Context Menu}
 
-\subsection{Menus}
+The left toolbar that was present in former versions of Why3 is now
+replaced by a context menu activited by clicking the right mouse button,
+while cursor is on a given row of the proof session tree.
 
-\begin{description}
-\item[Context menu]\emptyitem This menu is selected by the mouse right button on some row of the task tree view.
 \begin{description}
 \item[provers] The detected provers are listed. Note that you can hide some provers of that list using the preferences, tab \textsf{Provers}.
 \item[strategies] the set of known strategies is listed
+\item[Edit] starts an editor on the selected task.
 \item[Replay valid obsolete proofs] all proof nodes below the selected nodes that are obsolete but whose former status was Valid are replayed.
 \item[Replay all obsolete proofs] all proof nodes below the selected nodes that are obsolete are replayed.
+\item[Remove] removes a proof attempt or a transformation.
+\item[Clean] removes any unsuccessful proof attempt for which there is
+  another successful proof attempt for the same goal
+\item[Interrupt] cancels all the proof attempts currently scheduled or running.
 \end{description}
 
+\subsection{Global Menus}
+
+\begin{description}
 \item[Menu \textsf{File}]\emptyitem
 \begin{description}
 \item[Add File to session] adds a file in the current proof session.
@@ -392,8 +401,7 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \item[Mark obsolete] marks all the proof as
   obsolete.  This allows to replay every proof.
 
-\item[Interrupt] cancels all the proof attempts currently scheduled
-  but not yet started.
+\item[Interrupt] cancels all the proof attempts currently scheduled or running.
 
 \item[Bisect] performs a reduction of the context for the the current selected proof attempt, which must be a Valid one.
 
@@ -445,6 +453,29 @@ available as a textual command. However the textual interface allows
 for much more possibilities, including the ability to invoke
 transformations with arguments.
 
+\subsection{Key shortcuts}
+
+
+\begin{itemize}
+\item Save session and files : ctrl+s
+\item Save all and refresh session: ctrl+r
+\item Quit : ctrl+q
+\item Enlarge font : ctrl+plus
+\item Reduce font : ctrl+minus
+\item Collapse proven goals : !
+\item Collapse current node : -
+\item Expand current node : +
+\item Copy : ctrl+c
+\item Paste : ctrl+v
+\item Select parent node : ctrl+up
+\item Select next unproven goal : ctrl+down
+\item Change focus to command line : return
+\item Edit : e
+\item Replay : r
+\item Clean : c
+\item Remove : del
+\item Mark obsolete : o
+\end{itemize}
 
 \subsection{Preferences Dialog}
 

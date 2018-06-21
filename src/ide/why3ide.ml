@@ -2201,6 +2201,13 @@ let complete_context_menu () =
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
                                 (fun id -> Command_req (id, "Unfocus")));
   let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
+  let context_edit_menu_item =
+    create_menu_item context_tools_factory "Edit"
+                   "View or edit proof script (shortcut: e)" in
+  connect_menu_item
+    context_edit_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
+                                (fun id -> Command_req (id, "edit")));
   let replay_context_menu_item =
     create_menu_item context_tools_factory "Replay valid obsolete proofs"
                      "Replay valid obsolete proofs below the current node (shortcut: r)" in
@@ -2215,6 +2222,27 @@ let complete_context_menu () =
     replay_all_context_menu_item
     ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
                                 (fun id -> Command_req (id, "replay all")));
+  let context_remove_item =
+    create_menu_item context_tools_factory "Remove"
+                     "Remove the selected proof attempts or transformations  (shortcut: del)" in
+  connect_menu_item
+    context_remove_item
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
+                                (fun id -> Remove_subtree id));
+  let context_clean_menu_item =
+    create_menu_item context_tools_factory  "Clean"
+                   "Remove unsuccessful proofs or transformations that are below a proved goal (shortcut: c)" in
+  connect_menu_item
+    context_clean_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
+                                (fun id -> Command_req (id, "clean")));
+  let context_interrupt_item =
+  create_menu_item context_tools_factory "Interrupt"
+                   "Stop all running proof attempts" in
+  connect_menu_item
+    context_interrupt_item
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+                                (fun id -> Command_req (id, "interrupt")));
   ()
 
 
