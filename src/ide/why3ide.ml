@@ -1737,19 +1737,25 @@ let new_node ?parent id name typ detached =
 (* Helpers for menu items *)
 (**************************)
 
-let menu_factory ~accel_path:ap ~accel_group:ag menu =
-  fun ?key ?accel_path ?(accel_group=ag) ?(modi=[]) ?submenu ?(use_mnemonic=true) ?tooltip ?callback label ->
-  let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
-  let item = new GMenu.menu_item item in
-  item#misc#show ();
-  menu#append item;
-  let ap = match accel_path with None -> ap ^ label | Some ap -> ap in
-  GtkData.AccelMap.add_entry ap ?key ~modi;
-  GtkBase.Widget.set_accel_path item#as_widget ap accel_group;
-  Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
-  Opt.iter item#set_submenu submenu;
-  Opt.iter item#misc#set_tooltip_markup tooltip;
-  item
+class menu_factory ~accel_path:menu_path ~accel_group:menu_group menu =
+object (self)
+  method private aux ?key ~accel_path ?(accel_group=menu_group) ?(modi=[])
+    ?tooltip ?callback item =
+    GtkData.AccelMap.add_entry accel_path ?key ~modi;
+    GtkBase.Widget.set_accel_path item#as_widget accel_path accel_group;
+    Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
+    Opt.iter item#misc#set_tooltip_markup tooltip
+  method add_item ?key ?accel_path ?accel_group ?modi ?submenu
+    ?(use_mnemonic=true) ?tooltip ?callback label =
+    let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
+    let item = new GMenu.menu_item item in
+    item#misc#show ();
+    menu#append item;
+    let ap = match accel_path with None -> menu_path ^ label | Some ap -> ap in
+    self#aux ?key ~accel_path:ap ?accel_group ?modi ?tooltip ?callback item;
+    Opt.iter item#set_submenu submenu;
+    item
+end
 
 (*************)
 (* Main menu *)
@@ -1856,53 +1862,53 @@ let () =
 (* "View" menu items *)
 
 let view_menu = factory#add_submenu "_View"
-let view_factory = menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
+let view_factory = new menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
 
 let (_ : GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._plus
-    ~callback:enlarge_fonts "Enlarge font"
+  view_factory#add_item "Enlarge font"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._plus
+    ~callback:enlarge_fonts
 
 let (_ : GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._minus
-    ~callback:reduce_fonts "Reduce font"
+  view_factory#add_item "Reduce font"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._minus
+    ~callback:reduce_fonts
 
 let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
+  view_factory#add_item "Collapse proven goals"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
     ~tooltip:"Collapse all the proven nodes under the current node"
     ~callback:collapse_proven_goals
-    "Collapse proven goals"
 
 let (_: GMenu.menu_item) =
-  view_factory
+  view_factory#add_item "Expand all"
     ~tooltip:"Expand all nodes of the tree view"
     ~callback:goals_view#expand_all
-    "Expand all"
 
 let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
+  view_factory#add_item "Collapse current node"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
     ~callback:collapse_row
-    "Collapse current node"
 
 let (_: GMenu.menu_item) =
-  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
+  view_factory#add_item "Expand current node"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
     ~tooltip:"Expand current node, or its children when already expanded"
     ~callback:expand_row
-    "Expand current node"
 
 let (_: GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+  view_factory#add_item "Go to parent node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
     ~callback:move_current_row_selection_to_parent
-    "Go to parent node"
 
 let (_: GMenu.menu_item) =
-  view_factory
+  view_factory#add_item "Go to first child"
     ~callback:move_current_row_selection_to_first_child
-    "Go to first child"
 
 let (_: GMenu.menu_item) =
-  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Down
+  view_factory#add_item "Select next unproven goal"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Down
     ~callback:move_to_next_unproven_node_id
-    "Select next unproven goal"
 
 (* "Help" menu items *)
 
