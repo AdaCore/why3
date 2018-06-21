@@ -1754,6 +1754,27 @@ let on_selected_rows ~multiple ~notif_kind ~action f () =
 (* Helpers for menu items *)
 (**************************)
 
+let remove_mnemonic s =
+  try
+    let j = ref (String.index s '_') in
+    let i = ref 0 in
+    let n = String.length s in
+    let b = Buffer.create n in
+    try
+      while true do
+        Buffer.add_substring b s !i (!j - !i);
+        i := !j + 1;
+        if !i = n then raise Not_found;
+        Buffer.add_char b s.[!i];
+        incr i;
+        j := String.index_from s !i '_';
+      done;
+      assert false
+    with Not_found ->
+      Buffer.add_substring b s !i (n - !i);
+      Buffer.contents b
+  with Not_found -> s
+
 class menu_factory ~accel_path:menu_path ~accel_group:menu_group menu =
 object (self)
   method private aux ?key ~accel_path ?(accel_group=menu_group) ?(modi=[])
@@ -1768,7 +1789,9 @@ object (self)
     let item = new GMenu.menu_item item in
     item#misc#show ();
     menu#append item;
-    let ap = match accel_path with None -> menu_path ^ label | Some ap -> ap in
+    let ap = match accel_path with
+      | None -> menu_path ^ (if use_mnemonic then remove_mnemonic label else label)
+      | Some ap -> ap in
     self#aux ?key ~accel_path:ap ?accel_group ?modi ?tooltip ?callback item;
     item
   method add_separator () =
@@ -1790,7 +1813,7 @@ end
 (* Main menu *)
 (*************)
 
-let factory = new GMenu.factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
+let factory = new menu_factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
 
 let create_menu_item (factory:GMenu.menu GMenu.factory)
                      ?key label tooltip =
@@ -1939,12 +1962,6 @@ let (_ : GMenu.menu_item) =
 (* "Tools" submenus for strategies, provers, and transformations *)
 (*****************************************************************)
 
-let sanitize_markup x =
-  let remove = function
-    | '_' -> "__"
-    | c -> String.make 1 c in
-  Ident.sanitizer remove remove (Glib.Markup.escape_text x)
-
 let string_of_desc desc =
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
@@ -2060,26 +2077,29 @@ let () =
   let transformations = Server_utils.list_transforms () in
   let add_submenu_transform name filter =
     let submenu = tools_factory#add_submenu name in
-    let submenu = new GMenu.factory submenu
-      ~accel_path:("<Why3-Main>/Tools/" ^ name) ~accel_group:tools_accel_group ~accel_modi:[] in
+    let submenu = new menu_factory submenu
+      ~accel_path:("<Why3-Main>/Tools/" ^ name ^ "/")
+      ~accel_group:tools_accel_group in
     let iter ((name,_) as desc) =
-      let callback () = interp name in
-      let i = create_menu_item submenu (sanitize_markup name) (string_of_desc desc) in
-      connect_menu_item i ~callback
+      let (_ : GMenu.menu_item) = submenu#add_item (Glib.Markup.escape_text name)
+        ~use_mnemonic:false
+        ~tooltip:(string_of_desc desc)
+        ~callback:(fun () -> interp name) in
+      ()
     in
     let trans = List.filter filter transformations in
     List.iter iter trans
   in
   add_submenu_transform
-    "transformations (a-e)"
+    "Transformations (a-e)"
     (fun (x,_) -> x < "eliminate");
   add_submenu_transform
-    "transformations (eliminate)"
+    "Transformations (eliminate)"
     (fun (x,_) -> x >= "eliminate" && x < "eliminatf");
   add_submenu_transform
-    "transformations (e-r)"
+    "Transformations (e-r)"
     (fun (x,_) -> x >= "eliminatf" && x < "s");
-  add_submenu_transform "transformations (s-z)"
+  add_submenu_transform "Transformations (s-z)"
                         (fun (x,_) -> x >= "s");
   tools_factory#add_separator ()
 
