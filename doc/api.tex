@@ -296,7 +296,7 @@ quantifier.
 \lstinputlisting{generated/transform__negate.ml}
 
 The following illustrates how to turn such an OCaml function into a
-transformation in the sens of Why3 API. moreover, it registers that
+transformation in the sense of the Why3 API. Moreover, it registers that
 transformation to make it available for example in Why3 IDE.
 \lstinputlisting{generated/transform__register.ml}
 
@@ -331,7 +331,7 @@ module, then the module itself called \verb|Program|.
 \lstinputlisting{generated/mlw_tree__openmodule.ml}
 Notice the use of a first
 simple helper function \verb|mk_ident| to build an identifier without
-any label nor any location.
+any attributes nor any location.
 
 To write our programs, we need to import some other modules from the
 standard library. The following introduces two helper functions for
@@ -367,7 +367,7 @@ file, under the form of a map of module names to modules.
 \lstinputlisting{generated/mlw_tree__closemodule.ml}
 
 We can then construct the proofs tasks for our module, and then try to
-call the Alt-Ergo prover. The reste of that code is using OCaml
+call the Alt-Ergo prover. The rest of that code is using OCaml
 functions that were already introduced before.
 \lstinputlisting{generated/mlw_tree__checkingvcs.ml}
 
