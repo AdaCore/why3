@@ -494,6 +494,11 @@ module Translate = struct
         if eff_pure e.e_effect then []
         else let unit_ = pv (* create_pvsymbol (id_fresh "_") ity_unit *) in
           [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty MaskGhost e))]
+    | PDlet (LDvar (pv,  {e_node = Eexec ({c_node = Cany}, cty)})) ->
+        Debug.dprintf debug_compile "compiling undifined constant %a@"
+          print_pv pv;
+        let ty = mlty_of_ity cty.cty_mask cty.cty_result in
+        [ML.Dlet (ML.Lvar (pv, ML.e_any ty cty))]
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_compile "compiling top-level symbol %a@."
           print_pv pv;
@@ -674,7 +679,7 @@ module Transform = struct
         mk (Eraise (exn, Some e)), spv
     | Eassign _al ->
         e, Spv.empty
-    | Econst _ | Eabsurd | Ehole -> e, Spv.empty
+    | Econst _ | Eabsurd | Ehole | Eany _ -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
         mk (Eignore e), spv

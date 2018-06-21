@@ -387,6 +387,10 @@ module Print = struct
         (print_expr info) e
 
   and print_let_def ?(functor_arg=false) info fmt = function
+    | Lvar (pv, {e_node = Eany ty}) when functor_arg ->
+        fprintf fmt "@[<hov 2>val %a : %a@]"
+          (print_lident info) (pv_name pv)
+          (print_ty info) ty;
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
           (print_lident info) (pv_name pv)
@@ -424,7 +428,8 @@ module Print = struct
         forget_vars args
     | Lany (rs, _, _) -> check_val_in_drv info rs
 
-  and print_expr ?(paren=false) info fmt e = match e.e_node with
+  and print_expr ?(paren=false) info fmt e =
+    match e.e_node with
     | Econst c ->
         let n = Number.compute_int_constant c in
         let n = BigInt.to_string n in
@@ -445,6 +450,7 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
+    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -612,6 +618,7 @@ module Print = struct
   let rec is_signature_decl info = function
     | Dtype _ -> true
     | Dlet (Lany _) -> true
+    | Dlet (Lvar (_, {e_node = Eany _})) -> true
     | Dlet _ -> false
     | Dexn _ -> true
     | Dmodule (_, dl) -> is_signature info dl

@@ -1011,7 +1011,7 @@ module MLToC = struct
          | None, None -> raise (Unsupported ("assign not in driver")) in
        [], C.(Sexpr(Ebinop(Bassign, t, C.Evar v.pv_vs.vs_name)))
     | Eassign _ -> raise (Unsupported "assign")
-    | Ehole -> assert false
+    | Ehole | Eany _ -> assert false
     | Eexn _ -> raise (Unsupported "exception")
     | Eignore e ->
        [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),

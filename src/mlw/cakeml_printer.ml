@@ -227,7 +227,8 @@ module Print = struct
     | Lany (rs, _, _) ->
         check_val_in_drv info rs
 
-  and print_expr ?(paren=false) info fmt e = match e.e_node with
+  and print_expr ?(paren=false) info fmt e =
+    match e.e_node with
     | Econst c ->
         let n = Number.compute_int_constant c in
         let n = BigInt.to_string n in
@@ -246,6 +247,7 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
+    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->

@@ -769,6 +769,8 @@ let rec interp_expr info (e:Mltree.expr) : value =
                raise CannotReduce
   | Ehole -> Debug.dprintf debug_interp "Ehole@.";
              raise CannotReduce
+  | Eany _ -> Debug.dprintf debug_interp "Eany@.";
+             raise CannotReduce
   | Ematch (e, l, bl) ->
      Debug.dprintf debug_interp "Ematch@.";
      begin match interp_expr info e with

@@ -63,6 +63,7 @@ and expr_node =
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
   | Eignore of expr
+  | Eany    of ty
   | Eabsurd
   | Ehole
 
@@ -183,7 +184,7 @@ and iter_deps_pat f = function
   | Pas (p, _) -> iter_deps_pat f p
 
 and iter_deps_expr f e = match e.e_node with
-  | Econst _ | Evar _ | Eabsurd | Ehole -> ()
+  | Econst _ | Evar _ | Eabsurd | Ehole | Eany _ -> ()
   | Eapp (rs, exprl) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
   | Efun (args, e) ->
@@ -279,6 +280,9 @@ let is_unit = function
   | _ -> false
 
 let enope = Eblock []
+
+let e_any ty c =
+  mk_expr (Eany ty) (C c) MaskVisible Ity.eff_empty Sattr.empty
 
 let mk_hole =
   mk_expr Ehole (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
