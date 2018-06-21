@@ -1883,8 +1883,8 @@ let tools_factory = new menu_factory tools_menu
 let strategies_factory =
   let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
   tools_factory#add_separator ();
-  new GMenu.factory tools_submenu_strategies
-    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group ~accel_modi:[]
+  new menu_factory tools_submenu_strategies
+    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group
 
 let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
@@ -1971,33 +1971,33 @@ let string_of_desc desc =
 let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
 
 let parse_shortcut_as_key s =
-  match GtkData.AccelGroup.parse s with
-  | (0,[]) ->
-     Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s;
-     None
-  | (key, modi) ->
-     let name = GtkData.AccelGroup.name ~key ~modi in
-     Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name;
-     Some (name, key, modi)
+  let (key,modi) as r = GtkData.AccelGroup.parse s in
+  begin if key = 0 then
+    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
+  else
+    let name = GtkData.AccelGroup.name ~key ~modi in
+    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
+  end;
+  r
 
 let add_submenu_strategy (shortcut,strategy) =
-  let  i = create_menu_item
-             strategies_factory
-             (String.map (function '_' -> ' ' | c -> c) strategy)
-             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
-  in
   let callback () =
     Debug.dprintf debug "interp command '%s'@." strategy;
     interp strategy
   in
-  connect_menu_item i ~callback;
+  let (key, modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = strategies_factory#add_item
+    (String.map (function '_' -> ' ' | c -> c) strategy)
+    ~use_mnemonic:false
+    ~key ~modi
+    ~tooltip:("run strategy " ^ strategy ^ " on selected goal")
+    ~callback
+  in
   let  i = create_menu_item
              context_tools_factory
              (String.map (function '_' -> ' ' | c -> c) strategy)
-             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
+             ("run strategy " ^ strategy ^ " on selected goal")
   in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
   connect_menu_item i ~callback
 
 
@@ -2007,8 +2007,8 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
              prover_name
              ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
   in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
+  let (key,modi) = parse_shortcut_as_key shortcut in
+  if key > 0 then i#add_accelerator ~group:tools_accel_group ~modi key;
   let callback () =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
