@@ -425,6 +425,20 @@ let hb = GPack.hbox ~packing:vbox#add ()
 
 (* 1. Menu *)
 
+let menu_factory ~accel_path:ap ~accel_group:ag menu =
+  fun ?key ?accel_path ?(accel_group=ag) ?(modi=[]) ?submenu ?(use_mnemonic=true) ?tooltip ?callback label ->
+  let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
+  let item = new GMenu.menu_item item in
+  item#misc#show ();
+  menu#append item;
+  let ap = match accel_path with None -> ap ^ label | Some ap -> ap in
+  GtkData.AccelMap.add_entry ap ?key ~modi;
+  GtkBase.Widget.set_accel_path item#as_widget ap accel_group;
+  Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
+  Opt.iter item#set_submenu submenu;
+  Opt.iter item#misc#set_tooltip_markup tooltip;
+  item
+
 let accel_group = GtkData.AccelGroup.create ()
 
 let factory = new GMenu.factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
@@ -1293,23 +1307,15 @@ let apply_loc_on_ce (l: (Loc.position * color) list) =
 (*******************)
 
 let view_menu = factory#add_submenu "_View"
-let view_factory = new GMenu.factory view_menu
-  ~accel_path:"<Why3-Main>/View/" ~accel_group
-
-(* goals view is not yet multi-selectable
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._A
-    ~label:"Select all"
-    ~callback:(fun () -> goals_view#selection#select_all ()) ()
- *)
+let view_factory = menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
 
 let (_ : GMenu.menu_item) =
-  view_factory#add_item ~key:GdkKeysyms._plus
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._plus
     ~callback:enlarge_fonts "Enlarge font"
 
 let (_ : GMenu.menu_item) =
-    view_factory#add_item ~key:GdkKeysyms._minus
-      ~callback:reduce_fonts "Reduce font"
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._minus
+    ~callback:reduce_fonts "Reduce font"
 
 let collapse_iter iter =
   let path = goals_model#get_path iter in
@@ -1331,20 +1337,17 @@ let collapse_proven_goals () =
   | None -> ()
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
 
-let () =
-  let i = view_factory#add_item
-            "Collapse proven goals"
-            ~callback:(fun () -> collapse_proven_goals ())
-  in
-  i#add_accelerator ~group:tools_accel_group GdkKeysyms._exclam;
-  i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: !)";
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
+    ~tooltip:"Collapse all the proven nodes under the current node"
+    ~callback:collapse_proven_goals
+    "Collapse proven goals"
 
-  let i = view_factory#add_item
-            "Expand all"
-            ~callback:(fun () -> goals_view#expand_all ())
-  in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view"
-
+let (_: GMenu.menu_item) =
+  view_factory
+    ~tooltip:"Expand all nodes of the tree view"
+    ~callback:goals_view#expand_all
+    "Expand all"
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
@@ -1426,40 +1429,31 @@ let move_to_next_unproven_node_id () =
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
 
-let () =
-  let i = view_factory#add_item
-            "Collapse current node"
-            ~callback:collapse_row
-  in
-  i#add_accelerator ~group:tools_accel_group GdkKeysyms._minus;
-  i#misc#set_tooltip_markup "Collapse current node (shortcut: -)";
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
+    ~callback:collapse_row
+    "Collapse current node"
 
-  let i = view_factory#add_item
-            "Expand current node "
-            ~callback:expand_row
-  in
-  i#add_accelerator ~group:tools_accel_group GdkKeysyms._plus;
-  i#misc#set_tooltip_markup "Expand current node, or its children when already expanded (shortcut: +)";
+let (_: GMenu.menu_item) =
+  view_factory ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
+    ~tooltip:"Expand current node, or its children when already expanded"
+    ~callback:expand_row
+    "Expand current node"
 
-  let i = view_factory#add_item
-            "Go to parent node"
-            ~key:GdkKeysyms._Up
-            ~callback:(fun () -> move_current_row_selection_to_parent ())
-  in
-  i#misc#set_tooltip_markup "Go to parent";
+let (_: GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:move_current_row_selection_to_parent
+    "Go to parent node"
 
-  let i = view_factory#add_item
-            "Go to first child"
-            ~callback:(fun () -> move_current_row_selection_to_first_child ())
-  in
-  i#misc#set_tooltip_markup "Go to first child";
+let (_: GMenu.menu_item) =
+  view_factory
+    ~callback:move_current_row_selection_to_first_child
+    "Go to parent node"
 
-  let i = view_factory#add_item
-            "Select next unproven goal"
-            ~key:GdkKeysyms._Down
-            ~callback:(fun () -> move_to_next_unproven_node_id ())
-  in
-  i#misc#set_tooltip_markup "Select next unproven goal"
+let (_: GMenu.menu_item) =
+  view_factory ~modi:[`CONTROL] ~key:GdkKeysyms._Down
+    ~callback:move_to_next_unproven_node_id
+    "Select next unproven goal"
 
 (* unused
 let rec update_status_column_from_iter cont iter =
