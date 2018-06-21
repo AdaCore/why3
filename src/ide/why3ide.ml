@@ -2188,7 +2188,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
       (fun id -> Command_req (id, "edit")) in
   context_factory#add_item "_Edit"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Edit" ~add_accel:false
     ~tooltip:"View or edit proof script"
     ~callback
 in ();
@@ -2198,7 +2198,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
       (fun id -> Command_req (id, "replay")) in
   context_factory#add_item "_Replay valid obsolete proofs"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Replay valid obsolete proofs" ~add_accel:false
     ~tooltip:"Replay valid obsolete proofs under the current node"
     ~callback
 in ();
@@ -2208,7 +2208,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
       (fun id -> Command_req (id, "replay all")) in
   context_factory#add_item "Replay all obsolete proofs"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Replay all obsolete proofs" ~add_accel:false
     ~tooltip:"Replay all obsolete proofs under the current node"
     ~callback
 in ();
@@ -2218,7 +2218,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
       (fun id -> Command_req (id, "clean")) in
   context_factory#add_item "_Clean node"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Clean node" ~add_accel:false
     ~tooltip:"Remove unsuccessful proofs or transformations that are under a proved goal"
     ~callback
 in ();
@@ -2228,7 +2228,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
       (fun id -> Remove_subtree id) in
   context_factory#add_item "Remove node"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Remove node" ~add_accel:false
     ~tooltip:"Remove the selected proof attempts or transformations"
     ~callback
 in ();
@@ -2238,7 +2238,7 @@ let (_ : GMenu.menu_item) =
     on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
       (fun id -> Command_req (id, "interrupt")) in
   context_factory#add_item "_Interrupt"
-    ~add_accel:false
+    ~accel_path:"<Why3-Main>/Tools/Interrupt" ~add_accel:false
     ~tooltip:"Stop all running proof attempts"
     ~callback
 in ()
