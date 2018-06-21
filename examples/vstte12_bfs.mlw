@@ -83,6 +83,9 @@ module BFS
 
   function (!!) (s: B.t) : set vertex = B.contents s
 
+  val pick_succ (v: vertex) : B.t
+    ensures { !!result = succ v }
+
   (* function fill_next fills set next with the unvisited successors of v *)
   let fill_next (s t v: vertex) (visited current next: B.t) (d:ref int)
     requires { inv s t !!visited !!current !!next !d /\
@@ -91,7 +94,7 @@ module BFS
     ensures { inv s t !!visited !!current !!next !d /\
       subset (succ v) !!visited  /\
       (forall x: vertex. closure !!visited !!current !!next x) }
-  = let acc = any B.t ensures { !!result = succ v } in
+  = let acc = pick_succ v in
     while not (B.is_empty acc) do
       invariant {
         inv s t !!visited !!current !!next !d /\
