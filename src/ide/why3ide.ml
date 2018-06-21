@@ -434,7 +434,6 @@ let accel_group = GtkData.AccelGroup.create ()
 (* context_tools : simplified tools menu for mouse-3 *)
 
 let context_tools_menu = GMenu.menu ()
-let context_tools_factory = new GMenu.factory context_tools_menu ~accel_group
 
 (****************************)
 (* actions of the interface *)
@@ -1813,12 +1812,7 @@ end
 (*************)
 
 let factory = new menu_factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
-
-let create_menu_item (factory:GMenu.menu GMenu.factory)
-                     ?key label tooltip =
-  let i = factory#add_item ?key label in
-  i#misc#set_tooltip_markup tooltip;
-  i
+let context_factory = new menu_factory context_tools_menu ~accel_path:"" ~accel_group
 
 let connect_menu_item i ~callback =
   let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
@@ -1981,21 +1975,14 @@ let add_submenu_strategy (shortcut,strategy) =
     Debug.dprintf debug "interp command '%s'@." strategy;
     interp strategy
   in
+  let name = String.map (function '_' -> ' ' | c -> c) strategy in
+  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
   let (key, modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = strategies_factory#add_item
-    (String.map (function '_' -> ' ' | c -> c) strategy)
-    ~use_mnemonic:false
-    ~key ~modi
-    ~tooltip:("run strategy " ^ strategy ^ " on selected goal")
-    ~callback
-  in
-  let  i = create_menu_item
-             context_tools_factory
-             (String.map (function '_' -> ' ' | c -> c) strategy)
-             ("run strategy " ^ strategy ^ " on selected goal")
-  in
-  connect_menu_item i ~callback
-
+  let (_ : GMenu.menu_item) = strategies_factory#add_item name
+    ~use_mnemonic:false ~key ~modi ~tooltip ~callback in
+  let (_ : GMenu.menu_item) = context_factory#add_item name
+    ~use_mnemonic:false ~add_accel:false ~tooltip ~callback in
+  ()
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
   let callback () =
@@ -2003,23 +1990,13 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
     interp prover_parseable_name
   in
   let (key,modi) = parse_shortcut_as_key shortcut in
+  let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
   let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
-    ~use_mnemonic:false
-    ~key ~modi
-    ~tooltip:("run prover " ^ prover_name ^ " on selected goal")
-    ~callback
-  in
+    ~use_mnemonic:false ~key ~modi ~tooltip ~callback in
   if not (List.mem prover_parseable_name gconfig.hidden_provers) then
-    begin
-      let  i = create_menu_item
-             context_tools_factory
-             prover_name
-             ("run prover " ^ prover_name ^ " on selected goal")
-      in
-      connect_menu_item i ~callback;
-    end
-
-
+    let (_ : GMenu.menu_item) = context_factory#add_item prover_name
+      ~use_mnemonic:false ~add_accel:false ~tooltip ~callback in
+    ()
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
@@ -2043,7 +2020,7 @@ let init_completion provers transformations strategies commands =
               provers
   in
   List.iter add_submenu_prover provers_sorted;
-  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
+  context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
@@ -2198,51 +2175,70 @@ let paste_item =
     ~modi:[`CONTROL] ~key:GdkKeysyms._V
     ~tooltip:"Paste the copied node below the current node"
 
+(* complete the contextual menu (but only after provers and strategies, hence the function) *)
+
 let complete_context_menu () =
-  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
-  let context_edit_menu_item =
-    create_menu_item context_tools_factory "_Edit"
-      "View or edit proof script" in
-  connect_menu_item
-    context_edit_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
-                                (fun id -> Command_req (id, "edit")));
-  let replay_context_menu_item =
-    create_menu_item context_tools_factory "_Replay valid obsolete proofs"
-      "Replay valid obsolete proofs under the current node" in
-  connect_menu_item
-    replay_context_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
-                                (fun id -> Command_req (id, "replay")));
-  let replay_all_context_menu_item =
-    create_menu_item context_tools_factory "Replay all obsolete proofs"
-      "Replay all obsolete proofs under the current node" in
-  connect_menu_item
-    replay_all_context_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
-                                (fun id -> Command_req (id, "replay all")));
-  let context_remove_item =
-    create_menu_item context_tools_factory "Remove"
-      "Remove the selected proof attempts or transformations" in
-  connect_menu_item
-    context_remove_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
-                                (fun id -> Remove_subtree id));
-  let context_clean_menu_item =
-    create_menu_item context_tools_factory "_Clean"
-      "Remove unsuccessful proofs or transformations that are under a proved goal" in
-  connect_menu_item
-    context_clean_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
-                                (fun id -> Command_req (id, "clean")));
-  let context_interrupt_item =
-  create_menu_item context_tools_factory "_Interrupt"
-                   "Stop all running proof attempts" in
-  connect_menu_item
-    context_interrupt_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
-                                (fun id -> Command_req (id, "interrupt")));
-  ()
+  context_factory#add_separator ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
+      (fun id -> Command_req (id, "edit")) in
+  context_factory#add_item "_Edit"
+    ~add_accel:false
+    ~tooltip:"View or edit proof script"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+      (fun id -> Command_req (id, "replay")) in
+  context_factory#add_item "_Replay valid obsolete proofs"
+    ~add_accel:false
+    ~tooltip:"Replay valid obsolete proofs under the current node"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+      (fun id -> Command_req (id, "replay all")) in
+  context_factory#add_item "Replay all obsolete proofs"
+    ~add_accel:false
+    ~tooltip:"Replay all obsolete proofs under the current node"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
+      (fun id -> Command_req (id, "clean")) in
+  context_factory#add_item "_Clean node"
+    ~add_accel:false
+    ~tooltip:"Remove unsuccessful proofs or transformations that are under a proved goal"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
+      (fun id -> Remove_subtree id) in
+  context_factory#add_item "Remove node"
+    ~add_accel:false
+    ~tooltip:"Remove the selected proof attempts or transformations"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+      (fun id -> Command_req (id, "interrupt")) in
+  context_factory#add_item "_Interrupt"
+    ~add_accel:false
+    ~tooltip:"Stop all running proof attempts"
+    ~callback
+in ()
 
 (*************************************)
 (* Copy paste                        *)
