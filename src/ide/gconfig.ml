@@ -611,9 +611,8 @@ let show_about_window () =
                 "Martin Clochard";
                 "Simon Cruanes";
                 "Sylvain Dailler";
-                "Jacques-Pascal Deplaix";
                 "Clément Fumex";
-                "Leon Gondelman";
+                "Léon Gondelman";
                 "David Hauzar";
                 "Daisuke Ishii";
                 "Johannes Kanig";
@@ -622,6 +621,8 @@ let show_about_window () =
                 "Benjamin Monate";
                 "Kim Nguyễn";
                 "Thi-Minh-Tuyen Nguyen";
+                "Mário Pereira";
+                "Raphaël Rieu-Helft";
                 "Simão Melo de Sousa";
                 "Asma Tafat";
                 "Piotr Trojanek";
