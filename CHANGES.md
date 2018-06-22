@@ -26,6 +26,7 @@ Language
   * support for type coercions in logic using `meta coercion`
   * deprecated `theory`; use `module` instead
   * term on the left of sequence `;` must be of type `unit` :x:
+  * cloned axioms are now turned into lemmas; use `with axiom foo` to prevent :x:
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
@@ -34,7 +35,7 @@ Standard library
 Extraction
   * improved extraction to OCaml
   * added partial extraction to C using the memory model of `mach.c`
-  * added extraction to CakeML (using 'why3 extract -D cakeml ...')
+  * added extraction to CakeML (using `why3 extract -D cakeml ...`)
 
 Transformations
   * transformations can now have arguments
@@ -45,10 +46,10 @@ Drivers
   * support for `use` in theory drivers
 
 IDE
-  * left toolbar replaced by a context menu
+  * replaced left toolbar by a contextual menu
   * source is now editable
   * premises are no longer implicitly introduced
-  * command-line interface to call transformations and provers
+  * added textual interface to call transformations and provers
 
 Tools
   * deprecated `.why` file extension; use `.mlw` instead
