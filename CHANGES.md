@@ -45,6 +45,7 @@ Drivers
   * support for `use` in theory drivers
 
 IDE
+  * left toolbar replaced by a context menu
   * source is now editable
   * premises are no longer implicitly introduced
   * command-line interface to call transformations and provers
