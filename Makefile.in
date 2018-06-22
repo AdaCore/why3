@@ -700,7 +700,7 @@ gallery-simple::
 
 .PHONY: gallery-subs
 
-GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp prover
+GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp prover multiprecision
 
 gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
@@ -711,7 +711,7 @@ gallery-subs::
 	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
-	  zip -q -r $(GALLERYDIR)/$$d/$$d.zip $$d; \
+	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
 	  cd ..; \
 	done
 
