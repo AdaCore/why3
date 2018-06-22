@@ -409,7 +409,9 @@ let interp commands_table cont id s =
               QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
           | Not_Prover ->
              if Hstr.mem cont.Controller_itp.controller_strategies cmd then
-               Strategies cmd
+               match id with
+               | None   -> QError ("Please select a node in the task tree")
+               | Some _ -> Strategies cmd
              else
                match cmd, args with
                | "edit", _ ->
@@ -438,7 +440,12 @@ let interp commands_table cont id s =
                | "mark", _ ->
                    Mark_Obsolete
                | "Focus", _ ->
-                   Focus_req
+                   begin
+                     match id with
+                     | None ->
+                         QError ("Select at least one node of the task tree")
+                     | Some _ -> Focus_req
+                   end
                | "Unfocus", _ ->
                    Unfocus_req
                | "clean", _ ->

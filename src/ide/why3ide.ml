@@ -2160,9 +2160,7 @@ let (_ : GMenu.menu_item) =
     ~callback
 
 let (_ : GMenu.menu_item) =
-  let callback =
-    on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
-      (fun id -> Command_req (id, "Unfocus")) in
+  let callback = fun () -> send_request (Unfocus_req) in
   tools_factory#add_item "_Unfocus"
     ~callback
 
