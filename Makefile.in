@@ -158,8 +158,8 @@ endif
 .PHONY: install-bash install-emacs install-framac
 .PHONY: uninstall-bash uninstall-emacs uninstall-framac
 .PHONY: ide install-ide uninstall-ide
-.PHONY: coq install-coq uninstall-coq
-.PHONY: pvs install-pvs uninstall-pvs
+.PHONY: coq install-coq uninstall-coq clean-coq
+.PHONY: pvs install-pvs uninstall-pvs clean-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
@@ -1029,10 +1029,10 @@ COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
 COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 
-coq: $(COQVO) drivers/coq-realizations.aux
+coq: $(COQVO) drivers/coq-realizations.aux lib/coq/version
 
 clean-coq:
-	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version
 
 clean:: clean-coq
 
@@ -1163,8 +1163,6 @@ clean::
 # PVS realizations
 ####################
 
-ifeq (@enable_pvs_libs@,yes)
-
 PVSLIBS_INT_FILES = Int Abs MinMax ComputerDivision EuclideanDivision
 PVSLIBS_INT = $(addprefix lib/pvs/int/, $(PVSLIBS_INT_FILES))
 
@@ -1187,6 +1185,13 @@ PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
 PVSLIBS_FILES = $(PVSLIBS_INT) $(PVSLIBS_REAL) $(PVSLIBS_LIST) \
                 $(PVSLIBS_NUMBER) $(PVSLIBS_FP)
 
+update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
+	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
+	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
+	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
+	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
+	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
+
 drivers/pvs-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)(echo "(* generated automatically at compilation time *)"; \
@@ -1201,6 +1206,15 @@ drivers/pvs-realizations.aux: Makefile
 	for f in $(PVSLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
+
+pvs: lib/pvs/version
+
+clean-pvs:
+	rm -f lib/pvs/version
+
+clean:: clean-pvs
+
+ifeq (@enable_pvs_libs@,yes)
 
 uninstall-pvs:
 	rm -rf $(LIBDIR)/why3/pvs
@@ -1221,18 +1235,7 @@ install-pvs:
 
 install:: install-pvs
 
-update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
-	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
-	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
-	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
-	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
-	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
-
-else
-
-drivers/pvs-realizations.aux: Makefile
-	$(SHOW) 'Generate $@'
-	$(HIDE)echo "(* generated automatically at compilation time *)" > $@
+all: pvs
 
 endif
 
