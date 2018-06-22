@@ -1,4 +1,3 @@
-
 (* Dijkstra's "Dutch national flag"
 
    The following program sorts an array whose elements may have three
@@ -22,16 +21,15 @@
    4. Show that after execution the array contents is a permutation of its
       initial contents. Use the library predicate "permut_all" to do so
       (the corresponding module ArrayPermut is already imported).
-
 *)
 
 module Flag
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
 
   type color = Blue | White | Red
 

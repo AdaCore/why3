@@ -1,4 +1,3 @@
-
 (* Euclidean division
 
    1. Prove soundness, i.e. (division a b) returns an integer q such that
@@ -9,13 +8,12 @@
 
    2. Prove termination.
       (You may have to strengthen the precondition even further.)
-
 *)
 
 module Division
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   let division (a b: int) : int
     requires { true }

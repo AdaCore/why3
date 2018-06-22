@@ -3,7 +3,7 @@
    Multiply two integers a and b using only addition, multiplication by 2,
    and division by 2. You may assume b to be nonnegative.
 
-   Note: library int.ComputerDivision (already imported) provide functions
+   Note: library int.ComputerDivision (already imported) provides functions
    "div" and "mod".
 
    Questions:
@@ -11,14 +11,13 @@
    1. Prove soundness of function multiplication.
 
    2. Prove its termination.
-
 *)
 
 module Multiplication
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
 
   let multiplication (a b: int) : int
     requires { true }
@@ -34,8 +33,11 @@ module Multiplication
     done;
     !z
 
+  let main () =
+    multiplication 10 13
+
 end
 
-(* Note: this is exactly the same algorithm as exponentiation by squarring
+(* Note: this is exactly the same algorithm as exponentiation by squaring
    with power/*/1 being replaced by */+/0.
 *)
