@@ -388,7 +388,7 @@ module Print = struct
   let () = assert (List.length c_keywords = 32)
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
-  let sanitizer s = String.lowercase (sanitizer s)
+  let sanitizer s = Strings.lowercase (sanitizer s)
   let printer = create_ident_printer c_keywords ~sanitizer
 
   let print_ident fmt id = fprintf fmt "%s" (id_unique printer id)
@@ -1153,7 +1153,7 @@ let name_gen suffix ?fname m =
   let r = match fname with
     | None -> n ^ suffix
     | Some f -> f ^ "__" ^ n ^ suffix in
-  String.lowercase r
+  Strings.lowercase r
 
 let file_gen = name_gen ".c"
 let header_gen = name_gen ".h"
