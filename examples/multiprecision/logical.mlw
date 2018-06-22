@@ -314,52 +314,7 @@ module Logical
       (*nonlinear part*)
       assert { retval + radix * (value r (!i+1)
                  + (power radix (!i+1)) * !low)
-                 = value x (!i+2) * c
-               (* by
-                 (pelts r)[r.offset + k]
-               = (pelts r)[(!rp.offset at StartLoop)]
-               = (!low at StartLoop) + l
-               so
-                 !high = (pelts x)[(!xp).offset]
-               so
-                 retval + radix * (value r !i
-                                      + (power radix !i) * !low)
-               = retval + radix * (value r k
-                              + power radix k * (pelts r)[r.offset+k]
-                              + power radix !i * !low)
-               = retval + radix * (value r k
-                              + power radix k * ((!low at StartLoop) + l)
-                              + power radix !i * !low)
-               = retval + radix * (value r k
-                              + power radix k * (!low at StartLoop)
-                              + power radix k * l
-                              + power radix !i * !low)
-               = retval + radix * (value r k
-                              + power radix k * (!low at StartLoop))
-                 + radix * (power radix k * l
-                            + power radix !i * !low)
-               = value x (k+1) * power 2 (tnc)
-                 + radix * (power radix k * l
-                            + power radix !i * !low)
-               = value x !i * power 2 (tnc)
-                 + radix * (power radix k * l
-                            + power radix !i * !low)
-               = value x !i * power 2 (tnc)
-                 + radix * (power radix k * l
-                            + power radix k * radix * !low)
-               = value x !i * power 2 (tnc)
-                 + radix * (power radix k * (l + radix * !low))
-               = value x !i * power 2 (tnc)
-                 + radix * (power radix k * !high * power 2 (tnc))
-               = value x !i * power 2 (tnc)
-                 + power radix !i * !high * power 2 (tnc)
-               = (value x !i + power radix !i * !high)
-                 * power 2 (tnc)
-               = (value x !i
-                  + power radix !i * (pelts x)[x.offset + !i])
-                 * power 2 (tnc)
-               = value x (1 + !i) * power 2 (tnc) *)
-      };
+                 = value x (!i+2) * c };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
     done;

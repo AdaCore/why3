@@ -65,28 +65,7 @@ module Mul
                = value x !i * y + power radix !i * (!lx * y) };
                (*nonlinear, needed for reflection*)
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
-               value x (!i+1) * y
-              (* by
-                 value r !i + !c * (power radix !i)
-               = value r k + res * (power radix k)
-                     + (power radix !i) * !c
-               = value r k + (power radix k) * res
-                     + (power radix k) * radix * !c
-               = value r k + (power radix k) * (res + radix * !c)
-               = value r k + (power radix k) *
-                                   (res + radix * (rh + carry))
-               = value r k + (power radix k) *
-                                   (res + radix * carry + radix * rh)
-               = value r k + (power radix k) *
-                                   ((!c at StartLoop) + rl + radix*rh)
-               = value r k + (power radix k) *
-                                   ((!c at StartLoop) + !lx * y)
-               = value r k + (power radix k) * (!c at StartLoop)
-                                 + (power radix k) * !lx * y
-               = value x k * y + (power radix k) * !lx * y
-               = (value x k + (power radix k) * !lx) * y
-               = value x !i * y *)
-               };
+               value x (!i+1) * y };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
@@ -164,52 +143,7 @@ module Mul
                (* nonlinear part *)
       assert { value r (!i+1) + (power radix (!i+1)) * !c
                  = value (old r) (!i+1)
-                   + value x (!i+1) * y
-               (* by
-                (value r !i + (power radix !i) * !c
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix !i) * !c
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix !i) * (rh + carry)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix k) * radix * (rh + carry)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr
-                                   + radix * (rh + carry))
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res + radix * carry
-                          - !lr + radix * rh)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (rl + !lr + (!c at StartLoop)
-                          - !lr + radix * rh)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (rl + radix * rh + (!c at StartLoop))
-                = value (r at StartLoop) !i +
-                   (power radix k) * (!lx * y + (!c at StartLoop))
-                = value (r at StartLoop) k
-                    + (power radix k) * !lr
-                    + (power radix k) * (!lx * y + (!c at StartLoop))
-                = value (r at StartLoop) k
-                    + (power radix k) * (!c at StartLoop)
-                    + (power radix k) * (!lx * y + !lr)
-                = value (old r) k
-                    + value x k * y
-                    + (power radix k) * (!lx * y + !lr)
-                = value (old r) k
-                    + (power radix k) * !lr
-                    + (value x k + (power radix k)* (!lx)) * y
-                = value (old r) !i
-                    + (value x k + (power radix k)* (!lx)) * y
-                = value (old r) !i
-                    + value x !i * y
-                    by
-                  value (old r) !i = value (old r) k
-                     + (power radix k) * (!lr)
-                     ) *)
-                    };
+                   + value x (!i+1) * y };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
@@ -370,108 +304,7 @@ module Mul
       assert { value r (!i + sz + 1)
                     + (power radix (!i + sz + 1)) * !c
                   = value (old r) (!i + sz + 1)
-                    + value x sz
-                      * value y (!i + 1)
-               (*by
-                 power radix (k + sz) = power radix k * power radix sz
-               so
-                 power radix (!i + sz) = power radix k * power radix sz * radix
-               so
-                 value (r at StartLoop) k
-                 + (power radix k) * value_sub (pelts r at StartLoop)
-                                   (r.offset + k) (r.offset + k + sz)
-                 = value (r at StartLoop) (k + sz)
-               so (value (old r) (!i+sz)
-                  = value (old r) (k+sz)
-                  + power radix (k+sz) * !lr
-                  by !lr = (pelts (old r))[r.offset + k + sz])
-               so
-                  value !rp sz + (power radix sz) * c' =
-                  value (!rp at StartLoop) sz
-                  + value x sz * !ly
-               so
-                 value r (!i + sz)
-                    + (power radix (!i + sz)) * !c
-               = value r (k + sz)
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix k) * (power radix sz) * radix * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (res + radix * !c)
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (c' + (!c at StartLoop) + !lr)
-               = value r k + (power radix k)
-                    * (value !rp sz
-                      + power radix sz * (c'+ (!c at StartLoop) + !lr))
-               = value r k + (power radix k)
-                    * (value !rp sz
-                      + power radix sz * c'
-                      + power radix sz * ((!c at StartLoop) + !lr))
-               = value r k + (power radix k)
-                    * (value (!rp at StartLoop) sz
-                       + value x sz * !ly
-                       + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value r k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) k
-                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
-                                              (r.offset+k+ sz))
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * value x sz * !ly
-                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
-                 + power radix k * value x sz * !ly
-               = value (r at StartLoop) (k + sz)
-                 + power radix (k + sz) * ((!c at StartLoop) + !lr)
-                 + power radix k * value x sz * !ly
-               = value (r at StartLoop) (k + sz)
-                 + power radix (k + sz) * ((!c at StartLoop))
-                 + power radix (k + sz) * !lr
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + value x sz * value y k
-                 + power radix (k + sz) * !lr
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * value y k
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * (value y k + power radix k * !ly)
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * value y !i
-               = value (old r) (!i +sz)
-                 + value x sz * value y !i *)
-             };
+                    + value x sz * value y (!i + 1) };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
       assert { forall j. (!rp).offset + sz <= j ->
@@ -549,51 +382,7 @@ module Mul
                = value x sx * value y !i
                  + power radix !i * (value x sx * !ly) };
              (*nonlinear*)
-      assert { value r (!i + sx + 1) = value x sx * value y (!i+1)
-               (*by (value !rp sx + power radix sx * res
-                   = value (!rp at StartLoop) sx + value x sx * !ly
-                   by value !rp sx = value (!rp at BeforeCarry) sx)
-               so power radix (k + sx) = power radix k * power radix sx
-               so
-                 value (r at StartLoop) k
-                 + (power radix k) * value_sub (pelts r at StartLoop)
-                                   (r.offset + k) (r.offset + k + sx)
-                 = value (r at StartLoop) (k + sx)
-               so
-                 value r (!i + sx)
-               = value r (k + sx)
-                    + (power radix (k + sx)) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix (k + sx)) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix k) * (power radix sx) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix k) * (power radix sx) * res
-               = value r k
-                    + (power radix k) * (value !rp sx + (power radix sx) * res)
-               = value r k + (power radix k)
-                    * (value (!rp at StartLoop) sx
-                       + value x sx * !ly)
-               = value r k
-                 + power radix k * (value (!rp at StartLoop) sx)
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) k
-                 + power radix k * (value (!rp at StartLoop) sx)
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) k
-                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
-                                              (r.offset+k+ sx))
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) (k + sx)
-                 + power radix k * (value x sx * !ly)
-               = value x sx * value y k
-                + power radix k * value x sx * !ly
-               = value x sx *
-                 (value y k + power radix k * !ly)
-               = value x sx * value y !i *) };
+      assert { value r (!i + sx + 1) = value x sx * value y (!i+1) };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
     done;

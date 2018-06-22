@@ -48,20 +48,7 @@ module Add
       value_tail r !i;
       value_tail x !i;
       assert { value r (!i+1) + (power radix (!i+1)) * !c
-             = value x (!i+1) + y
-             (* by
-             value r !i + (power radix !i) * !c
-             = value r k + (power radix k) * res
-                               + (power radix !i) * !c
-             = value r k + (power radix k) * res
-                               + (power radix k) * radix * !c
-             = value r k + (power radix k) * (res + radix * !c)
-             = value r k +
-               (power radix k) * (!lx + (!c at StartLoop))
-             = value r k + (power radix k) * (!c at StartLoop)
-                               + (power radix k) * !lx
-             = value x k + y + (power radix k) * !lx
-             = value x !i + y*) };
+             = value x (!i+1) + y };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     if Int32.(=) !i sz then !c
@@ -127,27 +114,7 @@ module Add
       value_tail x !i;
       value_tail y !i;
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
-                value x (!i+1) + value y (!i+1)
-              (*by
-              value r !i + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix k) * radix * !c
-              = value r k + (power radix k) * (res + radix * !c)
-              = value r k +
-                  (power radix k) * (!lx + !ly + (!c at StartLoop))
-              = value r k + (power radix k) * (!c at StartLoop)
-                 + (power radix k) * (!lx + !ly)
-              = value x k + value y k
-                 + (power radix k) * (!lx + !ly)
-              = value x k + (power radix k) * !lx
-                 + value y k + (power radix k) * !ly
-              = value x !i
-                 + value y k + (power radix k) * !ly
-              = value x !i
-                 + (value y k + (power radix k) * !ly)
-              = value x !i + value y !i*) };
+                value x (!i+1) + value y (!i+1) };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
@@ -192,27 +159,7 @@ module Add
       value_tail x !i;
       value_tail y !i;
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
-                value x (!i+1) + value y (!i+1)
-              (*by
-              value r !i + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix k) * radix * !c
-              = value r k + (power radix k) * (res + radix * !c)
-              = value r k +
-                  (power radix k) * (!lx + !ly + (!c at StartLoop))
-              = value r k + (power radix k) * (!c at StartLoop)
-                 + (power radix k) * (!lx + !ly)
-              = value x k + value y k
-                 + (power radix k) * (!lx + !ly)
-              = value x k + (power radix k) * !lx
-                 + value y k + (power radix k) * !ly
-              = value x !i
-                 + value y k + (power radix k) * !ly
-              = value x !i
-                 + (value y k + (power radix k) * !ly)
-              = value x !i + value y !i*) };
+                value x (!i+1) + value y (!i+1) };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     try
@@ -235,22 +182,7 @@ module Add
       value_tail r !i;
       value_tail x !i;
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
-                value x (!i+1) + value y sy
-              (*by
-              value r !i + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix !i) * !c
-              = value r k + (power radix k) * res
-                   + (power radix k) * radix * !c
-              = value r k + (power radix k) * (res + radix * !c)
-              = value r k +
-                  (power radix k) * (!lx + 0 + (!c at StartLoop2))
-              = value r k + (power radix k) * (!c at StartLoop2)
-                 + (power radix k) * !lx
-              = value x k + value y sy
-                 + (power radix k) * !lx
-              = value x !i
-                 + value y sy*) };
+                value x (!i+1) + value y sy };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     assert { !i = sx }
@@ -272,17 +204,7 @@ module Add
       value_tail x !i;
       assert { value r !i = value x !i + value y sy }; (* true with this, should not be needed *)
       assert { value r (!i+1) + power radix (!i+1) * !c
-               = value x (!i+1) + value y sy
-               (*
-               by
-               value r !i + power radix !i * !c
-                 = value r !i
-                 = value r k + power radix k * !lx
-               so value x !i
-                  = value x k + power radix k * !lx
-               so value r k
-                  = value r k + power radix k * !c
-                  = value x k + value y sy*) };
+               = value x (!i+1) + value y sy };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
@@ -332,28 +254,7 @@ module Add
       value_tail ox !i;
       value_tail y !i;
       assert { value x (!i+1) + (power radix (!i+1)) * !c =
-                value ox (!i+1) + value y (!i+1)
-              (*by value ox k + (power radix k) * !lx
-                 = value ox !i
-              so value x !i + (power radix !i) * !c
-              = value x k + (power radix k) * res
-                   + (power radix !i) * !c
-              = value x k + (power radix k) * res
-                   + (power radix k) * radix * !c
-              = value x k + (power radix k) * (res + radix * !c)
-              = value x k +
-                  (power radix k) * (!lx + !ly + (!c at StartLoop))
-              = value x k + (power radix k) * (!c at StartLoop)
-                 + (power radix k) * (!lx + !ly)
-              = value ox k + value y k
-                 + (power radix k) * (!lx + !ly)
-              = (value ox k + (power radix k) * !lx)
-                 + (value y k + (power radix k) * !ly)
-              = value ox !i
-                 + (value y k + (power radix k) * !ly)
-              = value ox !i
-                 + (value y k + (power radix k) * !ly)
-              = value ox !i + value y !i*) };
+                value ox (!i+1) + value y (!i+1) };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     try
@@ -383,24 +284,7 @@ module Add
       value_tail ox !i;
       value_tail x !i;
       assert { value x (!i+1) + (power radix (!i+1)) * !c =
-                value ox (!i+1) + value y sy
-              (*by value ox k + (power radix k) * !lx
-                 = value ox !i
-              so
-              value x !i + (power radix !i) * !c
-              = value x k + (power radix k) * res
-                   + (power radix !i) * !c
-              = value x k + (power radix k) * res
-                   + (power radix k) * radix * !c
-              = value x k + (power radix k) * (res + radix * !c)
-              = value x k +
-                  (power radix k) * (!lx + 0 + (!c at StartLoop2))
-              = value x k + (power radix k) * (!c at StartLoop2)
-                 + (power radix k) * !lx
-              = value ox k + value y sy
-                 + (power radix k) * !lx
-              = value ox !i
-                 + value y sy*) };
+                value ox (!i+1) + value y sy };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     assert { !i = sx };
