@@ -11,11 +11,11 @@ module Add
   use types.Types
   use lemmas.Lemmas
 
-  (** `add_limb r x y sz` adds to `x` the value of the limb `y`,
+  (** `wmpn_add_1 r x y sz` adds to `x` the value of the limb `y`,
       writes the result in `r` and returns the carry. `r` and `x`
       have size `sz`. This corresponds to the function `mpn_add_1` *)
   (* r and x must be separated. This is enforced by Why3 regions in typing *)
-  let add_limb (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_add_1 (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
     requires { sz > 0 } (* ? GMP does the same for 0 and 1*)
@@ -74,10 +74,10 @@ module Add
     end
 
 
-  (** `add_limbs r x y sz` adds `x[0..sz-1]` and `y[0..sz-1]` and writes the result in `r`.
+  (** `wmpn_add_n r x y sz` adds `x[0..sz-1]` and `y[0..sz-1]` and writes the result in `r`.
       Returns the carry, either `0` or `1`. Corresponds to the function `mpn_add_n`. *)
 
-  let add_limbs (r x y:t) (sz:int32) : limb
+  let wmpn_add_n (r x y:t) (sz:int32) : limb
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r sz }
@@ -119,10 +119,10 @@ module Add
     done;
     !c
 
-  (** `add r x y sx sy` adds `(x, sx)` to `(y, sy)` and writes the
+  (** `wmpn_add r x y sx sy` adds `(x, sx)` to `(y, sy)` and writes the
       result in `(r, sx)`.  `sx` must be greater than or equal to
       `sy`. Returns carry, either 0 or 1. Corresponds to `mpn_add`. *)
-  let add (r x y:t) (sx sy:int32) : limb
+  let wmpn_add (r x y:t) (sx sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -209,7 +209,7 @@ module Add
     done;
     !c
 
-  let add_in_place (x y:t) (sx sy:int32) : limb
+  let wmpn_add_in_place (x y:t) (sx sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -306,10 +306,10 @@ module Add
 
   use int.EuclideanDivision
 
-  (** `incr x y sz` adds to `x` the value of the limb `y` in place.
+  (** `wmpn_incr x y sz` adds to `x` the value of the limb `y` in place.
       `x` has size `sz`. The addition must not overflow. This corresponds
-      to `mpn_incr` *)
-  let incr (x:t) (y:limb) (ghost sz:int32) : unit
+      to `mpn_wmpn_incr` *)
+  let wmpn_incr (x:t) (y:limb) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { value x sz + y < power radix sz }
@@ -366,10 +366,10 @@ module Add
                 so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
     value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
 
-  (** `incr_1 x sz` adds 1 to `x` in place.
+  (** `wmpn_incr_1 x sz` adds 1 to `x` in place.
       `x` has size `sz`. The addition must not overflow.
-      This corresponds to `mpn_incr` *)
-  let incr_1 (x:t) (ghost sz:int32) : unit
+      This corresponds to `mpn_wmpn_incr` *)
+  let wmpn_incr_1 (x:t) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { value x sz + 1 < power radix sz }

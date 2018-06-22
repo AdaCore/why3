@@ -98,23 +98,23 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
     if (Int32.(=) s n)
     then
       if begin ensures { result <->  value x0 n < value x1 n }
-           Int32.(<) (compare_same_size x0 x1 n) 0
+           Int32.(<) (wmpn_cmp x0 x1 n) 0
          end
       then begin
-        let ghost b = sub_limbs xsm1 x1 x0 n in
+        let ghost b = wmpn_sub_n xsm1 x1 x0 n in
         no_borrow_ptr x1 x0 xsm1 (p2i n) (p2i n) b;
         vm1_neg := true end
-      else let ghost b = sub_limbs xsm1 x0 x1 n in
+      else let ghost b = wmpn_sub_n xsm1 x0 x1 n in
            no_borrow_ptr x0 x1 xsm1 (p2i n) (p2i n) b
     else
       (* n-s=1*)
       if (Limb.(=) (get_ofs x0 s) 0) &&
-         (Int32.(<) (compare_same_size x0 x1 s) 0)
+         (Int32.(<) (wmpn_cmp x0 x1 s) 0)
       then begin
         assert { value x0 s < value x1 s };
         value_tail x0 s;
         assert { value x0 n = value x0 s };
-        let ghost b = sub_limbs xsm1 x1 x0 s in
+        let ghost b = wmpn_sub_n xsm1 x1 x0 s in
         no_borrow_ptr x1 x0 xsm1 (p2i s) (p2i s) b;
         value_sub_shift_no_change (pelts xsm1) (xsm1.offset) (p2i s) (p2i s) 0;
         set_ofs xsm1 s 0;
@@ -122,7 +122,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
         value_tail xsm1 s
         end
       else begin
-        let b = sub_limbs xsm1 x0 x1 s in
+        let b = wmpn_sub_n xsm1 x0 x1 s in
         label Borrow in
         value_sub_shift_no_change (pelts xsm1) (xsm1.offset) (p2i s) (p2i s) b;
         let lx = get_ofs x0 s in
@@ -142,32 +142,32 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
     if (Int32.(=) t n)
     then
       if begin ensures { result <-> value y0 n < value y1 n }
-           Int32.(<) (compare_same_size y0 y1 n) 0
+           Int32.(<) (wmpn_cmp y0 y1 n) 0
          end
       then begin
-        let ghost b = sub_limbs ysm1 y1 y0 n in
+        let ghost b = wmpn_sub_n ysm1 y1 y0 n in
         no_borrow_ptr y1 y0 ysm1 (p2i n) (p2i n) b;
         vm1_neg := not !vm1_neg end
       else
-        let ghost b = sub_limbs ysm1 y0 y1 n in
+        let ghost b = wmpn_sub_n ysm1 y0 y1 n in
         no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i n) b;
     else
       let y0t = C.incr y0 t in
-      let c0 = (Int32.(=) (is_zero y0t (Int32.(-) n t)) 1) in
-      let c1 = (Int32.(<) (compare_same_size y0 y1 t) 0) in
+      let c0 = (Int32.(=) (wmpn_zero_p y0t (Int32.(-) n t)) 1) in
+      let c1 = (Int32.(<) (wmpn_cmp y0 y1 t) 0) in
       if c0 && c1
       then begin
         assert { value y0 t < value y1 t };
         value_concat y0 t n;
         assert { value y0 n = value y0 t };
-        let ghost b = sub_limbs ysm1 y1 y0 t in
+        let ghost b = wmpn_sub_n ysm1 y1 y0 t in
         no_borrow_ptr y1 y0 ysm1 (p2i t) (p2i t) b;
         assert { forall j. (j < offset r \/ offset r + sx + sy <= j)
                              -> (pelts r)[j] = (pelts r)[j] at BSM1 };
         label Zero in
         let ghost ysm1z = { ysm1 } in
         let ysm1t = C.incr ysm1 t in
-        zero ysm1t (Int32.(-) n t);
+        wmpn_zero ysm1t (Int32.(-) n t);
         value_sub_frame_shift (pelts ysm1) (pelts ysm1z)
                               (offset ysm1) (offset ysm1z) (p2i t);
         assert { value ysm1 t = value ysm1 t at Zero };
@@ -187,7 +187,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                   \/ (not c1
                       so value y1 t <= value y0 t
                       so value y0 t <= value y0 n) };
-        let ghost b = sub ysm1 y0 y1 n t in
+        let ghost b = wmpn_sub ysm1 y0 y1 n t in
         no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i t) b;
         end
   end;
@@ -245,16 +245,16 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   let ghost hvinf = value vinfn (int32'int s + int32'int t- int32'int n) in
   assert { lv0 + m * hv0 = a0 * b0 };
   assert { lvinf + m * hvinf = a1 * b1 };
-  let cy = ref (add_in_place vinf v0n n n) in (*TODO add_limbs_in_place*)
+  let cy = ref (wmpn_add_in_place vinf v0n n n) in (*TODO wmpn_add_n_in_place*)
   assert { value vinf n = lvinf + hv0 - m * !cy };
-  let c = add_limbs v0n vinf v0 n in
+  let c = wmpn_add_n v0n vinf v0 n in
   let cy2 = Limb.(+) c !cy in
   assert { value v0n n = lvinf + hv0 + lv0 - m * cy2
            by value v0n n = lv0 + value vinf n - m * c
                           = lvinf + hv0 + lv0 - m * !cy - m * c
                           = lvinf + hv0 + lv0 - m * cy2 };
   label Add3 in
-  let c' = add_in_place vinf vinfn n (Int32.(-) (Int32.(+) s t) n) in
+  let c' = wmpn_add_in_place vinf vinfn n (Int32.(-) (Int32.(+) s t) n) in
   cy := Limb.(+) !cy c';
   assert { value vinf n = hvinf + lvinf + hv0 - m * !cy
            by m * (!cy at Add3) + m * c' = m * !cy
@@ -301,7 +301,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
     assert { power radix (n+n) = m * m };
     if !vm1_neg
     then
-      let c'' = add_in_place v0n scratch (n+n) (n+n) in
+      let c'' = wmpn_add_in_place v0n scratch (n+n) (n+n) in
       assert { value v0n (n+n)
                = value v0n (n+n) at AddSub + value scratch (n+n)
                  - power radix (n+n) * c'' };
@@ -317,7 +317,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                   = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
                     + hv0 + m * lvinf - m * cy2 - m * m * !cy }
     else
-      let b = sub_in_place v0n scratch (n+n) (n+n) in
+      let b = wmpn_sub_in_place v0n scratch (n+n) (n+n) in
       assert { value v0n (n+n)
                = value v0n (n+n) at AddSub - value scratch (n+n)
                  + power radix (n+n) * b };
@@ -633,7 +633,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
               so (m * m) * (value vinf0 (s+t) + cy2) < (m * m) * (m * m') };
   let ghost ri = { r } in
   label IncrM in
-  incr vinf0 cy2 (Int32.(+) s t);
+  wmpn_incr vinf0 cy2 (Int32.(+) s t);
   value_concat r (Int32.(+) n n) (Int32.(+) sx sy);
   assert { value_sub (pelts r) (offset r + n + n) (offset r + sx + sy)
            = value vinf0 (s+t) };
@@ -692,7 +692,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                 >= power radix (3*n) * (value vinfn (s+t-n) + !cy)
                 so power radix (3*n) * (value vinfn (s+t-n) + !cy)
                    < power radix (3*n) * m'};
-    incr vinfn !cy (Int32.(-) (Int32.(+) s t) n);
+    wmpn_incr vinfn !cy (Int32.(-) (Int32.(+) s t) n);
     value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
     assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
              = value vinfn (s+t-n)
@@ -734,7 +734,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
              so value r (3*n) < power radix (3*n)
              so power radix (3*n) * value vinfn (s+t-n) > 0
              so value vinfn (s+t-n) > 0 };
-    decr_1 vinfn (Int32.(-) (Int32.(+) s t) n);
+    wmpn_decr_1 vinfn (Int32.(-) (Int32.(+) s t) n);
     value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
     assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
              = value vinfn (s+t-n)
@@ -801,11 +801,11 @@ with toom22_mul_rec (r x y scratch: ptr limb) (sx sy: int32) (ghost k: int)
   variant  { k + k + 1 }
 =
   if Int32.(<=) sy toom22_threshold
-  then mul r x y sx sy
+  then wmpn_mul r x y sx sy
   else
     if Int32.(<) (Int32.( *) 4 sx) (Int32.( *) 5 sy) (* ? *)
     then toom22_mul r x y scratch sx sy k
-    else mul r x y sx sy (* TODO toom33_mul *)
+    else wmpn_mul r x y sx sy (* TODO toom33_mul *)
 
 with toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
   requires { valid x sz }
@@ -830,7 +830,7 @@ with toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
   variant  { k + k + 1 }
 =
   if Int32.(<=) sz toom22_threshold
-  then mul r x y sz sz
+  then wmpn_mul r x y sz sz
   else toom22_mul r x y scratch sz sz k
 
 end

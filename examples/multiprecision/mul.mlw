@@ -14,10 +14,10 @@ module Mul
   use add.Add
 
 
-    (** `mul_limb r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
+    (** `wmpn_mul_1 r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
     writes the n least significant limbs in `r`, and returns the most
     significant limb. It corresponds to `mpn_mul_1`. *)
-  let mul_limb (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_mul_1 (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -70,11 +70,11 @@ module Mul
     done;
     !c
 
-  (** `addmul_limb r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
+  (** `wmpn_addmul_1 r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
       least significant limbs to `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the carry
       of the addition. Corresponds to `mpn_addmul_1`.*)
-  let addmul_limb (r x:t) (y:limb) (sz:int32):limb
+  let wmpn_addmul_1 (r x:t) (y:limb) (sz:int32):limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -148,10 +148,10 @@ module Mul
     done;
     !c
 
-  (** `mul_limbs r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
   writes the result to `(r, 2*sz)`. `r` must not overlap with either
   `x` or `y`. Corresponds to `mpn_mul_n`.  *)
-  let mul_limbs (r x y:t) (sz:int32) : unit
+  let wmpn_mul_n (r x y:t) (sz:int32) : unit
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }
@@ -162,7 +162,7 @@ module Mul
     ensures { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
   =
-    zero r sz;
+    wmpn_zero r sz;
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
     let rp = ref (C.incr r (Int32.of_int 0)) in
@@ -184,7 +184,7 @@ module Mul
       assert { value !rp sz
                = value_sub (pelts r) (offset r + !i) (offset r + (!i + sz)) };
       ly := get_ofs y !i;
-      let c' =  addmul_limb !rp x !ly sz in
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
       assert { value !rp sz + power radix sz * c'
               = value (!rp at StartLoop) sz + value x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
@@ -225,7 +225,7 @@ module Mul
       rp.contents <- C.incr !rp one;
     done
 
- let addmul_limbs (r x y:t) (sz:int32) : limb
+ let wmpn_addmul_n (r x y:t) (sz:int32) : limb
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }
@@ -262,7 +262,7 @@ module Mul
       assert { value !rp sz
                = value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz)) };
       ly := get_ofs y !i;
-      let c' =  addmul_limb !rp x !ly sz in
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
       assert { forall j. (!rp).offset + sz <= j ->
                  (pelts (old r)) [j] = (pelts r)[j]
                  by (pelts r)[j]
@@ -312,10 +312,10 @@ module Mul
     done;
     !c
 
-  (** `mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  (** `wmpn_mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
-  let mul (r x y:t) (sx sy:int32) : unit
+  let wmpn_mul (r x y:t) (sx sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -327,7 +327,7 @@ module Mul
     (*ensures  { result = (pelts r)[r.offset + sx + sy - 1] }*)
   =
     let ly = ref (C.get y) in
-    let c = mul_limb r x !ly sx in
+    let c = wmpn_mul_1 r x !ly sx in
     value_sub_update_no_change (pelts r) (r.offset + p2i sx)
                                r.offset (r.offset + p2i sx - 1) c;
     set_ofs r sx c;
@@ -354,7 +354,7 @@ module Mul
       assert { value !rp sx =
                value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sx)) };
       ly := get_ofs y !i;
-      let res =  addmul_limb !rp x !ly sx in
+      let res =  wmpn_addmul_1 !rp x !ly sx in
       assert { value !rp sx + power radix sx * res
               = value (!rp at StartLoop) sx + value x sx * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)

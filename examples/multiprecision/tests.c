@@ -110,7 +110,7 @@ int main () {
             c = mpn_add (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            refc = add (rp, ap, bp, an, bn);
+            refc = wmpn_add (rp, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
@@ -174,7 +174,7 @@ int main () {
             mpn_mul (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            mul (rp, ap, bp, an, bn);
+            wmpn_mul (rp, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
@@ -238,7 +238,7 @@ int main () {
                 mpn_div_qr (refq, refr, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-                tdiv_qr(rq, rr, ap, bp, an, bn);
+                wmpn_tdiv_qr(rq, rr, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH

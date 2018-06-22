@@ -318,11 +318,11 @@ module Div
     assert { !qh * d + !r = ul + radix * uh };
     (!qh,!r)
 
-(** `divmod_1 q x y sz` divides `(x, sz)` by `y`, writes the quotient
+(** `wmpn_divrem_1 q x y sz` divides `(x, sz)` by `y`, writes the quotient
     in `(q, sz)` and returns the remainder. Corresponds to
-    `mpn_divmod_1`. *)
+    `mpn_wmpn_divrem_1`. *)
 (* TODO develop further decimal points (qxn) *)
-let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
+let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid q sz }
     requires { 0 < sz }
@@ -1340,7 +1340,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let ghost vy = value y (p2i sy) in
     let x1 = ref limb_zero in
     let x0 = ref limb_zero in
-    let r = compare_same_size xd y sy in
+    let r = wmpn_cmp xd y sy in
     let qh = (*begin
                ensures { r >= 0 -> result = 1 }
                ensures { r < 0 -> result = 0 }*)
@@ -1367,7 +1367,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     if (not (Limb.(=) qh limb_zero))
     then begin
          assert { qh = 1 };
-         let ghost b = sub_in_place xd y sy sy in
+         let ghost b = wmpn_sub_in_place xd y sy sy in
          begin
              ensures { value (x at PreAdjust) sx =
                   (value !qp (sx - sy - !i)
@@ -2398,7 +2398,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    so 0 <= j < xc.Array.length
                  } ;
           value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-          let c = add_in_place xd y (Int32.(-) sy one) (Int32.(-) sy one) in
+          let c = wmpn_add_in_place xd y (Int32.(-) sy one) (Int32.(-) sy one) in
           begin
           ensures { value x !i
                  = value (x at Adjust) !i }
@@ -3109,7 +3109,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   + value x sy };
     qh
 
-  let divmod_2 (q x y:t) (sx:int32) : limb
+  let wmpn_divrem_2 (q x y:t) (sx:int32) : limb
     requires { 2 <= sx }
     requires { valid x sx }
     requires { valid y 2 }
@@ -3376,7 +3376,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     assert { value y sy >= power radix (sy - 1) };
     if (Int32.(=) sy one)
     then
-      let lr = divmod_1 q x (C.get y) sx in
+      let lr = wmpn_divrem_1 q x (C.get y) sx in
       C.set r lr
     else
     if (Int32.(=) sy two)
@@ -3385,13 +3385,13 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let ghost p = power 2 (p2i clz) in
       if Int32.(=) clz zero
       then begin
-        copy nx x sx;
+        wmpn_copyi nx x sx;
         value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) limb_zero;
         C.set_ofs nx sx limb_zero;
         value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
         label Div2_ns in
-        let ghost _qh = divmod_2 q nx y (Int32.(+) sx one) in
-        copy r nx sy;
+        let ghost _qh = wmpn_divrem_2 q nx y (Int32.(+) sx one) in
+        wmpn_copyi r nx sy;
         assert { value x sx
                  = value q (sx - sy + 1) * value y sy
                  + value r sy
@@ -3430,7 +3430,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ()
       end
       else begin
-        let ghost _c = lshift ny y sy (Limb.of_int32 clz) in
+        let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
         begin
           ensures { normalized ny sy }
           ensures { value ny sy = power 2 clz * value y sy }
@@ -3479,7 +3479,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    so ndh >= div radix 2
                  };
         end;
-        let h = lshift nx x sx (Limb.of_int32 clz) in
+        let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
         C.set_ofs nx sx h;
         begin
           ensures { value nx (sx + 1)
@@ -3496,8 +3496,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         end;
         label Div2_s in
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-        let ghost _qh = divmod_2 q nx ny (Int32.(+) sx one) in
-        let ghost _l = rshift r nx sy (Limb.of_int32 clz) in
+        let ghost _qh = wmpn_divrem_2 q nx ny (Int32.(+) sx one) in
+        let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
         begin ensures { value nx 2 = p * value r 2 }
           assert { _l = 0
                  by
@@ -3624,7 +3624,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         let ghost p = power 2 (p2i clz) in
         if Int32.(=) clz zero
         then begin
-          copy nx x sx;
+          wmpn_copyi nx x sx;
           value_sub_shift_no_change (pelts x) x.offset
                                     (p2i sx) (p2i sx) limb_zero;
           C.set_ofs nx sx limb_zero;
@@ -3659,7 +3659,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                                  = dh * power radix (sx - 1))) };
           label Div_ns in
           let ghost _qh = div_sb_qr q nx y (Int32.(+) sx adjust) sy in
-          copy r nx sy;
+          wmpn_copyi r nx sy;
           assert { value x sx
                    = value q (sx - sy + adjust) * value y sy
                    + value r sy
@@ -3705,7 +3705,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
            end
         end
         else begin
-          let ghost _c = lshift ny y sy (Limb.of_int32 clz) in
+          let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
           begin
             ensures { normalized ny sy }
             ensures { value ny sy
@@ -3762,7 +3762,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                      so ndh >= div radix 2
                    };
           end;
-          let h = lshift nx x sx (Limb.of_int32 clz) in
+          let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
           label Shifted in
           C.set_ofs nx sx h;
           begin
@@ -3851,7 +3851,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                                  = p * dh * power radix (sy - 1 + sx - sy)
                                  = p * dh * power radix (sx - 1))) };
           let ghost _qh = div_sb_qr q nx ny (Int32.(+) sx adjust) sy in
-          let ghost _l = rshift r nx sy (Limb.of_int32 clz) in
+          let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
           begin ensures { value nx sy = p * value r sy }
             assert { _l = 0
                    by
@@ -3984,7 +3984,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         end
         end
 
-  let tdiv_qr (q r x y:t) (sx sy:int32) : unit
+  let wmpn_tdiv_qr (q r x y:t) (sx sy:int32) : unit
     requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid x sx }
     requires { valid y sy }

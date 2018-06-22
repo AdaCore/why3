@@ -12,10 +12,10 @@ module Sub
   use lemmas.Lemmas
 
 
-  (** `sub_limb r x y sz` subtracts `y` from `(x, sz)` and writes
+  (** `wmpn_sub_1 r x y sz` subtracts `y` from `(x, sz)` and writes
       the result to `(r, sz)`. Returns borrow, either 0 or
       1. Corresponds to `mpn_sub_1`. *)
-  let sub_limb (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_sub_1 (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
     requires { 0 < sz }
@@ -73,10 +73,10 @@ module Sub
     !b
   end
 
-  (** `sub_limbs r x y sz` subtracts `(y, sz)` from `(x, sz)` and
+  (** `wmpn_sub_n r x y sz` subtracts `(y, sz)` from `(x, sz)` and
       writes the result to `(r, sz)`. Returns borrow, either 0 or
       1. Corresponds to `mpn_sub_n`. *)
-  let sub_limbs (r x y:t) (sz:int32) : limb
+  let wmpn_sub_n (r x y:t) (sz:int32) : limb
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r sz }
@@ -117,10 +117,10 @@ module Sub
       done;
       !b
 
-  (** `sub r x y sx sy` subtracts `(y,sy)` from `(x, sx)` and writes the
+  (** `wmpn_sub r x y sx sy` subtracts `(y,sy)` from `(x, sx)` and writes the
       result in `(r, sx)`. `sx` must be greater than or equal to
       `sy`. Returns borrow, either 0 or 1. Corresponds to `mpn_sub`. *)
-  let sub (r x y:t) (sx sy:int32) : limb
+  let wmpn_sub (r x y:t) (sx sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -208,7 +208,7 @@ module Sub
     done;
     !b
 
-  let sub_in_place (x y:t) (sx sy:int32) : limb
+  let wmpn_sub_in_place (x y:t) (sx sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -305,10 +305,10 @@ module Sub
       end
     end
 
-  (** `decr x y sz` subtracts from `x` the value of the limb `y` in place.
+  (** `wmpn_decr x y sz` subtracts from `x` the value of the limb `y` in place.
       `x` has size `sz`. The subtraction must not overflow. This corresponds
-      to `mpn_decr` *)
-  let decr (x:t) (y:limb) (ghost sz:int32) : unit
+      to `mpn_wmpn_decr` *)
+  let wmpn_decr (x:t) (y:limb) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { 0 <= value x sz - y }
@@ -369,8 +369,8 @@ module Sub
 
   (** `incr_1 x sz` subtracts 1 from `x` in place.
       `x` has size `sz`. The subtraction must not overflow.
-      This corresponds to `mpn_decr` *)
-  let decr_1 (x:t) (ghost sz:int32) : unit
+      This corresponds to `mpn_wmpn_decr` *)
+  let wmpn_decr_1 (x:t) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { 0 <= value x sz - 1 }
