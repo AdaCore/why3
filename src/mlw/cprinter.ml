@@ -79,9 +79,10 @@ module C = struct
     | Sbreak
     | Sreturn of expr
 
+  and include_kind = Sys | Proj (* include <...> vs. include "..." *)
   and definition =
     | Dfun of ident * proto * body
-    | Dinclude of ident
+    | Dinclude of ident * include_kind
     | Dproto of ident * proto
     | Ddecl of names
     | Dstruct of struct_def
@@ -206,7 +207,7 @@ module C = struct
     | Ddecl (ty,l) ->
       let l,b = aux l in
       Ddecl (ty, l), b
-    | Dinclude i -> Dinclude i, true
+    | Dinclude (i,k) -> Dinclude (i,k), true
     | Dstruct _ -> raise (Unsupported "struct declaration inside function")
     | Dfun _ -> raise (Unsupported "nested function")
     | Dtypedef _ -> raise (Unsupported "typedef inside function")
@@ -362,6 +363,7 @@ type info = Pdriver.printer_args = private {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;
@@ -386,6 +388,7 @@ module Print = struct
   let () = assert (List.length c_keywords = 32)
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
+  let sanitizer s = String.lowercase (sanitizer s)
   let printer = create_ident_printer c_keywords ~sanitizer
 
   let print_ident fmt id = fprintf fmt "%s" (id_unique printer id)
@@ -518,41 +521,50 @@ module Print = struct
   and print_def fmt def =
     try match def with
     | Dfun (id,(rt,args),body) ->
-       fprintf fmt "%a %a(@[%a@])@ @[<hov>{@;<1 2>@[<hov>%a@]@\n}@\n@]"
+       let s = sprintf "%a %a(@[%a@])@ @[<hov>{@;<1 2>@[<hov>%a@]@\n}@\n@]"
                (print_ty ~paren:false) rt
                print_ident id
                (print_list comma
 			   (print_pair_delim nothing space nothing
 					     (print_ty ~paren:false) print_ident))
 	       args
-               print_body body
+               print_body body in
+       (* print into string first to print nothing in case of exception *)
+       fprintf fmt "%s" s
     | Dproto (id, (rt, args)) ->
-      fprintf fmt "%a %a(@[%a@]);@;"
-        (print_ty ~paren:false) rt
-        print_ident id
-        (print_list comma
-           (print_pair_delim nothing space nothing
-			     (print_ty ~paren:false) print_ident))
-	args
+      let s = sprintf "%a %a(@[%a@]);@;"
+                (print_ty ~paren:false) rt
+                print_ident id
+                (print_list comma
+                   (print_pair_delim nothing space nothing
+		      (print_ty ~paren:false) print_ident))
+	        args in
+      fprintf fmt "%s" s
     | Ddecl (ty, lie) ->
       let nb, ty = extract_stars ty in
       assert (nb=0);
-      fprintf fmt "%a @[<hov>%a@];"
-	(print_ty ~paren:false) ty
-	(print_list comma (print_id_init ~stars:nb)) lie
+      let s = sprintf "%a @[<hov>%a@];"
+	        (print_ty ~paren:false) ty
+	        (print_list comma (print_id_init ~stars:nb)) lie in
+      fprintf fmt "%s" s
     | Dstruct (s, lf) ->
-       fprintf fmt "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
-         s
-         (print_list newline
-            (fun fmt (s,ty) -> fprintf fmt "%a %s;"
-                                 (print_ty ~paren:false) ty s))
-         lf
-    | Dinclude id ->
-       fprintf fmt "#include<%a.h>@;" print_ident id
+       let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
+                 s
+                 (print_list newline
+                    (fun fmt (s,ty) -> fprintf fmt "%a %s;"
+                                         (print_ty ~paren:false) ty s))
+                 lf in
+       fprintf fmt "%s" s
+    | Dinclude (id, Sys) ->
+       fprintf fmt "#include <%s.h>@;"  (sanitizer id.id_string)
+    | Dinclude (id, Proj) ->
+       fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
     | Dtypedef (ty,id) ->
-       fprintf fmt "@[<hov>typedef@ %a@;%a;@]"
-	 (print_ty ~paren:false) ty print_ident id
-    with Unprinted s -> Format.printf "Missed a def because : %s@." s
+       let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
+	         (print_ty ~paren:false) ty print_ident id in
+       fprintf fmt "%s" s
+    with Unprinted s ->
+      Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
 
   and print_body fmt (def, s) =
     if def = []
@@ -563,6 +575,33 @@ module Print = struct
         (print_stmt ~braces:true)
         fmt (def,s)
 
+  let print_header_def fmt def =
+    try match def with
+    | Dfun (id,(rt,args),_) | Dproto (id, (rt, args)) ->
+       let s = sprintf "%a %a(@[%a@]);@;"
+                 (print_ty ~paren:false) rt
+                 print_ident id
+                 (print_list comma
+		    (print_pair_delim nothing space nothing
+		       (print_ty ~paren:false) print_ident))
+	         args in
+       fprintf fmt "%s" s
+    | Dstruct (s, lf) ->
+       let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
+                 s
+                 (print_list newline
+                    (fun fmt (s,ty) -> fprintf fmt "%a %s;"
+                                         (print_ty ~paren:false) ty s))
+                 lf in
+       fprintf fmt "%s" s
+    | Dinclude _ | Ddecl _ -> ()
+    | Dtypedef (ty,id) ->
+       let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
+	         (print_ty ~paren:false) ty print_ident id in
+       fprintf fmt "%s" s
+    with Unprinted s ->
+      Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
+
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
     newline fmt ();
@@ -570,7 +609,8 @@ module Print = struct
 
 end
 
-(*TODO simplifications : propagate constants, collapse blocks with only a statement and no def*)
+(*TODO simplifications : propagate constants, collapse blocks with
+   only a statement and no def*)
 
 module MLToC = struct
 
@@ -927,7 +967,8 @@ module MLToC = struct
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
       Debug.dprintf debug_c_extraction "RETURN@.";
       expr info {env with computes_return_value = true} r
-    | Eraise (_, None) -> assert false (* nothing to pass to return *)
+    | Eraise (xs, None) when Sid.mem xs.xs_name env.returns ->
+       assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor (i, sb, dir, eb, body) ->
        begin match i.pv_vs.vs_ty.ty_node with
@@ -1022,12 +1063,12 @@ module MLToC = struct
 
   let translate_decl (info:info) (d:decl) : C.definition list
     =
-    match d with
-    | Dlet (Lsym(rs, _, vl, e)) ->
-       if rs_ghost rs
-       then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
-       else
-         begin try
+    try
+      begin match d with
+      | Dlet (Lsym(rs, _, vl, e)) ->
+         if rs_ghost rs
+         then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
+         else
            let params =
              List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
                (List.filter (fun (_,_, gh) -> not gh) vl) in
@@ -1069,24 +1110,25 @@ module MLToC = struct
 	   let s = C.elim_nop s in
 	   let s = C.elim_empty_blocks s in
 	   sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))]
-           with Unsupported s ->
-             Format.printf "Unsupported : %s@." s; []
+      | Dtype [{its_name=id; its_def=idef}] ->
+         Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
+         begin
+           match idef with
+           | Some (Dalias _ty) -> [] (*[C.Dtypedef (ty_of_mlty info ty, id)] *)
+           | Some _ -> raise (Unsupported "Ddata/Drecord@.")
+           | None ->
+              begin match query_syntax info.syntax id with
+              | Some _ -> []
+              | None ->
+                 raise (Unsupported
+                          ("type declaration without syntax or alias: "
+                           ^id.id_string))
+              end
          end
-    | Dtype [{its_name=id; its_def=idef}] ->
-      Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
-      begin
-        match idef with
-        | Some (Dalias ty) -> [C.Dtypedef (ty_of_mlty info ty, id)]
-        | Some _ -> raise (Unsupported "Ddata/Drecord@.")
-        | None ->
-          begin match query_syntax info.syntax id with
-          | Some _ -> []
-          | None ->
-             raise (Unsupported ("type declaration without syntax or alias: "^id.id_string))
-          end
-      end
 
-    | _ -> [] (*TODO exn ? *)
+      | _ -> [] (*TODO exn ? *) end
+    with Unsupported s ->
+      Debug.dprintf debug_c_extraction "Unsupported : %s@." s; []
 
   let translate_decl (info:info) (d:Mltree.decl) : C.definition list
     =
@@ -1105,29 +1147,57 @@ module MLToC = struct
 end
 
 
-let fg ?fname m =
+let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
-  match fname with
-  | None -> n ^ ".c"
-  | Some f -> f ^ "__" ^ n ^ ".c"
-(*
-let pr args ?old ?fname ~flat m fmt _d =
-  ignore(old);
-  let ast = Translate.translate args m in
-  try Print.print_file fmt args ast
-  with Print.Unprinted s -> (Format.printf "Could not print: %s@." s;
-		       Format.fprintf fmt "/* Dummy file */@.")
-*)
+  let n = Print.sanitizer n in
+  let r = match fname with
+    | None -> n ^ suffix
+    | Some f -> f ^ "__" ^ n ^ suffix in
+  String.lowercase r
+
+let file_gen = name_gen ".c"
+let header_gen = name_gen ".h"
+
+let print_header_decl args ?old ?fname ~flat m fmt d =
+  ignore old;
+  ignore fname;
+  ignore flat;
+  ignore m;
+  let cds = MLToC.translate_decl args d in
+  List.iter (Format.fprintf fmt "%a@." Print.print_header_def) cds
+
+let print_prelude args ?old ?fname ~flat deps fmt pm =
+  ignore old;
+  ignore fname;
+  ignore flat;
+  ignore pm;
+  ignore args;
+  let add_include id =
+    Format.fprintf fmt "%a@." Print.print_def C.(Dinclude (id,Proj)) in
+  List.iter
+    (fun m ->
+      let id = m.Pmodule.mod_theory.Theory.th_name in
+      add_include id)
+    (List.rev deps)
+
 let print_decl args ?old ?fname ~flat m fmt d =
   ignore old;
   ignore fname;
-  ignore flat; (*FIXME*)
+  ignore flat;
   ignore m;
   let cds = MLToC.translate_decl args d in
   List.iter (Format.fprintf fmt "%a@." Print.print_def) cds
 
+let c_printer = Pdriver.{
+      desc            = "printer for C code";
+      file_gen        = file_gen;
+      decl_printer    = print_decl;
+      interf_gen      = Some header_gen;
+      interf_printer  = Some print_header_decl;
+      prelude_printer = print_prelude }
+
 let () =
-  Pdriver.register_printer "c" ~desc:"printer for C code" fg print_decl
+  Pdriver.register_printer "c" c_printer
 
 (*
 Local Variables:

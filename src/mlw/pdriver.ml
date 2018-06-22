@@ -24,6 +24,7 @@ type driver = {
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
+  drv_thinterface : Printer.interface_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_converter   : Printer.syntax_map;
@@ -34,6 +35,7 @@ type printer_args = {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;
@@ -85,6 +87,7 @@ let load_driver env file extra_files =
   List.iter add_global f.fe_global;
 
   let thprelude = ref Mid.empty in
+  let thinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let converter_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
@@ -179,6 +182,10 @@ let load_driver env file extra_files =
     with Not_found -> Loc.error ~loc (UnknownExn (!qualid,q))
   in
   let add_local_module loc m = function
+    | MRinterface s ->
+       let th = m.mod_theory in
+       let l = Mid.find_def [] th.th_name !thinterface in
+       thinterface := Mid.add th.th_name (s::l) !thinterface
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.Ity.xs_name s false
@@ -218,6 +225,7 @@ let load_driver env file extra_files =
     drv_printer     = !printer;
     drv_prelude     = List.rev !prelude;
     drv_thprelude   = Mid.map List.rev !thprelude;
+    drv_thinterface = Mid.map List.rev !thinterface;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_converter   = !converter_map;
@@ -229,22 +237,40 @@ let load_driver env file extra_files =
 open Wstdlib
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+type interface_generator = ?fname:string -> Pmodule.pmodule -> string
 
-type printer =
+type interf_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule -> Mltree.decl Pp.pp
+
+type prelude_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
+
+let print_empty_prelude _ ?old:_ ?fname:_ ~flat:_ _ _ _ = ()
+
+type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
   Pmodule.pmodule -> Mltree.decl Pp.pp
 
-type reg_printer = Pp.formatted * filename_generator * printer
+type printer =
+  { desc            : Pp.formatted;
+    file_gen        : filename_generator;
+    decl_printer    : decl_printer;
+    interf_gen      : interface_generator option;
+    interf_printer  : interf_printer option;
+    prelude_printer : prelude_printer; }
 
-let printers : reg_printer Hstr.t = Hstr.create 17
+
+let printers : printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 exception NoPrinter
 
-let register_printer ~desc s fg p =
+let register_printer s p =
   if Hstr.mem printers s then raise (KnownPrinter s);
-  Hstr.replace printers s (desc, fg, p)
+  Hstr.replace printers s p
 
 let lookup_printer drv =
   let p = match drv.drv_printer with
@@ -255,6 +281,7 @@ let lookup_printer drv =
       env         = drv.drv_env;
       prelude     = drv.drv_prelude;
       thprelude   = drv.drv_thprelude;
+      thinterface = drv.drv_thinterface;
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       converter   = drv.drv_converter;
@@ -262,11 +289,11 @@ let lookup_printer drv =
     }
   in
   try
-    let (_,fg,p) = Hstr.find printers p in (fg,printer_args,p)
+    let printer = Hstr.find printers p in printer_args, printer
   with Not_found -> raise (UnknownPrinter p)
 
 let list_printers () =
-  Hstr.fold (fun k (desc,_,_) acc -> (k,desc)::acc) printers []
+  Hstr.fold (fun k { desc = desc; _ } acc -> (k,desc)::acc) printers []
 
 (* exception report *)
 

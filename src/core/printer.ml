@@ -24,6 +24,8 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type interface = string list
+type interface_map = interface Mid.t
 type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
@@ -319,6 +321,8 @@ let syntax_float_literal s fp fmt c =
 let print_prelude fmt pl =
   let println fmt s = fprintf fmt "%s@\n" s in
   print_list nothing println fmt pl
+
+let print_interface = print_prelude
 
 let print_prelude_of_theories th_used fmt pm =
   let ht = Hid.create 5 in

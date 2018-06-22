@@ -44,6 +44,7 @@ type theory_rules = {
 
 type mo_rule =
   | MRtheory    of th_rule
+  | MRinterface of string
   | MRexception of qualid * string
   | MRval       of qualid * string
 

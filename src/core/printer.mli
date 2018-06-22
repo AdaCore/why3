@@ -21,6 +21,8 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type interface = string list
+type interface_map = interface Mid.t
 type blacklist = string list
 
 (* Makes it possible to estabilish traceability from names
@@ -59,6 +61,7 @@ val list_printers : unit -> (string * Pp.formatted) list
 
 val print_prelude : prelude Pp.pp
 val print_th_prelude : task -> prelude_map Pp.pp
+val print_interface : interface Pp.pp
 
 val meta_syntax_type : meta
 val meta_syntax_logic : meta

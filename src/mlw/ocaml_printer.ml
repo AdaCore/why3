@@ -693,10 +693,22 @@ let print_decl =
     if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
       Print.print_decl info fmt d end
 
-let fg ?fname m =
+let ng suffix ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
   let path     = m.mod_theory.th_path in
-  (module_name ?fname path mod_name) ^ ".ml"
+  (module_name ?fname path mod_name) ^ suffix
 
-let () = Pdriver.register_printer "ocaml"
-    ~desc:"printer for OCaml code" fg print_decl
+let file_gen = ng ".ml"
+let mli_gen = ng ".mli"
+
+open Pdriver
+
+let ocaml_printer =
+  { desc            = "printer for Ocaml code";
+    file_gen        = file_gen;
+    decl_printer    = print_decl;
+    interf_gen      = Some mli_gen;
+    interf_printer  = None;
+    prelude_printer = print_empty_prelude }
+
+let () = Pdriver.register_printer "ocaml" ocaml_printer
