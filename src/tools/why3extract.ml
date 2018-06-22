@@ -165,7 +165,7 @@ let print_mdecls ?fname m mdecls deps =
     if !opt_interface then begin
       match printer.Pdriver.interf_gen, printer.Pdriver.interf_printer with
       | None, _ | _, None ->
-         eprintf "Driver does not support interface extraction";
+         eprintf "Driver does not support interface extraction.@.";
          exit 1
       | Some ig, Some ipr ->
          let iout, old = get_cout_old ig m ?fname in
