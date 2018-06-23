@@ -2069,7 +2069,7 @@ STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 # TODO: remove the hack about int.mlw once it has become builtin
 stdlibdoc: $(STDLIBFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
-	sed -e "s/use import Int/use import int.Int/" stdlib/int.mlw > int.mlw
+	sed -e "s/use Int/use int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
 	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ -L stdlib \
           -o doc/stdlibdoc --title "Why3 Standard Library" \
