@@ -58,6 +58,9 @@ Provers
   * removed the `why3` Coq tactic :x:
   * dropped support for Coq 8.4 :x:
 
+Miscellaneous
+  * moved the opam base package to `why3`; added `why3-ide` and `why3-coq`
+
 Version 0.88.3, January 11, 2018
 --------------------------------
 
