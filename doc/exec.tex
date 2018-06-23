@@ -118,8 +118,14 @@ extraction command line:
 
 \paragraph{Examples.}
 We illustrate different ways of using the \texttt{extract} command through some
-examples. Consider the program in Figure~\ref{fig:AQueue} on
-page~\pageref{fig:AQueue}. If we are only interested in extracting function
+examples.
+\begin{latexonly}
+Consider the program in Figure~\ref{fig:AQueue} on page~\pageref{fig:AQueue}.
+\end{latexonly}
+\begin{htmlonly}
+Consider the program of Section~\ref{sec:AQueue}.
+\end{htmlonly}
+If we are only interested in extracting function
 \texttt{enqueue}, we can proceed as follows:
 \begin{verbatim}
 > why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
