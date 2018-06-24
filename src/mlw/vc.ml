@@ -32,6 +32,9 @@ let debug_sp = Debug.register_flag "vc_sp"
 let no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
+let debug_ignore_missing_diverges = Debug.register_info_flag "ignore_missing_diverges"
+  ~desc:"Suppress@ warnings@ on@ missing@ diverges"
+
 let case_split = Ident.create_attribute "case_split"
 let add_case t = t_attr_add case_split t
 
@@ -520,6 +523,7 @@ let rec k_expr env lps e res xmap =
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
     if eff.eff_oneway && not env.divergent then begin
+      if Debug.test_noflag debug_ignore_missing_diverges then
       Warning.emit ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
