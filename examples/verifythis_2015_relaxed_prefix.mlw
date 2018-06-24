@@ -46,7 +46,7 @@ public class Relaxed {
     public static boolean isRelaxedPrefix(int[] pat, int[] a) {
         int shift = 0;
 
-        for(int i=0; i<pat.length; i++) {
+        for(int i=0; i&lt;pat.length; i++) {
             if (pat[i]!=a[i-shift])
                 if (shift==0) shift=1;
                     else return false;
