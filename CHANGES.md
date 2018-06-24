@@ -12,8 +12,8 @@ Language
     so equality functions must be declared/defined on a per-type basis
     (already done for type `int` in the standard library) :x:
   * added overloading of program symbols
-  * new clause `alias` in function contracts :x:
-  * support for multiple assignments
+  * new contract clause `alias { <term> with <term>, ... }` :x:
+  * support for parallel assignment `<term>,... <- <term>,...`
   * type invariants now produce logical axioms;
     a type with an invariant must be proved to be inhabited :x:
   * support for local exceptions using `exception ... in ...`
@@ -21,12 +21,18 @@ Language
   * support for `exception` branches in `match` constructs
   * support for `for` loops on range types
     (including machine integers from the standard library)
-  * attribute `[@vc:sp]` on an expression switches from traditional WP to
-    Flanagan-Saxe-like VC generation
+  * attribute `[@vc:sp]` on an expression switches from traditional WP
+    to Flanagan-Saxe-like VC generation
   * support for type coercions in logic using `meta coercion`
-  * deprecated `theory`; use `module` instead
+  * keyword `theory` is deprecated; use `module` instead
   * term on the left of sequence `;` must be of type `unit` :x:
-  * cloned axioms are now turned into lemmas; use `with axiom foo` to prevent :x:
+  * cloned axioms turn into lemmas; use `with axiom my_axiom`
+    or `with axiom .` to keep them as axioms :x:
+  * `any <type> <spec>` produces an existential precondition;
+    use `val f : <type> <spec> in ...` (unsafe!) instead :x:
+  * `use T` and `clone T` now import the generated namespace T;
+    use `use T as T` and `clone T as T` to prevent this :x:
+  * `pure { <term> }` produces a ghost value in program code
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
@@ -39,7 +45,7 @@ Extraction
 
 Transformations
   * transformations can now have arguments
-  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc, à la Coq
+  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc., à la Coq
   * added transformations for reflection-based proofs
 
 Drivers

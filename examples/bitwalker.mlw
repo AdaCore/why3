@@ -254,18 +254,17 @@ module Bitwalker
     let lstart = BV32.sub_check (BV32.of_int 64) len in
     let i = ref BV32.zeros in
 
-    label Init in
     while BV32.ult !i len do variant { BV32.t'int len - BV32.t'int !i }
     invariant {0 <= BV32.t'int !i <= BV32.t'int len}
     invariant {forall j:int. 0 <= j < BV32.t'int start ->
-                 nth8_stream (addr at Init) j
+                 nth8_stream (old addr) j
                = nth8_stream addr j}
     invariant {forall j:int. BV32.t'int start <= j < BV32.t'int start + BV32.t'int !i ->
                  nth8_stream addr j
                = BV64.nth value (BV32.t'int len - j - 1 + BV32.t'int start) }
     invariant {forall j:int. BV32.t'int start + BV32.t'int !i <= j < 8 * length addr ->
                  nth8_stream addr j
-               = nth8_stream (addr at Init) j }
+               = nth8_stream (old addr) j }
 
       let flag = peek_64bit value (BV32.add_check lstart !i) in
 
@@ -292,7 +291,6 @@ module Bitwalker
     ensures {forall i. 0 <= i < 8 * length addr ->
                nth8_stream addr i = nth8_stream (old addr) i}
   =
-    label Init in
     let value = peek start len addr in
     let res = poke start len addr value in
 
@@ -300,7 +298,7 @@ module Bitwalker
 
     assert {forall i. BV32.t'int start <= i < BV32.t'int start + BV32.t'int len ->
          nth8_stream addr i
-       = nth8_stream (addr at Init) i};
+       = nth8_stream (old addr) i};
 
     res
 
