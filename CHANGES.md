@@ -1,28 +1,31 @@
 :x: marks a potential source of incompatibility
 
+Version 1.0.0, June 25, 2018
+----------------------------
+
 Core
   * improved support of counter-examples
+  * attribute `[@vc:sp]` on an expression switches from traditional WP
+    to Flanagan-Saxe-like VC generation
+  * type invariants now produce logical axioms;
+    a type with an invariant must be proved to be inhabited :x:
+  * logical symbols can no longer be used in non-ghost code;
+    in particular, there is no polymorphic equality in programs any more,
+    so equality functions must be declared/defined on a per-type basis
+    (already done for type `int` in the standard library) :x:
 
 Language
   * numerous changes to syntax, see documentation appendix :x:
   * `let function`, `let predicate`, `val function`, and `val predicate`
      introduce symbols in both logic and programs
-  * logical symbols can no longer be used in non-ghost code;
-    in particular, there is no polymorphic equality in programs any more,
-    so equality functions must be declared/defined on a per-type basis
-    (already done for type `int` in the standard library) :x:
   * added overloading of program symbols
   * new contract clause `alias { <term> with <term>, ... }` :x:
   * support for parallel assignment `<term>,... <- <term>,...`
-  * type invariants now produce logical axioms;
-    a type with an invariant must be proved to be inhabited :x:
   * support for local exceptions using `exception ... in ...`
   * added `break`, `continue`, and `return` statements
   * support for `exception` branches in `match` constructs
   * support for `for` loops on range types
     (including machine integers from the standard library)
-  * attribute `[@vc:sp]` on an expression switches from traditional WP
-    to Flanagan-Saxe-like VC generation
   * support for type coercions in logic using `meta coercion`
   * keyword `theory` is deprecated; use `module` instead
   * term on the left of sequence `;` must be of type `unit` :x:
