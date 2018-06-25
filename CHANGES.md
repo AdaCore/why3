@@ -17,7 +17,7 @@ Core
 Language
   * numerous changes to syntax, see documentation appendix :x:
   * `let function`, `let predicate`, `val function`, and `val predicate`
-     introduce symbols in both logic and programs
+    introduce symbols in both logic and programs
   * added overloading of program symbols
   * new contract clause `alias { <term> with <term>, ... }` :x:
   * support for parallel assignment `<term>,... <- <term>,...`
