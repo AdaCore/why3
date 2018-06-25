@@ -50,7 +50,7 @@ build-doc: [
 
 depends: [
   "ocamlfind" {build}
-  "menhir" {>= 20150629}
+  "menhir" {>= "20151112"}
   "num"
 ]
 
@@ -61,5 +61,6 @@ depopts: [
 ]
 
 conflicts: [
+  "why3-base"
   "ocamlgraph" {< "1.8.2"}
 ]
