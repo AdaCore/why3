@@ -300,32 +300,22 @@ Makarius Wenzel.
 \chapter{Release Notes}
 %HEVEA\cutname{changes.html}
 
-\section{Release Notes for version 0.90}
+\section{Release Notes for version 1.0: syntax changes w.r.t. 0.88}
 
-TO DISCUSS:
+The syntax of \whyml programs changed in release 1.0.
+The table in Figure~\ref{fig:syntax-1.0} summarizes the changes.
 
-comment mettre a jour l'example bag ? Parametrer par une egalit'e sur
-les elements ?
-
-
-Attention, ne pas introduire 1 variable par champ complique le boulot des prouveurs
-
-``inline'' ne doit pas inliner Map.set
-
-egalite sur les type algebriques ? engendrees automatiquement ?
-
-\subsection{Syntax Changes}
-
-Logical symbols can no longer be used in non-ghost code;
-in particular, there is no polymorphic equality in programs any more,
+Note also that logical symbols can no longer be used in non-ghost code;
+in particular, there is no polymorphic equality in programs anymore,
 so equality functions must be declared/defined on a per-type basis
-(already done for type \texttt{int} in the standard library). The CHANGES
-file contains other potential incompatibility.
+(already done for type \texttt{int} in the standard library). The \texttt{CHANGES.md}
+file describes other potential sources of incompatibility.
 
-\begin{center}
+\begin{figure}[thbp]
+\centering
 \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
 \hline
-\textbf{version 0.87} & \textbf{version 0.90} \\
+\textbf{version 0.88} & \textbf{version 1.0} \\
 \hline
 \texttt{function f ...} & \texttt{let function f ...} if called in
                           programs \\
@@ -357,25 +347,14 @@ file contains other potential incompatibility.
 \texttt{type ... invariant \{ ... self.foo ... \}} & \texttt{type ... invariant \{ ... foo ... \}}\\
 \hline
 \end{tabular}
-\end{center}
-
-\subsection{Model types, abstract types}
-
-explain \texttt{private} and ghost fields, \texttt{abstract mutable},
-\texttt{private mutable}
-
-\subsection{Polymorphic Equality}
-
-No polymorphic equality in programs. Consequence : no List.mem in
-programs, need for List.mem, List.filter, parameterized with a
-predicate.
-
-No default equality on algebraic datatypes
+\caption{Syntax changes from version 0.88 to version 1.0}
+\label{fig:syntax-1.0}
+\end{figure}
 
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
 The syntax of \whyml programs changed in release 0.80.
-The table in Figure~\ref{fig:syntax080} summarizes the changes.
+The table in Figure~\ref{fig:syntax-0.80} summarizes the changes.
 
 \begin{figure}[thbp]
   \centering
@@ -468,7 +447,7 @@ abstract e ensures \{ Q \}
 \hline
 \end{tabular}
 \caption{Syntax changes from version 0.73 to version 0.80}
-\label{fig:syntax080}
+\label{fig:syntax-0.80}
 \end{figure}
 
 \section{Summary of Changes w.r.t. Why 2}
