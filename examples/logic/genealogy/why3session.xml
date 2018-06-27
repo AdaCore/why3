@@ -27,6 +27,7 @@
 <prover id="22" name="Vampire" version="0.6" timelimit="3" steplimit="1" memlimit="1000"/>
 <prover id="23" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="24" name="veriT" version="201410" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="25" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="26" name="Zenon Modulo" version="0.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
 <prover id="27" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="28" name="Z3" version="4.4.1" timelimit="5" steplimit="1" memlimit="4000"/>
@@ -35,9 +36,9 @@
 <prover id="31" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="33" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="34" name="Coq" version="8.7.1" timelimit="5" steplimit="1" memlimit="4000"/>
-<file name="../genealogy.why">
-<theory name="Genealogy">
- <goal name="Child_is_son_or_daughter" expl="">
+<file name="../genealogy.why" proved="true">
+<theory name="Genealogy" proved="true">
+ <goal name="Child_is_son_or_daughter" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -59,6 +60,7 @@
  <proof prover="22"><result status="valid" time="0.00"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="10"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
@@ -68,7 +70,7 @@
  <proof prover="33"><result status="valid" time="0.02"/></proof>
  <proof prover="34" edited="genealogy_Genealogy_Child_is_son_or_daughter_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
- <goal name="Sibling_sym" expl="">
+ <goal name="Sibling_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -91,6 +93,7 @@
  <proof prover="22"><result status="valid" time="0.00"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="2"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.00"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
@@ -99,7 +102,7 @@
  <proof prover="31"><result status="valid" time="0.00"/></proof>
  <proof prover="33"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Sibling_is_brother_or_sister" expl="">
+ <goal name="Sibling_is_brother_or_sister" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -120,6 +123,7 @@
  <proof prover="22"><result status="valid" time="0.00"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="9"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="26"><result status="valid" time="0.01"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
@@ -128,7 +132,7 @@
  <proof prover="31"><result status="valid" time="0.00"/></proof>
  <proof prover="33"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Grandparent_is_grandfather_or_grandmother" expl="">
+ <goal name="Grandparent_is_grandfather_or_grandmother" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -150,6 +154,7 @@
  <proof prover="22"><result status="valid" time="0.01"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="32"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="20"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
@@ -158,7 +163,7 @@
  <proof prover="31"><result status="valid" time="0.00"/></proof>
  <proof prover="33"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Grandfather_male" expl="">
+ <goal name="Grandfather_male" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -181,6 +186,7 @@
  <proof prover="22"><result status="valid" time="0.03"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="11"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
@@ -188,7 +194,7 @@
  <proof prover="31"><result status="valid" time="0.00"/></proof>
  <proof prover="33"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Grandmother_female" expl="">
+ <goal name="Grandmother_female" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -211,6 +217,7 @@
  <proof prover="22"><result status="valid" time="0.01"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="11"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.00"/></proof>
  <proof prover="28"><result status="valid" time="0.00"/></proof>
@@ -218,7 +225,7 @@
  <proof prover="31"><result status="valid" time="0.00"/></proof>
  <proof prover="33"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Only_two_grandfathers" expl="">
+ <goal name="Only_two_grandfathers" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -241,6 +248,7 @@
  <proof prover="22"><result status="valid" time="0.01"/></proof>
  <proof prover="23"><result status="valid" time="0.01" steps="10"/></proof>
  <proof prover="24"><result status="valid" time="0.00"/></proof>
+ <proof prover="25"><result status="valid" time="0.00" steps="18"/></proof>
  <proof prover="26"><result status="valid" time="0.02"/></proof>
  <proof prover="27"><result status="valid" time="0.01"/></proof>
  <proof prover="28"><result status="valid" time="0.01"/></proof>
