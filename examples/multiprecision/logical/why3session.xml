@@ -8,6 +8,7 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../logical.mlw" proved="true">
 <theory name="Logical" proved="true">
  <goal name="VC pow2_64" expl="VC for pow2_64" proved="true">
@@ -890,6 +891,583 @@
   </transf>
   </goal>
   <goal name="VC wmpn_rshift.64" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC wmpn_lshift_in_place" expl="VC for wmpn_lshift_in_place" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC wmpn_lshift_in_place.0" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.1" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.2" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.3" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.4" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.5" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.6" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.7" expl="loop invariant init" proved="true">
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="54"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.8" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.9" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.10" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.11" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.12" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.13" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.14" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.15" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.16" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.17" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.18" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.19" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.20" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.21" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.22" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.23" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.24" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_lshift_in_place.24.0" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.24.1" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.24.2" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.24.3" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="88"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.25" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.26" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.27" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.28" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.29" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.30" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.31" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.32" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.33" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.34" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.38"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.35" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.36" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.37" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.38" expl="assertion" proved="true">
+  <transf name="replace" proved="true" arg1="(power radix2 2)" arg2="(radix2 * radix2)">
+   <goal name="VC wmpn_lshift_in_place.38.0" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.38.1" proved="true">
+   <proof prover="6"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.39" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_lshift_in_place.39.0" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.54"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.39.1" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.39.2" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.30"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.39.3" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.40" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.41" expl="assertion" proved="true">
+  <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
+   <goal name="VC wmpn_lshift_in_place.41.0" expl="assertion" proved="true">
+   <transf name="reflection_f" proved="true" arg1="mp_decision">
+    <goal name="VC wmpn_lshift_in_place.41.0.0" expl="assertion" proved="true">
+    <proof prover="0"><result status="valid" time="0.33"/></proof>
+    </goal>
+    <goal name="VC wmpn_lshift_in_place.41.0.1" proved="true">
+    <proof prover="6"><result status="valid" time="0.36"/></proof>
+    </goal>
+    <goal name="VC wmpn_lshift_in_place.41.0.2" proved="true">
+    <proof prover="6"><result status="valid" time="0.24"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.42" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.43" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_lshift_in_place.43.0" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.19"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.43.1" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.30"/></proof>
+   </goal>
+   <goal name="VC wmpn_lshift_in_place.43.2" expl="VC for wmpn_lshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.44" expl="loop variant decrease" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.45" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.46" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.64"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.47" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.48" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.49" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.50" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.51" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.52" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.53" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.54" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.55" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.56" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.57" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.58" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.59" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.60" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.61" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.62" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.63" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.64" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_lshift_in_place.65" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC wmpn_rshift_in_place" expl="VC for wmpn_rshift_in_place" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC wmpn_rshift_in_place.0" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.1" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.2" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.3" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.4" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.5" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.6" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.7" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.8" expl="loop invariant init" proved="true">
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.08" steps="111"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.9" expl="loop invariant init" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.10" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.11" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.12" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.13" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.14" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.15" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.16" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.17" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.18" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.19" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.20" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.21" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.22" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.23" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.24" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.25" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_rshift_in_place.25.0" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.1" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.2" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.3" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.4" expl="VC for wmpn_rshift_in_place" proved="true">
+   <transf name="rewrite" proved="true" arg1="H21">
+    <goal name="VC wmpn_rshift_in_place.25.4.0" expl="VC for wmpn_rshift_in_place" proved="true">
+    <proof prover="6"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="VC wmpn_rshift_in_place.25.4.1" proved="true">
+    <proof prover="6"><result status="valid" time="0.05"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.5" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.25.6" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.26" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.27" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.28" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.29" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.30" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.31" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.32" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.33" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.34" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.35" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.22"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.36" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.37" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.38" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.39" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.40" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_rshift_in_place.40.0" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.40.1" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.40.2" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.40.3" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.41" expl="assertion" proved="true">
+  <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
+   <goal name="VC wmpn_rshift_in_place.41.0" expl="assertion" proved="true">
+   <transf name="reflection_f" proved="true" arg1="mp_decision">
+    <goal name="VC wmpn_rshift_in_place.41.0.0" expl="assertion" proved="true">
+    <proof prover="0"><result status="valid" time="0.46"/></proof>
+    </goal>
+    <goal name="VC wmpn_rshift_in_place.41.0.1" proved="true">
+    <proof prover="6"><result status="valid" time="0.34"/></proof>
+    </goal>
+    <goal name="VC wmpn_rshift_in_place.41.0.2" proved="true">
+    <proof prover="6"><result status="valid" time="0.24"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.42" expl="integer overflow" proved="true">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.43" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_rshift_in_place.43.0" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.21"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.43.1" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="0"><result status="valid" time="0.40"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.43.2" expl="VC for wmpn_rshift_in_place" proved="true">
+   <proof prover="6"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.44" expl="loop variant decrease" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.45" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.46" expl="loop invariant preservation" proved="true">
+  <transf name="replace" proved="true" arg1="(int32&#39;int i)" arg2="(i1+1)">
+   <goal name="VC wmpn_rshift_in_place.46.0" expl="loop invariant preservation" proved="true">
+   <proof prover="6"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC wmpn_rshift_in_place.46.1" proved="true">
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.47" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.48" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.49" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.50" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.51" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.52" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.53" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.54" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.55" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.56" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.57" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.58" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.66"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.59" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="5" timelimit="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.60" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.61" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.62" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.63" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.64" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.65" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.66" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="2.97"/></proof>
+  </goal>
+  <goal name="VC wmpn_rshift_in_place.67" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
