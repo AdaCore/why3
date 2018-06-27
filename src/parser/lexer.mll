@@ -285,7 +285,11 @@ rule token = parse
     and fail checkpoint =
       let t = Lexing.lexeme lb in
       let token = match_tokens !last in
-      let s = Report.report (t, token) checkpoint in
+      let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
+      (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
+      let s = if Filename.remove_extension fname = "/trywhy3_input"
+        then "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        else Report.report (t, token) checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to
          be able to reload). *)
