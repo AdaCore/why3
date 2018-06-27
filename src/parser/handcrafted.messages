@@ -95,7 +95,7 @@ term_eof: UIDENT COMMA WRITES
 
 term_eof: UIDENT WITH 
 ##
-## Ends in an error in state: 1174.
+## Ends in an error in state: 1175.
 ##
 ## term_eof -> term . EOF [ # ]
 ##
@@ -119,7 +119,7 @@ term_eof: UIDENT WITH
 
 term_eof: WRITES 
 ##
-## Ends in an error in state: 1172.
+## Ends in an error in state: 1173.
 ##
 ## term_eof' -> . term_eof [ # ]
 ##
@@ -2908,7 +2908,7 @@ term_comma_list_eof: UIDENT OR WRITES
 
 term_comma_list_eof: UIDENT RIGHTSQ 
 ##
-## Ends in an error in state: 1170.
+## Ends in an error in state: 1171.
 ##
 ## term_comma_list_eof -> comma_list1(single_term) . EOF [ # ]
 ##
@@ -3067,7 +3067,7 @@ term_comma_list_eof: UIDENT WRITES
 
 term_comma_list_eof: WRITES 
 ##
-## Ends in an error in state: 1168.
+## Ends in an error in state: 1169.
 ##
 ## term_comma_list_eof' -> . term_comma_list_eof [ # ]
 ##
@@ -3079,7 +3079,7 @@ term_comma_list_eof: WRITES
 
 qualid_eof: UIDENT WRITES 
 ##
-## Ends in an error in state: 1166.
+## Ends in an error in state: 1167.
 ##
 ## qualid_eof -> qualid . EOF [ # ]
 ##
@@ -3098,7 +3098,7 @@ qualid_eof: UIDENT WRITES
 
 qualid_eof: WRITES 
 ##
-## Ends in an error in state: 1164.
+## Ends in an error in state: 1165.
 ##
 ## qualid_eof' -> . qualid_eof [ # ]
 ##
@@ -3251,7 +3251,7 @@ qualid_comma_list_eof: LEFTPAR WRITES
 
 qualid_comma_list_eof: UIDENT COMMA WRITES 
 ##
-## Ends in an error in state: 1160.
+## Ends in an error in state: 1161.
 ##
 ## separated_nonempty_list(COMMA,qualid) -> qualid COMMA . separated_nonempty_list(COMMA,qualid) [ EOF ]
 ##
@@ -3302,7 +3302,7 @@ qualid_comma_list_eof: UIDENT WHILE
 
 qualid_comma_list_eof: UIDENT WRITES 
 ##
-## Ends in an error in state: 1159.
+## Ends in an error in state: 1160.
 ##
 ## separated_nonempty_list(COMMA,qualid) -> qualid . [ EOF ]
 ## separated_nonempty_list(COMMA,qualid) -> qualid . COMMA separated_nonempty_list(COMMA,qualid) [ EOF ]
@@ -3322,7 +3322,7 @@ qualid_comma_list_eof: UIDENT WRITES
 
 qualid_comma_list_eof: WRITES 
 ##
-## Ends in an error in state: 1156.
+## Ends in an error in state: 1157.
 ##
 ## qualid_comma_list_eof' -> . qualid_comma_list_eof [ # ]
 ##
@@ -3334,7 +3334,7 @@ qualid_comma_list_eof: WRITES
 
 mlw_file: AXIOM UIDENT COLON WRITES 
 ##
-## Ends in an error in state: 1133.
+## Ends in an error in state: 1134.
 ##
 ## pure_decl -> AXIOM attrs(ident_nq) COLON . term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3346,7 +3346,7 @@ mlw_file: AXIOM UIDENT COLON WRITES
 
 mlw_file: AXIOM UIDENT POSITION WRITES 
 ##
-## Ends in an error in state: 1132.
+## Ends in an error in state: 1133.
 ##
 ## pure_decl -> AXIOM attrs(ident_nq) . COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3359,14 +3359,14 @@ mlw_file: AXIOM UIDENT POSITION WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 61, spurious reduction of production list(attr) -> 
 ## In state 62, spurious reduction of production list(attr) -> attr list(attr) 
-## In state 1036, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
+## In state 1037, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: AXIOM WRITES 
 ##
-## Ends in an error in state: 1131.
+## Ends in an error in state: 1132.
 ##
 ## pure_decl -> AXIOM . attrs(ident_nq) COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3378,7 +3378,7 @@ mlw_file: AXIOM WRITES
 
 mlw_file: CLONE EXPORT UIDENT AS 
 ##
-## Ends in an error in state: 1085.
+## Ends in an error in state: 1086.
 ##
 ## use_clone -> CLONE EXPORT tqualid . clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3396,7 +3396,7 @@ mlw_file: CLONE EXPORT UIDENT AS
 
 mlw_file: CLONE EXPORT WRITES 
 ##
-## Ends in an error in state: 1084.
+## Ends in an error in state: 1085.
 ##
 ## use_clone -> CLONE EXPORT . tqualid clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3408,7 +3408,7 @@ mlw_file: CLONE EXPORT WRITES
 
 mlw_file: CLONE IMPORT CONTINUE 
 ##
-## Ends in an error in state: 1127.
+## Ends in an error in state: 1128.
 ##
 ## use_clone -> CLONE boption(IMPORT) . tqualid option(preceded(AS,uident)) clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3420,7 +3420,7 @@ mlw_file: CLONE IMPORT CONTINUE
 
 mlw_file: CLONE UIDENT AS CORE_UIDENT WRITES 
 ##
-## Ends in an error in state: 1129.
+## Ends in an error in state: 1130.
 ##
 ## use_clone -> CLONE boption(IMPORT) tqualid option(preceded(AS,uident)) . clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3432,7 +3432,7 @@ mlw_file: CLONE UIDENT AS CORE_UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH AXIOM WRITES 
 ##
-## Ends in an error in state: 1118.
+## Ends in an error in state: 1119.
 ##
 ## single_clone_subst -> AXIOM . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> AXIOM . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3445,7 +3445,7 @@ mlw_file: CLONE UIDENT WITH AXIOM WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1116.
+## Ends in an error in state: 1117.
 ##
 ## single_clone_subst -> CONSTANT qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3457,7 +3457,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT UIDENT WRITES 
 ##
-## Ends in an error in state: 1115.
+## Ends in an error in state: 1116.
 ##
 ## single_clone_subst -> CONSTANT qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> CONSTANT qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3477,7 +3477,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH CONSTANT WRITES 
 ##
-## Ends in an error in state: 1114.
+## Ends in an error in state: 1115.
 ##
 ## single_clone_subst -> CONSTANT . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> CONSTANT . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3490,7 +3490,7 @@ mlw_file: CLONE UIDENT WITH CONSTANT WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1112.
+## Ends in an error in state: 1113.
 ##
 ## single_clone_subst -> EXCEPTION qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3502,7 +3502,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT WRITES 
 ##
-## Ends in an error in state: 1111.
+## Ends in an error in state: 1112.
 ##
 ## single_clone_subst -> EXCEPTION qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> EXCEPTION qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3522,7 +3522,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH EXCEPTION WRITES 
 ##
-## Ends in an error in state: 1110.
+## Ends in an error in state: 1111.
 ##
 ## single_clone_subst -> EXCEPTION . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> EXCEPTION . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3535,7 +3535,7 @@ mlw_file: CLONE UIDENT WITH EXCEPTION WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1108.
+## Ends in an error in state: 1109.
 ##
 ## single_clone_subst -> FUNCTION qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3547,7 +3547,7 @@ mlw_file: CLONE UIDENT WITH FUNCTION UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION UIDENT WRITES 
 ##
-## Ends in an error in state: 1107.
+## Ends in an error in state: 1108.
 ##
 ## single_clone_subst -> FUNCTION qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> FUNCTION qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3567,7 +3567,7 @@ mlw_file: CLONE UIDENT WITH FUNCTION UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH FUNCTION WRITES 
 ##
-## Ends in an error in state: 1106.
+## Ends in an error in state: 1107.
 ##
 ## single_clone_subst -> FUNCTION . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> FUNCTION . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3580,7 +3580,7 @@ mlw_file: CLONE UIDENT WITH FUNCTION WRITES
 
 mlw_file: CLONE UIDENT WITH GOAL WRITES 
 ##
-## Ends in an error in state: 1103.
+## Ends in an error in state: 1104.
 ##
 ## single_clone_subst -> GOAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> GOAL . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3593,7 +3593,7 @@ mlw_file: CLONE UIDENT WITH GOAL WRITES
 
 mlw_file: CLONE UIDENT WITH LEMMA UIDENT WRITES 
 ##
-## Ends in an error in state: 1121.
+## Ends in an error in state: 1122.
 ##
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst . COMMA separated_nonempty_list(COMMA,single_clone_subst) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -3607,14 +3607,14 @@ mlw_file: CLONE UIDENT WITH LEMMA UIDENT WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 287, spurious reduction of production ident_rich -> uident 
 ## In state 340, spurious reduction of production qualid -> ident_rich 
-## In state 1102, spurious reduction of production single_clone_subst -> LEMMA qualid 
+## In state 1103, spurious reduction of production single_clone_subst -> LEMMA qualid 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: CLONE UIDENT WITH LEMMA WRITES 
 ##
-## Ends in an error in state: 1100.
+## Ends in an error in state: 1101.
 ##
 ## single_clone_subst -> LEMMA . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> LEMMA . DOT [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3627,7 +3627,7 @@ mlw_file: CLONE UIDENT WITH LEMMA WRITES
 
 mlw_file: CLONE UIDENT WITH PREDICATE UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1098.
+## Ends in an error in state: 1099.
 ##
 ## single_clone_subst -> PREDICATE qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3639,7 +3639,7 @@ mlw_file: CLONE UIDENT WITH PREDICATE UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH PREDICATE UIDENT WRITES 
 ##
-## Ends in an error in state: 1097.
+## Ends in an error in state: 1098.
 ##
 ## single_clone_subst -> PREDICATE qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> PREDICATE qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3659,7 +3659,7 @@ mlw_file: CLONE UIDENT WITH PREDICATE UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH PREDICATE WRITES 
 ##
-## Ends in an error in state: 1096.
+## Ends in an error in state: 1097.
 ##
 ## single_clone_subst -> PREDICATE . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> PREDICATE . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3672,7 +3672,7 @@ mlw_file: CLONE UIDENT WITH PREDICATE WRITES
 
 mlw_file: CLONE UIDENT WITH TYPE UIDENT EQUAL RANGE WRITES 
 ##
-## Ends in an error in state: 1095.
+## Ends in an error in state: 1096.
 ##
 ## single_clone_subst -> TYPE qualid list(ty_var) EQUAL ty . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## ty -> ty . ARROW ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ARROW ]
@@ -3692,7 +3692,7 @@ mlw_file: CLONE UIDENT WITH TYPE UIDENT EQUAL RANGE WRITES
 
 mlw_file: CLONE UIDENT WITH TYPE UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1094.
+## Ends in an error in state: 1095.
 ##
 ## single_clone_subst -> TYPE qualid list(ty_var) EQUAL . ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3704,7 +3704,7 @@ mlw_file: CLONE UIDENT WITH TYPE UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH TYPE UIDENT QUOTE_LIDENT EOF 
 ##
-## Ends in an error in state: 1093.
+## Ends in an error in state: 1094.
 ##
 ## single_clone_subst -> TYPE qualid list(ty_var) . EQUAL ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3726,7 +3726,7 @@ mlw_file: CLONE UIDENT WITH TYPE UIDENT QUOTE_LIDENT EOF
 
 mlw_file: CLONE UIDENT WITH TYPE UIDENT WRITES 
 ##
-## Ends in an error in state: 1092.
+## Ends in an error in state: 1093.
 ##
 ## single_clone_subst -> TYPE qualid . list(ty_var) EQUAL ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> TYPE qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3746,7 +3746,7 @@ mlw_file: CLONE UIDENT WITH TYPE UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH TYPE WRITES 
 ##
-## Ends in an error in state: 1091.
+## Ends in an error in state: 1092.
 ##
 ## single_clone_subst -> TYPE . qualid list(ty_var) EQUAL ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> TYPE . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3759,7 +3759,7 @@ mlw_file: CLONE UIDENT WITH TYPE WRITES
 
 mlw_file: CLONE UIDENT WITH VAL UIDENT COMMA WRITES 
 ##
-## Ends in an error in state: 1122.
+## Ends in an error in state: 1123.
 ##
 ## separated_nonempty_list(COMMA,single_clone_subst) -> single_clone_subst COMMA . separated_nonempty_list(COMMA,single_clone_subst) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3771,7 +3771,7 @@ mlw_file: CLONE UIDENT WITH VAL UIDENT COMMA WRITES
 
 mlw_file: CLONE UIDENT WITH VAL UIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1089.
+## Ends in an error in state: 1090.
 ##
 ## single_clone_subst -> VAL qualid EQUAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3783,7 +3783,7 @@ mlw_file: CLONE UIDENT WITH VAL UIDENT EQUAL WRITES
 
 mlw_file: CLONE UIDENT WITH VAL UIDENT WRITES 
 ##
-## Ends in an error in state: 1088.
+## Ends in an error in state: 1089.
 ##
 ## single_clone_subst -> VAL qualid . EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> VAL qualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3803,7 +3803,7 @@ mlw_file: CLONE UIDENT WITH VAL UIDENT WRITES
 
 mlw_file: CLONE UIDENT WITH VAL WRITES 
 ##
-## Ends in an error in state: 1087.
+## Ends in an error in state: 1088.
 ##
 ## single_clone_subst -> VAL . qualid EQUAL qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## single_clone_subst -> VAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
@@ -3816,7 +3816,7 @@ mlw_file: CLONE UIDENT WITH VAL WRITES
 
 mlw_file: CLONE UIDENT WITH WRITES 
 ##
-## Ends in an error in state: 1086.
+## Ends in an error in state: 1087.
 ##
 ## clone_subst -> WITH . comma_list1(single_clone_subst) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3828,7 +3828,7 @@ mlw_file: CLONE UIDENT WITH WRITES
 
 mlw_file: CLONE WRITES 
 ##
-## Ends in an error in state: 1083.
+## Ends in an error in state: 1084.
 ##
 ## use_clone -> CLONE . EXPORT tqualid clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## use_clone -> CLONE . boption(IMPORT) tqualid option(preceded(AS,uident)) clone_subst [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -3841,7 +3841,7 @@ mlw_file: CLONE WRITES
 
 mlw_file: COINDUCTIVE WRITES 
 ##
-## Ends in an error in state: 1081.
+## Ends in an error in state: 1082.
 ##
 ## pure_decl -> COINDUCTIVE . with_list1(inductive_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3853,7 +3853,7 @@ mlw_file: COINDUCTIVE WRITES
 
 mlw_file: CONSTANT RANGE COLON CORE_LIDENT WRITES 
 ##
-## Ends in an error in state: 1079.
+## Ends in an error in state: 1080.
 ##
 ## constant_decl -> attrs(lident_rich) cast . option(preceded(EQUAL,term)) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3873,7 +3873,7 @@ mlw_file: CONSTANT RANGE COLON CORE_LIDENT WRITES
 
 mlw_file: CONSTANT RANGE WRITES 
 ##
-## Ends in an error in state: 1078.
+## Ends in an error in state: 1079.
 ##
 ## constant_decl -> attrs(lident_rich) . cast option(preceded(EQUAL,term)) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -3892,7 +3892,7 @@ mlw_file: CONSTANT RANGE WRITES
 
 mlw_file: CONSTANT WRITES 
 ##
-## Ends in an error in state: 1076.
+## Ends in an error in state: 1077.
 ##
 ## pure_decl -> CONSTANT . constant_decl [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4037,7 +4037,7 @@ mlw_file: EXCEPTION UIDENT LEFTPAR WRITES
 
 mlw_file: EXCEPTION UIDENT WITH 
 ##
-## Ends in an error in state: 1074.
+## Ends in an error in state: 1075.
 ##
 ## prog_decl -> EXCEPTION attrs(uident_nq) . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> EXCEPTION attrs(uident_nq) . return [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4057,7 +4057,7 @@ mlw_file: EXCEPTION UIDENT WITH
 
 mlw_file: EXCEPTION WRITES 
 ##
-## Ends in an error in state: 1073.
+## Ends in an error in state: 1074.
 ##
 ## prog_decl -> EXCEPTION . attrs(uident_nq) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> EXCEPTION . attrs(uident_nq) return [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4070,7 +4070,7 @@ mlw_file: EXCEPTION WRITES
 
 mlw_file: FUNCTION RANGE COLON CORE_LIDENT EQUAL CORE_LIDENT THEN 
 ##
-## Ends in an error in state: 1067.
+## Ends in an error in state: 1068.
 ##
 ## pure_decl -> FUNCTION function_decl . list(with_logic_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4088,15 +4088,15 @@ mlw_file: FUNCTION RANGE COLON CORE_LIDENT EQUAL CORE_LIDENT THEN
 ## In state 306, spurious reduction of production mk_term(single_term_) -> single_term_ 
 ## In state 337, spurious reduction of production single_term -> mk_term(single_term_) 
 ## In state 307, spurious reduction of production term -> single_term 
-## In state 986, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
-## In state 1072, spurious reduction of production function_decl -> attrs(lident_rich) params cast option(preceded(EQUAL,term)) 
+## In state 987, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
+## In state 1073, spurious reduction of production function_decl -> attrs(lident_rich) params cast option(preceded(EQUAL,term)) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: FUNCTION RANGE COLON CORE_LIDENT WRITES 
 ##
-## Ends in an error in state: 1071.
+## Ends in an error in state: 1072.
 ##
 ## function_decl -> attrs(lident_rich) params cast . option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4116,7 +4116,7 @@ mlw_file: FUNCTION RANGE COLON CORE_LIDENT WRITES
 
 mlw_file: FUNCTION RANGE UNDERSCORE WRITES 
 ##
-## Ends in an error in state: 1070.
+## Ends in an error in state: 1071.
 ##
 ## function_decl -> attrs(lident_rich) params . cast option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4136,7 +4136,7 @@ mlw_file: FUNCTION RANGE UNDERSCORE WRITES
 
 mlw_file: FUNCTION RANGE WRITES 
 ##
-## Ends in an error in state: 1069.
+## Ends in an error in state: 1070.
 ##
 ## function_decl -> attrs(lident_rich) . params cast option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4155,7 +4155,7 @@ mlw_file: FUNCTION RANGE WRITES
 
 mlw_file: FUNCTION WRITES 
 ##
-## Ends in an error in state: 1066.
+## Ends in an error in state: 1067.
 ##
 ## pure_decl -> FUNCTION . function_decl list(with_logic_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4167,7 +4167,7 @@ mlw_file: FUNCTION WRITES
 
 mlw_file: GOAL UIDENT COLON WRITES 
 ##
-## Ends in an error in state: 1064.
+## Ends in an error in state: 1065.
 ##
 ## pure_decl -> GOAL attrs(ident_nq) COLON . term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4179,7 +4179,7 @@ mlw_file: GOAL UIDENT COLON WRITES
 
 mlw_file: GOAL UIDENT POSITION WRITES 
 ##
-## Ends in an error in state: 1063.
+## Ends in an error in state: 1064.
 ##
 ## pure_decl -> GOAL attrs(ident_nq) . COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4192,14 +4192,14 @@ mlw_file: GOAL UIDENT POSITION WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 61, spurious reduction of production list(attr) -> 
 ## In state 62, spurious reduction of production list(attr) -> attr list(attr) 
-## In state 1036, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
+## In state 1037, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: GOAL WRITES 
 ##
-## Ends in an error in state: 1062.
+## Ends in an error in state: 1063.
 ##
 ## pure_decl -> GOAL . attrs(ident_nq) COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4211,7 +4211,7 @@ mlw_file: GOAL WRITES
 
 mlw_file: IMPORT UIDENT WRITES 
 ##
-## Ends in an error in state: 1061.
+## Ends in an error in state: 1062.
 ##
 ## module_decl -> IMPORT uqualid . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## uqualid -> uqualid . DOT uident [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END DOT CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4224,7 +4224,7 @@ mlw_file: IMPORT UIDENT WRITES
 
 mlw_file: IMPORT WRITES 
 ##
-## Ends in an error in state: 1060.
+## Ends in an error in state: 1061.
 ##
 ## module_decl -> IMPORT . uqualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4236,7 +4236,7 @@ mlw_file: IMPORT WRITES
 
 mlw_file: INDUCTIVE RANGE EQUAL BAR WRITES 
 ##
-## Ends in an error in state: 1049.
+## Ends in an error in state: 1050.
 ##
 ## bar_list1(ind_case) -> BAR . separated_nonempty_list(BAR,ind_case) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4248,7 +4248,7 @@ mlw_file: INDUCTIVE RANGE EQUAL BAR WRITES
 
 mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON CORE_LIDENT BAR WRITES 
 ##
-## Ends in an error in state: 1052.
+## Ends in an error in state: 1053.
 ##
 ## separated_nonempty_list(BAR,ind_case) -> ind_case BAR . separated_nonempty_list(BAR,ind_case) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4260,7 +4260,7 @@ mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON CORE_LIDENT BAR WRITES
 
 mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON CORE_LIDENT THEN 
 ##
-## Ends in an error in state: 1051.
+## Ends in an error in state: 1052.
 ##
 ## separated_nonempty_list(BAR,ind_case) -> ind_case . [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## separated_nonempty_list(BAR,ind_case) -> ind_case . BAR separated_nonempty_list(BAR,ind_case) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4279,14 +4279,14 @@ mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON CORE_LIDENT THEN
 ## In state 306, spurious reduction of production mk_term(single_term_) -> single_term_ 
 ## In state 337, spurious reduction of production single_term -> mk_term(single_term_) 
 ## In state 307, spurious reduction of production term -> single_term 
-## In state 1056, spurious reduction of production ind_case -> attrs(ident_nq) COLON term 
+## In state 1057, spurious reduction of production ind_case -> attrs(ident_nq) COLON term 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON WRITES 
 ##
-## Ends in an error in state: 1055.
+## Ends in an error in state: 1056.
 ##
 ## ind_case -> attrs(ident_nq) COLON . term [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE BAR AXIOM ]
 ##
@@ -4298,7 +4298,7 @@ mlw_file: INDUCTIVE RANGE EQUAL UIDENT COLON WRITES
 
 mlw_file: INDUCTIVE RANGE EQUAL UIDENT POSITION WRITES 
 ##
-## Ends in an error in state: 1054.
+## Ends in an error in state: 1055.
 ##
 ## ind_case -> attrs(ident_nq) . COLON term [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE BAR AXIOM ]
 ##
@@ -4311,14 +4311,14 @@ mlw_file: INDUCTIVE RANGE EQUAL UIDENT POSITION WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 61, spurious reduction of production list(attr) -> 
 ## In state 62, spurious reduction of production list(attr) -> attr list(attr) 
-## In state 1036, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
+## In state 1037, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: INDUCTIVE RANGE EQUAL WRITES 
 ##
-## Ends in an error in state: 1048.
+## Ends in an error in state: 1049.
 ##
 ## ind_defn -> EQUAL . bar_list1(ind_case) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4330,7 +4330,7 @@ mlw_file: INDUCTIVE RANGE EQUAL WRITES
 
 mlw_file: INDUCTIVE RANGE UNDERSCORE WRITES 
 ##
-## Ends in an error in state: 1047.
+## Ends in an error in state: 1048.
 ##
 ## inductive_decl -> attrs(lident_rich) params . ind_defn [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4350,7 +4350,7 @@ mlw_file: INDUCTIVE RANGE UNDERSCORE WRITES
 
 mlw_file: INDUCTIVE RANGE WITH WRITES 
 ##
-## Ends in an error in state: 1044.
+## Ends in an error in state: 1045.
 ##
 ## separated_nonempty_list(WITH,inductive_decl) -> inductive_decl WITH . separated_nonempty_list(WITH,inductive_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4362,7 +4362,7 @@ mlw_file: INDUCTIVE RANGE WITH WRITES
 
 mlw_file: INDUCTIVE RANGE WRITES 
 ##
-## Ends in an error in state: 1046.
+## Ends in an error in state: 1047.
 ##
 ## inductive_decl -> attrs(lident_rich) . params ind_defn [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4381,7 +4381,7 @@ mlw_file: INDUCTIVE RANGE WRITES
 
 mlw_file: INDUCTIVE WRITES 
 ##
-## Ends in an error in state: 1040.
+## Ends in an error in state: 1041.
 ##
 ## pure_decl -> INDUCTIVE . with_list1(inductive_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4393,7 +4393,7 @@ mlw_file: INDUCTIVE WRITES
 
 mlw_file: LEMMA UIDENT ATTRIBUTE WRITES 
 ##
-## Ends in an error in state: 1037.
+## Ends in an error in state: 1038.
 ##
 ## pure_decl -> LEMMA attrs(ident_nq) . COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4406,14 +4406,14 @@ mlw_file: LEMMA UIDENT ATTRIBUTE WRITES
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 61, spurious reduction of production list(attr) -> 
 ## In state 62, spurious reduction of production list(attr) -> attr list(attr) 
-## In state 1036, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
+## In state 1037, spurious reduction of production attrs(ident_nq) -> ident_nq list(attr) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LEMMA UIDENT COLON WRITES 
 ##
-## Ends in an error in state: 1038.
+## Ends in an error in state: 1039.
 ##
 ## pure_decl -> LEMMA attrs(ident_nq) COLON . term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4425,7 +4425,7 @@ mlw_file: LEMMA UIDENT COLON WRITES
 
 mlw_file: LEMMA UIDENT WRITES 
 ##
-## Ends in an error in state: 1035.
+## Ends in an error in state: 1036.
 ##
 ## attrs(ident_nq) -> ident_nq . list(attr) [ COLON ]
 ##
@@ -4437,7 +4437,7 @@ mlw_file: LEMMA UIDENT WRITES
 
 mlw_file: LEMMA WRITES 
 ##
-## Ends in an error in state: 1032.
+## Ends in an error in state: 1033.
 ##
 ## pure_decl -> LEMMA . attrs(ident_nq) COLON term [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4449,7 +4449,7 @@ mlw_file: LEMMA WRITES
 
 mlw_file: LET GHOST COMMA 
 ##
-## Ends in an error in state: 1022.
+## Ends in an error in state: 1023.
 ##
 ## prog_decl -> LET ghost . kind attrs(lident_rich) mk_expr(fun_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> LET ghost . kind attrs(lident_rich) const_defn [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4462,7 +4462,7 @@ mlw_file: LET GHOST COMMA
 
 mlw_file: LET PREDICATE CONTINUE 
 ##
-## Ends in an error in state: 1023.
+## Ends in an error in state: 1024.
 ##
 ## prog_decl -> LET ghost kind . attrs(lident_rich) mk_expr(fun_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> LET ghost kind . attrs(lident_rich) const_defn [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -4475,7 +4475,7 @@ mlw_file: LET PREDICATE CONTINUE
 
 mlw_file: LET RANGE COLON CORE_LIDENT EQUAL WRITES 
 ##
-## Ends in an error in state: 1030.
+## Ends in an error in state: 1031.
 ##
 ## const_defn -> cast EQUAL . seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4487,7 +4487,7 @@ mlw_file: LET RANGE COLON CORE_LIDENT EQUAL WRITES
 
 mlw_file: LET RANGE COLON CORE_LIDENT WRITES 
 ##
-## Ends in an error in state: 1029.
+## Ends in an error in state: 1030.
 ##
 ## const_defn -> cast . EQUAL seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -4564,7 +4564,7 @@ mlw_file: LET RANGE EQUAL ANY WRITES
 
 mlw_file: LET RANGE EQUAL BEGIN DIVERGES DIVERGES WITH 
 ##
-## Ends in an error in state: 929.
+## Ends in an error in state: 930.
 ##
 ## expr_block -> BEGIN single_spec spec . seq_expr END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## expr_block -> BEGIN single_spec spec . END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -4584,7 +4584,7 @@ mlw_file: LET RANGE EQUAL BEGIN DIVERGES DIVERGES WITH
 
 mlw_file: LET RANGE EQUAL BEGIN DIVERGES UIDENT WITH 
 ##
-## Ends in an error in state: 931.
+## Ends in an error in state: 932.
 ##
 ## expr_block -> BEGIN single_spec spec seq_expr . END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -4611,7 +4611,7 @@ mlw_file: LET RANGE EQUAL BEGIN DIVERGES UIDENT WITH
 
 mlw_file: LET RANGE EQUAL BEGIN DIVERGES WITH 
 ##
-## Ends in an error in state: 928.
+## Ends in an error in state: 929.
 ##
 ## expr_block -> BEGIN single_spec . spec seq_expr END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## expr_block -> BEGIN single_spec . spec END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -4624,7 +4624,7 @@ mlw_file: LET RANGE EQUAL BEGIN DIVERGES WITH
 
 mlw_file: LET RANGE EQUAL BEGIN UIDENT WITH 
 ##
-## Ends in an error in state: 933.
+## Ends in an error in state: 934.
 ##
 ## expr_block -> BEGIN seq_expr . END [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -4820,7 +4820,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT DO INVARIANT LEFTBRC 
 ##
 ## Ends in an error in state: 834.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) . seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) . loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) 
@@ -4829,20 +4829,20 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT DO INVARIANT LEFTBRC 
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 837, spurious reduction of production list(invariant) -> 
-## In state 838, spurious reduction of production list(invariant) -> invariant list(invariant) 
+## In state 838, spurious reduction of production list(invariant) -> 
+## In state 839, spurious reduction of production list(invariant) -> invariant list(invariant) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT DO UIDENT WITH 
 ##
-## Ends in an error in state: 835.
+## Ends in an error in state: 836.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) seq_expr . DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) loop_body . DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
-## FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) seq_expr 
+## FOR lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) loop_body 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
@@ -4858,6 +4858,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT DO UIDENT WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
+## In state 835, spurious reduction of production loop_body -> seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -4866,7 +4867,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT DO WRITES
 ##
 ## Ends in an error in state: 833.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO . list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr DO . list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL seq_expr for_direction seq_expr DO 
@@ -4878,7 +4879,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO UIDENT WITH
 ##
 ## Ends in an error in state: 832.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr . DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction seq_expr . DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL seq_expr for_direction seq_expr 
@@ -4905,7 +4906,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT TO WRITES
 ##
 ## Ends in an error in state: 831.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction . seq_expr DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr for_direction . seq_expr DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL seq_expr for_direction 
@@ -4917,7 +4918,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL UIDENT WITH
 ##
 ## Ends in an error in state: 828.
 ##
-## single_expr_ -> FOR lident_nq EQUAL seq_expr . for_direction seq_expr DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL seq_expr . for_direction seq_expr DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL seq_expr 
@@ -4944,7 +4945,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE EQUAL WRITES
 ##
 ## Ends in an error in state: 698.
 ##
-## single_expr_ -> FOR lident_nq EQUAL . seq_expr for_direction seq_expr DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq EQUAL . seq_expr for_direction seq_expr DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq EQUAL 
@@ -4956,7 +4957,7 @@ mlw_file: LET RANGE EQUAL FOR RANGE WRITES
 ##
 ## Ends in an error in state: 697.
 ##
-## single_expr_ -> FOR lident_nq . EQUAL seq_expr for_direction seq_expr DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR lident_nq . EQUAL seq_expr for_direction seq_expr DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR lident_nq 
@@ -4968,7 +4969,7 @@ mlw_file: LET RANGE EQUAL FOR WRITES
 ##
 ## Ends in an error in state: 696.
 ##
-## single_expr_ -> FOR . lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> FOR . lident_nq EQUAL seq_expr for_direction seq_expr DO list(invariant) loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR 
@@ -5059,7 +5060,7 @@ mlw_file: LET RANGE EQUAL FUN WRITES
 
 mlw_file: LET RANGE EQUAL GHOST ABSURD WHILE 
 ##
-## Ends in an error in state: 840.
+## Ends in an error in state: 841.
 ##
 ## single_expr_ -> single_expr . AMPAMP single_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> single_expr . BARBAR single_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5095,7 +5096,7 @@ mlw_file: LET RANGE EQUAL GHOST WRITES
 
 mlw_file: LET RANGE EQUAL IF UIDENT THEN UIDENT DIVERGES DIVERGES WHILE 
 ##
-## Ends in an error in state: 843.
+## Ends in an error in state: 844.
 ##
 ## single_expr_ -> IF seq_expr THEN contract_expr . ELSE contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> IF seq_expr THEN contract_expr . [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5116,7 +5117,7 @@ mlw_file: LET RANGE EQUAL IF UIDENT THEN UIDENT DIVERGES DIVERGES WHILE
 
 mlw_file: LET RANGE EQUAL IF UIDENT THEN UIDENT ELSE WRITES 
 ##
-## Ends in an error in state: 844.
+## Ends in an error in state: 845.
 ##
 ## single_expr_ -> IF seq_expr THEN contract_expr ELSE . contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5128,7 +5129,7 @@ mlw_file: LET RANGE EQUAL IF UIDENT THEN UIDENT ELSE WRITES
 
 mlw_file: LET RANGE EQUAL IF UIDENT THEN WRITES 
 ##
-## Ends in an error in state: 842.
+## Ends in an error in state: 843.
 ##
 ## single_expr_ -> IF seq_expr THEN . contract_expr ELSE contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> IF seq_expr THEN . contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5141,7 +5142,7 @@ mlw_file: LET RANGE EQUAL IF UIDENT THEN WRITES
 
 mlw_file: LET RANGE EQUAL IF UIDENT WITH 
 ##
-## Ends in an error in state: 841.
+## Ends in an error in state: 842.
 ##
 ## single_expr_ -> IF seq_expr . THEN contract_expr ELSE contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> IF seq_expr . THEN contract_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5237,7 +5238,7 @@ mlw_file: LET RANGE EQUAL LABEL WRITES
 
 mlw_file: LET RANGE EQUAL LEFTBRC RANGE EQUAL UIDENT SEMICOLON WRITES 
 ##
-## Ends in an error in state: 968.
+## Ends in an error in state: 969.
 ##
 ## semicolon_list1(separated_pair(lqualid,EQUAL,expr)) -> lqualid EQUAL expr SEMICOLON . [ RIGHTBRC ]
 ## semicolon_list1(separated_pair(lqualid,EQUAL,expr)) -> lqualid EQUAL expr SEMICOLON . semicolon_list1(separated_pair(lqualid,EQUAL,expr)) [ RIGHTBRC ]
@@ -5250,7 +5251,7 @@ mlw_file: LET RANGE EQUAL LEFTBRC RANGE EQUAL UIDENT SEMICOLON WRITES
 
 mlw_file: LET RANGE EQUAL LEFTBRC RANGE EQUAL UIDENT WRITES 
 ##
-## Ends in an error in state: 967.
+## Ends in an error in state: 968.
 ##
 ## semicolon_list1(separated_pair(lqualid,EQUAL,expr)) -> lqualid EQUAL expr . [ RIGHTBRC ]
 ## semicolon_list1(separated_pair(lqualid,EQUAL,expr)) -> lqualid EQUAL expr . SEMICOLON [ RIGHTBRC ]
@@ -5335,7 +5336,7 @@ mlw_file: LET RANGE EQUAL LEFTBRC UIDENT WITH WRITES
 
 mlw_file: LET RANGE EQUAL LEFTBRC UIDENT WRITES 
 ##
-## Ends in an error in state: 935.
+## Ends in an error in state: 936.
 ##
 ## expr_arg_ -> qualid . [ WITH LEFTSQ ]
 ## expr_pure -> LEFTBRC qualid . RIGHTBRC [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5369,7 +5370,7 @@ mlw_file: LET RANGE EQUAL LEFTBRC WRITES
 
 mlw_file: LET RANGE EQUAL LEFTPAR MINUS WRITES 
 ##
-## Ends in an error in state: 938.
+## Ends in an error in state: 939.
 ##
 ## lident_op -> MINUS . UNDERSCORE [ RIGHTPAR ]
 ## lident_op -> MINUS . [ RIGHTPAR ]
@@ -5412,7 +5413,7 @@ mlw_file: LET RANGE EQUAL LEFTPAR RIGHTPAR WHILE
 
 mlw_file: LET RANGE EQUAL LEFTPAR UIDENT WITH 
 ##
-## Ends in an error in state: 939.
+## Ends in an error in state: 940.
 ##
 ## expr_block -> LEFTPAR seq_expr . RIGHTPAR [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTSQ LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5453,7 +5454,7 @@ mlw_file: LET RANGE EQUAL LEFTPAR WRITES
 
 mlw_file: LET RANGE EQUAL LET GHOST COMMA 
 ##
-## Ends in an error in state: 861.
+## Ends in an error in state: 862.
 ##
 ## single_expr_ -> LET ghost . kind let_pattern EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> LET ghost . kind attrs(lident_op_id) EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5468,7 +5469,7 @@ mlw_file: LET RANGE EQUAL LET GHOST COMMA
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL UIDENT IN WRITES 
 ##
-## Ends in an error in state: 888.
+## Ends in an error in state: 889.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) EQUAL seq_expr IN . seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5480,7 +5481,7 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL UIDENT IN WRITES
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL UIDENT WITH 
 ##
-## Ends in an error in state: 887.
+## Ends in an error in state: 888.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) EQUAL seq_expr . IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5507,7 +5508,7 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL UIDENT WITH
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL WRITES 
 ##
-## Ends in an error in state: 886.
+## Ends in an error in state: 887.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) EQUAL . seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5519,7 +5520,7 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR EQUAL WRITES
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR POSITION WRITES 
 ##
-## Ends in an error in state: 885.
+## Ends in an error in state: 886.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) . EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) . mk_expr(fun_defn) IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5540,7 +5541,7 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR POSITION WRITES
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR UNDERSCORE EQUAL UIDENT IN WRITES 
 ##
-## Ends in an error in state: 891.
+## Ends in an error in state: 892.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) mk_expr(fun_defn) IN . seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5552,7 +5553,7 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR UNDERSCORE EQUAL UIDENT IN 
 
 mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR UNDERSCORE EQUAL UIDENT WITH 
 ##
-## Ends in an error in state: 890.
+## Ends in an error in state: 891.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_op_id) mk_expr(fun_defn) . IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5573,15 +5574,15 @@ mlw_file: LET RANGE EQUAL LET LEFTPAR EQUAL RIGHTPAR UNDERSCORE EQUAL UIDENT WIT
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 899, spurious reduction of production fun_defn -> binders return_opt spec EQUAL spec seq_expr 
-## In state 893, spurious reduction of production mk_expr(fun_defn) -> fun_defn 
+## In state 900, spurious reduction of production fun_defn -> binders return_opt spec EQUAL spec seq_expr 
+## In state 894, spurious reduction of production mk_expr(fun_defn) -> fun_defn 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL LET PREDICATE CONTINUE 
 ##
-## Ends in an error in state: 862.
+## Ends in an error in state: 863.
 ##
 ## single_expr_ -> LET ghost kind . let_pattern EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> LET ghost kind . attrs(lident_op_id) EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5596,7 +5597,7 @@ mlw_file: LET RANGE EQUAL LET PREDICATE CONTINUE
 
 mlw_file: LET RANGE EQUAL LET RANGE UNDERSCORE EQUAL UIDENT IN WRITES 
 ##
-## Ends in an error in state: 902.
+## Ends in an error in state: 903.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN . seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5608,7 +5609,7 @@ mlw_file: LET RANGE EQUAL LET RANGE UNDERSCORE EQUAL UIDENT IN WRITES
 
 mlw_file: LET RANGE EQUAL LET RANGE UNDERSCORE EQUAL UIDENT WITH 
 ##
-## Ends in an error in state: 901.
+## Ends in an error in state: 902.
 ##
 ## single_expr_ -> LET ghost kind attrs(lident_nq) mk_expr(fun_defn) . IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5629,15 +5630,15 @@ mlw_file: LET RANGE EQUAL LET RANGE UNDERSCORE EQUAL UIDENT WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 899, spurious reduction of production fun_defn -> binders return_opt spec EQUAL spec seq_expr 
-## In state 893, spurious reduction of production mk_expr(fun_defn) -> fun_defn 
+## In state 900, spurious reduction of production fun_defn -> binders return_opt spec EQUAL spec seq_expr 
+## In state 894, spurious reduction of production mk_expr(fun_defn) -> fun_defn 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL LET RANGE WITH 
 ##
-## Ends in an error in state: 900.
+## Ends in an error in state: 901.
 ##
 ## pat_arg_ -> attrs(lident_nq) . [ EQUAL COMMA COLON BAR AS ]
 ## single_expr_ -> LET ghost kind attrs(lident_nq) . mk_expr(fun_defn) IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -5690,9 +5691,9 @@ mlw_file: LET RANGE EQUAL LET REC RANGE CORE_LIDENT EQUAL UIDENT VAL
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 860, spurious reduction of production rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr 
-## In state 849, spurious reduction of production separated_nonempty_list(WITH,rec_defn) -> rec_defn 
-## In state 848, spurious reduction of production with_list1(rec_defn) -> separated_nonempty_list(WITH,rec_defn) 
+## In state 861, spurious reduction of production rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr 
+## In state 850, spurious reduction of production separated_nonempty_list(WITH,rec_defn) -> rec_defn 
+## In state 849, spurious reduction of production with_list1(rec_defn) -> separated_nonempty_list(WITH,rec_defn) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -5711,7 +5712,7 @@ mlw_file: LET RANGE EQUAL LET REC WRITES
 
 mlw_file: LET RANGE EQUAL LET UIDENT WRITES 
 ##
-## Ends in an error in state: 863.
+## Ends in an error in state: 864.
 ##
 ## let_pat_uni_ -> uqualid . nonempty_list(pat_arg) [ EQUAL COMMA COLON BAR AS ]
 ## pat_arg_ -> uqualid . [ EQUAL COMMA COLON BAR AS ]
@@ -5725,7 +5726,7 @@ mlw_file: LET RANGE EQUAL LET UIDENT WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE AS GHOST CONTINUE 
 ##
-## Ends in an error in state: 871.
+## Ends in an error in state: 872.
 ##
 ## let_pat_uni_ -> mk_pat(let_pat_uni_) AS ghost . attrs(lident_nq) [ EQUAL COMMA COLON BAR AS ]
 ##
@@ -5737,7 +5738,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE AS GHOST CONTINUE
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE AS WRITES 
 ##
-## Ends in an error in state: 870.
+## Ends in an error in state: 871.
 ##
 ## let_pat_uni_ -> mk_pat(let_pat_uni_) AS . ghost attrs(lident_nq) [ EQUAL COMMA COLON BAR AS ]
 ##
@@ -5749,7 +5750,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE AS WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE BAR CORE_LIDENT SEMICOLON 
 ##
-## Ends in an error in state: 878.
+## Ends in an error in state: 879.
 ##
 ## single_expr_ -> LET ghost kind let_pattern . EQUAL seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5768,16 +5769,16 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE BAR CORE_LIDENT SEMICOLON
 ## In state 231, spurious reduction of production pattern_ -> pat_conj_ 
 ## In state 226, spurious reduction of production mk_pat(pattern_) -> pattern_ 
 ## In state 232, spurious reduction of production pattern -> mk_pat(pattern_) 
-## In state 876, spurious reduction of production let_pattern_ -> mk_pat(let_pat_conj_) BAR pattern 
-## In state 877, spurious reduction of production mk_pat(let_pattern_) -> let_pattern_ 
-## In state 866, spurious reduction of production let_pattern -> mk_pat(let_pattern_) 
+## In state 877, spurious reduction of production let_pattern_ -> mk_pat(let_pat_conj_) BAR pattern 
+## In state 878, spurious reduction of production mk_pat(let_pattern_) -> let_pattern_ 
+## In state 867, spurious reduction of production let_pattern -> mk_pat(let_pattern_) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE BAR WRITES 
 ##
-## Ends in an error in state: 875.
+## Ends in an error in state: 876.
 ##
 ## let_pattern_ -> mk_pat(let_pat_conj_) BAR . pattern [ EQUAL ]
 ##
@@ -5789,7 +5790,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE BAR WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE COMMA CORE_LIDENT SEMICOLON 
 ##
-## Ends in an error in state: 884.
+## Ends in an error in state: 885.
 ##
 ## let_pattern_ -> let_pat_conj_ . [ EQUAL ]
 ## mk_pat(let_pat_conj_) -> let_pat_conj_ . [ BAR ]
@@ -5808,14 +5809,14 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE COMMA CORE_LIDENT SEMICOLON
 ## In state 222, spurious reduction of production mk_pat(pat_uni_) -> pat_uni_ 
 ## In state 236, spurious reduction of production separated_nonempty_list(COMMA,mk_pat(pat_uni_)) -> mk_pat(pat_uni_) 
 ## In state 235, spurious reduction of production comma_list1(mk_pat(pat_uni_)) -> separated_nonempty_list(COMMA,mk_pat(pat_uni_)) 
-## In state 869, spurious reduction of production let_pat_conj_ -> mk_pat(let_pat_uni_) COMMA comma_list1(mk_pat(pat_uni_)) 
+## In state 870, spurious reduction of production let_pat_conj_ -> mk_pat(let_pat_uni_) COMMA comma_list1(mk_pat(pat_uni_)) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE COMMA WRITES 
 ##
-## Ends in an error in state: 868.
+## Ends in an error in state: 869.
 ##
 ## let_pat_conj_ -> mk_pat(let_pat_uni_) COMMA . comma_list1(mk_pat(pat_uni_)) [ EQUAL BAR ]
 ##
@@ -5827,7 +5828,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE COMMA WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL UIDENT IN WRITES 
 ##
-## Ends in an error in state: 881.
+## Ends in an error in state: 882.
 ##
 ## single_expr_ -> LET ghost kind let_pattern EQUAL seq_expr IN . seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5839,7 +5840,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL UIDENT IN WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL UIDENT WITH 
 ##
-## Ends in an error in state: 880.
+## Ends in an error in state: 881.
 ##
 ## single_expr_ -> LET ghost kind let_pattern EQUAL seq_expr . IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5866,7 +5867,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL UIDENT WITH
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL WRITES 
 ##
-## Ends in an error in state: 879.
+## Ends in an error in state: 880.
 ##
 ## single_expr_ -> LET ghost kind let_pattern EQUAL . seq_expr IN seq_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5878,7 +5879,7 @@ mlw_file: LET RANGE EQUAL LET UNDERSCORE EQUAL WRITES
 
 mlw_file: LET RANGE EQUAL LET UNDERSCORE WRITES 
 ##
-## Ends in an error in state: 883.
+## Ends in an error in state: 884.
 ##
 ## let_pat_conj_ -> let_pat_uni_ . [ EQUAL BAR ]
 ## mk_pat(let_pat_uni_) -> let_pat_uni_ . [ COMMA COLON AS ]
@@ -5907,7 +5908,7 @@ mlw_file: LET RANGE EQUAL LET WRITES
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT VAL 
 ##
-## Ends in an error in state: 904.
+## Ends in an error in state: 905.
 ##
 ## single_expr_ -> MATCH seq_expr . WITH ext_match_cases END [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -5934,7 +5935,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT VAL
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH BAR WRITES 
 ##
-## Ends in an error in state: 921.
+## Ends in an error in state: 922.
 ##
 ## ext_match_cases -> BAR . ext_match_cases1 [ END ]
 ##
@@ -5946,7 +5947,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH BAR WRITES
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH EXCEPTION UIDENT ARROW ABSURD WITH 
 ##
-## Ends in an error in state: 912.
+## Ends in an error in state: 913.
 ##
 ## ext_match_cases1 -> EXCEPTION exn_handler . ext_match_cases0 [ END ]
 ##
@@ -5961,14 +5962,14 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH EXCEPTION UIDENT ARROW ABSURD WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 911, spurious reduction of production exn_handler -> uqualid option(pat_arg) ARROW seq_expr 
+## In state 912, spurious reduction of production exn_handler -> uqualid option(pat_arg) ARROW seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH EXCEPTION WRITES 
 ##
-## Ends in an error in state: 906.
+## Ends in an error in state: 907.
 ##
 ## ext_match_cases1 -> EXCEPTION . exn_handler ext_match_cases0 [ END ]
 ##
@@ -5980,7 +5981,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH EXCEPTION WRITES
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW ABSURD BAR WRITES 
 ##
-## Ends in an error in state: 913.
+## Ends in an error in state: 914.
 ##
 ## ext_match_cases0 -> BAR . ext_match_cases1 [ END ]
 ##
@@ -5992,7 +5993,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW ABSURD BAR WRITES
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW ABSURD WITH 
 ##
-## Ends in an error in state: 917.
+## Ends in an error in state: 918.
 ##
 ## ext_match_cases1 -> match_case(seq_expr) . ext_match_cases0 [ END ]
 ##
@@ -6007,14 +6008,14 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW ABSURD WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 916, spurious reduction of production match_case(seq_expr) -> pattern ARROW seq_expr 
+## In state 917, spurious reduction of production match_case(seq_expr) -> pattern ARROW seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW WRITES 
 ##
-## Ends in an error in state: 915.
+## Ends in an error in state: 916.
 ##
 ## match_case(seq_expr) -> pattern ARROW . seq_expr [ END BAR ]
 ##
@@ -6026,7 +6027,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE ARROW WRITES
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE SEMICOLON 
 ##
-## Ends in an error in state: 914.
+## Ends in an error in state: 915.
 ##
 ## match_case(seq_expr) -> pattern . ARROW seq_expr [ END BAR ]
 ##
@@ -6047,7 +6048,7 @@ mlw_file: LET RANGE EQUAL MATCH UIDENT WITH UNDERSCORE SEMICOLON
 
 mlw_file: LET RANGE EQUAL MATCH UIDENT WITH WRITES 
 ##
-## Ends in an error in state: 905.
+## Ends in an error in state: 906.
 ##
 ## single_expr_ -> MATCH seq_expr WITH . ext_match_cases END [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -6085,7 +6086,7 @@ mlw_file: LET RANGE EQUAL MINUS WRITES
 
 mlw_file: LET RANGE EQUAL NOT ABSURD WHILE 
 ##
-## Ends in an error in state: 926.
+## Ends in an error in state: 927.
 ##
 ## single_expr_ -> single_expr . AMPAMP single_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## single_expr_ -> single_expr . BARBAR single_expr [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -6230,7 +6231,7 @@ mlw_file: LET RANGE EQUAL PURE WRITES
 
 mlw_file: LET RANGE EQUAL RAISE LEFTPAR UIDENT UIDENT RIGHTBRC 
 ##
-## Ends in an error in state: 941.
+## Ends in an error in state: 942.
 ##
 ## single_expr_ -> RAISE LEFTPAR uqualid option(expr_arg) . RIGHTPAR [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -6246,7 +6247,7 @@ mlw_file: LET RANGE EQUAL RAISE LEFTPAR UIDENT UIDENT RIGHTBRC
 ## In state 722, spurious reduction of production expr_arg_ -> qualid 
 ## In state 751, spurious reduction of production mk_expr(expr_arg_) -> expr_arg_ 
 ## In state 725, spurious reduction of production expr_arg -> mk_expr(expr_arg_) 
-## In state 943, spurious reduction of production option(expr_arg) -> expr_arg 
+## In state 944, spurious reduction of production option(expr_arg) -> expr_arg 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -6278,7 +6279,7 @@ mlw_file: LET RANGE EQUAL RAISE LEFTPAR WRITES
 
 mlw_file: LET RANGE EQUAL RAISE UIDENT UIDENT UIDENT 
 ##
-## Ends in an error in state: 943.
+## Ends in an error in state: 944.
 ##
 ## expr_sub -> expr_arg . LEFTSQ expr RIGHTSQ [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LEFTSQ LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## expr_sub -> expr_arg . LEFTSQ expr LARROW expr RIGHTSQ [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LEFTSQ LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -6305,7 +6306,7 @@ mlw_file: LET RANGE EQUAL RAISE UIDENT UIDENT UIDENT
 
 mlw_file: LET RANGE EQUAL RAISE UIDENT WHILE 
 ##
-## Ends in an error in state: 944.
+## Ends in an error in state: 945.
 ##
 ## single_expr_ -> RAISE uqualid . option(expr_arg) [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ## uqualid -> uqualid . DOT uident [ WRITES WITH VARIANT VAL USE UIDENT TYPE TRUE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES REAL READS RANGE RAISES PURE PREDICATE OPPREF OP4 OP3 OP2 OP1 MINUS META LTGT LT LIDENT LET LEMMA LEFTPAR LEFTBRC LARROW INTEGER INDUCTIVE IN IMPORT GT GOAL FUNCTION FLOAT FALSE EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DOT DONE DO DIVERGES CORE_UIDENT CORE_LIDENT CONSTANT COMMA COLON COINDUCTIVE CLONE BEGIN BARBAR BAR AXIOM AMPAMP ALIAS ]
@@ -6442,7 +6443,7 @@ mlw_file: LET RANGE EQUAL RETURN UNDERSCORE
 
 mlw_file: LET RANGE EQUAL TRY UIDENT VAL 
 ##
-## Ends in an error in state: 947.
+## Ends in an error in state: 948.
 ##
 ## single_expr_ -> TRY seq_expr . WITH bar_list1(exn_handler) END [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -6469,7 +6470,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT VAL
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH BAR WRITES 
 ##
-## Ends in an error in state: 949.
+## Ends in an error in state: 950.
 ##
 ## bar_list1(exn_handler) -> BAR . separated_nonempty_list(BAR,exn_handler) [ END ]
 ##
@@ -6481,7 +6482,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH BAR WRITES
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW ABSURD BAR WRITES 
 ##
-## Ends in an error in state: 952.
+## Ends in an error in state: 953.
 ##
 ## separated_nonempty_list(BAR,exn_handler) -> exn_handler BAR . separated_nonempty_list(BAR,exn_handler) [ END ]
 ##
@@ -6493,7 +6494,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW ABSURD BAR WRITES
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW ABSURD WITH 
 ##
-## Ends in an error in state: 951.
+## Ends in an error in state: 952.
 ##
 ## separated_nonempty_list(BAR,exn_handler) -> exn_handler . [ END ]
 ## separated_nonempty_list(BAR,exn_handler) -> exn_handler . BAR separated_nonempty_list(BAR,exn_handler) [ END ]
@@ -6509,14 +6510,14 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW ABSURD WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 911, spurious reduction of production exn_handler -> uqualid option(pat_arg) ARROW seq_expr 
+## In state 912, spurious reduction of production exn_handler -> uqualid option(pat_arg) ARROW seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW WRITES 
 ##
-## Ends in an error in state: 910.
+## Ends in an error in state: 911.
 ##
 ## exn_handler -> uqualid option(pat_arg) ARROW . seq_expr [ END BAR ]
 ##
@@ -6528,7 +6529,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT ARROW WRITES
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT UNDERSCORE ANY 
 ##
-## Ends in an error in state: 909.
+## Ends in an error in state: 910.
 ##
 ## exn_handler -> uqualid option(pat_arg) . ARROW seq_expr [ END BAR ]
 ##
@@ -6540,7 +6541,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT UNDERSCORE ANY
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT WRITES 
 ##
-## Ends in an error in state: 907.
+## Ends in an error in state: 908.
 ##
 ## exn_handler -> uqualid . option(pat_arg) ARROW seq_expr [ END BAR ]
 ## uqualid -> uqualid . DOT uident [ UNDERSCORE UIDENT RANGE LIDENT LEFTPAR LEFTBRC FLOAT DOT CORE_UIDENT CORE_LIDENT ARROW ]
@@ -6553,7 +6554,7 @@ mlw_file: LET RANGE EQUAL TRY UIDENT WITH UIDENT WRITES
 
 mlw_file: LET RANGE EQUAL TRY UIDENT WITH WRITES 
 ##
-## Ends in an error in state: 948.
+## Ends in an error in state: 949.
 ##
 ## single_expr_ -> TRY seq_expr WITH . bar_list1(exn_handler) END [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
@@ -7397,9 +7398,9 @@ mlw_file: LET RANGE EQUAL VAL WRITES
 
 mlw_file: LET RANGE EQUAL WHILE UIDENT DO INVARIANT LEFTBRC CORE_LIDENT RIGHTBRC WRITES 
 ##
-## Ends in an error in state: 962.
+## Ends in an error in state: 963.
 ##
-## loop_annotation -> invariant . loop_annotation [ WHILE VAL UIDENT TRY TRUE RETURN REAL RANGE RAISE PURE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS MATCH LT LIDENT LET LEFTPAR LEFTBRC LABEL INTEGER IF GT GHOST FUN FOR FLOAT FALSE EXCEPTION CORE_UIDENT CORE_LIDENT CONTINUE CHECK BREAK BEGIN ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## loop_annotation -> invariant . loop_annotation [ WHILE VAL UIDENT TRY TRUE RETURN REAL RANGE RAISE PURE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS MATCH LT LIDENT LET LEFTPAR LEFTBRC LABEL INTEGER IF GT GHOST FUN FOR FLOAT FALSE EXCEPTION DONE CORE_UIDENT CORE_LIDENT CONTINUE CHECK BREAK BEGIN ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## invariant 
@@ -7409,12 +7410,12 @@ mlw_file: LET RANGE EQUAL WHILE UIDENT DO INVARIANT LEFTBRC CORE_LIDENT RIGHTBRC
 
 mlw_file: LET RANGE EQUAL WHILE UIDENT DO UIDENT WITH 
 ##
-## Ends in an error in state: 965.
+## Ends in an error in state: 966.
 ##
-## single_expr_ -> WHILE seq_expr DO loop_annotation seq_expr . DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> WHILE seq_expr DO loop_annotation loop_body . DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
-## WHILE seq_expr DO loop_annotation seq_expr 
+## WHILE seq_expr DO loop_annotation loop_body 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
@@ -7430,15 +7431,16 @@ mlw_file: LET RANGE EQUAL WHILE UIDENT DO UIDENT WITH
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
+## In state 835, spurious reduction of production loop_body -> seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET RANGE EQUAL WHILE UIDENT DO VARIANT LEFTBRC CORE_LIDENT RIGHTBRC WRITES 
 ##
-## Ends in an error in state: 960.
+## Ends in an error in state: 961.
 ##
-## loop_annotation -> variant . loop_annotation [ WHILE VAL UIDENT TRY TRUE RETURN REAL RANGE RAISE PURE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS MATCH LT LIDENT LET LEFTPAR LEFTBRC LABEL INTEGER IF GT GHOST FUN FOR FLOAT FALSE EXCEPTION CORE_UIDENT CORE_LIDENT CONTINUE CHECK BREAK BEGIN ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## loop_annotation -> variant . loop_annotation [ WHILE VAL UIDENT TRY TRUE RETURN REAL RANGE RAISE PURE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS MATCH LT LIDENT LET LEFTPAR LEFTBRC LABEL INTEGER IF GT GHOST FUN FOR FLOAT FALSE EXCEPTION DONE CORE_UIDENT CORE_LIDENT CONTINUE CHECK BREAK BEGIN ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## variant 
@@ -7448,9 +7450,9 @@ mlw_file: LET RANGE EQUAL WHILE UIDENT DO VARIANT LEFTBRC CORE_LIDENT RIGHTBRC W
 
 mlw_file: LET RANGE EQUAL WHILE UIDENT DO WRITES 
 ##
-## Ends in an error in state: 959.
+## Ends in an error in state: 960.
 ##
-## single_expr_ -> WHILE seq_expr DO . loop_annotation seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> WHILE seq_expr DO . loop_annotation loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## WHILE seq_expr DO 
@@ -7460,9 +7462,9 @@ mlw_file: LET RANGE EQUAL WHILE UIDENT DO WRITES
 
 mlw_file: LET RANGE EQUAL WHILE UIDENT WITH 
 ##
-## Ends in an error in state: 958.
+## Ends in an error in state: 959.
 ##
-## single_expr_ -> WHILE seq_expr . DO loop_annotation seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> WHILE seq_expr . DO loop_annotation loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## WHILE seq_expr 
@@ -7489,7 +7491,7 @@ mlw_file: LET RANGE EQUAL WHILE WRITES
 ##
 ## Ends in an error in state: 651.
 ##
-## single_expr_ -> WHILE . seq_expr DO loop_annotation seq_expr DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
+## single_expr_ -> WHILE . seq_expr DO loop_annotation loop_body DONE [ WRITES WITH VARIANT VAL USE TYPE TO THEN SEMICOLON SCOPE RIGHTSQ RIGHTPAR RIGHTBRC RETURNS REQUIRES READS RAISES PREDICATE OP4 OP3 OP2 OP1 MINUS META LTGT LT LET LEMMA LARROW INDUCTIVE IN IMPORT GT GOAL FUNCTION EXCEPTION EQUAL EOF ENSURES END ELSE DOWNTO DOTDOT DONE DO DIVERGES CONSTANT COMMA COLON COINDUCTIVE CLONE BARBAR BAR AXIOM AMPAMP ALIAS ]
 ##
 ## The known suffix of the stack is as follows:
 ## WHILE 
@@ -7499,7 +7501,7 @@ mlw_file: LET RANGE EQUAL WHILE WRITES
 
 mlw_file: LET RANGE EQUAL WRITES 
 ##
-## Ends in an error in state: 1025.
+## Ends in an error in state: 1026.
 ##
 ## const_defn -> EQUAL . seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7511,7 +7513,7 @@ mlw_file: LET RANGE EQUAL WRITES
 
 mlw_file: LET RANGE UNDERSCORE ARROW 
 ##
-## Ends in an error in state: 894.
+## Ends in an error in state: 895.
 ##
 ## fun_defn -> binders . return_opt spec EQUAL spec seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7530,7 +7532,7 @@ mlw_file: LET RANGE UNDERSCORE ARROW
 
 mlw_file: LET RANGE UNDERSCORE COLON CORE_LIDENT WITH 
 ##
-## Ends in an error in state: 895.
+## Ends in an error in state: 896.
 ##
 ## fun_defn -> binders return_opt . spec EQUAL spec seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7552,7 +7554,7 @@ mlw_file: LET RANGE UNDERSCORE COLON CORE_LIDENT WITH
 
 mlw_file: LET RANGE UNDERSCORE DIVERGES WITH 
 ##
-## Ends in an error in state: 896.
+## Ends in an error in state: 897.
 ##
 ## fun_defn -> binders return_opt spec . EQUAL spec seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7571,7 +7573,7 @@ mlw_file: LET RANGE UNDERSCORE DIVERGES WITH
 
 mlw_file: LET RANGE UNDERSCORE EQUAL DIVERGES WITH 
 ##
-## Ends in an error in state: 898.
+## Ends in an error in state: 899.
 ##
 ## fun_defn -> binders return_opt spec EQUAL spec . seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7590,7 +7592,7 @@ mlw_file: LET RANGE UNDERSCORE EQUAL DIVERGES WITH
 
 mlw_file: LET RANGE UNDERSCORE EQUAL WITH 
 ##
-## Ends in an error in state: 897.
+## Ends in an error in state: 898.
 ##
 ## fun_defn -> binders return_opt spec EQUAL . spec seq_expr [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7602,7 +7604,7 @@ mlw_file: LET RANGE UNDERSCORE EQUAL WITH
 
 mlw_file: LET RANGE WRITES 
 ##
-## Ends in an error in state: 1024.
+## Ends in an error in state: 1025.
 ##
 ## prog_decl -> LET ghost kind attrs(lident_rich) . mk_expr(fun_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> LET ghost kind attrs(lident_rich) . const_defn [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -7622,7 +7624,7 @@ mlw_file: LET RANGE WRITES
 
 mlw_file: LET REC GHOST WRITES 
 ##
-## Ends in an error in state: 852.
+## Ends in an error in state: 853.
 ##
 ## rec_defn -> ghost . kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7634,7 +7636,7 @@ mlw_file: LET REC GHOST WRITES
 
 mlw_file: LET REC PREDICATE CONTINUE 
 ##
-## Ends in an error in state: 853.
+## Ends in an error in state: 854.
 ##
 ## rec_defn -> ghost kind . attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7646,7 +7648,7 @@ mlw_file: LET REC PREDICATE CONTINUE
 
 mlw_file: LET REC RANGE CORE_LIDENT EQUAL UIDENT TO 
 ##
-## Ends in an error in state: 849.
+## Ends in an error in state: 850.
 ##
 ## separated_nonempty_list(WITH,rec_defn) -> rec_defn . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## separated_nonempty_list(WITH,rec_defn) -> rec_defn . WITH separated_nonempty_list(WITH,rec_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -7668,14 +7670,14 @@ mlw_file: LET REC RANGE CORE_LIDENT EQUAL UIDENT TO
 ## In state 816, spurious reduction of production assign_expr -> expr 
 ## In state 822, spurious reduction of production contract_expr -> assign_expr 
 ## In state 819, spurious reduction of production seq_expr -> contract_expr 
-## In state 860, spurious reduction of production rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr 
+## In state 861, spurious reduction of production rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: LET REC RANGE CORE_LIDENT EQUAL UIDENT WITH WRITES 
 ##
-## Ends in an error in state: 850.
+## Ends in an error in state: 851.
 ##
 ## separated_nonempty_list(WITH,rec_defn) -> rec_defn WITH . separated_nonempty_list(WITH,rec_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7687,7 +7689,7 @@ mlw_file: LET REC RANGE CORE_LIDENT EQUAL UIDENT WITH WRITES
 
 mlw_file: LET REC RANGE UNDERSCORE ARROW 
 ##
-## Ends in an error in state: 855.
+## Ends in an error in state: 856.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) binders . return_opt spec EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7706,7 +7708,7 @@ mlw_file: LET REC RANGE UNDERSCORE ARROW
 
 mlw_file: LET REC RANGE UNDERSCORE COLON CORE_LIDENT WITH 
 ##
-## Ends in an error in state: 856.
+## Ends in an error in state: 857.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) binders return_opt . spec EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7728,7 +7730,7 @@ mlw_file: LET REC RANGE UNDERSCORE COLON CORE_LIDENT WITH
 
 mlw_file: LET REC RANGE UNDERSCORE DIVERGES WITH 
 ##
-## Ends in an error in state: 857.
+## Ends in an error in state: 858.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec . EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7747,7 +7749,7 @@ mlw_file: LET REC RANGE UNDERSCORE DIVERGES WITH
 
 mlw_file: LET REC RANGE UNDERSCORE EQUAL DIVERGES WITH 
 ##
-## Ends in an error in state: 859.
+## Ends in an error in state: 860.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec . seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7766,7 +7768,7 @@ mlw_file: LET REC RANGE UNDERSCORE EQUAL DIVERGES WITH
 
 mlw_file: LET REC RANGE UNDERSCORE EQUAL WITH 
 ##
-## Ends in an error in state: 858.
+## Ends in an error in state: 859.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) binders return_opt spec EQUAL . spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7778,7 +7780,7 @@ mlw_file: LET REC RANGE UNDERSCORE EQUAL WITH
 
 mlw_file: LET REC RANGE WRITES 
 ##
-## Ends in an error in state: 854.
+## Ends in an error in state: 855.
 ##
 ## rec_defn -> ghost kind attrs(lident_rich) . binders return_opt spec EQUAL spec seq_expr [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IN IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7797,7 +7799,7 @@ mlw_file: LET REC RANGE WRITES
 
 mlw_file: LET REC WRITES 
 ##
-## Ends in an error in state: 1020.
+## Ends in an error in state: 1021.
 ##
 ## prog_decl -> LET REC . with_list1(rec_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7809,7 +7811,7 @@ mlw_file: LET REC WRITES
 
 mlw_file: LET WRITES 
 ##
-## Ends in an error in state: 1019.
+## Ends in an error in state: 1020.
 ##
 ## prog_decl -> LET . ghost kind attrs(lident_rich) mk_expr(fun_defn) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## prog_decl -> LET . ghost kind attrs(lident_rich) const_defn [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -7823,7 +7825,7 @@ mlw_file: LET WRITES
 
 mlw_file: META UIDENT AXIOM WRITES 
 ##
-## Ends in an error in state: 1012.
+## Ends in an error in state: 1013.
 ##
 ## meta_arg -> AXIOM . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7835,7 +7837,7 @@ mlw_file: META UIDENT AXIOM WRITES
 
 mlw_file: META UIDENT CONSTANT WRITES 
 ##
-## Ends in an error in state: 1010.
+## Ends in an error in state: 1011.
 ##
 ## meta_arg -> CONSTANT . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7847,7 +7849,7 @@ mlw_file: META UIDENT CONSTANT WRITES
 
 mlw_file: META UIDENT FUNCTION WRITES 
 ##
-## Ends in an error in state: 1008.
+## Ends in an error in state: 1009.
 ##
 ## meta_arg -> FUNCTION . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7859,7 +7861,7 @@ mlw_file: META UIDENT FUNCTION WRITES
 
 mlw_file: META UIDENT GOAL WRITES 
 ##
-## Ends in an error in state: 1006.
+## Ends in an error in state: 1007.
 ##
 ## meta_arg -> GOAL . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7871,7 +7873,7 @@ mlw_file: META UIDENT GOAL WRITES
 
 mlw_file: META UIDENT LEMMA WRITES 
 ##
-## Ends in an error in state: 1003.
+## Ends in an error in state: 1004.
 ##
 ## meta_arg -> LEMMA . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7883,7 +7885,7 @@ mlw_file: META UIDENT LEMMA WRITES
 
 mlw_file: META UIDENT PREDICATE WRITES 
 ##
-## Ends in an error in state: 1001.
+## Ends in an error in state: 1002.
 ##
 ## meta_arg -> PREDICATE . qualid [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7895,7 +7897,7 @@ mlw_file: META UIDENT PREDICATE WRITES
 
 mlw_file: META UIDENT STRING COMMA WRITES 
 ##
-## Ends in an error in state: 1016.
+## Ends in an error in state: 1017.
 ##
 ## separated_nonempty_list(COMMA,meta_arg) -> meta_arg COMMA . separated_nonempty_list(COMMA,meta_arg) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7907,7 +7909,7 @@ mlw_file: META UIDENT STRING COMMA WRITES
 
 mlw_file: META UIDENT STRING WRITES 
 ##
-## Ends in an error in state: 1015.
+## Ends in an error in state: 1016.
 ##
 ## separated_nonempty_list(COMMA,meta_arg) -> meta_arg . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ## separated_nonempty_list(COMMA,meta_arg) -> meta_arg . COMMA separated_nonempty_list(COMMA,meta_arg) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
@@ -7920,7 +7922,7 @@ mlw_file: META UIDENT STRING WRITES
 
 mlw_file: META UIDENT TYPE RANGE WRITES 
 ##
-## Ends in an error in state: 999.
+## Ends in an error in state: 1000.
 ##
 ## meta_arg -> TYPE ty . [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ## ty -> ty . ARROW ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ARROW ]
@@ -7940,7 +7942,7 @@ mlw_file: META UIDENT TYPE RANGE WRITES
 
 mlw_file: META UIDENT TYPE WRITES 
 ##
-## Ends in an error in state: 998.
+## Ends in an error in state: 999.
 ##
 ## meta_arg -> TYPE . ty [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COMMA COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7952,7 +7954,7 @@ mlw_file: META UIDENT TYPE WRITES
 
 mlw_file: META UIDENT WRITES 
 ##
-## Ends in an error in state: 997.
+## Ends in an error in state: 998.
 ##
 ## meta_decl -> META sident . comma_list1(meta_arg) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7964,7 +7966,7 @@ mlw_file: META UIDENT WRITES
 
 mlw_file: META WRITES 
 ##
-## Ends in an error in state: 996.
+## Ends in an error in state: 997.
 ##
 ## meta_decl -> META . sident comma_list1(meta_arg) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7976,7 +7978,7 @@ mlw_file: META WRITES
 
 mlw_file: MODULE WRITES 
 ##
-## Ends in an error in state: 994.
+## Ends in an error in state: 995.
 ##
 ## module_head -> MODULE . attrs(uident_nq) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -7990,7 +7992,7 @@ expecting a capitalized identifier (token UIDENT_NQ)
 
 mlw_file: PREDICATE RANGE EQUAL CORE_LIDENT THEN 
 ##
-## Ends in an error in state: 980.
+## Ends in an error in state: 981.
 ##
 ## pure_decl -> PREDICATE predicate_decl . list(with_logic_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8008,15 +8010,15 @@ mlw_file: PREDICATE RANGE EQUAL CORE_LIDENT THEN
 ## In state 306, spurious reduction of production mk_term(single_term_) -> single_term_ 
 ## In state 337, spurious reduction of production single_term -> mk_term(single_term_) 
 ## In state 307, spurious reduction of production term -> single_term 
-## In state 986, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
-## In state 993, spurious reduction of production predicate_decl -> attrs(lident_rich) params option(preceded(EQUAL,term)) 
+## In state 987, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
+## In state 994, spurious reduction of production predicate_decl -> attrs(lident_rich) params option(preceded(EQUAL,term)) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: PREDICATE RANGE EQUAL WRITES 
 ##
-## Ends in an error in state: 985.
+## Ends in an error in state: 986.
 ##
 ## option(preceded(EQUAL,term)) -> EQUAL . term [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8160,7 +8162,7 @@ mlw_file: PREDICATE RANGE UNDERSCORE WHILE
 
 mlw_file: PREDICATE RANGE UNDERSCORE WRITES 
 ##
-## Ends in an error in state: 992.
+## Ends in an error in state: 993.
 ##
 ## predicate_decl -> attrs(lident_rich) params . option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8192,7 +8194,7 @@ mlw_file: PREDICATE RANGE WHILE
 
 mlw_file: PREDICATE RANGE WITH RANGE COLON CORE_LIDENT AT 
 ##
-## Ends in an error in state: 984.
+## Ends in an error in state: 985.
 ##
 ## with_logic_decl -> WITH attrs(lident_rich) params option(cast) . option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8213,7 +8215,7 @@ mlw_file: PREDICATE RANGE WITH RANGE COLON CORE_LIDENT AT
 
 mlw_file: PREDICATE RANGE WITH RANGE EQUAL UIDENT THEN 
 ##
-## Ends in an error in state: 988.
+## Ends in an error in state: 989.
 ##
 ## list(with_logic_decl) -> with_logic_decl . list(with_logic_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8231,15 +8233,15 @@ mlw_file: PREDICATE RANGE WITH RANGE EQUAL UIDENT THEN
 ## In state 306, spurious reduction of production mk_term(single_term_) -> single_term_ 
 ## In state 337, spurious reduction of production single_term -> mk_term(single_term_) 
 ## In state 307, spurious reduction of production term -> single_term 
-## In state 986, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
-## In state 987, spurious reduction of production with_logic_decl -> WITH attrs(lident_rich) params option(cast) option(preceded(EQUAL,term)) 
+## In state 987, spurious reduction of production option(preceded(EQUAL,term)) -> EQUAL term 
+## In state 988, spurious reduction of production with_logic_decl -> WITH attrs(lident_rich) params option(cast) option(preceded(EQUAL,term)) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: PREDICATE RANGE WITH RANGE UNDERSCORE ALIAS 
 ##
-## Ends in an error in state: 983.
+## Ends in an error in state: 984.
 ##
 ## with_logic_decl -> WITH attrs(lident_rich) params . option(cast) option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8259,7 +8261,7 @@ mlw_file: PREDICATE RANGE WITH RANGE UNDERSCORE ALIAS
 
 mlw_file: PREDICATE RANGE WITH RANGE WRITES 
 ##
-## Ends in an error in state: 982.
+## Ends in an error in state: 983.
 ##
 ## with_logic_decl -> WITH attrs(lident_rich) . params option(cast) option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8278,7 +8280,7 @@ mlw_file: PREDICATE RANGE WITH RANGE WRITES
 
 mlw_file: PREDICATE RANGE WITH WRITES 
 ##
-## Ends in an error in state: 981.
+## Ends in an error in state: 982.
 ##
 ## with_logic_decl -> WITH . attrs(lident_rich) params option(cast) option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8290,7 +8292,7 @@ mlw_file: PREDICATE RANGE WITH WRITES
 
 mlw_file: PREDICATE RANGE WRITES 
 ##
-## Ends in an error in state: 991.
+## Ends in an error in state: 992.
 ##
 ## predicate_decl -> attrs(lident_rich) . params option(preceded(EQUAL,term)) [ WITH VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8309,7 +8311,7 @@ mlw_file: PREDICATE RANGE WRITES
 
 mlw_file: PREDICATE WRITES 
 ##
-## Ends in an error in state: 979.
+## Ends in an error in state: 980.
 ##
 ## pure_decl -> PREDICATE . predicate_decl list(with_logic_decl) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8321,7 +8323,7 @@ mlw_file: PREDICATE WRITES
 
 mlw_file: SCOPE CORE_UIDENT WRITES 
 ##
-## Ends in an error in state: 1136.
+## Ends in an error in state: 1137.
 ##
 ## module_decl -> scope_head . list(module_decl) END [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8333,7 +8335,7 @@ mlw_file: SCOPE CORE_UIDENT WRITES
 
 mlw_file: SCOPE IMPORT CORE_LIDENT 
 ##
-## Ends in an error in state: 977.
+## Ends in an error in state: 978.
 ##
 ## scope_head -> SCOPE boption(IMPORT) . uident [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8345,7 +8347,7 @@ mlw_file: SCOPE IMPORT CORE_LIDENT
 
 mlw_file: SCOPE WRITES 
 ##
-## Ends in an error in state: 976.
+## Ends in an error in state: 977.
 ##
 ## scope_head -> SCOPE . boption(IMPORT) uident [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8357,7 +8359,7 @@ mlw_file: SCOPE WRITES
 
 mlw_file: THEORY UIDENT END WRITES 
 ##
-## Ends in an error in state: 1151.
+## Ends in an error in state: 1152.
 ##
 ## list(mlw_module) -> mlw_module . list(mlw_module) [ EOF ]
 ##
@@ -8369,7 +8371,7 @@ mlw_file: THEORY UIDENT END WRITES
 
 mlw_file: THEORY UIDENT VAL RANGE EOF 
 ##
-## Ends in an error in state: 1139.
+## Ends in an error in state: 1140.
 ##
 ## list(module_decl) -> module_decl . list(module_decl) [ END ]
 ##
@@ -8389,14 +8391,14 @@ mlw_file: THEORY UIDENT VAL RANGE EOF
 ## In state 549, spurious reduction of production val_defn -> params return_opt spec 
 ## In state 133, spurious reduction of production mk_expr(val_defn) -> val_defn 
 ## In state 557, spurious reduction of production prog_decl -> VAL ghost kind attrs(lident_rich) mk_expr(val_defn) 
-## In state 1138, spurious reduction of production module_decl -> prog_decl 
+## In state 1139, spurious reduction of production module_decl -> prog_decl 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: THEORY UIDENT WITH 
 ##
-## Ends in an error in state: 1146.
+## Ends in an error in state: 1147.
 ##
 ## mlw_module -> module_head . list(module_decl) END [ THEORY MODULE EOF ]
 ##
@@ -8409,7 +8411,7 @@ mlw_file: THEORY UIDENT WITH
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 627, spurious reduction of production list(attr) -> 
 ## In state 628, spurious reduction of production attrs(uident_nq) -> uident_nq list(attr) 
-## In state 975, spurious reduction of production module_head -> THEORY attrs(uident_nq) 
+## In state 976, spurious reduction of production module_head -> THEORY attrs(uident_nq) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -8428,7 +8430,7 @@ mlw_file: THEORY UIDENT WRITES
 
 mlw_file: THEORY WRITES 
 ##
-## Ends in an error in state: 974.
+## Ends in an error in state: 975.
 ##
 ## module_head -> THEORY . attrs(uident_nq) [ VAL USE TYPE SCOPE PREDICATE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION END CONSTANT COINDUCTIVE CLONE AXIOM ]
 ##
@@ -8948,17 +8950,17 @@ mlw_file: TYPE RANGE INVARIANT LEFTBRC CORE_LIDENT RIGHTBRC ATTRIBUTE
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 837, spurious reduction of production list(invariant) -> 
-## In state 838, spurious reduction of production list(invariant) -> invariant list(invariant) 
+## In state 838, spurious reduction of production list(invariant) -> 
+## In state 839, spurious reduction of production list(invariant) -> invariant list(invariant) 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 mlw_file: TYPE RANGE INVARIANT LEFTBRC CORE_LIDENT RIGHTBRC WRITES 
 ##
-## Ends in an error in state: 837.
+## Ends in an error in state: 838.
 ##
-## list(invariant) -> invariant . list(invariant) [ WITH WHILE VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## list(invariant) -> invariant . list(invariant) [ WITH WHILE VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END DONE CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## invariant 
@@ -8970,7 +8972,7 @@ mlw_file: TYPE RANGE INVARIANT LEFTBRC UIDENT WITH
 ##
 ## Ends in an error in state: 643.
 ##
-## invariant -> INVARIANT LEFTBRC term . RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## invariant -> INVARIANT LEFTBRC term . RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END DONE CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## INVARIANT LEFTBRC term 
@@ -8994,7 +8996,7 @@ mlw_file: TYPE RANGE INVARIANT LEFTBRC WRITES
 ##
 ## Ends in an error in state: 642.
 ##
-## invariant -> INVARIANT LEFTBRC . term RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## invariant -> INVARIANT LEFTBRC . term RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END DONE CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## INVARIANT LEFTBRC 
@@ -9006,7 +9008,7 @@ mlw_file: TYPE RANGE INVARIANT WRITES
 ##
 ## Ends in an error in state: 641.
 ##
-## invariant -> INVARIANT . LEFTBRC term RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
+## invariant -> INVARIANT . LEFTBRC term RIGHTBRC [ WITH WHILE VARIANT VAL USE UIDENT TYPE TRY TRUE SCOPE RETURN REAL RANGE RAISE PURE PREDICATE POSITION OPPREF OP4 OP3 OP2 OP1 NOT MINUS META MATCH LT LIDENT LET LEMMA LEFTPAR LEFTBRC LABEL INVARIANT INTEGER INDUCTIVE IMPORT IF GT GOAL GHOST FUNCTION FUN FOR FLOAT FALSE EXCEPTION EOF END DONE CORE_UIDENT CORE_LIDENT CONTINUE CONSTANT COINDUCTIVE CLONE CHECK BY BREAK BEGIN AXIOM ATTRIBUTE ASSUME ASSERT ANY ABSURD ]
 ##
 ## The known suffix of the stack is as follows:
 ## INVARIANT 
@@ -9235,7 +9237,7 @@ mlw_file: USE WRITES
 
 mlw_file: VAL CORE_LIDENT END 
 ##
-## Ends in an error in state: 1149.
+## Ends in an error in state: 1150.
 ##
 ## nonempty_list(module_decl) -> module_decl . [ EOF ]
 ## nonempty_list(module_decl) -> module_decl . nonempty_list(module_decl) [ EOF ]
@@ -9256,7 +9258,7 @@ mlw_file: VAL CORE_LIDENT END
 ## In state 549, spurious reduction of production val_defn -> params return_opt spec 
 ## In state 133, spurious reduction of production mk_expr(val_defn) -> val_defn 
 ## In state 557, spurious reduction of production prog_decl -> VAL ghost kind attrs(lident_rich) mk_expr(val_defn) 
-## In state 1138, spurious reduction of production module_decl -> prog_decl 
+## In state 1139, spurious reduction of production module_decl -> prog_decl 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

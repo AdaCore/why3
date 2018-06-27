@@ -916,13 +916,13 @@ single_expr_:
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
       Elabel (id, over_loop e) }
-| WHILE seq_expr DO loop_annotation seq_expr DONE
+| WHILE seq_expr DO loop_annotation loop_body DONE
     { let id_b = mk_id break_id $startpos($3) $endpos($3) in
       let id_c = mk_id continue_id $startpos($3) $endpos($3) in
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
+| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* loop_body DONE
     { let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
@@ -1009,6 +1009,10 @@ expr_sub:
     { Eidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ DOTDOT expr RIGHTSQ
     { Eidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
+
+loop_body:
+| (* epsilon *)   { mk_expr (Etuple []) $startpos $endpos }
+| seq_expr        { $1 }
 
 loop_annotation:
 | (* epsilon *)
