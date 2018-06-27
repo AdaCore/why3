@@ -287,7 +287,7 @@ rule token = parse
       let token = match_tokens !last in
       let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
-      let s = if Filename.remove_extension fname = "/trywhy3_input"
+      let s = if Strings.has_prefix "/trywhy3_input." fname
         then "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
         else Report.report (t, token) checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in
