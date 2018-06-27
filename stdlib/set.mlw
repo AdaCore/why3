@@ -86,9 +86,8 @@ module Set
   = fun x -> not s[x]
 
   (** arbitrary element *)
-  let ghost function choose(s: set 'a): 'a
+  val ghost function choose(s: set 'a): 'a
     ensures { not (is_empty s) -> mem result s }
-  = any 'a ensures { not (is_empty s) -> mem result s }
 
 end
 

@@ -9,7 +9,7 @@
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../heapsort.mlw" proved="true">
-<theory name="HeapSort" proved="true" sum="b24b0ba972d2009dd0e19718fd0706ed">
+<theory name="HeapSort" proved="true">
  <goal name="VC min_of_sorted" expl="VC for min_of_sorted" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC min_of_sorted.0" expl="variant decrease" proved="true">
@@ -101,7 +101,7 @@
 </theory>
 </file>
 <file name="../heap.why" proved="true">
-<theory name="Heap" proved="true" sum="c43e894ad02fc7ade4ed176da0bfc752">
+<theory name="Heap" proved="true">
  <goal name="Parent_inf" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
@@ -172,7 +172,7 @@
 </theory>
 </file>
 <file name="../bag_of_integers.why" proved="true">
-<theory name="Bag_integers" proved="true" sum="11f798688fe35fe2155a1e298c24360f">
+<theory name="Bag_integers" proved="true">
  <goal name="Min_bag_union1" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
@@ -182,7 +182,7 @@
 </theory>
 </file>
 <file name="../test_harness.mlw" proved="true">
-<theory name="TestHarness" proved="true" sum="45070028561c41a332fde761f12fd18d">
+<theory name="TestHarness" proved="true">
  <goal name="VC testHarness" expl="VC for testHarness" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC testHarness.0" expl="array creation size" proved="true">
@@ -228,7 +228,7 @@
 </theory>
 </file>
 <file name="../elements.why" proved="true">
-<theory name="Elements" proved="true" sum="568d7e84d95d740156de701aaf50fd41">
+<theory name="Elements" proved="true">
  <goal name="Elements_singleton" proved="true">
  <proof prover="5"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -268,7 +268,7 @@
 </theory>
 </file>
 <file name="../heap_implem.mlw" proved="true">
-<theory name="Implementation" proved="true" sum="0eae515d4d680526289e3239fb2beb41">
+<theory name="Implementation" proved="true">
  <goal name="VC is_heap_min" expl="VC for is_heap_min" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC is_heap_min.0" expl="variant decrease" proved="true">
@@ -699,11 +699,9 @@
 </theory>
 </file>
 <file name="../abstract_heap.mlw" proved="true">
-<theory name="AbstractHeap" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
 </file>
 <file name="../heap_model.why" proved="true">
-<theory name="Model" proved="true" sum="4e26e6b01738e8834e2a10ad47b287a9">
+<theory name="Model" proved="true">
  <goal name="Model_empty" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>

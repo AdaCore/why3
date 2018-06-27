@@ -1230,6 +1230,7 @@ let clone_post_result q = match q.t_node with
   | _ -> invalid_arg "Ity.clone_post_result"
 
 let annot_attr = Ident.create_attribute "vc:annotation"
+let break_attr = Ident.create_attribute "vc:break_me"
 
 type cty = {
   cty_args   : pvsymbol list;

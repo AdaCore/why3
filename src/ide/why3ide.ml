@@ -357,6 +357,12 @@ let update_label_saved (label: GMisc.label) =
   if (Strings.has_prefix "*" s) then
     label#set_text (String.sub s 1 (String.length s - 1))
 
+let make_sources_editable b =
+  Hstr.iter
+    (fun _ (_,source_view,_,_) ->
+      source_view#set_editable b;
+      source_view#set_auto_indent b)
+    source_view_table
 
 (**********************)
 (* Graphical elements *)
@@ -423,73 +429,11 @@ let menubar = GMenu.menu_bar
 
 let hb = GPack.hbox ~packing:vbox#add ()
 
-(* 1. Menu *)
-
-let factory = new GMenu.factory menubar
-
-let accel_group = factory#accel_group
-
-let create_menu_item (factory:GMenu.menu GMenu.factory)
-                     ?key label tooltip =
-  let i = factory#add_item ?key label in
-  i#misc#set_tooltip_markup tooltip;
-  i
-
-let connect_menu_item i ~callback =
-  let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
-
-(* 1.1 "File" menu items *)
-
-let file_menu = factory#add_submenu "_File"
-let file_factory = new GMenu.factory file_menu ~accel_group
-let menu_add_file =
-  create_menu_item file_factory "Add file to session"
-                   "Insert another file in the current session"
-let menu_preferences =
-  create_menu_item file_factory "Preferences"
-                   "Open Preferences Window"
-let menu_save_session =
-  create_menu_item file_factory "Save session"
-                   "Save the current proof session on disk"
-let menu_save_files =
-  create_menu_item file_factory "Save files"
-                   "Save the edited source files on disk"
-let menu_save_session_and_files =
-  create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
-                   "Save the current proof session and the source files"
-let menu_refresh =
-  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
-                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
-
-let menu_quit =
-  create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
-                   "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
-
-(* 1.2 "Tools" menu items *)
-
-let tools_menu = factory#add_submenu "_Tools"
-let tools_factory = new GMenu.factory tools_menu ~accel_group
-let tools_accel_group = GtkData.AccelGroup.create ()
-
-let strategies_factory =
-  let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  new GMenu.factory tools_submenu_strategies
-
-let provers_factory =
-  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  new GMenu.factory tools_submenu_provers
+let accel_group = GtkData.AccelGroup.create ()
 
 (* context_tools : simplified tools menu for mouse-3 *)
 
 let context_tools_menu = GMenu.menu ()
-let context_tools_factory = new GMenu.factory context_tools_menu ~accel_group
-
-
-(* 1.3 "View" menu items *)
-
-
 
 (****************************)
 (* actions of the interface *)
@@ -509,56 +453,6 @@ let send_session_config_to_server () =
   send_request (Set_config_param("timelimit",nb));
   let nb = gconfig.session_mem_limit in
   send_request (Set_config_param("memlimit",nb))
-
-let () =
-  let callback () =
-    Gconfig.preferences gconfig;
-    (* TODO:
-      begin
-        match !current_env_session with
-          | None -> ()
-          | Some e ->
-              Session.update_env_session_config e gconfig.config;
-              Session.unload_provers e
-      end;
-      recreate_gui ();
-(*
-      Mprover.iter
-        (fun p pi ->
-          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
-            pi.editor)
-        (Whyconf.get_provers gconfig.config);
-     *)
-     *)
-    Hstr.iter
-      (fun _ (_,source_view,_,_) ->
-       source_view#set_editable gconfig.allow_source_editing;
-       source_view#set_auto_indent gconfig.allow_source_editing)
-      source_view_table;
-    send_session_config_to_server ()
-  in
-  connect_menu_item menu_preferences ~callback
-
-let () =
-  connect_menu_item
-    menu_save_session
-    ~callback:(fun () -> send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_session_and_files
-    ~callback:(fun () -> save_sources(); send_request Save_req)
-
-let () =
-  connect_menu_item
-    menu_save_files
-    ~callback:(fun () -> save_sources())
-
-
-let () =
-  connect_menu_item
-    menu_quit
-    ~callback:exit_function_safe
 
 let (_ : GtkSignal.id) =
   main_window#connect#destroy
@@ -1064,12 +958,60 @@ let update_monitor =
   let text = Printf.sprintf "%s %d/%d/%d" f t s r in
   monitor#set_text text
 
+(**********************)
+(* Cursor positioning *)
+(**********************)
 
-(*********************)
-(* Reaload Menu Item *)
-(*********************)
+(* Current position in the source files *)
+let current_cursor_loc = ref None
 
-let reload_unsafe () = clear_message_zone (); send_request Reload_req
+let move_to_line ~yalign (v : GSourceView2.source_view) line =
+  let line = max 0 (line - 1) in
+  let line = min line v#buffer#line_count in
+  let it = v#buffer#get_iter (`LINE line) in
+  v#buffer#place_cursor ~where:it;
+  let mark = `MARK (v#buffer#create_mark it) in
+  v#scroll_to_mark ~use_align:true ~yalign mark
+
+(* Scroll to a specific locations *)
+let scroll_to_loc ~force_tab_switch loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some loc ->
+    let f, l, _, _ = Loc.get loc in
+    try
+      let (n, v, _, _) = get_source_view_table f in
+      if force_tab_switch then
+        begin
+          Debug.dprintf debug "tab switch to page %d@." n;
+          notebook#goto_page n;
+        end;
+      move_to_line ~yalign:0.0 v l
+    with Nosourceview f ->
+      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
+
+(* Reposition the cursor to the place it was saved *)
+let reposition_ide_cursor () =
+  scroll_to_loc ~force_tab_switch:false !current_cursor_loc
+
+(* Save the current location of the cursor to be reused after reload *)
+let save_cursor_loc () =
+  let n = notebook#current_page in
+  let acc = ref None in
+  Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
+  match !acc with
+  | None -> ()
+  | Some (cur_file, view) ->
+    (* Get current line *)
+    let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
+    current_cursor_loc := Some (Loc.user_position cur_file line 1 1)
+
+(******************)
+(* Reload actions *)
+(******************)
+
+let reload_unsafe () =
+  save_cursor_loc (); clear_message_zone (); send_request Reload_req
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
@@ -1088,13 +1030,6 @@ let reload_safe () =
     | _ -> ()
   else
     reload_unsafe ()
-
-let () = connect_menu_item menu_refresh ~callback:save_and_reload
-
-
-
-
-
 
 (****************************)
 (* command entry completion *)
@@ -1164,14 +1099,6 @@ let convert_color (color: color): string =
   | Error_color -> "error_tag"
   | Error_line_color -> "error_line_tag"
 
-let move_to_line ~yalign (v : GSourceView2.source_view) line =
-  let line = max 0 (line - 1) in
-  let line = min line v#buffer#line_count in
-  let it = v#buffer#get_iter (`LINE line) in
-  v#buffer#place_cursor ~where:it;
-  let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign mark
-
 let color_line ~color loc =
   let color_line (v:GSourceView2.source_view) ~color l =
     let buf = v#buffer in
@@ -1221,23 +1148,6 @@ let color_loc ?(ce=false) ~color loc =
      print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
      Debug.dprintf debug "color_loc: no source view for file %s@." f
 
-(* Scroll to a specific locations *)
-let scroll_to_loc ~force_tab_switch loc_of_goal =
-  match loc_of_goal with
-  | None -> ()
-  | Some (loc, _) ->
-    let f, l, _, _ = Loc.get loc in
-    try
-      let (n, v, _, _) = get_source_view_table f in
-      if force_tab_switch then
-        begin
-          Debug.dprintf debug "tab switch to page %d@." n;
-          notebook#goto_page n;
-        end;
-      move_to_line ~yalign:0.0 v l
-    with Nosourceview f ->
-      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
-
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) =
@@ -1251,7 +1161,7 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
     with Not_found -> None
   in
-  scroll_to_loc ~force_tab_switch:false loc_of_goal
+  scroll_to_loc ~force_tab_switch:false (Opt.map fst loc_of_goal)
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
@@ -1259,29 +1169,6 @@ let apply_loc_on_ce (l: (Loc.position * color) list) =
   erase_color_loc counterexample_view;
   List.iter (fun (loc, color) ->
     color_loc ~ce:true ~color loc) l
-
-
-(*******************)
-(* The "View" menu *)
-(*******************)
-
-let view_menu = factory#add_submenu "_View"
-let view_factory = new GMenu.factory view_menu ~accel_group
-
-(* goals view is not yet multi-selectable
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._A
-    ~label:"Select all"
-    ~callback:(fun () -> goals_view#selection#select_all ()) ()
- *)
-
-let (_ : GMenu.menu_item) =
-  view_factory#add_item ~key:GdkKeysyms._plus
-    ~callback:enlarge_fonts "Enlarge font"
-
-let (_ : GMenu.menu_item) =
-    view_factory#add_item ~key:GdkKeysyms._minus
-      ~callback:reduce_fonts "Reduce font"
 
 let collapse_iter iter =
   let path = goals_model#get_path iter in
@@ -1302,21 +1189,6 @@ let collapse_proven_goals () =
   match goals_model#get_iter_first with
   | None -> ()
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
-
-let () =
-  let i = view_factory#add_item
-            "Collapse proven goals"
-            ~callback:(fun () -> collapse_proven_goals ())
-  in
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
-  i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
-
-  let i = view_factory#add_item
-            "Expand all"
-            ~callback:(fun () -> goals_view#expand_all ())
-  in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view"
-
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
@@ -1346,12 +1218,12 @@ let get_selected_row_references () =
 (**********************)
 (* Contextual actions *)
 (**********************)
-let expand_row ~all =
+let expand_row () =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let path = goals_model#get_path row#iter in
-      goals_view#expand_row path ~all
+      goals_view#expand_row path ~all:(goals_view#row_expanded path)
   | _ -> ()
 
 let collapse_row () =
@@ -1398,49 +1270,6 @@ let move_to_next_unproven_node_id () =
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
 
-(* TODO random shortcut: to be set. *)
-let () =
-  let i = view_factory#add_item
-            "Collapse under node"
-            ~key:GdkKeysyms._Left
-            ~callback:(fun () -> collapse_row ())
-  in
-  i#misc#set_tooltip_markup "Collapse current node";
-
-  let i = view_factory#add_item
-            "Expand below node "
-            ~key:GdkKeysyms._Right
-            ~callback:(fun () -> expand_row ~all:false)
-  in
-  i#misc#set_tooltip_markup "Expand only one node";
-
-  let i = view_factory#add_item
-            "Expand all below node "
-            ~callback:(fun () -> expand_row ~all:true)
-  in
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E;
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view";
-
-  let i = view_factory#add_item
-            "Go to parent node"
-            ~key:GdkKeysyms._Up
-            ~callback:(fun () -> move_current_row_selection_to_parent ())
-  in
-  i#misc#set_tooltip_markup "Go to parent";
-
-  let i = view_factory#add_item
-            "Go to first child"
-            ~callback:(fun () -> move_current_row_selection_to_first_child ())
-  in
-  i#misc#set_tooltip_markup "Go to first child";
-
-  let i = view_factory#add_item
-            "Select next unproven goal"
-            ~key:GdkKeysyms._Down
-            ~callback:(fun () -> move_to_next_unproven_node_id ())
-  in
-  i#misc#set_tooltip_markup "Select next unproven goal"
-
 (* unused
 let rec update_status_column_from_iter cont iter =
   set_status_column iter;
@@ -1472,9 +1301,7 @@ let interp_ide cmd =
   | "next" ->
       move_to_next_unproven_node_id ()
   | "expand" ->
-      expand_row ~all:false
-  | "ex_all" ->
-      expand_row ~all:true
+      expand_row ()
   | "collapse" ->
       collapse_row ()
   | "list_ide_command" ->
@@ -1646,10 +1473,6 @@ let select_file ~request =
   end ;
   d#destroy ()
 
-let (_ : GtkSignal.id) =
-  menu_add_file#connect#activate ~callback:(fun () ->
-      select_file ~request:(fun f -> send_request (Add_file_req f)))
-
 (*************************)
 (* Notification Handling *)
 (*************************)
@@ -1694,7 +1517,7 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
+         scroll_to_loc ~force_tab_switch:true (Some rel_loc);
          color_line ~color:Error_line_color rel_loc;
          color_loc ~color:Error_color rel_loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
@@ -1915,80 +1738,268 @@ let new_node ?parent id name typ detached =
   else
     Hint.find node_id_to_gtree id
 
+let on_selected_rows ~multiple ~notif_kind ~action f () =
+  match get_selected_row_references () with
+  | [] ->
+    print_message ~kind:1 ~notif_kind
+      "Select at least one node to perform the '%s' action" action
+  | _ :: _ :: _ when not multiple ->
+    print_message ~kind:1 ~notif_kind
+      "Select at most one node to perform the '%s' action" action
+  | l ->
+    List.iter (fun r -> send_request (f (get_node_id r#iter))) l
 
-(**************************************************)
-(* tools submenus for strategies, provers and transformations *)
-(**************************************************)
+(**************************)
+(* Helpers for menu items *)
+(**************************)
 
-let sanitize_markup x =
-  let remove = function
-    | '_' -> "__"
-    | c -> String.make 1 c in
-  Ident.sanitizer remove remove (Glib.Markup.escape_text x)
+let remove_mnemonic s =
+  try
+    let j = ref (String.index s '_') in
+    let i = ref 0 in
+    let n = String.length s in
+    let b = Buffer.create n in
+    try
+      while true do
+        Buffer.add_substring b s !i (!j - !i);
+        i := !j + 1;
+        if !i = n then raise Not_found;
+        Buffer.add_char b s.[!i];
+        incr i;
+        j := String.index_from s !i '_';
+      done;
+      assert false
+    with Not_found ->
+      Buffer.add_substring b s !i (n - !i);
+      Buffer.contents b
+  with Not_found -> s
+
+class menu_factory ~accel_path:menu_path ~accel_group:menu_group menu =
+object (self)
+  method add_item ?accel_path ?(accel_group=menu_group) ?modi ?key
+    ?(use_mnemonic=true) ?(add_accel=true) ?tooltip ?callback label =
+    let item = GtkMenu.MenuItem.create ~use_mnemonic ~label () in
+    let item = new GMenu.menu_item item in
+    item#misc#show ();
+    menu#append item;
+    if add_accel || accel_path <> None then begin
+      let accel_path = match accel_path with
+        | None -> menu_path ^ (if use_mnemonic then remove_mnemonic label else label)
+        | Some ap -> ap in
+      if add_accel then GtkData.AccelMap.add_entry accel_path ?key ?modi;
+      GtkBase.Widget.set_accel_path item#as_widget accel_path accel_group
+    end;
+    Opt.iter (fun callback -> let _ = item#connect#activate ~callback in ()) callback;
+    Opt.iter item#misc#set_tooltip_markup tooltip;
+    item
+  method add_separator () =
+    let item = GtkMenu.MenuItem.separator_create () in
+    let item = new GMenu.menu_item item in
+    item#misc#show ();
+    menu#append item;
+    ()
+  method add_submenu ?use_mnemonic label =
+    let m = GtkMenu.Menu.create [] in
+    let m = new GMenu.menu m in
+    m#misc#show ();
+    let item = self#add_item ?use_mnemonic ~add_accel:false label in
+    item#set_submenu m;
+    m
+end
+
+(*************)
+(* Main menu *)
+(*************)
+
+let tools_accel_group = GtkData.AccelGroup.create ()
+let factory = new menu_factory ~accel_path:"<Why3-Main>/" ~accel_group menubar
+let context_factory = new menu_factory context_tools_menu
+  ~accel_path:"" ~accel_group:tools_accel_group
+
+let connect_menu_item i ~callback =
+  let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
+
+(* "File" menu items *)
+
+let file_menu = factory#add_submenu "_File"
+let file_factory = new menu_factory file_menu ~accel_path:"<Why3-Main>/File/" ~accel_group
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Add file to session"
+    ~tooltip:"Insert another file in the current session"
+    ~callback:(fun () ->
+      select_file ~request:(fun f -> send_request (Add_file_req f)))
+
+let (_: GMenu.menu_item) =
+  let callback () =
+    Gconfig.preferences gconfig;
+    make_sources_editable gconfig.allow_source_editing;
+    send_session_config_to_server ()
+  in
+  file_factory#add_item "Preferences"
+    ~tooltip:"Open Preferences Window"
+    ~callback
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save session"
+    ~tooltip:"Save the current proof session on disk"
+    ~callback:(fun () -> send_request Save_req)
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save files"
+    ~tooltip:"Save the edited source files on disk"
+    ~callback:save_sources
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "_Save session and files"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._S
+    ~tooltip:"Save the current proof session and the source files"
+    ~callback:(fun () -> save_sources(); send_request Save_req)
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "Save all and _Refresh session"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._R
+    ~tooltip:"Save the current proof session and the source files, then refresh the proof session with updated source files."
+    ~callback:save_and_reload
+
+let (_: GMenu.menu_item) =
+  file_factory#add_item "_Quit"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Q
+    ~tooltip:"See the Preferences for setting the policy on automatic file saving at exit."
+    ~callback:exit_function_safe
+
+(* "Tools" menu items *)
+
+let tools_menu = factory#add_submenu "_Tools"
+let tools_factory = new menu_factory tools_menu
+  ~accel_path:"<Why3-Main>/Tools/" ~accel_group:tools_accel_group
+
+let strategies_factory =
+  let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
+  tools_factory#add_separator ();
+  new menu_factory tools_submenu_strategies
+    ~accel_path:"<Why3-Main>/Tools/Strategies/" ~accel_group:tools_accel_group
+
+let provers_factory =
+  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
+  tools_factory#add_separator ();
+  new menu_factory tools_submenu_provers
+    ~accel_path:"<Why3-Main>/Tools/Provers/" ~accel_group:tools_accel_group
+
+(* "View" menu items *)
+
+let view_menu = factory#add_submenu "_View"
+let view_factory = new menu_factory ~accel_path:"<Why3-Main>/View/" ~accel_group view_menu
+
+let (_ : GMenu.menu_item) =
+  view_factory#add_item "Enlarge font"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._plus
+    ~callback:enlarge_fonts
+
+let (_ : GMenu.menu_item) =
+  view_factory#add_item "Reduce font"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._minus
+    ~callback:reduce_fonts
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Collapse proven goals"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
+    ~tooltip:"Collapse all the proven nodes under the current node"
+    ~callback:collapse_proven_goals
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Expand all"
+    ~tooltip:"Expand all nodes of the tree view"
+    ~callback:goals_view#expand_all
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Collapse current node"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._minus
+    ~callback:collapse_row
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Expand current node"
+    ~accel_group:tools_accel_group ~key:GdkKeysyms._plus
+    ~tooltip:"Expand current node, or its children when already expanded"
+    ~callback:expand_row
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go to parent node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:move_current_row_selection_to_parent
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go to first child"
+    ~callback:move_current_row_selection_to_first_child
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Select next unproven goal"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Down
+    ~callback:move_to_next_unproven_node_id
+
+(* "Help" menu items *)
+
+let help_menu = factory#add_submenu "_Help"
+let help_factory = new menu_factory help_menu ~accel_path:"<Why3-Main>/Help/" ~accel_group
+
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "Legend"
+    ~callback:show_legend_window
+
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "About"
+    ~callback:show_about_window
+
+(*****************************************************************)
+(* "Tools" submenus for strategies, provers, and transformations *)
+(*****************************************************************)
 
 let string_of_desc desc =
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
   in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
 
-
-let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
-
 let parse_shortcut_as_key s =
-  match GtkData.AccelGroup.parse s with
-  | (0,[]) ->
-     Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s;
-     None
-  | (key, modi) ->
-     let name = GtkData.AccelGroup.name ~key ~modi in
-     Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name;
-     Some (name, key, modi)
+  let (key,modi) as r = GtkData.AccelGroup.parse s in
+  begin if key = 0 then
+    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
+  else
+    let name = GtkData.AccelGroup.name ~key ~modi in
+    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
+  end;
+  r
 
 let add_submenu_strategy (shortcut,strategy) =
-  let  i = create_menu_item
-             strategies_factory
-             (String.map (function '_' -> ' ' | c -> c) strategy)
-             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
-  in
   let callback () =
     Debug.dprintf debug "interp command '%s'@." strategy;
     interp strategy
   in
-  connect_menu_item i ~callback;
-  let  i = create_menu_item
-             context_tools_factory
-             (String.map (function '_' -> ' ' | c -> c) strategy)
-             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
-  in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
-  connect_menu_item i ~callback
-
+  let name = String.map (function '_' -> ' ' | c -> c) strategy in
+  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
+  let (key, modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = strategies_factory#add_item name
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+  let (_ : GMenu.menu_item) = context_factory#add_item name
+    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+  ()
 
 let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
-  let  i = create_menu_item
-             provers_factory
-             prover_name
-             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
-  in
-  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (parse_shortcut_as_key shortcut);
   let callback () =
     Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
-  connect_menu_item i ~callback;
+  let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
+  let (key,modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
   if not (List.mem prover_parseable_name gconfig.hidden_provers) then
-    begin
-      let  i = create_menu_item
-             context_tools_factory
-             prover_name
-             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
-      in
-      connect_menu_item i ~callback;
-    end
-
-
+    let (_ : GMenu.menu_item) = context_factory#add_item prover_name
+      ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+    ()
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
@@ -2012,7 +2023,7 @@ let init_completion provers transformations strategies commands =
               provers
   in
   List.iter add_submenu_prover provers_sorted;
-  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
+  context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
                     Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
@@ -2041,165 +2052,194 @@ let () =
   let transformations = Server_utils.list_transforms () in
   let add_submenu_transform name filter =
     let submenu = tools_factory#add_submenu name in
-    let submenu = new GMenu.factory submenu ~accel_group in
+    let submenu = new menu_factory submenu
+      ~accel_path:("<Why3-Main>/Tools/" ^ name ^ "/")
+      ~accel_group:tools_accel_group in
     let iter ((name,_) as desc) =
-      let callback () = interp name in
-      let i = create_menu_item submenu (sanitize_markup name) (string_of_desc desc) in
-      connect_menu_item i ~callback
+      let (_ : GMenu.menu_item) = submenu#add_item (Glib.Markup.escape_text name)
+        ~use_mnemonic:false
+        ~tooltip:(string_of_desc desc)
+        ~callback:(fun () -> interp name) in
+      ()
     in
     let trans = List.filter filter transformations in
     List.iter iter trans
   in
   add_submenu_transform
-    "transformations (a-e)"
+    "Transformations (a-e)"
     (fun (x,_) -> x < "eliminate");
   add_submenu_transform
-    "transformations (eliminate)"
+    "Transformations (eliminate)"
     (fun (x,_) -> x >= "eliminate" && x < "eliminatf");
   add_submenu_transform
-    "transformations (e-r)"
+    "Transformations (e-r)"
     (fun (x,_) -> x >= "eliminatf" && x < "s");
-  add_submenu_transform "transformations (s-z)"
+  add_submenu_transform "Transformations (s-z)"
                         (fun (x,_) -> x >= "s");
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  ()
+  tools_factory#add_separator ()
 
 (* complete the tools menu *)
 
-let edit_menu_item =
-  create_menu_item tools_factory "Edit"
-                   "View or edit proof script (shortcut: e)"
-let () =
-  edit_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._e
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
+      (fun id -> Command_req (id, "edit")) in
+  tools_factory#add_item "_Edit"
+    ~key:GdkKeysyms._E
+    ~tooltip:"View or edit proof script"
+    ~callback
 
-let replay_menu_item =
-  create_menu_item tools_factory "Replay valid obsolete proofs"
-                   "Replay valid obsolete proofs below the current node (shortcut: r)"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+      (fun id -> Command_req (id, "replay")) in
+  tools_factory#add_item "_Replay valid obsolete proofs"
+    ~key:GdkKeysyms._R
+    ~tooltip:"Replay valid obsolete proofs under the current node"
+    ~callback
 
-let replay_all_menu_item =
-  create_menu_item tools_factory "Replay all obsolete proofs"
-                   "Replay all obsolete proofs below the current node"
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+      (fun id -> Command_req (id, "replay all")) in
+  tools_factory#add_item "Replay all obsolete proofs"
+    ~tooltip:"Replay all obsolete proofs under the current node"
+    ~callback
 
-let () =
-  replay_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._r
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
+      (fun id -> Command_req (id, "clean")) in
+  tools_factory#add_item "_Clean node"
+    ~key:GdkKeysyms._C
+    ~tooltip:"Remove unsuccessful proofs or transformations that are under a proved goal"
+    ~callback
 
-let clean_menu_item =
-  create_menu_item tools_factory  "Clean"
-                   "Remove unsuccessful proofs or transformations that are below a proved goal (shortcut: c)"
-let () =
-  clean_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._c
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
+      (fun id -> Remove_subtree id) in
+  tools_factory#add_item "Remove node"
+    ~key:GdkKeysyms._Delete
+    ~tooltip:"Remove the selected proof attempts or transformations"
+    ~callback
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
+      (fun id -> Command_req (id, "mark")) in
+  tools_factory#add_item "Mark _obsolete"
+    ~key:GdkKeysyms._O
+    ~tooltip:"Mark all proof attempts under the current node as obsolete"
+    ~callback
 
-let remove_item =
-  create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations (shortcut: del)"
-let () =
-  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._Delete
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+      (fun id -> Command_req (id, "interrupt")) in
+  tools_factory#add_item "_Interrupt"
+    ~tooltip:"Stop all running proof attempts"
+    ~callback
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Bisect error" ~action:"bisect"
+      (fun id -> Command_req (id, "bisect")) in
+  tools_factory#add_item "_Bisect hypotheses"
+    ~tooltip:"Remove useless hypotheses from a proved goal by bisection"
+    ~callback
 
-let mark_obsolete_item =
-  create_menu_item tools_factory "Mark obsolete"
-                   "Mark all proof nodes below the current selected nodes as obsolete (shortcut: o)"
-let () =
-  mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
+let () = tools_factory#add_separator ()
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
+      (fun id -> Command_req (id, "Focus")) in
+  tools_factory#add_item "_Focus"
+    ~tooltip:"Focus view on the current node"
+    ~callback
 
-let interrupt_item =
-  create_menu_item tools_factory "Interrupt"
-                   "Stop all running proof attempts"
+let (_ : GMenu.menu_item) =
+  let callback = fun () -> send_request (Unfocus_req) in
+  tools_factory#add_item "_Unfocus"
+    ~callback
 
-let bisect_item =
-  create_menu_item tools_factory "Bisect on external proof"
-                   "Search for a maximal set of hypotheses to remove before calling a prover"
+let () = tools_factory#add_separator ()
 
-let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+let copy_item =
+  tools_factory#add_item "Copy node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._C
+    ~tooltip:"Copy the current node"
 
-let focus_item =
-  create_menu_item tools_factory "Focus"
-    "Focus on proof node"
+let paste_item =
+  tools_factory#add_item "Paste node"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._V
+    ~tooltip:"Paste the copied node below the current node"
 
-let unfocus_item =
-  create_menu_item tools_factory "Unfocus"
-    "Unfocus"
-
-let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
-
-let copy_item = create_menu_item tools_factory "Copy" "Copy the current tree node"
-
-let paste_item = create_menu_item tools_factory "Paste"
-                                  "Paste the copied node below the current node"
-
+(* complete the contextual menu (but only after provers and strategies, hence the function) *)
 
 let complete_context_menu () =
-  let on_selected_rows ~multiple ~notif_kind ~action f () =
-    match get_selected_row_references () with
-    | [] ->
-      print_message ~kind:1 ~notif_kind
-                    "Select at least one node to perform the '%s' action" action
-    | _ :: _ :: _ when not multiple ->
-       print_message ~kind:1 ~notif_kind
-        "Select at most one node to perform the '%s' action" action
-    | l ->
-      List.iter (fun r -> send_request (f (get_node_id r#iter))) l
-  in
-  connect_menu_item
-    replay_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
-                                (fun id -> Command_req (id, "replay")));
-  connect_menu_item
-    replay_all_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
-                                (fun id -> Command_req (id, "replay all")));
-  connect_menu_item
-    clean_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
-                                (fun id -> Command_req (id, "clean")));
-  connect_menu_item
-    mark_obsolete_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
-                                (fun id -> Command_req (id, "mark")));
-  connect_menu_item
-    interrupt_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
-                                (fun id -> Command_req (id, "interrupt")));
-  connect_menu_item
-    edit_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
-                                (fun id -> Command_req (id, "edit")));
-  connect_menu_item
-    bisect_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Bisect error" ~action:"bisect"
-                                (fun id -> Command_req (id, "bisect")));
-  connect_menu_item
-    focus_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
-                                (fun id -> Command_req (id, "Focus")));
-  connect_menu_item
-    remove_item
-    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
-                                (fun id -> Remove_subtree id));
-  connect_menu_item
-    unfocus_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Unfocus_req error" ~action:"unfocus"
-                                (fun id -> Command_req (id, "Unfocus")));
-  let ( _ : GMenu.menu_item) = context_tools_factory#add_separator () in
-  let replay_context_menu_item =
-    create_menu_item context_tools_factory "Replay valid obsolete proofs"
-                     "Replay valid obsolete proofs below the current node (shortcut: r)" in
-  connect_menu_item
-    replay_context_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
-                                (fun id -> Command_req (id, "replay")));
-  let replay_all_context_menu_item =
-    create_menu_item context_tools_factory "Replay all obsolete proofs"
-                     "Replay all obsolete proofs below the current node" in
-  connect_menu_item
-    replay_all_context_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
-                                (fun id -> Command_req (id, "replay all")));
-  ()
+  context_factory#add_separator ();
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
+      (fun id -> Command_req (id, "edit")) in
+  context_factory#add_item "_Edit"
+    ~accel_path:"<Why3-Main>/Tools/Edit" ~add_accel:false
+    ~tooltip:"View or edit proof script"
+    ~callback
+in ();
 
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
+      (fun id -> Command_req (id, "replay")) in
+  context_factory#add_item "_Replay valid obsolete proofs"
+    ~accel_path:"<Why3-Main>/Tools/Replay valid obsolete proofs" ~add_accel:false
+    ~tooltip:"Replay valid obsolete proofs under the current node"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay all"
+      (fun id -> Command_req (id, "replay all")) in
+  context_factory#add_item "Replay all obsolete proofs"
+    ~accel_path:"<Why3-Main>/Tools/Replay all obsolete proofs" ~add_accel:false
+    ~tooltip:"Replay all obsolete proofs under the current node"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
+      (fun id -> Command_req (id, "clean")) in
+  context_factory#add_item "_Clean node"
+    ~accel_path:"<Why3-Main>/Tools/Clean node" ~add_accel:false
+    ~tooltip:"Remove unsuccessful proofs or transformations that are under a proved goal"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
+      (fun id -> Remove_subtree id) in
+  context_factory#add_item "Remove node"
+    ~accel_path:"<Why3-Main>/Tools/Remove node" ~add_accel:false
+    ~tooltip:"Remove the selected proof attempts or transformations"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:true ~notif_kind:"Interrupt error" ~action:"interrupt"
+      (fun id -> Command_req (id, "interrupt")) in
+  context_factory#add_item "_Interrupt"
+    ~accel_path:"<Why3-Main>/Tools/Interrupt" ~add_accel:false
+    ~tooltip:"Stop all running proof attempts"
+    ~callback
+in ()
 
 (*************************************)
 (* Copy paste                        *)
@@ -2231,8 +2271,9 @@ let () =
   connect_menu_item copy_item ~callback:copy;
   connect_menu_item paste_item ~callback:paste
 
-
-(* the command-line *)
+(**********************************)
+(* Notification handling (part 2) *)
+(**********************************)
 
 let check_uninstalled_prover =
   let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
@@ -2385,6 +2426,7 @@ let treat_notification n =
         sc_view#source_buffer#end_not_undoable_action ();
         update_label_saved l;
         b := false;
+        reposition_ide_cursor ()
       with
       | Not_found -> create_source_view file_name content
     end
@@ -2400,27 +2442,6 @@ let treat_notification n =
         print_notify n
   end;
   ()
-
-
-
-(*************)
-(* Help menu *)
-(*************)
-
-
-let help_menu = factory#add_submenu "_Help"
-let help_factory = new GMenu.factory help_menu ~accel_group
-
-let (_ : GMenu.menu_item) =
-  help_factory#add_item
-    "Legend"
-    ~callback:show_legend_window
-
-let (_ : GMenu.menu_item) =
-  help_factory#add_item
-    "About"
-    ~callback:show_about_window
-
 
 (***********************************)
 (* accel group switching           *)

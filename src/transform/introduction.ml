@@ -74,9 +74,11 @@ let intro_var subst ({vs_name = id; vs_ty = ty} as vs) =
   Mvs.add vs (fs_app ls [] ty) subst,
   create_param_decl ls
 
+let get_expls f =
+  Sattr.filter (fun a -> Strings.has_prefix "expl:" a.attr_string) f.t_attrs
+
 let rec intros kn pr expl f =
-  let is_expl a = Strings.has_prefix "expl:" a.attr_string in
-  let fexpl = Sattr.filter is_expl f.t_attrs in
+  let fexpl = get_expls f in
   let expl = if Sattr.is_empty fexpl then expl else fexpl in
   let move_expl f = if Sattr.is_empty fexpl && not (Sattr.is_empty expl)
                     then t_attr_add (Sattr.min_elt expl) f else f in
@@ -90,13 +92,13 @@ let rec intros kn pr expl f =
       (* f is going to be removed, preserve its attributes and location in f2 *)
       let f2 = t_attr_copy f f2 in
       let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
+      let idx = id_fresh "H" ~attrs:(Sattr.singleton intro_attr) in
       let add (subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
           let subst, d = intro_var subst vs in
           subst, d::dl) svs (subst, dl) in
-        let prx = create_prsymbol (id_fresh "H"
-                                     ~attrs:(Sattr.singleton intro_attr)) in
+        let prx = create_prsymbol idx in
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
         subst, d::dl in
       let _, fl = List.fold_left add (Mvs.empty, []) fl in
@@ -129,11 +131,56 @@ let introduce_premises = Trans.store (fun t ->
   let known_map = Task.task_known t in
   Trans.apply (Trans.goal (intros ~known_map)) t)
 
-
-
 let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
+
+let generalize hd (pl, task) = match hd.Task.task_decl.Theory.td_node with
+  | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
+      if pl = [] then [], Some hd else
+      let expl = get_expls f in
+      let get_vs {ls_name = id; ls_value = oty} =
+        let attrs = Sattr.remove intro_attr id.id_attrs in
+        let id = id_fresh ~attrs ?loc:id.id_loc id.id_string in
+        create_vsymbol id (Opt.get oty) in
+      let set_vs vs ls f =
+        t_replace (t_app ls [] ls.ls_value) (t_var vs) f in
+      let rewind (vl,f) d = match d.d_node with
+        | Dparam ls ->
+            let v = get_vs ls in
+            v::vl, set_vs v ls f
+        | Dlogic [ls,ld] ->
+            let f = t_forall_close vl [] f in
+            let v = get_vs ls in
+            let f = set_vs v ls f in
+            let _, h = Decl.open_ls_defn ld in
+            [], t_let_close v h f
+        | Dprop (Paxiom,_,h) ->
+            let f = t_forall_close vl [] f in
+            [], t_implies (t_attr_remove intro_attr h) f
+        | _ -> assert false (* never *) in
+      let vl, f = List.fold_left rewind ([],f) pl in
+      let f = t_forall_close vl [] f in
+      let f = if Sattr.is_empty expl then f else
+              t_attr_add  (Sattr.min_elt expl) f in
+      [], Task.add_decl task (create_prop_decl Pgoal pr f)
+  | Theory.Decl ({d_node =
+      ( Dparam {ls_name = id; ls_args = []; ls_value = Some _}
+      | Dlogic [{ls_name = id; ls_args = []; ls_value = Some _}, _]
+      | Dprop (Paxiom, {pr_name = id}, _))} as d)
+    when Sattr.mem intro_attr id.id_attrs -> d::pl, task
+  (* We only reattach the local premises right before the goal.
+     On the first non-local premise, we ignore the accumulator
+     and return the original task. We make an exception for
+     metas, as they are not checked against the known_map *)
+  | Theory.Meta _ -> pl, Task.add_tdecl task hd.Task.task_decl
+  | _ -> [], Some hd
+
+let generalize_intro = Trans.fold_map generalize [] None
+
+let () = Trans.register_transform "generalize_introduced" generalize_intro
+  ~desc:"Move@ the@ premises@ introduced@ by@ \"introduce_premises\"@ back@ \
+         into@ the@ goal."
 
 
 (** Destruction of existential quantifiers in axioms.
@@ -171,7 +218,9 @@ let simplify_intros =
                 introduce_premises
 
 let split_vc =
-  Trans.compose_l Split_goal.split_goal_right (Trans.singleton simplify_intros)
+  Trans.compose_l  (* TODO: decide whether we want generalize in split_vc *)
+    ((* Trans.compose generalize_intro *) Split_goal.split_goal_right)
+    (Trans.singleton simplify_intros)
 
 let () = Trans.register_transform_l
            "split_vc" split_vc

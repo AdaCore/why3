@@ -315,18 +315,27 @@ transformations have changed (new version of \why), \why will detect
 that. Since the provers might answer differently on these new
 proof obligations, the corresponding proof attempts are marked obsolete.
 
+\subsection{Context Menu}
 
-\subsection{Menus}
+The left toolbar that was present in former versions of Why3 is now
+replaced by a context menu activited by clicking the right mouse button,
+while cursor is on a given row of the proof session tree.
 
-\begin{description}
-\item[Context menu]\emptyitem This menu is selected by the mouse right button on some row of the task tree view.
 \begin{description}
 \item[provers] The detected provers are listed. Note that you can hide some provers of that list using the preferences, tab \textsf{Provers}.
 \item[strategies] the set of known strategies is listed
+\item[Edit] starts an editor on the selected task.
 \item[Replay valid obsolete proofs] all proof nodes below the selected nodes that are obsolete but whose former status was Valid are replayed.
 \item[Replay all obsolete proofs] all proof nodes below the selected nodes that are obsolete are replayed.
+\item[Remove] removes a proof attempt or a transformation.
+\item[Clean] removes any unsuccessful proof attempt for which there is
+  another successful proof attempt for the same goal
+\item[Interrupt] cancels all the proof attempts currently scheduled or running.
 \end{description}
 
+\subsection{Global Menus}
+
+\begin{description}
 \item[Menu \textsf{File}]\emptyitem
 \begin{description}
 \item[Add File to session] adds a file in the current proof session.
@@ -392,8 +401,7 @@ proof obligations, the corresponding proof attempts are marked obsolete.
 \item[Mark obsolete] marks all the proof as
   obsolete.  This allows to replay every proof.
 
-\item[Interrupt] cancels all the proof attempts currently scheduled
-  but not yet started.
+\item[Interrupt] cancels all the proof attempts currently scheduled or running.
 
 \item[Bisect] performs a reduction of the context for the the current selected proof attempt, which must be a Valid one.
 
@@ -445,6 +453,29 @@ available as a textual command. However the textual interface allows
 for much more possibilities, including the ability to invoke
 transformations with arguments.
 
+\subsection{Key shortcuts}
+
+
+\begin{itemize}
+\item Save session and files : ctrl+s
+\item Save all and refresh session: ctrl+r
+\item Quit : ctrl+q
+\item Enlarge font : ctrl+plus
+\item Reduce font : ctrl+minus
+\item Collapse proven goals : !
+\item Collapse current node : -
+\item Expand current node : +
+\item Copy : ctrl+c
+\item Paste : ctrl+v
+\item Select parent node : ctrl+up
+\item Select next unproven goal : ctrl+down
+\item Change focus to command line : return
+\item Edit : e
+\item Replay : r
+\item Clean : c
+\item Remove : del
+\item Mark obsolete : o
+\end{itemize}
 
 \subsection{Preferences Dialog}
 
@@ -688,8 +719,9 @@ about the session, depending on the following specific options.
   the session as edited proofs.
 \item[\texttt{-{}-stats}] prints various proofs statistics, as
   detailed below.
-\item[\texttt{-{}-tree}] prints the structure of the session as a
-  tree in ASCII, as detailed below.
+% OBSOLETE
+% \item[\texttt{-{}-tree}] prints the structure of the session as a
+%   tree in ASCII, as detailed below.
 \item[\texttt{-{}-print0}] separates the results of the options
   \verb|provers| and \verb|--edited-files| by the character number 0
   instead of end of line \verb|\n|. That allows you to safely use
@@ -708,36 +740,39 @@ why3 session info --edited-files --print0 vstte12_bfs.mlw | \
 
 \end{description}
 
-\paragraph{Session Tree}
 
-The hierarchical structure of the session is printed as a tree in
-ASCII. The files, theories, goals are marked with a question mark
-\verb|?|, if they are not verified. A proof is usually said to be
-verified if the proof result is \verb|valid| and the proof is not
-obsolete.
-However here specially we separate these two properties. On
-the one hand if the proof suffers from an internal failure we mark it
-with an exclamation mark \verb|!|, otherwise if it is not valid we
-mark it with a question mark \verb|?|, finally if it is valid we add
-nothing. On the other hand if the proof is obsolete we mark it with an
-\verb|O|.
+% OBSOLETE
 
-For example, here are the session tree produced on the ``hello
-proof'' example of Section~\ref{chap:starting}.
-{\scriptsize
-\begin{verbatim}
-hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Simplify (1.5.4)?
-                                                |    `-Alt-Ergo (0.94)
-                                                |-G2?-+-split_goal?-+-G2.2-+-Simplify (1.5.4)
-                                                |     |             |      `-Alt-Ergo (0.94)
-                                                |     |             `-G2.1?-+-Coq (8.3pl4)?
-                                                |     |                     |-Simplify (1.5.4)?
-                                                |     |                     `-Alt-Ergo (0.94)?
-                                                |     |-Simplify (1.5.4)?
-                                                |     `-Alt-Ergo (0.94)?
-                                                `-G1---Simplify (1.5.4)
-\end{verbatim}
-}
+% \paragraph{Session Tree}
+
+% The hierarchical structure of the session is printed as a tree in
+% ASCII. The files, theories, goals are marked with a question mark
+% \verb|?|, if they are not verified. A proof is usually said to be
+% verified if the proof result is \verb|valid| and the proof is not
+% obsolete.
+% However here specially we separate these two properties. On
+% the one hand if the proof suffers from an internal failure we mark it
+% with an exclamation mark \verb|!|, otherwise if it is not valid we
+% mark it with a question mark \verb|?|, finally if it is valid we add
+% nothing. On the other hand if the proof is obsolete we mark it with an
+% \verb|O|.
+
+% For example, here are the session tree produced on the ``hello
+% proof'' example of Section~\ref{chap:starting}.
+% {\scriptsize
+% \begin{verbatim}
+% hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Simplify (1.5.4)?
+%                                                 |    `-Alt-Ergo (0.94)
+%                                                 |-G2?-+-split_goal?-+-G2.2-+-Simplify (1.5.4)
+%                                                 |     |             |      `-Alt-Ergo (0.94)
+%                                                 |     |             `-G2.1?-+-Coq (8.3pl4)?
+%                                                 |     |                     |-Simplify (1.5.4)?
+%                                                 |     |                     `-Alt-Ergo (0.94)?
+%                                                 |     |-Simplify (1.5.4)?
+%                                                 |     `-Alt-Ergo (0.94)?
+%                                                 `-G1---Simplify (1.5.4)
+% \end{verbatim}
+% }
 
 \paragraph{Session Statistics}
 
@@ -763,26 +798,30 @@ For example, here are the session statistics produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
 {\footnotesize
 \begin{verbatim}
-== Number of goals ==
-  total: 5  proved: 3
+== Number of root goals ==
+  total: 3  proved: 2
+
+== Number of sub goals ==
+  total: 2  proved: 1
 
 == Goals not proved ==
   +-- file ../hello_proof.why
     +-- theory HelloProof
       +-- goal G2
-        +-- transformation split_goal
-          +-- goal G2.1
+        +-- transformation split_goal_right
+          +-- goal G2.0
 
 == Goals proved by only one prover ==
   +-- file ../hello_proof.why
     +-- theory HelloProof
-      +-- goal G1: Simplify (1.5.4) (0.00)
-      +-- goal G3: Alt-Ergo (0.94) (0.00)
+      +-- goal G1: Alt-Ergo 0.99.1
+      +-- goal G2
+        +-- transformation split_goal_right
+          +-- goal G2.1: Alt-Ergo 0.99.1
+      +-- goal G3: Alt-Ergo 0.99.1
 
 == Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==
-  Alt-Ergo (0.94)      :   2   0.00   0.00   0.00
-  Simplify (1.5.4)     :   2   0.00   0.00   0.00
-
+  Alt-Ergo 0.99.1     :   3   0.00   0.00   0.00
 \end{verbatim}
 }
 
@@ -879,14 +918,14 @@ override this default).
 \begin{htmlonly}
 \begin{rawhtml}
 <h1>Why3 Proof Results for Project "hello_proof"</h1>
-<h2><font color="#FF0000">Theory "HelloProof": not fully verified</font></h2>
-<table border="1"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo (0.94)</td><td text-rotation="90">Coq (8.3pl4)</td><td text-rotation="90">Simplify (1.5.4)</td></td></tr>
-<td bgcolor="#C0FFC0" colspan="2">G1</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
-<td bgcolor="#FF0000" colspan="2">G2</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
-<tr><td bgcolor="#FF0000" colspan="2">split_goal</td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td></tr>
-<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">1.</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.43</td><td bgcolor="#FF8000">0.00</td></tr>
-<tr><td bgcolor="#C0FFC0" colspan="1">2.</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
-<td bgcolor="#C0FFC0" colspan="2">G3</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
+<h2><span style="color:#FF0000">Theory "hello_proof.HelloProof": not fully verified</span></h2>
+<table border="1" style="border-collapse:collapse"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo 0.99.1</td><td text-rotation="90">Coq 8.7.1</td></tr>
+<tr><td style="background-color:#C0FFC0" colspan="2">G1</td><td style="background-color:#C0FFC0">0.00</td><td style="background-color:#E0E0E0">---</td></tr>
+<tr><td style="background-color:#FF0000" colspan="2">G2</td><td style="background-color:#FF8000">0.00</td><td style="background-color:#E0E0E0">---</td></tr>
+<tr><td style="background-color:#FF0000" colspan="2">split_goal_right</td><td style="background-color:#E0E0E0"></td><td style="background-color:#E0E0E0"></td></tr>
+<tr><td rowspan="2" style="width:1ex"></td><td style="background-color:#FF0000" colspan="1">G2.0</td><td style="background-color:#FF8000">0.00</td><td style="background-color:#FF8000">0.29</td></tr>
+<tr><td style="background-color:#C0FFC0" colspan="1">G2.1</td><td style="background-color:#C0FFC0">0.00</td><td style="background-color:#E0E0E0">---</td></tr>
+<tr><td style="background-color:#C0FFC0" colspan="2">G3</td><td style="background-color:#C0FFC0">0.00</td><td style="background-color:#E0E0E0">---</td></tr>
 </table>
 \end{rawhtml}
 \end{htmlonly}

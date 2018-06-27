@@ -1304,7 +1304,7 @@ end
      match r with
      | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
-     | Exit_req | Get_global_infos -> true
+     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1396,7 +1396,7 @@ end
             in
             focused_node := Focus_on [focus_on];
             reset_and_send_the_whole_tree ()
-        | Unfocus_req -> unfocus ()
+        | Server_utils.Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
@@ -1427,6 +1427,7 @@ end
     | Set_prover_policy(p,u)   ->
        let c = d.cont in
        Controller_itp.set_session_prover_upgrade_policy c p u
+    | Unfocus_req             -> unfocus ()
     | Exit_req                -> exit 0
      )
     with

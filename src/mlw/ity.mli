@@ -400,6 +400,7 @@ val clone_post_result : post -> preid
 val create_post : vsymbol -> term -> post
 
 val annot_attr : attribute
+val break_attr : attribute
 
 type cty = private {
   cty_args   : pvsymbol list;

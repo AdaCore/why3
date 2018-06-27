@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Term
 open Ty
 open Decl
@@ -768,6 +779,8 @@ let rec interp_expr info (e:Mltree.expr) : value =
   | Eabsurd -> Debug.dprintf debug_interp "Eabsurd@.";
                raise CannotReduce
   | Ehole -> Debug.dprintf debug_interp "Ehole@.";
+             raise CannotReduce
+  | Eany _ -> Debug.dprintf debug_interp "Eany@.";
              raise CannotReduce
   | Ematch (e, l, bl) ->
      Debug.dprintf debug_interp "Ematch@.";

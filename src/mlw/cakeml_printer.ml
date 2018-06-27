@@ -8,6 +8,7 @@
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
+
 open Compile
 open Format
 open Ident
@@ -227,7 +228,8 @@ module Print = struct
     | Lany (rs, _, _) ->
         check_val_in_drv info rs
 
-  and print_expr ?(paren=false) info fmt e = match e.e_node with
+  and print_expr ?(paren=false) info fmt e =
+    match e.e_node with
     | Econst c ->
         let n = Number.compute_int_constant c in
         let n = BigInt.to_string n in
@@ -246,6 +248,7 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
+    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -472,13 +475,29 @@ let fg_cml ?fname m =
   let path     = m.mod_theory.th_path in
   (module_name ?fname path mod_name) ^ ".cml"
 
-let () = Pdriver.register_printer "cakeml"
-    ~desc:"printer for CakeML code" fg_cml print_decl
+open Pdriver
+
+let cml_printer =
+  { desc = "printer for CakeML code";
+    file_gen = fg_cml;
+    decl_printer = print_decl;
+    interf_gen = None;
+    interf_printer = None;
+    prelude_printer = print_empty_prelude }
+
+let () = Pdriver.register_printer "cakeml" cml_printer
 
 let fg_sml ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
   let path     = m.mod_theory.th_path in
   (module_name ?fname path mod_name) ^ ".sml"
 
-let () = Pdriver.register_printer "sml"
-    ~desc:"printer for SML code" fg_sml print_decl
+let sml_printer =
+  { desc = "printer for SML code";
+    file_gen = fg_sml;
+    decl_printer = print_decl;
+    interf_gen = None;
+    interf_printer = None;
+    prelude_printer = print_empty_prelude }
+
+let () = Pdriver.register_printer "sml" sml_printer

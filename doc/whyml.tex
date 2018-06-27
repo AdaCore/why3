@@ -56,7 +56,7 @@ See Chapter~\ref{chap:manpages} for more details regarding command lines.
 
 \medskip
 As an introduction to \whyml, we use a small logical puzzle
-(Sec.~\ref{sec:Einstein}) and then the five problems from the VSTTE
+(Section~\ref{sec:Einstein}) and then the five problems from the VSTTE
 2010 verification competition~\cite{vstte10comp}.
 The source code for all these examples is contained in \why's
 distribution, in sub-directory \texttt{examples/}. Look for files
@@ -132,7 +132,7 @@ end
 We now start a new theory, \texttt{Einstein}, which will contain all
 the individuals of the problem.
 \begin{whycode}
-theory Einstein "Einstein's problem"
+theory Einstein
 \end{whycode}
 First, we introduce enumeration types for houses, colors, persons,
 drinks, cigars, and pets.
@@ -194,7 +194,7 @@ end
 The next theory contains the 15 hypotheses. It starts by importing
 theory \texttt{Einstein}.
 \begin{whycode}
-theory EinsteinHints "Hints"
+theory EinsteinHints
   use import Einstein
 \end{whycode}
 Then each hypothesis is stated in terms of \texttt{to\_} and \texttt{of}
@@ -214,7 +214,7 @@ end
 \end{whycode}
 Finally, we declare the goal in a fourth theory:
 \begin{whycode}
-theory Problem "Goal of Einstein's problem"
+theory Problem
   use import Einstein
   use import EinsteinHints
 
@@ -931,6 +931,7 @@ end
 %END LATEX
 
 \section{Problem 5: Amortized Queue}
+\label{sec:AQueue}
 
 The last problem consists in verifying the implementation of a
 well-known purely applicative data structure for queues.

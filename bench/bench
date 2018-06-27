@@ -15,6 +15,7 @@ suffix=$1
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
+    test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
@@ -45,6 +46,7 @@ goods () {
 
 bads () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
 	if $pgm $2 $f > /dev/null 2>&1; then
@@ -59,6 +61,7 @@ bads () {
 
 drivers () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
@@ -76,6 +79,7 @@ drivers () {
 
 valid_goals () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
         if ! $pgm -t 15 -P alt-ergo $f > /dev/null 2>&1; then
@@ -90,6 +94,7 @@ valid_goals () {
 
 invalid_goals () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
 	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
@@ -105,6 +110,7 @@ invalid_goals () {
 
 replay () {
     pgm="bin/why3replay$suffix"
+    test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
         if $pgm $2 $f > /dev/null 2> /dev/null; then
@@ -182,7 +188,7 @@ extract_and_run () {
 }
 
 extract_and_test_wmp () {
-    dir="examples/in_progress/multiprecision"
+    dir=$1
     shift
     printf "  $dir... "
     printf "clean... "
@@ -255,6 +261,7 @@ goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/ce
+goods src/trywhy3/examples "--debug ignore_missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -270,6 +277,7 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
+goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
 echo ""
 
@@ -291,6 +299,7 @@ replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_20
 replay examples/double_wp "-L examples/double_wp --merging-only"
 replay examples/ring_decision "-L examples/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
+replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
 #replay examples/in_progress --merging-only
 #replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
 echo ""
@@ -346,7 +355,8 @@ extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,
 echo ""
 
 echo "=== Checking extraction to C ==="
-extract_and_test_wmp
+extract_and_test_wmp examples/in_progress/multiprecision
+extract_and_test_wmp examples/multiprecision
 echo ""
 
 echo "=== Checking --list-* ==="

@@ -14,10 +14,10 @@ module Mul
   use add.Add
 
 
-    (** `mul_limb r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
+    (** `wmpn_mul_1 r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
     writes the n least significant limbs in `r`, and returns the most
     significant limb. It corresponds to `mpn_mul_1`. *)
-  let mul_limb (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_mul_1 (r x:t) (y:limb) (sz:int32) : limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -65,37 +65,16 @@ module Mul
                = value x !i * y + power radix !i * (!lx * y) };
                (*nonlinear, needed for reflection*)
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
-               value x (!i+1) * y
-              (* by
-                 value r !i + !c * (power radix !i)
-               = value r k + res * (power radix k)
-                     + (power radix !i) * !c
-               = value r k + (power radix k) * res
-                     + (power radix k) * radix * !c
-               = value r k + (power radix k) * (res + radix * !c)
-               = value r k + (power radix k) *
-                                   (res + radix * (rh + carry))
-               = value r k + (power radix k) *
-                                   (res + radix * carry + radix * rh)
-               = value r k + (power radix k) *
-                                   ((!c at StartLoop) + rl + radix*rh)
-               = value r k + (power radix k) *
-                                   ((!c at StartLoop) + !lx * y)
-               = value r k + (power radix k) * (!c at StartLoop)
-                                 + (power radix k) * !lx * y
-               = value x k * y + (power radix k) * !lx * y
-               = (value x k + (power radix k) * !lx) * y
-               = value x !i * y *)
-               };
+               value x (!i+1) * y };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
 
-  (** `addmul_limb r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
+  (** `wmpn_addmul_1 r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
       least significant limbs to `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the carry
       of the addition. Corresponds to `mpn_addmul_1`.*)
-  let addmul_limb (r x:t) (y:limb) (sz:int32):limb
+  let wmpn_addmul_1 (r x:t) (y:limb) (sz:int32):limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -164,60 +143,15 @@ module Mul
                (* nonlinear part *)
       assert { value r (!i+1) + (power radix (!i+1)) * !c
                  = value (old r) (!i+1)
-                   + value x (!i+1) * y
-               (* by
-                (value r !i + (power radix !i) * !c
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix !i) * !c
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix !i) * (rh + carry)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr)
-                   + (power radix k) * radix * (rh + carry)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res - !lr
-                                   + radix * (rh + carry))
-                = value (r at StartLoop) !i +
-                   (power radix k) * (res + radix * carry
-                          - !lr + radix * rh)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (rl + !lr + (!c at StartLoop)
-                          - !lr + radix * rh)
-                = value (r at StartLoop) !i +
-                   (power radix k) * (rl + radix * rh + (!c at StartLoop))
-                = value (r at StartLoop) !i +
-                   (power radix k) * (!lx * y + (!c at StartLoop))
-                = value (r at StartLoop) k
-                    + (power radix k) * !lr
-                    + (power radix k) * (!lx * y + (!c at StartLoop))
-                = value (r at StartLoop) k
-                    + (power radix k) * (!c at StartLoop)
-                    + (power radix k) * (!lx * y + !lr)
-                = value (old r) k
-                    + value x k * y
-                    + (power radix k) * (!lx * y + !lr)
-                = value (old r) k
-                    + (power radix k) * !lr
-                    + (value x k + (power radix k)* (!lx)) * y
-                = value (old r) !i
-                    + (value x k + (power radix k)* (!lx)) * y
-                = value (old r) !i
-                    + value x !i * y
-                    by
-                  value (old r) !i = value (old r) k
-                     + (power radix k) * (!lr)
-                     ) *)
-                    };
+                   + value x (!i+1) * y };
       i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
 
-  (** `mul_limbs r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
   writes the result to `(r, 2*sz)`. `r` must not overlap with either
   `x` or `y`. Corresponds to `mpn_mul_n`.  *)
-  let mul_limbs (r x y:t) (sz:int32) : unit
+  let wmpn_mul_n (r x y:t) (sz:int32) : unit
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }
@@ -228,7 +162,7 @@ module Mul
     ensures { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
   =
-    zero r sz;
+    wmpn_zero r sz;
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
     let rp = ref (C.incr r (Int32.of_int 0)) in
@@ -250,7 +184,7 @@ module Mul
       assert { value !rp sz
                = value_sub (pelts r) (offset r + !i) (offset r + (!i + sz)) };
       ly := get_ofs y !i;
-      let c' =  addmul_limb !rp x !ly sz in
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
       assert { value !rp sz + power radix sz * c'
               = value (!rp at StartLoop) sz + value x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
@@ -291,7 +225,7 @@ module Mul
       rp.contents <- C.incr !rp one;
     done
 
- let addmul_limbs (r x y:t) (sz:int32) : limb
+ let wmpn_addmul_n (r x y:t) (sz:int32) : limb
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }
@@ -328,7 +262,7 @@ module Mul
       assert { value !rp sz
                = value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz)) };
       ly := get_ofs y !i;
-      let c' =  addmul_limb !rp x !ly sz in
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
       assert { forall j. (!rp).offset + sz <= j ->
                  (pelts (old r)) [j] = (pelts r)[j]
                  by (pelts r)[j]
@@ -370,108 +304,7 @@ module Mul
       assert { value r (!i + sz + 1)
                     + (power radix (!i + sz + 1)) * !c
                   = value (old r) (!i + sz + 1)
-                    + value x sz
-                      * value y (!i + 1)
-               (*by
-                 power radix (k + sz) = power radix k * power radix sz
-               so
-                 power radix (!i + sz) = power radix k * power radix sz * radix
-               so
-                 value (r at StartLoop) k
-                 + (power radix k) * value_sub (pelts r at StartLoop)
-                                   (r.offset + k) (r.offset + k + sz)
-                 = value (r at StartLoop) (k + sz)
-               so (value (old r) (!i+sz)
-                  = value (old r) (k+sz)
-                  + power radix (k+sz) * !lr
-                  by !lr = (pelts (old r))[r.offset + k + sz])
-               so
-                  value !rp sz + (power radix sz) * c' =
-                  value (!rp at StartLoop) sz
-                  + value x sz * !ly
-               so
-                 value r (!i + sz)
-                    + (power radix (!i + sz)) * !c
-               = value r (k + sz)
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix (k + sz)) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix (!i + sz)) * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz) * res
-                    + (power radix k) * (power radix sz) * radix * !c
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (res + radix * !c)
-               = value r k
-                    + (power radix k) * value !rp sz
-                    + (power radix k) * (power radix sz)
-                             * (c' + (!c at StartLoop) + !lr)
-               = value r k + (power radix k)
-                    * (value !rp sz
-                      + power radix sz * (c'+ (!c at StartLoop) + !lr))
-               = value r k + (power radix k)
-                    * (value !rp sz
-                      + power radix sz * c'
-                      + power radix sz * ((!c at StartLoop) + !lr))
-               = value r k + (power radix k)
-                    * (value (!rp at StartLoop) sz
-                       + value x sz * !ly
-                       + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value r k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) k
-                 + power radix k * (value (!rp at StartLoop) sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) k
-                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
-                                              (r.offset+k+ sz))
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * (value x sz * !ly
-                    + (power radix sz) * ((!c at StartLoop) + !lr))
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * value x sz * !ly
-                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
-               = value (r at StartLoop) (k + sz)
-                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
-                 + power radix k * value x sz * !ly
-               = value (r at StartLoop) (k + sz)
-                 + power radix (k + sz) * ((!c at StartLoop) + !lr)
-                 + power radix k * value x sz * !ly
-               = value (r at StartLoop) (k + sz)
-                 + power radix (k + sz) * ((!c at StartLoop))
-                 + power radix (k + sz) * !lr
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + value x sz * value y k
-                 + power radix (k + sz) * !lr
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * value y k
-                 + power radix k * value x sz * !ly
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * (value y k + power radix k * !ly)
-               = value (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value x sz * value y !i
-               = value (old r) (!i +sz)
-                 + value x sz * value y !i *)
-             };
+                    + value x sz * value y (!i + 1) };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
       assert { forall j. (!rp).offset + sz <= j ->
@@ -479,10 +312,10 @@ module Mul
     done;
     !c
 
-  (** `mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  (** `wmpn_mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
-  let mul (r x y:t) (sx sy:int32) : unit
+  let wmpn_mul (r x y:t) (sx sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -494,7 +327,7 @@ module Mul
     (*ensures  { result = (pelts r)[r.offset + sx + sy - 1] }*)
   =
     let ly = ref (C.get y) in
-    let c = mul_limb r x !ly sx in
+    let c = wmpn_mul_1 r x !ly sx in
     value_sub_update_no_change (pelts r) (r.offset + p2i sx)
                                r.offset (r.offset + p2i sx - 1) c;
     set_ofs r sx c;
@@ -521,7 +354,7 @@ module Mul
       assert { value !rp sx =
                value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sx)) };
       ly := get_ofs y !i;
-      let res =  addmul_limb !rp x !ly sx in
+      let res =  wmpn_addmul_1 !rp x !ly sx in
       assert { value !rp sx + power radix sx * res
               = value (!rp at StartLoop) sx + value x sx * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
@@ -549,51 +382,7 @@ module Mul
                = value x sx * value y !i
                  + power radix !i * (value x sx * !ly) };
              (*nonlinear*)
-      assert { value r (!i + sx + 1) = value x sx * value y (!i+1)
-               (*by (value !rp sx + power radix sx * res
-                   = value (!rp at StartLoop) sx + value x sx * !ly
-                   by value !rp sx = value (!rp at BeforeCarry) sx)
-               so power radix (k + sx) = power radix k * power radix sx
-               so
-                 value (r at StartLoop) k
-                 + (power radix k) * value_sub (pelts r at StartLoop)
-                                   (r.offset + k) (r.offset + k + sx)
-                 = value (r at StartLoop) (k + sx)
-               so
-                 value r (!i + sx)
-               = value r (k + sx)
-                    + (power radix (k + sx)) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix (k + sx)) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix k) * (power radix sx) * res
-               = value r k
-                    + (power radix k) * value !rp sx
-                    + (power radix k) * (power radix sx) * res
-               = value r k
-                    + (power radix k) * (value !rp sx + (power radix sx) * res)
-               = value r k + (power radix k)
-                    * (value (!rp at StartLoop) sx
-                       + value x sx * !ly)
-               = value r k
-                 + power radix k * (value (!rp at StartLoop) sx)
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) k
-                 + power radix k * (value (!rp at StartLoop) sx)
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) k
-                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
-                                              (r.offset+k+ sx))
-                 + power radix k * (value x sx * !ly)
-               = value (r at StartLoop) (k + sx)
-                 + power radix k * (value x sx * !ly)
-               = value x sx * value y k
-                + power radix k * value x sx * !ly
-               = value x sx *
-                 (value y k + power radix k * !ly)
-               = value x sx * value y !i *) };
+      assert { value r (!i + sx + 1) = value x sx * value y (!i+1) };
       i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
     done;

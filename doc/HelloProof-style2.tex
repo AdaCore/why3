@@ -1,15 +1,15 @@
-\begin{tabular}{| l |c |c |c |c |c |}
-\hline Proof obligations & \provername{Alt-Ergo (0.94)} & \provername{Coq (8.3pl4)} & \provername{Simplify (1.5.4)} \\ 
-\hline 
-\explanation{G1} & \noresult& \noresult& \valid{0.00} \\ 
-\hline 
-\explanation{G2} & \unknown{0.00} & \noresult& \unknown{0.00} \\ 
-\cline{2-4} 
-\quad\transformation{split\_goal} & \multicolumn{3}{|c|}{}\\ 
-\cline{2-4} 
-\quad\subgoal{1.}{1} & \unknown{0.00} & \unknown{0.43} & \unknown{0.00} \\ 
-\cline{2-4} 
-\quad\subgoal{2.}{2} & \valid{0.00} & \noresult& \valid{0.00} \\ 
-\hline 
-\explanation{G3} & \valid{0.00} & \noresult& \unknown{0.00} \\ 
+\begin{tabular}{|l|l|l|l|c|c|}
+\hline Proof obligations & \provername{Alt-Ergo 0.99.1} & \provername{Coq 8.7.1} \\ 
+\hline
+\explanation{G1} & \valid{0.00} & \noresult\\ 
+\hline
+\explanation{G2} & \unknown{0.00} & \noresult\\ 
+\cline{2-3}
+\quad\transformation{split\_goal\_right} & \multicolumn{2}{|c|}{}\\
+\cline{2-3}
+\quad\subgoal{G2.0}{1} & \unknown{0.00} & \unknown{0.29} \\ 
+\cline{2-3}
+\quad\subgoal{G2.1}{2} & \valid{0.00} & \noresult\\ 
+\hline
+\explanation{G3} & \valid{0.00} & \noresult\\ 
 \hline \end{tabular}

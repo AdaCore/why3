@@ -124,8 +124,9 @@ rule scan fmt empty delayed = parse
             comment fmt true lexbuf;
             pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
-  | eof   { if delayed <> "" then
-              fprintf fmt "</pre>\n<div class=\"info\">%s</div>" delayed }
+  | eof   { pp_print_string fmt "</pre>\n";
+            if delayed <> "" then
+              fprintf fmt "<div class=\"info\">%s</div>" delayed }
   | ident as s
           { print_ident fmt lexbuf s;
             scan fmt false delayed lexbuf }

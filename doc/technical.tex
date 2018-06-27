@@ -21,7 +21,7 @@ file is reproduced below.
 %BEGIN LATEX
 {\footnotesize
 %END LATEX
-\lstinputlisting{../share/provers-detection-data.conf}
+\lstinputlisting[language={},morecomment={[l]\#},morestring={[b]"}]{../share/provers-detection-data.conf}
 %BEGIN LATEX
 }
 %END LATEX
@@ -42,91 +42,17 @@ tools look for it in the following order:
 \end{enumerate}
 If none of these files exist, a built-in default configuration is used.
 
-The configuration file is a human-readable text file, which consists
-of association pairs arranged in sections.
-%BEGIN LATEX
-Figure~\ref{fig:why3conf} shows an example of configuration file.
-%END LATEX
-%HEVEA Below is an example of configuration file.
-
-%BEGIN LATEX
-\begin{figure}[p]
-{\footnotesize
-%END LATEX
-\begin{verbatim}
-[main]
-loadpath = "/usr/local/share/why3/theories"
-loadpath = "/usr/local/share/why3/modules"
-magic = 14
-memlimit = 0
-plugin = "/usr/local/lib/why3/plugins/tptp"
-plugin = "/usr/local/lib/why3/plugins/genequlin"
-plugin = "/usr/local/lib/why3/plugins/hypothesis_selection"
-running_provers_max = 4
-timelimit = 2
-
-[ide]
-default_editor = "editor %f"
-error_color = "orange"
-goal_color = "gold"
-iconset = "fatcow"
-intro_premises = true
-premise_color = "chartreuse"
-print_attributes = false
-print_locs = false
-print_time_limit = false
-saving_policy = 2
-task_height = 404
-tree_width = 512
-verbose = 0
-window_height = 1173
-window_width = 1024
-
-[prover]
-command = "'why3-cpulimit' 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
-driver = "/usr/local/share/why3/drivers/coq.drv"
-editor = "coqide"
-in_place = false
-interactive = true
-name = "Coq"
-shortcut = "coq"
-version = "8.3pl4"
-
-[prover]
-command = "'why3-cpulimit' %t %m -s alt-ergo %f"
-driver = "/usr/local/share/why3/drivers/alt_ergo_0.93.drv"
-editor = ""
-in_place = false
-interactive = false
-name = "Alt-Ergo"
-shortcut = "altergo"
-shortcut = "alt-ergo"
-version = "0.93.1"
-
-[editor coqide]
-command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
-name = "CoqIDE"
-\end{verbatim}
-%BEGIN LATEX
-}
-\caption{Sample \texttt{why3.conf} file}
-\label{fig:why3conf}
-\end{figure}
-%END LATEX
-
 A section begins with a header inside square brackets and ends at the
-beginning of the next section. The header of a
-section can be only one identifier, \texttt{main} and \texttt{ide} in
-the example, or it can be composed by a family name and one family
-argument, \texttt{prover} is one family name, \texttt{coq} and
-\texttt{alt-ergo} are the family argument.
+beginning of the next section. The header of a section can be a single
+identifier, \eg \texttt{[main]}, or it can be composed by a family name
+and a single family argument, \eg \texttt{[prover alt-ergo]}.
 
 Sections contain associations \texttt{key=value}. A value is either
 an integer (\eg \texttt{-555}), a boolean (\texttt{true}, \texttt{false}),
 or a string (\eg \texttt{"emacs"}). Some specific keys can be attributed
 multiple values and are
 thus allowed to occur several times inside a given section. In that
-case, the relative order of these associations matter.
+case, the relative order of these associations matters.
 
 \section{Drivers for External Provers}
 \label{sec:drivers}
@@ -204,13 +130,13 @@ goal G :
      end
 \end{whycode}
   When induction can be applied to several variables, the transformation
-  picks one heuristically. A label \verb|"induction"| can be used to
+  picks one heuristically. The \verb|[@induction]| attribute can be used to
   force induction over one particular variable, \eg with
 \begin{whycode}
-goal G: forall l1 "induction" l2 l3: list 'a.
+goal G: forall l1 [@induction] l2 l3: list 'a.
         l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 \end{whycode}
-induction will be applied on \verb|l1|. If this label is attached to
+induction will be applied on \verb|l1|. If this attribute is attached to
 several variables, a lexicographic induction is performed on these
 variables, from left to right.
 
@@ -275,17 +201,17 @@ meta "rewrite" prop a
   nor for confluence of the set of rewrite rules declared.
 \end{itemize}
 Instead of using a meta, it is possible to declare an axiom as a
-rewrite rule by adding the label \verb|"rewrite"| on the axiom name or
+rewrite rule by adding the \verb|[@rewrite]| attribute on the axiom name or
 on the axiom itself, e.g.:
 \begin{whycode}
-axiom a "rewrite": forall ... t1 = t2
-lemma b: "rewrite" forall ... f1 <-> f2
+axiom a [@rewrite]: forall ... t1 = t2
+lemma b: [@rewrite] forall ... f1 <-> f2
 \end{whycode}
 The second form allows some form of local rewriting, e.g.
 \begin{whycode}
-lemma l: forall x y. ("rewrite" x = y) -> f x = f y
+lemma l: forall x y. ([@rewrite] x = y) -> f x = f y
 \end{whycode}
-can be proved by \verb|introduce_premises| followed by \verb|"compute_specified"|.
+can be proved by \verb|introduce_premises| followed by \verb|compute_specified|.
 
 \paragraph{Bound on the number of reductions}
 The computations performed by these transformations can take an
@@ -434,7 +360,7 @@ P(t)
 
 \item[split\_premise] replaces axioms in conjunctive form
   by an equivalent collection of axioms.
-  In absence of case analysis labels (see \texttt{split\_goal} for details),
+  In absence of case analysis attributes (see \texttt{split\_goal} for details),
   the number of axiom generated per initial axiom is
   linear in the size of that initial axiom.
 \index{split-premise@\verb+split_premise+}
@@ -457,7 +383,7 @@ P(t)
 \index{simplify-formula-and-task@\verb+simplify_formula_and_task+}
 
 \item[split\_goal] changes conjunctive goals into the
-  corresponding set of subgoals. In absence of case analysis labels,
+  corresponding set of subgoals. In absence of case analysis attributes,
   the number of subgoals generated is linear in the size of the initial goal.
 
   \paragraph{Behavior on asymmetric connectives and
@@ -565,35 +491,35 @@ because \verb|T| holds as well. And from those three conditions on
 \verb|x|, we can deduce \verb|A|.
 \end{itemize}
 
-\paragraph{Labels controlling the transformation}
+\paragraph{Attributes controlling the transformation}
 
 The transformations in the split family can be controlled by using
-labels on formulas.
+attributes on formulas.
 
-The label \verb|"stop_split"| can be used to block the splitting of a
-formula.  The label is removed after blocking, so applying the
+The \verb|[@stop_split]| attribute can be used to block the splitting of a
+formula.  The attribute is removed after blocking, so applying the
 transformation a second time will split the formula. This is can be
 used to decompose the splitting process in several steps. Also, if a
-formula with this label is found in non-goal position, its
+formula with this attribute is found in non-goal position, its
 \texttt{by}/\texttt{so} proof indication will be erased by the
-transformation. In a sense, formulas tagged by \verb|"stop_split"| are
+transformation. In a sense, formulas tagged by \verb|[@stop_split]| are
 handled as if they were local lemmas.
 
-The label \verb|"case_split"| can be used to force case analysis on hypotheses.
+The \verb|[@case_split]| attribute can be used to force case analysis on hypotheses.
 For instance, applying \texttt{split\_goal} on
 \begin{whycode}
-goal G : ("case_split" A \/ B) -> C
+goal G : ([@case_split] A \/ B) -> C
 \end{whycode}
 generates the subgoals
 \begin{whycode}
 goal G1 : A -> C
 goal G2 : B -> C
 \end{whycode}
-Without the label, the transformation does nothing because undesired case analysis
+Without the attribute, the transformation does nothing because undesired case analysis
 may easily lead to an exponential blow-up.
 
 Note that the precise behavior of splitting transformations in presence of
-the \verb|"case_split"| label is not yet specified
+the \verb|[@case_split]| attribute is not yet specified
 and is likely to change in future versions.
 
 \index{split-goal@\verb+split_goal+}

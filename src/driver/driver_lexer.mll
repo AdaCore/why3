@@ -24,6 +24,7 @@
         "remove", REMOVE;
         "meta", META;
         "prelude", PRELUDE;
+        "interface", INTERFACE;
         "printer", PRINTER;
 	"steps", STEPS;
 	"model_parser", MODEL_PARSER;

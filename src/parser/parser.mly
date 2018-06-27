@@ -106,6 +106,29 @@
     | Pwild -> sp
     | _ -> { sp with sp_post = List.map apply sp.sp_post }
 
+  let we_attr = Ident.create_attribute "expl:witness existence"
+
+  let pre_of_any any_loc ty ql =
+    if ql = [] then [] else
+    let ri loc = { id_str = "result"; id_loc = loc; id_ats = [] } in
+    let rt loc = { term_desc = Tident (Qident (ri loc)); term_loc = loc } in
+    let rec case (loc, pfl) = match pfl with
+      | [{ pat_desc = Ptree.Pparen p; pat_loc = loc}, f] -> case (loc, [p,f])
+      | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] -> f
+      | [{ pat_desc = Ptree.Pvar { id_str = "result" } }, f] -> f
+      | [{ pat_desc = Ptree.Pvar id }, f] ->
+              { term_desc = Tlet (id, rt loc, f); term_loc = loc }
+      | _ ->  { term_desc = Tcase (rt loc, pfl); term_loc = loc } in
+    let mk_t desc = { term_desc = desc; term_loc = any_loc } in
+    let rec join ql = match ql with
+      | [] -> assert false (* never *)
+      | [q] -> case q
+      | q::ql -> mk_t (Tbinop (case q, Dterm.DTand_asym, join ql)) in
+    let id = add_attr (ri any_loc) [ATstr Ity.break_attr] in
+    let bl = [any_loc, Some id, false, Some ty] in
+    let p = mk_t (Tquant (Dterm.DTexists, bl, [], join ql)) in
+    [mk_t (Tattr (ATstr we_attr, p))]
+
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -850,7 +873,19 @@ single_expr_:
       Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
 | ANY return_named spec
     { let pat, ty, mask = $2 in
-      Eany ([], Expr.RKnone, Some ty, mask, apply_return pat $3) }
+      let loc = floc $startpos $endpos in
+      let spec = apply_return pat $3 in
+      if spec.sp_writes <> [] then Loc.errorm ~loc
+        "this expression should not produce side effects";
+      if spec.sp_xpost <> [] then Loc.errorm ~loc
+        "this expression should not raise exceptions";
+      if spec.sp_alias <> [] then Loc.errorm ~loc
+        "this expression cannot have alias restrictions";
+      if spec.sp_diverge then Loc.errorm ~loc
+        "this expression must terminate";
+      let pre = pre_of_any loc ty spec.sp_post in
+      let spec = { spec with sp_pre = spec.sp_pre @ pre } in
+      Eany ([], Expr.RKnone, Some ty, mask, spec) }
 | VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | MATCH seq_expr WITH ext_match_cases END
@@ -881,13 +916,13 @@ single_expr_:
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
       Elabel (id, over_loop e) }
-| WHILE seq_expr DO loop_annotation seq_expr DONE
+| WHILE seq_expr DO loop_annotation loop_body DONE
     { let id_b = mk_id break_id $startpos($3) $endpos($3) in
       let id_c = mk_id continue_id $startpos($3) $endpos($3) in
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
+| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* loop_body DONE
     { let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
@@ -974,6 +1009,10 @@ expr_sub:
     { Eidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ DOTDOT expr RIGHTSQ
     { Eidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
+
+loop_body:
+| (* epsilon *)   { mk_expr (Etuple []) $startpos $endpos }
+| seq_expr        { $1 }
 
 loop_annotation:
 | (* epsilon *)

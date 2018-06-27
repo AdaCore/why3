@@ -387,6 +387,10 @@ module Print = struct
         (print_expr info) e
 
   and print_let_def ?(functor_arg=false) info fmt = function
+    | Lvar (pv, {e_node = Eany ty}) when functor_arg ->
+        fprintf fmt "@[<hov 2>val %a : %a@]"
+          (print_lident info) (pv_name pv)
+          (print_ty info) ty;
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
           (print_lident info) (pv_name pv)
@@ -424,7 +428,8 @@ module Print = struct
         forget_vars args
     | Lany (rs, _, _) -> check_val_in_drv info rs
 
-  and print_expr ?(paren=false) info fmt e = match e.e_node with
+  and print_expr ?(paren=false) info fmt e =
+    match e.e_node with
     | Econst c ->
         let n = Number.compute_int_constant c in
         let n = BigInt.to_string n in
@@ -445,6 +450,7 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
+    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -612,6 +618,7 @@ module Print = struct
   let rec is_signature_decl info = function
     | Dtype _ -> true
     | Dlet (Lany _) -> true
+    | Dlet (Lvar (_, {e_node = Eany _})) -> true
     | Dlet _ -> false
     | Dexn _ -> true
     | Dmodule (_, dl) -> is_signature info dl
@@ -686,10 +693,22 @@ let print_decl =
     if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
       Print.print_decl info fmt d end
 
-let fg ?fname m =
+let ng suffix ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
   let path     = m.mod_theory.th_path in
-  (module_name ?fname path mod_name) ^ ".ml"
+  (module_name ?fname path mod_name) ^ suffix
 
-let () = Pdriver.register_printer "ocaml"
-    ~desc:"printer for OCaml code" fg print_decl
+let file_gen = ng ".ml"
+let mli_gen = ng ".mli"
+
+open Pdriver
+
+let ocaml_printer =
+  { desc            = "printer for Ocaml code";
+    file_gen        = file_gen;
+    decl_printer    = print_decl;
+    interf_gen      = Some mli_gen;
+    interf_printer  = None;
+    prelude_printer = print_empty_prelude }
+
+let () = Pdriver.register_printer "ocaml" ocaml_printer

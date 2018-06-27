@@ -21,6 +21,8 @@ let set_hook = (:=) hook
 let emit ?loc p =
   let b = Buffer.create 100 in
   let fmt = formatter_of_buffer b in
+  pp_set_margin fmt 1000000000;
+  pp_open_box fmt 0;
   let handle fmt =
-    Format.pp_print_flush fmt (); !hook ?loc (Buffer.contents b) in
+    pp_print_flush fmt (); !hook ?loc (Buffer.contents b) in
   kfprintf handle fmt p

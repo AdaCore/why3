@@ -20,7 +20,7 @@ open Pdecl
 
 (* basic tools *)
 
-let debug = Debug.register_info_flag "vc_debug"
+let debug_vc = Debug.register_info_flag "vc_debug"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
 let debug_reflow = Debug.register_info_flag "vc_reflow"
@@ -29,8 +29,11 @@ let debug_reflow = Debug.register_info_flag "vc_reflow"
 let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
 
-let no_eval = Debug.register_flag "vc_no_eval"
+let debug_no_eval = Debug.register_flag "vc_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
+
+let debug_ignore_diverges = Debug.register_info_flag "ignore_missing_diverges"
+  ~desc:"Suppress@ warnings@ on@ missing@ diverges."
 
 let case_split = Ident.create_attribute "case_split"
 let add_case t = t_attr_add case_split t
@@ -520,6 +523,7 @@ let rec k_expr env lps e res xmap =
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
     if eff.eff_oneway && not env.divergent then begin
+      if Debug.test_noflag debug_ignore_diverges then
       Warning.emit ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
         clause@ in@ the@ outer@ specification";
@@ -1180,12 +1184,12 @@ let rec havoc kn wr regs t ity fl =
           t, begin match f.t_node with Ttrue -> fl | _ -> f::fl end
       end
 
-let print_dst dst = if Debug.test_flag debug then
+let print_dst dst = if Debug.test_flag debug_vc then
   Format.printf "@[vars = %a@]@." (Pp.print_list Pp.space
     (fun fmt (o,n) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_pv o Pretty.print_vs n)) (Mpv.bindings dst)
 
-let print_regs regs = if Debug.test_flag debug then
+let print_regs regs = if Debug.test_flag debug_vc then
   Format.printf "@[regs = %a@]@." (Pp.print_list Pp.space
     (fun fmt (r,t) -> Format.fprintf fmt "(%a -> %a)"
       Ity.print_reg r Pretty.print_term t)) (Mreg.bindings regs)
@@ -1462,7 +1466,7 @@ and wp_expr kn k q = match k with
 (** VCgen *)
 
 let vc_kode {known_map = kn} vc_wp k =
-  if Debug.test_flag debug then
+  if Debug.test_flag debug_vc then
     Format.eprintf "K @[%a@]@\n" k_print k;
   let k = reflow vc_wp k in
   if Debug.test_flag debug_reflow then
@@ -1482,7 +1486,7 @@ let mk_vc_decl kn id f =
   let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
-  let f = if Debug.test_flag no_eval then f else
+  let f = if Debug.test_flag debug_no_eval then f else
     Eval_match.eval_match kn f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 

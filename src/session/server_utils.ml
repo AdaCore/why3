@@ -396,15 +396,22 @@ let interp commands_table cont id s =
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
           | Prover (prover_config, limit) ->
-             if prover_config.Whyconf.interactive then
-               Edit prover_config.Whyconf.prover
-             else
-               Prove (prover_config, limit)
+             begin
+               match id with
+               | None -> QError ("Please select a node in the task tree")
+               | Some _id ->
+                   if prover_config.Whyconf.interactive then
+                     Edit prover_config.Whyconf.prover
+                   else
+                     Prove (prover_config, limit)
+             end
           | Bad_Arguments prover ->
               QError (Format.asprintf "Prover %a was recognized but arguments were not parsed" Whyconf.print_prover prover)
           | Not_Prover ->
              if Hstr.mem cont.Controller_itp.controller_strategies cmd then
-               Strategies cmd
+               match id with
+               | None   -> QError ("Please select a node in the task tree")
+               | Some _ -> Strategies cmd
              else
                match cmd, args with
                | "edit", _ ->
@@ -433,7 +440,12 @@ let interp commands_table cont id s =
                | "mark", _ ->
                    Mark_Obsolete
                | "Focus", _ ->
-                   Focus_req
+                   begin
+                     match id with
+                     | None ->
+                         QError ("Select at least one node of the task tree")
+                     | Some _ -> Focus_req
+                   end
                | "Unfocus", _ ->
                    Unfocus_req
                | "clean", _ ->

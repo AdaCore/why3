@@ -106,6 +106,7 @@ let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
         | Tcase (t, [bt]) ->
             lookup_names t; lookup_names (snd (t_open_branch bt))
         | Tcase (t, _) | Tbinop (Timplies, _, t) -> lookup_names t
+        | Tbinop (Tand, t1, t2) -> lookup_names t1; lookup_names t2
         | Tquant (_, qf) -> let _,_,f = t_open_quant qf in lookup_names f
         | _ -> () in
       let idl = try lookup_names f; clone v.vs_name with FoundIdl idl -> idl in
@@ -185,8 +186,10 @@ let rec eval_match kn stop env t =
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
-        let vl,tl,f = if stop then List.rev vl,tl,f else
-          List.fold_left (add_quant kn) ([],tl,f) vl in
+        let add_quant (vl,tl,f as acc) ({vs_name = id} as v) =
+          if stop && not (Sattr.mem Ity.break_attr id.id_attrs)
+          then v::vl, tl, f else add_quant kn acc v in
+        let vl,tl,f = List.fold_left add_quant ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
         t_map (eval env) t)

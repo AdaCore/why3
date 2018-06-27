@@ -58,6 +58,9 @@ let () = log_time ("Initialising why3 worker: end ")
 
 let split_trans = Trans.lookup_transform_l "split_vc" env
 
+let split_trans = (* TODO: remove if generalize is integrated in split_vc *)
+  Trans.compose (Trans.lookup_transform "generalize_introduced" env) split_trans
+
 (* CF gmain.ml ligne 568 et suivante *)
 module W =
   struct
@@ -187,7 +190,7 @@ module Task =
       Hashtbl.add task_table th_id  { task = `Theory(th);
 				      parent_id = "theory-list";
 				      status = `New;
-				      subtasks = task_ids;
+				      subtasks = List.rev task_ids;
 				      loc = [];
 				      expl = th_name;
                                       pretty = "";

@@ -1,31 +1,41 @@
 :x: marks a potential source of incompatibility
 
+Version 1.0.0, June 25, 2018
+----------------------------
+
 Core
   * improved support of counter-examples
-
-Language
-  * numerous changes to syntax, see documentation appendix :x:
-  * `let function`, `let predicate`, `val function`, and `val predicate`
-     introduce symbols in both logic and programs
+  * attribute `[@vc:sp]` on an expression switches from traditional WP
+    to Flanagan-Saxe-like VC generation
+  * type invariants now produce logical axioms;
+    a type with an invariant must be proved to be inhabited :x:
   * logical symbols can no longer be used in non-ghost code;
     in particular, there is no polymorphic equality in programs any more,
     so equality functions must be declared/defined on a per-type basis
     (already done for type `int` in the standard library) :x:
+
+Language
+  * numerous changes to syntax, see documentation appendix :x:
+  * `let function`, `let predicate`, `val function`, and `val predicate`
+    introduce symbols in both logic and programs
   * added overloading of program symbols
-  * new clause `alias` in function contracts :x:
-  * support for multiple assignments
-  * type invariants now produce logical axioms;
-    a type with an invariant must be proved to be inhabited :x:
+  * new contract clause `alias { <term> with <term>, ... }` :x:
+  * support for parallel assignment `<term>,... <- <term>,...`
   * support for local exceptions using `exception ... in ...`
   * added `break`, `continue`, and `return` statements
   * support for `exception` branches in `match` constructs
   * support for `for` loops on range types
     (including machine integers from the standard library)
-  * attribute `[@vc:sp]` on an expression switches from traditional WP to
-    Flanagan-Saxe-like VC generation
   * support for type coercions in logic using `meta coercion`
-  * deprecated `theory`; use `module` instead
+  * keyword `theory` is deprecated; use `module` instead
   * term on the left of sequence `;` must be of type `unit` :x:
+  * cloned axioms turn into lemmas; use `with axiom my_axiom`
+    or `with axiom .` to keep them as axioms :x:
+  * `any <type> <spec>` produces an existential precondition;
+    use `val f : <type> <spec> in ...` (unsafe!) instead :x:
+  * `use T` and `clone T` now import the generated namespace T;
+    use `use T as T` and `clone T as T` to prevent this :x:
+  * `pure { <term> }` produces a ghost value in program code
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
@@ -34,20 +44,21 @@ Standard library
 Extraction
   * improved extraction to OCaml
   * added partial extraction to C using the memory model of `mach.c`
-  * added extraction to CakeML (using 'why3 extract -D cakeml ...')
+  * added extraction to CakeML (using `why3 extract -D cakeml ...`)
 
 Transformations
   * transformations can now have arguments
-  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc, à la Coq
+  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc., à la Coq
   * added transformations for reflection-based proofs
 
 Drivers
   * support for `use` in theory drivers
 
 IDE
+  * replaced left toolbar by a contextual menu
   * source is now editable
   * premises are no longer implicitly introduced
-  * command-line interface to call transformations and provers
+  * added textual interface to call transformations and provers
 
 Tools
   * deprecated `.why` file extension; use `.mlw` instead
@@ -55,6 +66,9 @@ Tools
 Provers
   * removed the `why3` Coq tactic :x:
   * dropped support for Coq 8.4 :x:
+
+Miscellaneous
+  * moved the opam base package to `why3`; added `why3-ide` and `why3-coq`
 
 Version 0.88.3, January 11, 2018
 --------------------------------
