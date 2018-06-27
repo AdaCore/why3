@@ -82,10 +82,10 @@ valid_goals () {
     test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
-        if ! $pgm -t 15 -P alt-ergo $f > /dev/null 2>&1; then
+        if ! $pgm -t 15 -P alt-ergo $2 $f > /dev/null 2>&1; then
             echo "FAILED!"
-            echo "$pgm -t 15 -P alt-ergo $f"
-            $pgm -t 15 -P alt-ergo $f
+            echo "$pgm -t 15 -P alt-ergo $2 $f"
+            $pgm -t 15 -P alt-ergo $2 $f
 	    exit 1
        fi
        echo "ok"
@@ -306,6 +306,10 @@ echo ""
 
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
+echo ""
+
+echo "=== Checking splitted valid goals ==="
+valid_goals bench/valid/split_vc "-a split_vc"
 echo ""
 
 echo "=== Checking invalid goals ==="
