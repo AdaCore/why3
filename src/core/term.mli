@@ -55,6 +55,8 @@ val ls_hash : lsymbol -> int
 val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
 
 val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
+(** ~constr is the number of constructors of the type in which the
+   symbol is a constructor otherwise it must be the default 0. *)
 
 val create_psymbol : preid -> ty list -> lsymbol
 

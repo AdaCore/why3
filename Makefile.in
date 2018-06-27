@@ -1015,6 +1015,8 @@ COQLIBS_IEEEFLOAT_FILES = RoundingMode GenericFloat Float32 Float64
 COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
+COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
+
 COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
 
 %.vo: %.v
@@ -1063,9 +1065,11 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory ieee_float.'"$$f"' meta "realized_theory" "ieee_float.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_FOR_DRIVER_FILES); do \
+	echo 'theory for_driver.'"$$f"' meta "realized_theory" "for_driver.'"$$f"'", "" end'; done; \
 	) > $@
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float update-coq-for-drivers
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/int.mlw
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done
@@ -1093,6 +1097,9 @@ update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdl
 
 update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/bv.mlw
 	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T bv.$$f -o $(GENERATED_PREFIX_COQ)/bv/; done
+
+update-coq-for-drivers: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/for_drivers.why
+	for f in $(COQLIBS_FOR_DRIVERS_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T for_drivers.$$f -o $(GENERATED_PREFIX_COQ)/for_drivers/; done
 
 update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/ieee_float.mlw
 	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T ieee_float.$$f -o $(GENERATED_PREFIX_COQ)/ieee_float/; done

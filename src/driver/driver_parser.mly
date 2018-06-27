@@ -19,7 +19,7 @@
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
 %token INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
@@ -92,6 +92,7 @@ trule:
 | REMOVE ALL                     { Rremoveall }
 | META ident meta_args           { Rmeta      ($2, $3) }
 | META STRING meta_args          { Rmeta      ($2, $3) }
+| USE qualid                     { Ruse       ($2)     }
 
 meta_args: separated_nonempty_list(COMMA,meta_arg) { $1 }
 

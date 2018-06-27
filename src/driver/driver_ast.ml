@@ -36,6 +36,7 @@ type th_rule =
   | Rremovepr  of qualid
   | Rremoveall
   | Rmeta      of string * metarg list
+  | Ruse       of qualid
 
 type theory_rules = {
   thr_name  : qualid;
