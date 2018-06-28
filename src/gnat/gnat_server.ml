@@ -238,7 +238,7 @@ let env, gconfig =
 let () =
   let session_dir = Gnat_objectives.get_session_dir () in
   Queue.add session_dir files;
- (* Queue.add Gnat_config.filename files*);
+ (* Queue.add Gnat_config.filename files; *)
   let session_dir = Server_utils.get_session_dir ~allow_mkdir:true files in
 (*
     try

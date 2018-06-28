@@ -116,7 +116,10 @@ let connect_internal () =
        the prefix of the file. *)
     Filename.basename (Filename.temp_file "why3server" "sock")
   in
-  let exec = "why3server" in
+  (* Sys.executable_name is used to locate the gnat_server/gnatwhy3 executable.
+     Why3server, gnatwhy3 and gnat_server are in the same directory. *)
+  let exec_spark_location = Filename.dirname Sys.executable_name in
+  let exec = Filename.concat exec_spark_location "why3server" in
   let pid =
     (* use this version for debugging the C code
     Unix.create_process "valgrind"
