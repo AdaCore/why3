@@ -1218,6 +1218,16 @@ let get_selected_row_references () =
 (**********************)
 (* Contextual actions *)
 (**********************)
+
+(* goals_view#selection#select_iter only changes the selection for the selection
+   tree, it should also change the cursor of the goal_view. The reason is that
+   the cursor is used for arrow keys moves (not the selected row). *)
+let select_iter iter =
+  goals_view#selection#select_iter iter;
+  let path = goals_model#get_path iter in
+  goals_view#set_cursor path view_name_column
+
+
 let expand_row () =
   let rows = get_selected_row_references () in
   match rows with
@@ -1243,7 +1253,7 @@ let move_current_row_selection_to_parent () =
         match goals_model#iter_parent row#iter with
         | None -> ()
         | Some iter ->
-            goals_view#selection#select_iter iter
+            select_iter iter
       end
   | _ -> ()
 
@@ -1258,7 +1268,7 @@ let move_current_row_selection_to_first_child () =
         begin
           goals_view#selection#unselect_all ();
           let iter = goals_model#iter_children ?nth:(Some 0) (Some row#iter) in
-          goals_view#selection#select_iter iter
+          select_iter iter
         end
   | _ -> ()
 
@@ -2350,7 +2360,7 @@ let treat_notification n =
              proof, it is better to only have the new goal selected *)
           goals_view#selection#unselect_all ();
           let iter = (get_node_row next_unproved_id)#iter in
-          goals_view#selection#select_iter iter
+          select_iter iter
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
@@ -2382,7 +2392,7 @@ let treat_notification n =
        | None -> goals_view#selection#unselect_all ()
        | Some parent ->
           goals_view#selection#unselect_all ();
-          goals_view#selection#select_iter parent
+          select_iter parent
           (* TODO Go to the next unproved goal ?
             let parent_id = get_node_id parent in
           send_request (Get_first_unproven_node parent_id)*));
@@ -2397,7 +2407,7 @@ let treat_notification n =
      display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
      complete_context_menu ();
-     Opt.iter goals_view#selection#select_iter goals_model#get_iter_first
+     Opt.iter select_iter goals_model#get_iter_first
   | Saved                         ->
       session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
