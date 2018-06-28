@@ -58,9 +58,6 @@ let () = log_time ("Initialising why3 worker: end ")
 
 let split_trans = Trans.lookup_transform_l "split_vc" env
 
-let split_trans = (* TODO: remove if generalize is integrated in split_vc *)
-  Trans.compose (Trans.lookup_transform "generalize_introduced" env) split_trans
-
 (* CF gmain.ml ligne 568 et suivante *)
 module W =
   struct

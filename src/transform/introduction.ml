@@ -218,8 +218,8 @@ let simplify_intros =
                 introduce_premises
 
 let split_vc =
-  Trans.compose_l  (* TODO: decide whether we want generalize in split_vc *)
-    ((* Trans.compose generalize_intro *) Split_goal.split_goal_right)
+  Trans.compose_l
+    (Trans.compose generalize_intro Split_goal.split_goal_right)
     (Trans.singleton simplify_intros)
 
 let () = Trans.register_transform_l

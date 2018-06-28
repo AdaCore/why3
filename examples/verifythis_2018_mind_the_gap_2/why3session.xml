@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2018_mind_the_gap_2.mlw" proved="true">
 <theory name="GapBuffer" proved="true">
  <goal name="VC dummy_char" expl="VC for dummy_char" proved="true">
@@ -52,7 +52,7 @@
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC right.4" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.02" steps="55"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.02" steps="55"/></proof>
   </goal>
   <goal name="VC right.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -80,14 +80,7 @@
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC grow.4" expl="precondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC grow.4.0" expl="VC for grow" proved="true">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="VC grow.4.1" expl="VC for grow" proved="true">
-   <proof prover="1"><result status="valid" time="0.03"/></proof>
-   </goal>
-  </transf>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC grow.5" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -116,7 +109,6 @@
   </goal>
   <goal name="VC insert.3" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="182"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC insert.4" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -129,7 +121,6 @@
   </goal>
   <goal name="VC insert.7" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="104"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
   </goal>
  </transf>
  </goal>
@@ -139,41 +130,7 @@
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delete.1" expl="postcondition" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC delete.1.0" expl="VC for delete" proved="true">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC delete.1.1" expl="VC for delete" proved="true">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC delete.1.2" expl="VC for delete" proved="true">
-   <transf name="introduce_premises" proved="true" >
-    <goal name="VC delete.1.2.0" expl="VC for delete" proved="true">
-    <transf name="inline_goal" proved="true" >
-     <goal name="VC delete.1.2.0.0" expl="VC for delete" proved="true">
-     <transf name="split_vc" proved="true" >
-      <goal name="VC delete.1.2.0.0.0" expl="VC for delete" proved="true">
-      <proof prover="1"><result status="valid" time="0.04"/></proof>
-      </goal>
-      <goal name="VC delete.1.2.0.0.1" expl="VC for delete" proved="true">
-      <proof prover="1"><result status="valid" time="0.03"/></proof>
-      </goal>
-      <goal name="VC delete.1.2.0.0.2" expl="VC for delete" proved="true">
-      <proof prover="1"><result status="valid" time="0.02"/></proof>
-      </goal>
-      <goal name="VC delete.1.2.0.0.3" expl="VC for delete" proved="true">
-      <proof prover="1"><result status="valid" time="0.02"/></proof>
-      </goal>
-      <goal name="VC delete.1.2.0.0.4" expl="VC for delete" proved="true">
-      <proof prover="1"><result status="valid" time="0.04"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delete.2" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
