@@ -42,6 +42,8 @@ val send_request :
   cmd:string list ->
   unit
 
+val send_interrupt : id:int -> unit
+
 type final_answer = {
   id        : int;
   time      : float;

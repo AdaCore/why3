@@ -564,3 +564,5 @@ let call_editor ~command fin =
   let pid = Unix.create_process exec argarray fd_in Unix.stdout Unix.stderr in
   if use_stdin then Unix.close fd_in;
   EditorCall pid
+
+let interrupt_call id = Prove_client.send_interrupt id

@@ -191,5 +191,7 @@ val query_call : prover_call -> prover_update
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)
 
+val interrupt_call : server_id -> unit
+
 val wait_for_server_result :
   blocking:bool -> (server_id * prover_result option) list
