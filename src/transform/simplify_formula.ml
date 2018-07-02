@@ -113,7 +113,9 @@ let rec fmla_quant ~keep_model_vars sign f = function
   | vs::l ->
      let vsl, f = fmla_quant ~keep_model_vars sign f l in
      if keep_model_vars && has_a_model_attr vs.vs_name then
-       vs::vsl, f
+      vs::vsl, f
+     else if t_v_occurs vs f = 0 then
+      vsl, f
      else
       try
         fmla_find_subst (Svs.singleton vs) vs sign f;
