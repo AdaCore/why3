@@ -25,6 +25,16 @@ let stop f = Sattr.mem Term.stop_split f.t_attrs
 let case_split = Ident.create_attribute "case_split"
 let case f = Sattr.mem case_split f.t_attrs
 
+let meta_intro_ls = Theory.register_meta
+  ~desc:"(internal@ use)@ Preserve@ an@ introduced@ logical@ symbol@ name@ \
+        after@ generalization."
+  "introduced_lsymbol" [Theory.MTlsymbol]
+
+let meta_intro_pr = Theory.register_meta
+  ~desc:"(internal@ use)@ Preserve@ an@ introduced@ proposition@ name@ \
+        after@ generalization."
+  "introduced_prsymbol" [Theory.MTprsymbol]
+
 let rec dequant pos f = t_attr_copy f (match f.t_node with
   | _ when stop f -> f
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) })
@@ -67,17 +77,28 @@ let rec dequant pos f = t_attr_copy f (match f.t_node with
 and dequant_if_case pos f = if case f then dequant pos f else f
 
 let intro_attr = Ident.create_attribute "introduced"
+let intro_attrs = Sattr.singleton intro_attr
 
-let intro_var subst ({vs_name = id; vs_ty = ty} as vs) =
-  let new_id = id_clone ~attrs:(Sattr.singleton intro_attr) id in
-  let ls = create_fsymbol new_id [] ty in
-  Mvs.add vs (fs_app ls [] ty) subst,
-  create_param_decl ls
+let compat ls vs =
+  ls.ls_args = [] &&
+  Opt.equal ty_equal ls.ls_value (Some vs.vs_ty) &&
+  Opt.equal Loc.equal ls.ls_name.id_loc vs.vs_name.id_loc &&
+  Sattr.equal ls.ls_name.id_attrs (Sattr.add intro_attr vs.vs_name.id_attrs)
+
+let ls_of_vs mal vs = match mal with
+  | Theory.MAls ls :: mal when compat ls vs -> ls, mal
+  | _ ->  let id = id_clone ~attrs:intro_attrs vs.vs_name in
+          create_fsymbol id [] vs.vs_ty, mal
+
+let intro_var (subst, mal) vs =
+  let ls, mal = ls_of_vs mal vs in
+  let subst = Mvs.add vs (fs_app ls [] vs.vs_ty) subst in
+  (subst, mal), create_param_decl ls
 
 let get_expls f =
   Sattr.filter (fun a -> Strings.has_prefix "expl:" a.attr_string) f.t_attrs
 
-let rec intros kn pr expl f =
+let rec intros kn pr mal expl f =
   let fexpl = get_expls f in
   let expl = if Sattr.is_empty fexpl then expl else fexpl in
   let move_expl f = if Sattr.is_empty fexpl && not (Sattr.is_empty expl)
@@ -96,40 +117,61 @@ let rec intros kn pr expl f =
       let add (subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
-          let subst, d = intro_var subst vs in
+          let (subst,_), d = intro_var (subst, []) vs in
           subst, d::dl) svs (subst, dl) in
-        let prx = create_prsymbol idx in
+        (* only reuse the name when fl is a singleton *)
+        let prx = match mal, fl with
+          | Theory.MApr pr :: _, [_] -> pr
+          | _, _ -> create_prsymbol idx in
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
         subst, d::dl in
+      (* consume the topmost name *)
+      let mal = match mal with
+        | Theory.MApr _ :: mal -> mal
+        | _ -> mal in
       let _, fl = List.fold_left add (Mvs.empty, []) fl in
-      List.rev_append fl (intros kn pr expl f2)
+      List.rev_append fl (intros kn pr mal expl f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
-      let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
+      let (subst, mal), dl =
+        Lists.map_fold_left intro_var (Mvs.empty, mal) vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr expl f
+      dl @ intros kn pr mal expl f
   | Tlet (t,fb) ->
-      let vs,f = t_open_bound fb in
-      let id = id_clone ~attrs:(Sattr.singleton intro_attr) vs.vs_name in
-      let ls = create_lsymbol id [] (Some vs.vs_ty) in
+      let vs, f = t_open_bound fb in
+      let ls, mal = ls_of_vs mal vs in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr expl f
+      d :: intros kn pr mal expl f
   | _ -> [create_prop_decl Pgoal pr (move_expl f)]
 
-let intros ?known_map pr f =
+let intros kn mal pr f =
   let tvs = t_ty_freevars Stv.empty f in
   let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] NoDef in
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  Mtv.values decls @ intros known_map pr Sattr.empty f
+  let dl = intros kn pr mal Sattr.empty f in
+  Mtv.values decls @ dl
 
-let introduce_premises = Trans.store (fun t ->
-  let known_map = Task.task_known t in
-  Trans.apply (Trans.goal (intros ~known_map)) t)
+let introduce hd (mal, task) = match hd.Task.task_decl.Theory.td_node with
+  | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
+      let kn = Some (Task.task_known task) in
+      let dl = intros kn (List.rev mal) pr f in
+      [], List.fold_left Task.add_decl task dl
+  | Theory.Meta (m,[ma])
+    when Theory.meta_equal m meta_intro_ls ||
+         Theory.meta_equal m meta_intro_pr ->
+      ma::mal, task
+  | Theory.Meta _ ->
+      mal, Task.add_tdecl task hd.Task.task_decl
+  | _ -> [], Some hd
+
+let intros ?known_map pr f = intros known_map [] pr f
+
+let introduce_premises = Trans.fold_map introduce [] None
 
 let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
@@ -157,7 +199,7 @@ let generalize hd (pl, task) = match hd.Task.task_decl.Theory.td_node with
             [], t_let_close v h f
         | Dprop (Paxiom,_,h) ->
             let f = t_forall_close vl [] f in
-            [], t_implies (t_attr_remove intro_attr h) f
+            [], t_implies h f
         | _ -> assert false (* never *) in
       let vl, f = List.fold_left rewind ([],f) pl in
       let f = t_forall_close vl [] f in
@@ -165,15 +207,19 @@ let generalize hd (pl, task) = match hd.Task.task_decl.Theory.td_node with
               t_attr_add  (Sattr.min_elt expl) f in
       [], Task.add_decl task (create_prop_decl Pgoal pr f)
   | Theory.Decl ({d_node =
-      ( Dparam {ls_name = id; ls_args = []; ls_value = Some _}
-      | Dlogic [{ls_name = id; ls_args = []; ls_value = Some _}, _]
-      | Dprop (Paxiom, {pr_name = id}, _))} as d)
-    when Sattr.mem intro_attr id.id_attrs -> d::pl, task
+      ( Dparam ({ls_args = []; ls_value = Some _} as ls)
+      | Dlogic [{ls_args = []; ls_value = Some _} as ls, _])} as d)
+    when Sattr.mem intro_attr ls.ls_name.id_attrs ->
+      d::pl, Task.add_meta task meta_intro_ls [Theory.MAls ls]
+  | Theory.Decl ({d_node = Dprop (Paxiom, pr, _)} as d)
+    when Sattr.mem intro_attr pr.pr_name.id_attrs ->
+      d::pl, Task.add_meta task meta_intro_pr [Theory.MApr pr]
   (* We only reattach the local premises right before the goal.
      On the first non-local premise, we ignore the accumulator
      and return the original task. We make an exception for
      metas, as they are not checked against the known_map *)
-  | Theory.Meta _ -> pl, Task.add_tdecl task hd.Task.task_decl
+  | Theory.Meta _ ->
+      pl, Task.add_tdecl task hd.Task.task_decl
   | _ -> [], Some hd
 
 let generalize_intro = Trans.fold_map generalize [] None
