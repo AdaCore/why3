@@ -35,6 +35,14 @@ let meta_intro_pr = Theory.register_meta
         after@ generalization."
   "introduced_prsymbol" [Theory.MTprsymbol]
 
+let apply_prev fn hd = match hd.Task.task_prev with
+  | Some hd -> fn hd
+  | None -> [], None
+
+let apply_head fn = function
+  | Some hd -> snd (fn hd)
+  | None -> None
+
 let rec dequant pos f = t_attr_copy f (match f.t_node with
   | _ when stop f -> f
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) })
@@ -156,29 +164,36 @@ let intros kn mal pr f =
   let dl = intros kn pr mal Sattr.empty f in
   Mtv.values decls @ dl
 
-let introduce hd (mal, task) = match hd.Task.task_decl.Theory.td_node with
+let rec introduce hd =
+  match hd.Task.task_decl.Theory.td_node with
   | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
+      let mal, task = apply_prev introduce hd in
       let kn = Some (Task.task_known task) in
       let dl = intros kn (List.rev mal) pr f in
       [], List.fold_left Task.add_decl task dl
   | Theory.Meta (m,[ma])
     when Theory.meta_equal m meta_intro_ls ||
          Theory.meta_equal m meta_intro_pr ->
+      let mal, task = apply_prev introduce hd in
       ma::mal, task
   | Theory.Meta _ ->
+      let mal, task = apply_prev introduce hd in
       mal, Task.add_tdecl task hd.Task.task_decl
-  | _ -> [], Some hd
+  | _ ->
+      [], Some hd
 
 let intros ?known_map pr f = intros known_map [] pr f
 
-let introduce_premises = Trans.fold_map introduce [] None
+let introduce_premises = Trans.store (apply_head introduce)
 
 let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
-let generalize hd (pl, task) = match hd.Task.task_decl.Theory.td_node with
+let rec generalize hd =
+  match hd.Task.task_decl.Theory.td_node with
   | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
+      let pl, task = apply_prev generalize hd in
       if pl = [] then [], Some hd else
       let expl = get_expls f in
       let get_vs {ls_name = id; ls_value = oty} =
@@ -210,19 +225,23 @@ let generalize hd (pl, task) = match hd.Task.task_decl.Theory.td_node with
       ( Dparam ({ls_args = []; ls_value = Some _} as ls)
       | Dlogic [{ls_args = []; ls_value = Some _} as ls, _])} as d)
     when Sattr.mem intro_attr ls.ls_name.id_attrs ->
+      let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_ls [Theory.MAls ls]
   | Theory.Decl ({d_node = Dprop (Paxiom, pr, _)} as d)
     when Sattr.mem intro_attr pr.pr_name.id_attrs ->
+      let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_pr [Theory.MApr pr]
   (* We only reattach the local premises right before the goal.
      On the first non-local premise, we ignore the accumulator
      and return the original task. We make an exception for
      metas, as they are not checked against the known_map *)
   | Theory.Meta _ ->
+      let pl, task = apply_prev generalize hd in
       pl, Task.add_tdecl task hd.Task.task_decl
-  | _ -> [], Some hd
+  | _ ->
+      [], Some hd
 
-let generalize_intro = Trans.fold_map generalize [] None
+let generalize_intro = Trans.store (apply_head generalize)
 
 let () = Trans.register_transform "generalize_introduced" generalize_intro
   ~desc:"Move@ the@ premises@ introduced@ by@ \"introduce_premises\"@ back@ \
