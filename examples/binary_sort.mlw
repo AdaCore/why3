@@ -19,21 +19,21 @@ module BinarySort
   use array.Array
   use array.ArrayPermut
 
-  let lemma occ_shift (m1 m2: M.map int 'a) (mid k: int) (x: 'a) : unit
+  let lemma occ_shift (m1 m2: int -> 'a) (mid k: int) (x: 'a) : unit
     requires { 0 <= mid <= k }
-    requires { forall i. mid < i <= k -> M.get m2 i = M.get m1 (i - 1) }
-    requires { M.get m2 mid = M.get m1 k }
+    requires { forall i. mid < i <= k -> m2 i = m1 (i - 1) }
+    requires { m2 mid = m1 k }
     ensures  { M.Occ.occ x m1 mid (k+1) = M.Occ.occ x m2 mid (k+1) }
-  = for i = mid to Int.(-) k 1 do
+  = for i = mid to k - 1 do
       invariant { M.Occ.occ x m1 mid i = M.Occ.occ x m2 (mid+1) (i+1) }
       ()
     done;
-    assert { M.Occ.occ (M.get m1 k) m1 mid (k+1) =
-             1 + M.Occ.occ (M.get m1 k) m1 mid k };
-    assert { M.Occ.occ (M.get m1 k) m2 mid (k+1) =
-             1 + M.Occ.occ (M.get m1 k) m2 (mid+1) (k+1) };
+    assert { M.Occ.occ (m1 k) m1 mid (k+1) =
+             1 + M.Occ.occ (m1 k) m1 mid k };
+    assert { M.Occ.occ (m1 k) m2 mid (k+1) =
+             1 + M.Occ.occ (m1 k) m2 (mid+1) (k+1) };
     assert { M.Occ.occ x m1 mid (k+1) = M.Occ.occ x m2 mid (k+1)
-             by x = M.get m1 k \/ x <> M.get m1 k }
+             by x = m1 k \/ x <> m1 k }
 
   let binary_sort (a: array int) : unit
     ensures { forall i j. 0 <= i <= j < length a -> a[i] <= a[j] }

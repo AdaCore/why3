@@ -23,21 +23,21 @@ module M
 
   (* interp x i j is the integer X[j-1]...X[i] *)
 
-  function interp (M.map int int) int int : int
+  function interp (int -> int) int int : int
 
   axiom Interp_1 :
-    forall x : M.map int int, i j : int.
+    forall x : int -> int, i j : int.
     i >= j -> interp x i j = 0
 
   axiom Interp_2 :
-    forall x : M.map int int, i j : int.
-    i < j -> interp x i j = M.get x i + 10 * interp x (i+1) j
+    forall x : int -> int, i j : int.
+    i < j -> interp x i j = x i + 10 * interp x (i+1) j
 
   (* to allow provers to prove that an assignment does not change the
      interpretation on the left (or on the right); requires induction *)
   let rec lemma interp_eq
-    (x1 x2 : M.map int int) (i j : int)
-    requires { forall k : int. i <= k < j -> M.get x1 k = M.get x2 k }
+    (x1 x2 : int -> int) (i j : int)
+    requires { forall k : int. i <= k < j -> x1 k = x2 k }
     ensures  { interp x1 i j = interp x2 i j }
     variant  { j - i }
   = if i < j then interp_eq x1 x2 (i+1) j
@@ -45,26 +45,26 @@ module M
   (* the sum of the elements of x[i..j[ *)
   use int.Sum
 
-  function sum (m: M.map int int) (i j: int) : int =
-    Sum.sum (fun k -> M.get m k) i (j - 1)
+  function sum (m: int -> int) (i j: int) : int =
+    Sum.sum m i (j - 1)
 
   lemma Sum_is_sum_digits_interp:
-    forall x : M.map int int, i j : int.
+    forall x : int -> int, i j : int.
     sum x i j = sum_digits (interp x i j)
 
   lemma Sum_digits_a_set_eq:
     forall x : array int, i j k v : int.
-    (k < i \/ k >= j) -> sum (M.set x.elts k v) i j = sum x.elts i j
+    (k < i \/ k >= j) -> sum (Map.set x.elts k v) i j = sum x.elts i j
 
   (* interp9 X i j is the j-digit integer obtained by replacing the i least
      significant digits in X by 9, i.e. X[j-1]...X[i]9...9 *)
 
-  function interp9 (x : M.map int int) (i j : int) : int =
+  function interp9 (x : int -> int) (i j : int) : int =
     power 10 i * (interp x i j + 1) - 1
 
   lemma Interp9_step:
-    forall x : M.map int int, i j : int.
-    i < j -> interp9 (M.set x i 9) i j = interp9 x (i+1) j
+    forall x : int -> int, i j : int.
+    i < j -> interp9 (Map.set x i 9) i j = interp9 x (i+1) j
 
   val x : array int
 
@@ -115,8 +115,8 @@ let search_safety ()
       with digit sum y *)
 
   (* x[0..m-1] is a well-formed integer i.e. has digits in 0..9 *)
-  predicate is_integer (x : M.map int int) =
-    forall k : int. 0 <= k < m -> 0 <= M.get x k <= 9
+  predicate is_integer (x : int -> int) =
+    forall k : int. 0 <= k < m -> 0 <= x k <= 9
 
 let search ()
   requires { length x = m /\ is_integer x.elts }
@@ -163,18 +163,18 @@ let search ()
    4. Completeness: we always raise the Success exception *)
 
   (* x1 > x2 since x1[d] > x2[d] and x1[d+1..m-1] = x2[d+1..m-1] *)
-  predicate gt_digit (x1 x2 : M.map int int) (d : int) =
+  predicate gt_digit (x1 x2 : int -> int) (d : int) =
     is_integer x1 /\ is_integer x2 /\ 0 <= d < m /\
-    M.get x1 d > M.get x2 d /\ forall k : int. d < k < m -> M.get x1 k = M.get x2 k
+    x1 d > x2 d /\ forall k : int. d < k < m -> x1 k = x2 k
 
   lemma Gt_digit_interp:
-    forall x1 x2 : M.map int int, d : int.
+    forall x1 x2 : int -> int, d : int.
     gt_digit x1 x2 d -> interp x1 0 m > interp x2 0 m
 
   lemma Gt_digit_update:
-    forall x1 x2 : M.map int int, d i v : int.
+    forall x1 x2 : int -> int, d i v : int.
     gt_digit x1 x2 d -> 0 <= i < d -> 0 <= v <= 9 ->
-    gt_digit (M.set x1 i v) x2 d
+    gt_digit (Map.set x1 i v) x2 d
 
   (* the number of digits of a given integer *)
   function nb_digits int : int
@@ -188,7 +188,7 @@ let search ()
   (* the smallest integer with digit sum y is (y mod 9)9..9
      with exactly floor(y/9) trailing 9s *)
 
-  function smallest int : M.map int int
+  function smallest int : int -> int
 
   function smallest_size int : int
 
@@ -202,7 +202,7 @@ let search ()
   (* smallest(y) is an integer *)
   axiom Smallest_def1:
     forall y : int. y >= 0 ->
-    forall k : int. 0 <= k < smallest_size y -> 0 <= M.get (smallest y) k <= 9
+    forall k : int. 0 <= k < smallest_size y -> 0 <= smallest y k <= 9
 
   (* smallest(y) has digit sum y *)
   axiom Smallest_def2:
@@ -217,12 +217,12 @@ let search ()
 
   lemma Smallest_shape_1:
     forall y : int. y >= 0 -> mod y 9 = 0 ->
-    forall k : int. 0 <= k < smallest_size y -> M.get (smallest y) k = 9
+    forall k : int. 0 <= k < smallest_size y -> smallest y k = 9
 
   lemma Smallest_shape_2:
     forall y : int. y >= 0 -> mod y 9 <> 0 ->
-    (forall k : int. 0 <= k < smallest_size y - 1 -> M.get (smallest y) k = 9) /\
-    M.get (smallest y) (smallest_size y - 1) = mod y 9
+    (forall k : int. 0 <= k < smallest_size y - 1 -> smallest y k = 9) /\
+    smallest y (smallest_size y - 1) = mod y 9
 
   lemma Smallest_nb_digits:
     forall y : int. y >= 0 ->
@@ -265,7 +265,7 @@ let search_smallest ()
         x = old x /\
         forall c' : int. x[d] < c' < c ->
           forall u : int.
-          interp (old x.elts) 0 m < u <= interp9 (M.set x.elts d c') d m ->
+          interp (old x.elts) 0 m < u <= interp9 (Map.set x.elts d c') d m ->
             sum_digits u <> y }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
@@ -281,7 +281,7 @@ let search_smallest ()
              sum x.elts d m = y - delta /\
              sum x.elts 0 i = (if i <= k then 9*i else delta) /\
              (forall j : int. 0 <= j < i ->
-                (j <  smallest_size delta -> x[j] = M.get (smallest delta) j) /\
+                (j <  smallest_size delta -> x[j] = smallest delta j) /\
                 (j >= smallest_size delta -> x[j] = 0)) /\
              gt_digit x.elts (old x.elts) d }
           if i < k then x[i] <- 9

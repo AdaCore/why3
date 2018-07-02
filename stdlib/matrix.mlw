@@ -3,7 +3,7 @@
 module Matrix
 
   use int.Int
-  use map.Map as M
+  use map.Map
 
   type matrix 'a = private {
     ghost mutable elts: int -> int -> 'a;
@@ -14,14 +14,22 @@ module Matrix
   predicate valid_index (a: matrix 'a) (r c: int) =
     0 <= r < a.rows /\ 0 <= c < a.columns
 
-  val function get (a: matrix 'a) (r c: int) : 'a
+  function get (a: matrix 'a) (r c: int) : 'a =
+    a.elts r c
+
+  val get (a: matrix 'a) (r c: int) : 'a
     requires { [@expl:index in matrix bounds] valid_index a r c }
     ensures  { result = a.elts r c }
+
+  val ghost function update (a: matrix 'a) (r c: int) (v: 'a) : matrix 'a
+    ensures  { result.rows = a.rows }
+    ensures  { result.columns = a.columns }
+    ensures  { result.elts = a.elts[r <- (a.elts r)[c <- v]] }
 
   val set (a: matrix 'a) (r c: int) (v: 'a) : unit
     requires { [@expl:index in matrix bounds] valid_index a r c }
     writes   { a }
-    ensures  { a.elts = M.((old a.elts)[r <- (old a.elts r)[c <- v]]) }
+    ensures  { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -36,7 +44,7 @@ module Matrix
 
   let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
     ensures { [@expl:index in matrix bounds] valid_index a r c }
-    ensures { a.elts = M.((old a.elts)[r <- (old a.elts r)[c <- v]]) }
+    ensures { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
     raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     set a r c v

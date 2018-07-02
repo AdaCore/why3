@@ -10,7 +10,7 @@ modification of an array does not modify its length.
 module Array
 
   use int.Int
-  use map.Map as M
+  use map.Map
 
   type array 'a = private {
     mutable ghost elts : int -> 'a;
@@ -25,11 +25,11 @@ module Array
 
   val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
     ensures { result.length = a.length }
-    ensures { result.elts = M.set a.elts i v }
+    ensures { result.elts = Map.set a.elts i v }
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { [@expl:index in array bounds] 0 <= i < length a }
-    ensures  { a.elts = M.set (old a).elts i v }
+    ensures  { a.elts = Map.set (old a).elts i v }
     ensures  { a = (old a)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)

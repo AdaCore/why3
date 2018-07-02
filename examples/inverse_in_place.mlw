@@ -24,8 +24,8 @@ module InverseInPlace
 
   let function (~_) (x: int) : int = -x-1
 
-  function numof (m: M.map int int) (l r: int) : int =
-    NumOf.numof (fun n -> M.([]) m n >= 0) l r
+  function numof (m: int -> int) (l r: int) : int =
+    NumOf.numof (fun n -> m n >= 0) l r
 
   predicate is_permutation (a: array int) =
     forall i: int. 0 <= i < length a ->

@@ -76,7 +76,7 @@ function make (len: int) (dummy: 'a) : rarray 'a =
 
   let ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
     requires { 0 <= i < r.length }
-    ensures { r.data.A.elts = A.M.([<-]) (old r).data.A.elts i v }
+    ensures { r.data.A.elts = A.Map.([<-]) (old r).data.A.elts i v }
     =
     A.([]<-) r.data i v
 
