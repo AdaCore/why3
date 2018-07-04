@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bellman_ford.mlw" proved="true">
 <theory name="Graph" proved="true">
  <goal name="VC s" expl="VC for s" proved="true">
@@ -37,7 +37,7 @@
  <goal name="long_path_reduction" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="long_path_reduction.0" proved="true">
-  <proof prover="11"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="long_path_reduction.1" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
@@ -174,7 +174,7 @@
    <proof prover="1"><result status="valid" time="0.04" steps="69"/></proof>
    </goal>
    <goal name="VC relax.0.2" expl="VC for relax" proved="true">
-   <proof prover="11"><result status="valid" time="0.54"/></proof>
+   <proof prover="0"><result status="valid" time="0.91"/></proof>
    </goal>
    <goal name="VC relax.0.3" expl="VC for relax" proved="true">
    <proof prover="1"><result status="valid" time="0.03" steps="117"/></proof>
@@ -294,7 +294,7 @@
     <goal name="VC bellman_ford.0.0.0" expl="loop invariant init" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="VC bellman_ford.0.0.0.0" expl="loop invariant init" proved="true">
-     <proof prover="11"><result status="valid" time="0.19"/></proof>
+     <proof prover="0"><result status="valid" time="0.36"/></proof>
      </goal>
      <goal name="VC bellman_ford.0.0.0.1" expl="loop invariant init" proved="true">
      <proof prover="1"><result status="valid" time="0.02" steps="76"/></proof>
@@ -375,7 +375,7 @@
    <proof prover="1"><result status="valid" time="0.04" steps="164"/></proof>
    </goal>
    <goal name="VC bellman_ford.12.6" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.34" steps="672"/></proof>
+   <proof prover="1"><result status="valid" time="0.20" steps="672"/></proof>
    </goal>
    <goal name="VC bellman_ford.12.7" expl="VC for bellman_ford" proved="true">
    <proof prover="1"><result status="valid" time="0.14" steps="239"/></proof>

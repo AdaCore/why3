@@ -2,107 +2,106 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../../../stdlib/bintree.mlw" expanded="true">
-<theory name="Tree" sum="c05a159c0fca07eac9e3cabdb81061c8">
- <goal name="VC is_empty" expl="VC for is_empty">
- <transf name="split_goal_right">
-  <goal name="VC is_empty.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../../../stdlib/bintree.mlw" proved="true">
+<theory name="Tree" proved="true">
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC is_empty.0" expl="postcondition" proved="true">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC is_empty.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Size" sum="25151db6b3d3cc6174f10a3a39c2edef">
- <goal name="VC size" expl="VC for size">
- <transf name="split_goal_right">
- </transf>
- </goal>
- <goal name="size_nonneg" expl="">
- <transf name="induction_ty_lex">
-  <goal name="size_nonneg.1" expl="">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="size_empty" expl="">
- <transf name="induction_ty_lex">
-  <goal name="size_empty.1" expl="">
-  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="VC is_empty.1" expl="postcondition" proved="true">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Occ" sum="e14989349e39a9623554727d87f4f045">
- <goal name="occ_nonneg" expl="">
- <transf name="induction_ty_lex">
-  <goal name="occ_nonneg.1" expl="">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+<theory name="Size" proved="true">
+ <goal name="VC size" expl="VC for size" proved="true">
+ <transf name="split_goal_right" proved="true" >
+ </transf>
+ </goal>
+ <goal name="size_nonneg" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="size_nonneg.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="size_empty" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="size_empty.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Height" sum="14f2c751c348b80453a8fea15102cb33">
- <goal name="VC height" expl="VC for height">
- <transf name="split_goal_right">
- </transf>
- </goal>
- <goal name="height_nonneg" expl="">
- <transf name="induction_ty_lex">
-  <goal name="height_nonneg.1" expl="">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="12"/></proof>
+<theory name="Occ" proved="true">
+ <goal name="occ_nonneg" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="occ_nonneg.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Inorder" sum="4fca30ee436b71a9157f8610a88f8fd0">
- <goal name="VC inorder" expl="VC for inorder">
- <transf name="split_goal_right">
+<theory name="Height" proved="true">
+ <goal name="VC height" expl="VC for height" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
-</theory>
-<theory name="Preorder" sum="4fca30ee436b71a9157f8610a88f8fd0">
- <goal name="VC preorder" expl="VC for preorder">
- <transf name="split_goal_right">
- </transf>
- </goal>
-</theory>
-<theory name="InorderLength" sum="f063cf6c9f0b5640a312165a548dda7a">
- <goal name="inorder_length" expl="">
- <transf name="induction_ty_lex">
-  <goal name="inorder_length.1" expl="">
-  <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
+ <goal name="height_nonneg" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="height_nonneg.0" proved="true">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Zipper" sum="88e22753aaf66294dba157b6974885a8">
- <goal name="VC zip" expl="VC for zip">
- <transf name="split_goal_right">
+<theory name="Inorder" proved="true">
+ <goal name="VC inorder" expl="VC for inorder" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
- <goal name="VC start" expl="VC for start">
- <transf name="split_goal_right">
+</theory>
+<theory name="Preorder" proved="true">
+ <goal name="VC preorder" expl="VC for preorder" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
- <goal name="VC up" expl="VC for up">
- <transf name="split_goal_right">
+</theory>
+<theory name="InorderLength" proved="true">
+ <goal name="inorder_length" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="inorder_length.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
  </transf>
  </goal>
- <goal name="VC top" expl="VC for top">
- <transf name="split_goal_right">
+</theory>
+<theory name="Zipper" proved="true">
+ <goal name="VC zip" expl="VC for zip" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
- <goal name="VC down_left" expl="VC for down_left">
- <transf name="split_goal_right">
+ <goal name="VC start" expl="VC for start" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
- <goal name="VC down_right" expl="VC for down_right">
- <transf name="split_goal_right">
+ <goal name="VC up" expl="VC for up" proved="true">
+ <transf name="split_goal_right" proved="true" >
+ </transf>
+ </goal>
+ <goal name="VC top" expl="VC for top" proved="true">
+ <transf name="split_goal_right" proved="true" >
+ </transf>
+ </goal>
+ <goal name="VC down_left" expl="VC for down_left" proved="true">
+ <transf name="split_goal_right" proved="true" >
+ </transf>
+ </goal>
+ <goal name="VC down_right" expl="VC for down_right" proved="true">
+ <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>

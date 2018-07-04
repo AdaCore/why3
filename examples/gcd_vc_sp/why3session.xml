@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../gcd_vc_sp.mlw" proved="true">
 <theory name="EuclideanAlgorithm" proved="true">
  <goal name="VC euclid" expl="VC for euclid" proved="true">
@@ -28,22 +28,22 @@
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="gcd_even_even" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
  </goal>
  <goal name="gcd_even_odd" proved="true">
  <proof prover="3" edited="gcd_vc_sp_BinaryGcd_gcd_even_odd_1.v"><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="gcd_even_odd2" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="29"/></proof>
+ <proof prover="4"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
  <goal name="odd_odd_div2" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="VC gcd_odd_odd" expl="VC for gcd_odd_odd" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
  </goal>
  <goal name="gcd_odd_odd2" proved="true">
- <proof prover="1"><result status="valid" time="0.06" steps="30"/></proof>
+ <proof prover="4"><result status="valid" time="0.06" steps="37"/></proof>
  </goal>
  <goal name="VC binary_gcd" expl="VC for binary_gcd" proved="true">
  <transf name="split_goal_right" proved="true" >

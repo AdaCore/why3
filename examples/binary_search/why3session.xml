@@ -2,32 +2,31 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../binary_search.mlw" proved="true">
 <theory name="BinarySearch" proved="true">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
- <proof prover="3"><result status="valid" time="0.05" steps="88"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="132"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchAnyMidPoint" proved="true">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="63"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="63"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchBranchless" proved="true">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="147"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="218"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchInt32" proved="true">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
- <proof prover="3"><result status="valid" time="1.27" steps="8288"/></proof>
+ <proof prover="0"><result status="valid" time="2.65" steps="9890"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchBoolean" proved="true">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
- <proof prover="3"><result status="valid" time="0.08" steps="194"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="245"/></proof>
  </goal>
 </theory>
 </file>

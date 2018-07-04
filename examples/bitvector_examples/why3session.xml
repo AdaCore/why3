@@ -3,12 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" proved="true">
 <theory name="Test_proofinuse" proved="true">
  <goal name="VC shift_is_div" expl="VC for shift_is_div" proved="true">
- <proof prover="3"><result status="valid" time="0.06" steps="117"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="117"/></proof>
  </goal>
  <goal name="VC mask" expl="VC for mask" proved="true">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
@@ -150,10 +149,10 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="to_int_ule" proved="true">
- <proof prover="3"><result status="valid" time="0.01" steps="72"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="72"/></proof>
  </goal>
  <goal name="to_int_ult" proved="true">
- <proof prover="3"><result status="valid" time="0.02" steps="72"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
  </goal>
  <goal name="bv32_bounds_0" proved="true">
  <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -182,10 +181,10 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC add.6" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="137"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="138"/></proof>
   </goal>
   <goal name="VC add.7" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="2.36" steps="2847"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.16" steps="267"/></proof>
   </goal>
   <goal name="VC add.8" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.06"/></proof>

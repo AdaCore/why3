@@ -4,8 +4,8 @@
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../euler001.mlw" proved="true">
 <theory name="DivModHints" proved="true">
  <goal name="mod_div_unique" proved="true">
@@ -22,40 +22,40 @@
  </goal>
  <goal name="div_succ_2" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.10"/></proof>
- <proof prover="4" timelimit="30"><result status="valid" time="0.17" steps="52"/></proof>
+ <proof prover="3" timelimit="30"><result status="valid" time="0.17" steps="41"/></proof>
  </goal>
  <goal name="mod2_mul2" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.05" steps="10"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="6"/></proof>
  </goal>
  <goal name="mod2_mul2_aux" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.02" steps="12"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
  <goal name="mod2_mul2_aux2" proved="true">
  <proof prover="1" timelimit="35"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.03" steps="15"/></proof>
- <proof prover="5"><result status="valid" time="0.36"/></proof>
+ <proof prover="2"><result status="valid" time="0.15"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
  </goal>
  <goal name="div2_mul2" proved="true">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
  <goal name="div2_mul2_aux" proved="true">
  <proof prover="1"><result status="valid" time="0.08"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
  <goal name="div2_add" proved="true">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="div2_sub" proved="true">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="5" timelimit="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="TriangularNumbers" proved="true">
@@ -63,25 +63,25 @@
  <proof prover="0" memlimit="1000" edited="euler001_TriangularNumbers_tr_mod_2_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="tr_repr" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="tr_succ" proved="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
 <theory name="SumMultiple" proved="true">
  <goal name="mod_15" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.13"/></proof>
- <proof prover="4"><result status="valid" time="0.17" steps="76"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="28"/></proof>
  </goal>
  <goal name="Closed_formula_0" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.06" steps="85"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="79"/></proof>
  </goal>
  <goal name="Closed_formula_n" proved="true">
  <proof prover="1" timelimit="10"><result status="valid" time="1.46"/></proof>
- <proof prover="4" timelimit="10"><result status="valid" time="0.35" steps="55"/></proof>
+ <proof prover="3" timelimit="10"><result status="valid" time="0.06" steps="55"/></proof>
  </goal>
  <goal name="Closed_formula_n_3" proved="true">
  <proof prover="1" timelimit="10"><result status="valid" time="2.35"/></proof>
@@ -97,18 +97,18 @@
  </goal>
  <goal name="div_15" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="div_5" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="div_3" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="Closed_Formula" proved="true">
  <proof prover="0" timelimit="30" memlimit="1000" edited="euler001_SumMultiple_Closed_Formula_1.v"><result status="valid" time="0.32"/></proof>
@@ -116,13 +116,13 @@
 </theory>
 <theory name="Euler001" proved="true">
  <goal name="VC solve" expl="VC for solve" proved="true">
- <proof prover="4"><result status="valid" time="2.18" steps="522"/></proof>
+ <proof prover="3"><result status="valid" time="1.72" steps="349"/></proof>
  </goal>
  <goal name="VC run" expl="VC for run" proved="true">
- <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC bench" expl="VC for bench" proved="true">
- <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
 </file>

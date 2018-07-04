@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../hillel_challenge.mlw" proved="true">
 <theory name="Leftpad" proved="true">
  <goal name="VC leftpad" expl="VC for leftpad" proved="true">
@@ -45,7 +45,7 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC unique.10" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.59"/></proof>
+  <proof prover="3"><result status="valid" time="0.84"/></proof>
   </goal>
   <goal name="VC unique.11" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(x=o)">
@@ -85,7 +85,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC unique.14" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC unique.15" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="(x = o)">
@@ -111,7 +111,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC unique.18" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC unique.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
@@ -235,19 +235,19 @@
   </goal>
   <goal name="VC add_big.6" expl="type invariant" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC add_big.6.0" expl="VC for add_big" proved="true">
+   <goal name="VC add_big.6.0" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC add_big.6.1" expl="VC for add_big" proved="true">
+   <goal name="VC add_big.6.1" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="VC add_big.6.2" expl="VC for add_big" proved="true">
+   <goal name="VC add_big.6.2" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="VC add_big.6.3" expl="VC for add_big" proved="true">
+   <goal name="VC add_big.6.3" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="VC add_big.6.4" expl="VC for add_big" proved="true">
+   <goal name="VC add_big.6.4" expl="type invariant" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
@@ -435,16 +435,16 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fulcrum.24" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.38"/></proof>
+  <proof prover="0"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC fulcrum.25" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.91"/></proof>
+  <proof prover="3"><result status="valid" time="1.34"/></proof>
   </goal>
   <goal name="VC fulcrum.26" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC fulcrum.27" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.34"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fulcrum.28" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="38"/></proof>
@@ -456,7 +456,7 @@
   <proof prover="0"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC fulcrum.31" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="3"><result status="valid" time="0.49"/></proof>
   </goal>
   <goal name="VC fulcrum.32" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>

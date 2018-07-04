@@ -4,10 +4,9 @@
 <why3session shape_version="4">
 <prover id="0" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_ring_buffer.mlw" proved="true">
 <theory name="RingBuffer" proved="true">
  <goal name="VC buffer" expl="VC for buffer" proved="true">
@@ -23,7 +22,7 @@
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="VC push" expl="VC for push" proved="true">
- <proof prover="4"><result status="valid" time="0.21" steps="473"/></proof>
+ <proof prover="5"><result status="valid" time="0.21" steps="479"/></proof>
  </goal>
  <goal name="VC head" expl="VC for head" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -139,7 +138,7 @@
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="VC pop" expl="VC for pop" proved="true">
- <proof prover="6"><result status="valid" time="0.06"/></proof>
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
 <theory name="HarnessSeq" proved="true">
@@ -147,10 +146,10 @@
  <proof prover="3"><result status="valid" time="0.18"/></proof>
  </goal>
  <goal name="VC harness2" expl="VC for harness2" proved="true">
- <proof prover="2"><result status="valid" time="0.90"/></proof>
+ <proof prover="2" timelimit="10"><result status="valid" time="0.90"/></proof>
  </goal>
  <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="6"><result status="valid" time="0.23"/></proof>
+ <proof prover="2"><result status="valid" time="0.23"/></proof>
  </goal>
 </theory>
 </file>

@@ -3,9 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../generate_all_trees.mlw" proved="true">
 <theory name="GenerateAllTrees" proved="true">
  <goal name="size_nonneg" proved="true">
@@ -59,10 +58,10 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC combine.1" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.02" steps="131"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="165"/></proof>
   </goal>
   <goal name="VC combine.2" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.52" steps="2512"/></proof>
+  <proof prover="1"><result status="valid" time="0.52" steps="2274"/></proof>
   </goal>
   <goal name="VC combine.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
@@ -71,13 +70,13 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC combine.5" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.02" steps="102"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="108"/></proof>
   </goal>
   <goal name="VC combine.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC combine.7" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.37" steps="2097"/></proof>
+  <proof prover="1"><result status="valid" time="0.37" steps="2357"/></proof>
   </goal>
   <goal name="VC combine.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.14"/></proof>
@@ -102,19 +101,19 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC all_trees.2" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.02" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="VC all_trees.3" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC all_trees.4" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.00" steps="168"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="168"/></proof>
   </goal>
   <goal name="VC all_trees.5" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.00" steps="20"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
   <goal name="VC all_trees.6" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.01" steps="148"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="149"/></proof>
   </goal>
   <goal name="VC all_trees.7" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -135,13 +134,13 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC all_trees.13" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.05" steps="151"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="229"/></proof>
   </goal>
   <goal name="VC all_trees.14" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.94"/></proof>
+  <proof prover="3"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="VC all_trees.15" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.04" steps="175"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="146"/></proof>
   </goal>
   <goal name="VC all_trees.16" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.06"/></proof>

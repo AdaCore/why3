@@ -2,223 +2,222 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="9" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../fibonacci.mlw" proved="true">
 <theory name="FibonacciTest" proved="true">
  <goal name="isfib_2_1" proved="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="isfib_6_8" proved="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="not_isfib_2_2" proved="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
- <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
 <theory name="FibonacciLinear" proved="true">
  <goal name="VC fib" expl="VC for fib" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="FibRecGhost" proved="true">
  <goal name="VC fib_aux" expl="VC for fib_aux" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC fib" expl="VC for fib" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="VC test42" expl="VC for test42" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC bench" expl="VC for bench" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
 <theory name="FibRecNoGhost" proved="true">
  <goal name="VC fib_aux" expl="VC for fib_aux" proved="true">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC fib" expl="VC for fib" proved="true">
- <proof prover="5"><result status="valid" time="0.08"/></proof>
+ <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
 <theory name="SmallestFibAbove" proved="true">
  <goal name="VC smallest_fib_above" expl="VC for smallest_fib_above" proved="true">
- <proof prover="5"><result status="valid" time="0.12"/></proof>
+ <proof prover="2"><result status="valid" time="0.12"/></proof>
  </goal>
 </theory>
 <theory name="Zeckendorf" proved="true">
  <goal name="VC fib_nonneg" expl="VC for fib_nonneg" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="17"/></proof>
  </goal>
  <goal name="VC fib_increasing" expl="VC for fib_increasing" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC greatest_fib" expl="VC for greatest_fib" proved="true">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC zeckendorf" expl="VC for zeckendorf" proved="true">
- <proof prover="9"><result status="valid" time="0.11"/></proof>
+ <proof prover="4"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="VC zeckendorf_fast" expl="VC for zeckendorf_fast" proved="true">
- <proof prover="9"><result status="valid" time="0.50"/></proof>
+ <proof prover="4"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="VC zeckendorf_unique" expl="VC for zeckendorf_unique" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC zeckendorf_unique.0" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.1" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.2" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.3" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.4" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.5" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.6" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.7" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.10" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.11" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.13" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.14" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.15" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.16" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.17" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.18" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.19" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.20" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.21" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.22" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.23" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.24" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC zeckendorf_unique.25" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Mat22" proved="true">
  <goal name="Assoc" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
  <goal name="Unit_def_l" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="Unit_def_r" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="FibonacciLogarithmic" proved="true">
  <goal name="VC m1110" expl="VC for m1110" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC logfib" expl="VC for logfib" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC logfib.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="VC logfib.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC logfib.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC logfib.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC logfib.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC logfib.5" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC logfib.6" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC logfib.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.29" steps="81"/></proof>
+  <proof prover="3"><result status="valid" time="0.29" steps="93"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC fib_m" expl="VC for fib_m" proved="true">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC fibo" expl="VC for fibo" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
  <goal name="VC test0" expl="VC for test0" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC test1" expl="VC for test1" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC test7" expl="VC for test7" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC test42" expl="VC for test42" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC test2014" expl="VC for test2014" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC bench" expl="VC for bench" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
 </file>

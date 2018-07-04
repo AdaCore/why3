@@ -2,53 +2,53 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../gcd_bezout.mlw" expanded="true">
-<theory name="GcdBezout" sum="6d4ff8bdfabfccd6c9451c7f2fc39247" expanded="true">
- <goal name="VC gcd" expl="VC for gcd" expanded="true">
- <transf name="split_goal_right" expanded="true">
-  <goal name="VC gcd.1" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../gcd_bezout.mlw" proved="true">
+<theory name="GcdBezout" proved="true">
+ <goal name="VC gcd" expl="VC for gcd" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC gcd.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC gcd.2" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
+  <goal name="VC gcd.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC gcd.3" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC gcd.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC gcd.4" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="VC gcd.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC gcd.5" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC gcd.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC gcd.6" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC gcd.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC gcd.7" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC gcd.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC gcd.8" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <goal name="VC gcd.7" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC gcd.9" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.18" steps="42"/></proof>
+  <goal name="VC gcd.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="42"/></proof>
   </goal>
-  <goal name="VC gcd.10" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.09" steps="19"/></proof>
+  <goal name="VC gcd.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="19"/></proof>
   </goal>
-  <goal name="VC gcd.11" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.09" steps="19"/></proof>
+  <goal name="VC gcd.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="19"/></proof>
   </goal>
-  <goal name="VC gcd.12" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.09" steps="20"/></proof>
+  <goal name="VC gcd.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="20"/></proof>
   </goal>
-  <goal name="VC gcd.13" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC gcd.12" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC gcd.14" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC gcd.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
  </transf>
  </goal>

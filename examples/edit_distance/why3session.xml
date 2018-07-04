@@ -2,10 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Coq" version="8.7.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="10" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../edit_distance.mlw" proved="true">
 <theory name="Word" proved="true">
@@ -39,12 +38,12 @@
  </transf>
  </goal>
  <goal name="key_lemma_left" proved="true">
- <proof prover="10"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="dist_concat_left" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="dist_concat_left.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="114"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="114"/></proof>
   </goal>
  </transf>
  </goal>
@@ -70,7 +69,7 @@
     <proof prover="3"><result status="valid" time="0.22"/></proof>
     </goal>
     <goal name="min_dist_equal.0.1.3" proved="true">
-    <proof prover="1"><result status="valid" time="0.02" steps="131"/></proof>
+    <proof prover="0"><result status="valid" time="0.02" steps="131"/></proof>
     </goal>
    </transf>
    </goal>
@@ -116,7 +115,7 @@
    <proof prover="11"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="min_dist_eps_length.0.1" proved="true">
-   <proof prover="1"><result status="valid" time="0.15" steps="790"/></proof>
+   <proof prover="0"><result status="valid" time="0.15" steps="807"/></proof>
    </goal>
   </transf>
   </goal>
@@ -139,25 +138,25 @@
   <proof prover="11"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC distance.3" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="VC distance.4" expl="loop invariant init" proved="true">
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC distance.5" expl="index in array bounds" proved="true">
-  <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <proof prover="11"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC distance.6" expl="index in array bounds" proved="true">
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <proof prover="11"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC distance.7" expl="index in array bounds" proved="true">
   <proof prover="11"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC distance.8" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="222"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="213"/></proof>
   </goal>
   <goal name="VC distance.9" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="112"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="119"/></proof>
   </goal>
   <goal name="VC distance.10" expl="loop invariant init" proved="true">
   <proof prover="11"><result status="valid" time="0.03"/></proof>
@@ -175,10 +174,10 @@
   <proof prover="11"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC distance.15" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.19" steps="452"/></proof>
+  <proof prover="0"><result status="valid" time="0.32" steps="990"/></proof>
   </goal>
   <goal name="VC distance.16" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="134"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="175"/></proof>
   </goal>
   <goal name="VC distance.17" expl="loop invariant preservation" proved="true">
   <proof prover="11"><result status="valid" time="0.04"/></proof>
@@ -193,10 +192,10 @@
   <proof prover="11"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC distance.21" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.57" steps="1372"/></proof>
+  <proof prover="0"><result status="valid" time="0.57" steps="1454"/></proof>
   </goal>
   <goal name="VC distance.22" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="147"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="185"/></proof>
   </goal>
   <goal name="VC distance.23" expl="loop invariant preservation" proved="true">
   <proof prover="11"><result status="valid" time="0.04"/></proof>

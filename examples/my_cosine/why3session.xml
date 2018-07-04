@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Gappa" version="1.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../my_cosine.mlw" proved="true">
 <theory name="M" proved="true">
  <goal name="VC my_cosine" expl="VC for my_cosine" proved="true">
@@ -15,10 +15,10 @@
   <proof prover="3" edited="my_cosine_M_VC_my_cosine_1.v"><result status="valid" time="1.78"/></proof>
   </goal>
   <goal name="VC my_cosine.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC my_cosine.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="188"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="54"/></proof>
   </goal>
   <goal name="VC my_cosine.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00"/></proof>

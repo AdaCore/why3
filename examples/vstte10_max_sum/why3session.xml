@@ -4,8 +4,7 @@
 <why3session shape_version="4">
 <prover id="0" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte10_max_sum.mlw" proved="true">
 <theory name="MaxAndSum" proved="true">
  <goal name="VC max_sum" expl="VC for max_sum" proved="true">
@@ -103,13 +102,13 @@
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC test.11" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="VC test.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.14"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="VC test.13" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.10" steps="203"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="203"/></proof>
   </goal>
  </transf>
  </goal>
