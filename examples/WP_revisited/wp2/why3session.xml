@@ -4,35 +4,35 @@
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.7.1" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="4000"/>
 <prover id="10" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../wp2.mlw" proved="true">
 <theory name="Imp" proved="true">
  <goal name="VC subst_term" expl="VC for subst_term" proved="true">
- <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="eval_subst_term" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_subst_term.0" proved="true">
-  <proof prover="6"><result status="valid" time="0.02" steps="99"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="eval_term_change_free" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_term_change_free.0" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC subst" expl="VC for subst" proved="true">
- <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="eval_subst" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_subst.0" proved="true">
-  <proof prover="6"><result status="valid" time="0.12" steps="1103"/></proof>
+  <proof prover="2"><result status="valid" time="0.12" steps="1078"/></proof>
   </goal>
  </transf>
  </goal>
@@ -43,12 +43,12 @@
  <proof prover="0" timelimit="5" edited="wp2_Imp_eval_change_free_1.v"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="check_skip" proved="true">
- <proof prover="6"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="steps_non_neg" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="steps_non_neg.0" proved="true">
-  <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="steps_non_neg.1" proved="true">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -61,45 +61,45 @@
 </theory>
 <theory name="TestSemantics" proved="true">
  <goal name="Test13" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
  <goal name="Test42" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
  <goal name="Test0" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
  <goal name="Test55" proved="true">
  <proof prover="1"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="Ass42" proved="true">
- <proof prover="6"><result status="valid" time="0.05" steps="103"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="103"/></proof>
  </goal>
  <goal name="If42" proved="true">
  <transf name="inversion_pr" proved="true" >
   <goal name="If42.0" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="If42.1" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="If42.2" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="If42.3" proved="true">
-  <proof prover="6"><result status="valid" time="0.09" steps="215"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="215"/></proof>
   </goal>
   <goal name="If42.4" proved="true">
   <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="If42.5" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="If42.6" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
   <goal name="If42.7" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
  </transf>
  </goal>
@@ -117,22 +117,22 @@
  </transf>
  </goal>
  <goal name="skip_rule" proved="true">
- <proof prover="6"><result status="valid" time="0.08" steps="306"/></proof>
+ <proof prover="2"><result status="valid" time="0.08" steps="267"/></proof>
  </goal>
  <goal name="assign_rule" proved="true">
- <proof prover="6"><result status="valid" time="0.56" steps="1880"/></proof>
+ <proof prover="2"><result status="valid" time="0.56" steps="1816"/></proof>
  </goal>
  <goal name="seq_rule" proved="true">
- <proof prover="6"><result status="valid" time="0.14" steps="487"/></proof>
+ <proof prover="2"><result status="valid" time="0.14" steps="407"/></proof>
  </goal>
  <goal name="if_rule" proved="true">
  <proof prover="0" edited="wp2_HoareLogic_if_rule_1.v"><result status="valid" time="0.49"/></proof>
  </goal>
  <goal name="assert_rule" proved="true">
- <proof prover="6"><result status="valid" time="0.22" steps="631"/></proof>
+ <proof prover="2"><result status="valid" time="0.22" steps="518"/></proof>
  </goal>
  <goal name="assert_rule_ext" proved="true">
- <proof prover="6"><result status="valid" time="0.31" steps="1397"/></proof>
+ <proof prover="2"><result status="valid" time="0.17" steps="836"/></proof>
  </goal>
  <goal name="while_rule" proved="true">
  <proof prover="0" edited="wp2_HoareLogic_while_rule_1.v"><result status="valid" time="0.48"/></proof>
@@ -143,33 +143,33 @@
 </theory>
 <theory name="WP" proved="true">
  <goal name="assigns_refl" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
  </goal>
  <goal name="assigns_trans" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="7"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="assigns_union_left" proved="true">
- <proof prover="6"><result status="valid" time="0.03" steps="6"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="12"/></proof>
  </goal>
  <goal name="assigns_union_right" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="6"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
  </goal>
  <goal name="VC compute_writes" expl="VC for compute_writes" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC compute_writes.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
   <goal name="VC compute_writes.1" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="44"/></proof>
   </goal>
   <goal name="VC compute_writes.2" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="VC compute_writes.3" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="VC compute_writes.4" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
   <goal name="VC compute_writes.5" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -177,13 +177,13 @@
    <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC compute_writes.5.1" expl="postcondition" proved="true">
-   <proof prover="6" timelimit="1"><result status="valid" time="0.13" steps="328"/></proof>
+   <proof prover="2" timelimit="1"><result status="valid" time="0.13" steps="324"/></proof>
    </goal>
    <goal name="VC compute_writes.5.2" expl="postcondition" proved="true">
    <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC compute_writes.5.3" expl="postcondition" proved="true">
-   <proof prover="6" timelimit="1"><result status="valid" time="0.07" steps="283"/></proof>
+   <proof prover="2" timelimit="1"><result status="valid" time="0.07" steps="287"/></proof>
    </goal>
    <goal name="VC compute_writes.5.4" expl="postcondition" proved="true">
    <proof prover="0" timelimit="5" memlimit="1000" edited="wp2_WP_VC_compute_writes_1.v"><result status="valid" time="0.48"/></proof>
@@ -198,36 +198,36 @@
  <goal name="VC wp" expl="VC for wp" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC wp.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
   <goal name="VC wp.1" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="45"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="45"/></proof>
   </goal>
   <goal name="VC wp.2" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.03" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="VC wp.3" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="50"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="50"/></proof>
   </goal>
   <goal name="VC wp.4" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.04" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
   <goal name="VC wp.5" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wp.5.0" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="VC wp.5.1" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
    <goal name="VC wp.5.2" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.02" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
    </goal>
    <goal name="VC wp.5.3" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="1.54" steps="7849"/></proof>
+   <proof prover="2"><result status="valid" time="0.57" steps="3077"/></proof>
    </goal>
    <goal name="VC wp.5.4" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.02" steps="18"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
    <goal name="VC wp.5.5" expl="postcondition" proved="true">
    <proof prover="0" timelimit="0" edited="wp2_WP_VC_wp_1.v"><result status="valid" time="0.52"/></proof>

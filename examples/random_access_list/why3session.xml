@@ -21,7 +21,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC nth_flatten.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC nth_flatten.2" expl="postcondition" proved="true">
   <proof prover="4" timelimit="5"><result status="valid" time="3.54"/></proof>
@@ -29,7 +29,7 @@
  </transf>
  </goal>
  <goal name="VC lookup" expl="VC for lookup" proved="true">
- <proof prover="3"><result status="valid" time="0.13" steps="511"/></proof>
+ <proof prover="3"><result status="valid" time="0.34" steps="670"/></proof>
  </goal>
  <goal name="VC tail" expl="VC for tail" proved="true">
  <proof prover="4"><result status="valid" time="0.08"/></proof>
@@ -43,7 +43,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC update.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
   <goal name="VC update.3" expl="unreachable point" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
@@ -55,7 +55,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="VC update.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="30"/></proof>
   </goal>
   <goal name="VC update.7" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
@@ -64,35 +64,35 @@
   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC update.9" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.04" steps="88"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="100"/></proof>
   </goal>
   <goal name="VC update.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05" steps="101"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="108"/></proof>
   </goal>
   <goal name="VC update.11" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC update.11.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.05" steps="58"/></proof>
+   <proof prover="3"><result status="valid" time="0.05" steps="59"/></proof>
    </goal>
    <goal name="VC update.11.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.31" steps="473"/></proof>
+   <proof prover="3"><result status="valid" time="0.31" steps="576"/></proof>
    </goal>
    <goal name="VC update.11.2" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.81" steps="1273"/></proof>
+   <proof prover="3"><result status="valid" time="1.90" steps="2184"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC update.12" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.28" steps="605"/></proof>
+  <proof prover="3"><result status="valid" time="0.28" steps="708"/></proof>
   </goal>
   <goal name="VC update.13" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06" steps="226"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="342"/></proof>
   </goal>
   <goal name="VC update.14" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04" steps="129"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="137"/></proof>
   </goal>
   <goal name="VC update.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05" steps="195"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="197"/></proof>
   </goal>
  </transf>
  </goal>
@@ -121,13 +121,13 @@
   <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="cons_flatten.1" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="25"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="cons_flatten.2" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="72"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="69"/></proof>
   </goal>
   <goal name="cons_flatten.3" proved="true">
-  <proof prover="3"><result status="valid" time="0.21" steps="368"/></proof>
+  <proof prover="3"><result status="valid" time="0.46" steps="492"/></proof>
   </goal>
   <goal name="cons_flatten.4" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="32"/></proof>
@@ -144,14 +144,48 @@
  <proof prover="3"><result status="valid" time="0.03" steps="171"/></proof>
  </goal>
  <goal name="VC lookup" expl="VC for lookup" proved="true">
- <proof prover="3"><result status="valid" time="0.25" steps="418"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="VC lookup.0" expl="unreachable point" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="VC lookup.1" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC lookup.2" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC lookup.3" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC lookup.4" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="VC lookup.5" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="38"/></proof>
+  </goal>
+  <goal name="VC lookup.6" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC lookup.7" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC lookup.7.0" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="11"/></proof>
+   </goal>
+   <goal name="VC lookup.7.1" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="27"/></proof>
+   </goal>
+   <goal name="VC lookup.7.2" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="96"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="VC tail" expl="VC for tail" proved="true">
- <proof prover="3"><result status="valid" time="0.09" steps="417"/></proof>
+ <proof prover="3"><result status="valid" time="0.30" steps="724"/></proof>
  </goal>
  <goal name="VC aux" expl="VC for aux" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="1"/></proof>
- <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC fupdate" expl="VC for fupdate" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -162,37 +196,37 @@
   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC fupdate.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="VC fupdate.3" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="VC fupdate.4" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.03" steps="45"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="42"/></proof>
   </goal>
   <goal name="VC fupdate.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04" steps="32"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="38"/></proof>
   </goal>
   <goal name="VC fupdate.6" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC fupdate.6.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.30" steps="235"/></proof>
+   <proof prover="3"><result status="valid" time="0.30" steps="267"/></proof>
    </goal>
    <goal name="VC fupdate.6.1" expl="VC for fupdate" proved="true">
-   <proof prover="3"><result status="valid" time="1.00" steps="1299"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="1.93" steps="1536"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC fupdate.7" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC fupdate.7.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.03" steps="86"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="115"/></proof>
    </goal>
    <goal name="VC fupdate.7.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.06" steps="129"/></proof>
+   <proof prover="3"><result status="valid" time="0.06" steps="207"/></proof>
    </goal>
    <goal name="VC fupdate.7.2" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.09" steps="212"/></proof>
+   <proof prover="3"><result status="valid" time="0.09" steps="266"/></proof>
    </goal>
   </transf>
   </goal>

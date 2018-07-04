@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_fm2012_LRS.mlw" proved="true">
 <theory name="LCP" proved="true">
  <goal name="not_common_prefix_if_last_char_are_different" proved="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="longest_common_prefix_succ" proved="true">
- <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
  </goal>
  <goal name="VC lcp" expl="VC for lcp" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -63,7 +63,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC compare.6" expl="unreachable point" proved="true">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC compare.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -72,7 +72,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC compare.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="44"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
  </transf>
  </goal>
@@ -80,7 +80,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="le_trans" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="246"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="254"/></proof>
  </goal>
  <goal name="VC sort" expl="VC for sort" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -136,7 +136,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC sort.17" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="58"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="109"/></proof>
   </goal>
   <goal name="VC sort.18" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -145,7 +145,7 @@
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC sort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.46" steps="494"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="177"/></proof>
   </goal>
   <goal name="VC sort.21" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
@@ -154,10 +154,10 @@
   <proof prover="2"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC sort.23" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.51" steps="615"/></proof>
+  <proof prover="3"><result status="valid" time="0.51" steps="938"/></proof>
   </goal>
   <goal name="VC sort.24" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.56" steps="550"/></proof>
+  <proof prover="3"><result status="valid" time="0.56" steps="925"/></proof>
   </goal>
   <goal name="VC sort.25" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
@@ -166,7 +166,7 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC sort.27" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="297"/></proof>
+  <proof prover="3"><result status="valid" time="0.13" steps="345"/></proof>
   </goal>
   <goal name="VC sort.28" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -210,7 +210,7 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC create.3" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC create.4" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
@@ -244,7 +244,7 @@
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC lcp.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="71"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="76"/></proof>
   </goal>
  </transf>
  </goal>
@@ -256,10 +256,10 @@
 </theory>
 <theory name="LRS" proved="true">
  <goal name="lcp_sym" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
  <goal name="le_le_common_prefix" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="152"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="155"/></proof>
  </goal>
  <goal name="le_le_longest_common_prefix" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>

@@ -2,31 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.7.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../../../stdlib/array.mlw" proved="true">
 <theory name="Array" proved="true">
  <goal name="VC array" expl="VC for array" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC defensive_get" expl="VC for defensive_get" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC defensive_set" expl="VC for defensive_set" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC fill" expl="VC for fill" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="177"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="102"/></proof>
  <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="VC self_blit" expl="VC for self_blit" proved="true">
- <proof prover="2"><result status="valid" time="0.32" steps="666"/></proof>
+ <proof prover="3"><result status="valid" time="0.32" steps="641"/></proof>
  </goal>
 </theory>
 <theory name="ArrayPermut" proved="true">
@@ -42,60 +40,60 @@
 </theory>
 <theory name="ArraySwap" proved="true">
  <goal name="VC swap" expl="VC for swap" proved="true">
- <proof prover="0"><result status="valid" time="0.00" steps="30"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
 <theory name="ToList" proved="true">
  <goal name="VC to_list" expl="VC for to_list" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
  <goal name="VC to_list_append" expl="VC for to_list_append" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="118"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="119"/></proof>
  </goal>
 </theory>
 <theory name="ToSeq" proved="true">
  <goal name="VC to_seq_sub" expl="VC for to_seq_sub" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
  <goal name="VC to_seq_length" expl="VC for to_seq_length" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC to_seq_length.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC to_seq_length.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC to_seq_length.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC to_seq_nth" expl="VC for to_seq_nth" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC to_seq_nth.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC to_seq_nth.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC to_seq_nth.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="3" timelimit="6"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC to_seq" expl="VC for to_seq" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="Inversions" proved="true">
  <goal name="VC exchange_inversion" expl="VC for exchange_inversion" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC exchange_inversion.0" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC exchange_inversion.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="VC exchange_inversion.2" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -106,10 +104,10 @@
    <proof prover="6"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.25" steps="1015"/></proof>
+   <proof prover="3"><result status="valid" time="1.25" steps="1001"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.85" steps="663"/></proof>
+   <proof prover="3"><result status="valid" time="0.85" steps="815"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.4" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.92"/></proof>
@@ -117,12 +115,12 @@
    <goal name="VC exchange_inversion.2.5" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC exchange_inversion.2.5.0" expl="assertion" proved="true">
-    <proof prover="6"><result status="valid" time="5.64"/></proof>
+    <proof prover="6"><result status="valid" time="4.97"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="VC exchange_inversion.2.6" expl="VC for exchange_inversion" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
    </goal>
   </transf>
   </goal>
@@ -143,17 +141,17 @@
    </transf>
    </goal>
    <goal name="VC exchange_inversion.4.1" expl="VC for exchange_inversion" proved="true">
-   <proof prover="2"><result status="valid" time="1.50" steps="834"/></proof>
+   <proof prover="3"><result status="valid" time="0.87" steps="441"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC exchange_inversion.5" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC exchange_inversion.5.0" expl="VC for exchange_inversion" proved="true">
-   <proof prover="2"><result status="valid" time="0.06" steps="154"/></proof>
+   <proof prover="3"><result status="valid" time="0.06" steps="158"/></proof>
    </goal>
    <goal name="VC exchange_inversion.5.1" expl="VC for exchange_inversion" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="59"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="63"/></proof>
    </goal>
    <goal name="VC exchange_inversion.5.2" expl="VC for exchange_inversion" proved="true">
    <proof prover="6"><result status="valid" time="0.25"/></proof>
@@ -164,25 +162,25 @@
   </transf>
   </goal>
   <goal name="VC exchange_inversion.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="VC exchange_inversion.7" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC exchange_inversion.8" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC exchange_inversion.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC exchange_inversion.10" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
   <goal name="VC exchange_inversion.11" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
   <goal name="VC exchange_inversion.12" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC exchange_inversion.13" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="2.36"/></proof>

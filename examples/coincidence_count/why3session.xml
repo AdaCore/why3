@@ -2,25 +2,20 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../coincidence_count.mlw" proved="true">
 <theory name="CoincidenceCount" proved="true">
  <goal name="drop_left" proved="true">
- <proof prover="2"><result status="valid" time="0.15" steps="337"/></proof>
- <proof prover="3"><result status="valid" time="0.06" steps="344"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.15" steps="288"/></proof>
  </goal>
  <goal name="not_mem_inter_r" proved="true">
- <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
- <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="162"/></proof>
  </goal>
  <goal name="not_mem_inter_l" proved="true">
- <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
- <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="162"/></proof>
  </goal>
  <goal name="VC coincidence_count" expl="VC for coincidence_count" proved="true">
- <proof prover="3"><result status="valid" time="0.62" steps="2573"/></proof>
+ <proof prover="0"><result status="valid" time="0.62" steps="2222"/></proof>
  </goal>
 </theory>
 </file>

@@ -2,169 +2,169 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="11" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="11" steplimit="0" memlimit="1000"/>
-<file name="../mergesort_queue.mlw">
-<theory name="MergesortQueue" sum="c5c80a3f8590dd47c3d56de212885757">
- <goal name="Transitive.Trans" expl="">
- <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
+<file name="../mergesort_queue.mlw" proved="true">
+<theory name="MergesortQueue" proved="true">
+ <goal name="Transitive.Trans" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="VC merge" expl="VC for merge">
- <transf name="split_goal_right">
-  <goal name="VC merge.1" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="VC merge" expl="VC for merge" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC merge.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC merge.2" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
+  <goal name="VC merge.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC merge.3" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC merge.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC merge.4" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC merge.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC merge.5" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC merge.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC merge.6" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC merge.5" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC merge.7" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="1.14" steps="3428"/></proof>
+  <goal name="VC merge.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.82" steps="2319"/></proof>
   </goal>
-  <goal name="VC merge.8" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="83"/></proof>
+  <goal name="VC merge.7" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
-  <goal name="VC merge.9" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.12" steps="565"/></proof>
+  <goal name="VC merge.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="504"/></proof>
   </goal>
-  <goal name="VC merge.10" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.20" steps="443"/></proof>
+  <goal name="VC merge.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="437"/></proof>
   </goal>
-  <goal name="VC merge.11" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="VC merge.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC merge.12" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC merge.11" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC merge.13" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="1.08" steps="2582"/></proof>
+  <goal name="VC merge.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.85" steps="2263"/></proof>
   </goal>
-  <goal name="VC merge.14" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.08" steps="464"/></proof>
+  <goal name="VC merge.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="486"/></proof>
   </goal>
-  <goal name="VC merge.15" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="86"/></proof>
+  <goal name="VC merge.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="95"/></proof>
   </goal>
-  <goal name="VC merge.16" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.18" steps="427"/></proof>
+  <goal name="VC merge.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="427"/></proof>
   </goal>
-  <goal name="VC merge.17" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC merge.16" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC merge.18" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC merge.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC merge.19" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC merge.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC merge.20" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="72"/></proof>
+  <goal name="VC merge.19" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
   </goal>
-  <goal name="VC merge.21" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.94" steps="2754"/></proof>
+  <goal name="VC merge.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.94" steps="2584"/></proof>
   </goal>
-  <goal name="VC merge.22" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.16" steps="722"/></proof>
+  <goal name="VC merge.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="740"/></proof>
   </goal>
-  <goal name="VC merge.23" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="8.90" steps="15958"/></proof>
+  <goal name="VC merge.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="15.06" steps="26072"/></proof>
   </goal>
-  <goal name="VC merge.24" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.27" steps="482"/></proof>
+  <goal name="VC merge.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.52" steps="476"/></proof>
   </goal>
-  <goal name="VC merge.25" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="VC merge.24" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC merge.26" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="73"/></proof>
+  <goal name="VC merge.25" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
-  <goal name="VC merge.27" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.99" steps="3052"/></proof>
+  <goal name="VC merge.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.79" steps="2426"/></proof>
   </goal>
-  <goal name="VC merge.28" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="10.28" steps="19715"/></proof>
+  <goal name="VC merge.27" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="5.02" steps="11189"/></proof>
   </goal>
-  <goal name="VC merge.29" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.16" steps="732"/></proof>
+  <goal name="VC merge.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.34" steps="1174"/></proof>
   </goal>
-  <goal name="VC merge.30" expl="loop invariant preservation">
+  <goal name="VC merge.29" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="3.10"/></proof>
   </goal>
-  <goal name="VC merge.31" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="VC merge.30" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC merge.32" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="77"/></proof>
+  <goal name="VC merge.31" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC mergesort" expl="VC for mergesort">
- <transf name="split_goal_right">
-  <goal name="VC mergesort.1" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
+ <goal name="VC mergesort" expl="VC for mergesort" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC mergesort.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC mergesort.2" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC mergesort.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC mergesort.3" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC mergesort.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC mergesort.4" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="VC mergesort.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC mergesort.5" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="67"/></proof>
+  <goal name="VC mergesort.4" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="67"/></proof>
   </goal>
-  <goal name="VC mergesort.6" expl="loop invariant preservation">
+  <goal name="VC mergesort.5" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="3.05"/></proof>
   </goal>
-  <goal name="VC mergesort.7" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="81"/></proof>
+  <goal name="VC mergesort.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="81"/></proof>
   </goal>
-  <goal name="VC mergesort.8" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="52"/></proof>
+  <goal name="VC mergesort.7" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
-  <goal name="VC mergesort.9" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.16" steps="229"/></proof>
+  <goal name="VC mergesort.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="246"/></proof>
   </goal>
-  <goal name="VC mergesort.10" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="115"/></proof>
+  <goal name="VC mergesort.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="115"/></proof>
   </goal>
-  <goal name="VC mergesort.11" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC mergesort.10" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC mergesort.12" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC mergesort.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC mergesort.13" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="59"/></proof>
+  <goal name="VC mergesort.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
-  <goal name="VC mergesort.14" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="63"/></proof>
+  <goal name="VC mergesort.13" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
-  <goal name="VC mergesort.15" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="VC mergesort.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC mergesort.16" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="102"/></proof>
+  <goal name="VC mergesort.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="117"/></proof>
   </goal>
-  <goal name="VC mergesort.17" expl="assertion">
+  <goal name="VC mergesort.16" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.20"/></proof>
   </goal>
-  <goal name="VC mergesort.18" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC mergesort.17" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
  </transf>
  </goal>

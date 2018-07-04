@@ -2,15 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vacid_0_red_black_trees.mlw" proved="true">
-<theory name="RedBlackTree" proved="true" sum="fd36ae2cb85ada782c00563ce3059234">
+<theory name="RedBlackTree" proved="true">
  <goal name="memt_color" proved="true">
- <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="19"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
  <goal name="lt_leaf" proved="true">
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -102,25 +102,25 @@
  <goal name="VC rbalance" expl="VC for rbalance" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC rbalance.0" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.50" steps="2398"/></proof>
+  <proof prover="0"><result status="valid" time="0.50" steps="2230"/></proof>
   </goal>
   <goal name="VC rbalance.1" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC rbalance.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.43" steps="1975"/></proof>
+  <proof prover="0"><result status="valid" time="0.43" steps="1939"/></proof>
   </goal>
   <goal name="VC rbalance.3" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC rbalance.4" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.36" steps="1705"/></proof>
+  <proof prover="0"><result status="valid" time="0.36" steps="1662"/></proof>
   </goal>
   <goal name="VC rbalance.5" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC rbalance.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.50" steps="2335"/></proof>
+  <proof prover="0"><result status="valid" time="0.50" steps="2185"/></proof>
   </goal>
   <goal name="VC rbalance.7" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -132,7 +132,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC rbalance.10" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.40" steps="2014"/></proof>
+  <proof prover="0"><result status="valid" time="0.40" steps="1853"/></proof>
   </goal>
   <goal name="VC rbalance.11" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -201,7 +201,7 @@
    <proof prover="4"><result status="valid" time="0.28"/></proof>
    </goal>
    <goal name="VC insert.10.6" expl="VC for insert" proved="true">
-   <proof prover="2"><result status="valid" time="0.24" steps="1085"/></proof>
+   <proof prover="0"><result status="valid" time="0.24" steps="795"/></proof>
    </goal>
   </transf>
   </goal>
@@ -240,7 +240,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Vacid0" proved="true" sum="c8823045eec16b7c4f7177c76ab784cd">
+<theory name="Vacid0" proved="true">
  <goal name="VC default" expl="VC for default" proved="true">
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>

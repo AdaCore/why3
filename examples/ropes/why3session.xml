@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../ropes.mlw" proved="true">
@@ -62,7 +62,7 @@
  <proof prover="5"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="string_of_array_frame" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="67"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="66"/></proof>
  </goal>
  <goal name="VC string_of_array_concat_empty" expl="VC for string_of_array_concat_empty" proved="true">
  <proof prover="5"><result status="valid" time="0.05"/></proof>
@@ -85,10 +85,10 @@
   <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC insert.5" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
   </goal>
   <goal name="VC insert.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="VC insert.7" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.13"/></proof>
@@ -112,7 +112,7 @@
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC insert.14" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="92"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="95"/></proof>
   </goal>
   <goal name="VC insert.15" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.04"/></proof>
@@ -124,7 +124,7 @@
   <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC insert.18" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="64"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
   <goal name="VC insert.19" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -150,7 +150,7 @@
  <proof prover="3"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="VC balance" expl="VC for balance" proved="true">
- <proof prover="2"><result status="valid" time="0.18" steps="664"/></proof>
+ <proof prover="0"><result status="valid" time="0.18" steps="489"/></proof>
  </goal>
 </theory>
 </file>

@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="10" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../bitwalker.mlw" proved="true">
 <theory name="Bitwalker" proved="true">
  <goal name="nth64" proved="true">
- <proof prover="10"><result status="valid" time="0.02" steps="91"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="90"/></proof>
  </goal>
  <goal name="nth8" proved="true">
- <proof prover="10"><result status="valid" time="0.06" steps="226"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="208"/></proof>
  </goal>
  <goal name="VC maxvalue" expl="VC for maxvalue" proved="true">
  <transf name="compute_in_goal" proved="true" >
@@ -236,17 +236,17 @@
    <goal name="VC poke_8bit_array.5.0" expl="postcondition" proved="true">
    <transf name="case" proved="true" arg1="(div i 8 = o)">
     <goal name="VC poke_8bit_array.5.0.0" expl="true case (postcondition)" proved="true">
-    <proof prover="10"><result status="valid" time="0.15" steps="262"/></proof>
+    <proof prover="0"><result status="valid" time="0.15" steps="258"/></proof>
     </goal>
     <goal name="VC poke_8bit_array.5.0.1" expl="false case (postcondition)" proved="true">
-    <proof prover="10"><result status="valid" time="0.12" steps="176"/></proof>
+    <proof prover="0"><result status="valid" time="0.12" steps="176"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC poke_8bit_array.6" expl="postcondition" proved="true">
-  <proof prover="10"><result status="valid" time="0.10" steps="169"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="169"/></proof>
   </goal>
  </transf>
  </goal>
@@ -437,7 +437,7 @@
   <proof prover="12"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC pokethenpeek.9" expl="postcondition" proved="true">
-  <proof prover="10"><result status="valid" time="0.09" steps="149"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="149"/></proof>
   </goal>
  </transf>
  </goal>

@@ -3,33 +3,32 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linear_probing.mlw" proved="true">
 <theory name="HashedTypeWithDummy" proved="true">
  <goal name="VC neq" expl="VC for neq" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC dummy" expl="VC for dummy" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="LinearProbing" proved="true">
  <goal name="VC bucket" expl="VC for bucket" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="NumOfDummy.VC numof_eq" expl="VC for numof_eq" proved="true">
  <proof prover="2"><result status="valid" time="3.57"/></proof>
  </goal>
  <goal name="NumOfDummy.VC dummy_const" expl="VC for dummy_const" proved="true">
- <proof prover="1"><result status="valid" time="0.10" steps="251"/></proof>
+ <proof prover="6"><result status="valid" time="0.22" steps="356"/></proof>
  </goal>
  <goal name="VC numof_update" expl="VC for numof_update" proved="true">
- <proof prover="1"><result status="valid" time="0.64" steps="1438"/></proof>
+ <proof prover="6"><result status="valid" time="0.92" steps="1403"/></proof>
  </goal>
  <goal name="VC t" expl="VC for t" proved="true">
  <transf name="exists" proved="true" arg1="0">
@@ -51,69 +50,69 @@
  </transf>
  </goal>
  <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="73"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="164"/></proof>
  </goal>
  <goal name="VC clear" expl="VC for clear" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="106"/></proof>
+ <proof prover="6"><result status="valid" time="0.07" steps="219"/></proof>
  </goal>
  <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="VC find" expl="VC for find" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC find.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="VC find.1" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC find.2" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC find.3" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC find.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC find.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="VC find.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="176"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="220"/></proof>
   </goal>
   <goal name="VC find.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16" steps="517"/></proof>
+  <proof prover="6"><result status="valid" time="0.32" steps="822"/></proof>
   </goal>
   <goal name="VC find.8" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC find.9" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="VC find.10" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="47"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="60"/></proof>
   </goal>
   <goal name="VC find.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC find.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC find.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC find.14" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="VC find.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="VC find.16" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC find.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
@@ -123,32 +122,32 @@
  <goal name="VC resize" expl="VC for resize" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC resize.0" expl="array creation size" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC resize.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="VC resize.2" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="VC resize.3" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC resize.4" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC resize.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC resize.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="80"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="100"/></proof>
   </goal>
   <goal name="VC resize.7" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="2.03"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC resize.8" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="VC resize.9" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.38"/></proof>
@@ -202,10 +201,10 @@
   </transf>
   </goal>
   <goal name="VC resize.13" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC resize.14" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="VC resize.15" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
@@ -224,32 +223,32 @@
   </transf>
   </goal>
   <goal name="VC resize.19" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC resize.20" expl="out of loop bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC add" expl="VC for add" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC add.0" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC add.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC add.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC add.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="VC add.4" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="VC add.5" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC add.6" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.18"/></proof>
@@ -283,7 +282,7 @@
        <goal name="VC add.9.0.0.2.0.0" expl="VC for add" proved="true">
        <transf name="case" proved="true" arg1="(i=i1)">
         <goal name="VC add.9.0.0.2.0.0.0" expl="true case" proved="true">
-        <proof prover="6"><result status="valid" time="0.03" steps="35"/></proof>
+        <proof prover="6" timelimit="1"><result status="valid" time="0.03" steps="35"/></proof>
         </goal>
         <goal name="VC add.9.0.0.2.0.0.1" expl="false case" proved="true">
         <transf name="inline_all" proved="true" >
@@ -336,7 +335,7 @@
   </transf>
   </goal>
   <goal name="VC add.10" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="40"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
   <goal name="VC add.11" expl="type invariant" proved="true">
   <proof prover="7"><result status="valid" time="0.05"/></proof>
@@ -348,7 +347,7 @@
   <proof prover="7"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC add.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
  </transf>
  </goal>
@@ -356,123 +355,123 @@
  <proof prover="2"><result status="valid" time="2.03"/></proof>
  </goal>
  <goal name="VC find_dummy" expl="VC for find_dummy" proved="true">
- <proof prover="1"><result status="valid" time="0.42" steps="1062"/></proof>
+ <proof prover="6"><result status="valid" time="1.02" steps="1301"/></proof>
  </goal>
  <goal name="VC delete" expl="VC for delete" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC delete.0" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="VC delete.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC delete.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="115"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="172"/></proof>
   </goal>
   <goal name="VC delete.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC delete.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC delete.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="127"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
   <goal name="VC delete.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC delete.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC delete.8" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC delete.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="97"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="134"/></proof>
   </goal>
   <goal name="VC delete.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.10" steps="263"/></proof>
+  <proof prover="6"><result status="valid" time="0.10" steps="302"/></proof>
   </goal>
   <goal name="VC delete.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="VC delete.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC delete.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="1.42" steps="1538"/></proof>
+  <proof prover="6"><result status="valid" time="3.37" steps="1591"/></proof>
   </goal>
   <goal name="VC delete.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="VC delete.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="VC delete.16" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC delete.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
   <goal name="VC delete.18" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC delete.19" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="VC delete.20" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="46"/></proof>
   </goal>
   <goal name="VC delete.21" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="96"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="121"/></proof>
   </goal>
   <goal name="VC delete.22" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="VC delete.23" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
   <goal name="VC delete.24" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="196"/></proof>
+  <proof prover="6"><result status="valid" time="0.06" steps="280"/></proof>
   </goal>
   <goal name="VC delete.25" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="229"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="303"/></proof>
   </goal>
   <goal name="VC delete.26" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="49"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="55"/></proof>
   </goal>
   <goal name="VC delete.27" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.12" steps="70"/></proof>
+  <proof prover="6"><result status="valid" time="0.12" steps="76"/></proof>
   </goal>
   <goal name="VC delete.28" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="176"/></proof>
+  <proof prover="6"><result status="valid" time="0.22" steps="313"/></proof>
   </goal>
   <goal name="VC delete.29" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="VC delete.30" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="237"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="277"/></proof>
   </goal>
   <goal name="VC delete.31" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="33"/></proof>
   </goal>
   <goal name="VC delete.32" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="VC delete.33" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
   <goal name="VC delete.34" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="48"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
   <goal name="VC delete.35" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
   <goal name="VC delete.36" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.27"/></proof>
   </goal>
   <goal name="VC delete.37" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
   <goal name="VC delete.38" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -488,13 +487,13 @@
   <proof prover="7"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC delete.40" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="VC delete.41" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="VC delete.42" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
   <goal name="VC delete.43" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.13"/></proof>
@@ -505,67 +504,67 @@
  <goal name="VC remove" expl="VC for remove" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC remove.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC remove.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC remove.2" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="VC remove.3" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC remove.4" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.22"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC remove.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC remove.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="VC remove.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="54"/></proof>
   </goal>
   <goal name="VC remove.8" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.28"/></proof>
   </goal>
   <goal name="VC remove.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="126"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="175"/></proof>
   </goal>
   <goal name="VC remove.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC remove.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC remove.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="VC remove.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="VC remove.14" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
   <goal name="VC remove.15" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="VC remove.16" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC remove.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="76"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
   <goal name="VC remove.18" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="79"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="89"/></proof>
   </goal>
   <goal name="VC remove.19" expl="precondition" proved="true">
   <proof prover="7"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC remove.20" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.41" steps="2162"/></proof>
+  <proof prover="6"><result status="valid" time="5.84" steps="2613"/></proof>
   </goal>
   <goal name="VC remove.21" expl="type invariant" proved="true">
   <proof prover="7"><result status="valid" time="0.56"/></proof>
@@ -577,7 +576,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC remove.24" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="43"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="43"/></proof>
   </goal>
   <goal name="VC remove.25" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>

@@ -2,11 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -23,8 +22,8 @@
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="p_pos" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -42,7 +41,7 @@
     <goal name="p_val_part.0.0.0" proved="true">
     <transf name="unfold" proved="true" arg1="sqr">
      <goal name="p_val_part.0.0.0.0" proved="true">
-     <proof prover="5"><result status="valid" time="0.08" steps="4"/></proof>
+     <proof prover="2"><result status="valid" time="0.08" steps="4"/></proof>
      </goal>
     </transf>
     </goal>
@@ -53,12 +52,12 @@
  </transf>
  </goal>
  <goal name="p_val_part_pos" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="2"><result status="valid" time="0.40" steps="10"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="p_val_part_pos_aux" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="CauchySchwarz_aux_non_null" proved="true">
@@ -69,28 +68,27 @@
  <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="CauchySchwarz_aux_null" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="18"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.06"/></proof>
  <proof prover="6"><result status="valid" time="0.28"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="CauchySchwarz_aux" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="norm_pos" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="sqr_le_sqrt" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
  <proof prover="4"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="CauchySchwarz" proved="true">
@@ -102,8 +100,8 @@
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="sqr_sqrt_le" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="17"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="triangle" proved="true">

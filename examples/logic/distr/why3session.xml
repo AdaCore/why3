@@ -3,18 +3,18 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="2" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="2" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="2" steplimit="0" memlimit="1000"/>
 <file name="../distr.why" proved="true">
 <theory name="T" proved="true">
  <goal name="G" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="G3" proved="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.02" steps="0"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="1"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>

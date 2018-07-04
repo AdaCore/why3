@@ -2,37 +2,36 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tree_height.mlw" proved="true">
 <theory name="HeightCPS" proved="true">
  <goal name="VC height_cps" expl="VC for height_cps" proved="true">
- <proof prover="6"><result status="valid" time="0.00" steps="46"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="46"/></proof>
  </goal>
  <goal name="VC height" expl="VC for height" proved="true">
- <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="Iteration" proved="true">
  <goal name="VC is_id" expl="VC for is_id" proved="true">
- <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC is_result" expl="VC for is_result" proved="true">
- <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="sizek_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="sizek_nonneg.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="helper1" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+ <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="sizew_nonneg" proved="true">
  <proof prover="2"><result status="valid" time="0.11"/></proof>
@@ -40,66 +39,66 @@
  <goal name="VC height1" expl="VC for height1" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC height1.0" expl="loop invariant init" proved="true">
-  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="VC height1.1" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC height1.2" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC height1.3" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="VC height1.4" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="39"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="VC height1.5" expl="unreachable point" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="VC height1.6" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC height1.7" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC height1.8" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="VC height1.9" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
   <goal name="VC height1.10" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC height1.11" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="VC height1.12" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC height1.13" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="VC height1.14" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="VC height1.15" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
   <goal name="VC height1.16" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="VC height1.17" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="VC height1.18" expl="unreachable point" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC height1.19" expl="postcondition" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="VC height1.19.0" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
    </goal>
   </transf>
   </goal>
@@ -117,16 +116,16 @@
  <goal name="VC height_stack" expl="VC for height_stack" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC height_stack.0" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC height_stack.1" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="VC height_stack.2" expl="variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC height_stack.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC height_stack.4" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
@@ -136,7 +135,7 @@
  <goal name="VC height1" expl="VC for height1" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC height1.0" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
   <goal name="VC height1.1" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
