@@ -3,103 +3,105 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../binary_sort.mlw" proved="true">
 <theory name="BinarySort" proved="true">
  <goal name="VC occ_shift" expl="VC for occ_shift" proved="true">
  <proof prover="0"><result status="valid" time="0.54"/></proof>
  </goal>
  <goal name="VC binary_sort" expl="VC for binary_sort" proved="true">
- <transf name="split_goal_right" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="VC binary_sort.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC binary_sort.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC binary_sort.2" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC binary_sort.3" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC binary_sort.4" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC binary_sort.5" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC binary_sort.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC binary_sort.7" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
   <goal name="VC binary_sort.8" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="26"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="VC binary_sort.9" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
   <goal name="VC binary_sort.10" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="VC binary_sort.11" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="22"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
   <goal name="VC binary_sort.12" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="VC binary_sort.13" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
   <goal name="VC binary_sort.14" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="22"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="25"/></proof>
   </goal>
   <goal name="VC binary_sort.15" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="VC binary_sort.16" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC binary_sort.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="VC binary_sort.18" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC binary_sort.19" expl="assertion" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.50" steps="419"/></proof>
-  </goal>
-  <goal name="VC binary_sort.20" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="VC binary_sort.21" expl="loop invariant preservation" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC binary_sort.21.0" expl="loop invariant preservation" proved="true">
-   <transf name="case" proved="true" arg1="(j=k)">
-    <goal name="VC binary_sort.21.0.0" expl="true case (loop invariant preservation)" proved="true">
-    <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="1.50" steps="1019"/></proof>
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC binary_sort.19.0" expl="assertion" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="VC binary_sort.19.0.0" expl="assertion" proved="true">
+    <proof prover="8"><result status="valid" time="0.02" steps="84"/></proof>
     </goal>
-    <goal name="VC binary_sort.21.0.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="1" timelimit="1"><result status="valid" time="0.80" steps="689"/></proof>
+    <goal name="VC binary_sort.19.0.1" expl="assertion" proved="true">
+    <proof prover="8"><result status="valid" time="2.31" steps="1188"/></proof>
+    </goal>
+    <goal name="VC binary_sort.19.0.2" expl="assertion" proved="true">
+    <proof prover="8"><result status="valid" time="0.02" steps="56"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
+  <goal name="VC binary_sort.20" expl="assertion" proved="true">
+  <proof prover="8"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC binary_sort.21" expl="loop invariant preservation" proved="true">
+  <proof prover="8"><result status="valid" time="1.81" steps="1154"/></proof>
+  </goal>
   <goal name="VC binary_sort.22" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="8"><result status="valid" time="0.03" steps="114"/></proof>
   </goal>
   <goal name="VC binary_sort.23" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="VC binary_sort.24" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="8"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="VC binary_sort.25" expl="out of loop bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
  </transf>
  </goal>

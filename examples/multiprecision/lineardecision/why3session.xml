@@ -2,11 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../lineardecision.mlw" proved="true">
 <theory name="LinearEquationsCoeffs" proved="true">
  <goal name="VC czero" expl="VC for czero" proved="true">
@@ -169,10 +168,10 @@
   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
   <goal name="VC sprod.3" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC sprod.4" expl="exceptional postcondition" proved="true">
-  <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
@@ -465,7 +464,7 @@
    <proof prover="4"><result status="valid" time="0.03" steps="40"/></proof>
    </goal>
    <goal name="VC norm_eq.2.2" expl="VC for norm_eq" proved="true">
-   <proof prover="1"><result status="valid" time="0.16"/></proof>
+   <proof prover="0"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC norm_eq.2.3" expl="VC for norm_eq" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
@@ -484,7 +483,7 @@
    <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
    </goal>
    <goal name="VC norm_eq.3.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.60"/></proof>
+   <proof prover="0"><result status="valid" time="0.60"/></proof>
    </goal>
   </transf>
   </goal>
@@ -599,10 +598,10 @@
   <goal name="VC add_expr.4" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC add_expr.4.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.80"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="VC add_expr.4.1" expl="postcondition" proved="true">
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.46"/></proof>
+   <proof prover="3"><result status="valid" time="0.26"/></proof>
    </goal>
   </transf>
   </goal>
@@ -663,10 +662,10 @@
     <goal name="VC add_expr.17.0.0" expl="postcondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC add_expr.17.0.0.0" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.84"/></proof>
+     <proof prover="3"><result status="valid" time="0.54"/></proof>
      </goal>
      <goal name="VC add_expr.17.0.0.1" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.54"/></proof>
+     <proof prover="3"><result status="valid" time="0.25"/></proof>
      </goal>
     </transf>
     </goal>
@@ -812,7 +811,7 @@
   <goal name="VC zero_expr.3" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC zero_expr.3.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
@@ -829,7 +828,7 @@
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC sub_expr.0.1" expl="VC for sub_expr" proved="true">
-   <proof prover="1"><result status="valid" time="0.05"/></proof>
+   <proof prover="0"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC sub_expr.0.2" expl="VC for sub_expr" proved="true">
    <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
@@ -856,7 +855,7 @@
  <goal name="VC same_eq" expl="VC for same_eq" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC same_eq.0" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.37"/></proof>
+  <proof prover="0"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="VC same_eq.1" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
@@ -971,7 +970,7 @@
   <proof prover="3"><result status="valid" time="1.88"/></proof>
   </goal>
   <goal name="VC check_combination.19" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC check_combination.20" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -1089,8 +1088,8 @@
   <transf name="introduce_premises" proved="true" >
    <goal name="VC gauss_jordan.27.0" expl="assertion" proved="true">
    <transf name="split_vc" proved="true" >
-    <goal name="VC gauss_jordan.27.0.0" expl="VC for gauss_jordan" proved="true">
-    <proof prover="1"><result status="valid" time="0.36"/></proof>
+    <goal name="VC gauss_jordan.27.0.0" expl="assertion" proved="true">
+    <proof prover="0"><result status="valid" time="0.36"/></proof>
     </goal>
     <goal name="VC gauss_jordan.27.0.1" expl="VC for gauss_jordan" proved="true">
     <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1110,7 +1109,7 @@
     </transf>
     </goal>
     <goal name="VC gauss_jordan.27.0.4" expl="VC for gauss_jordan" proved="true">
-    <proof prover="1"><result status="valid" time="0.36"/></proof>
+    <proof prover="0"><result status="valid" time="0.36"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1148,7 +1147,7 @@
   <goal name="VC gauss_jordan.37" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC gauss_jordan.37.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.30"/></proof>
+   <proof prover="0"><result status="valid" time="0.30"/></proof>
    </goal>
    <goal name="VC gauss_jordan.37.1" expl="VC for gauss_jordan" proved="true">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -1160,7 +1159,7 @@
    <proof prover="4"><result status="valid" time="0.26" steps="538"/></proof>
    </goal>
    <goal name="VC gauss_jordan.37.4" expl="VC for gauss_jordan" proved="true">
-   <proof prover="1"><result status="valid" time="0.31"/></proof>
+   <proof prover="0"><result status="valid" time="0.31"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1316,7 +1315,7 @@
   </goal>
   <goal name="VC linear_decision.17" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="VC linear_decision.18" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
@@ -1326,24 +1325,24 @@
   </goal>
   <goal name="VC linear_decision.20" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC linear_decision.21" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
   <goal name="VC linear_decision.22" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.23" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.24" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.25" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.26" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -1361,10 +1360,10 @@
   <proof prover="4"><result status="valid" time="0.02" steps="96"/></proof>
   </goal>
   <goal name="VC linear_decision.31" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="37"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC linear_decision.32" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC linear_decision.33" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="94"/></proof>
@@ -1377,12 +1376,13 @@
   </goal>
   <goal name="VC linear_decision.36" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.37" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
   <goal name="VC linear_decision.38" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
   <goal name="VC linear_decision.39" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="94"/></proof>
@@ -1395,7 +1395,6 @@
   </goal>
   <goal name="VC linear_decision.42" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.43" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -1426,16 +1425,16 @@
   <proof prover="4"><result status="valid" time="0.02" steps="92"/></proof>
   </goal>
   <goal name="VC linear_decision.52" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
   <goal name="VC linear_decision.53" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="VC linear_decision.54" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="90"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="90"/></proof>
   </goal>
   <goal name="VC linear_decision.55" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="40"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
   <goal name="VC linear_decision.56" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
@@ -1444,16 +1443,16 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.58" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="35"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
   <goal name="VC linear_decision.59" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
   <goal name="VC linear_decision.60" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="90"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="90"/></proof>
   </goal>
   <goal name="VC linear_decision.61" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
   <goal name="VC linear_decision.62" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
@@ -1511,17 +1510,17 @@
   </goal>
   <goal name="VC linear_decision.80" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.81" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="VC linear_decision.82" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
+  <goal name="VC linear_decision.82" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
   <goal name="VC linear_decision.83" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC linear_decision.84" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -1572,16 +1571,16 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC linear_decision.99" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC linear_decision.100" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.101" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC linear_decision.102" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1809,7 +1808,7 @@
  <proof prover="4"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
  <goal name="VC gcd" expl="VC for gcd" proved="true">
- <proof prover="1"><result status="valid" time="0.30"/></proof>
+ <proof prover="0"><result status="valid" time="0.30"/></proof>
  <transf name="split_goal_right" proved="true" >
   <goal name="VC gcd.0" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -1861,7 +1860,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC simp.3" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC simp.4" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
@@ -2025,18 +2024,18 @@
  <transf name="split_vc" proved="true" >
   <goal name="VC is_zero.0" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC is_zero.0.0" expl="VC for is_zero" proved="true">
+   <goal name="VC is_zero.0.0" expl="postcondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC is_zero.0.0.0" expl="VC for is_zero" proved="true">
+    <goal name="VC is_zero.0.0.0" expl="postcondition" proved="true">
     <transf name="inline_goal" proved="true" >
-     <goal name="VC is_zero.0.0.0.0" expl="VC for is_zero" proved="true">
+     <goal name="VC is_zero.0.0.0.0" expl="postcondition" proved="true">
      <proof prover="2"><result status="valid" time="0.01"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="VC is_zero.0.1" expl="VC for is_zero" proved="true">
+   <goal name="VC is_zero.0.1" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
@@ -3154,7 +3153,7 @@
  <proof prover="4"><result status="valid" time="0.30" steps="1270"/></proof>
  </goal>
  <goal name="VC m_eq" expl="VC for m_eq" proved="true">
- <proof prover="1"><result status="valid" time="0.30"/></proof>
+ <proof prover="0"><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="VC m_ctx" expl="VC for m_ctx" proved="true">
  <proof prover="4"><result status="valid" time="0.09" steps="741"/></proof>
@@ -3174,13 +3173,13 @@
   <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="VC mp_decision.4" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mp_decision.5" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mp_decision.6" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
