@@ -1,5 +1,15 @@
 
-(** {2 Peano arithmetic} *)
+(** {2 Peano arithmetic}
+
+  This module implements the idea described in this paper:
+  {h <a href="https://hal.inria.fr/hal-01162661">
+     How to avoid proving the absence of integer overflows</a>}
+
+  When extracted to OCaml, the following type `Peano.t` will be mapped to
+  OCaml's type `int` (63-bit signed integers).
+
+  See also `mach.onetime`.
+*)
 
 module Peano
 

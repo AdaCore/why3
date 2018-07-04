@@ -2067,8 +2067,12 @@ STDLIBS = \
 	stack \
 	string \
 	sum \
-	mach/array \
-	mach/int
+	witness \
+        mach/array \
+	mach/int \
+        mach/matrix \
+	mach/onetime \
+	mach/peano
 # function ? tptp ?
 
 STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
