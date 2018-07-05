@@ -242,7 +242,6 @@ module McCarthy91Mach
         n := !n - 10;
         e := pred !e
       end else begin
-        assert { spec !n = spec (spec (!n + 11)) };
         n := !n + 11;
         e := succ !e
       end

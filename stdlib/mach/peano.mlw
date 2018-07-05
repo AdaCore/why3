@@ -70,19 +70,33 @@ module Peano
      e.g. addition of two values of different signs
   *)
 
+end
+
+module ComputerDivision
+
+  use int.Int
   use int.ComputerDivision
+  use Peano
 
   val div (x y: t) : t
     requires { y.v <> 0 }
     ensures  { result.v = div x.v y.v }
+
   val mod (x y: t) : t
     requires { y.v <> 0 }
     ensures  { result.v = mod x.v y.v }
 
+end
+
+module MinMax
+
+  use int.Int
   use int.MinMax
+  use Peano
 
   val max (x y: t) : t
     ensures { result.v = max x.v y.v }
+
   val min (x y: t) : t
     ensures { result.v = min x.v y.v }
 
