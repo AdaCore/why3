@@ -167,6 +167,8 @@ let load_driver env file extra_files =
         in
         let m = lookup_meta s in
         ignore (create_meta m (List.map convert al))
+    | Ruse _ ->
+        Loc.errorm "theory use cannot be used in extraction driver"
   in
   let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
   let open Pmodule in

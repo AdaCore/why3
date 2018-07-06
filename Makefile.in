@@ -94,8 +94,9 @@ INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@
 #   5    Partially applied function: expression whose result has function
 #        type and is ignored.
 #   48   Implicit elimination of optional arguments.
+#   8    Partial match: missing cases in pattern-matching.
 
-WARNINGS = A-4-9-41-44-45-50-52@5@48
+WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 
 OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
