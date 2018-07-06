@@ -44,6 +44,7 @@ type reason =
    | VC_Stronger_Classwide_Post
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
+   | VC_Inconsistent_Post
    | VC_Dead_Code
 
 let is_warning_reason r =
@@ -91,6 +92,7 @@ let is_warning_reason r =
      -> false
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
+   | VC_Inconsistent_Post
    | VC_Dead_Code
      -> true
 
@@ -167,6 +169,7 @@ let reason_from_string s =
    | "VC_STRONGER_CLASSWIDE_POST"   -> VC_Stronger_Classwide_Post
    (* VC_Warning_Kind - warnings *)
    | "VC_INCONSISTENT_PRE"          -> VC_Inconsistent_Pre
+   | "VC_INCONSISTENT_POST"         -> VC_Inconsistent_Post
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
        let s = Format.sprintf "unknown VC reason: %s@." s in
@@ -218,6 +221,7 @@ let reason_to_ada reason =
    | VC_Stronger_Classwide_Post   -> "VC_STRONGER_CLASSWIDE_POST"
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "VC_INCONSISTENT_PRE"
+   | VC_Inconsistent_Post         -> "VC_INCONSISTENT_POST"
    | VC_Dead_Code                 -> "VC_DEAD_CODE"
 
 let reason_to_string reason =
@@ -264,6 +268,7 @@ let reason_to_string reason =
    | VC_Stronger_Classwide_Post   -> "stronger_classwide_post"
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "inconsistent_pre"
+   | VC_Inconsistent_Post         -> "inconsistent_post"
    | VC_Dead_Code                 -> "dead_code"
 
 type gp_label =
