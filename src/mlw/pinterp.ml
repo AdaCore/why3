@@ -279,16 +279,16 @@ let built_in_modules =
       "False", eval_false ;
     ] ;
     ["int"],"Int", [],
-    [ "infix +", eval_int_op BigInt.add;
+    [ Ident.op_infix "+", eval_int_op BigInt.add;
       (* defined as x+(-y)
-         "infix -", eval_int_op BigInt.sub; *)
-      "infix *", eval_int_op BigInt.mul;
-      "prefix -", eval_int_uop BigInt.minus;
-      "infix =", eval_int_rel BigInt.eq;
-      "infix <", eval_int_rel BigInt.lt;
-      "infix <=", eval_int_rel BigInt.le;
-      "infix >", eval_int_rel BigInt.gt;
-      "infix >=", eval_int_rel BigInt.ge;
+         Ident.op_infix "-", eval_int_op BigInt.sub; *)
+      Ident.op_infix "*", eval_int_op BigInt.mul;
+      Ident.op_prefix "-", eval_int_uop BigInt.minus;
+      Ident.op_infix "=", eval_int_rel BigInt.eq;
+      Ident.op_infix "<", eval_int_rel BigInt.lt;
+      Ident.op_infix "<=", eval_int_rel BigInt.le;
+      Ident.op_infix ">", eval_int_rel BigInt.gt;
+      Ident.op_infix ">=", eval_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
     [ "min", eval_int_op BigInt.min;
@@ -305,9 +305,9 @@ let built_in_modules =
    ["array"],"Array",
     ["array", builtin_array_type],
     ["make", exec_array_make ;
-     "mixfix []", exec_array_get ;
+     Ident.op_get, exec_array_get ;
      "length", exec_array_length ;
-     "mixfix []<-", exec_array_set ;
+     Ident.op_set, exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
   ]

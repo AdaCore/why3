@@ -212,8 +212,10 @@ let induction x bound env =
 
   (* Loading of needed symbols from int theory *)
   let th = Env.read_theory env ["int"] "Int" in
-  let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
-  let lt_int = Theory.ns_find_ls th.Theory.th_export ["infix <"] in
+  let le_int = Theory.ns_find_ls th.Theory.th_export
+    [Ident.op_infix "<="] in
+  let lt_int = Theory.ns_find_ls th.Theory.th_export
+    [Ident.op_infix "<"] in
 
   (* Symbol associated to term x *)
   let lsx =

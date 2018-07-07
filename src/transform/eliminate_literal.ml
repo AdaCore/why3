@@ -136,10 +136,10 @@ let eliminate le_int le_real neg_real type_kept
 let eliminate_literal env =
   (* FIXME: int.Int.le_sym should be imported in the task *)
   let th = Env.read_theory env ["int"] "Int" in
-  let le_int = ns_find_ls th.th_export ["infix <="] in
+  let le_int = ns_find_ls th.th_export [op_infix "<="] in
   let th = Env.read_theory env ["real"] "Real" in
-  let le_real = ns_find_ls th.th_export ["infix <="] in
-  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  let le_real = ns_find_ls th.th_export [op_infix "<="] in
+  let neg_real = ns_find_ls th.th_export [op_prefix "-"] in
   Trans.on_meta meta_range (fun range_metas ->
       Trans.on_meta meta_float (fun float_metas ->
           let range_metas = List.fold_left (fun acc meta_arg ->
@@ -188,9 +188,9 @@ let rec replace_negative_constants neg_int neg_real t =
 let eliminate_negative_constants env =
   (* FIXME: int.Int should be imported in the task *)
   let th = Env.read_theory env ["int"] "Int" in
-  let neg_int = ns_find_ls th.th_export ["prefix -"] in
+  let neg_int = ns_find_ls th.th_export [op_prefix "-"] in
   let th = Env.read_theory env ["real"] "Real" in
-  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  let neg_real = ns_find_ls th.th_export [op_prefix "-"] in
   Trans.rewrite (replace_negative_constants neg_int neg_real) None
 
 let () =

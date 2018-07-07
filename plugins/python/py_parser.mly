@@ -31,8 +31,8 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
+  let get_op s e = Qident (mk_id Ident.op_get s e)
+  let upd_op s e = Qident (mk_id Ident.op_upd s e)
 
   let empty_spec = {
     sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
@@ -316,7 +316,7 @@ term_sub_:
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
-    { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Tidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 
 %inline bin_op:
 | ARROW   { Dterm.DTimplies }
@@ -333,17 +333,17 @@ term_sub_:
           | Bgt  -> ">"
           | Bge  -> ">="
           | Badd|Bsub|Bmul|Bdiv|Bmod|Band|Bor -> assert false in
-           mk_id (Ident.infix op) $startpos $endpos }
+           mk_id (Ident.op_infix op) $startpos $endpos }
 
 %inline prefix_op:
-| MINUS { mk_id (Ident.prefix "-")  $startpos $endpos }
+| MINUS { mk_id (Ident.op_prefix "-")  $startpos $endpos }
 
 %inline infix_op_234:
 | DIV    { mk_id "div" $startpos $endpos }
 | MOD    { mk_id "mod" $startpos $endpos }
-| PLUS   { mk_id (Ident.infix "+") $startpos $endpos }
-| MINUS  { mk_id (Ident.infix "-") $startpos $endpos }
-| TIMES  { mk_id (Ident.infix "*") $startpos $endpos }
+| PLUS   { mk_id (Ident.op_infix "+") $startpos $endpos }
+| MINUS  { mk_id (Ident.op_infix "-") $startpos $endpos }
+| TIMES  { mk_id (Ident.op_infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }

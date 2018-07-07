@@ -53,11 +53,11 @@
 
   let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
 
-  let get_op s e = Qident (mk_id (Ident.mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (Ident.mixfix "[<-]") s e)
-  let sub_op s e = Qident (mk_id (Ident.mixfix "[..]") s e)
-  let above_op s e = Qident (mk_id (Ident.mixfix "[_..]") s e)
-  let below_op s e = Qident (mk_id (Ident.mixfix "[.._]") s e)
+  let get_op  s e = Qident (mk_id Ident.op_get s e)
+  let upd_op  s e = Qident (mk_id Ident.op_upd s e)
+  let cut_op  s e = Qident (mk_id Ident.op_cut s e)
+  let rcut_op s e = Qident (mk_id Ident.op_rcut s e)
+  let lcut_op s e = Qident (mk_id Ident.op_lcut s e)
 
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -663,13 +663,13 @@ term_sub_:
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
-    { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Tidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 | term_arg LEFTSQ term DOTDOT term RIGHTSQ
-    { Tidapp (sub_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Tidapp (cut_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 | term_arg LEFTSQ term DOTDOT RIGHTSQ
-    { Tidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
+    { Tidapp (rcut_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ DOTDOT term RIGHTSQ
-    { Tidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
+    { Tidapp (lcut_op $startpos($2) $endpos($2), [$1;$4]) }
 
 field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
@@ -777,15 +777,15 @@ assign_expr:
       let rec down ll rl = match ll, rl with
         | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl -> (e1,q,e2) :: down ll rl
         | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_
-          when id.id_str = Ident.mixfix "[]" -> Loc.errorm ~loc
+          when id.id_str = Ident.op_get -> Loc.errorm ~loc
             "Parallel array assignments are not allowed"
         | {expr_loc = loc}::_, _::_ -> Loc.errorm ~loc
             "Invalid left expression in an assignment"
         | [], [] -> []
         | _ -> Loc.errorm ~loc "Invalid parallel assignment" in
       let d = match $1.expr_desc, $3.expr_desc with
-        | Eidapp (Qident id, [e1;e2]), _ when id.id_str = Ident.mixfix "[]" ->
-            Eidapp (Qident {id with id_str = Ident.mixfix "[]<-"}, [e1;e2;$3])
+        | Eidapp (Qident id, [e1;e2]), _ when id.id_str = Ident.op_get ->
+            Eidapp (Qident {id with id_str = Ident.op_set}, [e1;e2;$3])
         | Etuple ll, Etuple rl -> Eassign (down ll rl)
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
         | _, _ -> Eassign (down [$1] [$3]) in
@@ -1002,13 +1002,13 @@ expr_sub:
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ expr LARROW expr RIGHTSQ
-    { Eidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Eidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 | expr_arg LEFTSQ expr DOTDOT expr RIGHTSQ
-    { Eidapp (sub_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Eidapp (cut_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 | expr_arg LEFTSQ expr DOTDOT RIGHTSQ
-    { Eidapp (above_op $startpos($2) $endpos($2), [$1;$3]) }
+    { Eidapp (rcut_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ DOTDOT expr RIGHTSQ
-    { Eidapp (below_op $startpos($2) $endpos($2), [$1;$4]) }
+    { Eidapp (lcut_op $startpos($2) $endpos($2), [$1;$4]) }
 
 loop_body:
 | (* epsilon *)   { mk_expr (Etuple []) $startpos $endpos }
@@ -1244,18 +1244,18 @@ lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
 
 lident_op:
-| op_symbol               { Ident.infix $1 }
-| op_symbol UNDERSCORE    { Ident.prefix $1 }
-| MINUS     UNDERSCORE    { Ident.prefix "-" }
-| EQUAL                   { Ident.infix "=" }
-| MINUS                   { Ident.infix "-" }
-| OPPREF UNDERSCORE?      { Ident.prefix $1 }
-| LEFTSQ RIGHTSQ          { Ident.mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ   { Ident.mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW   { Ident.mixfix "[]<-" }
-| LEFTSQ DOTDOT RIGHTSQ   { Ident.mixfix "[..]" }
-| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.mixfix "[_..]" }
-| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.mixfix "[.._]" }
+| op_symbol                         { Ident.op_infix $1 }
+| op_symbol UNDERSCORE              { Ident.op_prefix $1 }
+| MINUS     UNDERSCORE              { Ident.op_prefix "-" }
+| EQUAL                             { Ident.op_infix "=" }
+| MINUS                             { Ident.op_infix "-" }
+| OPPREF UNDERSCORE?                { Ident.op_prefix $1 }
+| LEFTSQ RIGHTSQ                    { Ident.op_get }
+| LEFTSQ LARROW RIGHTSQ             { Ident.op_upd }
+| LEFTSQ RIGHTSQ LARROW             { Ident.op_set }
+| LEFTSQ DOTDOT RIGHTSQ             { Ident.op_cut }
+| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.op_rcut }
+| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.op_lcut }
 
 op_symbol:
 | OP1 { $1 }
@@ -1266,24 +1266,24 @@ op_symbol:
 | GT  { ">" }
 
 %inline oppref:
-| o = OPPREF { mk_id (Ident.prefix o)  $startpos $endpos }
+| o = OPPREF { mk_id (Ident.op_prefix o)  $startpos $endpos }
 
 prefix_op:
-| op_symbol { mk_id (Ident.prefix $1)  $startpos $endpos }
-| MINUS     { mk_id (Ident.prefix "-") $startpos $endpos }
+| op_symbol { mk_id (Ident.op_prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (Ident.op_prefix "-") $startpos $endpos }
 
 %inline infix_op_1:
-| o = OP1   { mk_id (Ident.infix o)    $startpos $endpos }
-| EQUAL     { mk_id (Ident.infix "=")  $startpos $endpos }
-| LTGT      { mk_id (Ident.infix "<>") $startpos $endpos }
-| LT        { mk_id (Ident.infix "<")  $startpos $endpos }
-| GT        { mk_id (Ident.infix ">")  $startpos $endpos }
+| o = OP1   { mk_id (Ident.op_infix o)    $startpos $endpos }
+| EQUAL     { mk_id (Ident.op_infix "=")  $startpos $endpos }
+| LTGT      { mk_id (Ident.op_infix "<>") $startpos $endpos }
+| LT        { mk_id (Ident.op_infix "<")  $startpos $endpos }
+| GT        { mk_id (Ident.op_infix ">")  $startpos $endpos }
 
 %inline infix_op_234:
-| o = OP2   { mk_id (Ident.infix o)    $startpos $endpos }
-| o = OP3   { mk_id (Ident.infix o)    $startpos $endpos }
-| o = OP4   { mk_id (Ident.infix o)    $startpos $endpos }
-| MINUS     { mk_id (Ident.infix "-")  $startpos $endpos }
+| o = OP2   { mk_id (Ident.op_infix o)    $startpos $endpos }
+| o = OP3   { mk_id (Ident.op_infix o)    $startpos $endpos }
+| o = OP4   { mk_id (Ident.op_infix o)    $startpos $endpos }
+| MINUS     { mk_id (Ident.op_infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 

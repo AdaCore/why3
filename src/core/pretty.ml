@@ -133,45 +133,46 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 (* pretty-print infix and prefix logic symbols *)
 
-let extract_op s =
-  (*let s = ls.ls_name.id_string in*)
-  match Ident.kind_of_fix s with
-  | `None | `Mixfix _ -> None
-  | `Prefix s | `Infix s -> Some s
-
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
-let escape_op s =
-  let s = if Strings.has_prefix "*" s then " " ^ s else s in
-  let s = if Strings.has_suffix "*" s then s ^ " " else s in
-  s
+let left_escape_op s =
+  if Strings.has_prefix "*" s then " " ^ s else s
+
+let escape_op s = let s = left_escape_op s in
+  if Strings.has_suffix "*" s then s ^ " " else s
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
+  pp_print_string fmt (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique tprinter ts.ts_name)
+  if ts_equal ts ts_func then pp_print_string fmt "(->)" else
+  pp_print_string fmt (id_unique tprinter ts.ts_name)
 
-let print_ls fmt ({ls_name = {id_string = nm}} as ls) =
-  if nm = "mixfix []" then pp_print_string fmt "([])" else
-  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
-  if nm = "mixfix [..]" then pp_print_string fmt "([..])" else
-  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
-  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
-  let s = id_unique iprinter ls.ls_name in
-  match extract_op s with
-  | Some s -> fprintf fmt "(%s)" (escape_op s)
-  | None   -> fprintf fmt "%s" s
+let print_raw_ls fmt ls =
+  pp_print_string fmt (id_unique iprinter ls.ls_name)
+
+let print_ls fmt ({ls_name = id} as ls) =
+  match Ident.sn_decode id.id_string with
+  | Ident.SNinfix s -> fprintf fmt "(%s)" (escape_op s)
+  | Ident.SNprefix s when tight_op s -> fprintf fmt "(%s)" (escape_op s)
+  | Ident.SNprefix s -> fprintf fmt "(%s_)" (left_escape_op s)
+  | Ident.SNget -> pp_print_string fmt "([])"
+  | Ident.SNupd -> pp_print_string fmt "([<-])"
+  | Ident.SNset -> pp_print_string fmt "([]<-)"
+  | Ident.SNcut -> pp_print_string fmt "([..])"
+  | Ident.SNlcut -> pp_print_string fmt "([.._])"
+  | Ident.SNrcut -> pp_print_string fmt "([_..])"
+  | Ident.SNword _ -> print_raw_ls fmt ls
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
+  pp_print_string fmt (id_unique pprinter pr.pr_name)
 
 (** Types *)
 
@@ -255,7 +256,6 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
@@ -271,38 +271,39 @@ and print_lterm pri fmt t =
     else print_tattr pri fmt t in
   print_tloc pri fmt t
 
-and print_app pri ls fmt tl =
-  let s = id_unique iprinter ls.ls_name in
-  match extract_op s, tl with
-  | _, [] ->
-      print_ls fmt ls
-  | Some s, [t1] when tight_op s ->
+and print_app pri ({ls_name = id} as ls) fmt tl =
+  if tl = [] then print_raw_ls fmt ls else
+  match Ident.sn_decode id.id_string, tl with
+  | Ident.SNprefix s, [t1] when tight_op s ->
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
-  | Some s, [t1] ->
+  | Ident.SNprefix s, [t1] ->
       fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
         s (print_lterm 6) t1
-  | Some s, [t1;t2] ->
+  | Ident.SNinfix s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
-  | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
+  | Ident.SNget, [t1;t2] ->
       fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
         (print_lterm 7) t1 print_term t2
-  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
+  | Ident.SNupd, [t1;t2;t3] ->
       fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
-  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [..]" ->
+  | Ident.SNset, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 5) "@[%a@,[%a] <-@ %a@]")
+        (print_lterm 6) t1 print_term t2 (print_lterm 6) t3
+  | Ident.SNcut, [t1;t2;t3] ->
       fprintf fmt (protect_on (pri > 7) "%a[%a..%a]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
-  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [_..]" ->
+  | Ident.SNrcut, [t1;t2] ->
       fprintf fmt (protect_on (pri > 7) "%a[%a..]")
         (print_lterm 7) t1 print_term t2
-  | _, [t1;t2] when ls.ls_name.id_string = "mixfix [.._]" ->
+  | Ident.SNlcut, [t1;t2] ->
       fprintf fmt (protect_on (pri > 7) "%a[..%a]")
         (print_lterm 7) t1 print_term t2
-  | _, tl ->
+  | _, tl -> (* do not fail if not SNword, just print the string *)
       fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
-        print_ls ls (print_list space (print_lterm 7)) tl
+        print_raw_ls ls (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
@@ -574,12 +575,12 @@ module NsTree = struct
       let k, _ = find_prop_decl kn p in
       Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
-      if s = "infix ="  && ls_equal ls ps_equ then acc else
+      if ls_equal ls ps_equ then acc else
         Leaf (ls_kind ls ^ " " ^ s) :: acc
     in
     let add_ts s ts acc =
-      if s = "int"  && ts_equal ts ts_int  then acc else
-      if s = "real" && ts_equal ts ts_real then acc else
+      if ts_equal ts ts_int  then acc else
+      if ts_equal ts ts_real then acc else
         Leaf ("type " ^ s) :: acc
     in
     let acc = Mstr.fold add_ns ns.ns_ns []  in
@@ -753,7 +754,7 @@ let () = Exn_printer.register
   | Decl.UnboundVar vs ->
       fprintf fmt "Unbound variable: %a" print_vsty vs
   | Decl.ClashIdent id ->
-      fprintf fmt "Ident %s is defined twice" id.id_string
+      fprintf fmt "Ident %s is defined twice" (Ident.str_decode id.id_string)
   | Decl.EmptyDecl ->
       fprintf fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
@@ -761,12 +762,12 @@ let () = Exn_printer.register
   | Decl.EmptyIndDecl ls ->
       fprintf fmt "Inductive predicate %a has no constructors" print_ls ls
   | Decl.KnownIdent id ->
-      fprintf fmt "Ident %s is already declared" id.id_string
+      fprintf fmt "Ident %s is already declared" (Ident.str_decode id.id_string)
   | Decl.UnknownIdent id ->
-      fprintf fmt "Ident %s is not yet declared" id.id_string
+      fprintf fmt "Ident %s is not yet declared" (Ident.str_decode id.id_string)
   | Decl.RedeclaredIdent id ->
       fprintf fmt "Ident %s is already declared, with a different declaration"
-        id.id_string
+        (Ident.str_decode id.id_string)
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | _ -> raise exn

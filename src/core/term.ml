@@ -966,7 +966,7 @@ let t_eps_close v f = t_eps (t_close_bound v f)
 
 let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix =") [v; v]
+  create_psymbol (id_fresh (op_infix "=")) [v; v]
 
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
@@ -1001,7 +1001,8 @@ let t_tuple tl =
 let fs_func_app =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
   let ty_b = ty_var (create_tvsymbol (id_fresh "b")) in
-  create_fsymbol (id_fresh "infix @") [ty_func ty_a ty_b; ty_a] ty_b
+  let id = id_fresh (op_infix "@") in
+  create_fsymbol id [ty_func ty_a ty_b; ty_a] ty_b
 
 let t_func_app fn t = t_app_infer fs_func_app [fn; t]
 let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true

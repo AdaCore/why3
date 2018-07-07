@@ -40,8 +40,9 @@ let qloc_last = function
   | Qdot (_, id) | Qident id -> id.id_loc
 
 let rec print_qualid fmt = function
-  | Qdot (p, id) -> Format.fprintf fmt "%a.%s" print_qualid p id.id_str
-  | Qident id    -> Format.fprintf fmt "%s" id.id_str
+  | Qdot (p, id) ->
+      Format.fprintf fmt "%a.%s" print_qualid p (Ident.str_decode id.id_str)
+  | Qident id    ->  Format.pp_print_string fmt (Ident.str_decode id.id_str)
 
 let string_list_of_qualid q =
   let rec sloq acc = function
@@ -101,7 +102,6 @@ let find_prog_symbol_ns ns p =
         know the correct symbol at this stage *)
     | OO ss -> (Srs.choose ss).rs_name in
   find_qualid get_id_ps ns_find_prog_symbol ns p
-
 
 (** Parsing types *)
 
@@ -268,8 +268,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tinfix (e1, op1, e23)
   | Ptree.Tinnfix (e1, op1, e23) ->
       let apply loc de1 op de2 =
-        if op.id_str = "infix <>" then
-          let op = { op with id_str = "infix =" } in
+        if op.id_str = Ident.op_neq then
+          let op = { op with id_str = Ident.op_equ } in
           let ls = find_lsymbol_ns ns (Qident op) in
           DTnot (Dterm.dterm crcmap ~loc (DTapp (ls, [de1;de2])))
         else
@@ -758,8 +758,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Einfix (e1, op1, e23)
   | Ptree.Einnfix (e1, op1, e23) ->
       let apply loc de1 op de2 =
-        if op.id_str = "infix <>" then
-          let oq = Qident { op with id_str = "infix =" } in
+        if op.id_str = Ident.op_neq then
+          let oq = Qident { op with id_str = Ident.op_equ } in
           let dt = qualid_app op.id_loc oq [de1;de2] in
           DEnot (Dexpr.dexpr ~loc dt)
         else

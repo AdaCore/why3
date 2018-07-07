@@ -1225,16 +1225,16 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
-let get_rs_name nm =
-  if nm = "mixfix []" then "([])" else
-  if nm = "mixfix []<-" then "([]<-)" else
-  if nm = "mixfix [<-]" then "([<-])" else
-  if nm = "mixfix [..]" then "([..])" else
-  if nm = "mixfix [_..]" then "([_..])" else
-  if nm = "mixfix [.._]" then "([.._])" else
-  try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
-  try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
-  nm
+let get_rs_name nm = match Ident.sn_decode nm with
+  | Ident.SNget -> "([])"
+  | Ident.SNset -> "([]<-)"
+  | Ident.SNupd -> "([<-])"
+  | Ident.SNcut -> "([..])"
+  | Ident.SNrcut -> "([_..])"
+  | Ident.SNlcut -> "([.._])"
+  | Ident.SNinfix s -> "(" ^ s ^ ")"
+  | Ident.SNprefix s -> "(" ^ s ^ "_)"
+  | Ident.SNword s -> s
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt

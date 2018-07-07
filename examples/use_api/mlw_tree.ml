@@ -97,10 +97,10 @@ let mk_evar x = mk_expr(Eident(Qident x))
  *)
 
 (* BEGIN{code1} *)
-let eq_symb = mk_qid [Ident.infix "="]
+let eq_symb = mk_qid [Ident.op_infix "="]
 let int_type_id = mk_qid ["int"]
 let int_type = PTtyapp(int_type_id,[])
-let mul_int = mk_qid ["Int";Ident.infix "*"]
+let mul_int = mk_qid ["Int";Ident.op_infix "*"]
 
 let d1 : decl =
   let id_x = mk_ident "x" in
@@ -146,7 +146,7 @@ END{source2}
 *)
 
 (* BEGIN{code2} *)
-let ge_int = mk_qid ["Int";Ident.infix ">="]
+let ge_int = mk_qid ["Int";Ident.op_infix ">="]
 
 let use_ref_Ref = use_import ("ref","Ref")
 
@@ -168,7 +168,7 @@ let d2 =
   let body =
     let e1 = mk_eapp (mk_qid ["Ref";"ref"]) [mk_econst "42"] in
     let id_x = mk_ident "x" in
-    let e2 = mk_eapp (mk_qid ["Ref";Ident.prefix "!"]) [mk_evar id_x] in
+    let e2 = mk_eapp (mk_qid ["Ref";Ident.op_prefix "!"]) [mk_evar id_x] in
     mk_expr(Elet(id_x,false,Expr.RKlocal,e1,e2))
   in
   let f = Efun(param0,None,Ity.MaskVisible,spec,body)
@@ -198,9 +198,9 @@ let array_int_type = PTtyapp(mk_qid ["Array";"array"],[int_type])
 
 let length = mk_qid ["Array";"length"]
 
-let array_get = mk_qid ["Array"; Ident.mixfix "[]"]
+let array_get = mk_qid ["Array"; Ident.op_get]
 
-let array_set = mk_qid ["Array"; Ident.mixfix "[]<-"]
+let array_set = mk_qid ["Array"; Ident.op_set]
 
 let d3 =
   let id_a = mk_ident "a" in

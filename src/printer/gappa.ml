@@ -108,8 +108,8 @@ let find_th env file th =
 
 let get_info env task =
   (* unary minus for constants *)
-  int_minus := find_th env "int" "Int" "prefix -";
-  real_minus := find_th env "real" "Real" "prefix -";
+  int_minus := find_th env "int" "Int" (op_prefix "-");
+  real_minus := find_th env "real" "Real" (op_prefix "-");
   (* handling of inequalities *)
   let ops = on_meta arith_meta (fun acc meta_arg ->
     match meta_arg with
@@ -217,12 +217,12 @@ let rec print_term info defs fmt t =
 (* predicates *)
 
 let rel_error_pat =
-  PatApp (["real"], "Real", ["infix <="], [
+  PatApp (["real"], "Real", [op_infix "<="], [
     PatApp (["real"], "Abs", ["abs"], [
-      PatApp (["real"], "Real", ["infix -"], [
+      PatApp (["real"], "Real", [op_infix "-"], [
         PatHole 0;
         PatHole 1])]);
-    PatApp (["real"], "Real", ["infix *"], [
+    PatApp (["real"], "Real", [op_infix "*"], [
       PatHole 2;
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])

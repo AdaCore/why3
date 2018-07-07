@@ -139,14 +139,14 @@ ident_rich:
 | LEFTPAR operator RIGHTPAR { $2 }
 
 operator:
-| OPERATOR              { Ident.infix $1 }
-| OPERATOR UNDERSCORE   { Ident.prefix $1 }
-| LEFTSQ RIGHTSQ        { Ident.mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ { Ident.mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW { Ident.mixfix "[]<-" }
-| LEFTSQ DOTDOT RIGHTSQ { Ident.mixfix "[..]" }
-| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ { Ident.mixfix "[_..]" }
-| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ { Ident.mixfix "[.._]" }
+| OPERATOR                          { Ident.op_infix $1 }
+| OPERATOR UNDERSCORE               { Ident.op_prefix $1 }
+| LEFTSQ RIGHTSQ                    { Ident.op_get }
+| LEFTSQ LARROW RIGHTSQ             { Ident.op_upd }
+| LEFTSQ RIGHTSQ LARROW             { Ident.op_set }
+| LEFTSQ DOTDOT RIGHTSQ             { Ident.op_cut }
+| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.op_rcut }
+| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.op_lcut }
 
 (* Types *)
 

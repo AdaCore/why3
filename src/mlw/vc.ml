@@ -90,12 +90,12 @@ type vc_env = {
 let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc = {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
-  ps_int_le = Theory.ns_find_ls ns_int ["infix <="];
-  ps_int_ge = Theory.ns_find_ls ns_int ["infix >="];
-  ps_int_lt = Theory.ns_find_ls ns_int ["infix <"];
-  ps_int_gt = Theory.ns_find_ls ns_int ["infix >"];
-  fs_int_pl = Theory.ns_find_ls ns_int ["infix +"];
-  fs_int_mn = Theory.ns_find_ls ns_int ["infix -"];
+  ps_int_le = Theory.ns_find_ls ns_int [Ident.op_infix "<="];
+  ps_int_ge = Theory.ns_find_ls ns_int [Ident.op_infix ">="];
+  ps_int_lt = Theory.ns_find_ls ns_int [Ident.op_infix "<"];
+  ps_int_gt = Theory.ns_find_ls ns_int [Ident.op_infix ">"];
+  fs_int_pl = Theory.ns_find_ls ns_int [Ident.op_infix "+"];
+  fs_int_mn = Theory.ns_find_ls ns_int [Ident.op_infix "-"];
   ps_wf_acc = Theory.ns_find_ls ns_acc ["acc"];
   exn_count = ref 0;
   divergent = false;

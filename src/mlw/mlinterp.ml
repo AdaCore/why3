@@ -397,16 +397,16 @@ let built_in_modules =
       "False", eval_false ;
     ] ;
     ["int"],"Int", [],
-    [ "infix +", eval_big_int_op BigInt.add;
+    [ Ident.op_infix "+", eval_big_int_op BigInt.add;
       (* defined as x+(-y)
-         "infix -", eval_big_int_op BigInt.sub; *)
-      "infix *", eval_big_int_op BigInt.mul;
-      "prefix -", eval_big_int_uop BigInt.minus;
-      "infix =", eval_big_int_rel BigInt.eq;
-      "infix <", eval_big_int_rel BigInt.lt;
-      "infix <=", eval_big_int_rel BigInt.le;
-      "infix >", eval_big_int_rel BigInt.gt;
-      "infix >=", eval_big_int_rel BigInt.ge;
+         Ident.op_infix "-", eval_big_int_op BigInt.sub; *)
+      Ident.op_infix "*", eval_big_int_op BigInt.mul;
+      Ident.op_prefix "-", eval_big_int_uop BigInt.minus;
+      Ident.op_infix "=", eval_big_int_rel BigInt.eq;
+      Ident.op_infix "<", eval_big_int_rel BigInt.lt;
+      Ident.op_infix "<=", eval_big_int_rel BigInt.le;
+      Ident.op_infix ">", eval_big_int_rel BigInt.gt;
+      Ident.op_infix ">=", eval_big_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
     [ "min", eval_big_int_op BigInt.min;
@@ -421,73 +421,73 @@ let built_in_modules =
       "mod", eval_big_int_op BigInt.euclidean_mod;
     ] ;
     ["mach";"int"],"Int31",[],
-    [ "infix +", eval_int_op (+);
-      "infix -", eval_int_op (-);
-      "infix *", eval_int_op ( * );
-      "infix /", eval_int_op (/);
-      "infix %", eval_int_op (mod);
-      "prefix -", eval_int_uop (~-);
-      "infix =", eval_int_rel (=);
-      "infix <", eval_int_rel (<);
-      "infix <=", eval_int_rel (<=);
-      "infix >", eval_int_rel (>);
-      "infix >=", eval_int_rel (>=);
+    [ Ident.op_infix "+", eval_int_op (+);
+      Ident.op_infix "-", eval_int_op (-);
+      Ident.op_infix "*", eval_int_op ( * );
+      Ident.op_infix "/", eval_int_op (/);
+      Ident.op_infix "%", eval_int_op (mod);
+      Ident.op_prefix "-", eval_int_uop (~-);
+      Ident.op_infix "=", eval_int_rel (=);
+      Ident.op_infix "<", eval_int_rel (<);
+      Ident.op_infix "<=", eval_int_rel (<=);
+      Ident.op_infix ">", eval_int_rel (>);
+      Ident.op_infix ">=", eval_int_rel (>=);
       "of_int", eval_of_big_int;
     ] ;
     ["mach";"int"],"Int32",[],
-    [ "infix +", eval_int_op (+);
-      "infix -", eval_int_op (-);
-      "infix *", eval_int_op ( * );
-      "infix /", eval_int_op (/);
-      "infix %", eval_int_op (mod);
-      "prefix -", eval_int_uop (~-);
-      "infix =", eval_int_rel (=);
-      "infix <", eval_int_rel (<);
-      "infix <=", eval_int_rel (<=);
-      "infix >", eval_int_rel (>);
-      "infix >=", eval_int_rel (>=);
+    [ Ident.op_infix "+", eval_int_op (+);
+      Ident.op_infix "-", eval_int_op (-);
+      Ident.op_infix "*", eval_int_op ( * );
+      Ident.op_infix "/", eval_int_op (/);
+      Ident.op_infix "%", eval_int_op (mod);
+      Ident.op_prefix "-", eval_int_uop (~-);
+      Ident.op_infix "=", eval_int_rel (=);
+      Ident.op_infix "<", eval_int_rel (<);
+      Ident.op_infix "<=", eval_int_rel (<=);
+      Ident.op_infix ">", eval_int_rel (>);
+      Ident.op_infix ">=", eval_int_rel (>=);
       "of_int", eval_of_big_int;
     ] ;
     ["mach";"int"],"Int63",[],
-    [ "infix +", eval_int_op (+);
-      "infix -", eval_int_op (-);
-      "infix *", eval_int_op ( * );
-      "infix /", eval_int_op (/);
-      "infix %", eval_int_op (mod);
-      "prefix -", eval_int_uop (~-);
-      "infix =", eval_int_rel (=);
-      "infix <", eval_int_rel (<);
-      "infix <=", eval_int_rel (<=);
-      "infix >", eval_int_rel (>);
-      "infix >=", eval_int_rel (>=);
+    [ Ident.op_infix "+", eval_int_op (+);
+      Ident.op_infix "-", eval_int_op (-);
+      Ident.op_infix "*", eval_int_op ( * );
+      Ident.op_infix "/", eval_int_op (/);
+      Ident.op_infix "%", eval_int_op (mod);
+      Ident.op_prefix "-", eval_int_uop (~-);
+      Ident.op_infix "=", eval_int_rel (=);
+      Ident.op_infix "<", eval_int_rel (<);
+      Ident.op_infix "<=", eval_int_rel (<=);
+      Ident.op_infix ">", eval_int_rel (>);
+      Ident.op_infix ">=", eval_int_rel (>=);
       "of_int", eval_of_big_int;
     ] ;
     ["array"],"Array", [],
     ["make", exec_bigarray_make ;
-     "mixfix []", exec_bigarray_get ;
      "length", exec_bigarray_length ;
-     "mixfix []<-", exec_bigarray_set ;
+     Ident.op_get, exec_bigarray_get ;
+     Ident.op_set, exec_bigarray_set ;
      "copy", exec_bigarray_copy ;
     ] ;
     ["mach"; "array"],"Array31", [],
     ["make", exec_array_make ;
-     "mixfix []", exec_array_get ;
      "length", exec_array_length ;
-     "mixfix []<-", exec_array_set ;
+     Ident.op_get, exec_array_get ;
+     Ident.op_set, exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["mach"; "array"],"Array32", [],
     ["make", exec_array_make ;
-     "mixfix []", exec_array_get ;
      "length", exec_array_length ;
-     "mixfix []<-", exec_array_set ;
+     Ident.op_get, exec_array_get ;
+     Ident.op_set, exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["mach"; "array"],"Array63", [],
     ["make", exec_array_make ;
-     "mixfix []", exec_array_get ;
      "length", exec_array_length ;
-     "mixfix []<-", exec_array_set ;
+     Ident.op_get, exec_array_get ;
+     Ident.op_set, exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["matrix"],"Matrix", [],
@@ -509,8 +509,8 @@ let built_in_modules =
     ["ref"],"Ref",
     [], (* ? *)
     ["ref", exec_ref_make ;
-     "prefix !", exec_ref_get;
-     "infix :=", exec_ref_set;
+     Ident.op_prefix "!", exec_ref_get;
+     Ident.op_infix ":=", exec_ref_set;
     ] ;
     ["debug"],"Debug",
     [],

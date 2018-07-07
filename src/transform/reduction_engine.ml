@@ -168,14 +168,14 @@ let built_in_theories =
     ] ;
 *)
     ["int"],"Int", [],
-    [ "infix +", None, eval_int_op BigInt.add simpl_add;
-      "infix -", None, eval_int_op BigInt.sub simpl_sub;
-      "infix *", None, eval_int_op BigInt.mul simpl_mul;
-      "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
-      "infix <", None, eval_int_rel BigInt.lt;
-      "infix <=", None, eval_int_rel BigInt.le;
-      "infix >", None, eval_int_rel BigInt.gt;
-      "infix >=", None, eval_int_rel BigInt.ge;
+    [ Ident.op_infix "+", None, eval_int_op BigInt.add simpl_add;
+      Ident.op_infix "-", None, eval_int_op BigInt.sub simpl_sub;
+      Ident.op_infix "*", None, eval_int_op BigInt.mul simpl_mul;
+      Ident.op_prefix "-", Some ls_minus, eval_int_uop BigInt.minus;
+      Ident.op_infix "<", None, eval_int_rel BigInt.lt;
+      Ident.op_infix "<=", None, eval_int_rel BigInt.le;
+      Ident.op_infix ">", None, eval_int_rel BigInt.gt;
+      Ident.op_infix ">=", None, eval_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
     [ "min", None, eval_int_op BigInt.min simpl_minmax;

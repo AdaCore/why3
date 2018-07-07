@@ -1172,32 +1172,32 @@ let forget_let_defn = function
   | LDsym (s,_) -> forget_rs s
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
-let extract_op {id_string = s} =
-  match Ident.kind_of_fix s with
-  | `None | `Mixfix _ -> None
-  | `Prefix s | `Infix s -> Some s
-
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
-let print_rs fmt ({rs_name = {id_string = nm}} as s) =
-  if nm = Ident.mixfix "[]" then pp_print_string fmt "([])" else
-  if nm = Ident.mixfix "[]<-" then pp_print_string fmt "([]<-)" else
-  if nm = Ident.mixfix "[<-]" then pp_print_string fmt "([<-])" else
-  if nm = Ident.mixfix "[..]" then pp_print_string fmt "([..])" else
-  if nm = Ident.mixfix "[_..]" then pp_print_string fmt "([_..])" else
-  if nm = Ident.mixfix "[.._]" then pp_print_string fmt "([.._])" else
-  match extract_op s.rs_name, s.rs_logic with
-  | Some x, _ ->
-      fprintf fmt "(%s%s%s)"
-        (if Strings.has_prefix "*" x then " " else "")
-        x
-        (if List.length s.rs_cty.cty_args = 1 then "_" else
-         if Strings.has_suffix "*" x then " " else "")
-  | _, RLnone | _, RLlemma ->
-      pp_print_string fmt (id_unique sprinter s.rs_name)
-  | _, RLpv v -> print_pv fmt v
-  | _, RLls s -> print_ls fmt s
+let left_escape_op s =
+  if Strings.has_prefix "*" s then " " ^ s else s
+
+let escape_op s = let s = left_escape_op s in
+  if Strings.has_suffix "*" s then s ^ " " else s
+
+let print_normal_rs fmt s = match s.rs_logic with
+  | RLnone | RLlemma -> pp_print_string fmt (id_unique sprinter s.rs_name)
+  | RLpv v -> print_pv fmt v
+  | RLls s -> print_ls fmt s
+
+let print_rs fmt ({rs_name = id} as s) =
+  match Ident.sn_decode id.id_string with
+  | Ident.SNinfix s -> fprintf fmt "(%s)" (escape_op s)
+  | Ident.SNprefix s when tight_op s -> fprintf fmt "(%s)" (escape_op s)
+  | Ident.SNprefix s -> fprintf fmt "(%s_)" (left_escape_op s)
+  | Ident.SNget -> pp_print_string fmt "([])"
+  | Ident.SNupd -> pp_print_string fmt "([<-])"
+  | Ident.SNset -> pp_print_string fmt "([]<-)"
+  | Ident.SNcut -> pp_print_string fmt "([..])"
+  | Ident.SNlcut -> pp_print_string fmt "([.._])"
+  | Ident.SNrcut -> pp_print_string fmt "([_..])"
+  | Ident.SNword _ -> print_normal_rs fmt s
 
 let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
@@ -1247,56 +1247,38 @@ let ambig_ls s =
 let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
 let print_capp pri ({rs_name = id} as s) fmt vl =
-  match extract_op id, vl with
-  | _, [] ->
-      print_rs fmt s
-  | Some o, [t1] when tight_op o ->
+  if vl = [] then print_normal_rs fmt s else
+  match Ident.sn_decode id.id_string, vl with
+  | Ident.SNprefix o, [t1] when tight_op o ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
-  | Some o, [t1] when String.get id.id_string 0 = 'p' ->
+  | Ident.SNprefix o, [t1] ->
       fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1
-  | Some o, [t1;t2] ->
+  | Ident.SNinfix o, [t1;t2] ->
       fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
         print_pv t1 o print_pv t2
-  | _, [t1;t2] when id.id_string = "mixfix []" ->
+  | Ident.SNget, [t1;t2] ->
       fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when id.id_string = "mixfix [<-]" ->
+  | Ident.SNupd, [t1;t2;t3] ->
       fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
         print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2;t3] when id.id_string = "mixfix []<-" ->
+  | Ident.SNset, [t1;t2;t3] ->
       fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
         print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2;t3] when id.id_string = "mixfix [..]" ->
+  | Ident.SNcut, [t1;t2;t3] ->
       fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
         print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2] when id.id_string = "mixfix [_..]" ->
+  | Ident.SNrcut, [t1;t2] ->
       fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
-  | _, [t1;t2] when id.id_string = "mixfix [.._]" ->
+  | Ident.SNlcut, [t1;t2] ->
       fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
-  | _, tl ->
+  | _, tl -> (* do not fail if not SNword, just print the string *)
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_rs s (Pp.print_list Pp.space print_pv) tl
+        print_normal_rs s (Pp.print_list Pp.space print_pv) tl
 
-let print_cpur pri ({ls_name = id} as s) fmt vl =
-  let op = match extract_op id, vl with
-    | Some o, [_] when tight_op o -> Some o
-    | Some o, [_] when String.get id.id_string 0 = 'p' -> Some (o ^ "_")
-    | Some o, [_;_] -> Some o
-    | _, [_;_] when id.id_string = "mixfix []" -> Some "[]"
-    | _, [_;_;_] when id.id_string = "mixfix [<-]" -> Some "[<-]"
-    | _, [_;_;_] when id.id_string = "mixfix []<-" -> Some "[]<-"
-    | _, [_;_;_] when id.id_string = "mixfix [..]" -> Some "[..]"
-    | _, [_;_] when id.id_string = "mixfix [_..]" -> Some "[_..]"
-    | _, [_;_] when id.id_string = "mixfix [.._]" -> Some "[.._]"
-    | _ -> None in
-  match op, vl with
-  | None, [] ->
-      fprintf fmt "{%a}" print_ls s
-  | None, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{%a}@ %a@]")
-        print_ls s (Pp.print_list Pp.space print_pv) tl
-  | Some o, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{(%s)}@ %a@]")
-        o (Pp.print_list Pp.space print_pv) tl
+let print_cpur pri s fmt vl =
+  if vl = [] then fprintf fmt "{%a}" print_ls s else
+  fprintf fmt (protect_on (pri > 5) "@[<hov 1>{%a}@ %a@]")
+    print_ls s (Pp.print_list Pp.space print_pv) vl
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
 

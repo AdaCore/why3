@@ -122,14 +122,14 @@ let int_theory =
     Self.fatal "Exception raised while loading int theory:@ %a"
       Exn_printer.exn_printer e
 
-let add_int : Term.lsymbol = find int_theory "infix +"
-let sub_int : Term.lsymbol = find int_theory "infix -"
-let minus_int : Term.lsymbol = find int_theory "prefix -"
-let mul_int : Term.lsymbol = find int_theory "infix *"
-let ge_int : Term.lsymbol = find int_theory "infix >="
-let le_int : Term.lsymbol = find int_theory "infix <="
-let gt_int : Term.lsymbol = find int_theory "infix >"
-let lt_int : Term.lsymbol = find int_theory "infix <"
+let add_int : Term.lsymbol = find int_theory (Ident.op_infix "+")
+let sub_int : Term.lsymbol = find int_theory (Ident.op_infix "-")
+let minus_int : Term.lsymbol = find int_theory (Ident.op_prefix "-")
+let mul_int : Term.lsymbol = find int_theory (Ident.op_infix "*")
+let ge_int : Term.lsymbol = find int_theory (Ident.op_infix ">=")
+let le_int : Term.lsymbol = find int_theory (Ident.op_infix "<=")
+let gt_int : Term.lsymbol = find int_theory (Ident.op_infix ">")
+let lt_int : Term.lsymbol = find int_theory (Ident.op_infix "<")
 
 let computer_div_theory =
   Pmodule.read_module env ["int"] "ComputerDivision"
@@ -138,11 +138,11 @@ let div_int : Term.lsymbol = find computer_div_theory "div"
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
 let real_theory = Pmodule.read_module env ["real"] "Real"
-let add_real : Term.lsymbol = find real_theory "infix +"
-let sub_real : Term.lsymbol = find real_theory "infix -"
-let minus_real : Term.lsymbol = find real_theory "prefix -"
-let mul_real : Term.lsymbol = find real_theory "infix *"
-let ge_real : Term.lsymbol = find real_theory "infix >="
+let add_real : Term.lsymbol = find real_theory (Ident.op_infix "+")
+let sub_real : Term.lsymbol = find real_theory (Ident.op_infix "-")
+let minus_real : Term.lsymbol = find real_theory (Ident.op_prefix "-")
+let mul_real : Term.lsymbol = find real_theory (Ident.op_infix "*")
+let ge_real : Term.lsymbol = find real_theory (Ident.op_infix ">=")
 
 (* map.Map theory *)
 (*
@@ -171,11 +171,11 @@ let ref_type : Ity.itysymbol =
 
 let ref_fun : Expr.rsymbol = find_rs ref_module "ref"
 
-let get_logic_fun : Term.lsymbol = find ref_module "prefix !"
+let get_logic_fun : Term.lsymbol = find ref_module (Ident.op_prefix "!")
 
-let get_fun : Expr.rsymbol = find_rs ref_module "prefix !"
+let get_fun : Expr.rsymbol = find_rs ref_module (Ident.op_prefix "!")
 
-let set_fun : Expr.rsymbol = find_rs ref_module "infix :="
+let set_fun : Expr.rsymbol = find_rs ref_module (Ident.op_infix ":=")
 
 (* mach_int.Int32 module *)
 
@@ -217,7 +217,7 @@ let usub32_fun : Expr.rsymbol = find_rs bv32_module "sub_check"
 
 let umul32_fun : Expr.rsymbol = find_rs bv32_module "mul_check"
 
-(*let neg32_fun : Expr.rsymbol = find_rs bv32_module "prefix -"
+(*let neg32_fun : Expr.rsymbol = find_rs bv32_module (Ident.op_prefix "-")
  *)
 
 let ueq32_fun : Expr.rsymbol = find_rs bv32_module "eq_check"
@@ -252,15 +252,15 @@ let int64_type : Why3.Ity.itysymbol =
 
 let int64_to_int : Term.lsymbol = find int64_module "to_int"
 
-let add64_fun : Expr.rsymbol = find_rs int64_module "infix +"
+let add64_fun : Expr.rsymbol = find_rs int64_module (Ident.op_infix "+")
 
-let sub64_fun : Expr.rsymbol = find_rs int64_module "infix -"
+let sub64_fun : Expr.rsymbol = find_rs int64_module (Ident.op_infix "-")
 
-let mul64_fun : Expr.rsymbol = find_rs int64_module "infix *"
+let mul64_fun : Expr.rsymbol = find_rs int64_module (Ident.op_infix "*")
 
-let le64_fun : Expr.rsymbol = find_rs int64_module "infix <="
+let le64_fun : Expr.rsymbol = find_rs int64_module (Ident.op_infix "<=")
 
-let lt64_fun : Expr.rsymbol = find_rs int64_module "infix <"
+let lt64_fun : Expr.rsymbol = find_rs int64_module (Ident.op_infix "<")
 
 let int64ofint_fun : Expr.rsymbol = find_rs int64_module "of_int"
 
@@ -272,10 +272,10 @@ let array_module : Pmodule.pmodule =
 let array_type : Ity.itysymbol =
   Pmodule.ns_find_its array_module.Pmodule.mod_export ["array"]
 
-let array_get : Term.lsymbol = find array_module "mixfix []"
+let array_get : Term.lsymbol = find array_module Ident.op_get
 let array_length : Term.lsymbol = find array_module "length"
-let array_get_fun : Expr.rsymbol = find_rs array_module "mixfix []"
-let array_set_fun : Expr.rsymbol = find_rs array_module "mixfix []<-"
+let array_get_fun : Expr.rsymbol = find_rs array_module Ident.op_get
+let array_set_fun : Expr.rsymbol = find_rs array_module Ident.op_set
 
 
 (*********)

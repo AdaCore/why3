@@ -29,21 +29,41 @@ val create_attribute : string -> attribute
 
 val list_attributes : unit -> string list
 
-(** {2 Naming convention } *)
+(** {2 Naming convention} *)
 
-val infix: string -> string
-(** Apply the naming convention for infix operator (+) *)
+type notation =
+  | SNword   of string
+  | SNinfix  of string
+  | SNprefix of string
+  | SNget  (* [] *)
+  | SNset  (* []<- *)
+  | SNupd  (* [<-] *)
+  | SNcut  (* [..] *)
+  | SNlcut (* [.._] *)
+  | SNrcut (* [_..] *)
 
-val prefix: string -> string
-(** Apply the naming convention for prefix operator *)
+val sn_encode : notation -> string
+(* encode the symbol name as a string *)
 
-val mixfix: string -> string
-(** Apply the naming convention for mixfix operator *)
+val sn_decode : string -> notation
+(* decode the string as a symbol name *)
 
-val kind_of_fix: string -> [ `None
-                           | `Prefix of string
-                           | `Infix  of string
-                           | `Mixfix of string ]
+val str_decode : string -> string
+(* decode the string as a symbol name and pretty-print it *)
+
+(* specialized encoders *)
+
+val op_infix  : string -> string
+val op_prefix : string -> string
+
+val op_equ  : string
+val op_neq  : string
+val op_get  : string
+val op_set  : string
+val op_upd  : string
+val op_cut  : string
+val op_lcut : string
+val op_rcut : string
 
 (** {2 Identifiers} *)
 

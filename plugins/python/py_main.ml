@@ -27,9 +27,10 @@ let () = Debug.set_flag Dterm.debug_ignore_unused_var
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
-let infix  ~loc s = Qident (mk_id ~loc (Ident.infix s))
-let prefix ~loc s = Qident (mk_id ~loc (Ident.prefix s))
-let mixfix ~loc s = Qident (mk_id ~loc (Ident.mixfix s))
+let infix  ~loc s = Qident (mk_id ~loc (Ident.op_infix s))
+let prefix ~loc s = Qident (mk_id ~loc (Ident.op_prefix s))
+let get_op ~loc   = Qident (mk_id ~loc Ident.op_get)
+let set_op ~loc   = Qident (mk_id ~loc Ident.op_set)
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
@@ -48,7 +49,7 @@ let mk_ref ~loc e =
 let deref_id ~loc id =
   mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
 let array_set ~loc a i v =
-  mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
+  mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
   mk_expr ~loc (Econst (Number.const_of_int i))
 let constant_s ~loc s =
@@ -194,7 +195,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
       mk_expr ~loc (Esequence (assign, seq)) in
     List.fold_left init (mk_var ~loc id) el))
   | Py_ast.Eget (e1, e2) ->
-    mk_expr ~loc (Eidapp (mixfix ~loc "[]", [expr env e1; expr env e2]))
+    mk_expr ~loc (Eidapp (get_op ~loc, [expr env e1; expr env e2]))
 
 let post env (loc, l) =
   loc, List.map (fun (pat, t) -> pat, deref env t) l
@@ -220,7 +221,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     let e = expr env e in
     if Mstr.mem id.id_str env.vars then
       let x = let loc = id.id_loc in mk_expr ~loc (Eident (Qident id)) in
-      mk_expr ~loc (Einfix (x, mk_id ~loc "infix :=", e))
+      mk_expr ~loc (Einfix (x, mk_id ~loc (Ident.op_infix ":="), e))
     else
       block env ~loc [Dstmt s]
   | Py_ast.Sset (e1, e2, e3) ->
@@ -272,11 +273,11 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     let invariant inv =
       let loc = inv.term_loc in
       let li = mk_term ~loc
-        (Tidapp (mixfix ~loc "[]", [mk_tvar ~loc l; mk_tvar ~loc i])) in
+        (Tidapp (get_op ~loc, [mk_tvar ~loc l; mk_tvar ~loc i])) in
       mk_term ~loc (Tlet (id, li, deref env inv)) in
     mk_expr ~loc (Efor (i, lb, Expr.To, ub, List.map invariant inv,
     let li = mk_expr ~loc
-      (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; mk_var ~loc i])) in
+      (Eidapp (get_op ~loc, [mk_var ~loc l; mk_var ~loc i])) in
     mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc li,
     let env = add_var env id in
     block ~loc env body

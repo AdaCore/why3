@@ -267,7 +267,8 @@ let ty_bool = ty_app ts_bool []
 let ts_func =
   let tv_a = create_tvsymbol (id_fresh "a") in
   let tv_b = create_tvsymbol (id_fresh "b") in
-  create_tysymbol (id_fresh "infix ->") [tv_a;tv_b] NoDef
+  let id = id_fresh (op_infix "->") in
+  create_tysymbol id [tv_a;tv_b] NoDef
 
 let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
 

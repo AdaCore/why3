@@ -475,8 +475,8 @@ let induction_int_lex th_int = function
 	task_prev = prev; task_known = km } as t ->
     begin
       try
-	let le_int = ns_find_ls th_int.th_export ["infix <="] in
-	let lt_int = ns_find_ls th_int.th_export ["infix <"] in
+	let le_int = ns_find_ls th_int.th_export [Ident.op_infix "<="] in
+	let lt_int = ns_find_ls th_int.th_export [Ident.op_infix "<"] in
 	if not (Mid.mem le_int.ls_name km) then raise Exit;
 	List.map (add_prop_decl prev Pgoal pr)
 	  (induction_int_lex km (le_int, lt_int) f)
@@ -491,10 +491,4 @@ let () =
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
-*)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3.byte"
-End:
 *)
