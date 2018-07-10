@@ -13,7 +13,7 @@ open Ty
 open Term
 
 type t
-  (** a set of coercions *)
+(** a set of coercions *)
 
 val empty: t
 

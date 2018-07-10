@@ -50,8 +50,8 @@ let mem crcmap ts1 ts2 =
 let rec may_match ty1 ty2 =
   match (ty1.ty_node, ty2.ty_node) with
   | Tyapp (ts1, tl1), Tyapp (ts2, tl2) ->
-      if not (ts_equal ts1 ts2) then raise Not_found
-      else List.iter2 may_match tl1 tl2
+      if not (ts_equal ts1 ts2) then raise Not_found;
+      List.iter2 may_match tl1 tl2
   | _  -> ()
 
 let find_crc crcmap ts1 ts2 = Mts.find ts2 (Mts.find ts1 crcmap)
@@ -72,7 +72,7 @@ let find crcmap ty1 ty2 =
 let rec ck_eq ck_old ck_new =
   match ck_old, ck_new with
   | CRCleaf ls_old, CRCleaf ls_new when ls_equal ls_old ls_new -> ()
-  |  CRCcomp (old_ck1, old_ck2), CRCcomp (new_ck1, new_ck2) ->
+  | CRCcomp (old_ck1, old_ck2), CRCcomp (new_ck1, new_ck2) ->
       ck_eq old_ck1 new_ck1;
       ck_eq old_ck2 new_ck2
   | _  -> raise Not_found
