@@ -267,14 +267,16 @@ use_clone:
     { Typing.add_decl (floc $startpos $endpos) (Duse $3) }
 | CLONE EXPORT tqualid clone_subst
     { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
-| USE boption(IMPORT) tqualid option(preceded(AS, uident))
+| USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
-      if $2 && $4 = None then Warning.emit ~loc
+      let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
+      if $2 && not exists_as then Warning.emit ~loc
         "the keyword `import' is redundant here and can be omitted";
-      let import = $2 || $4 = None in
-      Typing.open_scope loc (use_as $3 $4);
-      Typing.add_decl loc (Duse $3);
-      Typing.close_scope loc ~import }
+      let add_import (m, q) = let import = $2 || q = None in
+        Typing.open_scope loc (use_as m q);
+        Typing.add_decl loc (Duse m);
+        Typing.close_scope loc ~import  in
+      List.iter add_import m_as_list }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
       if $2 && $4 = None then Warning.emit ~loc
@@ -283,6 +285,9 @@ use_clone:
       Typing.open_scope loc (use_as $3 $4);
       Typing.add_decl loc (Dclone ($3, $5));
       Typing.close_scope loc ~import }
+
+use_as:
+| n = tqualid q = option(preceded(AS, uident)) { (n, q) }
 
 clone_subst:
 | (* epsilon *)                         { [] }

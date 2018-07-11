@@ -5,9 +5,7 @@
 
 module Pigeonhole
 
-  use int.Int
-  use set.Fset
-  use ref.Ref
+  use int.Int, set.Fset, ref.Ref
 
   let rec below (n: int) : set int
     requires { 0 <= n }
