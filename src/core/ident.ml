@@ -264,24 +264,23 @@ let sanitizer head rest n = sanitizer' head rest rest n
 
 (** {2 functions for working with counterexample model labels} *)
 
-let model_label = create_label "model"
 let model_projected_label = create_label "model_projected"
 let model_vc_label = create_label "model_vc"
 let model_vc_post_label = create_label "model_vc_post"
 
 let create_model_trace_label s = create_label ("model_trace:" ^ s)
 
+let is_model_trace_label label =
+  Strings.has_prefix "model_trace:" label.lab_string
+
 let is_counterexample_label l =
-  l = model_label || l = model_projected_label
+  is_model_trace_label l || l = model_projected_label
 
 let has_a_model_label id =
   Slab.exists is_counterexample_label id.id_label
 
 let remove_model_labels ~labels =
   Slab.filter (fun l -> not (is_counterexample_label l)) labels
-
-let is_model_trace_label label =
-  Strings.has_prefix "model_trace:" label.lab_string
 
 let get_model_trace_label ~labels =
   Slab.choose (Slab.filter is_model_trace_label labels)

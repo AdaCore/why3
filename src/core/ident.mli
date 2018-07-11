@@ -145,8 +145,7 @@ val id_unique_label :
 
 (** {2 labels for handling counterexamples} *)
 
-val model_label : label
-val model_projected_label : label
+val model_projected_label: label
 val model_vc_label : label
 val model_vc_post_label : label
 

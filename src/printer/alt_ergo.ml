@@ -94,7 +94,7 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+  if ls.ls_args = [] && Ident.has_a_model_label ls.ls_name then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -149,7 +149,7 @@ let unambig_fs fs =
   inspect (Opt.get fs.ls_value)
 
 let rec print_term info fmt t =
-  if Slab.mem model_label t.t_label then
+  if Slab.exists is_model_trace_label t.t_label then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -241,7 +241,7 @@ and print_tapp info fmt = function
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
 let rec print_fmla info fmt f =
-  if Slab.mem model_label f.t_label then
+  if Slab.exists is_model_trace_label f.t_label then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;

@@ -48,7 +48,7 @@ end
     if List.exists is_model_trace_label id.id_lab then id else
       let l =
         (Lstr (Ident.create_model_trace_label id.id_str))
-        ::(Lstr Ident.model_label) :: id.id_lab in
+        :: id.id_lab in
       { id with id_lab = l }
 
   let add_model_labels (b : binder) =

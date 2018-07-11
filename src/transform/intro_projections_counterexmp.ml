@@ -89,7 +89,7 @@ let introduce_constant ls t_rhs proj_name =
      array attributes like First and Last *)
   if is_proj_for_array_attr proj_name then
     (* introduce new constant c and axiom stating c = t_rhs  *)
-    let const_label = Slab.add model_label ls.ls_name.id_label in
+    let const_label = ls.ls_name.id_label in
     let const_label = append_to_model_element_name ~labels:const_label ~to_append:proj_name in
     let const_loc = Opt.get ls.ls_name.id_loc in
     let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
