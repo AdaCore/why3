@@ -77,49 +77,6 @@ let add_model_element (el: term) info_model =
   let info_model = S.remove el info_model in
   S.add el info_model
 
-        (*
-let add_old lab_str =
-  try
-    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
-    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
-    if after = "@init" then
-      (String.sub lab_str 0 pos) ^ "@old"
-    else lab_str
-  with Not_found -> lab_str ^ "@old"
-
-let model_trace_for_postcondition ~labels (info: vc_term_info)  =
-  (* Modifies the  model_trace label of a term in the postcondition:
-     - if term corresponds to the initial value of a function
-     parameter, model_trace label will have postfix @old
-     - if term corresponds to the return value of a function, add
-     model_trace label in a form function_name@result
-  *)
-  try
-    let trace_label = get_model_trace_label ~labels in
-    let lab_str = add_old trace_label.lab_string in
-    if lab_str = trace_label.lab_string then
-      labels
-    else
-      let other_labels = Slab.remove trace_label labels in
-      Slab.add
-	(Ident.create_label lab_str)
-	other_labels
-  with Not_found ->
-    (* no model_trace label => the term represents the return value *)
-    Slab.add
-      (Ident.create_model_trace_label
-	 ((Opt.get_def "" info.vc_func_name)  ^ "@result"))
-      labels
-         *)
-
-let get_fun_name name =
-  let splitted = Strings.bounded_split ':' name 2 in
-  match splitted with
-  | _::[second] ->
-    second
-  | _ ->
-    ""
-
 let check_enter_vc_term t in_goal vc_term_info =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
@@ -128,18 +85,7 @@ let check_enter_vc_term t in_goal vc_term_info =
   *)
   if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
     vc_term_info.vc_inside <- true;
-    vc_term_info.vc_loc <- t.t_loc;
-    try
-      (* Label "model_func" => the VC is postcondition or precondition *)
-      (* Extract the function name from "model_func" label *)
-      let fun_label =
-        Slab.choose (Slab.filter (fun l -> Strings.has_prefix "model_func:" l.lab_string)
-                                 t.t_label)
-      in
-      vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
-    with Not_found ->
-      (* No label "model_func" => the VC is not postcondition or precondition *)
-      ()
+    vc_term_info.vc_loc <- t.t_loc
   end
 
 let check_exit_vc_term t in_goal info =
