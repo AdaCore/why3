@@ -195,8 +195,7 @@ let print_var_list info fmt vsl =
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && (Sattr.mem model_attr ls.ls_name.id_attrs ||
-  Sattr.mem Ident.model_projected_attr ls.ls_name.id_attrs) then
+  if ls.ls_args = [] && (has_a_model_attr ls.ls_name) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -223,7 +222,7 @@ let number_format = {
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
 
-  if Sattr.mem model_attr t.t_attrs then
+  if Sattr.exists is_model_trace_attr t.t_attrs then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -322,7 +321,7 @@ in
 
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
-  if Sattr.mem model_attr f.t_attrs then
+  if Sattr.exists is_model_trace_attr f.t_attrs then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;

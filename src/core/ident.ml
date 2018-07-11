@@ -383,7 +383,6 @@ let sanitizer head rest n = sanitizer' head rest rest n
 
 (** {2 functions for working with counterexample attributes} *)
 
-let model_attr = create_attribute "model"
 let model_projected_attr = create_attribute "model_projected"
 let model_vc_attr = create_attribute "model_vc"
 let model_vc_post_attr = create_attribute "model_vc_post"
@@ -391,17 +390,17 @@ let model_vc_havoc_attr = create_attribute "model_vc_havoc"
 
 let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 
-let is_counterexample_attr l =
-  l = model_attr || l = model_projected_attr
+let is_model_trace_attr a =
+  Strings.has_prefix "model_trace:" a.attr_string
+
+let is_counterexample_attr a =
+  is_model_trace_attr a || a = model_projected_attr
 
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs
 
 let remove_model_attrs ~attrs =
   Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
-
-let is_model_trace_attr a =
-  Strings.has_prefix "model_trace:" a.attr_string
 
 let get_model_trace_attr ~attrs =
   Sattr.choose (Sattr.filter is_model_trace_attr attrs)

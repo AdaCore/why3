@@ -34,7 +34,7 @@
     if List.exists is_model_trace_attr id.id_ats then id else
       let l =
         (ATstr (Ident.create_model_trace_attr id.id_str))
-        ::(ATstr Ident.model_attr) :: id.id_ats in
+        :: id.id_ats in
       { id with id_ats = l }
 
   let add_model_attrs (b : binder) =

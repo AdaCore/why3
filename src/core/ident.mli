@@ -164,7 +164,6 @@ val id_unique_attr :
 
 (** {2 Attributes for handling counterexamples} *)
 
-val model_attr : attribute
 val model_projected_attr : attribute
 
 val model_vc_attr : attribute

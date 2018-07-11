@@ -2,94 +2,93 @@ bench/ce/int_overflow.mlw ModelInt test0: Valid
 bench/ce/int_overflow.mlw ModelInt test1: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 9:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/int_overflow.mlw ModelInt test2: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 14:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow: Valid
 bench/ce/int_overflow.mlw ModelInt test_overflow: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 18:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "65535" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow2: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 23:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "-2" }
-y, [[@model], [@introduced],
-[@model_trace:y]] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow2: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 23:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "65535" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 30:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "-65536" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 35:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "-65536" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 35:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "65535" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_bis: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 40:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "32768" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "32768" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 48:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "-2147483648" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 53:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "1073741824" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1073741824" }
 
@@ -97,9 +96,9 @@ bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Valid
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Unknown (other)
 Counter-example model:File int_overflow.mlw:
 Line 58:
-x, [[@model], [@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "1073741824" }
-y, [[@model], [@introduced],
+y, [[@introduced],
 [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1073741824" }
 

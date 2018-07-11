@@ -69,7 +69,6 @@ let intro_const_equal_to_term
   (* See documentation of the function in file intro_projections_counterexmp.mli. *)
 
   (* Create declaration of new constant *)
-  (*let attr_new = Sattr.add model_attr attrs in*)
   let ls_new_constant =  Term.create_lsymbol id_new [] term.t_ty in
   let decl_new_constant = Decl.create_param_decl ls_new_constant in
   let t_new_constant = Term.t_app ls_new_constant [] term.t_ty in
@@ -88,7 +87,7 @@ let introduce_constant ls t_rhs proj_name =
      array attributes like First and Last *)
   if is_proj_for_array_attr proj_name then
     (* introduce new constant c and axiom stating c = t_rhs  *)
-    let const_attr = Sattr.add model_attr ls.ls_name.id_attrs in
+    let const_attr = ls.ls_name.id_attrs in
     let const_attr = append_to_model_element_name ~attrs:const_attr ~to_append:proj_name in
     let const_loc = Opt.get ls.ls_name.id_loc in
     let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
