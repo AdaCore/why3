@@ -9,97 +9,104 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* Resizable arrays *)
+(** This module is automatically extracted from
+    why3/examples/util/PQueue_impl.mlw *)
 
-module RA = struct
+(** This is a contribution by Aymeric Walch. *)
 
-  type 'a t = { default: 'a; mutable size: int; mutable data: 'a array }
-
-  let length a = a.size
-
-  let make n d = { default = d; size = n; data = Array.make n d }
-
-  let get a i =
-    if i < 0 || i >= a.size then invalid_arg "RA.get";
-    a.data.(i)
-
-  let set a i v =
-    if i < 0 || i >= a.size then invalid_arg "RA.set";
-    a.data.(i) <- v
-
-  let resize a s =
-    if s <= a.size then begin
-      Array.fill a.data s (a.size - s) a.default
-    end else begin
-      let n = Array.length a.data in
-      if s > n then begin
-	let n' = max (2 * n) s in
-	let a' = Array.make n' a.default in
-	Array.blit a.data 0 a' 0 a.size;
-	a.data <- a'
-      end
-    end;
-    a.size <- s
-
-end
-
-(* Priority queue *)
-
-(* The heap is encoded into a resizable array, where elements are stored
-   from [0] to [length - 1]. From an element stored at [i], the left
-   (resp. right) subtree, if any, is rooted at [2*i+1] (resp. [2*i+2]). *)
-
-module Make(X: Set.OrderedType) = struct
+module Make(X: sig type t
+  val dummy : t
+  val compare : t -> t -> int end) =
+struct
   type elt = X.t
-  type t = elt RA.t
-  let create ~dummy = RA.make 0 dummy
-  let is_empty h = RA.length h = 0
-  (* dead code
-  let clear h = RA.resize h 0
-  *)
 
-  let rec move_up h x i =
-    if i = 0 then RA.set h i x else
-      let fi = (i - 1) / 2 in
-      let y = RA.get h fi in
-      if X.compare y x > 0 then begin RA.set h i y; move_up h x fi end
-      else RA.set h i x
+  type t = X.t Vector.t
 
-  let add h x =
-    let n = RA.length h in RA.resize h (n + 1); move_up h x n
+  let create (us: unit) : t =
+    Vector.create ?capacity:(Some 0) ~dummy:X.dummy
+
+  let is_empty (h: t) : bool = Vector.is_empty h
+
+  let size (h: t) : int = Vector.length h
 
   exception Empty
 
-  let get_min h =
-    if RA.length h = 0 then raise Empty;
-    RA.get h 0
+  let find_min_exn (h: t) : X.t =
+    begin
+      if Vector.is_empty h then begin raise Empty end;
+      Vector.get h 0
+    end
 
-  let min h l r = if X.compare (RA.get h r) (RA.get h l) < 0 then r else l
+  let find_min (h: t) : X.t option =
+    if Vector.is_empty h then begin None end
+    else
+    begin
+      Some (Vector.get h 0) end
 
-  let smallest_node h x i =
-    let l = 2 * i + 1 in
-    let n = RA.length h in
-    if l >= n then i else
-      let r = l + 1 in
-      let j = if r < n then min h l r else l in
-      if X.compare (RA.get h j) x < 0 then j else i
+  let rec move_down (a: X.t Vector.t) (i: int) (x: X.t) : unit =
+    let n = Vector.length a in
+    let q = if n = 1 then begin (-1) end else begin (n - 2) / 2 end in
+    if i <= q then begin
+      let j = let j1 = (2 * i) + 1 in
+        if
+          ((j1 + 1) < n) && ((X.compare (Vector.get a (j1 + 1))
+                                (Vector.get a j1)) < 0) then begin
+          j1 + 1 end
+        else
+        begin
+          j1 end in
+      if (X.compare (Vector.get a j) x) < 0 then begin
+        begin
+          let o = Vector.get a j in Vector.set a i o;
+          move_down a j x
+        end end
+      else
+      begin
+        Vector.set a i x end end
+    else
+    begin
+      Vector.set a i x end
 
-  let rec move_down h x i =
-    let j = smallest_node h x i in
-    if j = i then RA.set h i x
-    else begin RA.set h i (RA.get h j); move_down h x j end
+  let extract_min_exn (h: t) : X.t =
+    begin try let x = Vector.pop h in
+      let n = Vector.length h in
+      if not (n = 0) then begin
+        let min = Vector.get h 0 in begin move_down h 0 x; min end end
+      else
+      begin
+        x end with
+    | Vector.Empty -> raise Empty
+    end
 
-  let remove_min h =
-    let n = RA.length h - 1 in
-    if n < 0 then raise Empty;
-    let x = RA.get h n in
-    RA.resize h n;
-    if n > 0 then move_down h x 0
+  let delete_min_exn (h: t) : unit = ignore (extract_min_exn h)
 
-  let extract_min h =
-    if RA.length h = 0 then raise Empty;
-    let x = RA.get h 0 in
-    remove_min h;
-    x
+  let rec move_up (a: X.t Vector.t) (i: int) (x: X.t) : unit =
+    if i = 0 then begin Vector.set a i x end
+    else
+    begin
+      let j = (i - 1) / 2 in
+      let y = Vector.get a j in
+      if (X.compare y x) > 0 then begin
+        begin Vector.set a i y; move_up a j x end end
+      else
+      begin
+        Vector.set a i x end end
 
+  let insert (x: X.t) (h: t) : unit =
+    begin
+      if (size h) = Sys.max_array_length
+      then begin
+        raise (Invalid_argument "") end;
+      let n = Vector.length h in
+      if n = 0 then begin Vector.push h x end
+      else
+      begin
+        let j = (n - 1) / 2 in
+        let y = Vector.get h j in
+        if (X.compare y x) > 0 then begin
+          begin Vector.push h y; move_up h j x end end
+        else
+        begin
+          Vector.push h x end end
+    end
 end

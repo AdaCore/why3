@@ -605,21 +605,22 @@ let run_match (type i) icmp cp mty mv t =
     code_loc = cp
   } in
   let module MS = struct
+    let dummy = origin
     type t = i matching_state
     let compare t1 t2 = icmp t2.code_loc.highest_id t1.code_loc.highest_id
   end in
   let module HMS = Pqueue.Make(MS) in
-  let h = HMS.create ~dummy:origin in
-  HMS.add h origin;
+  let h = HMS.create () in
+  HMS.insert origin h;
   let rec run () =
-    match HMS.extract_min h with
+    match HMS.extract_min_exn h with
     | ms ->
       if instrs ms ms.code_loc.straight_code
       then
         match ms.code_loc.branch with
         | Stop -> Some (ms.code_loc.highest_id,ms.type_match,ms.term_match)
         | Fork cm ->
-          MInstr.iter (fun _ cp -> HMS.add h {ms with code_loc = cp}) cm;
+          MInstr.iter (fun _ cp -> HMS.insert {ms with code_loc = cp} h) cm;
           run ()
         | Switch mp ->
           let t = match ms.term_stack with
@@ -647,7 +648,7 @@ let run_match (type i) icmp cp mty mv t =
           begin match MC.find c mp with
           | mil -> MIL.iter (fun l cp ->
               let ms = {ms with code_loc = cp} in
-              if instr ms (Fragment (l,c)) then HMS.add h ms) mil
+              if instr ms (Fragment (l,c)) then HMS.insert ms h) mil
           | exception Not_found -> ()
           end;
           run ()
@@ -660,7 +661,7 @@ let run_match (type i) icmp cp mty mv t =
           begin match MCty.find c mp with
           | mil -> MIL.iter (fun l cp ->
             let ms = {ms with code_loc = cp} in
-            if instr ms (FragmentTy (l,c)) then HMS.add h ms) mil
+            if instr ms (FragmentTy (l,c)) then HMS.insert ms h) mil
           | exception Not_found -> ()
           end;
           run ()
@@ -675,7 +676,7 @@ let run_match (type i) icmp cp mty mv t =
           in
           begin match MCpat.find c mp with
           | cp ->
-            if instr ms (FragmentPat c) then HMS.add h {ms with code_loc = cp}
+            if instr ms (FragmentPat c) then HMS.insert {ms with code_loc = cp} h
           | exception Not_found -> ()
           end;
           run ()
@@ -1200,16 +1201,3 @@ let compile id rigid_tv rigid_vs tp =
   )
 
 let () = Trans.register_env_transform "a" matching_debug ~desc:"DEBUG"*)
-
-
-
-
-
-
-
-
-
-
-
-
-

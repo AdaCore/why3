@@ -868,12 +868,6 @@ module Pairing(Old: S)(New: S) = struct
 
   (* priority queues for pairs of nodes *)
 
-  module E = struct
-    type t = int * (node * node)
-    let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
-  end
-  module PQ = Pqueue.Make(E)
-
   let dprintf = Debug.dprintf debug
 
   let associate oldgoals newgoals =
@@ -930,15 +924,21 @@ module Pairing(Old: S)(New: S) = struct
     let allgoals = List.sort compare allgoals in
     build_list allgoals;
     if allgoals <> [] then begin
-      let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n) in
-      let pq = PQ.create ~dummy in
+      let module E = struct
+        let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n)
+        type t = int * (node * node)
+        let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
+      end in
+      let module PQ = Pqueue.Make(E) in
+      let pq = PQ.create () in
       let add x y = match x.elt, y.elt with
-        | Old _, New _ | New _, Old _ -> PQ.add pq (lcp x.shape y.shape, (x, y))
+        | Old _, New _ | New _, Old _ ->
+            PQ.insert (lcp x.shape y.shape, (x, y)) pq
         | Old _, Old _ | New _, New _ -> () in
       iter_pairs add allgoals;
       (* FIXME: exit earlier, as soon as we get min(old,new) pairs *)
       while not (PQ.is_empty pq) do
-        let _, (x, y) = PQ.extract_min pq in
+        let _, (x, y) = PQ.extract_min_exn pq in
         if x.valid && y.valid then begin
           let o, n = match x.elt, y.elt with
             | New n, Old o | Old o, New n -> o, n | _ -> assert false in
