@@ -75,8 +75,8 @@ let model_trace_for_postcondition ~labels =
     else
       let other_labels = Slab.remove trace_label labels in
       Slab.add
-	(Ident.create_label lab_str)
-	other_labels
+        (Ident.create_label lab_str)
+        other_labels
   with Not_found ->
     labels
 
@@ -113,35 +113,35 @@ let rec do_intro info vc_loc vc_map vc_var t =
       | None -> []
       | Some loc ->
 
-	  (* variable inside the term T that triggers VC. If the variable
-	     should be in counterexample, introduce new constant in location
-	     loc with all labels necessary for collecting it for counterexample
-	     and make it equal to the variable *)
+          (* variable inside the term T that triggers VC. If the variable
+             should be in counterexample, introduce new constant in location
+             loc with all labels necessary for collecting it for counterexample
+             and make it equal to the variable *)
           if Ident.has_a_model_label ls then
-	    let const_label = if info.vc_pre_or_post then
-	      model_trace_for_postcondition ~labels:ls.id_label
-	    else
-	      ls.id_label in
-	    let const_name = ls.id_string^"_vc_constant" in
-	    let axiom_name = ls.id_string^"_vc_axiom" in
-	    (* Create a new id here to check the couple name, location. *)
-	    let id_new = Ident.id_user ~label:const_label const_name loc in
-	    (* The following check is used to avoid duplication of
-	       *_vc_constant_n.  We keep track of the preids that have already
-	       been duplicated in vc_map.  Note that we need to do it before
-	       these preid are casted to lsymbol (by Term.create_lsymbol)
-	       because those integrates a unique hash that would make identical
-	       preid different lsymbol *)
-	    if (Hprid.mem vc_map id_new) then
-	      []
-	    else
-	      begin
-		Hprid.add vc_map id_new true;
-		intro_const_equal_to_term
-		  ~term:t ~id_new:id_new ~axiom_name
-	      end
-	  else
-	    []
+            let const_label = if info.vc_pre_or_post then
+              model_trace_for_postcondition ~labels:ls.id_label
+            else
+              ls.id_label in
+            let const_name = ls.id_string^"_vc_constant" in
+            let axiom_name = ls.id_string^"_vc_axiom" in
+            (* Create a new id here to check the couple name, location. *)
+            let id_new = Ident.id_user ~label:const_label const_name loc in
+            (* The following check is used to avoid duplication of
+               *_vc_constant_n.  We keep track of the preids that have already
+               been duplicated in vc_map.  Note that we need to do it before
+               these preid are casted to lsymbol (by Term.create_lsymbol)
+               because those integrates a unique hash that would make identical
+               preid different lsymbol *)
+            if (Hprid.mem vc_map id_new) then
+              []
+            else
+              begin
+                Hprid.add vc_map id_new true;
+                intro_const_equal_to_term
+                  ~term:t ~id_new:id_new ~axiom_name
+              end
+          else
+            []
     end
     else [] in
   match t.t_node with
@@ -152,10 +152,10 @@ let rec do_intro info vc_loc vc_map vc_var t =
         new_counter_example_variable ls.ls_name info
       | _ ->
         List.fold_left
-	    (fun defs term ->
-	      List.append defs (do_intro term))
-	    []
-	    tl
+            (fun defs term ->
+              List.append defs (do_intro term))
+            []
+            tl
     end
   | Tvar v ->
     if (Hvs.mem vc_var v) then
@@ -175,7 +175,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
   | Tif (f1, f2, f3) ->
     List.append
       (List.append (do_intro f1) (do_intro f2))
-	(do_intro f3)
+        (do_intro f3)
   | Tcase (t, _) ->
     do_intro t
     (* todo: handle the second argument of Tcase *)
@@ -203,8 +203,8 @@ let rec remove_positive_foralls vc_var f =
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
-	Hvs.add vc_var vs true;
-	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
+        Hvs.add vc_var vs true;
+        Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
@@ -247,14 +247,14 @@ let rec intros info vc_loc vc_map vc_var f =
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
-	Hvs.add vc_var vs true;
-	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
+        Hvs.add vc_var vs true;
+        Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       (* if vs is a symbol that is tagged with a model or model_projected
-	 label, we have to allow it to be printed but it wont be available
-	 after its substitution *)
+         label, we have to allow it to be printed but it wont be available
+         after its substitution *)
       (* preserve labels and location of f *)
       let f = t_label_copy f (t_subst subst f_t) in
       let decl, goal = intros f in
@@ -265,11 +265,11 @@ let rec intros info vc_loc vc_map vc_var f =
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
       (* If we are not inside a vc we don't want left side of let otherwise we
-	 might want it *)
+         might want it *)
       let decl, goal = intros f in
       if info.vc_inside then
         let l = do_intro info vc_loc vc_map vc_var t in
-	(d :: l @ decl, goal)
+        (d :: l @ decl, goal)
       else
         (d :: decl, goal)
   | _ ->
@@ -334,10 +334,10 @@ let get_location_of_vc task =
     let split = Strings.rev_split ':' loc_str in
     let loc =  match split with
       | col2 :: col1 :: line :: ((_ :: _) as rest) ->
-	let line = int_of_string line in
-	let col1 = int_of_string col1 in
-	let col2 = int_of_string col2 in
-	let filename = Strings.join ":" (List.rev rest) in
+        let line = int_of_string line in
+        let col1 = int_of_string col1 in
+        let col2 = int_of_string col2 in
+        let filename = Strings.join ":" (List.rev rest) in
         Some (Loc.user_position filename line col1 col2)
       | _ -> None in
     loc
