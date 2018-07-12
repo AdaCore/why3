@@ -322,17 +322,27 @@ let mk_var id ty md =
   let new_labels, loc = match md with
     | None ->
       (* If there is no model data remove model labels (prevents counter-example
-	 projections of this variable, displaying this variable in counterexample, ...) *)
+         projections of this variable, displaying this variable in
+         counterexample, ...) *)
       let new_labels = Ident.remove_model_labels ~labels:id.id_label in
       (new_labels, None)
     | Some md -> begin
         let new_labels =
-          append_to_model_trace_label ~labels:id.id_label
-            ~to_append:("@"^md.md_append_to_model_trace)
+          match md.md_context_labels with
+          | None -> id.id_label
+          | Some ctx_lab ->
+              if Slab.exists is_model_trace_label ctx_lab then
+                (* The right model_trace should be in the md context labels *)
+                let other_labels =
+                  Slab.filter (fun x -> not (is_model_trace_label x)) id.id_label
+                in
+                Slab.union ctx_lab other_labels
+              else
+                Slab.union ctx_lab id.id_label
         in
-        let new_labels = match md.md_context_labels with
-          | None -> new_labels
-          | Some s -> Slab.union s new_labels
+        let new_labels =
+          append_to_model_trace_label ~labels:new_labels
+            ~to_append:("@"^md.md_append_to_model_trace)
         in
         (new_labels, md.md_loc)
     end

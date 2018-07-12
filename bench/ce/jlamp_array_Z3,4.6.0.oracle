@@ -8,8 +8,7 @@ Line 18:
 a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "0" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
-"val" : [{"indice" : "9" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
+"val" : [{"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
 bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
@@ -19,15 +18,15 @@ a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "43" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] }
-a, ["model_trace:a",
-"model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
+a, ["model_trace:a@call"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 21:
-a, ["model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
-"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+a, ["model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -39,17 +38,17 @@ a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "43" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] }
-a, ["model_trace:a",
-"model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "17" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
+a, ["model_trace:a@call"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 27:
-a, ["model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
-"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
+a, ["model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "2" } }, {"indice" : "17" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -62,17 +61,17 @@ a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "17" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] }
-a, ["model_trace:a",
-"model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "17" ,
-"value" : {"type" : "Integer" , "val" : "2" } },
+{"others" : {"type" : "Integer" ,
+"val" : "3" } }] }
+a, ["model_trace:a@call"] = {"type" : "Array" ,
+"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 Line 33:
-a, ["model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
-"val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : "17" , "value" : {"type" : "Integer" , "val" : "2" } },
+a, ["model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "42" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "17" ,
+"value" : {"type" : "Integer" , "val" : "2" } },
 {"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
@@ -86,8 +85,7 @@ Line 18:
 a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "0" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
-"val" : [{"indice" : "9" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
+"val" : [{"others" : {"type" : "Integer" ,
 "val" : "3" } }] }
 
 bench/ce/jlamp_array.mlw Array WP_parameter f : Valid
@@ -95,7 +93,7 @@ bench/ce/jlamp_array.mlw Array WP_parameter f : Unknown (other)
 Counter-example model:File jlamp_array.mlw:
 Line 18:
 a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "0" }
+"val" : "1" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "42" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
