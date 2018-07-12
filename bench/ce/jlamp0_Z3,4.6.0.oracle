@@ -1,10 +1,165 @@
 bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 8:
-b, ["model_trace:b"] = {"type" : "Integer" ,
+b.contents, ["model_trace:b.contents"] = {"type" : "Integer" ,
+"val" : "3" }
+Line 11:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "3" }
+Line 12:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "3" }
+
+bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "7" }
+Line 8:
+b.contents, ["model_trace:b.contents"] = {"type" : "Integer" ,
+"val" : "3" }
+Line 10:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "9" }
+Line 11:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "10" }
+Line 13:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "9" }
+
+bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "2" }
+Line 8:
+b.contents, ["model_trace:b.contents"] = {"type" : "Integer" ,
+"val" : "3" }
+Line 10:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "5" }
+Line 11:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "5" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 22:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 23:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
+a.contents, ["model_trace:a.contents@loop"] = {"type" : "Integer" ,
+"val" : "3" }
+c.contents, ["model_trace:c.contents@loop"] = {"type" : "Integer" ,
+"val" : "10" }
+Line 22:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "12" }
+Line 25:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "13" }
+Line 26:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "12" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
+a.contents, ["model_trace:a.contents@loop"] = {"type" : "Integer" ,
+"val" : "9" }
+c.contents, ["model_trace:c.contents@loop"] = {"type" : "Integer" ,
+"val" : "2" }
+Line 23:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "11" }
+Line 25:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "11" }
+Line 26:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "4" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
+a.contents, ["model_trace:a.contents@loop"] = {"type" : "Integer" ,
+"val" : "3" }
+c.contents, ["model_trace:c.contents@loop"] = {"type" : "Integer" ,
+"val" : "2" }
+Line 25:
+a.contents, ["model_trace:a.contents@call"] = {"type" : "Integer" ,
+"val" : "5" }
+Line 26:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "4" }
+
+bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents@init"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 19:
+a.contents, ["model_trace:a.contents@loop"] = {"type" : "Integer" ,
+"val" : "3" }
+Line 20:
+c.contents, ["model_trace:c.contents@call"] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
+a.contents, ["model_trace:a.contents@loop"] = {"type" : "Integer" ,
+"val" : "3" }
+c.contents, ["model_trace:c.contents@loop"] = {"type" : "Integer" ,
+"val" : "11" }
+
+bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
+"val" : "0" }
+Line 8:
+b.contents, ["model_trace:b.contents"] = {"type" : "Integer" ,
 "val" : "3" }
 Line 11:
 a, ["model_trace:a@call"] = {"type" : "Integer" ,
@@ -16,10 +171,10 @@ a, ["model_trace:a@call"] = {"type" : "Integer" ,
 bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "7" }
 Line 8:
-b, ["model_trace:b"] = {"type" : "Integer" ,
+b.contents, ["model_trace:b.contents"] = {"type" : "Integer" ,
 "val" : "3" }
 Line 10:
 a, ["model_trace:a@call"] = {"type" : "Integer" ,
@@ -31,25 +186,10 @@ Line 13:
 a, ["model_trace:a@call"] = {"type" : "Integer" ,
 "val" : "9" }
 
-bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
-"val" : "2" }
-Line 8:
-b, ["model_trace:b"] = {"type" : "Integer" ,
-"val" : "3" }
-Line 10:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "5" }
-Line 11:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "5" }
-
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
@@ -61,19 +201,19 @@ c, ["model_trace:c@call"] = {"type" : "Integer" ,
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
 "val" : "1" }
 Line 23:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
@@ -96,7 +236,7 @@ c, ["model_trace:c@call"] = {"type" : "Integer" ,
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
@@ -119,7 +259,7 @@ c, ["model_trace:c@call"] = {"type" : "Integer" ,
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
@@ -139,10 +279,10 @@ c, ["model_trace:c@call"] = {"type" : "Integer" ,
 bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
 Counter-example model:File jlamp0.mlw:
 Line 6:
-a, ["model_trace:a@init"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents"] = {"type" : "Integer" ,
 "val" : "0" }
 Line 19:
-a, ["model_trace:a@loop"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents@try"] = {"type" : "Integer" ,
 "val" : "3" }
 Line 20:
 c, ["model_trace:c@call"] = {"type" : "Integer" ,
@@ -150,149 +290,13 @@ c, ["model_trace:c@call"] = {"type" : "Integer" ,
 Line 21:
 a, ["model_trace:a@loop"] = {"type" : "Integer" ,
 "val" : "3" }
-c, ["model_trace:c@loop"] = {"type" : "Integer" ,
-"val" : "11" }
-
-bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 8:
-b, ["model_trace:b"] = {"type" : "Integer" ,
-"val" : "3" }
-Line 11:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "3" }
-Line 12:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "3" }
-
-bench/ce/jlamp0.mlw M WP_parameter p1 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "7" }
-Line 8:
-b, ["model_trace:b"] = {"type" : "Integer" ,
-"val" : "3" }
-Line 10:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "9" }
-Line 11:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "10" }
-Line 13:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "9" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 22:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 23:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 21:
-a, ["model_trace:a@loop"] = {"type" : "Integer" ,
-"val" : "3" }
-c, ["model_trace:c@loop"] = {"type" : "Integer" ,
-"val" : "10" }
-Line 22:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "12" }
-Line 25:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "13" }
-Line 26:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "12" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 21:
-a, ["model_trace:a@loop"] = {"type" : "Integer" ,
-"val" : "9" }
-c, ["model_trace:c@loop"] = {"type" : "Integer" ,
-"val" : "2" }
-Line 23:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "11" }
-Line 25:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "11" }
-Line 26:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "4" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 21:
-a, ["model_trace:a@loop"] = {"type" : "Integer" ,
-"val" : "3" }
-c, ["model_trace:c@loop"] = {"type" : "Integer" ,
-"val" : "2" }
-Line 25:
-a, ["model_trace:a@call"] = {"type" : "Integer" ,
-"val" : "5" }
-Line 26:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "4" }
-
-bench/ce/jlamp0.mlw M WP_parameter p2 : Unknown (other)
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 19:
-a, ["model_trace:a@try"] = {"type" : "Integer" ,
-"val" : "3" }
-Line 20:
-c, ["model_trace:c@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 21:
-a, ["model_trace:a@loop"] = {"type" : "Integer" ,
+a.contents, ["model_trace:a.contents@try"] = {"type" : "Integer" ,
 "val" : "3" }
 a, ["model_trace:a@try"] = {"type" : "Integer" ,
 "val" : "3" }
 c, ["model_trace:c@loop"] = {"type" : "Integer" ,
+"val" : "11" }
+c.contents, ["model_trace:c.contents@try"] = {"type" : "Integer" ,
 "val" : "11" }
 c, ["model_trace:c@try"] = {"type" : "Integer" ,
 "val" : "11" }
