@@ -45,11 +45,9 @@ x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
 bench/ce/records.mlw M WP_parameter test_record_match_eval_test5 : Unknown (other)
 Counter-example model:File ref.mlw:
 Line 18:
-re.my_field_f, ["model_trace:re.my_field_f",
-"model_trace:re@old"] = {"type" : "Integer" ,
+old re.my_field_f, ["model_trace:re.my_field_f@old"] = {"type" : "Integer" ,
 "val" : "3" }
-re.g, ["model_trace:re.g",
-"model_trace:re@old"] = {"type" : "Boolean" ,
+old re.g, ["model_trace:re.g@old"] = {"type" : "Boolean" ,
 "val" : false }
 x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
 "val" : "6" }
@@ -57,11 +55,9 @@ x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
 "val" : false }
 File records.mlw:
 Line 38:
-re, ["model_trace:re@init",
-"model_trace:re.my_field_f"] = {"type" : "Integer" ,
+re.my_field_f, ["model_trace:re.my_field_f@init"] = {"type" : "Integer" ,
 "val" : "3" }
-re, ["model_trace:re@init",
-"model_trace:re.g"] = {"type" : "Boolean" ,
+re.g, ["model_trace:re.g@init"] = {"type" : "Boolean" ,
 "val" : false }
 Line 40:
 x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,

@@ -16,17 +16,17 @@ a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
 "val" : "2" }
 a.elts, ["model_trace:a.elts"] = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
-{"others" : {"type" : "Integer" , "val" : "0" } }] }
-a, ["model_trace:a",
-"model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "42" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "42" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+a, ["model_trace:a@call"] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 Line 12:
-a, ["model_trace:a@call", "model_trace:a@old"] = {"type" : "Array" ,
-"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
-{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
+a, ["model_trace:a@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "42" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 
