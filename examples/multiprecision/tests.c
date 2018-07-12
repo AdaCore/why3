@@ -15,8 +15,14 @@
 
 #ifdef TEST_MINIGMP
 #include "mini-gmp.c"
-#else
+#endif
+#ifdef TEST_GMP
 #include <gmp.h>
+#endif
+#ifdef TEST_WHY3
+#include "build/add.h"
+#include "build/mul.h"
+#include "build/div.h"
 #endif
 
 #include "mt19937-64.c"
@@ -25,15 +31,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
-
-uint64_t add(uint64_t * r3, uint64_t * x4, uint64_t * y3, int32_t sx, int32_t
-             sy);
-
-void mul(uint64_t * r10, uint64_t * x11, uint64_t * y10, int32_t sx2, int32_t
-         sy2);
-
-void tdiv_qr(uint64_t * q, uint64_t * r, uint64_t * x, uint64_t * y,
-             int32_t sx, int32_t sy);
 
 #define TMP_ALLOC_LIMBS(n) malloc((n) * 8)
 
