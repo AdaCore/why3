@@ -5,7 +5,7 @@ module Main
 
   type path_sel_type = { mutable sel_path : bool}
 
-  val path_selector "model" "model_trace:TEMP_NAME": path_sel_type
+  val path_selector "model_trace:TEMP_NAME": path_sel_type
 
 end
 
@@ -14,7 +14,7 @@ module Other
 
   use import Main
 
-  let f (a : int) 
+  let f (a : int)
     ensures {result = 5}
   =
     (* The counterexample should contain the node_id 5454 here but not 121 *)

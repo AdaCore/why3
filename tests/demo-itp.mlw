@@ -15,31 +15,31 @@ module ApplyRewrite
   axiom H: forall x. (\z: int. x + z) =  f x
 
   goal g1: (\toto. 42 + toto) = f 42
-  
+
   axiom Ha: forall x. (\z: int. x + z) 2 = 2
-  
-  goal g3: (\toto. 42 + toto) 2 = 2 
-    
+
+  goal g3: (\toto. 42 + toto) 2 = 2
+
   goal g2: (\y. y + y) = f 24
 end
 
 module A
-  
+
   use import int.Int
   use HighOrd
 
   function f int: int
 
   axiom H: forall y. exists x. f x = x + y
-  
+
   goal g1: exists x. f x = x + 42
-  
+
   goal g: (\y. f y) 0 = 3
 
   constant b: bool
 
   axiom Ha: forall y. if b = true then let x = 3 in f x = x + y else false
-  
+
   goal ga: if b = true then let z = 3 in f z = z + 42 else false
 
   goal gb: if b  = true then let z = 453 in f z = z + 42 else false
@@ -61,9 +61,9 @@ end
 module TestCEX
 
   use import int.Int
-  
-  goal g: forall x "model". x=0
-  
+
+  goal g: forall x. x=0
+
 end
 
 module TestCopyPaste

@@ -4,23 +4,22 @@ Line 17:
 a, ["model_trace:a"] = {"type" : "Integer" ,
 "val" : "5" }
 Line 18:
-TEMP_NAME, ["model", "node_id=121",
+TEMP_NAME, ["node_id=121",
 "model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
 "val" : true }
 Line 21:
-TEMP_NAME, ["model", "node_id=5454",
+TEMP_NAME, ["node_id=5454",
 "model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
 "val" : false }
 Line 25:
-TEMP_NAME, ["model", "node_id=121",
+TEMP_NAME, ["node_id=121",
 "model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
 "val" : true }
 
 bench/ce/if_decision_branch.mlw Other WP_parameter f : Unknown (other)
 Counter-example model:File if_decision_branch.mlw:
 Line 8:
-TEMP_NAME.sel_path, ["model",
-"model_trace:TEMP_NAME.sel_path"] = {"type" : "Boolean" ,
+TEMP_NAME.sel_path, ["model_trace:TEMP_NAME.sel_path"] = {"type" : "Boolean" ,
 "val" : false }
 Line 17:
 a, ["model_trace:a"] = {"type" : "Integer" ,
@@ -28,11 +27,11 @@ a, ["model_trace:a"] = {"type" : "Integer" ,
 Line 18:
 the check fails with all inputs
 Line 21:
-TEMP_NAME, ["model", "node_id=5454",
+TEMP_NAME, ["node_id=5454",
 "model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
 "val" : false }
 Line 25:
-TEMP_NAME, ["model", "node_id=121",
+TEMP_NAME, ["node_id=121",
 "model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
 "val" : true }
 
