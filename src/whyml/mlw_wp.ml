@@ -409,14 +409,18 @@ let update_term env (mreg : vsymbol Mreg.t) f =
 
 let get_single_region_of_var vs =
   match (ity_of_vs vs).ity_node with
-    | Ityapp (_,_,[r]) -> Some r
+    | Ityapp (l,_,[r]) ->
+        let its_regs = l.its_regs in
+        (match its_regs with
+        | [l] -> Some (r, l)
+        | _ -> None)
     | _ -> None
 
 (* look for a variable with a single region equal to [reg] *)
 let var_of_region reg f =
   let test acc vs =
     match get_single_region_of_var vs with
-    | Some r when reg_equal r reg -> Some vs
+    | Some (r,l) when reg_equal r reg -> Some (vs, l)
     | _ -> acc in
   t_v_fold test None f
 
@@ -424,20 +428,51 @@ let quantify md env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
-    let id = match var_of_region reg f with
-      | Some vs -> vs.vs_name
-      | None -> reg.reg_name in
+    let id, suf = match var_of_region reg f with
+      | Some (vs, l) ->
+          (vs.vs_name, l)
+      | None -> (reg.reg_name, reg) in
+    (* Here we cannot keep the model_trace because we don't know what
+       projection was applied in get_single_region_of_var. For example, with
+       elements that have only one mutable field like comp:
+       type comp = {mutable a; int}
+       The new elements vs.vs_name will be used for something of type a
+       whereas the model_trace refers to something of type comp. The reason
+       is that a is the only region of comp so it is returned by
+       get_single_region_of_var.
+    *)
+    let model_trace_suf =
+      try get_model_element_name ~labels:suf.reg_name.id_label with
+      | Not_found -> ""
+    in
+    let labels =
+      if model_trace_suf <> "" then
+        append_to_model_element_name
+          ~labels:id.id_label
+          ~to_append:model_trace_suf
+      else
+        append_to_model_element_name
+          ~labels:id.id_label
+          ~to_append:("."^suf.reg_name.id_string)
+    in
     let md = match md.md_loc with
       | None ->
-	(
-	  match id.id_loc with
-	  | None -> None
-	  | Some l ->
-	    Some (create_model_data
-		    ~loc:l ~context_labels:id.id_label md.md_append_to_model_trace)
-	)
-      | _ -> Some md in
-    mk_var id ty md in
+        (
+          match id.id_loc with
+          | None  -> None
+          | Some l  ->
+            Some (create_model_data
+                  ~loc:l ~context_labels:labels md.md_append_to_model_trace)
+       )
+      | Some loc ->
+          let labels =
+            Slab.union (Opt.get_def Slab.empty md.md_context_labels) labels
+          in
+          Some (create_model_data ~loc:loc
+                  ~context_labels:labels md.md_append_to_model_trace)
+    in
+    mk_var id ty md
+  in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
   let f = update_term env mreg f in
@@ -1072,7 +1107,8 @@ let add_wp_decl km name f uc =
   let f = if Debug.test_flag no_eval then f else
     (* do preliminary checks on f to spare eval_match any surprises *)
     let _lkm = Decl.known_add_decl lkm (create_prop_decl Pgoal pr f) in
-    Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkm f in
+    Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkm f
+  in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
   Theory.add_decl uc d
@@ -1233,7 +1269,7 @@ end = struct
   let fresh_var_from_var md vs =
     mk_var vs.vs_name (ity_of_vs vs) md
 
-  let is_simple_var = get_single_region_of_var
+  let is_simple_var x = Opt.map fst (get_single_region_of_var x)
   let is_simple_pvar pv = is_simple_var pv.pv_vs
 
   let add_pvar md pv s =

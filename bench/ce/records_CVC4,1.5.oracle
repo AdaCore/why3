@@ -23,49 +23,49 @@ old x.my_field_f, ["model_trace:x.my_field_f@old"] = {"type" : "Integer" ,
 bench/ce/records.mlw M WP_parameter record_match_eval_test3 : Unknown (other)
 Counter-example model:File records.mlw:
 Line 27:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 30:
-x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
+x.contents.my_field_f, ["model_trace:x.contents.my_field_f@call"] = {"type" : "Integer" ,
 "val" : "6" }
-x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g@call"] = {"type" : "Boolean" ,
 "val" : false }
 
 bench/ce/records.mlw M WP_parameter record_match_eval_test4 : Unknown (other)
 Counter-example model:File records.mlw:
 Line 32:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 35:
-x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
+x.contents.my_field_f, ["model_trace:x.contents.my_field_f@call"] = {"type" : "Integer" ,
 "val" : "6" }
-x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g@call"] = {"type" : "Boolean" ,
 "val" : false }
 
 bench/ce/records.mlw M WP_parameter test_record_match_eval_test5 : Unknown (other)
 Counter-example model:File ref.mlw:
 Line 18:
-old re.my_field_f, ["model_trace:re.my_field_f@old"] = {"type" : "Integer" ,
+old re.contents.my_field_f, ["model_trace:re.contents.my_field_f@old"] = {"type" : "Integer" ,
 "val" : "5" }
-old re.g, ["model_trace:re.g@old"] = {"type" : "Boolean" ,
+old re.contents.g, ["model_trace:re.contents.g@old"] = {"type" : "Boolean" ,
 "val" : false }
-x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
+x.contents.my_field_f, ["model_trace:x.contents.my_field_f@call"] = {"type" : "Integer" ,
 "val" : "6" }
-x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g@call"] = {"type" : "Boolean" ,
 "val" : false }
 File records.mlw:
 Line 38:
-re.my_field_f, ["model_trace:re.my_field_f@init"] = {"type" : "Integer" ,
+re.contents.my_field_f, ["model_trace:re.contents.my_field_f@init"] = {"type" : "Integer" ,
 "val" : "5" }
-re.g, ["model_trace:re.g@init"] = {"type" : "Boolean" ,
+re.contents.g, ["model_trace:re.contents.g@init"] = {"type" : "Boolean" ,
 "val" : false }
 Line 40:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 43:
-x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
+x.contents.my_field_f, ["model_trace:x.contents.my_field_f@call"] = {"type" : "Integer" ,
 "val" : "6" }
-x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g@call"] = {"type" : "Boolean" ,
 "val" : false }
 
 bench/ce/records.mlw Mutable WP_parameter record_match_eval_test1 : Unknown (other)
@@ -124,7 +124,7 @@ old x.my_field_f, ["model_trace:x.my_field_f@old"] = {"type" : "Integer" ,
 bench/ce/records.mlw M WP_parameter record_match_eval_test3 : Unknown (other)
 Counter-example model:File records.mlw:
 Line 27:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 30:
 x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
@@ -135,7 +135,7 @@ x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
 bench/ce/records.mlw M WP_parameter record_match_eval_test4 : Unknown (other)
 Counter-example model:File records.mlw:
 Line 32:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 35:
 x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,
@@ -146,17 +146,17 @@ x.g, ["model_trace:x.g@call"] = {"type" : "Boolean" ,
 bench/ce/records.mlw M WP_parameter test_record_match_eval_test5 : Unknown (other)
 Counter-example model:File records.mlw:
 Line 38:
-re.my_field_f, ["model_trace:re.my_field_f"] = {"type" : "Integer" ,
+re.contents.my_field_f, ["model_trace:re.contents.my_field_f"] = {"type" : "Integer" ,
 "val" : "5" }
-re.g, ["model_trace:re.g"] = {"type" : "Boolean" ,
+re.contents.g, ["model_trace:re.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 40:
-x.g, ["model_trace:x.g"] = {"type" : "Boolean" ,
+x.contents.g, ["model_trace:x.contents.g"] = {"type" : "Boolean" ,
 "val" : false }
 Line 41:
-old re.my_field_f, ["model_trace:re.my_field_f@old"] = {"type" : "Integer" ,
+old re.contents.my_field_f, ["model_trace:re.contents.my_field_f@old"] = {"type" : "Integer" ,
 "val" : "5" }
-old re.g, ["model_trace:re.g@old"] = {"type" : "Boolean" ,
+old re.contents.g, ["model_trace:re.contents.g@old"] = {"type" : "Boolean" ,
 "val" : false }
 Line 43:
 x.my_field_f, ["model_trace:x.my_field_f@call"] = {"type" : "Integer" ,

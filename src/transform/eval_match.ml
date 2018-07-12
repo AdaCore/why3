@@ -62,7 +62,7 @@ let rec add_quant kn (vl,tl,f) v =
   in
   match cl with
     | [ls,pjl] ->
-	(* there is only one constructor *)
+        (* there is only one constructor *)
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty pj =
 	  (* The name of the field corresponding to the variable that is created  *)
@@ -70,7 +70,8 @@ let rec add_quant kn (vl,tl,f) v =
 	    | Some pj_ls ->
 	      begin
 		try
-		  Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label
+                  let fn = Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label in
+                  if fn = "" then raise Not_found else fn
 		with Not_found -> "."^pj_ls.ls_name.id_string
 	      end
 	    | _ -> ""
@@ -141,35 +142,37 @@ let eval_match ~inline kn t =
     let stop = stop || Slab.mem Split_goal.stop_split t.t_label ||
     Slab.mem keep_on_simp_label t.t_label in
     let eval = eval stop in
-    let t_eval_matched = (match t.t_node with
-    | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
-        cs_equ kn env (eval env t1) (eval env t2)
-    | Tapp (ls, [t1]) when is_projection kn ls ->
-        let t1 = eval env t1 in
-        let fn _env t = apply_projection kn ls t in
-        begin try dive_to_constructor kn fn env t1
-        with Exit -> t_app ls [t1] t.t_ty end
-    | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
-        begin match find_logic_definition kn ls with
-          | None -> t_map (eval env) t
-          | Some def -> eval env (unfold def tl t.t_ty)
-        end
-    | Tlet (t1, tb2) ->
-        let t1 = eval env t1 in
-        let_map eval env t1 tb2
-    | Tcase (t1, bl1) ->
-        let t1 = eval env t1 in
-        let fn env t2 = eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
-        begin try dive_to_constructor kn fn env t1
-        with Exit -> branch_map eval env t1 bl1 end
-    | Tquant (q, qf) ->
-        let vl,tl,f,close = t_open_quant_cb qf in
-        let vl,tl,f = if stop
-          then (List.rev vl,tl,f)
-          else List.fold_left (add_quant kn) ([],tl,f) vl in
-        t_quant_simp q (close (List.rev vl) tl (eval env f))
-    | _ ->
-        t_map_simp (eval env) t) in
+    let t_eval_matched =
+      (match t.t_node with
+      | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
+          cs_equ kn env (eval env t1) (eval env t2)
+      | Tapp (ls, [t1]) when is_projection kn ls ->
+          let t1 = eval env t1 in
+          let fn _env t = apply_projection kn ls t in
+          begin try dive_to_constructor kn fn env t1
+          with Exit -> t_app ls [t1] t.t_ty end
+      | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
+          begin match find_logic_definition kn ls with
+            | None -> t_map (eval env) t
+            | Some def -> eval env (unfold def tl t.t_ty)
+          end
+      | Tlet (t1, tb2) ->
+          let t1 = eval env t1 in
+          let_map eval env t1 tb2
+      | Tcase (t1, bl1) ->
+          let t1 = eval env t1 in
+          let fn env t2 = eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
+          begin try dive_to_constructor kn fn env t1
+          with Exit -> branch_map eval env t1 bl1 end
+      | Tquant (q, qf) ->
+          let vl,tl,f,close = t_open_quant_cb qf in
+          let vl,tl,f = if stop
+            then (List.rev vl,tl,f)
+            else List.fold_left (add_quant kn) ([],tl,f) vl in
+          t_quant_simp q (close (List.rev vl) tl (eval env f))
+      | _ ->
+          t_map_simp (eval env) t)
+    in
 
     (* Copy all labels of t to t_eval_matched except for "model_trace:*" label.
        This label is not copied if both t and t_eval_matched contain it. *)
