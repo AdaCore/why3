@@ -95,10 +95,10 @@ let rec add_quant kn (cnt, vl,tl,f) v =
         (* there is only one constructor *)
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty pj =
-	  (* The name of the field corresponding to the variable that is created  *)
-	  let field_name = (match pj with
-	    | Some pj_ls ->
-	      begin
+          (* The name of the field corresponding to the variable that is created  *)
+          let field_name = (match pj with
+            | Some pj_ls ->
+              begin
                 try
                   let fn = Ident.get_model_trace_string ~labels:pj_ls.ls_name.id_label in
                   if fn = "" then raise Not_found else fn
@@ -107,15 +107,16 @@ let rec add_quant kn (cnt, vl,tl,f) v =
                      will not be included in counterexample. *)
                   "@hide_field"
 
-	      end
-	    | _ -> ""
-	  ) in
-	  let label = if field_name = "@hide_field" then
-	      Ident.remove_model_labels ~labels:v.vs_name.id_label
-	    else
-	      Ident.append_to_model_element_name
-		~labels:v.vs_name.id_label ~to_append:(field_name) in
-	  create_vsymbol (id_lab label v.vs_name) (ty_inst s ty) in
+              end
+            | _ -> ""
+          ) in
+          let label =
+            if field_name = "@hide_field" then
+              v.vs_name.id_label
+            else
+              Ident.append_to_model_element_name
+                ~labels:v.vs_name.id_label ~to_append:(field_name) in
+          create_vsymbol (id_lab label v.vs_name) (ty_inst s ty) in
         let nvl = List.map2 mk_v ls.ls_args pjl in
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in
@@ -240,10 +241,10 @@ let eval_match ~inline kn t =
        This label is not copied if both t and t_eval_matched contain it. *)
     let t =
       (try
-	 let _ = Ident.get_model_trace_label ~labels:t_eval_matched.t_label in
-	 let original_mt_label = Ident.get_model_trace_label ~labels:t.t_label in
-	 (* If both t_eval_matched and t contain model_trace label, remove it *)
-	 t_label_remove original_mt_label t
+        let _ = Ident.get_model_trace_label ~labels:t_eval_matched.t_label in
+        let original_mt_label = Ident.get_model_trace_label ~labels:t.t_label in
+        (* If both t_eval_matched and t contain model_trace label, remove it *)
+        t_label_remove original_mt_label t
        with Not_found -> t) in
     t_label_copy t t_eval_matched
   in
