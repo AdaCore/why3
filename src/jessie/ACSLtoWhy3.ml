@@ -272,10 +272,10 @@ let array_module : Pmodule.pmodule =
 let array_type : Ity.itysymbol =
   Pmodule.ns_find_its array_module.Pmodule.mod_export ["array"]
 
-let array_get : Term.lsymbol = find array_module Ident.op_get
+let array_get : Term.lsymbol = find array_module (Ident.op_get "")
 let array_length : Term.lsymbol = find array_module "length"
-let array_get_fun : Expr.rsymbol = find_rs array_module Ident.op_get
-let array_set_fun : Expr.rsymbol = find_rs array_module Ident.op_set
+let array_get_fun : Expr.rsymbol = find_rs array_module (Ident.op_get "")
+let array_set_fun : Expr.rsymbol = find_rs array_module (Ident.op_set "")
 
 
 (*********)

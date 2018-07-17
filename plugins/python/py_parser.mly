@@ -31,8 +31,8 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let get_op s e = Qident (mk_id Ident.op_get s e)
-  let upd_op s e = Qident (mk_id Ident.op_upd s e)
+  let get_op s e = Qident (mk_id (Ident.op_get "") s e)
+  let upd_op s e = Qident (mk_id (Ident.op_update "") s e)
 
   let empty_spec = {
     sp_pre     = [];    sp_post    = [];  sp_xpost  = [];

@@ -305,9 +305,9 @@ let built_in_modules =
    ["array"],"Array",
     ["array", builtin_array_type],
     ["make", exec_array_make ;
-     Ident.op_get, exec_array_get ;
+     Ident.op_get "", exec_array_get ;
      "length", exec_array_length ;
-     Ident.op_set, exec_array_set ;
+     Ident.op_set "", exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
   ]

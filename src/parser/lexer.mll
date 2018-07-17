@@ -185,7 +185,7 @@ rule token = parse
       { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
-  | "'" (lident as id)
+  | "'" (lalpha suffix as id)
       { QUOTE_LIDENT id }
   | ","
       { COMMA }
@@ -203,6 +203,8 @@ rule token = parse
       { SEMICOLON }
   | "->"
       { ARROW }
+  | "->'"
+      { Lexlib.backjump lexbuf 1; ARROW }
   | "<-"
       { LARROW }
   | "<->"
@@ -235,13 +237,17 @@ rule token = parse
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
-  | op_char_pref op_char_4* as s
+  | "]" (quote+ as s)
+      { RIGHTSQ_QUOTE s }
+  | ")" (['\'' '_'] alpha suffix core_suffix* as s)
+      { RIGHTPAR_QUOTE s }
+  | op_char_pref op_char_4* quote* as s
       { OPPREF s }
-  | op_char_1234* op_char_1 op_char_1234* as s
+  | op_char_1234* op_char_1 op_char_1234* quote* as s
       { OP1 s }
-  | op_char_234*  op_char_2 op_char_234*  as s
+  | op_char_234* op_char_2 op_char_234* quote* as s
       { OP2 s }
-  | op_char_34*   op_char_3 op_char_34*  as s
+  | op_char_34* op_char_3 op_char_34* quote* as s
       { OP3 s }
   | op_char_4+ as s
       { OP4 s }

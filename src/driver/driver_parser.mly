@@ -18,6 +18,8 @@
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
+%token <string> RIGHTSQ_QUOTE
+%token <string> RIGHTPAR_QUOTE
 %token <string> INPUT (* never reaches the parser *)
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
 %token INTERFACE
@@ -135,18 +137,24 @@ ident:
 | PLUGIN       { "plugin" }
 
 ident_rich:
-| ident                     { $1 }
-| LEFTPAR operator RIGHTPAR { $2 }
+| ident                             { $1 }
+| LEFTPAR operator RIGHTPAR         { $2 }
+| LEFTPAR operator RIGHTPAR_QUOTE   { $2 ^ $3 }
 
 operator:
-| OPERATOR                          { Ident.op_infix $1 }
+| o = OPERATOR                      { if o.[0] <> '!' && o.[0] <> '?' then
+                                      Ident.op_infix o else Ident.op_prefix o }
 | OPERATOR UNDERSCORE               { Ident.op_prefix $1 }
-| LEFTSQ RIGHTSQ                    { Ident.op_get }
-| LEFTSQ LARROW RIGHTSQ             { Ident.op_upd }
-| LEFTSQ RIGHTSQ LARROW             { Ident.op_set }
-| LEFTSQ DOTDOT RIGHTSQ             { Ident.op_cut }
-| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.op_rcut }
-| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.op_lcut }
+| LEFTSQ rightsq                    { Ident.op_get $2 }
+| LEFTSQ rightsq LARROW             { Ident.op_set $2 }
+| LEFTSQ LARROW rightsq             { Ident.op_update $3 }
+| LEFTSQ DOTDOT rightsq             { Ident.op_cut $3 }
+| LEFTSQ UNDERSCORE DOTDOT rightsq  { Ident.op_rcut $4 }
+| LEFTSQ DOTDOT UNDERSCORE rightsq  { Ident.op_lcut $4 }
+
+rightsq:
+| RIGHTSQ         { "" }
+| RIGHTSQ_QUOTE   { $1 }
 
 (* Types *)
 

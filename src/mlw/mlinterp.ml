@@ -465,29 +465,29 @@ let built_in_modules =
     ["array"],"Array", [],
     ["make", exec_bigarray_make ;
      "length", exec_bigarray_length ;
-     Ident.op_get, exec_bigarray_get ;
-     Ident.op_set, exec_bigarray_set ;
+     Ident.op_get "", exec_bigarray_get ;
+     Ident.op_set "", exec_bigarray_set ;
      "copy", exec_bigarray_copy ;
     ] ;
     ["mach"; "array"],"Array31", [],
     ["make", exec_array_make ;
      "length", exec_array_length ;
-     Ident.op_get, exec_array_get ;
-     Ident.op_set, exec_array_set ;
+     Ident.op_get "", exec_array_get ;
+     Ident.op_set "", exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["mach"; "array"],"Array32", [],
     ["make", exec_array_make ;
      "length", exec_array_length ;
-     Ident.op_get, exec_array_get ;
-     Ident.op_set, exec_array_set ;
+     Ident.op_get "", exec_array_get ;
+     Ident.op_set "", exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["mach"; "array"],"Array63", [],
     ["make", exec_array_make ;
      "length", exec_array_length ;
-     Ident.op_get, exec_array_get ;
-     Ident.op_set, exec_array_set ;
+     Ident.op_get "", exec_array_get ;
+     Ident.op_set "", exec_array_set ;
      "copy", exec_array_copy ;
     ] ;
     ["matrix"],"Matrix", [],

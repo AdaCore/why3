@@ -61,7 +61,7 @@ let alpha = ['a'-'z' 'A'-'Z' '_']
 let digit = ['0'-'9']
 let ident = alpha (alpha | digit | '\'')*
 
-let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
+let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%' '\\'
                '!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
 
 rule token = parse
@@ -97,11 +97,15 @@ rule token = parse
       { COMMA }
   | "'"
       { QUOTE }
-  | op_char+ as op
+  | "]" ("'"+ as s)
+      { RIGHTSQ_QUOTE s }
+  | ")" (['\'' '_'] ident as s)
+      { RIGHTPAR_QUOTE s }
+  | op_char+ "'"* as op
       { OPERATOR op }
-  | "\""
+  | '"'
       { STRING (Lexlib.string lexbuf) }
-  | "import" space*  "\""
+  | "import" space* '"'
       { INPUT (Lexlib.string lexbuf) }
   | eof
       { EOF }

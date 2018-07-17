@@ -41,8 +41,8 @@ let qloc_last = function
 
 let rec print_qualid fmt = function
   | Qdot (p, id) ->
-      Format.fprintf fmt "%a.%s" print_qualid p (Ident.str_decode id.id_str)
-  | Qident id    ->  Format.pp_print_string fmt (Ident.str_decode id.id_str)
+      Format.fprintf fmt "%a.%a" print_qualid p Ident.print_decoded id.id_str
+  | Qident id -> Ident.print_decoded fmt id.id_str
 
 let string_list_of_qualid q =
   let rec sloq acc = function

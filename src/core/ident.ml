@@ -53,130 +53,100 @@ type notation =
   | SNword   of string
   | SNinfix  of string
   | SNprefix of string
-  | SNget  (* [] *)
-  | SNset  (* []<- *)
-  | SNupd  (* [<-] *)
-  | SNcut  (* [..] *)
-  | SNlcut (* [.._] *)
-  | SNrcut (* [_..] *)
+  | SNget    of string  (* [] *)
+  | SNset    of string  (* []<- *)
+  | SNupdate of string  (* [<-] *)
+  | SNcut    of string  (* [..] *)
+  | SNlcut   of string  (* [.._] *)
+  | SNrcut   of string  (* [_..] *)
 
 (* current encoding *)
 
 let op_infix  s = "infix " ^ s
 let op_prefix s = "prefix " ^ s
+let op_get    s = "mixfix []" ^ s
+let op_set    s = "mixfix []<-" ^ s
+let op_update s = "mixfix [<-]" ^ s
+let op_cut    s = "mixfix [..]" ^ s
+let op_lcut   s = "mixfix [.._]" ^ s
+let op_rcut   s = "mixfix [_..]" ^ s
 
 let op_equ  = op_infix "="
 let op_neq  = op_infix "<>"
-let op_get  = "mixfix []"
-let op_set  = "mixfix []<-"
-let op_upd  = "mixfix [<-]"
-let op_cut  = "mixfix [..]"
-let op_lcut = "mixfix [.._]"
-let op_rcut = "mixfix [_..]"
-
-let check_op = function
-  | '@' | '!' | '^' | '$' | '=' | '%' | '>' | '#'
-  | '.' | ',' | '<' | '-' | '&' | '/' | '+' | '?'
-  | ':' | '*' | '~' | '|' | '\\' -> ()
-  | _ -> raise Exit
-
-let extract_infix s =
-  let len = String.length s in
-  if len <= 6 then None else
-  let prf = String.sub s 0 6 in
-  if prf <> "infix " then None else
-  let suf = String.sub s 6 (len - 6) in
-  try String.iter check_op suf; Some suf
-  with Exit -> None
-
-let extract_prefix s =
-  let len = String.length s in
-  if len <= 7 then None else
-  let prf = String.sub s 0 7 in
-  if prf <> "prefix " then None else
-  let suf = String.sub s 7 (len - 7) in
-  try String.iter check_op suf; Some suf
-  with Exit -> None
-
-let sn_decode s =
-  match extract_infix s  with Some op -> SNinfix  op | None -> begin
-  match extract_prefix s with Some op -> SNprefix op | None -> begin
-  if Strings.has_prefix "mixfix " s then begin
-    if s = op_get  then SNget else
-    if s = op_set  then SNset else
-    if s = op_upd  then SNupd else
-    if s = op_cut  then SNcut else
-    if s = op_lcut then SNlcut else
-    if s = op_rcut then SNrcut else
-    invalid_arg "Ident.sn_decode"
-  end else SNword s end end
-
-(* NOTE: possible future code, do not remove
-let op_to_alpha = function
-  | '@' -> 'a' | '!' -> 'b' | '^' -> 'c' | '$' -> 'd'
-  | '=' -> 'e' | '%' -> 'f' | '>' -> 'g' | '#' -> 'h'
-  | '.' -> 'i' | ',' -> 'j' | '<' -> 'l' | '-' -> 'm'
-  | '&' -> 'n' | '/' -> 'o' | '+' -> 'p' | '?' -> 'q'
-  | ':' -> 'r' | '*' -> 's' | '~' -> 't' | '\\' -> 'u'
-  | '|' -> 'v' | _ -> invalid_arg "Ident.sn_encode"
-
-let alpha_to_op = function
-  | 'a' -> '@' | 'b' -> '!' | 'c' -> '^' | 'd' -> '$'
-  | 'e' -> '=' | 'f' -> '%' | 'g' -> '>' | 'h' -> '#'
-  | 'i' -> '.' | 'j' -> ',' | 'l' -> '<' | 'm' -> '-'
-  | 'n' -> '&' | 'o' -> '/' | 'p' -> '+' | 'q' -> '?'
-  | 'r' -> ':' | 's' -> '*' | 't' -> '~' | 'u' -> '\\'
-  | 'v' -> '|' | _ -> invalid_arg "Ident.sn_decode"
-
-let op_infix  s = String.map op_to_alpha s ^ "'i"
-let op_prefix s = String.map op_to_alpha s ^ "'p"
-
-let op_equ  = op_infix "="
-let op_neq  = op_infix "<>"
-let op_get  = "get'm"
-let op_set  = "set'm"
-let op_upd  = "upd'm"
-let op_cut  = "cut'm"
-let op_lcut = "lcut'm"
-let op_rcut = "rcut'm"
-
-let sn_decode s =
-  let len = String.length s - 2 in
-  if len <= 0 || String.get s len <> '\'' then SNword s else
-  match String.get s (succ len) with
-  | 'i' -> SNinfix  (String.map alpha_to_op (String.sub s 0 len))
-  | 'p' -> SNprefix (String.map alpha_to_op (String.sub s 0 len))
-  | 'm' ->  if s = op_get  then SNget else
-            if s = op_set  then SNset else
-            if s = op_upd  then SNupd else
-            if s = op_cut  then SNcut else
-            if s = op_lcut then SNlcut else
-            if s = op_rcut then SNrcut else
-            invalid_arg "Ident.sn_decode"
-  | _   -> SNword s
-*)
 
 let sn_encode = function
-  | SNword s -> s
-  | SNinfix s -> op_infix s
+  | SNinfix s ->  op_infix s
   | SNprefix s -> op_prefix s
-  | SNget  -> op_get
-  | SNset  -> op_set
-  | SNupd  -> op_upd
-  | SNcut  -> op_cut
-  | SNlcut -> op_lcut
-  | SNrcut -> op_rcut
+  | SNget s ->    op_get s
+  | SNset s ->    op_set s
+  | SNupdate s -> op_update s
+  | SNcut s ->    op_cut s
+  | SNlcut s ->   op_lcut s
+  | SNrcut s ->   op_rcut s
+  | SNword s ->   s
 
-let str_decode s = match sn_decode s with
-  | SNword s -> s
-  | SNinfix s -> "(" ^ s ^ ")"
-  | SNprefix s -> "(" ^ s ^ "_)"
-  | SNget ->  "([])"
-  | SNupd ->  "([<-])"
-  | SNset ->  "([]<-)"
-  | SNcut ->  "([..])"
-  | SNlcut -> "([.._])"
-  | SNrcut -> "([_..])"
+let print_sn fmt w =
+  let lspace p = if p.[0] = '*' then " " else "" in
+  let rspace p = if p.[String.length p - 1] = '*' then " " else "" in
+  match w with (* infix/prefix never empty, mixfix never have stars *)
+  | SNinfix p ->  Format.fprintf fmt "(%s%s%s)" (lspace p) p (rspace p)
+  | SNprefix p when p.[0] = '!' || p.[0] = '?' ->
+                  Format.fprintf fmt "(%s%s)" p (rspace p)
+  | SNprefix p -> Format.fprintf fmt "(%s%s_)" (lspace p) p
+  | SNget p ->    Format.fprintf fmt "([]%s)" p
+  | SNset p ->    Format.fprintf fmt "([]%s<-)" p
+  | SNupdate p -> Format.fprintf fmt "([<-]%s)" p
+  | SNcut p ->    Format.fprintf fmt "([..]%s)" p
+  | SNlcut p ->   Format.fprintf fmt "([.._]%s)" p
+  | SNrcut p ->   Format.fprintf fmt "([_..]%s)" p
+  | SNword p ->   Format.pp_print_string fmt p
+
+(* The function below recognizes the following strings as notations:
+      "infix " (opchar+ [']* as p) (['_] [^'_] .* as q)
+      "prefix " (opchar+ [']* as p) (['_] [^'_] .* as q)
+      "mixfix [" .* "]" opchar* ([']* as p) (['_] [^'_] .* as q)
+   It will fail if you add a mixfix that contains a non-opchar after
+   the closing square bracket, or a mixfix that does have brackets.
+   Be careful when working with this code, it may eat your brain. *)
+
+let sn_decode s =
+  let len = String.length s in
+  if len <= 6 then SNword s else
+  let k = let prf = String.sub s 0 6 in
+          if prf = "infix " then 6 else
+          if len <= 7 || s.[6] <> ' ' then 0 else
+          if prf = "prefix" then 7 else
+          if len <= 8 || s.[7] <> '[' then 0 else
+          if prf <> "mixfix" then 0 else
+          try succ (String.index_from s 8 ']')
+          with Not_found -> 0 in
+  if k = 0 then SNword s else
+  let rec skip_opchar i =
+    if i = len then i else match s.[i] with
+      | '@' | '!' | '^' | '$' | '=' | '%' | '>' | '#'
+      | '.' | '<' | '-' | '&' | '/' | '+' | '?' | ':'
+      | '*' | '~' | '|' | '\\' -> skip_opchar (succ i)
+      | _ -> i in
+  let l = skip_opchar k in
+  if l = k && k < 8 then SNword s else
+  let rec skip_quote i =
+    if i = len || s.[i] <> '\'' then i else skip_quote (succ i) in
+  let m = skip_quote l in
+  let m = if l < m && m < len && s.[m] <> '_' then pred m else m in
+  let w = if k = 6 then SNinfix (String.sub s 6 (m - 6)) else
+          if k = 7 then SNprefix (String.sub s 7 (m - 7)) else
+          let p = if l < m then String.sub s l (m - l) else "" in
+          match String.sub s 8 (l - 8) with
+          | "]"   -> SNget p | "]<-"  -> SNset p  | "<-]"  -> SNupdate p
+          | "..]" -> SNcut p | ".._]" -> SNlcut p | "_..]" -> SNrcut p
+          | _ -> SNword (if m = len then s else String.sub s 0 m) in
+  if m = len then w (* no appended suffix *) else
+  if s.[m] <> '\'' && s.[m] <> '_' then SNword s else
+  let p = print_sn Format.str_formatter w;
+          Format.flush_str_formatter () in
+  SNword (p ^ String.sub s m (len - m))
+
+let print_decoded fmt s = print_sn fmt (sn_decode s)
 
 (** Identifiers *)
 
@@ -254,29 +224,20 @@ type ident_printer = {
 let find_unique indices name =
   let specname ind =
     (* If the symbol is infix/prefix *and* the name has not been
-       sanitized for provers (the quote is still there), we don't
-       want to disambiguate with a number but with a symbol:
-       "+" becomes "+^" "+^^" etc. This allows to parse the
-       ident again (for transformations). *)
+       sanitized for provers, we don't want to disambiguate with
+       a number but with a symbol: "+" becomes "+'" "+''" etc.
+       This allows to parse the ident again (for transformations). *)
     if ind <= 0 then name else
-    match extract_infix name with
-    | Some s -> op_infix (s ^ String.make ind '^')
-    | None -> begin match extract_prefix name with
-    | Some s -> op_prefix (s ^ String.make ind '^')
-    | None -> name ^ string_of_int ind end
-  in
-(* NOTE: possible future code, do not remove
-  let specname ind =
-    if ind <= 0 then name else
-    let len = String.length name - 2 in
-    if len > 0 && String.get name len = '\'' then
-      match String.get name (succ len) with
-      | 'i' -> String.sub name 0 len ^ String.make ind 'c' ^ "'i"
-      | 'p' -> String.sub name 0 len ^ String.make ind 'c' ^ "'p"
-      | _   -> name ^ string_of_int ind
-    else name ^ string_of_int ind
-  in
-*)
+    match sn_decode name with
+    | SNinfix s -> op_infix (s ^ String.make ind '\'')
+    | SNprefix s -> op_prefix (s ^ String.make ind '\'')
+    | SNget s -> op_get (s ^ String.make ind '\'')
+    | SNset s -> op_set (s ^ String.make ind '\'')
+    | SNupdate s -> op_update (s ^ String.make ind '\'')
+    | SNcut s -> op_cut (s ^ String.make ind '\'')
+    | SNlcut s -> op_lcut (s ^ String.make ind '\'')
+    | SNrcut s -> op_rcut (s ^ String.make ind '\'')
+    | SNword _ -> name ^ string_of_int ind in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in

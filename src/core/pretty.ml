@@ -136,12 +136,6 @@ let forget_var vs = forget_id iprinter vs.vs_name
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
-let left_escape_op s =
-  if Strings.has_prefix "*" s then " " ^ s else s
-
-let escape_op s = let s = left_escape_op s in
-  if Strings.has_suffix "*" s then s ^ " " else s
-
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
@@ -151,28 +145,15 @@ let print_ts fmt ts =
   if ts_equal ts ts_func then pp_print_string fmt "(->)" else
   pp_print_string fmt (id_unique tprinter ts.ts_name)
 
-let print_raw_ls fmt ls =
-  pp_print_string fmt (id_unique iprinter ls.ls_name)
-
-let print_ls fmt ({ls_name = id} as ls) =
-  match Ident.sn_decode id.id_string with
-  | Ident.SNinfix s -> fprintf fmt "(%s)" (escape_op s)
-  | Ident.SNprefix s when tight_op s -> fprintf fmt "(%s)" (escape_op s)
-  | Ident.SNprefix s -> fprintf fmt "(%s_)" (left_escape_op s)
-  | Ident.SNget -> pp_print_string fmt "([])"
-  | Ident.SNupd -> pp_print_string fmt "([<-])"
-  | Ident.SNset -> pp_print_string fmt "([]<-)"
-  | Ident.SNcut -> pp_print_string fmt "([..])"
-  | Ident.SNlcut -> pp_print_string fmt "([.._])"
-  | Ident.SNrcut -> pp_print_string fmt "([_..])"
-  | Ident.SNword _ -> print_raw_ls fmt ls
-
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
   pp_print_string fmt (id_unique iprinter ~sanitizer ls.ls_name)
 
+let print_ls fmt ls =
+  Ident.print_decoded fmt (id_unique iprinter ls.ls_name)
+
 let print_pr fmt pr =
-  pp_print_string fmt (id_unique pprinter pr.pr_name)
+  Ident.print_decoded fmt (id_unique pprinter pr.pr_name)
 
 (** Types *)
 
@@ -271,9 +252,10 @@ and print_lterm pri fmt t =
     else print_tattr pri fmt t in
   print_tloc pri fmt t
 
-and print_app pri ({ls_name = id} as ls) fmt tl =
-  if tl = [] then print_raw_ls fmt ls else
-  match Ident.sn_decode id.id_string, tl with
+and print_app pri ls fmt tl =
+  if tl = [] then print_ls fmt ls else
+  let s = id_unique iprinter ls.ls_name in
+  match Ident.sn_decode s, tl with
   | Ident.SNprefix s, [t1] when tight_op s ->
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
@@ -283,27 +265,30 @@ and print_app pri ({ls_name = id} as ls) fmt tl =
   | Ident.SNinfix s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
-  | Ident.SNget, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
-        (print_lterm 7) t1 print_term t2
-  | Ident.SNupd, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
-        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
-  | Ident.SNset, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 5) "@[%a@,[%a] <-@ %a@]")
-        (print_lterm 6) t1 print_term t2 (print_lterm 6) t3
-  | Ident.SNcut, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a..%a]")
-        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
-  | Ident.SNrcut, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a..]")
-        (print_lterm 7) t1 print_term t2
-  | Ident.SNlcut, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 7) "%a[..%a]")
-        (print_lterm 7) t1 print_term t2
-  | _, tl -> (* do not fail if not SNword, just print the string *)
-      fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
-        print_raw_ls ls (print_list space (print_lterm 7)) tl
+  | Ident.SNget s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]%s@]")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNupdate s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]%s@]")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3 s
+  | Ident.SNset s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 5) "@[%a@,[%a]%s <-@ %a@]")
+        (print_lterm 6) t1 print_term t2 s (print_lterm 6) t3
+  | Ident.SNcut s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..%a]%s")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3 s
+  | Ident.SNrcut s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..]%s")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNlcut s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "%a[..%a]%s")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNword s, tl ->
+      fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
+        s (print_list space (print_lterm 7)) tl
+  | _, tl -> (* do not fail, just print the string *)
+      fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
+        s (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
@@ -754,20 +739,20 @@ let () = Exn_printer.register
   | Decl.UnboundVar vs ->
       fprintf fmt "Unbound variable: %a" print_vsty vs
   | Decl.ClashIdent id ->
-      fprintf fmt "Ident %s is defined twice" (Ident.str_decode id.id_string)
+      fprintf fmt "Ident %a is defined twice" Ident.print_decoded id.id_string
   | Decl.EmptyDecl ->
       fprintf fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" print_ts ts
   | Decl.EmptyIndDecl ls ->
       fprintf fmt "Inductive predicate %a has no constructors" print_ls ls
-  | Decl.KnownIdent id ->
-      fprintf fmt "Ident %s is already declared" (Ident.str_decode id.id_string)
-  | Decl.UnknownIdent id ->
-      fprintf fmt "Ident %s is not yet declared" (Ident.str_decode id.id_string)
-  | Decl.RedeclaredIdent id ->
-      fprintf fmt "Ident %s is already declared, with a different declaration"
-        (Ident.str_decode id.id_string)
+  | Decl.KnownIdent {id_string = s} ->
+      fprintf fmt "Ident %a is already declared" Ident.print_decoded s
+  | Decl.UnknownIdent {id_string = s} ->
+      fprintf fmt "Ident %a is not yet declared" Ident.print_decoded s
+  | Decl.RedeclaredIdent {id_string = s} ->
+      fprintf fmt "Ident %a is already declared, with a different declaration"
+        Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | _ -> raise exn

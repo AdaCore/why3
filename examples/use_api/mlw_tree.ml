@@ -198,9 +198,9 @@ let array_int_type = PTtyapp(mk_qid ["Array";"array"],[int_type])
 
 let length = mk_qid ["Array";"length"]
 
-let array_get = mk_qid ["Array"; Ident.op_get]
+let array_get = mk_qid ["Array"; Ident.op_get ""]
 
-let array_set = mk_qid ["Array"; Ident.op_set]
+let array_set = mk_qid ["Array"; Ident.op_set ""]
 
 let d3 =
   let id_a = mk_ident "a" in

@@ -1154,8 +1154,7 @@ let ls_decr_of_rec_defn = function
 open Format
 open Pretty
 
-let sprinter = create_ident_printer []
-  ~sanitizer:(sanitizer char_to_alpha char_to_alnumus)
+let sprinter = create_ident_printer [] ~sanitizer:(fun x -> x)
 
 let id_of_rs s = match s.rs_logic with
   | RLnone | RLlemma -> s.rs_name
@@ -1175,29 +1174,11 @@ let forget_let_defn = function
 let tight_op s =
   s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
 
-let left_escape_op s =
-  if Strings.has_prefix "*" s then " " ^ s else s
-
-let escape_op s = let s = left_escape_op s in
-  if Strings.has_suffix "*" s then s ^ " " else s
-
-let print_normal_rs fmt s = match s.rs_logic with
-  | RLnone | RLlemma -> pp_print_string fmt (id_unique sprinter s.rs_name)
+let print_rs fmt s = match s.rs_logic with
+  | RLnone | RLlemma ->
+      Ident.print_decoded fmt (id_unique sprinter s.rs_name)
   | RLpv v -> print_pv fmt v
   | RLls s -> print_ls fmt s
-
-let print_rs fmt ({rs_name = id} as s) =
-  match Ident.sn_decode id.id_string with
-  | Ident.SNinfix s -> fprintf fmt "(%s)" (escape_op s)
-  | Ident.SNprefix s when tight_op s -> fprintf fmt "(%s)" (escape_op s)
-  | Ident.SNprefix s -> fprintf fmt "(%s_)" (left_escape_op s)
-  | Ident.SNget -> pp_print_string fmt "([])"
-  | Ident.SNupd -> pp_print_string fmt "([<-])"
-  | Ident.SNset -> pp_print_string fmt "([]<-)"
-  | Ident.SNcut -> pp_print_string fmt "([..])"
-  | Ident.SNlcut -> pp_print_string fmt "([.._])"
-  | Ident.SNrcut -> pp_print_string fmt "([_..])"
-  | Ident.SNword _ -> print_normal_rs fmt s
 
 let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
@@ -1246,9 +1227,10 @@ let ambig_ls s =
 
 let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
-let print_capp pri ({rs_name = id} as s) fmt vl =
-  if vl = [] then print_normal_rs fmt s else
-  match Ident.sn_decode id.id_string, vl with
+let print_capp pri s fmt vl =
+  if vl = [] then print_rs fmt s else
+  let p = id_unique sprinter s.rs_name in
+  match Ident.sn_decode p, vl with
   | Ident.SNprefix o, [t1] when tight_op o ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
   | Ident.SNprefix o, [t1] ->
@@ -1256,24 +1238,27 @@ let print_capp pri ({rs_name = id} as s) fmt vl =
   | Ident.SNinfix o, [t1;t2] ->
       fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
         print_pv t1 o print_pv t2
-  | Ident.SNget, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
-  | Ident.SNupd, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | Ident.SNset, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
-        print_pv t1 print_pv t2 print_pv t3
-  | Ident.SNcut, [t1;t2;t3] ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | Ident.SNrcut, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
-  | Ident.SNlcut, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
-  | _, tl -> (* do not fail if not SNword, just print the string *)
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_normal_rs s (Pp.print_list Pp.space print_pv) tl
+  | Ident.SNget p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a]%s") print_pv t1 print_pv t2 p
+  | Ident.SNupdate p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]%s")
+        print_pv t1 print_pv t2 print_pv t3 p
+  | Ident.SNset p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 0) "%a[%a]%s <- %a")
+        print_pv t1 print_pv t2 p print_pv t3
+  | Ident.SNcut p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]%s")
+        print_pv t1 print_pv t2 print_pv t3 p
+  | Ident.SNrcut p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..]%s") print_pv t1 print_pv t2 p
+  | Ident.SNlcut p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[..%a]%s") print_pv t1 print_pv t2 p
+  | Ident.SNword p, vl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%s@ %a@]")
+        p (Pp.print_list Pp.space print_pv) vl
+  | _, vl -> (* do not fail, just print the string *)
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%s@ %a@]")
+        p (Pp.print_list Pp.space print_pv) vl
 
 let print_cpur pri s fmt vl =
   if vl = [] then fprintf fmt "{%a}" print_ls s else

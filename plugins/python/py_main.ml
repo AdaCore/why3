@@ -29,8 +29,8 @@ let mk_id ~loc name =
 
 let infix  ~loc s = Qident (mk_id ~loc (Ident.op_infix s))
 let prefix ~loc s = Qident (mk_id ~loc (Ident.op_prefix s))
-let get_op ~loc   = Qident (mk_id ~loc Ident.op_get)
-let set_op ~loc   = Qident (mk_id ~loc Ident.op_set)
+let get_op ~loc   = Qident (mk_id ~loc (Ident.op_get ""))
+let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }

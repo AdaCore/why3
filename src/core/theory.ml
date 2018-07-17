@@ -448,8 +448,7 @@ let add_symbol_pr uc pr = add_symbol add_pr pr.pr_name pr uc
 
 let create_decl d = mk_tdecl (Decl d)
 
-let print_id fmt id =
-  Format.pp_print_string fmt (Ident.str_decode id.id_string)
+let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let warn_dubious_axiom uc k p syms =
   match k with
@@ -962,14 +961,11 @@ let print_meta_arg_type fmt = function
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NonLocal id ->
-      Format.fprintf fmt "Non-local symbol: %s"
-        (Ident.str_decode id.id_string)
+      Format.fprintf fmt "Non-local symbol: %a" print_id id
   | CannotInstantiate id ->
-      Format.fprintf fmt "Cannot instantiate a defined symbol %s"
-        (Ident.str_decode id.id_string)
+      Format.fprintf fmt "Cannot instantiate a defined symbol %a" print_id id
   | BadInstance id ->
-      Format.fprintf fmt "Illegal instantiation for symbol %s"
-        (Ident.str_decode id.id_string)
+      Format.fprintf fmt "Illegal instantiation for symbol %a" print_id id
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->

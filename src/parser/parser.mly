@@ -53,11 +53,11 @@
 
   let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
 
-  let get_op  s e = Qident (mk_id Ident.op_get s e)
-  let upd_op  s e = Qident (mk_id Ident.op_upd s e)
-  let cut_op  s e = Qident (mk_id Ident.op_cut s e)
-  let rcut_op s e = Qident (mk_id Ident.op_rcut s e)
-  let lcut_op s e = Qident (mk_id Ident.op_lcut s e)
+  let get_op  q s e = Qident (mk_id (Ident.op_get q) s e)
+  let upd_op  q s e = Qident (mk_id (Ident.op_update q) s e)
+  let cut_op  q s e = Qident (mk_id (Ident.op_cut q) s e)
+  let rcut_op q s e = Qident (mk_id (Ident.op_rcut q) s e)
+  let lcut_op q s e = Qident (mk_id (Ident.op_lcut q) s e)
 
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -149,6 +149,8 @@
 %token <string> ATTRIBUTE
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
+%token <string> RIGHTSQ_QUOTE (* ]'' *)
+%token <string> RIGHTPAR_QUOTE (* )'spec *)
 
 (* keywords *)
 
@@ -614,11 +616,11 @@ single_term_:
       | Pvar id -> Tlet (id, def, $6)
       | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
       | _ -> Tcase (def, [pat, $6]) }
-| LET attrs(lident_op_id) EQUAL term IN term
+| LET attrs(lident_op_nq) EQUAL term IN term
     { Tlet ($2, $4, $6) }
 | LET attrs(lident_nq) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
-| LET attrs(lident_op_id) mk_term(lam_defn) IN term
+| LET attrs(lident_op_nq) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
 | MATCH term WITH match_cases(term) END
     { Tcase ($2, $4) }
@@ -665,16 +667,16 @@ term_sub_:
 | term_block                                        { $1 }
 | uqualid DOT mk_term(term_block)                   { Tscope ($1, $3) }
 | term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
-| term_arg LEFTSQ term RIGHTSQ
-    { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
-| term_arg LEFTSQ term LARROW term RIGHTSQ
-    { Tidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
-| term_arg LEFTSQ term DOTDOT term RIGHTSQ
-    { Tidapp (cut_op $startpos($2) $endpos($2), [$1;$3;$5]) }
-| term_arg LEFTSQ term DOTDOT RIGHTSQ
-    { Tidapp (rcut_op $startpos($2) $endpos($2), [$1;$3]) }
-| term_arg LEFTSQ DOTDOT term RIGHTSQ
-    { Tidapp (lcut_op $startpos($2) $endpos($2), [$1;$4]) }
+| term_arg LEFTSQ term rightsq
+    { Tidapp (get_op $4 $startpos($2) $endpos($2), [$1;$3]) }
+| term_arg LEFTSQ term LARROW term rightsq
+    { Tidapp (upd_op $6 $startpos($2) $endpos($2), [$1;$3;$5]) }
+| term_arg LEFTSQ term DOTDOT term rightsq
+    { Tidapp (cut_op $6 $startpos($2) $endpos($2), [$1;$3;$5]) }
+| term_arg LEFTSQ term DOTDOT rightsq
+    { Tidapp (rcut_op $5 $startpos($2) $endpos($2), [$1;$3]) }
+| term_arg LEFTSQ DOTDOT term rightsq
+    { Tidapp (lcut_op $5 $startpos($2) $endpos($2), [$1;$4]) }
 
 field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
@@ -781,16 +783,25 @@ assign_expr:
     { let loc = floc $startpos $endpos in
       let rec down ll rl = match ll, rl with
         | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl -> (e1,q,e2) :: down ll rl
-        | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_
-          when id.id_str = Ident.op_get -> Loc.errorm ~loc
-            "Parallel array assignments are not allowed"
+        | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_ ->
+            begin match Ident.sn_decode id.id_str with
+              | Ident.SNget _ -> Loc.errorm ~loc
+                  "Parallel array assignments are not allowed"
+              | _ -> Loc.errorm ~loc
+                  "Invalid left expression in an assignment"
+            end
         | {expr_loc = loc}::_, _::_ -> Loc.errorm ~loc
             "Invalid left expression in an assignment"
         | [], [] -> []
         | _ -> Loc.errorm ~loc "Invalid parallel assignment" in
       let d = match $1.expr_desc, $3.expr_desc with
-        | Eidapp (Qident id, [e1;e2]), _ when id.id_str = Ident.op_get ->
-            Eidapp (Qident {id with id_str = Ident.op_set}, [e1;e2;$3])
+        | Eidapp (Qident id, [e1;e2]), _ ->
+            begin match Ident.sn_decode id.id_str with
+              | Ident.SNget q ->
+                  Eidapp (Qident {id with id_str = Ident.op_set q}, [e1;e2;$3])
+              | _ -> Loc.errorm ~loc:$1.expr_loc
+                  "Invalid left expression in an assignment"
+            end
         | Etuple ll, Etuple rl -> Eassign (down ll rl)
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
         | _, _ -> Eassign (down [$1] [$3]) in
@@ -864,11 +875,11 @@ single_expr_:
       | Pghost {pat_desc = Pwild} ->
                   Elet (id_anonymous pat.pat_loc, true, kind, def, $8)
       | _ -> Ematch (def, [pat, $8], []) }
-| LET ghost kind attrs(lident_op_id) EQUAL seq_expr IN seq_expr
+| LET ghost kind attrs(lident_op_nq) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
-| LET ghost kind attrs(lident_op_id) mk_expr(fun_defn) IN seq_expr
+| LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
@@ -1004,16 +1015,16 @@ expr_sub:
 | expr_dot DOT mk_expr(expr_pure)                   { Eapply ($3, $1) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
-| expr_arg LEFTSQ expr RIGHTSQ
-    { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
-| expr_arg LEFTSQ expr LARROW expr RIGHTSQ
-    { Eidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
-| expr_arg LEFTSQ expr DOTDOT expr RIGHTSQ
-    { Eidapp (cut_op $startpos($2) $endpos($2), [$1;$3;$5]) }
-| expr_arg LEFTSQ expr DOTDOT RIGHTSQ
-    { Eidapp (rcut_op $startpos($2) $endpos($2), [$1;$3]) }
-| expr_arg LEFTSQ DOTDOT expr RIGHTSQ
-    { Eidapp (lcut_op $startpos($2) $endpos($2), [$1;$4]) }
+| expr_arg LEFTSQ expr rightsq
+    { Eidapp (get_op $4 $startpos($2) $endpos($2), [$1;$3]) }
+| expr_arg LEFTSQ expr LARROW expr rightsq
+    { Eidapp (upd_op $6 $startpos($2) $endpos($2), [$1;$3;$5]) }
+| expr_arg LEFTSQ expr DOTDOT expr rightsq
+    { Eidapp (cut_op $6 $startpos($2) $endpos($2), [$1;$3;$5]) }
+| expr_arg LEFTSQ expr DOTDOT rightsq
+    { Eidapp (rcut_op $5 $startpos($2) $endpos($2), [$1;$3]) }
+| expr_arg LEFTSQ DOTDOT expr rightsq
+    { Eidapp (lcut_op $5 $startpos($2) $endpos($2), [$1;$4]) }
 
 loop_body:
 | (* epsilon *)   { mk_expr (Etuple []) $startpos $endpos }
@@ -1234,33 +1245,47 @@ lident_keyword:
 quote_lident:
 | QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
 
+rightsq:
+| RIGHTSQ         { "" }
+| RIGHTSQ_QUOTE   { $1 }
+
 (* Idents + symbolic operation names *)
 
 ident_rich:
 | uident        { $1 }
 | lident        { $1 }
-| lident_op_id  { $1 }
+| lident_op     { $1 }
 
 lident_rich:
 | lident_nq     { $1 }
-| lident_op_id  { $1 }
-
-lident_op_id:
-| LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
+| lident_op_nq  { $1 }
 
 lident_op:
+| LEFTPAR lident_op_str RIGHTPAR
+    { mk_id $2 $startpos($2) $endpos($2) }
+| LEFTPAR lident_op_str RIGHTPAR_QUOTE
+    { mk_id ($2^$3) $startpos $endpos }
+
+lident_op_nq:
+| LEFTPAR lident_op_str RIGHTPAR
+    { mk_id $2 $startpos($2) $endpos($2) }
+| LEFTPAR lident_op_str RIGHTPAR_QUOTE
+    { let loc = floc $startpos $endpos in
+      Loc.errorm ~loc "Symbol (%s)%s cannot be user-defined" $2 $3 }
+
+lident_op_str:
 | op_symbol                         { Ident.op_infix $1 }
 | op_symbol UNDERSCORE              { Ident.op_prefix $1 }
 | MINUS     UNDERSCORE              { Ident.op_prefix "-" }
 | EQUAL                             { Ident.op_infix "=" }
 | MINUS                             { Ident.op_infix "-" }
 | OPPREF UNDERSCORE?                { Ident.op_prefix $1 }
-| LEFTSQ RIGHTSQ                    { Ident.op_get }
-| LEFTSQ LARROW RIGHTSQ             { Ident.op_upd }
-| LEFTSQ RIGHTSQ LARROW             { Ident.op_set }
-| LEFTSQ DOTDOT RIGHTSQ             { Ident.op_cut }
-| LEFTSQ UNDERSCORE DOTDOT RIGHTSQ  { Ident.op_rcut }
-| LEFTSQ DOTDOT UNDERSCORE RIGHTSQ  { Ident.op_lcut }
+| LEFTSQ rightsq                    { Ident.op_get $2 }
+| LEFTSQ rightsq LARROW             { Ident.op_set $2 }
+| LEFTSQ LARROW rightsq             { Ident.op_update $3 }
+| LEFTSQ DOTDOT rightsq             { Ident.op_cut $3 }
+| LEFTSQ UNDERSCORE DOTDOT rightsq  { Ident.op_rcut $4 }
+| LEFTSQ DOTDOT UNDERSCORE rightsq  { Ident.op_lcut $4 }
 
 op_symbol:
 | OP1 { $1 }
@@ -1293,32 +1318,32 @@ prefix_op:
 (* Qualified idents *)
 
 qualid:
-| ident_rich                { Qident $1 }
-| uqualid DOT ident_rich    { Qdot ($1, $3) }
+| ident_rich              { Qident $1 }
+| uqualid DOT ident_rich  { Qdot ($1, $3) }
 
 lqualid_rich:
-| lident                    { Qident $1 }
-| lident_op_id              { Qident $1 }
-| uqualid DOT lident        { Qdot ($1, $3) }
-| uqualid DOT lident_op_id  { Qdot ($1, $3) }
+| lident                  { Qident $1 }
+| lident_op               { Qident $1 }
+| uqualid DOT lident      { Qdot ($1, $3) }
+| uqualid DOT lident_op   { Qdot ($1, $3) }
 
 lqualid:
-| lident              { Qident $1 }
-| uqualid DOT lident  { Qdot ($1, $3) }
+| lident                  { Qident $1 }
+| uqualid DOT lident      { Qdot ($1, $3) }
 
 uqualid:
-| uident              { Qident $1 }
-| uqualid DOT uident  { Qdot ($1, $3) }
+| uident                  { Qident $1 }
+| uqualid DOT uident      { Qdot ($1, $3) }
 
 (* Theory/Module names *)
 
 tqualid:
-| uident                { Qident $1 }
-| any_qualid DOT uident { Qdot ($1, $3) }
+| uident                  { Qident $1 }
+| any_qualid DOT uident   { Qdot ($1, $3) }
 
 any_qualid:
-| sident                { Qident $1 }
-| any_qualid DOT sident { Qdot ($1, $3) }
+| sident                  { Qident $1 }
+| any_qualid DOT sident   { Qdot ($1, $3) }
 
 sident:
 | ident   { $1 }

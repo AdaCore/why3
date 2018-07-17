@@ -1225,20 +1225,9 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
-let get_rs_name nm = match Ident.sn_decode nm with
-  | Ident.SNget -> "([])"
-  | Ident.SNset -> "([]<-)"
-  | Ident.SNupd -> "([<-])"
-  | Ident.SNcut -> "([..])"
-  | Ident.SNrcut -> "([_..])"
-  | Ident.SNlcut -> "([.._])"
-  | Ident.SNinfix s -> "(" ^ s ^ ")"
-  | Ident.SNprefix s -> "(" ^ s ^ "_)"
-  | Ident.SNword s -> s
-
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
-      "Incombatible type signatures for notation '%s'" (get_rs_name nm)
+      "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
   | _ -> raise e)
