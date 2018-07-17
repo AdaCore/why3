@@ -59,7 +59,8 @@
 let space = [' ' '\t' '\r']
 let alpha = ['a'-'z' 'A'-'Z' '_']
 let digit = ['0'-'9']
-let ident = alpha (alpha | digit | '\'')*
+let idsuf = alpha | digit | '\''
+let ident = alpha idsuf*
 
 let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%' '\\'
                '!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
@@ -99,7 +100,7 @@ rule token = parse
       { QUOTE }
   | "]" ("'"+ as s)
       { RIGHTSQ_QUOTE s }
-  | ")" (['\'' '_'] ident as s)
+  | ")" (['\'' '_'] ['a'-'z' 'A'-'Z'] idsuf* as s)
       { RIGHTPAR_QUOTE s }
   | op_char+ "'"* as op
       { OPERATOR op }
