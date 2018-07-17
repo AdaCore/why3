@@ -565,4 +565,4 @@ let call_editor ~command fin =
   if use_stdin then Unix.close fd_in;
   EditorCall pid
 
-let interrupt_call id = Prove_client.send_interrupt id
+let interrupt_call id = Prove_client.send_interrupt ~id
