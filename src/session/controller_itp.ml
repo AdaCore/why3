@@ -269,9 +269,34 @@ end
 
 module Make(S : Scheduler) = struct
 
-let scheduled_proof_attempts = Queue.create ()
+(* type for scheduled proof attempts *)
+type sched_pa_rec =
+  { spa_contr    : controller;
+    spa_id       : proofNodeID;
+    spa_pr       : Whyconf.prover;
+    spa_limit    : Call_provers.resource_limit;
+    spa_pr_scr   : string option;
+    spa_callback : (proof_attempt_status -> unit);
+    spa_ores     : Call_provers.prover_result option;
+  }
 
-let prover_tasks_in_progress = Hashtbl.create 17
+let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
+
+(* type for prover tasks in progress *)
+type tasks_prog_rec =
+  {
+    tp_session  : Session_itp.session;
+    tp_id       : proofNodeID;
+    tp_pr       : Whyconf.prover;
+    tp_callback : (proof_attempt_status -> unit);
+    tp_started  : bool;
+    tp_call     : Call_provers.prover_call;
+    tp_ores     : Call_provers.prover_result option;
+  }
+
+let prover_tasks_in_progress :
+    (Call_provers.prover_call,tasks_prog_rec) Hashtbl.t =
+  Hashtbl.create 17
 
 (* We need to separate tasks that are edited from proofattempt in progress
    because we are not using why3server for the edited proofs and timeout_handler
@@ -289,9 +314,7 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-(* calling provers, with limits adaptation
-
- *)
+(* calling provers, with limits adaptation *)
 
 
 (* to avoid corner cases when prover results are obtained very closely
@@ -363,28 +386,38 @@ let fuzzy_proof_time nres ores =
   else nres
 
 
-let build_prover_call ?proof_script c id pr limit callback ores =
-  let (config_pr,driver) = Hprover.find c.controller_provers pr in
-  let with_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+let build_prover_call spa =
+  let c = spa.spa_contr in
+  let limit = spa.spa_limit in
+  let (config_pr,driver) = Hprover.find c.controller_provers spa.spa_pr in
+  let with_steps =
+    Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
   try
-    let task = Session_itp.get_task c.controller_session id in
+    let task = Session_itp.get_task c.controller_session spa.spa_id in
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
-                  (Pp.print_option Pp.string) proof_script;
+                  (Pp.print_option Pp.string) spa.spa_pr_scr;
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     try
       let call =
-        Driver.prove_task ?old:proof_script ~inplace ~command
-                          ~limit ~interactive driver task
+        Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
+                        ~limit ~interactive driver task
       in
-      let pa = (c.controller_session,id,pr,callback,false,call,ores) in
+      let pa =
+        { tp_session  = c.controller_session;
+          tp_id       = spa.spa_id;
+          tp_pr       = spa.spa_pr;
+          tp_callback = spa.spa_callback;
+          tp_started  = false;
+          tp_call     = call;
+          tp_ores     = spa.spa_ores } in
       Hashtbl.replace prover_tasks_in_progress call pa
     with Sys_error _ as e ->
-      callback (InternalFailure e)
+      spa.spa_callback (InternalFailure e)
   with Not_found (* goal has no task, it is detached *) ->
-       callback Detached
+       spa.spa_callback Detached
 
 let update_observer () =
   let scheduled = Queue.length scheduled_proof_attempts in
@@ -400,31 +433,31 @@ let timeout_handler () =
     let results = Call_provers.get_new_results ~blocking:S.blocking in
     List.iter (fun (call, prover_update) ->
       match Hashtbl.find prover_tasks_in_progress call with
-      | (ses,id,pr,callback,started,call,ores) ->
+      | ptp ->
         begin match prover_update with
         | Call_provers.NoUpdates -> ()
         | Call_provers.ProverStarted ->
-            assert (not started);
-            callback Running;
+            assert (not ptp.tp_started);
+            ptp.tp_callback Running;
             incr number_of_running_provers;
-            Hashtbl.replace prover_tasks_in_progress call
-              (ses,id,pr,callback,true,call,ores)
+            Hashtbl.replace prover_tasks_in_progress ptp.tp_call
+              {ptp with tp_started = true}
         | Call_provers.ProverFinished res ->
-            Hashtbl.remove prover_tasks_in_progress call;
-            if started then decr number_of_running_provers;
-            let res = Opt.fold fuzzy_proof_time res ores in
+            Hashtbl.remove prover_tasks_in_progress ptp.tp_call;
+            if ptp.tp_started then decr number_of_running_provers;
+            let res = Opt.fold fuzzy_proof_time res ptp.tp_ores in
             (* inform the callback *)
-            callback (Done res)
+            ptp.tp_callback (Done res)
         | Call_provers.ProverInterrupted ->
-            Hashtbl.remove prover_tasks_in_progress call;
-            if started then decr number_of_running_provers;
+            Hashtbl.remove prover_tasks_in_progress ptp.tp_call;
+            if ptp.tp_started then decr number_of_running_provers;
             (* inform the callback *)
-            callback (Interrupted)
+            ptp.tp_callback (Interrupted)
         | Call_provers.InternalFailure exn ->
-            Hashtbl.remove prover_tasks_in_progress call;
-            if started then decr number_of_running_provers;
+            Hashtbl.remove prover_tasks_in_progress ptp.tp_call;
+            if ptp.tp_started then decr number_of_running_provers;
             (* inform the callback *)
-            callback (InternalFailure (exn))
+            ptp.tp_callback (InternalFailure (exn))
         end
       | exception Not_found -> ()
         (* We probably received ProverStarted after ProverFinished,
@@ -461,12 +494,10 @@ let timeout_handler () =
     try
       for _i = Hashtbl.length prover_tasks_in_progress
           to S.multiplier * !session_max_tasks do
-        let (c,id,pr,limit,proof_script,callback,ores) =
-          Queue.pop scheduled_proof_attempts in
-        try
-          build_prover_call ?proof_script c id pr limit callback ores
+        let spa = Queue.pop scheduled_proof_attempts in
+        try build_prover_call spa
         with e when not (Debug.test_flag Debug.stack_trace) ->
-          callback (InternalFailure e)
+          spa.spa_callback (InternalFailure e)
       done
   with Queue.Empty -> ()
   end;
@@ -475,8 +506,7 @@ let timeout_handler () =
 
 let interrupt () =
   (* Interrupt provers *)
-  Hashtbl.iter (fun _k e ->
-    let (_, _, _, callback, _, _, _) = e in callback Interrupted)
+  Hashtbl.iter (fun _k e -> e.tp_callback Interrupted)
     prover_tasks_in_progress;
   Hashtbl.clear prover_tasks_in_progress;
   (* Do not interrupt editors
@@ -488,9 +518,8 @@ let interrupt () =
   *)
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,_proof_script,callback,_ores) =
-      Queue.pop scheduled_proof_attempts in
-    callback Interrupted
+    let spa = Queue.pop scheduled_proof_attempts in
+    spa.spa_callback Interrupted
   done;
   !observer 0 0 0
 
@@ -550,8 +579,15 @@ let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
     with Not_found | Session_itp.BadID -> limit,None,save_to
   in
   let panid = graft_proof_attempt ~limit ses id pr in
-  Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,ores)
-            scheduled_proof_attempts;
+  let spa =
+    { spa_contr    = c;
+      spa_id       = id;
+      spa_pr       = pr;
+      spa_limit    = adaptlimit;
+      spa_pr_scr   = proof_script;
+      spa_callback = callback panid;
+      spa_ores     = ores } in
+  Queue.add spa scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
 
