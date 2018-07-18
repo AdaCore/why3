@@ -1760,7 +1760,7 @@ let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfreq
     mostfrequent_memlimit
 
 let save_string_attrib name fmt s =
-  if s <> "" then fprintf fmt "@ %s=\"%s\"" name s
+  if s <> "" then fprintf fmt "@ %s=\"%a\"" name save_string s
 
 let save_option_def name fmt opt =
   match opt with
