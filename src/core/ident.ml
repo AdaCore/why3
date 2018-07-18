@@ -104,22 +104,20 @@ let print_sn fmt w =
 (* The function below recognizes the following strings as notations:
       "infix " (opchar+ [']* as p) (['_] [^'_] .* as q)
       "prefix " (opchar+ [']* as p) (['_] [^'_] .* as q)
-      "mixfix [" .* "]" opchar* ([']* as p) (['_] [^'_] .* as q)
+      "mixfix " .* "]" opchar* ([']* as p) (['_] [^'_] .* as q)
    It will fail if you add a mixfix that contains a non-opchar after
-   the closing square bracket, or a mixfix that does have brackets.
+   the closing square bracket, or a mixfix that does not use brackets.
    Be careful when working with this code, it may eat your brain. *)
 
 let sn_decode s =
   let len = String.length s in
   if len <= 6 then SNword s else
-  let k = let prf = String.sub s 0 6 in
-          if prf = "infix " then 6 else
-          if len <= 7 || s.[6] <> ' ' then 0 else
-          if prf = "prefix" then 7 else
-          if len <= 8 || s.[7] <> '[' then 0 else
-          if prf <> "mixfix" then 0 else
-          try succ (String.index_from s 8 ']')
-          with Not_found -> 0 in
+  if s.[5] <> ' ' && s.[6] <> ' ' then SNword s else
+  let k = match String.sub s 0 6 with
+    | "infix " -> 6
+    | "prefix" -> 7
+    | "mixfix" -> (try succ (String.index_from s 7 ']') with Not_found -> 0)
+    | _ -> 0 in
   if k = 0 then SNword s else
   let rec skip_opchar i =
     if i = len then i else match s.[i] with
@@ -128,12 +126,13 @@ let sn_decode s =
       | '*' | '~' | '|' | '\\' -> skip_opchar (succ i)
       | _ -> i in
   let l = skip_opchar k in
-  if l = k && k < 8 then SNword s else
   let rec skip_quote i =
-    if i = len || s.[i] <> '\'' then i else skip_quote (succ i) in
+    if i = len then i else
+    if s.[i] = '\'' then skip_quote (succ i) else
+    if i = l || s.[i] = '_' then i else pred i in
   let m = skip_quote l in
-  let m = if l < m && m < len && s.[m] <> '_' then pred m else m in
-  let w = if k = 6 then SNinfix (String.sub s 6 (m - 6)) else
+  if l = k && k < 8 then SNword s (* null infix/prefix *) else
+  let w = if k = 6 then SNinfix  (String.sub s 6 (m - 6)) else
           if k = 7 then SNprefix (String.sub s 7 (m - 7)) else
           let p = if l < m then String.sub s l (m - l) else "" in
           match String.sub s 8 (l - 8) with
