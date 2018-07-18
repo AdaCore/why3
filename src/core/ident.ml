@@ -50,9 +50,10 @@ let attr_compare a1 a2 = Pervasives.compare a1.attr_tag a2.attr_tag
 (** Naming convention *)
 
 type notation =
-  | SNword   of string
-  | SNinfix  of string
-  | SNprefix of string
+  | SNword   of string  (* plus *)
+  | SNinfix  of string  (* + *)
+  | SNtight  of string  (* ! *)
+  | SNprefix of string  (* -_ *)
   | SNget    of string  (* [] *)
   | SNset    of string  (* []<- *)
   | SNupdate of string  (* [<-] *)
@@ -71,35 +72,24 @@ let op_cut    s = "mixfix [..]" ^ s
 let op_lcut   s = "mixfix [.._]" ^ s
 let op_rcut   s = "mixfix [_..]" ^ s
 
-let op_equ  = op_infix "="
-let op_neq  = op_infix "<>"
-
-let sn_encode = function
-  | SNinfix s ->  op_infix s
-  | SNprefix s -> op_prefix s
-  | SNget s ->    op_get s
-  | SNset s ->    op_set s
-  | SNupdate s -> op_update s
-  | SNcut s ->    op_cut s
-  | SNlcut s ->   op_lcut s
-  | SNrcut s ->   op_rcut s
-  | SNword s ->   s
+let op_equ   = op_infix "="
+let op_neq   = op_infix "<>"
+let op_tight = op_prefix
 
 let print_sn fmt w =
   let lspace p = if p.[0] = '*' then " " else "" in
   let rspace p = if p.[String.length p - 1] = '*' then " " else "" in
-  match w with (* infix/prefix never empty, mixfix never have stars *)
-  | SNinfix p ->  Format.fprintf fmt "(%s%s%s)" (lspace p) p (rspace p)
-  | SNprefix p when p.[0] = '!' || p.[0] = '?' ->
-                  Format.fprintf fmt "(%s%s)" p (rspace p)
+  match w with (* infix/prefix never empty, mixfix cannot have stars *)
+  | SNinfix  p -> Format.fprintf fmt "(%s%s%s)" (lspace p) p (rspace p)
+  | SNtight  p -> Format.fprintf fmt "(%s%s)" p (rspace p)
   | SNprefix p -> Format.fprintf fmt "(%s%s_)" (lspace p) p
-  | SNget p ->    Format.fprintf fmt "([]%s)" p
-  | SNset p ->    Format.fprintf fmt "([]%s<-)" p
+  | SNget    p -> Format.fprintf fmt "([]%s)" p
+  | SNset    p -> Format.fprintf fmt "([]%s<-)" p
   | SNupdate p -> Format.fprintf fmt "([<-]%s)" p
-  | SNcut p ->    Format.fprintf fmt "([..]%s)" p
-  | SNlcut p ->   Format.fprintf fmt "([.._]%s)" p
-  | SNrcut p ->   Format.fprintf fmt "([_..]%s)" p
-  | SNword p ->   Format.pp_print_string fmt p
+  | SNcut    p -> Format.fprintf fmt "([..]%s)" p
+  | SNlcut   p -> Format.fprintf fmt "([.._]%s)" p
+  | SNrcut   p -> Format.fprintf fmt "([_..]%s)" p
+  | SNword   p -> Format.pp_print_string fmt p
 
 (* The function below recognizes the following strings as notations:
       "infix " (opchar+ [']* as p) (['_] [^'_] .* as q)
@@ -132,8 +122,10 @@ let sn_decode s =
     if i = l || s.[i] = '_' then i else pred i in
   let m = skip_quote l in
   if l = k && k < 8 then SNword s (* null infix/prefix *) else
-  let w = if k = 6 then SNinfix  (String.sub s 6 (m - 6)) else
-          if k = 7 then SNprefix (String.sub s 7 (m - 7)) else
+  let w = if k = 6 then SNinfix (String.sub s 6 (m - 6)) else
+          if k = 7 then let op = String.sub s 7 (m - 7) in
+                        if s.[7] = '!' || s.[7] = '?' then
+                          SNtight op else SNprefix op else
           let p = if l < m then String.sub s l (m - l) else "" in
           match String.sub s 8 (l - 8) with
           | "]"   -> SNget p | "]<-"  -> SNset p  | "<-]"  -> SNupdate p
@@ -224,19 +216,12 @@ let find_unique indices name =
   let specname ind =
     (* If the symbol is infix/prefix *and* the name has not been
        sanitized for provers, we don't want to disambiguate with
-       a number but with a symbol: "+" becomes "+'" "+''" etc.
+       a number but with a quote symbol: "+" becomes "+'" "+''" etc.
        This allows to parse the ident again (for transformations). *)
     if ind <= 0 then name else
     match sn_decode name with
-    | SNinfix s -> op_infix (s ^ String.make ind '\'')
-    | SNprefix s -> op_prefix (s ^ String.make ind '\'')
-    | SNget s -> op_get (s ^ String.make ind '\'')
-    | SNset s -> op_set (s ^ String.make ind '\'')
-    | SNupdate s -> op_update (s ^ String.make ind '\'')
-    | SNcut s -> op_cut (s ^ String.make ind '\'')
-    | SNlcut s -> op_lcut (s ^ String.make ind '\'')
-    | SNrcut s -> op_rcut (s ^ String.make ind '\'')
-    | SNword _ -> name ^ string_of_int ind in
+    | SNword _ -> name ^ string_of_int ind
+    | _        -> name ^ String.make ind '\'' in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in

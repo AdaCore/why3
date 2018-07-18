@@ -131,11 +131,6 @@ let print_vs fmt vs =
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
-(* pretty-print infix and prefix logic symbols *)
-
-let tight_op s =
-  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
-
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
@@ -256,7 +251,7 @@ and print_app pri ls fmt tl =
   if tl = [] then print_ls fmt ls else
   let s = id_unique iprinter ls.ls_name in
   match Ident.sn_decode s, tl with
-  | Ident.SNprefix s, [t1] when tight_op s ->
+  | Ident.SNtight s, [t1] ->
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Ident.SNprefix s, [t1] ->

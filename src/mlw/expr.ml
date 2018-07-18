@@ -1171,9 +1171,6 @@ let forget_let_defn = function
   | LDsym (s,_) -> forget_rs s
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
-let tight_op s =
-  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
-
 let print_rs fmt s = match s.rs_logic with
   | RLnone | RLlemma ->
       Ident.print_decoded fmt (id_unique sprinter s.rs_name)
@@ -1231,7 +1228,7 @@ let print_capp pri s fmt vl =
   if vl = [] then print_rs fmt s else
   let p = id_unique sprinter s.rs_name in
   match Ident.sn_decode p, vl with
-  | Ident.SNprefix o, [t1] when tight_op o ->
+  | Ident.SNtight o, [t1] ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
   | Ident.SNprefix o, [t1] ->
       fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1

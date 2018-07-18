@@ -32,9 +32,10 @@ val list_attributes : unit -> string list
 (** {2 Naming convention} *)
 
 type notation =
-  | SNword   of string
-  | SNinfix  of string
-  | SNprefix of string
+  | SNword   of string  (* plus *)
+  | SNinfix  of string  (* + *)
+  | SNtight  of string  (* ! *)
+  | SNprefix of string  (* -_ *)
   | SNget    of string  (* [] *)
   | SNset    of string  (* []<- *)
   | SNupdate of string  (* [<-] *)
@@ -42,18 +43,8 @@ type notation =
   | SNlcut   of string  (* [.._] *)
   | SNrcut   of string  (* [_..] *)
 
-val sn_encode : notation -> string
-(* encode the symbol name as a string *)
-
-val sn_decode : string -> notation
-(* decode the string as a symbol name *)
-
-val print_decoded : Format.formatter -> string -> unit
-(* decode the string as a symbol name and pretty-print it *)
-
-(* specialized encoders *)
-
 val op_infix  : string -> string
+val op_tight  : string -> string
 val op_prefix : string -> string
 val op_get    : string -> string
 val op_set    : string -> string
@@ -63,6 +54,12 @@ val op_lcut   : string -> string
 val op_rcut   : string -> string
 val op_equ    : string
 val op_neq    : string
+
+val sn_decode : string -> notation
+(* decode the string as a symbol name *)
+
+val print_decoded : Format.formatter -> string -> unit
+(* decode the string as a symbol name and pretty-print it *)
 
 (** {2 Identifiers} *)
 
