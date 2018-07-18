@@ -30,6 +30,11 @@ let coercion_attr = create_attribute "coercion"
 
 module type Printer = sig
 
+    val tprinter : ident_printer  (* type symbols *)
+    val aprinter : ident_printer  (* type variables *)
+    val sprinter : ident_printer  (* variables and functions *)
+    val pprinter : ident_printer  (* propoition names *)
+
     val forget_all : unit -> unit     (* flush id_unique *)
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
     val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
@@ -81,7 +86,6 @@ module type Printer = sig
 
   end
 
-
 let debug_print_attrs =
   Debug.register_info_flag
     "print_attributes"
@@ -93,7 +97,7 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
 let debug_print_coercions = Debug.register_info_flag "print_coercions"
   ~desc:"Print@ coercions@ in@ logical@ formulas."
 
-let create iprinter aprinter tprinter pprinter do_forget_all =
+let create sprinter aprinter tprinter pprinter do_forget_all =
   (module (struct
 
 let forget_tvs () =
@@ -101,7 +105,7 @@ let forget_tvs () =
   (* if do_forget_all then *) forget_all aprinter
 
 let forget_all () =
-  if do_forget_all then forget_all iprinter;
+  if do_forget_all then forget_all sprinter;
   if do_forget_all then forget_all aprinter;
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
@@ -127,14 +131,14 @@ let print_tv fmt tv =
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
   let sanitizer = Strings.uncapitalize in
-  pp_print_string fmt (id_unique iprinter ~sanitizer vs.vs_name)
+  Ident.print_decoded fmt (id_unique sprinter ~sanitizer vs.vs_name)
 
-let forget_var vs = forget_id iprinter vs.vs_name
+let forget_var vs = forget_id sprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
-  pp_print_string fmt (id_unique iprinter ~sanitizer th.th_name)
+  pp_print_string fmt (id_unique sprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
   if ts_equal ts ts_func then pp_print_string fmt "(->)" else
@@ -142,10 +146,10 @@ let print_ts fmt ts =
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
-  pp_print_string fmt (id_unique iprinter ~sanitizer ls.ls_name)
+  pp_print_string fmt (id_unique sprinter ~sanitizer ls.ls_name)
 
 let print_ls fmt ls =
-  Ident.print_decoded fmt (id_unique iprinter ls.ls_name)
+  Ident.print_decoded fmt (id_unique sprinter ls.ls_name)
 
 let print_pr fmt pr =
   Ident.print_decoded fmt (id_unique pprinter pr.pr_name)
@@ -249,7 +253,7 @@ and print_lterm pri fmt t =
 
 and print_app pri ls fmt tl =
   if tl = [] then print_ls fmt ls else
-  let s = id_unique iprinter ls.ls_name in
+  let s = id_unique sprinter ls.ls_name in
   match Ident.sn_decode s, tl with
   | Ident.SNtight s, [t1] ->
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
@@ -621,23 +625,25 @@ let print_sequent fmt task =
   fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld1;
   fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld2;
+  fprintf fmt "@[<v 0>%a@]" aux ld2
 
-
+let sprinter = sprinter
+let aprinter = aprinter
+let tprinter = tprinter
+let pprinter = pprinter
 
             end) : Printer) (* end of the first class module *)
 
 
-
 module LegacyPrinter =
-  (val (let iprinter,aprinter,tprinter,pprinter =
+  (val (let sprinter,aprinter,tprinter,pprinter =
     let same = fun x -> x in
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same
   in
-  create iprinter aprinter tprinter pprinter true))
+  create sprinter aprinter tprinter pprinter true))
 
 include LegacyPrinter
 

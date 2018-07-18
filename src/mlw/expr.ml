@@ -1154,8 +1154,6 @@ let ls_decr_of_rec_defn = function
 open Format
 open Pretty
 
-let sprinter = create_ident_printer [] ~sanitizer:(fun x -> x)
-
 let id_of_rs s = match s.rs_logic with
   | RLnone | RLlemma -> s.rs_name
   | RLpv v -> v.pv_vs.vs_name
@@ -1163,19 +1161,16 @@ let id_of_rs s = match s.rs_logic with
 
 let forget_rs s = match s.rs_logic with
   | RLnone | RLlemma -> forget_id sprinter s.rs_name
-  | RLpv v -> forget_pv v
-  | RLls _ -> () (* we don't forget top-level symbols *)
+  | RLpv v -> forget_id sprinter v.pv_vs.vs_name
+  | RLls _ -> () (* never forget top-level symbols *)
 
 let forget_let_defn = function
   | LDvar (v,_) -> forget_pv v
   | LDsym (s,_) -> forget_rs s
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
-let print_rs fmt s = match s.rs_logic with
-  | RLnone | RLlemma ->
-      Ident.print_decoded fmt (id_unique sprinter s.rs_name)
-  | RLpv v -> print_pv fmt v
-  | RLls s -> print_ls fmt s
+let print_rs fmt s =
+  Ident.print_decoded fmt (id_unique sprinter (id_of_rs s))
 
 let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
@@ -1226,7 +1221,7 @@ let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
 let print_capp pri s fmt vl =
   if vl = [] then print_rs fmt s else
-  let p = id_unique sprinter s.rs_name in
+  let p = id_unique sprinter (id_of_rs s) in
   match Ident.sn_decode p, vl with
   | Ident.SNtight o, [t1] ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1

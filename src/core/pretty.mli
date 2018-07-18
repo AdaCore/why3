@@ -13,12 +13,6 @@
 
 val coercion_attr : Ident.attribute
 
-(*
-val forget_all : unit -> unit     (* flush id_unique *)
-val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
-val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
-*)
-
 val why3_keywords : string list
 
 open Format
@@ -30,6 +24,11 @@ open Theory
 open Task
 
 module type Printer = sig
+
+    val tprinter : ident_printer  (* type symbols *)
+    val aprinter : ident_printer  (* type variables *)
+    val sprinter : ident_printer  (* variables and functions *)
+    val pprinter : ident_printer  (* propoition names *)
 
     val forget_all : unit -> unit     (* flush id_unique *)
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
@@ -84,6 +83,6 @@ module type Printer = sig
 
 include Printer
 
-val create  : Ident.ident_printer ->Ident.ident_printer ->
+val create :  Ident.ident_printer -> Ident.ident_printer ->
               Ident.ident_printer -> Ident.ident_printer ->
               bool -> (module Printer)
