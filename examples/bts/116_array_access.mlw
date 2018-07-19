@@ -1,0 +1,15 @@
+module Test
+
+  use array.Array
+  use mach.array.Array63
+
+  constant d: Array.array int
+  constant e: Array63.array int
+
+(*  goal a: e[1] = 5*)
+
+  goal c: Array.([]) d 3 = 5
+
+(* goal g: Array63.([]) e 3 = 5 *)
+
+end
