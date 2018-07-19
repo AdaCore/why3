@@ -4,12 +4,14 @@ module Test
   use mach.array.Array63
 
   constant d: Array.array int
-  constant e: Array63.array int
+  val e: Array63.array int
 
-(*  goal a: e[1] = 5*)
+  goal a: d[1] = 5
 
-  goal c: Array.([]) d 3 = 5
+  let f i =
+    e[i] <- 5;
+    e[i]
 
-(* goal g: Array63.([]) e 3 = 5 *)
+  goal c: d[3] = 5
 
 end
