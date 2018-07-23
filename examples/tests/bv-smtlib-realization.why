@@ -9,14 +9,14 @@ why3 ide -C ../../why3-smt-realize.conf -P cvc4r bv-smtlib-realization.why
 
 theory BV_Check
 
-  use import int.Int
-  use import bv.BV8
+  use int.Int
+  use bv.BV8
 
   goal size_pos : size > 0
 
 (* Conversions from/to integers *)
 
-  use import bv.Pow2int
+  use bv.Pow2int
 
   lemma two_power_size_val : two_power_size = pow2 size
   lemma max_int_val : t'maxInt = two_power_size - 1
@@ -93,7 +93,7 @@ theory BV_Check
 
   goal lsl_zero: forall x. lsl x 0 = x
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   goal Nth_rotate_right :
     forall v n i. 0 <= i < size -> 0 <= n ->
@@ -168,13 +168,13 @@ theory BV_Check
       eq_sub    a b (t'int i) (t'int n)
   <-> eq_sub_bv a b i n
 
-  goal Extensionality: forall x y : t [eq x y]. eq x y -> x = y
+  goal Extensionality: forall x y : t [x == y]. x == y -> x = y
 
 end
 
 theory BVConverter_Check
 
-  use import bv.BVConverter_32_64
+  use bv.BVConverter_32_64
 
   goal toSmall_to_uint :
     forall x. in_range x -> BV64.t'int x = BV32.t'int (toSmall x)

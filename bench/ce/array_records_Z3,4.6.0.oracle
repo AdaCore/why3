@@ -1,109 +1,126 @@
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
-Counter-example model:File array.mlw:
-Line 28:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-File array_records.mlw:
-Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
 Counter-example model:File array_records.mlw:
 Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "1" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 25:
-old i, ["model_trace:i@old"] = {"type" : "Integer" ,
-"val" : "0" }
-
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
-Counter-example model:File array.mlw:
-Line 28:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
-File array_records.mlw:
-Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
+Line 27:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
 
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
-Counter-example model:File array.mlw:
-Line 28:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "0" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-File array_records.mlw:
-Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "0" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
-Counter-example model:File array.mlw:
-Line 28:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-File array_records.mlw:
-Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
-Counter-example model:File array.mlw:
-Line 28:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-File array_records.mlw:
-Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Valid
-bench/ce/array_records.mlw Array_records WP_parameter var_overwrite : Unknown (other)
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
 Counter-example model:File array_records.mlw:
 Line 23:
-a.length, ["model_trace:a.length"] = {"type" : "Integer" ,
-"val" : "175" }
-i, ["model_trace:i"] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 27:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 27:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 28:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 28:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 28:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 29:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 29:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 29:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 30:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 30:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 30:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 31:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "2" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "2" }
 Line 25:
-old i, ["model_trace:i@old"] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "2" }
 

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../mex.mlw" proved="true">
+<theory name="MexArray" proved="true">
+ <goal name="VC mex" expl="VC for mex" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC mex.0" expl="array creation size" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.2" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.3" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.4" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.5" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="204"/></proof>
+  </goal>
+  <goal name="VC mex.6" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+  <goal name="VC mex.7" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="27"/></proof>
+  </goal>
+  <goal name="VC mex.8" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="35"/></proof>
+  </goal>
+  <goal name="VC mex.9" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.10" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.11" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.12" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.13" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.14" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.15" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.16" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mex.18" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.19" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.20" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC mex.21" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.22" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.23" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.24" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.25" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="85"/></proof>
+  </goal>
+  <goal name="VC mex.26" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.27" expl="out of loop bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="MexArrayInPlace" proved="true">
+ <goal name="VC mex" expl="VC for mex" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC mex.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.2" expl="loop invariant init" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC mex.2.0" expl="loop invariant init" proved="true">
+   <proof prover="1"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mex.3" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.4" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.5" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mex.6" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.7" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.9" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.10" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.11" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="VC mex.12" expl="loop invariant preservation" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC mex.12.0" expl="loop invariant preservation" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="80"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mex.13" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.14" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.15" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mex.16" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC mex.18" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.19" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="VC mex.20" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.21" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.15"/></proof>
+  </goal>
+  <goal name="VC mex.22" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC mex.23" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="VC mex.24" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC mex.25" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC mex.26" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mex.27" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.28" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="(mem x a)">
+   <goal name="VC mex.28.0" proved="true">
+   <transf name="assert" proved="true" arg1="(a[x] = x)">
+    <goal name="VC mex.28.0.0" proved="true">
+    <proof prover="1"><result status="valid" time="0.02"/></proof>
+    </goal>
+    <goal name="VC mex.28.0.1" proved="true">
+    <proof prover="1"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC mex.28.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mex.29" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.30" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.31" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC mex.32" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="(mem x a)">
+   <goal name="VC mex.32.0" proved="true">
+   <transf name="assert" proved="true" arg1="(a[x] = x)">
+    <goal name="VC mex.32.0.0" proved="true">
+    <proof prover="1"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="VC mex.32.0.1" proved="true">
+    <proof prover="1"><result status="valid" time="0.03"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC mex.32.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC mex.33" expl="out of loop bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

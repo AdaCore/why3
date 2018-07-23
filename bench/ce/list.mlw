@@ -1,7 +1,7 @@
 
 module List_int
 
-  use import int.Int
+  use int.Int
   
   type list = Nil | Cons int list
   
@@ -19,8 +19,8 @@ end
 
 module List_poly
 
-  use import list.List
-  use import list.Length
+  use list.List
+  use list.Length
   
   goal g1: forall l:list int. length l <> 0
 

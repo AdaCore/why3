@@ -14,7 +14,25 @@
 Require Import BuiltIn.
 Require BuiltIn.
 
+(* Why3 assumption *)
+Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)) : Prop :=
+  match l with
+  | Init.Datatypes.nil => True
+  | (Init.Datatypes.cons _ _) => False
+  end.
+
+(* Why3 goal *)
+Lemma is_nil_spec {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)), (is_nil l) <-> (l = Init.Datatypes.nil).
+Proof.
+intros l.
+split.
+now destruct l.
+now intros ->.
+Qed.
+
 Global Instance list_WhyType : forall T {T_WT : WhyType T}, WhyType (list T).
+Proof.
 split.
 apply nil.
 induction x as [|xh x] ; intros [|yh y] ; try (now right).

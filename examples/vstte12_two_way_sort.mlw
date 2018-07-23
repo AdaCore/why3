@@ -7,12 +7,12 @@
 
 module TwoWaySort
 
-  use import int.Int
-  use import bool.Bool
-  use import ref.Refint
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use bool.Bool
+  use ref.Refint
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
 
   predicate le (x y: bool) = x = False \/ y = True
 
@@ -22,14 +22,13 @@ module TwoWaySort
   let two_way_sort (a: array bool)
     ensures { sorted a }
     ensures { permut_all (old a) a }
-  = 'Init:
-    let i = ref 0 in
+  = let i = ref 0 in
     let j = ref (length a - 1) in
     while !i < !j do
       invariant { 0 <= !i /\ !j < length a }
       invariant { forall k: int. 0 <= k < !i -> a[k] = False }
       invariant { forall k: int. !j < k < length a -> a[k] = True }
-      invariant { permut_all (at a 'Init) a }
+      invariant { permut_all (old a) a }
       variant   { !j - !i }
       if not a[!i] then incr i
       else if a[!j] then decr j

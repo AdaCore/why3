@@ -3,10 +3,10 @@
 
 module BinarySearch
 
-  use import int.Int
-  use import int.ComputerDivision
+  use int.Int
+  use int.ComputerDivision
 
-  function f int : int
+  val function f int : int
 
   axiom f_monotonic : forall x y : int. x <= y -> f x <= f y
 

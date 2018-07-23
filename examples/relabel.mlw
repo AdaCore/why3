@@ -7,10 +7,10 @@
 
 module Relabel
 
-  use import list.List
-  use import list.Mem
-  use import list.Append
-  use import list.Distinct
+  use list.List
+  use list.Mem
+  use list.Append
+  use list.Distinct
 
   type tree 'a =
     | Leaf 'a
@@ -37,8 +37,8 @@ module Relabel
         same_shape l1 l2 -> same_shape r1 r2 ->
         same_shape (Node l1 r1) (Node l2 r2)
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   val r : ref int
 

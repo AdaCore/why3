@@ -1,0 +1,122 @@
+module Valuation
+
+  use int.Int
+  use int.Power
+  use int.ComputerDivision
+  use export number.Divisibility
+  use number.Prime
+  use number.Coprime
+  use export number.Parity
+
+  let rec function valuation (n p: int)
+    requires { 1 < p }
+    requires { 1 <= n }
+    variant { n }
+    ensures { 0 <= result }
+    ensures { divides (power p result) n }
+  = if mod n p = 0
+    then
+      let d = div n p in
+      let r = valuation d p in
+      r+1
+    else 0
+
+  lemma valuation_mul: forall n p. 1 <= n -> 1 < p
+    -> valuation (n*p) p = 1 + valuation n p
+       by mod (n*p) p = 0 so div (n*p) p = n
+
+  lemma power_ge_1: forall b e. 1 <= b -> 0 <= e -> 1 <= power b e
+
+  let rec lemma valuation_times_pow (n p k:int)
+    requires { 1 <= n /\ 1 < p /\ 0 <= k }
+    ensures  { valuation (n * power p k) p = k + valuation n p }
+    variant  { k }
+  =
+    if k > 0
+    then begin
+      valuation_times_pow n p (k-1);
+      assert { valuation (n * power p k) p
+               = 1 + valuation (n * power p (k-1)) p
+               by valuation (n * power p k) p
+               = valuation (n * power p (k-1) * p) p
+               = 1 + valuation (n * power p (k-1)) p }
+    end
+
+  lemma valuation_split: forall n p. 1 <= n -> prime p ->
+    let v = valuation n p in
+    valuation (div n (power p v)) p = 0        (* only altergo proves this? *)
+
+  let lemma valuation_lower_bound (n p v:int)
+    requires {  1 <= n /\ 1 < p /\ 0 <= v }
+    requires { divides (power p v) n }
+    ensures  { v <= valuation n p }
+  =
+    let q = div n (power p v) in
+    assert { n = q * power p v };
+    valuation_times_pow q p v
+
+  lemma valuation_pow: forall p k. 1 < p /\ 0 <= k -> valuation (power p k) p = k
+
+  let rec lemma valuation_monotonous (n c p:int)
+    requires { 1 <= n /\ 1 <= c /\ 1 < p }
+    ensures { valuation n p <= valuation (n*c) p }
+    variant { n }
+  = if mod n p = 0
+    then begin
+      let q = div n p in
+      assert { n = p * q };
+      valuation_monotonous q c p;
+      assert { valuation n p = 1 + valuation q p };
+      let m = q * c in
+      assert { valuation (n * c) p = 1 + valuation m p
+               by n * c = m * p
+               so valuation (n*c) p = valuation (m*p) p
+                  = 1 + valuation m p };
+    end
+
+  lemma valuation_nondiv: forall n p. 1 <= n -> 1 < p ->
+    valuation n p = 0 <-> not (divides p n)
+
+  lemma valuation_zero_prod: forall c1 c2 p. 1 <= c1 -> 1 <= c2 -> prime p ->
+    valuation c1 p = 0 -> valuation c2 p = 0 -> valuation (c1 * c2) p = 0
+
+  let rec lemma valuation_times_nondiv (n c p:int)
+    requires { 1 <= n /\ 1 <= c }
+    requires { prime p }
+    requires { valuation c p = 0 }
+    ensures  { valuation (n*c) p = valuation n p }
+    variant  { n }
+  = if mod n p = 0
+    then let d = div n p in
+         valuation_times_nondiv d c p;
+         assert { valuation (n*c) p
+                  = valuation (d*c*p) p
+                  = 1 + valuation (d*c) p
+                  = 1 + valuation d p = valuation n p }
+    else ()
+
+  lemma valuation_prod: forall n1 n2 p. 1 <= n1 -> 1 <= n2 -> prime p
+    -> valuation (n1 * n2) p = valuation n1 p + valuation n2 p
+    by let v1 = valuation n1 p in
+       let v2 = valuation n2 p in
+       let c1 = div n1 (power p v1) in
+       let c2 = div n2 (power p v2) in
+       n1 = power p v1 * c1
+    so n2 = power p v2 * c2
+    so valuation c1 p = 0
+    so valuation c2 p = 0
+    so valuation (c1 * c2) p = 0
+    so n1 * n2 = power p v1 * power p v2 * (c1 * c2)
+       = power p (v1+v2) * (c1 * c2)
+    so let pow = power p (v1+v2) in
+       let c = c1 * c2 in
+       1 <= c1 so 1 <= c2 so 1 <= c
+       so valuation (n1*n2) p = valuation (pow * c) p = valuation pow p =  v1 + v2
+
+  lemma valuation_mod: forall n p. 1 <= n -> 1 < p -> (mod n p = 0 <-> valuation n p > 0)
+
+  lemma valuation_decomp: forall n p. 1 <= n -> 1 < p ->
+        n = (power p (valuation n p)) * (div n (power p (valuation n p)))
+        by divides (power p (valuation n p)) n
+
+end

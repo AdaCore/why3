@@ -16,9 +16,9 @@
 
 module WhiteAndBlackBalls
 
-  use import int.Int
-  use import ref.Ref
-  use import number.Parity
+  use int.Int
+  use ref.Ref
+  use number.Parity
 
   (* answer: the color of the last ball depends on the parity of the
      number of black balls, which is an invariant of the process *)
@@ -33,7 +33,7 @@ module WhiteAndBlackBalls
       invariant { !b >= 0 && !w >= 0 && !b + !w >= 1 }
       invariant { odd !b <-> odd b0 }
       variant   { !b + !w }
-      let x, y = any (int, int) returns { x, y ->
+      let x, y = any (x: int, y: int) ensures {
         0 <= x && 0 <= y && x + y = 2 && x <= !b && y <= !w } in
       if x = 0 || y = 0 then begin (* same color -> insert a white *)
         b := !b - x;

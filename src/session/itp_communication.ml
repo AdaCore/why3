@@ -115,6 +115,7 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
   | Get_first_unproven_node of node_ID
+  | Unfocus_req
   | Save_req
   | Reload_req
   | Exit_req
@@ -129,7 +130,7 @@ let modify_session (r: ide_request) =
 
   | Set_config_param _ | Set_prover_policy _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
-  | Save_req | Exit_req | Get_global_infos
+  | Unfocus_req | Save_req | Exit_req | Get_global_infos
   | Interrupt_req -> false
 
 
@@ -147,10 +148,11 @@ let print_request fmt r =
              Whyconf.print_prover_upgrade_policy p2
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b,loc)           -> fprintf fmt "get task(%d,%b,%b)" nid b loc
+  | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Save_file_req _                 -> fprintf fmt "save file"
+  | Unfocus_req                     -> fprintf fmt "unfocus"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
   | Exit_req                        -> fprintf fmt "exit"
@@ -196,15 +198,15 @@ let print_notify fmt n =
                    ni Controller_itp.print_status st b
       end
   | New_node (ni, pni, _nt,  _nf, _d) -> fprintf fmt "new node = %d, parent = %d" ni pni
-  | Remove _ni                         -> fprintf fmt "remove"
-  | Next_Unproven_Node_Id (ni, nj)   -> fprintf fmt "next unproven node_id from %d is %d" ni nj
-  | Initialized _gi                    -> fprintf fmt "initialized"
-  | Saved                              -> fprintf fmt "saved"
-  | Message msg                        ->
+  | Remove _ni                        -> fprintf fmt "remove"
+  | Next_Unproven_Node_Id (ni, nj)    -> fprintf fmt "next unproven node_id from %d is %d" ni nj
+  | Initialized _gi                   -> fprintf fmt "initialized"
+  | Saved                             -> fprintf fmt "saved"
+  | Message msg                       ->
       print_msg fmt msg
-  | Dead s                             -> fprintf fmt "dead :%s" s
-  | File_contents (_f, _s)             -> fprintf fmt "file contents"
-  | Source_and_ce (_s, _list_loc)      -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc)            ->
+  | Dead s                            -> fprintf fmt "dead :%s" s
+  | File_contents (f, _s)             -> fprintf fmt "file contents %s" f
+  | Source_and_ce (_s, _list_loc)     -> fprintf fmt "source and ce"
+  | Task (ni, _s, list_loc)           ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations"
               ni (List.length list_loc) (* print_list_loc list_loc *)

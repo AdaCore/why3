@@ -10,7 +10,7 @@
       f(i,c) = max{j in c} m[i][j] + f(i+1, C\{j})
 
    As such, it would still be a brute force approach (of complexity n!)
-   but we can memoize f and then the search space decreases to 2^n-1.
+   but we can memoize f and then the search space decreases to n*2^n.
 
    The following code implements such a solution. Sets of integers are
    provided in theory Bitset. Hash tables for memoization are provided
@@ -19,9 +19,9 @@
    maximum and memo).
 *)
 
-theory Bitset "sets of small integers"
+theory Bitset
 
-  use import int.Int
+  use int.Int
 
   constant size : int (* elements belong to 0..size-1 *)
 
@@ -29,25 +29,20 @@ theory Bitset "sets of small integers"
 
   (* membership
      [mem i s] can be implemented as [s land (1 lsl i) <> 0] *)
-  predicate mem int set
+  val predicate mem int set
 
   (* removal
      [remove i s] can be implemented as [s - (1 lsl i)] *)
-  function remove int set : set
-
-  axiom remove_def1:
-    forall x y: int, s: set.
-    mem x (remove y s) <-> x <> y /\ mem x s
+  val function remove (x: int) (s: set): set
+    ensures { forall y: int. mem y result <-> y <> x /\ mem y s }
 
   (* the set {0,1,...,n-1}
      [below n] can be implemented as [1 lsl n - 1] *)
-  function below int : set
+  val function below (n: int): set
+    requires { 0 <= n <= size }
+    ensures { forall x: int. mem x result <-> 0 <= x < n }
 
-  axiom below_def:
-    forall x n: int. 0 <= n <= size ->
-    mem x (below n) <-> 0 <= x < n
-
-  function cardinal set : int
+  val function cardinal set: int
 
   axiom cardinal_empty:
     forall s: set. cardinal s = 0 <-> (forall x: int. not (mem x s))
@@ -64,11 +59,11 @@ end
 
 module HashTable
 
-  use import option.Option
-  use import int.Int
-  use import map.Map
+  use option.Option
+  use int.Int
+  use map.Map
 
-  type t 'a 'b model { mutable contents: map 'a (option 'b) }
+  type t 'a 'b = private { ghost mutable contents: map 'a (option 'b) }
 
   function ([]) (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
@@ -90,40 +85,40 @@ end
 
 module MaxMatrixMemo
 
-  use import int.Int
-  use import int.MinMax
-  use import map.Map
-  use map.Const
-  use import ref.Ref
+  use int.Int
+  use int.MinMax
+  use ref.Ref
+  use Bitset
+  use map.Map
 
-  constant n : int
-  axiom n_nonneg: 0 <= n
+  clone appmap.Appmap with type key = int, axiom .
 
-  use import Bitset
-  axiom integer_size: n <= size
+  val constant n : int
+    ensures { 0 <= result <= size }
 
-  constant m : map int (map int int)
-  axiom m_pos: forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= m[i][j]
+  val constant m : t (t int)
+    ensures { forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= result[i][j] }
 
-  predicate solution (s: map int int) (i: int) =
-    (forall k: int. i <= k < n -> 0 <= s[k] < n) /\
-    (forall k1 k2: int. i <= k1 < k2 < n -> s[k1] <> s[k2])
+  type mapii = Map.map int int
 
-  predicate permutation (s: map int int) = solution s 0
+  predicate solution (s: mapii) (i: int) =
+    (forall k: int. i <= k < n -> 0 <= Map.get s k < n) /\
+    (forall k1 k2: int. i <= k1 < k2 < n -> Map.get s k1 <> Map.get s k2)
 
-  type mapii = map int int
-  function f (s: map int int) (i: int) : int = m[i][s[i]]
-  clone import sum.Sum with type container = mapii, function f = f
+  predicate permutation (s: mapii) = solution s 0
+
+  function f (s: mapii) (i: int) : int = m[i][Map.get s i]
+  clone sum.Sum with type container = mapii, function f = f, axiom .
 
   lemma sum_ind:
     forall i: int. i < n -> forall j: int.
-    forall s: map int int. sum s[i <- j] i n = m[i][j] + sum s (i+1) n
+    forall s: mapii. sum (Map.set s i j) i n = m[i][j] + sum s (i+1) n
 
-  use import option.Option
+  use option.Option
   use HashTable as H
 
   type key = (int, set)
-  type value = (int, mapii)
+  type value = (int, t int)
 
   predicate pre (k: key) =
     let (i, c) = k in
@@ -132,11 +127,11 @@ module MaxMatrixMemo
   predicate post (k: key) (v: value) =
     let (i, c) = k in
     let (r, sol) = v in
-    0 <= r /\ solution sol i /\
+    0 <= r /\ solution sol.contents i /\
     (forall k: int. i <= k < n -> mem sol[k] c) /\
-    r = sum sol i n /\
-    (forall s: map int int.
-       solution s i -> (forall k: int. i <= k < n -> mem s[k] c) ->
+    r = sum sol.contents i n /\
+    (forall s: mapii.
+       solution s i -> (forall k: int. i <= k < n -> mem (Map.get s k) c) ->
        r >= sum s i n)
 
   type table = H.t key value
@@ -146,25 +141,25 @@ module MaxMatrixMemo
   predicate inv (t: table) =
     forall k: key, v: value. H.([]) t k = Some v -> post k v
 
-  let rec maximum (i:int) (c: set) : (int, map int int) variant {2*n-2*i}
+  let rec maximum (i:int) (c: set) : (int, t int) variant {2*n-2*i}
     requires { pre (i, c) /\ inv table }
     ensures { post (i,c) result /\ inv table }
   = if i = n then
-      (0, Const.const 0)
+      (0, create 0)
     else begin
       let r = ref (-1) in
-      let sol = ref (Const.const 0) in
+      let sol = ref (create 0) in
       for j = 0 to n-1 do
         invariant {
           inv table /\
           (  (!r = -1 /\ forall k: int. 0 <= k < j -> not (mem k c))
           \/
-            (0 <= !r /\ solution !sol i /\
+            (0 <= !r /\ solution !sol.contents i /\
               (forall k: int. i <= k < n -> mem !sol[k] c) /\
-              !r = sum !sol i n /\
-              (forall s: map int int.
-                 solution s i -> (forall k: int. i <= k < n -> mem s[k] c) ->
-                 mem s[i] c -> s[i] < j -> !r >= sum s i n)))
+              !r = sum !sol.contents i n /\
+              (forall s: mapii.
+                 solution s i -> (forall k: int. i <= k < n -> mem (Map.get s k) c) ->
+                 mem (Map.get s i) c -> Map.get s i < j -> !r >= sum s i n)))
         }
         if mem j c then
           let (r', sol') = memo (i+1) (remove j c) in
@@ -175,15 +170,15 @@ module MaxMatrixMemo
       (!r, !sol)
     end
 
-  with memo (i:int) (c: set) : (int, map int int) variant {2*n-2*i+1}
+  with memo (i:int) (c: set) : (int, t int) variant {2*n-2*i+1}
     requires { pre (i,c) /\ inv table }
     ensures { post (i,c) result /\ inv table }
   = try  H.find table (i,c)
     with H.Not_found -> let r = maximum i c in H.add table (i,c) r; r end
 
   let maxmat ()
-    ensures { exists s: map int int. permutation s /\ result =  sum s 0 n }
-    ensures { forall s: map int int. permutation s -> result >= sum s 0 n }
+    ensures { exists s: mapii. permutation s /\ result =  sum s 0 n }
+    ensures { forall s: mapii. permutation s -> result >= sum s 0 n }
   = H.clear table;
     assert { inv table };
     let (r, _) = maximum 0 (below n) in r

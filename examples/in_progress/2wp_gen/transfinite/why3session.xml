@@ -2,75 +2,47 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
-<file name="../transfinite.mlw">
-<theory name="IterateCommon">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../transfinite.mlw" proved="true">
+<theory name="ExtensionDef" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Iterates">
+<theory name="Extension" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="IterateProof">
- <goal name="tr_reach_compare">
- <transf name="induction_pr">
-  <goal name="tr_reach_compare.1" expl="1.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="tr_reach_compare.1.1" expl="1.">
-   <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
-   </goal>
-  </transf>
+<theory name="ExtensionDet" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="TransportDef" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Transport" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="ExtensionProof" proved="true" sum="72e322f795afca86e97c12aa3bf4cc1a">
+ <goal name="tr_ext_compare" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_compare.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="234"/></proof>
   </goal>
-  <goal name="tr_reach_compare.2" expl="2.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="tr_reach_compare.2.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.29"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="tr_reach_compare.3" expl="3.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="tr_reach_compare.3.1" expl="1.">
-   <proof prover="4"><result status="valid" time="0.02" steps="52"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
- <goal name="separation">
- <transf name="induction_pr">
-  <goal name="separation.1" expl="1.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="separation.1.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="separation.1.1.1" expl="1.">
-    <proof prover="4"><result status="valid" time="0.01" steps="44"/></proof>
+  <goal name="tr_ext_compare.1" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_compare.1.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_compare.1.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
     </goal>
    </transf>
    </goal>
-  </transf>
-  </goal>
-  <goal name="separation.2" expl="2.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="separation.2.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="separation.2.1.1" expl="1.">
-    <proof prover="0"><result status="valid" time="0.46"/></proof>
+   <goal name="tr_ext_compare.1.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_compare.1.1.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="64"/></proof>
     </goal>
    </transf>
    </goal>
-  </transf>
-  </goal>
-  <goal name="separation.3" expl="3.">
-  <transf name="simplify_trivial_quantification_in_goal">
-   <goal name="separation.3.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="separation.3.1.1" expl="1.">
-    <transf name="inline_goal">
-     <goal name="separation.3.1.1.1" expl="1.">
-     <proof prover="3"><result status="valid" time="1.17"/></proof>
-     </goal>
-    </transf>
+   <goal name="tr_ext_compare.1.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_compare.1.2.0" proved="true">
+    <proof prover="1"><result status="valid" time="0.12"/></proof>
     </goal>
    </transf>
    </goal>
@@ -78,59 +50,170 @@
   </goal>
  </transf>
  </goal>
- <goal name="all_separation">
- <transf name="split_goal_right">
-  <goal name="all_separation.1" expl="1.">
-  <proof prover="4"><result status="valid" time="0.02" steps="47"/></proof>
+ <goal name="tr_ext_transitive" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_transitive.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_transitive.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="1"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.2" expl="2.">
-  <proof prover="4"><result status="valid" time="0.25" steps="317"/></proof>
+  <goal name="tr_ext_transitive.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_transitive.1.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.3" expl="3.">
-  <proof prover="4"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="tr_ext_transitive.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_transitive.2.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.4" expl="4.">
-  <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
+ </transf>
+ </goal>
+ <goal name="tr_ext_preserve_chain" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_preserve_chain.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_chain.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.5" expl="5.">
-  <proof prover="4"><result status="valid" time="0.04" steps="251"/></proof>
+  <goal name="tr_ext_preserve_chain.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_chain.1.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.6" expl="6.">
-  <proof prover="4"><result status="valid" time="0.08" steps="625"/></proof>
+  <goal name="tr_ext_preserve_chain.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_chain.2.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.7" expl="7.">
-  <proof prover="4"><result status="valid" time="0.02" steps="108"/></proof>
+ </transf>
+ </goal>
+ <goal name="tr_ext_preserve_wf_chain" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_preserve_wf_chain.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_wf_chain.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="all_separation.8" expl="8.">
-  <transf name="induction_pr">
-   <goal name="all_separation.8.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="all_separation.8.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="all_separation.8.1.1.1" expl="1.">
-     <proof prover="0"><result status="valid" time="0.14"/></proof>
+  <goal name="tr_ext_preserve_wf_chain.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_wf_chain.1.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_preserve_wf_chain.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_preserve_wf_chain.2.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_decompose" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_decompose.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="105"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="359"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.82"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="44"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.19" steps="716"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="507"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.8" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.9" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.73" steps="2374"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.10" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.11" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.75" steps="3368"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.12" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="20"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.13" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.80" steps="2575"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.14" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.25" steps="3715"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.15" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.28" steps="902"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.16" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.79" steps="2610"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.17" proved="true">
+  <proof prover="3"><result status="valid" time="1.01"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="828"/></proof>
+  </goal>
+  <goal name="tr_ext_decompose.19" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_decompose.19.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_decompose.19.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_decompose.19.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.24" steps="440"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="all_separation.8.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="all_separation.8.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="all_separation.8.2.1.1" expl="1.">
-     <proof prover="0"><result status="valid" time="0.29"/></proof>
+   <goal name="tr_ext_decompose.19.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_decompose.19.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_decompose.19.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="101"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="all_separation.8.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="all_separation.8.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="all_separation.8.3.1.1" expl="1.">
-     <proof prover="0"><result status="valid" time="0.27"/></proof>
+   <goal name="tr_ext_decompose.19.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_decompose.19.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_decompose.19.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="551"/></proof>
      </goal>
     </transf>
     </goal>
@@ -140,257 +223,120 @@
   </goal>
  </transf>
  </goal>
- <goal name="fixpoint_max_proof">
- <transf name="split_goal_right">
-  <goal name="fixpoint_max_proof.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
+ <goal name="tr_ext_stop_progress" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_stop_progress.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="107"/></proof>
   </goal>
-  <goal name="fixpoint_max_proof.2" expl="2.">
-  <proof prover="4"><result status="valid" time="0.03" steps="283"/></proof>
+  <goal name="tr_ext_stop_progress.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
-  <goal name="fixpoint_max_proof.3" expl="3.">
-  <proof prover="4"><result status="valid" time="0.02" steps="26"/></proof>
+  <goal name="tr_ext_stop_progress.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.32" steps="493"/></proof>
   </goal>
-  <goal name="fixpoint_max_proof.4" expl="4.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="tr_ext_stop_progress.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="16"/></proof>
   </goal>
-  <goal name="fixpoint_max_proof.5" expl="5.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="55"/></proof>
+  <goal name="tr_ext_stop_progress.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="45"/></proof>
   </goal>
-  <goal name="fixpoint_max_proof.6" expl="6.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="tr_ext_stop_progress.5" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_stop_progress.5.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_progress.5.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_progress.5.0.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="8"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_stop_progress.5.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_progress.5.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_progress.5.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="16"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_stop_progress.5.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_progress.5.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_progress.5.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="35"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="fixpoint_max_proof.7" expl="7.">
-  <proof prover="4"><result status="valid" time="0.55" steps="1089"/></proof>
-  </goal>
-  <goal name="fixpoint_max_proof.8" expl="8.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="19"/></proof>
+  <goal name="tr_ext_stop_progress.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="fixpoint_is_max_proof">
- <transf name="split_goal_right">
-  <goal name="fixpoint_is_max_proof.1" expl="1.">
-  <proof prover="4"><result status="valid" time="0.03" steps="83"/></proof>
-  </goal>
-  <goal name="fixpoint_is_max_proof.2" expl="2.">
-  <transf name="induction_pr">
-   <goal name="fixpoint_is_max_proof.2.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="fixpoint_is_max_proof.2.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="fixpoint_is_max_proof.2.1.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.03" steps="31"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="fixpoint_is_max_proof.2.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="fixpoint_is_max_proof.2.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="fixpoint_is_max_proof.2.2.1.1" expl="1.">
-     <proof prover="0"><result status="valid" time="1.35"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="fixpoint_is_max_proof.2.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="fixpoint_is_max_proof.2.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="fixpoint_is_max_proof.2.3.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.03" steps="90"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+ <goal name="tr_ext_det_sub" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_det_sub.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_sub.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="fixpoint_is_max_proof.3" expl="3.">
-  <proof prover="4"><result status="valid" time="0.05" steps="172"/></proof>
+  <goal name="tr_ext_det_sub.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_sub.1.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_det_sub.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_sub.2.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="tr_reach_wf">
- <transf name="split_goal_right">
-  <goal name="tr_reach_wf.1" expl="1.">
-  <proof prover="0"><result status="valid" time="1.57"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.2" expl="2.">
-  <transf name="compute_specified">
-   <goal name="tr_reach_wf.2.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.20"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="tr_reach_wf.3" expl="3.">
-  <transf name="compute_specified">
-   <goal name="tr_reach_wf.3.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.76"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="tr_reach_wf.4" expl="4.">
-  <proof prover="4"><result status="valid" time="0.06" steps="193"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.5" expl="5.">
-  <proof prover="4"><result status="valid" time="0.03" steps="9"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.6" expl="6.">
-  <proof prover="4"><result status="valid" time="0.02" steps="45"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.7" expl="7.">
-  <transf name="compute_specified">
-   <goal name="tr_reach_wf.7.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.29"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="tr_reach_wf.8" expl="8.">
-  <proof prover="4"><result status="valid" time="0.02" steps="36"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.9" expl="9.">
-  <proof prover="4"><result status="valid" time="0.33" steps="855"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.10" expl="10.">
-  <proof prover="4"><result status="valid" time="0.08" steps="367"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.11" expl="11.">
-  <proof prover="4"><result status="valid" time="0.02" steps="56"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.12" expl="12.">
-  <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.13" expl="13.">
-  <proof prover="4"><result status="valid" time="0.06" steps="233"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.14" expl="14.">
-  <proof prover="4"><result status="valid" time="0.03" steps="69"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.15" expl="15.">
-  <transf name="compute_specified">
-   <goal name="tr_reach_wf.15.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.71"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="tr_reach_wf.16" expl="16.">
-  <proof prover="4"><result status="valid" time="0.26" steps="790"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.17" expl="17.">
-  <transf name="induction_pr">
-   <goal name="tr_reach_wf.17.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_wf.17.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="tr_reach_wf.17.1.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.54" steps="1041"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="tr_reach_wf.17.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_wf.17.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="tr_reach_wf.17.2.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.03" steps="25"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="tr_reach_wf.17.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_wf.17.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="tr_reach_wf.17.3.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.31" steps="538"/></proof>
-     </goal>
-    </transf>
+ <goal name="tr_ext_det_back" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_det_back.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_back.0.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_back.0.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="tr_reach_wf.18" expl="18.">
-  <proof prover="4"><result status="valid" time="3.63" steps="7678"/></proof>
-  </goal>
-  <goal name="tr_reach_wf.19" expl="19.">
-  <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="add_chain">
- <transf name="split_goal_right">
-  <goal name="add_chain.1" expl="1.">
-  <proof prover="4"><result status="valid" time="0.06" steps="367"/></proof>
-  </goal>
-  <goal name="add_chain.2" expl="2.">
-  <transf name="introduce_premises">
-   <goal name="add_chain.2.1" expl="1.">
-   <transf name="inline_goal">
-    <goal name="add_chain.2.1.1" expl="1.">
-    <transf name="split_goal_right">
-     <goal name="add_chain.2.1.1.1" expl="1.">
-     <proof prover="2"><result status="valid" time="0.10"/></proof>
-     </goal>
-     <goal name="add_chain.2.1.1.2" expl="2.">
-     <proof prover="2"><result status="valid" time="0.09"/></proof>
-     </goal>
-    </transf>
+  <goal name="tr_ext_det_back.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_back.1.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_back.1.0.0" proved="true">
+    <proof prover="0" timelimit="5"><result status="valid" time="0.71" steps="2153"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="add_chain.3" expl="3.">
-  <proof prover="4"><result status="valid" time="0.03" steps="123"/></proof>
-  </goal>
-  <goal name="add_chain.4" expl="4.">
-  <proof prover="4"><result status="valid" time="0.07" steps="106"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="Iterates.tr_reach_separated">
- <proof prover="0"><result status="valid" time="0.15"/></proof>
- </goal>
- <goal name="Iterates.tr_reach_maximum">
- <proof prover="4"><result status="valid" time="0.03" steps="17"/></proof>
- </goal>
- <goal name="Iterates.tr_reach_fixpoint">
- <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
- </goal>
- <goal name="Iterates.tr_reach_compare">
- <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
- </goal>
- <goal name="Iterates.tr_reach_transitive">
- <transf name="prop_curry">
-  <goal name="tr_reach_transitive.1" expl="1.">
-  <transf name="induction_pr">
-   <goal name="tr_reach_transitive.1.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_transitive.1.1.1" expl="1.">
-    <proof prover="4"><result status="valid" time="0.01" steps="0"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="tr_reach_transitive.1.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_transitive.1.2.1" expl="1.">
-    <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="tr_reach_transitive.1.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="tr_reach_transitive.1.3.1" expl="1.">
-    <proof prover="4"><result status="valid" time="0.02" steps="45"/></proof>
+  <goal name="tr_ext_det_back.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_det_back.2.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_back.2.0.0" proved="true">
+    <proof prover="0" timelimit="5"><result status="valid" time="2.46" steps="3497"/></proof>
     </goal>
    </transf>
    </goal>
@@ -398,111 +344,633 @@
   </goal>
  </transf>
  </goal>
- <goal name="Iterates.tr_reach_wf">
- <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
+ <goal name="tr_ext_recover_criterion" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_recover_criterion.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.24" steps="925"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="69"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="17"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="27"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.5" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="149"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.6" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="16"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.7" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.13" steps="405"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.8" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.9" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="290"/></proof>
+  </goal>
+  <goal name="tr_ext_recover_criterion.10" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_recover_criterion.10.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_recover_criterion.10.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_recover_criterion.10.0.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="172"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_recover_criterion.10.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_recover_criterion.10.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_recover_criterion.10.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_recover_criterion.10.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_recover_criterion.10.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_recover_criterion.10.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="241"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_decompose" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_det_decompose.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="112"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.18" steps="712"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.2" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.20" steps="501"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="392"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.5" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="tr_ext_det_decompose.6" proved="true">
+  <proof prover="2"><result status="valid" time="0.22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_next_separator" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_next_separator.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="27"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="21"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="53"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.38" steps="1228"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.20" steps="642"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.5" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.19" steps="323"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.6" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="60"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.7" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.24" steps="864"/></proof>
+  </goal>
+  <goal name="tr_ext_next_separator.8" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_next_separator.8.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_next_separator.8.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_next_separator.8.0.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="371"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_next_separator.8.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_next_separator.8.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_next_separator.8.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="16"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_next_separator.8.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_next_separator.8.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_next_separator.8.2.0.0" proved="true">
+     <proof prover="0" timelimit="20"><result status="valid" time="15.95" steps="15025"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_next_separator.9" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="86"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_all_separator" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_all_separator.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="63"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="40"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.91" steps="1444"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.43" steps="1089"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="7"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.5" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="8"/></proof>
+  </goal>
+  <goal name="tr_ext_all_separator.6" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_all_separator.6.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_all_separator.6.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_all_separator.6.0.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="29"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_all_separator.6.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_all_separator.6.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_all_separator.6.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="13"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_all_separator.6.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_all_separator.6.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_all_separator.6.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="68"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_chain" proved="true">
+ <proof prover="1"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="tr_ext_all_det" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="tr_ext_all_det.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_all_det.0.0" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="4"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_all_det.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_all_det.1.0" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_all_det.2" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="tr_ext_all_det.2.0" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_maximum" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_det_maximum.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.58" steps="1453"/></proof>
+  </goal>
+  <goal name="tr_ext_det_maximum.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.17" steps="422"/></proof>
+  </goal>
+  <goal name="tr_ext_det_maximum.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="tr_ext_det_maximum.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="158"/></proof>
+  </goal>
+  <goal name="tr_ext_det_maximum.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_stop_det_progress" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_stop_det_progress.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.26" steps="762"/></proof>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.26" steps="935"/></proof>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.13" steps="184"/></proof>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.5" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_stop_det_progress.5.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_det_progress.5.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_det_progress.5.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.06" steps="78"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_stop_det_progress.5.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_det_progress.5.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_det_progress.5.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="15"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_stop_det_progress.5.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_stop_det_progress.5.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_stop_det_progress.5.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="26"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_stop_det_progress.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="77"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_first" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_det_first.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="42"/></proof>
+  </goal>
+  <goal name="tr_ext_det_first.1" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="171"/></proof>
+  </goal>
+  <goal name="tr_ext_det_first.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.40" steps="799"/></proof>
+  </goal>
+  <goal name="tr_ext_det_first.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.22" steps="690"/></proof>
+  </goal>
+  <goal name="tr_ext_det_first.4" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_det_first.4.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_first.4.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_first.4.0.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="10"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_first.4.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_first.4.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_first.4.1.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="16"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_first.4.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_first.4.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_first.4.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="0.55" steps="532"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_det_first.5" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="19"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_stop_progress" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_det_stop_progress.0" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.32" steps="987"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.2" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="41"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.3" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.48" steps="1289"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.4" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.10" steps="246"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.5" proved="true">
+  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.6" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="64"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.7" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.12" steps="249"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="123"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.9" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="97"/></proof>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.10" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_det_stop_progress.10.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_stop_progress.10.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_stop_progress.10.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.06" steps="60"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_stop_progress.10.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_stop_progress.10.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_stop_progress.10.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_stop_progress.10.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_stop_progress.10.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_stop_progress.10.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_det_stop_progress.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="71"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tr_ext_det_wf_chain" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="tr_ext_det_wf_chain.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="60"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.47" steps="1325"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.51" steps="1053"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.54" steps="659"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="33"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="247"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="113"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.11" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="tr_ext_det_wf_chain.11.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_wf_chain.11.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_wf_chain.11.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.13" steps="275"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_wf_chain.11.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_wf_chain.11.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_wf_chain.11.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.07" steps="22"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="tr_ext_det_wf_chain.11.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="tr_ext_det_wf_chain.11.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="tr_ext_det_wf_chain.11.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.09" steps="117"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="tr_ext_det_wf_chain.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Extension.tr_ext_compare" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="26"/></proof>
+ </goal>
+ <goal name="Extension.tr_ext_transitive" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="36"/></proof>
+ </goal>
+ <goal name="Extension.tr_ext_decompose" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="97"/></proof>
+ </goal>
+ <goal name="Extension.tr_ext_preserve_chain" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="38"/></proof>
+ </goal>
+ <goal name="Extension.tr_ext_preserve_wf_chain" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+ </goal>
+ <goal name="Extension.tr_ext_stop_progress" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="53"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_is_ext" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="3"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_alt" proved="true">
+ <proof prover="2"><result status="valid" time="0.27"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_criterion" proved="true">
+ <proof prover="2"><result status="valid" time="0.25"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_decompose" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_chain" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="43"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_wf_chain" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_first" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_all_det" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_maximum" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_det_stop_progress" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
+ <goal name="ExtensionDet.tr_ext_stop_det_progress" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
-<theory name="ChainExtensionCommon">
-</theory>
-<theory name="ChainExtension">
-</theory>
-<theory name="ChainExtensionProof">
- <goal name="extends_inflationary">
- <proof prover="4" steplimit="0"><result status="valid" time="0.72" steps="1219"/></proof>
- </goal>
- <goal name="extends_preserve_chains">
- <proof prover="4"><result status="valid" time="0.23" steps="533"/></proof>
- </goal>
- <goal name="extends_preserve_wf_chains">
- <transf name="split_goal_right">
-  <goal name="extends_preserve_wf_chains.1" expl="1.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="53"/></proof>
+<theory name="TransportProof" proved="true" sum="f740a198524d0b3cfd26838c0c5634c7">
+ <goal name="transport" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="transport.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
-  <goal name="extends_preserve_wf_chains.2" expl="2.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="9"/></proof>
+  <goal name="transport.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.26" steps="462"/></proof>
   </goal>
-  <goal name="extends_preserve_wf_chains.3" expl="3.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.4" expl="4.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.27" steps="624"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.5" expl="5.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.49" steps="759"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.6" expl="6.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.04" steps="11"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.7" expl="7.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.8" expl="8.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.9" expl="9.">
-  <proof prover="4" steplimit="0"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.10" expl="10.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.11" expl="11.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="12"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.12" expl="12.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.13" expl="13.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="53"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.14" expl="14.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="33"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.15" expl="15.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.05" steps="215"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.16" expl="16.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.17" expl="17.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="extends_preserve_wf_chains.18" expl="18.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.04" steps="17"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="reach_only_chains">
- <transf name="split_goal_right">
-  <goal name="reach_only_chains.1" expl="1.">
-  <transf name="induction_pr">
-   <goal name="reach_only_chains.1.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_chains.1.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_chains.1.1.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.04" steps="4"/></proof>
+  <goal name="transport.2" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="transport.2.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport.2.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport.2.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="reach_only_chains.1.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_chains.1.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_chains.1.2.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.05" steps="67"/></proof>
+   <goal name="transport.2.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport.2.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport.2.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.24" steps="735"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="reach_only_chains.1.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_chains.1.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_chains.1.3.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.07" steps="116"/></proof>
+   <goal name="transport.2.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport.2.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport.2.2.0.0" proved="true">
+     <proof prover="0" timelimit="5"><result status="valid" time="2.12" steps="1896"/></proof>
      </goal>
     </transf>
     </goal>
@@ -510,43 +978,115 @@
    </goal>
   </transf>
   </goal>
-  <goal name="reach_only_chains.2" expl="2.">
-  <proof prover="4"><result status="valid" time="0.02" steps="23"/></proof>
+  <goal name="transport.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="reach_only_wf_chains">
- <transf name="split_goal_right">
-  <goal name="reach_only_wf_chains.1" expl="1.">
-  <transf name="induction_pr">
-   <goal name="reach_only_wf_chains.1.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_wf_chains.1.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_wf_chains.1.1.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.04" steps="4"/></proof>
+ <goal name="transport_criterion" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="transport_criterion.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="258"/></proof>
+  </goal>
+  <goal name="transport_criterion.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.90"/></proof>
+  </goal>
+  <goal name="transport_criterion.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="392"/></proof>
+  </goal>
+  <goal name="transport_criterion.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="transport_criterion.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="114"/></proof>
+  </goal>
+  <goal name="transport_criterion.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="53"/></proof>
+  </goal>
+  <goal name="transport_criterion.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="transport_criterion.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
+  </goal>
+  <goal name="transport_criterion.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="96"/></proof>
+  </goal>
+  <goal name="transport_criterion.9" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="51"/></proof>
+  </goal>
+  <goal name="transport_criterion.10" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="25"/></proof>
+  </goal>
+  <goal name="transport_criterion.11" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="323"/></proof>
+  </goal>
+  <goal name="transport_criterion.12" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
+  </goal>
+  <goal name="transport_criterion.13" proved="true">
+  <proof prover="0"><result status="valid" time="0.48" steps="1347"/></proof>
+  </goal>
+  <goal name="transport_criterion.14" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+  </goal>
+  <goal name="transport_criterion.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="transport_criterion.16" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="transport_criterion.17" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="58"/></proof>
+  </goal>
+  <goal name="transport_criterion.18" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="53"/></proof>
+  </goal>
+  <goal name="transport_criterion.19" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
+  </goal>
+  <goal name="transport_criterion.20" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+  </goal>
+  <goal name="transport_criterion.21" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="transport_criterion.22" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="11"/></proof>
+  </goal>
+  <goal name="transport_criterion.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="400"/></proof>
+  </goal>
+  <goal name="transport_criterion.24" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="transport_criterion.24.0" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport_criterion.24.0.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport_criterion.24.0.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.78" steps="2130"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="reach_only_wf_chains.1.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_wf_chains.1.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_wf_chains.1.2.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.04" steps="35"/></proof>
+   <goal name="transport_criterion.24.1" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport_criterion.24.1.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport_criterion.24.1.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="reach_only_wf_chains.1.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_only_wf_chains.1.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_only_wf_chains.1.3.1.1" expl="1.">
-     <proof prover="4"><result status="valid" time="0.07" steps="96"/></proof>
+   <goal name="transport_criterion.24.2" proved="true">
+   <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+    <goal name="transport_criterion.24.2.0" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="transport_criterion.24.2.0.0" proved="true">
+     <proof prover="0"><result status="valid" time="0.15" steps="399"/></proof>
      </goal>
     </transf>
     </goal>
@@ -554,141 +1094,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="reach_only_wf_chains.2" expl="2.">
-  <proof prover="4"><result status="valid" time="0.04" steps="15"/></proof>
+  <goal name="transport_criterion.25" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="51"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="reach_ch_interval">
- <transf name="split_goal_right">
-  <goal name="reach_ch_interval.1" expl="1.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.24" steps="448"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.2" expl="2.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.3" expl="3.">
-  <proof prover="4" steplimit="0"><result status="valid" time="0.43" steps="470"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.4" expl="4.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.43" steps="443"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.5" expl="5.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.6" expl="6.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="21"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.7" expl="7.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="45"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.8" expl="8.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="24"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.9" expl="9.">
-  <proof prover="0"><result status="valid" time="0.54"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.10" expl="10.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.04" steps="17"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.11" expl="11.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="2.07" steps="2531"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.12" expl="12.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.72" steps="1036"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.13" expl="13.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.89" steps="1289"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.14" expl="14.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.81" steps="1358"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.15" expl="15.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.06" steps="39"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.16" expl="16.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.04" steps="30"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.17" expl="17.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.18" expl="18.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="2.37" steps="2687"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.19" expl="19.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.60" steps="915"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.20" expl="20.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.03" steps="33"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.21" expl="21.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.05" steps="60"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.22" expl="22.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.56" steps="841"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.23" expl="23.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.52" steps="465"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.24" expl="24.">
-  <proof prover="4" steplimit="-1"><result status="valid" time="0.06" steps="122"/></proof>
-  </goal>
-  <goal name="reach_ch_interval.25" expl="25.">
-  <transf name="induction_pr">
-   <goal name="reach_ch_interval.25.1" expl="1.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_ch_interval.25.1.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_ch_interval.25.1.1.1" expl="1.">
-     <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="16"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="reach_ch_interval.25.2" expl="2.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_ch_interval.25.2.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_ch_interval.25.2.1.1" expl="1.">
-     <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="25"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="reach_ch_interval.25.3" expl="3.">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="reach_ch_interval.25.3.1" expl="1.">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="reach_ch_interval.25.3.1.1" expl="1.">
-     <proof prover="4" steplimit="-1"><result status="valid" time="0.05" steps="141"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <goal name="Transport.transport" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="ChainExtension.extends_inflationary">
- <proof prover="4"><result status="valid" time="0.04" steps="7"/></proof>
- </goal>
- <goal name="ChainExtension.extends_preserve_chains">
- <proof prover="4"><result status="valid" time="0.03" steps="11"/></proof>
- </goal>
- <goal name="ChainExtension.extends_preserve_wf_chains">
- <proof prover="4"><result status="valid" time="0.03" steps="7"/></proof>
- </goal>
- <goal name="ChainExtension.reach_only_chains">
- <proof prover="4"><result status="valid" time="0.04" steps="44"/></proof>
- </goal>
- <goal name="ChainExtension.reach_only_wf_chains">
- <proof prover="4"><result status="valid" time="0.04" steps="25"/></proof>
- </goal>
- <goal name="ChainExtension.reach_ch_interval">
- <proof prover="4" steplimit="-1"><result status="valid" time="0.02" steps="12"/></proof>
+ <goal name="Transport.transport_criterion" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
  </goal>
 </theory>
 </file>

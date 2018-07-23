@@ -2,57 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lcp.mlw">
-<theory name="LCP">
- <goal name="not_eqseq" expl="">
- <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../lcp.mlw" proved="true">
+<theory name="LCP" proved="true">
+ <goal name="not_eqseq" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
- <goal name="WP_parameter lcp" expl="VC for lcp">
- <transf name="split_goal_right">
-  <goal name="WP_parameter lcp.1" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.2" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.3" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.4" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.5" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.6" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.7" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter lcp.7.1" expl="postcondition">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   <proof prover="5"><result status="valid" time="0.18"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter lcp.8" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.9" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.10" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter lcp.11" expl="postcondition">
-  <proof prover="4" timelimit="5"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
- </transf>
+ <goal name="VC lcp" expl="VC for lcp" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="79"/></proof>
  </goal>
 </theory>
 </file>

@@ -104,11 +104,11 @@ and print_fmla info fmt f = match f.t_node with
   | Tfalse ->
       fprintf fmt "FALSE"
   | Tif _ ->
-      unsupportedTerm f "simplify : you must eliminate if"
+      unsupportedTerm f "simplify: you must eliminate if"
   | Tlet _ ->
-      unsupportedTerm f "simplify : you must eliminate let"
+      unsupportedTerm f "simplify: you must eliminate let"
   | Tcase _ ->
-      unsupportedTerm f "simplify : you must eliminate match"
+      unsupportedTerm f "simplify: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
@@ -131,7 +131,7 @@ let print_decl info fmt d = match d.d_node with
   | Dlogic _ ->
       unsupportedDecl d "Predicate and function definition aren't supported"
   | Dind _ ->
-      unsupportedDecl d "simplify : inductive definition are not supported"
+      unsupportedDecl d "simplify: inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[(BG_PUSH@\n ;; axiom %s@\n @[<hov 2>%a@])@]@\n@\n"
@@ -142,7 +142,7 @@ let print_decl info fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[;; %a@]@\n" Loc.gen_report_position loc
         | None -> ());
       fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) ->
+  | Dprop (Plemma, _, _) ->
       assert false
 
 let print_decls =

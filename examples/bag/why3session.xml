@@ -2,124 +2,180 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC3" version="2.4.1" timelimit="60" steplimit="0" memlimit="4000"/>
-<prover id="9" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="4000"/>
-<file name="../bag.mlw">
-<theory name="Bag">
+<prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../bag.mlw" proved="true">
+<theory name="Bag" proved="true">
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
 </theory>
-<theory name="BagSpec">
+<theory name="BagSpec" proved="true">
+ <goal name="VC t" expl="VC for t" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
 </theory>
-<theory name="ResizableArraySpec">
+<theory name="ResizableArraySpec" proved="true">
+ <goal name="VC rarray" expl="VC for rarray" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
 </theory>
-<theory name="BagImpl">
- <goal name="WP_parameter create" expl="VC for create">
- <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+<theory name="BagImpl" proved="true">
+ <goal name="VC t" expl="VC for t" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="WP_parameter clear" expl="VC for clear">
- <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add">
- <proof prover="3"><result status="valid" time="0.38"/></proof>
- <proof prover="5"><result status="valid" time="11.26"/></proof>
+ <goal name="VC clear" expl="VC for clear" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="48"/></proof>
  </goal>
- <goal name="WP_parameter get" expl="VC for get">
- <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
- <proof prover="5"><result status="valid" time="0.03"/></proof>
- </goal>
- <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_right">
-  <goal name="WP_parameter remove.1" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="4"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC add.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter remove.2" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <goal name="VC add.1" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC add.1.0" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+   </goal>
+   <goal name="VC add.1.1" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+   </goal>
+   <goal name="VC add.1.2" expl="VC for add" proved="true">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter remove.3" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <goal name="VC add.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter remove.4" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <goal name="VC add.3" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.24" steps="401"/></proof>
   </goal>
-  <goal name="WP_parameter remove.5" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <goal name="VC add.4" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter remove.6" expl="assertion">
-  <proof prover="1"><result status="valid" time="1.75"/></proof>
-  <proof prover="5"><result status="valid" time="1.35"/></proof>
+  <goal name="VC add.5" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter remove.7" expl="assertion">
-  <proof prover="1" timelimit="76"><result status="valid" time="8.21"/></proof>
+  <goal name="VC add.6" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.19" steps="242"/></proof>
   </goal>
-  <goal name="WP_parameter remove.8" expl="assertion">
-  <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="0.06" steps="34"/></proof>
+  <goal name="VC add.7" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter remove.9" expl="type invariant">
-  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.10" expl="type invariant">
-  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.11" expl="type invariant">
-  <proof prover="1" timelimit="5" memlimit="4000"><result status="valid" time="1.74"/></proof>
-  <proof prover="9"><result status="valid" time="0.12"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.12" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.13" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.14" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.15" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.32"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.16" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.17" expl="assertion">
-  <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.18" expl="type invariant">
-  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.19" expl="type invariant">
-  <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.20" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.21" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.22" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <goal name="VC add.8" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
-</theory>
-<theory name="Harness">
- <goal name="WP_parameter test1" expl="VC for test1">
- <transf name="split_goal_right">
-  <goal name="WP_parameter test1.1" expl="assertion">
-  <proof prover="0" timelimit="10"><result status="valid" time="0.39" steps="195"/></proof>
-  <proof prover="1" timelimit="10"><result status="valid" time="0.18"/></proof>
-  <proof prover="3" timelimit="10"><result status="valid" time="0.02"/></proof>
+ <goal name="VC get" expl="VC for get" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC remove.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter test1.2" expl="assertion">
-  <proof prover="3" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="VC remove.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC remove.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC remove.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  </goal>
+  <goal name="VC remove.4" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC remove.4.0" expl="assertion" proved="true">
+   <proof prover="1" timelimit="15"><result status="valid" time="10.20" steps="3605"/></proof>
+   </goal>
+   <goal name="VC remove.4.1" expl="VC for remove" proved="true">
+   <proof prover="1"><result status="valid" time="0.50" steps="542"/></proof>
+   </goal>
+   <goal name="VC remove.4.2" expl="VC for remove" proved="true">
+   <proof prover="1"><result status="valid" time="1.31" steps="580"/></proof>
+   </goal>
+   <goal name="VC remove.4.3" expl="VC for remove" proved="true">
+   <proof prover="1"><result status="valid" time="0.07" steps="163"/></proof>
+   </goal>
+   <goal name="VC remove.4.4" expl="VC for remove" proved="true">
+   <proof prover="0"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC remove.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC remove.6" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="VC remove.7" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="87"/></proof>
+  </goal>
+  <goal name="VC remove.8" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.53"/></proof>
+  </goal>
+  <goal name="VC remove.9" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC remove.10" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="35"/></proof>
+  </goal>
+  <goal name="VC remove.11" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.27" steps="283"/></proof>
+  </goal>
+  <goal name="VC remove.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC remove.13" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+  </goal>
+  <goal name="VC remove.14" expl="type invariant" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
+  </goal>
+  <goal name="VC remove.15" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC remove.16" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC remove.17" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="BagSpec.VC t" expl="VC for t" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="BagSpec.VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+ </goal>
+ <goal name="BagSpec.VC clear" expl="VC for clear" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+ </goal>
+ <goal name="BagSpec.VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+</theory>
+<theory name="Harness" proved="true">
+ <goal name="VC test1" expl="VC for test1" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC test1.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="244"/></proof>
+  </goal>
+  <goal name="VC test1.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.90" steps="484"/></proof>
   </goal>
  </transf>
  </goal>

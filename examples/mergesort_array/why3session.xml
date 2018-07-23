@@ -2,803 +2,621 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="2" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="13" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
-<prover id="15" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mergesort_array.mlw" proved="true">
-<theory name="Elt" proved="true">
-</theory>
 <theory name="Merge" proved="true">
- <goal name="WP_parameter merge" expl="VC for merge" proved="true">
+ <goal name="VC merge" expl="VC for merge" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC merge.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter merge.1" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC merge.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.2" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC merge.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter merge.3" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC merge.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter merge.4" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC merge.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter merge.5" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="VC merge.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter merge.6" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC merge.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter merge.7" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC merge.7" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter merge.8" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC merge.8" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter merge.9" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="VC merge.9" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="VC merge.10" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC merge.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter merge.12" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC merge.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter merge.13" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.03"/></proof>
+  <goal name="VC merge.13" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter merge.14" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.03"/></proof>
+  <goal name="VC merge.14" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.16" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.12" steps="157"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.17" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.18" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.19" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.20" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.21" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.22" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.23" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.24" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.25" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.26" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.27" expl="loop invariant preservation" proved="true">
+  <goal name="VC merge.15" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.28" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.14" steps="166"/></proof>
+  <goal name="VC merge.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="4.68" steps="5814"/></proof>
   </goal>
-  <goal name="WP_parameter merge.29" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
+  <goal name="VC merge.17" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
-  <goal name="WP_parameter merge.30" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC merge.18" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge.31" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="26"/></proof>
+  <goal name="VC merge.19" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter merge.32" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC merge.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter merge.33" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
+  <goal name="VC merge.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter merge.34" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
+  <goal name="VC merge.22" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter merge.35" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.03"/></proof>
+  <goal name="VC merge.23" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter merge.36" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="VC merge.24" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.37" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.02"/></proof>
+  <goal name="VC merge.25" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="3.40" steps="4056"/></proof>
   </goal>
-  <goal name="WP_parameter merge.38" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.12" steps="164"/></proof>
+  <goal name="VC merge.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="65"/></proof>
   </goal>
-  <goal name="WP_parameter merge.39" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="37"/></proof>
+  <goal name="VC merge.27" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter merge.40" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.41" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.42" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.43" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.44" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.45" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.46" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.47" expl="loop invariant preservation" proved="true">
-  <proof prover="15"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.48" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.23" steps="201"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.49" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.50" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.51" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.52" expl="postcondition" proved="true">
+  <goal name="VC merge.28" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
-   <goal name="WP_parameter merge.52.0" expl="postcondition" proved="true">
+   <goal name="VC merge.28.0" expl="postcondition" proved="true">
    <transf name="split_goal_right" proved="true" >
-    <goal name="WP_parameter merge.52.0.0" expl="VC for merge" proved="true">
-    <proof prover="13"><result status="valid" time="0.00" steps="3"/></proof>
+    <goal name="VC merge.28.0.0" expl="VC for merge" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
     </goal>
-    <goal name="WP_parameter merge.52.0.1" expl="VC for merge" proved="true">
-    <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
+    <goal name="VC merge.28.0.1" expl="VC for merge" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
     </goal>
-    <goal name="WP_parameter merge.52.0.2" expl="VC for merge" proved="true">
-    <proof prover="13"><result status="valid" time="0.01" steps="10"/></proof>
+    <goal name="VC merge.28.0.2" expl="VC for merge" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
     </goal>
-    <goal name="WP_parameter merge.52.0.3" expl="VC for merge" proved="true">
-    <proof prover="13"><result status="valid" time="0.02" steps="10"/></proof>
+    <goal name="VC merge.28.0.3" expl="VC for merge" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
     </goal>
-    <goal name="WP_parameter merge.52.0.4" expl="VC for merge" proved="true">
-    <proof prover="13"><result status="valid" time="0.02" steps="4"/></proof>
+    <goal name="VC merge.28.0.4" expl="VC for merge" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
     </goal>
-    <goal name="WP_parameter merge.52.0.5" expl="VC for merge" proved="true">
-    <proof prover="15"><result status="valid" time="0.03"/></proof>
+    <goal name="VC merge.28.0.5" expl="VC for merge" proved="true">
+    <proof prover="4" timelimit="11"><result status="valid" time="0.35"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge.53" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC merge.29" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  </goal>
+  <goal name="VC merge.30" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter merge_using" expl="VC for merge_using" proved="true">
+ <goal name="VC merge_using" expl="VC for merge_using" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter merge_using.0" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC merge_using.0" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.1" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC merge_using.1" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.2" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="36"/></proof>
+  <goal name="VC merge_using.2" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.3" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="46"/></proof>
+  <goal name="VC merge_using.3" expl="postcondition" proved="true">
+  <proof prover="4" timelimit="11"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.4" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC merge_using.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.5" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC merge_using.5" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.6" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC merge_using.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.7" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC merge_using.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.8" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="40"/></proof>
+  <goal name="VC merge_using.8" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.9" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="43"/></proof>
+  <goal name="VC merge_using.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.10" expl="assertion" proved="true">
+  <goal name="VC merge_using.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+  <goal name="VC merge_using.11" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
-   <goal name="WP_parameter merge_using.10.0" expl="assertion" proved="true">
-   <transf name="split_goal_right" proved="true" >
-    <goal name="WP_parameter merge_using.10.0.0" expl="VC for merge_using" proved="true">
-    <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
-    </goal>
-    <goal name="WP_parameter merge_using.10.0.1" expl="VC for merge_using" proved="true">
-    <proof prover="13"><result status="valid" time="1.16" steps="1436"/></proof>
-    </goal>
-    <goal name="WP_parameter merge_using.10.0.2" expl="VC for merge_using" proved="true">
-    <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
-    </goal>
-   </transf>
+   <goal name="VC merge_using.11.0" expl="assertion" proved="true">
+   <proof prover="4" timelimit="11"><result status="valid" time="0.45"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge_using.11" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="25"/></proof>
+  <goal name="VC merge_using.12" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.12" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC merge_using.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.13" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
+  <goal name="VC merge_using.14" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.14" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="20"/></proof>
+  <goal name="VC merge_using.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.15" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="VC merge_using.16" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC merge_using.17" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="TopDownMergesort" proved="true">
- <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter mergesort_rec.0" expl="check division by zero" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="VC mergesort_rec" expl="VC for mergesort_rec" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC mergesort_rec.0" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.1" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC mergesort_rec.1" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.2" expl="variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC mergesort_rec.2" expl="check division by zero" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.3" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC mergesort_rec.3" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.4" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC mergesort_rec.4" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.5" expl="variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="31"/></proof>
+  <goal name="VC mergesort_rec.5" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.6" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC mergesort_rec.6" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.7" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="29"/></proof>
+  <goal name="VC mergesort_rec.7" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.8" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC mergesort_rec.8" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.9" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.10" steps="131"/></proof>
+  <goal name="VC mergesort_rec.9" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.10" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC mergesort_rec.10" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.11" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC mergesort_rec.11" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.15" steps="184"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.12" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.17" steps="220"/></proof>
+  <goal name="VC mergesort_rec.12" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.13" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC mergesort_rec.13" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.14" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC mergesort_rec.14" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="234"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mergesort" expl="VC for mergesort" proved="true">
- <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+ <goal name="VC mergesort" expl="VC for mergesort" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
  </goal>
 </theory>
 <theory name="BottomUpMergesort" proved="true">
- <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
+ <goal name="VC bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter bottom_up_mergesort.0" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="VC bottom_up_mergesort.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.1" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC bottom_up_mergesort.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.2" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC bottom_up_mergesort.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.3" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC bottom_up_mergesort.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.4" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC bottom_up_mergesort.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.5" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC bottom_up_mergesort.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.6" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC bottom_up_mergesort.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.7" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC bottom_up_mergesort.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.8" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC bottom_up_mergesort.8" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.9" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC bottom_up_mergesort.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.10" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC bottom_up_mergesort.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.11" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC bottom_up_mergesort.11" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.12" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="30"/></proof>
+  <goal name="VC bottom_up_mergesort.12" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.13" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
+  <goal name="VC bottom_up_mergesort.13" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="146"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.14" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.15" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.04" steps="53"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.16" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.34"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.17" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.18" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.19" expl="assertion" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter bottom_up_mergesort.19.0" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.02" steps="47"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.19.1" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="1.24" steps="695"/></proof>
+  <goal name="VC bottom_up_mergesort.14" expl="assertion" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC bottom_up_mergesort.14.0" expl="assertion" proved="true">
+   <proof prover="4" timelimit="11"><result status="valid" time="0.35"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.20" expl="assertion" proved="true">
+  <goal name="VC bottom_up_mergesort.15" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.16" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.17" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.75" steps="490"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.18" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter bottom_up_mergesort.20.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.1" expl="assertion" proved="true">
+   <goal name="VC bottom_up_mergesort.18.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.2" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.03" steps="56"/></proof>
+   <goal name="VC bottom_up_mergesort.18.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.3" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.90" steps="624"/></proof>
+   <goal name="VC bottom_up_mergesort.18.2" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="42"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.4" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+   <goal name="VC bottom_up_mergesort.18.3" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="103"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.5" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+   <goal name="VC bottom_up_mergesort.18.4" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.22" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="40"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.23" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="55"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.24" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.03" steps="55"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.25" expl="loop variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter bottom_up_mergesort.26" expl="assertion" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter bottom_up_mergesort.26.0" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.26.1" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.26.2" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.26.3" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.02" steps="31"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.26.4" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.02" steps="22"/></proof>
-   </goal>
-   <goal name="WP_parameter bottom_up_mergesort.26.5" expl="assertion" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
+   <goal name="VC bottom_up_mergesort.18.5" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.27" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC bottom_up_mergesort.19" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.28" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC bottom_up_mergesort.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.29" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="29"/></proof>
+  <goal name="VC bottom_up_mergesort.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.30" expl="loop variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC bottom_up_mergesort.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.31" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC bottom_up_mergesort.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.32" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC bottom_up_mergesort.24" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="177"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.33" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC bottom_up_mergesort.25" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.34" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC bottom_up_mergesort.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.27" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.29" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.30" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="VC bottom_up_mergesort.31" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="NaturalMergesort" proved="true">
- <goal name="WP_parameter find_run" expl="VC for find_run" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter find_run.0" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.1" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.2" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.3" expl="index in array bounds" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.4" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.5" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.6" expl="loop variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.7" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.8" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.9" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.10" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.11" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter find_run.12" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
- </transf>
+ <goal name="VC find_run" expl="VC for find_run" proved="true">
+ <proof prover="0"><result status="valid" time="0.13" steps="178"/></proof>
  </goal>
- <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort" proved="true">
+ <goal name="VC natural_mergesort" expl="VC for natural_mergesort" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter natural_mergesort.0" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC natural_mergesort.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.1" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC natural_mergesort.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.2" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC natural_mergesort.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.3" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC natural_mergesort.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.4" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC natural_mergesort.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.5" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC natural_mergesort.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.6" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC natural_mergesort.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.7" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC natural_mergesort.7" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.8" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="34"/></proof>
+  <goal name="VC natural_mergesort.8" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.9" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="VC natural_mergesort.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.10" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC natural_mergesort.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.11" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
+  <goal name="VC natural_mergesort.11" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.12" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter natural_mergesort.12.0" expl="VC for natural_mergesort" proved="true">
-   <proof prover="13"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="WP_parameter natural_mergesort.12.1" expl="VC for natural_mergesort" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC natural_mergesort.12" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="42"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.15" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.16" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.19" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="126"/></proof>
+  </goal>
+  <goal name="VC natural_mergesort.20" expl="assertion" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC natural_mergesort.20.0" expl="assertion" proved="true">
+   <transf name="split_goal_right" proved="true" >
+    <goal name="VC natural_mergesort.20.0.0" expl="VC for natural_mergesort" proved="true">
+    <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
+    </goal>
+    <goal name="VC natural_mergesort.20.0.1" expl="VC for natural_mergesort" proved="true">
+    <proof prover="4" timelimit="11"><result status="valid" time="0.10"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter natural_mergesort.13" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC natural_mergesort.21" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.14" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC natural_mergesort.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.15" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC natural_mergesort.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.16" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC natural_mergesort.24" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.17" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="27"/></proof>
+  <goal name="VC natural_mergesort.25" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.18" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.04" steps="84"/></proof>
+  <goal name="VC natural_mergesort.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.19" expl="assertion" proved="true">
-  <proof prover="15"><result status="valid" time="0.03"/></proof>
+  <goal name="VC natural_mergesort.27" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="37"/></proof>
+  <goal name="VC natural_mergesort.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="85"/></proof>
+  <goal name="VC natural_mergesort.29" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.22" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
+  <goal name="VC natural_mergesort.30" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="102"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.23" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.03" steps="104"/></proof>
+  <goal name="VC natural_mergesort.31" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.24" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="51"/></proof>
+  <goal name="VC natural_mergesort.32" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="67"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.25" expl="loop variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
+  <goal name="VC natural_mergesort.33" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.26" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="VC natural_mergesort.34" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.27" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="VC natural_mergesort.35" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.28" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.07" steps="134"/></proof>
+  <goal name="VC natural_mergesort.36" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.29" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.30" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="52"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.31" expl="loop variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="38"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.32" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.33" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.34" expl="loop variant decrease" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter natural_mergesort.34.0" expl="VC for natural_mergesort" proved="true">
-   <proof prover="13"><result status="valid" time="0.02" steps="16"/></proof>
-   </goal>
-   <goal name="WP_parameter natural_mergesort.34.1" expl="VC for natural_mergesort" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.35" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort.36" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC natural_mergesort.37" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter naturalrec" expl="VC for naturalrec" proved="true">
+ <goal name="VC naturalrec" expl="VC for naturalrec" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter naturalrec.0" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="1"/></proof>
+  <goal name="VC naturalrec.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.1" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC naturalrec.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.2" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="VC naturalrec.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.3" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC naturalrec.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.4" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="1"/></proof>
+  <goal name="VC naturalrec.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.5" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC naturalrec.5" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.6" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="VC naturalrec.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.7" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="VC naturalrec.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.8" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC naturalrec.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.9" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="VC naturalrec.9" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.10" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="VC naturalrec.10" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.11" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC naturalrec.11" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.12" expl="loop invariant init" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="VC naturalrec.12" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.13" expl="variant decrease" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC naturalrec.13" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.14" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC naturalrec.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.15" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC naturalrec.15" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.16" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter naturalrec.17" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter naturalrec.18" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter naturalrec.19" expl="precondition" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter naturalrec.19.0" expl="VC for naturalrec" proved="true">
-   <proof prover="13"><result status="valid" time="0.00" steps="26"/></proof>
-   </goal>
-   <goal name="WP_parameter naturalrec.19.1" expl="VC for naturalrec" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
-   </goal>
-   <goal name="WP_parameter naturalrec.19.2" expl="VC for naturalrec" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
-   </goal>
-   <goal name="WP_parameter naturalrec.19.3" expl="VC for naturalrec" proved="true">
-   <proof prover="13"><result status="valid" time="0.00" steps="36"/></proof>
-   </goal>
-   <goal name="WP_parameter naturalrec.19.4" expl="VC for naturalrec" proved="true">
-   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC naturalrec.16" expl="assertion" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC naturalrec.16.0" expl="assertion" proved="true">
+   <proof prover="4" timelimit="11"><result status="valid" time="1.49"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter naturalrec.20" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.05" steps="142"/></proof>
+  <goal name="VC naturalrec.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.21" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="VC naturalrec.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.22" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.03" steps="108"/></proof>
+  <goal name="VC naturalrec.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.23" expl="assertion" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="51"/></proof>
+  <goal name="VC naturalrec.20" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="168"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.24" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="1"/></proof>
+  <goal name="VC naturalrec.21" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.25" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
+  <goal name="VC naturalrec.22" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.26" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.04" steps="103"/></proof>
+  <goal name="VC naturalrec.23" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.27" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="77"/></proof>
+  <goal name="VC naturalrec.24" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="160"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.28" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="VC naturalrec.25" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="106"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.29" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="VC naturalrec.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.30" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.03" steps="105"/></proof>
+  <goal name="VC naturalrec.27" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.31" expl="loop invariant preservation" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="79"/></proof>
+  <goal name="VC naturalrec.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="168"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.32" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC naturalrec.29" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="110"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.33" expl="type invariant" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC naturalrec.30" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.34" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC naturalrec.31" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.35" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC naturalrec.32" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.36" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC naturalrec.33" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.37" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
+  <goal name="VC naturalrec.34" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter natural_mergesort2.0" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort2.1" expl="precondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.00" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort2.2" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter natural_mergesort2.3" expl="postcondition" proved="true">
-  <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
- </transf>
+ <goal name="VC natural_mergesort2" expl="VC for natural_mergesort2" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="42"/></proof>
  </goal>
 </theory>
 </file>

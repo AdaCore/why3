@@ -2,62 +2,31 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.3" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../insertion_sort_list.mlw">
-<theory name="InsertionSort">
- <goal name="Transitive.Trans" expl="">
- <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
+<prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
+<file name="../insertion_sort_list.mlw" proved="true">
+<theory name="InsertionSort" proved="true">
+ <goal name="Transitive.Trans" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <transf name="split_goal_right">
-  <goal name="WP_parameter insert.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC insert.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter insert.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="4"/></proof>
+  <goal name="VC insert.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter insert.3" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  <goal name="VC insert.2" expl="postcondition" proved="true">
+  <proof prover="2" timelimit="1"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter insert.4" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.5" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.6" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.7" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.58" steps="741"/></proof>
-  </goal>
-  <goal name="WP_parameter insert.8" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.21"/></proof>
+  <goal name="VC insert.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.34"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort">
- <transf name="split_goal_right">
-  <goal name="WP_parameter insertion_sort.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.3" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.4" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.5" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter insertion_sort.6" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="286"/></proof>
-  </goal>
- </transf>
+ <goal name="VC insertion_sort" expl="VC for insertion_sort" proved="true">
+ <proof prover="3"><result status="valid" time="0.11" steps="548"/></proof>
  </goal>
 </theory>
 </file>

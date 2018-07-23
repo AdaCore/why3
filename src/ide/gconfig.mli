@@ -19,9 +19,9 @@ type t =
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable intro_premises : bool;
       mutable show_full_context : bool;
-      mutable show_labels : bool;
+      mutable show_attributes : bool;
+      mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
@@ -117,6 +117,7 @@ val show_about_window : unit -> unit
 val preferences : t -> unit
 
 val uninstalled_prover_dialog :
+  height:int ->
   callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
   t -> Whyconf.prover -> unit
 

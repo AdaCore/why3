@@ -6,11 +6,12 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
   predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
   type t
 
@@ -61,15 +62,16 @@ end
 
 module SkewHeaps
 
-  use import int.Int
-  use import bintree.Tree
+  use int.Int
+  use bintree.Tree
   use export bintree.Size
   use export bintree.Occ
 
   type elt
 
-  predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  val predicate le elt elt
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
   (* [e] is no greater than the root of [t], if any *)
   predicate le_root (e: elt) (t: tree elt) = match t with
@@ -97,8 +99,8 @@ module SkewHeaps
   = match t with
     | Empty -> absurd
     | Node l _ r ->
-        if l <> Empty then root_is_min l;
-        if r <> Empty then root_is_min r
+        if not (is_empty l) then root_is_min l;
+        if not (is_empty r) then root_is_min r
     end
 
   let empty () : tree elt
@@ -107,16 +109,6 @@ module SkewHeaps
     ensures { forall e. not (mem e result) }
   =
     Empty
-
-  let is_empty (t: tree elt) : bool
-    ensures { result <-> size t = 0 }
-  =
-    t = Empty
-
-  let size (t: tree elt) : int
-    ensures { result = size t }
-  =
-    size t
 
   let get_min (t: tree elt) : elt
     requires { heap t && 0 < size t }
@@ -171,14 +163,14 @@ end
 
 module HeapSort
 
-  use import SkewHeaps
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArrayPermut
-  clone export array.Sorted with type elt = elt, predicate le = le
-  use import map.Occ as M
-  use import bintree.Occ as H
+  use SkewHeaps
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArrayPermut
+  clone export array.Sorted with type elt = elt, predicate le = le, axiom .
+  use map.Occ as M
+  use bintree.Occ as H
 
   let heapsort (a: array elt) : unit
     ensures { sorted a }
@@ -193,13 +185,13 @@ module HeapSort
       t := add a[i] !t;
       assert { M.occ a[i] a.elts i n = 1 + M.occ a[i] a.elts (i+1) n }
     done;
-    'I:
+    label I in
     for i = 0 to n - 1 do
       invariant { sorted_sub a 0 i }
       invariant { heap !t && size !t = n - i }
       invariant { forall j. 0 <= j < i -> forall e. mem e !t -> le a[j] e }
       invariant { forall e.
-                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (at a.elts 'I) 0 n }
+                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (a.elts at I) 0 n }
       a[i] <- get_min !t;
       t := remove_min !t
     done

@@ -16,23 +16,23 @@ open Theory
 open Ty
 
 let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
+  (* The term with attribute "model_trace:name" will be
+     in the counterexample with name "name" *)
 
-
-let label_starts_with regexp l =
+let attr_starts_with regexp a =
   try
-    ignore(Str.search_forward regexp l.lab_string 0);
+    ignore(Str.search_forward regexp a.attr_string 0);
     true
   with Not_found -> false
 
-let string_starts_with regexp l =
+let string_starts_with regexp s =
   try
-    ignore(Str.search_forward regexp l 0);
+    ignore(Str.search_forward regexp s 0);
     true
   with Not_found -> false
 
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
+let get_attr attrs regexp =
+  Sattr.choose (Sattr.filter (attr_starts_with regexp) attrs)
 
 let is_proj_for_array_attr proj_name =
   let b =
@@ -40,7 +40,6 @@ let is_proj_for_array_attr proj_name =
       string_starts_with (Str.regexp "'First\\|'Last\\|\\.") proj_name
     with Not_found -> false in
   b
-
 
 
 (*
@@ -70,7 +69,6 @@ let intro_const_equal_to_term
   (* See documentation of the function in file intro_projections_counterexmp.mli. *)
 
   (* Create declaration of new constant *)
-  (*let lab_new = Slab.add model_label labels in*)
   let ls_new_constant =  Term.create_lsymbol id_new [] term.t_ty in
   let decl_new_constant = Decl.create_param_decl ls_new_constant in
   let t_new_constant = Term.t_app ls_new_constant [] term.t_ty in
@@ -89,19 +87,19 @@ let introduce_constant ls t_rhs proj_name =
      array attributes like First and Last *)
   if is_proj_for_array_attr proj_name then
     (* introduce new constant c and axiom stating c = t_rhs  *)
-    let const_label = ls.ls_name.id_label in
-    let const_label = append_to_model_element_name ~labels:const_label ~to_append:proj_name in
+    let const_attr = ls.ls_name.id_attrs in
+    let const_attr = append_to_model_element_name ~attrs:const_attr ~to_append:proj_name in
     let const_loc = Opt.get ls.ls_name.id_loc in
     let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
     let axiom_name = ls.ls_name.id_string^"_proj_axiom_"^proj_name in
-    let id_new = Ident.id_user ~label:const_label const_name const_loc in
+    let id_new = Ident.id_user ~attrs:const_attr const_name const_loc in
     intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name:axiom_name
   else
     []
 
 let get_record_field_suffix projection =
   try
-    get_model_element_name ~labels:projection.ls_name.id_label
+    get_model_element_name ~attrs:projection.ls_name.id_attrs
   with Not_found -> ""
 
 (* Find the projections corresponding to some type if it exists *)
@@ -169,12 +167,13 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 
 let intro_proj_for_ls env map_projs ls_projected =
   (* Returns list of declarations for projection of ls_projected
-     if it has a  label "model_projected", otherwise returns [].
+     if it has an attribute "model_projected", otherwise returns [].
 
      There can be more projections for ls_projected. For each projection
      f the declarations include:
-     - declaration of new constant with labels of ls_projected, label "model",
-       and label "model_trace:proj_name" where proj_name is the name of the projection
+     - declaration of new constant with attributes of ls_projected,
+       attribute "model" a nd attribute "model_trace:proj_name" where
+       proj_name is the name of the projection
      - declaration of axiom saying that the new constant is equal to
        ls_projected projected by its projection
 
@@ -182,11 +181,11 @@ let intro_proj_for_ls env map_projs ls_projected =
      map_projs.
 
      @param map_projs maps types to projection function for these types
-     @param ls_projected the label symbol that should be projected
+     @param ls_projected the attribute symbol that should be projected
   *)
-  if not (Slab.mem Ident.model_projected_label ls_projected.ls_name.id_label)
+  if not (Sattr.mem Ident.model_projected_attr ls_projected.ls_name.id_attrs)
   then
-    (* ls_projected has not a label "model_projected" *)
+    (* ls_projected has not an attribute "model_projected" *)
     []
   else
     match ls_projected.ls_value with
@@ -251,13 +250,9 @@ let intro_projections_counterexmp env =
   Trans.on_tagged_ls Theory.meta_projection (encapsulate env)
 
 
-let () = Trans.register_env_transform "intro_projections_counterexmp" intro_projections_counterexmp
-  ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ with@ label@ model_projected@ \
-and@ projectin@ f@ for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ label@ model@ and@ an@ axiom@ \
-c = f p."
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let () = Trans.register_env_transform "intro_projections_counterexmp"
+  intro_projections_counterexmp
+  ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ \
+         with@ attribute@ [%@model_projected]@ and@ projecting@ f@ \
+         for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ \
+         attribute@ [%@model]@ and@ an@ axiom@ c = f p."

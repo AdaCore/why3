@@ -4,7 +4,7 @@ theory Mono
 
 goal g0 : 2 = 3
 
-use import int.Int
+use int.Int
 
 goal g : 2+2 = 5
 
@@ -58,7 +58,7 @@ end
 
 theory TestList
 
-use import list.List
+use list.List
 
 goal g : match Cons 42 Nil with Nil -> false | Cons x _ -> x=42 end
 
@@ -98,8 +98,8 @@ end
 
 theory Map
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
 
   goal g: forall m:map int int.
     let m' = m[0<-42][1<-42] in
@@ -112,7 +112,7 @@ end
 
 theory TestBool
 
-  use import bool.Bool
+  use bool.Bool
 
   goal g : forall b:bool.  b = b
 
@@ -127,8 +127,8 @@ end
 
 theory TestTuple
 
-  use import int.Int
-  use import bool.Bool
+  use int.Int
+  use bool.Bool
 
   type t = (int,bool)
 

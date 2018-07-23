@@ -108,8 +108,8 @@ let find_th env file th =
 
 let get_info env task =
   (* unary minus for constants *)
-  int_minus := find_th env "int" "Int" "prefix -";
-  real_minus := find_th env "real" "Real" "prefix -";
+  int_minus := find_th env "int" "Int" (op_prefix "-");
+  real_minus := find_th env "real" "Real" (op_prefix "-");
   (* handling of inequalities *)
   let ops = on_meta arith_meta (fun acc meta_arg ->
     match meta_arg with
@@ -164,12 +164,10 @@ type constant = Enum of term * int | Value of term | Varying
 let rec constant_value defs t =
   match t.t_node with
   | Tconst c ->
-      fprintf str_formatter "%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "%a" (Number.print number_format) c
   | Tapp (ls, [{ t_node = Tconst c}])
       when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-      fprintf str_formatter "-%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "-%a" (Number.print number_format) c
   | Tapp (ls, []) ->
     begin
       match Hid.find defs ls.ls_name with
@@ -212,19 +210,19 @@ let rec print_term info defs fmt t =
   | Tcase _ -> unsupportedTerm t
       "gappa: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "gappa : you must eliminate epsilon"
+      "gappa: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 
 (* predicates *)
 
 let rel_error_pat =
-  PatApp (["real"], "Real", ["infix <="], [
+  PatApp (["real"], "Real", [op_infix "<="], [
     PatApp (["real"], "Abs", ["abs"], [
-      PatApp (["real"], "Real", ["infix -"], [
+      PatApp (["real"], "Real", [op_infix "-"], [
         PatHole 0;
         PatHole 1])]);
-    PatApp (["real"], "Real", ["infix *"], [
+    PatApp (["real"], "Real", [op_infix "*"], [
       PatHole 2;
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])
@@ -415,7 +413,7 @@ let prepare defs ints truths acc d =
       split_hyp defs truths pr acc (simpl_fmla defs truths f)
   | Dprop (Pgoal, pr, f) ->
       split_hyp defs truths pr acc (simpl_fmla defs truths (t_not f))
-  | Dprop ((Plemma|Pskip), _, _) ->
+  | Dprop (Plemma, _, _) ->
       unsupportedDecl d "gappa: lemmas are not supported"
 
 let filter_hyp defs (eqs, hyps) ((pr, f) as hyp) =

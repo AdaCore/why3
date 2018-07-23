@@ -1,8 +1,8 @@
 
 module A
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   let f1 (a:array int) : int
   = a[0]
@@ -16,9 +16,9 @@ end
 
 module B
 
-  use import int.Int
-  use import array.Array
-  clone import array.Sorted with 
+  use int.Int
+  use array.Array
+  clone array.Sorted with 
     type elt=int,
     predicate le=(<=)
   

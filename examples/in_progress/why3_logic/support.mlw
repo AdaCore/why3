@@ -17,45 +17,43 @@ end
 
 (* Higher-order miscellaneous support definitions. *)
 module HO
-  
-  use export HighOrd
-  
+
   predicate extensional_equal (f g:'a -> 'b) =
     forall x. f x = g x
-  
+
   function compose (g:'b -> 'c) (f:'a -> 'b) : 'a -> 'c =
     \x. g (f x)
   function rcompose (f:'a -> 'b) (g:'b -> 'c) : 'a -> 'c = compose g f
-  
+
   function id : 'a -> 'a = \x.x
-  
+
   function const (x:'b) : 'a -> 'b = \_.x
-  
+
   function ho_ite (p:'a -> bool) (th:'a -> 'b) (el:'a -> 'b) : 'a -> 'b =
     \x. if p x then th x else el x
-  
+
   function update (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b =
     \z. if z = x then y else f z
-  
+
   function ([ <- ]) (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b = update f x y
-  
+
   constant all : 'a -> bool = \_.true
   constant none : 'a -> bool = \_.false
-  
+
   function union (a b:'a -> bool) : 'a -> bool = \x. a x \/ b x
-  
+
   predicate subset (a b:'a -> bool) = forall x. a x -> b x
-  
+
   predicate maps_to (a:'a -> bool) (f:'a -> 'b) (b:'b -> bool) =
     forall x. a x -> b (f x)
-  
+
   predicate equalizer (a:'a -> bool) (f g:'a -> 'b) =
     forall x. a x -> f x = g x
-  
-  use import int.Int
-  
+
+  use int.Int
+
   function range (a b:int) : int -> bool = \x. a <= x < b
-  
+
 end
 
 (* The verification of the following modules is delayed to the HOProof module.
@@ -64,7 +62,7 @@ end
    The advantage of this otherwise complex setup is that the part of the
    context that is needed to carry proof does not have to be exported along
    the properties, hence considerably limiting context explosion.
-   
+
    The trade-off is that the system unfortunately does not check yet
    the correct integration between the declaration and the proof module,
    so the following things could happen (and their absence
@@ -76,7 +74,7 @@ end
      (missing axiom<-goals substitutions)
      (thankfully, it is enough to check whether the count of
       axiom declarations and goal substitutions coincides)
-   
+
    This mechanism triggers a lot of warnings on a normal setup because:
    1) The cloned theory does not contains abstract symbols
    2) The axioms we write does not contains abstract symbols neither.
@@ -87,121 +85,121 @@ end
       to the provers) *)
 
 module HOExt
-  
+
   clone import Dummy as DHOExt
   use export HO
-  
+
   axiom extensionality : forall f g:'a -> 'b.
     extensional_equal f g -> f = g
     /\ forall _:d.true
-  
+
   let ghost extensionality (f g:'a -> 'b)
     requires { extensional_equal f g }
     ensures { f = g }
   = ()
-  
+
 end
 
 module HOCompose
-  
+
   clone import Dummy as DHOCompose
   use export HO
-  
+
   axiom compose_associative : forall f:'a -> 'b,g:'b -> 'c,h:'c -> 'd.
     compose (compose h g) f = compose h (compose g f)
     /\ forall _:d.true
-  
+
   axiom id_neutral : forall f:'a -> 'b.
     compose f id = f = compose id f
     /\ forall _:d.true
-  
+
 end
 
 module HOConst
-  
+
   clone import Dummy as DHOConst
   use export HO
-  
+
   axiom compose_const_right : forall x:'c,f:'a -> 'b.
     compose (const x) f = const x
     /\ forall _:d.true
-  
+
   axiom compose_const_left : forall x:'b,f:'b -> 'c.
     compose f (const x:'a -> 'b) = const (f x)
     /\ forall _:d.true
-  
+
 end
 
 module HOIte
-  
+
   clone import Dummy as DHOIte
   use export HO
-  
+
   axiom ho_ite_compose_left : forall p,th el:'a -> 'b,f:'b -> 'c.
     compose f (ho_ite p th el) = ho_ite p (compose f th) (compose f el)
     /\ forall _:d.true
-  
+
   axiom ho_ite_compose_right : forall p,th el:'b -> 'c,f:'a -> 'b.
     compose (ho_ite p th el) f =
       ho_ite (compose p f) (compose th f) (compose el f)
     /\ forall _:d.true
-  
+
 end
 
 module HOFull
-  
+
   use export HOExt
   use export HOCompose
   use export HOConst
   use export HOIte
-  
+
 end
 
 module HOProof
-  
-  use import HO
-  use import NoDiscriminate
-  
+
+  use HO
+  use NoDiscriminate
+
   predicate hack (f g h:'a -> 'b) = f = g = h
   let lemma extensionality (f g:'a -> 'b)
     requires { extensional_equal f g }
     ensures { f = g }
   = assert { hack f (\x.f x) g }
-  
+
   let lemma id_neutral (f:'a -> 'b)
     ensures { compose f id = f = compose id f }
   = assert { extensional_equal f (compose f id) /\
       extensional_equal (compose id f) f }
-  
+
   let lemma compose_associative (f:'a -> 'b) (g:'b -> 'c) (h:'c -> 'd)
     (a b:'a -> 'd)
     requires { a = compose h (compose g f) /\ b = compose (compose h g) f }
     ensures { a = b }
   = assert { extensional_equal a b }
-  
+
   let lemma compose_const_left (x:'b) (f:'b -> 'c) (a:'a -> 'c)
     requires { a = compose f (const x) }
     ensures { a = const (f x) }
   = assert { extensional_equal a (const (f x)) }
-  
+
   let lemma compose_const_right (x:'c) (f:'a -> 'b)
     ensures { const x = compose (const x) f }
   = assert { extensional_equal (const x) (compose (const x) f) }
-  
+
   let lemma ho_ite_compose_left (p:'a -> bool) (th el:'a -> 'b) (f:'b -> 'c)
     (a b:'a -> 'c)
     requires { a = compose f (ho_ite p th el) }
     requires { b = ho_ite p (compose f th) (compose f el) }
     ensures { a = b }
   = assert { extensional_equal a b }
-  
+
   let lemma ho_ite_compose_right (p:'b -> bool) (th el:'b -> 'c) (f:'a -> 'b)
     (a b:'a -> 'c)
     requires { a = compose (ho_ite p th el) f }
     requires { b = ho_ite (compose p f) (compose th f) (compose el f) }
     ensures { a = b }
   = assert { extensional_equal a b }
-  
+
   clone HOExt with type DHOExt.d = unit,
     goal extensionality
   clone HOCompose with type DHOCompose.d = unit,
@@ -210,98 +208,98 @@ module HOProof
     goal compose_const_left, goal compose_const_right
   clone HOIte with type DHOIte.d = unit,
     goal ho_ite_compose_left, goal ho_ite_compose_right
-  
+
 end
 
 module PartialMap
-  
-  use import HO
-  use import option.Option
-  
+
+  use HO
+  use option.Option
+
   type pmap 'a 'b = 'a -> option 'b
-  
+
   function extend (m1:'a -> option 'b) (m2:'a -> option 'b) : 'a -> option 'b =
     \x. match m1 x with
       | None -> m2 x
       | s -> s
       end
-  
+
   function domain (m:'a -> option 'b) : 'a -> bool =
     \x. m x <> None
-  
+
   function complete (m:'a -> option 'b) (d:'a -> 'b) : 'a -> 'b =
     \x. match m x with
       | None -> d x
       | Some x -> x
       end
-  
+
 end
 
 module Bind
-  
-  use import HO
-  
+
+  use HO
+
   type bind 'a 'b =
     | Old 'a
     | Fresh 'b
-  
+
   function bfold (o:'a -> 'c) (f:'b -> 'c) : bind 'a 'b -> 'c =
     \x. match x with Old x -> o x | Fresh y -> f y end
-  
+
   (* For the practical use cases (representing binders),
      there is no need to map over the second component.
      ==> Keep the function simple.
    *)
   function bmap (f:'a -> 'b) : bind 'a 'c -> bind 'b 'c =
     bfold (compose Old f) Fresh
-  
+
 end
 
 (* Proof delegated to BindProof. *)
 module BindFull
-  
+
   clone import Dummy as DBindFull
-  use import HO
+  use HO
   use export Bind
-  
+
   axiom bfold_identity : bfold Old Fresh = (id:bind 'a 'b -> bind 'a 'b)
     /\ forall _:d.true
-  
+
   axiom bfold_compose : forall o:'a -> 'c,f:'b -> 'c,g:'c -> 'd.
     compose g (bfold o f) = bfold (compose g o) (compose g f)
     /\ forall _:d.true
-  
+
   axiom bfold_constructor : forall o:'a -> 'c,f:'b -> 'c.
     compose (bfold o f) Old = o /\ compose (bfold o f) Fresh = f
     /\ forall _:d.true
-  
+
   axiom bfold_all : bfold all all = (all:bind 'a 'b -> bool)
     /\ forall _:d.true
-  
+
   axiom bfold_map_compose : forall a:'a -> 'b,o:'b -> 'e,f:'c -> 'e.
     compose (bfold o f) (bmap a) = bfold (compose o a) f
     /\ forall _:d.true
-  
+
   axiom bmap_compose : forall g:'b -> 'c,f:'a -> 'b.
     bmap (compose g f) = compose (bmap g) (bmap f:bind 'a 'd -> bind 'b 'd)
     /\ forall _:d.true
-  
+
   axiom bmap_identity : bmap id = (id:bind 'a 'b -> bind 'a 'b)
     /\ forall _:d.true
-  
+
 end
 
 module BindProof
-  
-  use import HOFull
-  use import Bind
-  use import NoDiscriminate
-  
+
+  use HOFull
+  use Bind
+  use NoDiscriminate
+
   let lemma bfold_identity ()
     ensures { bfold Old Fresh = (id:bind 'a 'b -> bind 'a 'b) }
   = assert { extensional_equal (bfold Old Fresh)
                                (id:bind 'a 'b -> bind 'a 'b) }
-  
+
   let lemma bfold_compose (o:'a -> 'c) (f:'b -> 'c) (g:'c -> 'd)
     ensures { compose g (bfold o f) = bfold (compose g o) (compose g f) }
   = assert { let a = compose g (bfold o f) in
@@ -309,17 +307,17 @@ module BindProof
     not(extensional_equal a b) ->
     (forall x. a x <> b x -> match x with
       | Old _ -> a x = b x && false | Fresh _ -> false end && false) && false }
-  
+
   let lemma bfold_constructor (o:'a -> 'c) (f:'b -> 'c)
     ensures { compose (bfold o f) Old = o }
     ensures { compose (bfold o f) Fresh = f }
   = assert { extensional_equal (compose (bfold o f) Old) o /\
              extensional_equal (compose (bfold o f) Fresh) f }
-  
+
   let lemma bfold_all () : unit
     ensures { bfold all all = (all:bind 'a 'b -> bool) }
   = extensionality (bfold all all) (all:bind 'a 'b -> bool)
-  
+
   clone BindFull with type DBindFull.d = unit,
     goal bfold_identity,
     goal bfold_compose,
@@ -328,87 +326,87 @@ module BindProof
     goal bmap_compose,
     goal bmap_identity,
     goal bfold_map_compose
-  
+
 end
 
 (* Useful higher-order definition about lists. *)
 module HOList
-  
-  use import list.List
-  use import list.Nth
-  use import option.Option
-  use import HO
-  
+
+  use list.List
+  use list.Nth
+  use option.Option
+  use HO
+
   function map (f:'a -> 'b) (l:list 'a) : list 'b = match l with
     | Nil -> Nil
     | Cons x q -> Cons (f x) (map f q)
     end
-  
+
   predicate for_all (p:'a -> bool) (l:list 'a) = match l with
     | Nil -> true
     | Cons x q -> p x /\ for_all p q
     end
-  
+
   predicate exist (p:'a -> bool) (l:list 'a) = match l with
     | Nil -> false
     | Cons x q -> p x \/ exist p q
     end
-  
+
   function list_nth (l:list 'a) (d:int -> 'a) : int -> 'a =
     \n. match nth n l with
       | None -> d n
       | Some x -> x
       end
-  
+
 end
 
 (* Delayed proof in HOListProof. *)
 module HOListFull
-  
+
   clone import Dummy as DHOListFull
-  use import list.List
-  use import list.Nth
-  use import list.Length
-  use import option.Option
-  use import HO
+  use list.List
+  use list.Nth
+  use list.Length
+  use option.Option
+  use HO
   use export HOList
-  
+
   axiom map_nth : forall f:'a -> 'b,l:list 'a,n:int.
     nth n (map f l) = match nth n l with None -> None | Some x -> Some (f x) end
     /\ forall _:d. true
-  
+
   axiom map_nth2 : forall f:'a -> 'b,l:list 'a,n:int.
     match nth n (map f l) with
     | None -> nth n l = None
     | Some x -> exists y. nth n l = Some y /\ f y = x
     end
     /\ forall _:d. true
-  
+
   axiom map_length : forall f:'a -> 'b,l:list 'a. length (map f l) = length l
     /\ forall _:d. true
-  
+
   axiom for_all_nth : forall p:'a -> bool,l:list 'a.
     for_all p l <->
       forall n. match nth n l with Some x -> p x | _ -> true end
     /\ forall _:d.true
-  
+
   axiom exist_nth : forall p:'a -> bool,l:list 'a.
     exist p l <-> exists n y. nth n l = Some y /\ p y
     /\ forall _:d.true
-  
+
 end
 
 module HOListProof
-  
-  use import list.List
-  use import list.Nth
-  use import list.NthLength
-  use import list.Length
-  use import option.Option
-  use import int.Int
-  use import HOList
-  use import NoDiscriminate
-  
+
+  use list.List
+  use list.Nth
+  use list.NthLength
+  use list.Length
+  use option.Option
+  use int.Int
+  use HOList
+  use NoDiscriminate
+
   let rec lemma map_nth (f:'a -> 'b) (l:list 'a) (n:int) : unit
     ensures { nth n (map f l) = match nth n l with
       | None -> None
@@ -416,19 +414,19 @@ module HOListProof
       end }
     variant { l }
   = match l with Cons _ q -> map_nth f q (n-1) | _ -> () end
-  
+
   let lemma map_nth2 (f:'a -> 'b) (l:list 'a) (n:int) : unit
     ensures { match nth n (map f l) with
       | None -> nth n l = None
       | Some x -> exists y. nth n l = Some y /\ f y = x
       end }
   = match nth n l with None -> "keep_on_simp" () | _ -> () end
-  
+
   let rec lemma map_length (f:'a -> 'b) (l:list 'a) : unit
     ensures { length (map f l) = length l }
     variant { l }
   = match l with Cons _ q -> map_length f q | _ -> () end
-  
+
   let rec lemma for_all_nth (p:'a -> bool) (l:list 'a) : unit
     ensures { for_all p l <->
       forall n. match nth n l with Some x -> p x | _ -> true end }
@@ -441,7 +439,7 @@ module HOListProof
         for_all p q && nth 0 l = Some x && for_all p l }
     | _ -> ()
     end
-  
+
   let rec lemma exist_nth (p:'a -> bool) (l:list 'a) : unit
     ensures { exist p l <-> exists n y. nth n l = Some y /\ p y }
     variant { l }
@@ -452,21 +450,20 @@ module HOListProof
           (forall n y. nth n q = Some y /\ p y -> nth (n+1) l = Some y) }
     | _ -> ()
     end
-  
+
   clone HOListFull with type DHOListFull.d = unit,
     goal map_nth,
     goal map_nth2,
     goal map_length,
     goal for_all_nth,
     goal exist_nth
-  
+
 end
 
 (* Axiomatic module: arbitrary choice. *)
 module Choice
-  
-  use import HighOrd
-  use import option.Option
+
+  use option.Option
   constant default : 'a
   function choice (p:'a -> bool) : 'a
   axiom choice_def : forall p:'a -> bool. (exists x. p x) -> p (choice p)
@@ -478,32 +475,32 @@ module Choice
     returns { Some x -> p x | None -> forall x. not (p x) }
   = let u = choice p in
     if p u then Some u else None
-  
+
 end
 
 module Finite
-  
-  use import HO
-  use import Choice
-  use import int.Int
+
+  use HO
+  use Choice
+  use int.Int
   predicate equirange (p:'a -> bool) (n:int) =
     n >= 0 /\
     exists f g. (forall x. range 0 n x -> p (f x) /\ g (f x) = x) /\
       (forall x. p x -> range 0 n (g x) /\ f (g x) = x)
-  
+
   predicate finite (p:'a -> bool) = exists n. equirange p n
   function cardinal (p:'a -> bool) : int = choice (equirange p)
-  
+
 end
 
 (* Proof delegated to FiniteProof. *)
 module FiniteFull
-  
+
   clone import Dummy as DFiniteFull
-  use import HO
-  use import int.Int
+  use HO
+  use int.Int
   use export Finite
-  
+
   axiom finite_empty : finite (none:'a -> bool)
     /\ forall _:d.true
   axiom finite_add : forall x,y:'a. finite x -> finite (update x y true)
@@ -539,25 +536,25 @@ module FiniteFull
     /\ forall _:d.true
   axiom cardinal_range : forall a b. a <= b -> cardinal (range a b) = b-a
     /\ forall _:d.true
-  
+
 end
 
 module FiniteProof
 
-  use import HOFull
-  use import Choice
-  use import int.Int
-  use import Finite
-  use import option.Option
-  use import NoDiscriminate
-  
+  use HOFull
+  use Choice
+  use int.Int
+  use Finite
+  use option.Option
+  use NoDiscriminate
+
   predicate equirange_with (n:int) (p:'a -> bool) (f:int -> 'a) (g:'a -> int) =
     (forall x. range 0 n x -> p (f x) /\ g (f x) = x) /\
     (forall x. p x -> range 0 n (g x) /\ f (g x) = x)
-  
+
   lemma equirange_def : forall n,p:'a -> bool.
     equirange p n <-> (n >= 0 /\ exists f g. equirange_with n p f g)
-  
+
   let lemma equirange_add (n:int) (p:'a -> bool) (x:'a)
     (f:int -> 'a) (g:'a -> int)
     requires { equirange_with n p f g /\ not p x /\ n >= 0 }
@@ -565,7 +562,7 @@ module FiniteProof
   = let f2 = f[n <- x] in
     let g2 = g[x <- n] in
     assert { equirange_with (n+1) (update p x true) f2 g2 }
-  
+
   let lemma equirange_remove (n:int) (p:'a -> bool) (x:'a)
     (f:int -> 'a) (g:'a -> int)
     requires { equirange_with n p f g /\ p x }
@@ -578,7 +575,7 @@ module FiniteProof
     let g2 = g[y <- i] in
     assert { extensional_equal (range 0 m) (update (range 0 n) m false) };
     assert { equirange_with m (update p x false) f2 g2 }
-  
+
   let rec lemma equirange_unique (n m:int) (p:'a -> bool)
     requires { equirange p n /\ equirange p m /\ n >= 0 /\ m >= 0 }
     ensures { n = m }
@@ -588,40 +585,40 @@ module FiniteProof
     then equirange_unique (n-1) (m-1) (update p x false)
     else assert { forall u. equirange p u -> u > 0 ->
         (forall f g. equirange_with u p f g -> p (f 0) && false) && false }
-  
+
   lemma equirange_cardinal : forall p:'a -> bool.
     finite p <-> equirange p (cardinal p)
-  
+
   let lemma cardinal_empty (a:'a -> bool)
     requires { a = none }
     ensures { finite a }
     ensures { cardinal a = 0 }
   = assert { equirange_with 0 a default default }
-  
+
   let lemma finite_add (p:'a -> bool) (x:'a)
     requires { finite p }
     ensures { finite (update p x true) }
   = if p x then assert { extensional_equal p (update p x true) }
-  
+
   let lemma finite_remove (p:'a -> bool) (x:'a)
     requires { finite p }
     ensures { finite (update p x false) }
   = if p x
     then assert { extensional_equal (update (update p x false) x true) p }
     else assert { extensional_equal (update p x false) p }
-  
+
   let lemma cardinal_remove (p:'a -> bool) (x:'a)
     requires { finite p /\ p x }
     ensures { cardinal (update p x false) = cardinal p - 1 }
   = assert { equirange (update p x false) (cardinal p - 1) }
-  
+
   let lemma cardinal_add (p:'a -> bool) (x:'a)
     requires { finite p /\ not p x }
     ensures { cardinal (update p x true) = cardinal p + 1 }
   = assert { equirange (update p x true) (cardinal p + 1) }
-  
+
   function diff (a b:'a -> bool) : 'a -> bool = \x. a x /\ not (b x)
-  
+
   let rec lemma cardinal_subset (p1 p2:'a -> bool)
     requires { finite p1 /\ subset p2 p1 }
     ensures { finite p2 /\ cardinal p2 <= cardinal p1 }
@@ -630,13 +627,13 @@ module FiniteProof
     | Some x -> cardinal_subset (update p1 x false) p2
     | None -> assert { subset p1 p2 && extensional_equal p1 p2 }
     end
-  
+
   let lemma cardinal_zero (p:'a -> bool)
     requires { finite p /\ cardinal p = 0 }
     ensures { p = none }
   = assert { forall x. p x -> (exists y. range 0 0 y) && false };
     extensionality p none
-  
+
   let rec lemma cardinal_eq_subset (p1 p2:'a -> bool)
     requires { finite p2 /\ subset p1 p2 }
     requires { cardinal p1 = cardinal p2 }
@@ -647,7 +644,7 @@ module FiniteProof
       extensionality p1 p2
     | None -> extensionality p1 none
     end
-  
+
   let rec lemma finite_union (p1 p2:'a -> bool)
     requires { finite p1 /\ finite p2 }
     ensures { finite (union p1 p2) }
@@ -658,14 +655,14 @@ module FiniteProof
       let u = union (update p1 x true) (update p2 x false) in
       assert { extensional_equal u (union p1 p2) }
     else assert { extensional_equal p1 (union p1 p2) }
-  
+
   let lemma finite_range (a b:int) : unit
     ensures { finite (range a b) }
     ensures { a <= b -> cardinal (range a b) = b - a }
   = if a > b
     then extensionality (range a b) none
     else assert { equirange_with (b-a) (range a b) ((+) a) ((+) (-a)) }
-  
+
   clone FiniteFull with type DFiniteFull.d = unit,
     goal finite_empty,
     goal finite_add,
@@ -680,6 +677,6 @@ module FiniteProof
     goal cardinal_eq_subset,
     goal finite_range,
     goal cardinal_range
-    
+
 end
 

@@ -1,9 +1,9 @@
 module BitCount8bit_fact
 
-  use import int.Int
-  use import int.NumOf
-  use import bv.BV8
-  use import ref.Ref
+  use int.Int
+  use int.NumOf
+  use bv.BV8
+  use ref.Ref
 
   function nth_as_bv (a i : t) : t =
     if nth_bv a i
@@ -18,7 +18,7 @@ module BitCount8bit_fact
   lemma nth_as_bv_is_int : forall a i.
     t'int (nth_as_bv a i) = nth_as_int a (t'int i)
 
-    use import int.EuclideanDivision
+  use int.EuclideanDivision
 
   let ghost step1 (n x1 : t) (i : int) : unit
     requires { 0 <= i < 4 }
@@ -100,10 +100,10 @@ end
 
 module BitCounting32
 
-  use import int.Int
-  use import int.NumOf
-  use import bv.BV32
-  use import ref.Ref
+  use int.Int
+  use int.NumOf
+  use bv.BV32
+  use ref.Ref
 
   predicate step0 (n x1 : t) =
     x1 = sub n (bw_and (lsr_bv n (1 : t)) (0x55555555 : t))
@@ -249,11 +249,10 @@ end
 
 
 module Hamming
-  use import int.Int
-  use import int.NumOf
-  use import mach.bv.BVCheck32
-  use import BitCounting32
-  use import HighOrd as HO
+  use int.Int
+  use int.NumOf
+  use mach.bv.BVCheck32
+  use BitCounting32
 
   predicate nth_diff (a b : t) (i : int) = nth a i <> nth b i
 
@@ -276,7 +275,7 @@ module Hamming
   =
     assert { hammingD_logic a b = 0 -> eq_sub a b 0 32 }
 
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     variant {b - a}
@@ -297,32 +296,33 @@ module Hamming
 
 end
 
+(** {2 ASCII checksum}
+
+    In the beginning the encoding of an ascii character was done on 8
+    bits: the first 7 bits were used for the character itself while
+    the 8th bit was used as a checksum, i.e. a mean to detect errors. The
+    checksum value was the binary sum of the 7 other bits, allowing the
+    detection of any change of an odd number of bits in the initial
+    value. Let's prove it! *)
+
 module AsciiCode
-  use import int.Int
-  use import int.NumOf
-  use import number.Parity
-  use import bool.Bool
-  use import mach.bv.BVCheck32
-  use import BitCounting32
+  use int.Int
+  use int.NumOf
+  use number.Parity
+  use bool.Bool
+  use mach.bv.BVCheck32
+  use BitCounting32
 
   constant one : t = 1 : t
   constant lastbit : t = sub size_bv one
 
   (* let lastbit () = (sub_check size_bv one) : t *)
 
-  (** {2 ASCII cheksum }
-    In the beginning the encoding of an ascii character was done on 8
-    bits: the first 7 bits were used for the carracter itself while
-    the 8th bit was used as a cheksum: a mean to detect errors. The
-    cheksum value was the binary sum of the 7 other bits, allowing the
-    detections of any change of an odd number of bits in the initial
-    value. Let's prove it! *)
+  (** {4 Checksum computation and correctness} *)
 
-  (** {6 Checksum computation and correctness } *)
-
-  (** A ascii character is valid if its number of bits is even.
+  (** A ascii character is valid if its number of 1-bits is even.
       (Remember that a binary number is odd if and only if its first
-      bit is 1) *)
+      bit is 1.) *)
   predicate validAscii (b : t) = even (count_logic b)
 
   let lemma bv_even (b:t)
@@ -337,9 +337,7 @@ module AsciiCode
 
   (* use Numofbit *)
 
-  use HighOrd as HO
-
-  function fun_or (f g : HO.pred 'a) : HO.pred 'a = \x. f x \/ g x
+  function fun_or (f g : 'a -> bool) : 'a -> bool = fun x -> f x \/ g x
 
   let rec lemma numof_or (p q : int -> bool) (a b: int) : unit
     requires { forall i. a <= i < b -> not (p i) \/ not (q i) }
@@ -360,16 +358,17 @@ module AsciiCode
     assert { numof (fun_or (nth b) (nth c)) 0 32 = numof (nth b) 0 32 + numof (nth c) 0 32 };
     assert { numof (nth (bw_or b c)) 0 32 = numof (fun_or (nth b) (nth c)) 0 32 }
 
-  (** The ascii checksum aim is to make any character valid in the
-      sens that we just defined. One way to implement it is to count
-      the number of bit of a character encoded in 7 bits, and if this
-      number is odd, set the 8th bit to 1 if not, do nothing:*)
+  (** The `ascii` function makes any character valid in the
+      sense that we just defined. One way to implement it is to count
+      the number of 1-bits of a character encoded on 7 bits, and if this
+      number is odd, set the 8th bit to 1 if not, do nothing. *)
+
   let ascii (b : t) =
     requires { not (nth_bv b lastbit) }
     ensures  { eq_sub_bv result b zeros lastbit }
     ensures  { validAscii result }
     let c = count b in
-    let maskbit = lsl_check c lastbit in
+    let maskbit = lsl_check c (of_int 31) in
     assert { bw_and b maskbit = zeros };
     assert { even (t'int c) ->
                not (nth_bv c zeros)
@@ -383,13 +382,14 @@ module AsciiCode
     assert { count_logic code = count_logic b + count_logic maskbit };
     code
 
-  (** Now, for the correctness of the checksum :
+  (** Now, for the correctness of the checksum:
 
       We prove that two numbers differ by an odd number of bits,
       i.e. are of odd hamming distance, iff one is a valid ascii
-      character while the other is not. This imply that if there is an
+      character while the other is not. This implies that if there is an
       odd number of changes on a valid ascii character, the result
       will be invalid, hence the validity of the encoding. *)
+
   use Hamming
 
   let rec lemma tmp (a b : t) (i j : int)
@@ -410,12 +410,12 @@ end
 (*** unfinished
 
 module GrayCode
-  use import int.Int
-  use import int.NumOf
-  use import number.Parity
-  use import bool.Bool
-  use import mach.bv.BVCheck32
-  use import BitCounting32
+  use int.Int
+  use int.NumOf
+  use number.Parity
+  use bool.Bool
+  use mach.bv.BVCheck32
+  use BitCounting32
   use Hamming
 
   constant one : t = 1 : t
@@ -430,7 +430,7 @@ module GrayCode
     discussed in Chapter 13, p.311.
   *)
 
-  (** {4 the two transformations, to and from Gray-coded integer } *)
+  (** {4 The two transformations, to and from Gray-coded integer} *)
 
   function toGray (bv : t) : t =
     bw_xor bv (lsr_bv bv one)
@@ -447,7 +447,7 @@ module GrayCode
   lemma iso: forall b.
     toGray (fromGray b) = b /\ fromGray (toGray b) = b
 
-  (** {4 Some properties of the reflected binary Gray code } *)
+  (** {4 Some properties of the reflected binary Gray code} *)
 
   (** The first property that we want to check is that the reflected
      binary Gray code is indeed a Gray code. *)
@@ -477,13 +477,13 @@ module GrayCode
 
   (** Bit i of a binary integer is the parity of all the bits at and
       to the left of position i in the corresponding Gray coded
-      integer *)
+      integer. *)
 
   lemma nthBinary: forall b i.
     ult i size_bv ->
       nth_bv (fromGray b) i <-> even (count_logic (lsr_bv b i))
 
-  (** The last property that we check is that if an integer is even
+  (** The last property that we check is that, if an integer is even,
       its encoding has an even number of 1-bits, and if it is odd, its
       encoding has an odd number of 1-bits. *)
 

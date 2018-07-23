@@ -212,8 +212,10 @@ let induction x bound env =
 
   (* Loading of needed symbols from int theory *)
   let th = Env.read_theory env ["int"] "Int" in
-  let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
-  let lt_int = Theory.ns_find_ls th.Theory.th_export ["infix <"] in
+  let le_int = Theory.ns_find_ls th.Theory.th_export
+    [Ident.op_infix "<="] in
+  let lt_int = Theory.ns_find_ls th.Theory.th_export
+    [Ident.op_infix "<"] in
 
   (* Symbol associated to term x *)
   let lsx =
@@ -226,8 +228,8 @@ let induction x bound env =
   let init_trans = Trans.decl (fun d -> match d.d_node with
     | Dprop (Pgoal, pr, t) ->
         let nt = Term.t_app_infer le_int [x; bound] in
-        let lab_base = Ident.create_label "expl:base case" in
-        let d = create_prop_decl Pgoal pr (t_label_add lab_base t) in
+        let attr_base = Ident.create_attribute "expl:base case" in
+        let d = create_prop_decl Pgoal pr (t_attr_add attr_base t) in
         let pr_init =
           create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) nt in
         [pr_init; d]
@@ -259,8 +261,8 @@ let induction x bound env =
             create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_gt_bound_t in
           let rec_pr = create_prsymbol (gen_ident "Hrec") in
           let hrec = create_prop_decl Paxiom rec_pr t_delta' in
-          let lab_rec = Ident.create_label "expl:recursive case" in
-          let d = create_prop_decl Pgoal pr (t_label_add lab_rec t) in
+          let attr_rec = Ident.create_attribute "expl:recursive case" in
+          let d = create_prop_decl Pgoal pr (t_attr_add attr_rec t) in
           [x_gt_bound; hrec; d]
     | Dprop (_p, _pr, _t) ->
         if !x_is_passed then

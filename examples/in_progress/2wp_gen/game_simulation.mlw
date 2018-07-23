@@ -1,0 +1,2892 @@
+(* Simulation theorems about games. *)
+
+(* Basic definitions about simulations. *)
+module SimDef
+
+  use game.Game
+  use game_no_strat.StratLessDef
+  use ho_set.Set
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.Ordered
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+
+  (* Simulation = relation that maps winning strategies from one game to
+     the other. *)
+  predicate simulate (g1:game 'a) (r:rel 'a 'b) (g2:game 'b) =
+    forall start win. have_uniform_winning_strat g1 start win ->
+      have_uniform_winning_strat g2 (related r start) (related r win)
+
+  predicate rel_mapping (h:set 'a) (f:'a -> 'b) (r:rel 'a 'b) =
+    forall x. h x -> r x (f x)
+
+  (* Step simulation = relation that map steps and limits from one game
+     to the other. *)
+  predicate step_limit (o1:erel 'a) (r:rel 'a 'b) (g2:game 'b) =
+    let o2 = g2.progress in
+    forall ch f s2. chain o1 ch /\ inhabited ch ->
+    monotone_on ch o1 f o2 /\ rel_mapping ch f r ->
+    supremum o2 (image f ch) s2 ->
+    have_winning_strat g2 s2 (related r (supremum o1 ch))
+
+  predicate step_simulate (g1:game 'a) (r:rel 'a 'b) (g2:game 'b) =
+    step_limit g1.progress r g2 /\
+    forall x y s. g1.transition x s /\ r x y ->
+      have_winning_strat g2 y (related r s)
+
+  (* Stuff required for making simulations explicit. *)
+
+  (* Step simulation, explicitly given by a family of invariant.
+     Used to explicit invariant traductions. *)
+  predicate step_limit_by (o1:erel 'a) (r:rel 'a 'b) (g2:game 'b)
+    (invl:set 'a -> ('a -> 'b) -> set (set 'b)) =
+    let o2 = g2.progress in
+    forall ch f s2.
+      chain o1 ch /\ inhabited ch ->
+      monotone_on ch o1 f o2 /\ rel_mapping ch f r ->
+      supremum o2 (image f ch) s2 ->
+      let target = related r (supremum o1 ch) in
+      victory_invariant g2 ((=) s2) target (invl ch f)
+
+  predicate step_simulate_by (g1:game 'a) (r:rel 'a 'b) (g2:game 'b)
+    (invf:'a -> set 'a -> set (set 'b))
+    (invl:set 'a -> ('a -> 'b) -> set (set 'b)) =
+    step_limit_by g1.progress r g2 invl /\
+    (* As victory invariant does not strictly respect transitions,
+       we need to consider 'super-transitions' as well. *)
+    forall x s1 s2. g1.transition x s1 /\ subset s1 s2 ->
+      victory_invariant g2 (related r ((=) x)) (related r s2) (invf x s2)
+
+end
+
+(* Simulation theorem: step simulation -> simulation. *)
+module Sim "W:non_conservative_extension:N" (* => SimProof *)
+
+  use game.Game
+  use export SimDef
+  use ho_rel.Rel
+
+  (* (obvious) prelude lemma. *)
+  axiom simulation_comp : forall g1:game 'a,r12,g2:game 'b,r23,g3:game 'c.
+    simulate g1 r12 g2 /\ simulate g2 r23 g3 -> simulate g1 (compose r12 r23) g3
+
+  axiom simulation : forall g1,r:rel 'a 'b,g2.
+    step_simulate g1 r g2 -> simulate g1 r g2
+
+end
+
+(* From there, the module is about the 'constructive' proof.
+   'Constructive' in the sense
+   that we make the simulations explicit as invariant traductions. *)
+
+(* Introduce a completed game, and show that we can lift step simulations
+   to the completed game. *)
+module SimCompleteDef
+
+  use game.Game
+  use choice.Choice
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.Chain
+  use order.LimUniq
+  use fn.Fun
+  use fn.Image
+
+  (* Completed game description *)
+  predicate complete_transition (g:game 'a) (h:set 'a) (hs:set (set 'a)) =
+    let o = g.progress in
+    let x = sup o h in
+    if maximum o h x
+    then (* hs = {H\cup\{x\}|x\in X} for some X such that g.transition x X *)
+         image (image (add h)) (g.transition x) hs
+    else hs = image (add h) (supremum o h)
+
+  let ghost function completed (g:game {'a}) : game (set {'a}) =
+     let o = g.progress in
+     let tr = pure { complete_transition g } in
+     assert { forall h1 hs h2. tr h1 hs /\ hs h2 ->
+       subchain o h1 h2
+       by let x = sup o h1 in
+       if maximum o h1 x
+       then exists s. hs = image (add h1) s /\ g.transition x s
+         so exists y. s y /\ h2 = add h1 y
+         so upper_bound o h1 y by o x y
+       else exists x. supremum o h1 x /\ h2 = add h1 x
+     };
+     { progress = subchain o; transition = tr }
+
+  (* Relation inducing a simulation g -> (completed g) *)
+  function complete_rel (o:erel 'a) : rel 'a (set 'a) =
+    fun x h -> maximum o h x
+  (* Lifting step simulations : g1 -> g2 to (completed g1) -> g2 *)
+  function complete_lift (o:erel 'a) (r:rel 'a 'b) : rel (set 'a) 'b =
+    fun h y -> let x = sup o h in supremum o h x /\ r x y
+  (* Explicit invariant for simulation g -> (completed g) *)
+  function complete_inv (o:erel 'a) (inv:set (set 'a)) : set (set (set 'a)) =
+    fun hh -> let h0 = inf (subchain o) hh in
+      let x0 = sup o h0 in
+      minimum (subchain o) hh h0 /\ maximum o h0 x0 /\
+      chain (subchain o) hh /\
+      inv (diff (bigunion hh) (remove h0 x0))
+
+  (* Explicit invariants for the reconstructed step simulation
+     (completed g1) -> g2 *)
+  function complete_invf (o:erel 'a) (r:rel 'a 'b)
+    (invf:'a -> set 'a -> set (set 'b))
+    : set 'a -> set (set 'a) -> set (set 'b) =
+    fun h hs -> let x = sup o h in
+      if maximum o h x
+      then
+        let s = inter (o x) (preimage (add h) hs) in
+        invf x s
+      else image (=) (complete_lift o r h)
+
+  function map_hist (o:erel 'a) (hh:set (set 'a)) (f:set 'a -> 'b) (x:'a) : 'b
+  = f (bigunion (inter hh (flip (upper_bound o) x)))
+  function complete_invl (o:erel 'a) (invl:set 'a -> ('a -> 'b) -> set (set 'b))
+    : set (set 'a) -> (set 'a -> 'b) -> set (set 'b) =
+    fun hh fh -> invl (image (sup o) hh) (map_hist o hh fh)
+
+
+end
+
+module SimComplete "W:non_conservative_extension:N" (* => SimCompleteProof *)
+
+  use game.Game
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use export SimCompleteDef
+  use export SimDef
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+
+  axiom complete_lift_composition : forall o:erel 'a,r:rel 'a 'b.
+    order o -> compose (complete_rel o) (complete_lift o r) = r
+
+  axiom complete_rel_simulation : forall g:game 'a.
+    simulate g (complete_rel g.progress) (completed g)
+
+  axiom complete_lift_step_simulation : forall g1 g2,r:rel 'a 'b.
+    step_simulate g1 r g2 ->
+    step_simulate (completed g1) (complete_lift g1.progress r) g2
+
+  axiom complete_rel_simulation_explicit : forall g:game 'a, start win inv.
+    victory_invariant g start win inv ->
+    let o = g.progress in
+    let r = complete_rel o in
+    let i = complete_inv o inv in
+    cropped o win inv ->
+    victory_invariant (completed g) (related r start) (related r win) i
+
+  axiom complete_lift_step_simulation_explicit :
+    forall g1 g2 invl invf,r:rel 'a 'b.
+      step_simulate_by g1 r g2 invf invl ->
+      step_simulate_by (completed g1) (complete_lift g1.progress r) g2
+      (complete_invf g1.progress r invf)
+      (complete_invl g1.progress invl)
+
+end
+
+(* Simulation to/from an extended/product game,
+   containing extra 'memory' that helps build winning strategies,
+   but must be forgotten. *)
+module SimExtendedDef
+
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+  use SimDef
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use ho_set.Set
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+
+  (* Define extended game. *)
+  predicate set_with_left (x:'a) (s:set 'b) (u:('a,'b)) =
+    let (a,b) = u in x = a /\ s b
+  predicate extended_transition (o:erel 'a) (r:rel 'a 'b)
+                                (g:game 'b) (x:('a,'b)) (s:set ('a,'b)) =
+    let (x,y) = x in
+    (exists x'. o x x' /\ r x' y /\ s = (=) (x',y)) \/
+    (exists ys. g.transition y ys /\ s = set_with_left x ys)
+
+  (* Distasteful case: there are no way to locally import
+     order.Product to prove the VC. *)
+  let ghost function extended_game (o:erel {'a}) (r:{rel 'a 'b})
+                                   (g:game {'b}) : {game ('a,'b)}
+    requires { order o }
+  = let op = pure { rprod o g.progress } in
+    let tr = pure { extended_transition o r g } in
+    assert { (order op by order g.progress so
+        reflexive op
+        /\ (antisymetric op by forall x y. op x y /\ op y x -> x = y)
+        /\ (transitive op by forall x y z. op x y /\ op y z -> op x z
+      )) && forall x s y. tr x s /\ s y -> op x y };
+    { progress = op; transition = tr }
+
+  (* Extended relation, for simulation to extended game. *)
+  predicate extended_rel (r:rel 'a 'b) (x:'a) (y:('a,'b)) =
+    let (x',y) = y in x = x' /\ r x y
+
+  (* Utility: get related elements within a pair chain. *)
+  function get_paired (r:rel 'a 'b) (hp:set ('a,'b)) : set ('a,'b) =
+    fun p -> let (x,y) = p in hp p /\ r x y
+
+  (* Utility: get mapping from limit paired chain. *)
+  function get_mapping (o2:erel 'b) (r:rel 'a 'b)
+                       (hp:set ('a,'b)) (x:'a) : 'b =
+    let hl = inter hp (preimage fst ((=) x)) in
+    let hl2 = image snd hl in
+    let s = inter hl2 (r x) in
+    inf o2 s
+
+  (* Utility: used outside invariant as well. *)
+  predicate has_low_sync (o1:erel 'a) (r:rel 'a 'b)
+                         (o2:erel 'b) (hp:set ('a,'b)) =
+   let h1 = image fst hp in
+   forall x. h1 x /\ not maximum o1 h1 x ->
+     let hl = inter hp (preimage fst ((=) x)) in
+     let s = inter (image snd hl) (r x) in minimum o2 s (inf o2 s)
+
+  (* Explicit invariant traduction to extended game. *)
+  function extended_inv (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b) (q:set 'a)
+    (inv:set (set 'a))
+    (invf:'a -> set 'a -> set (set 'b))
+    (invl:set 'a -> ('a -> 'b) -> set (set 'b)) : set (set ('a,'b)) =
+    fun hp ->
+      (* Set of history. *)
+      chain (rprod o1 o2) hp /\ inhabited hp /\
+      let h1 = image fst hp in
+      (* First components respect source invariant. *)
+        inv h1
+      (* Chains contains enough 'synchronisation points',
+         so that limit chains contains a paired subset with same supremum.
+         Moreover, those were reached at minimal positions. *)
+      /\ has_low_sync o1 r o2 hp
+      (* Local behavior, relevant only if the position in
+         first game is currently well-defined. *)
+      /\ let x = sup o1 h1 in maximum o1 h1 x ->
+         (* hl2 = local history for second game. *)
+         let hl = inter hp (preimage fst ((=) x)) in
+         let hl2 = image snd hl in
+         let s = inter hl2 (r x) in
+         if inhabited s
+         then (* Synchronised, local behavior = mimic step from h1. *)
+           let y = inf o2 s in minimum o2 s y
+           /\ let target = inter (lower o1 x) (next_hist inv h1) in
+             q x \/ crop o2 (related r target) (invf x target) (inter hl2 (o2 y))
+         else let z = inf o2 hl2 in minimum o2 hl2 z
+           /\ let h1r = remove h1 x in
+             let f = get_mapping o2 r hp in
+             (* Conditions required only so that the invariant is valid. *)
+             inhabited h1r /\ supremum o1 h1r x /\ supremum o2 (image f h1r) z
+           (* Local behavior = synchronisation to a related point. *)
+           /\ invl h1r f hl2
+
+  (* Caracterise victory invariant that can be used for forgetting
+     extra memory. *)
+  predicate extension (op:erel ('a,'b)) (inv:set (set ('a,'b)))
+                                        (h h':set ('a,'b)) =
+    inv h' /\ subchain op h h' /\ image snd h = image snd h'
+  predicate reducible (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b)
+                      (inv:set (set ('a,'b))) =
+    let op = rprod o1 o2 in
+    (* Condition 0: actually need to enforce a 'type invariant',
+       e.g that element of the invariant are chains. *)
+    (forall h. inv h -> chain op h)
+    (* Condition 1: deterministic enough on first component. *)
+    /\ (forall h. inv h ->
+       let hm = sup (subchain op) (extension op inv h) in
+       maximum (subchain op) (extension op inv h) hm)
+    (* Condition 2: downward closed *)
+    /\ (forall h h'. inhabited h /\ subchain op h h' /\ inv h' -> inv h)
+    (* Condition 3: limits on the first component reduce to limits
+       over a paired chain. *)
+    /\ (forall h. inv h ->
+      not maximum o1 (image fst h) (sup o1 (image fst h)) ->
+      upper_bound o1 (image fst h) =
+      upper_bound o1 (image fst (get_paired r h)))
+
+  (* Build the 'existential strategy' that enforce
+     reducibility from a choice function for
+     { x | r x y /\ z <= x }'s subsets.
+     TODO/FIXME: just noticed that in presence of completion,
+     it should be lifted as well, which is annoying as hell and
+     in fact close to impossible with the current enrichment
+     (in a purely constructive way, at least).
+     Indeed, one would need to explicitly restrict (<=) to
+     steps that may be transitioned in g1....
+     We will simply not lift that, having a set choice function
+     over chains is fine enough. *)
+  predicate red_ang_choice (o1:erel 'a) (r:rel 'a 'b)
+                           (f:'a -> 'b -> set 'a -> 'a) =
+    forall s x y z. s x /\ r x y /\ o1 z x ->
+      let x = f z y s in s x /\ r x y /\ o1 z x
+  predicate red_ang_core (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b)
+                        (inv:set (set ('a,'b)))
+                        (f:'a -> 'b -> set 'a -> 'a)
+                        (hp:set ('a,'b)) (x z:'a) (y t:'b) =
+    o1 x z /\ o2 y t /\
+    let a = remove (next_hist inv hp) (x,y) in
+    let b = inter a (preimage snd ((=) y)) in
+    inv hp /\ a (z,t) /\
+    if y <> t then x = z else r z y /\ z = f x y (image fst b)
+  function red_ang (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b)
+                   (inv:set (set ('a,'b)))
+                   (f:'a -> 'b -> set 'a -> 'a) : angel ('a,'b) =
+    fun hp n ->
+      let (x,y) = sup (rprod o1 o2) hp in
+      let (z,t) = n in
+      red_ang_core o1 r o2 inv f hp x z y t
+
+  (* Caracterise conditions between the relations and both
+     order so that forgetting extension is feasible at all,
+     e.g when any chain that admit a limit through the prism of
+     the relation r also admit a limit before.
+     Chain-completeness of o1 actually implies this, since the
+     limit exists unconditionally. *)
+  predicate pairing_pull_limits (o1:erel 'a) (r:rel 'a 'b) (o2:erel 'b) =
+    forall ch f s2. chain o1 ch /\ inhabited ch ->
+      monotone_on ch o1 f o2 /\ rel_mapping ch f r /\ supremum o2 (image f ch) s2 ->
+      supremum o1 ch (sup o1 ch)
+
+  (* Projection relation, inducing simulation from extended game. *)
+  predicate proj2 (x:('a,'b)) (y:'b) = let (_,z) = x in y = z
+
+  predicate antec_choice (p:set ('a,'b)) (f_p:'b -> ('a,'b)) =
+    forall y. image snd p y -> p (f_p y) /\ snd (f_p y) = y
+
+  (* Define invariants for forgetting the extended state. *)
+  predicate sub_proj_as (op:erel ('a,'b)) (h:set 'b) (hp h1:set ('a,'b)) =
+    image snd h1 = h /\ subchain op h1 hp
+  predicate forget_core (o1:erel 'a) (o2:erel 'b) (inv:set (set ('a,'b)))
+                        (tog:bool)
+                        (f_p:'b -> ('a,'b)) (h:set 'b) (hp:set ('a,'b)) =
+    let mh = inf o2 h in
+    let op = rprod o1 o2 in
+    inv hp /\
+    image snd hp = h /\ minimum o2 h mh /\ minimum op hp (f_p mh) /\
+    (forall h1 x. inhabited h1 /\ subchain op (add h1 x) hp /\
+      upper_bound op h1 x /\ not image snd h1 (snd x) ->
+      let s = sup op h1 in supremum op h1 s /\ fst x = fst s) /\
+    (forall h0. subchain o2 h0 h /\ maximum o2 h0 (sup o2 h0) ->
+      let h1 = inf (subchain op) (sub_proj_as op h0 hp) in
+      minimum (subchain op) (sub_proj_as op h0 hp) h1 /\
+      (tog \/ h <> h0 ->
+       subchain op (sup (subchain op) (extension op inv h1)) hp))
+
+  (* Two closely linked invariant for forgetting:
+     forget_inv_a actually implies forget_inv_b,
+     and actual steps from forget_inv_b maps to forget_inv_a. *)
+  function forget_inv_a (o1:erel 'a) (o2:erel 'b) (inv:set (set ('a,'b)))
+                        (f_p:'b -> ('a,'b)) : set (set 'b)
+  = fun h ->
+    let o = subchain (rprod o1 o2) in
+    let core = forget_core o1 o2 inv false f_p h in
+    let hp = inf o core in minimum o core hp
+
+  function forget_inv_b (o1:erel 'a) (o2:erel 'b) (inv:set (set ('a,'b)))
+                         (f_p:'b -> ('a,'b)) : set (set 'b)
+  = fun h ->
+    let core = forget_core o1 o2 inv true f_p h in
+    (exists hp. core hp) /\
+    (forall hp1 hp2. core hp1 /\ core hp2 -> hp1 = hp2)
+
+
+end
+
+module SimExtended "W:non_conservative_extension:N" (* => SimExtendedProof *)
+
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+  use SimDef
+  use export SimExtendedDef
+  use ho_set.Set
+  use fn.Fun
+  use fn.Image
+  use ho_rel.RelSet
+
+  axiom simulation_to_extended : forall g1 g2,r:rel 'a 'b.
+    step_simulate g1 r g2 ->
+      simulate g1 (extended_rel r) (extended_game g1.progress r g2)
+
+  axiom simulation_from_extended : forall o,r:rel 'a 'b,g2:game 'b.
+    order o /\ pairing_pull_limits o r g2.progress ->
+      simulate (extended_game o r g2) proj2 g2
+
+  axiom make_reducible_invariants : forall o1 g2 inv p q f,r:rel 'a 'b.
+    let gp = extended_game o1 r g2 in
+    let ang = red_ang o1 r g2.progress inv f in
+    let rinv = strong_u_acc_s (span_game gp) (crop_ang inv ang) p in
+    order o1 /\ red_ang_choice o1 r f ->
+    victory_invariant gp p q inv ->
+    victory_invariant gp p q rinv
+    /\ subset rinv inv
+    /\ reducible o1 r g2.progress rinv
+
+  axiom simulation_to_extended_explicit : forall g1 g2,r:rel 'a 'b,invf invl.
+    step_simulate_by g1 r g2 invf invl ->
+    let er = extended_rel r in
+    forall p q inv. victory_invariant g1 p q inv /\ cropped g1.progress q inv ->
+      let invp = extended_inv g1.progress r g2.progress q inv invf invl in
+      victory_invariant (extended_game g1.progress r g2)
+                        (related er p) (related er q) invp
+
+  axiom proj2_related : forall s:set ('a,'b).
+    related proj2 s = image snd s
+
+  axiom extended_rel_proj2_composition : forall r:rel 'a 'b.
+    compose (extended_rel r) proj2 = r
+
+  axiom simulation_from_extended_invariant_link :
+    forall o1 o2,r:rel 'a 'b,inv f_p.
+      order o1 /\ order o2 /\ reducible o1 r o2 inv ->
+      subset (forget_inv_a o1 o2 inv f_p) (forget_inv_b o1 o2 inv f_p)
+
+  axiom simulation_from_extended_explicit :
+    forall o1 g2,r:rel 'a 'b, p q inv f_p.
+      order o1 /\ pairing_pull_limits o1 r g2.progress ->
+      victory_invariant (extended_game o1 r g2) p q inv ->
+      reducible o1 r g2.progress inv /\ antec_choice p f_p ->
+      let p2 = image snd p in let q2 = image snd q in
+      victory_invariant g2 p2 q2 (forget_inv_a o1 g2.progress inv f_p)
+      /\ victory_invariant g2 p2 q2 (forget_inv_b o1 g2.progress inv f_p)
+end
+
+(* Explicit, end-to-end simulation. *)
+module SimExplicitDef
+
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use ho_set.Set
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtraDef
+  use export SimDef
+  use export SimExtendedDef
+  use export SimCompleteDef
+
+  function sim_explicit (g1:game 'a) (r:rel 'a 'b) (g2:game 'b)
+                        (invf:'a -> set 'a -> set (set 'b))
+                        (invl:set 'a -> ('a -> 'b) -> set (set 'b))
+                        (f:set 'a -> 'b -> set (set 'a) -> set 'a)
+                        (start win:set 'a) (f_p:'b -> (set 'a,'b))
+                        (inv:set (set 'a)) : set (set 'b)
+  = let o1 = g1.progress in let o2 = g2.progress in
+    (* Crop initial invariant. *)
+    let cinv = crop o1 win inv in
+    (* Lift to completed. *)
+    let linvf = complete_invf o1 r invf in
+    let linvl = complete_invl o1 invl in
+    let linv = complete_inv o1 cinv in
+    let lr = complete_rel g1.progress in
+    let lwin = related lr win in
+    let cr = complete_lift o1 r in
+    let cg1 = completed g1 in
+    let ol1 = cg1.progress in
+    (* Shift to extended game. *)
+    let pinv = extended_inv ol1 cr o2 lwin linv linvf linvl in
+    let gp = extended_game ol1 cr g2 in
+    let ang = red_ang ol1 cr o2 pinv f in
+    let ecs = related (extended_rel cr) (related lr start) in
+    let rinv = strong_u_acc_s (span_game gp) (crop_ang pinv ang) ecs in
+    forget_inv_a ol1 o2 rinv f_p
+
+end
+
+module SimExplicit "W:non_conservative_extension:N" (* => SimProof *)
+
+  use game.Game
+  use game_no_strat.StratLessDef
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use export SimExplicitDef
+
+  axiom simulation_explicit : forall g1,r:rel 'a 'b,g2 invf invl f.
+    step_simulate_by g1 r g2 invf invl ->
+    let o1 = g1.progress in let o2 = g2.progress in
+    let cr = complete_lift o1 r in
+    let lr = complete_rel o1 in
+    let ecr = extended_rel cr in
+    let cg1 = completed g1 in
+    let ol1 = cg1.progress in
+    red_ang_choice ol1 cr f ->
+    forall p f_p q inv.
+      let pl = related lr p in
+      let epl = related ecr pl in
+      let pr = related r p in
+      let qr = related r q in
+      let finv = sim_explicit g1 r g2 invf invl f p q f_p inv in
+      victory_invariant g1 p q inv /\ antec_choice epl f_p ->
+      victory_invariant g2 pr qr finv
+
+end
+
+
+(* Utility properties used everywhere. *)
+module Util
+
+  use game.Game
+  use game.BasicStrats
+  use choice.Choice
+  use game_no_strat.WinAlt
+  use order.LimUniq
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use ho_rel.RelSet
+  use ho_set.Set
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+  use SimDef
+
+  (* If we have a step simulation, there exists an explicitation.
+     Useful to derive implicit theorems from explict ones. *)
+  function explicit_invf (r:rel 'a 'b) (g2:game 'b)
+    : 'a -> set 'a -> set (set 'b) =
+    fun x s ->
+      choice (victory_invariant g2 (related r ((=) x)) (related r s))
+  function explicit_invl (o1:erel 'a) (r:rel 'a 'b) (g2:game 'b)
+    : set 'a -> ('a -> 'b) -> set (set 'b) =
+    fun ch f -> let s2 = sup g2.progress (image f ch) in
+      let target = related r (supremum o1 ch) in
+      choice (victory_invariant g2 ((=) s2) target)
+
+  lemma step_simulation_made_explicit :
+    forall g1 g2,r:rel 'a 'b.
+      step_simulate g1 r g2 ->
+      let o1 = g1.progress in let o2 = g2.progress in
+      step_simulate_by g1 r g2
+        (explicit_invf r g2) (explicit_invl o1 r g2)
+      by (forall x s1 s2. g1.transition x s1 /\ subset s1 s2 ->
+        let i = explicit_invf r g2 x s2 in
+        let st = related r ((=) x) in
+        let target = related r s2 in
+        victory_invariant g2 st target i
+        by have_uniform_winning_strat g2 st target
+        by let t1 = related r s1 in
+          have_uniform_winning_strat g2 st t1 /\ subset t1 target
+      ) /\ forall ch f s2. chain o1 ch /\ inhabited ch ->
+        monotone_on ch o1 f o2 /\ rel_mapping ch f r /\
+        supremum o2 (image f ch) s2 ->
+        let st = (=) s2 in
+        let target = related r (supremum o1 ch) in
+        victory_invariant g2 ((=) s2) target (explicit_invl o1 r g2 ch f)
+        by have_uniform_winning_strat g2 st target
+
+  lemma step_simulation_unexplicit :
+    forall g1 g2 invf invl,r:rel 'a 'b.
+      let o1 = g1.progress in let o2 = g2.progress in
+      step_simulate_by g1 r g2 invf invl ->
+      step_simulate g1 r g2
+    by (forall x y s. g1.transition x s /\ r x y ->
+      let target = related r s in
+      have_winning_strat g2 y target
+      by let st = related r ((=) x) in
+        have_uniform_winning_strat g2 st target
+      by victory_invariant g2 st target (invf x s)
+    ) /\ forall ch f s2. chain o1 ch /\ inhabited ch ->
+      monotone_on ch o1 f o2 /\ rel_mapping ch f r ->
+      supremum o2 (image f ch) s2 ->
+      let target = related r (supremum o1 ch) in
+      have_winning_strat g2 s2 target
+      by have_uniform_winning_strat g2 ((=) s2) target
+
+  predicate simulate_alt (g1:game 'a) (r:rel 'a 'b) (g2:game 'b) =
+    forall start win i. victory_invariant g1 start win i ->
+      exists i2. victory_invariant g2 (related r start) (related r win) i2
+
+  lemma traduction_simulation :
+    forall g1 g2,r:rel 'a 'b. simulate_alt g1 r g2 -> simulate g1 r g2
+
+end
+
+(* From there: proofs. *)
+
+
+module SimCompleteProof
+
+  use game.Game
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtra
+  use choice.Choice
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use fn.Image
+  use order.SubChain
+  use Util
+  use SimDef
+  use SimCompleteDef
+
+  lemma complete_rel_simulation : forall g:game 'a,start win inv.
+    victory_invariant g start win inv ->
+    let o = g.progress in
+    let sb = subchain o in
+    let sbb = subchain sb in
+    let r = complete_rel g.progress in
+    let i = complete_inv g.progress inv in
+    let cg = completed g in
+    let rst = related r start in
+    let rwn = related r win in
+    cropped o win inv ->
+    victory_invariant cg rst rwn i
+      (* Base case *)
+    by (forall h. rst h -> let hh = (=) h in
+      i hh by minimum sb hh h
+      so let x0 = sup o h in maximum o h x0
+      so sext (diff (bigunion hh) (remove h x0)) ((=) x0)
+    ) (* Supremum case *)
+    /\ (forall hh h. i hh /\ supremum sb hh h -> let hh2 = add hh h in
+      i hh2 by h = bigunion hh
+      so let h0 = inf sb hh in minimum sb hh2 h0
+      so sext (bigunion hh2) (bigunion hh)
+    ) (* Chain case *)
+    /\ ("stop_split"
+      forall chh. subset chh i /\ chain sbb chh /\ inhabited chh ->
+      let hhl = bigunion chh in i hhl
+      by exists hh0. chh hh0
+      so i hh0
+      so let h0 = inf sb hh0 in minimum sb hh0 h0
+      so let x0 = sup o h0 in maximum o h0 x0
+      so (forall hh. chh hh -> minimum sb hh h0
+        by if subchain sb hh0 hh then true else
+          subchain sb hh hh0
+        so let h1 = inf sb hh in minimum sb hh h1
+        so h1 = h0 by minimum sb hh0 h1
+      )
+      so let fn = fun hh -> diff (bigunion hh) (remove h0 x0) in
+        let ch2 = image fn chh in
+        subset ch2 inv
+      so (inhabited ch2 by ch2 (fn hh0))
+        (* Technical: fn is monotonic,
+          so it preserve subchain ordering. *)
+      so ("stop_split" chain sb ch2
+        by monotone sbb fn sb
+        by forall hh1 hh2. sbb hh1 hh2 -> sb (fn hh1) (fn hh2)
+          by let h1 = bigunion hh1 in let h2 = bigunion hh2 in
+            subchain o h1 h2
+          by forall u v. h1 u /\ h2 v /\ not h1 v -> o u v
+          by exists h3 h4. hh1 h3 /\ h3 u /\ hh2 h4 /\ h4 v
+          so sb h3 h4
+      )
+      so let hl = bigunion ch2 in inv hl
+        (* Technical: commutation between bigunions and removals. *)
+      so ("stop_split" sext (fn hhl) hl
+        by (forall x. fn hhl x -> hl x
+          by bigunion hhl x
+          so exists h. hhl h /\ h x
+          so exists hh. chh hh /\ hh h
+          so bigunion hh x
+          so fn hh x /\ ch2 (fn hh)
+        ) /\ forall x. hl x -> fn hhl x
+          by exists h. ch2 h /\ h x
+          so exists hh. fn hh = h /\ chh hh
+          so bigunion hh x
+          so exists h. hh h /\ h x
+          so hhl h so bigunion hhl x
+      )
+      so (minimum sb hhl h0 by subchain sb hh0 hhl
+          by supremum sbb chh hhl)
+      so h0 = inf sb hhl
+    ) (* Step case *)
+    /\ ("stop_split"
+      forall hh h. i hh /\ not inhabited (inter hh rwn) ->
+      maximum sb hh h ->
+      (exists a. cg.transition h a /\ not a h /\ subset a (next_hist i hh))
+      by let h0 = inf sb hh in
+        let x0 = sup o h0 in
+        let df = remove h0 x0 in
+        let h1 = diff h df in
+        let x = sup o h in
+        minimum sb hh h0 /\ maximum o h0 x0 /\ inv h1
+      so (h1 x0 by h x0 by sb h0 h)
+      (* Either mimic a regular step, either mimic a supremum step. *)
+      so if maximum o h x
+        then (h1 x by not (df x so x = x0 by o x x0 /\ o x0 x))
+          so maximum o h1 x
+          so not (inhabited (inter h1 win)
+            so exists y. inter h1 win y so maximum o h1 y
+            so y = x so inter hh rwn h)
+          so exists b.
+            g.transition x b /\ not b x /\ subset b (next_hist inv h1)
+          so let a = image (add h) b in
+            cg.transition h a
+          so not (a h so exists y. b y /\ h = add h y
+            so maximum o h y by o x y /\ transitive o)
+          so "stop_split" subset a (next_hist i hh)
+            by forall hu. a hu -> let hhu = add hh hu in i hhu
+            by (upper_bound sb hh hu by sb h hu /\ transitive sb)
+            so minimum sb hhu h0 /\ chain sb hhu
+            so h0 = inf sb hhu
+            so exists u. hu = add h u /\ b u
+            so let h2 = diff hu df in
+              (sext h2 (add h1 u) by forall v. add h1 u v -> h2 v
+                by if v <> u then true else
+                  not (df v so v = x0 by o x0 x /\ o x v /\ o v x0)
+              )
+            so inv h2
+            so (hu = bigunion hhu by maximum sb hhu hu)
+        else let a = image (add h) (supremum o h) in
+          cg.transition h a
+          so not a h
+          so "stop_split" subset a (next_hist i hh)
+            by forall hu. a hu -> let hhu = add hh hu in i hhu
+            by (upper_bound sb hh hu by sb h hu /\ transitive sb)
+            so minimum sb hhu h0 /\ chain sb hhu
+            so h0 = inf sb hhu
+            so exists u. hu = add h u /\ supremum o h u so u = x
+            so (supremum o h1 u
+              by forall v. upper_bound o h1 v -> upper_bound o h v
+              by forall w. h w -> o w v
+              by if h0 w then o w x0 /\ o x0 v else h1 w by not df w)
+            so let h2 = diff hu df in
+              (sext h2 (add h1 u) by forall v. add h1 u v -> h2 v
+                by if v <> u then true else
+                  not (df v so v = x0 by o x0 v /\ o v x0)
+              )
+            so inv h2
+            so (hu = bigunion hhu by maximum sb hhu hu)
+
+    )
+
+  use fn.Fun
+
+  (* FIXME: although necessary here, that's not really the place
+     this lemma belongs.... *)
+  lemma id_invariant : forall g:game 'a,p q.
+    subset p q ->
+    let inv = image (=) p in
+    let o = g.progress in
+    victory_invariant g p q inv
+    by (forall h. inv h -> inhabited (inter h q)
+      by exists x. inter h q x by p x /\ h = (=) x)
+    /\ (forall ch. subset ch inv /\ chain (subchain o) ch /\ inhabited ch ->
+      let hl = bigunion ch in
+      inv hl by exists h. ch h so exists x. p x /\ h = (=) x
+      so (forall h1. ch h1 -> h1 = (=) x
+        by exists y. p y /\ h1 = (=) y so x = y
+        by (h1 x by subchain o h h1) \/ (h y by subchain o h1 h))
+      so sext hl ((=) x)
+    )
+    /\ (forall h x. inv h /\ supremum o h x -> inv (add h x)
+      by exists y. p y /\ h = (=) y
+      so sext (add h x) h by x = y by supremum o h y
+    )
+
+  use ho_rel.Prod
+  use order.Product
+  use order.ProductChain
+
+  lemma complete_lift_step_simulation : forall g1 g2 invl invf,r:rel 'a 'b.
+    step_simulate_by g1 r g2 invf invl ->
+    let cg = completed g1 in
+    let o = g1.progress in
+    let cr = complete_lift o r in
+    let cinvf = complete_invf o r invf in
+    let cinvl = complete_invl o invl in
+    step_simulate_by cg cr g2 cinvf cinvl
+    by ("stop_split" forall h hs1 hs2. cg.transition h hs1 /\ subset hs1 hs2 ->
+      let eh = (=) h in
+      let reh = related cr eh in
+      let rs = related cr hs2 in
+      let i = cinvf h hs2 in
+      victory_invariant g2 reh rs i
+      by let x = sup o h in
+        if maximum o h x
+        then exists a. g1.transition x a /\ hs1 = image (add h) a
+          so let b = inter (o x) (preimage (add h) hs2) in
+            subset a b
+          so i = invf x b
+          so let ex = (=) x in
+            let rex = related r ex in
+            let rb = related r b in
+            victory_invariant g2 rex rb i
+          so subset reh rex
+          so (subset rb rs by forall y. rb y -> rs y
+            by exists u. b u /\ r u y
+            so let hu = add h u in hs2 hu /\ supremum o hu u
+            by maximum o hu u by o x u /\ transitive o
+          )
+          so (forall h. inhabited (inter h rb) -> inhabited (inter h rs)
+            by exists x. inter h rs x by inter h rb x)
+        else hs1 = image (add h) (supremum o h)
+          so (subset reh rs by forall y. reh y -> rs y
+            by let x = sup o h in supremum o h x /\ r x y
+            so let hx = add h x in hs2 hx /\ supremum o hx x
+            so cr hx y
+          )
+          so sext reh (cr h)
+          so i = image (=) reh
+    ) /\ ("stop_split" forall ch f s2.
+      let o2 = g2.progress in
+      let sb = subchain o in
+      let chf = image f ch in
+      chain sb ch /\ inhabited ch ->
+      monotone_on ch sb f o2 /\ rel_mapping ch f cr ->
+      supremum o2 chf s2 ->
+      let target = related cr (supremum sb ch) in
+      let i = cinvl ch f in
+      victory_invariant g2 ((=) s2) target i
+      by let ch0 = image (sup o) ch in
+        let f0 = map_hist o ch f in
+        i = invl ch0 f0
+      so (* First note that we can build a very particular (maximal)
+            antecedent for any element of ch0. This is the one
+            used by the restricted mapping. *)
+        ("stop_split" forall u. ch0 u ->
+          let chr = inter ch (flip (upper_bound o) u) in
+          let hr = bigunion chr in
+          ch hr /\ supremum o hr u
+          by exists h. ch h /\ sup o h = u
+          so (supremum o h u by cr h (f h)) so chr h
+          so supremum (subchain o) chr hr
+          so (forall h x. chr h /\ supremum o h u /\ hr x /\ not h x ->
+            x = u by subchain o h hr
+            so upper_bound o h x so o u x
+            so o x u by exists h0. chr h0 /\ h0 x so upper_bound o h0 u
+          )
+          so if not hr u then sext h hr else
+            exists h. chr h /\ h u
+            so maximum o h u
+            so sext h hr
+        )
+        (* Deduce that s2 is also the supremum of ch0f.
+           (all missed element from chf are capped by non-missed one) *)
+      so let ch0f = image f0 ch0 in
+        ("stop_split" supremum o2 ch0f s2
+          by (forall u. ch0f u -> o2 u s2 by chf u
+            by exists a. ch0 a /\ f0 a = u
+            so let chr = inter ch (flip (upper_bound o) a) in
+              let hr = bigunion chr in
+              ch hr /\ f hr = u
+          ) /\ (forall u. upper_bound o2 ch0f u -> o2 s2 u
+            by upper_bound o2 chf u by forall v. chf v -> o2 v u
+            by exists h. ch h /\ f h = v
+            so let s = sup o h in
+              let chr = inter ch (flip (upper_bound o) s) in
+              let hr = bigunion chr in
+              ch0 s so ch hr
+            so (subchain o h hr by supremum (subchain o) chr hr
+              so chr h by cr h (f h))
+            so o2 (f h) (f hr) /\ ch0f (f hr)
+            so o2 (f hr) u
+          )
+        )
+      so (inhabited ch0 by exists u. ch0 (sup o u) by ch u)
+      so rel_mapping ch0 f0 r
+      so ("stop_split" monotone_on ch0 o f0 o2
+        by forall u v. ch0 u /\ ch0 v /\ o u v -> o2 (f0 u) (f0 v)
+        by let chru = inter ch (flip (upper_bound o) u) in
+          let chrv = inter ch (flip (upper_bound o) v) in
+          (subset chru chrv by forall h. ch h /\ upper_bound o h u ->
+            upper_bound o h v by transitive o)
+        so let hru = bigunion chru in let hrv = bigunion chrv in
+          subset hru hrv
+        so o2 (f hru) (f hrv)
+        by subchain o hru hrv || (false by subchain o hrv hru))
+      so (chain o ch0 by monotone_on ch sb (sup o) o
+        by forall h1 h2. ch h1 /\ ch h2 /\ subchain o h1 h2 ->
+          let s1 = sup o h1 in let s2 = sup o h2 in o s1 s2
+        by cr h1 (f h1) /\ cr h2 (f h2)
+        so upper_bound o h1 s2 by upper_bound o h2 s2
+      )
+      so let hl = bigunion ch in
+        supremum sb ch hl
+      so ("stop_split" sext (upper_bound o hl) (upper_bound o ch0)
+        by (forall u. upper_bound o hl u -> upper_bound o ch0 u
+          by forall x. ch0 x -> o x u
+          by exists h. ch h /\ sup o h = x so cr h (f h)
+          so upper_bound o h u
+        ) /\ (forall u. upper_bound o ch0 u -> upper_bound o hl u
+          by forall x. hl x -> o x u
+          by exists h. ch h /\ h x
+          so let y = sup o h in cr h (f h)
+          so (o x y by upper_bound o h y) so ch0 y
+        ))
+      so (forall u. supremum o ch0 u <-> supremum o hl u)
+      so "stop_split"
+        let t2 = related r (supremum o ch0) in
+        sext target t2
+      by sext target (cr hl) /\ sext (cr hl) t2
+      by forall y. t2 y -> cr hl y
+      by exists x. r x y /\ supremum o ch0 x
+      so x = sup o hl
+    )
+
+  use ho_rel.Rel
+
+  lemma complete_lift_composition : forall o:erel 'a,r:rel 'a 'b.
+    order o -> let c = complete_rel o in let cr = complete_lift o r in
+      compose c cr = r
+      by rext (compose c cr) r
+      by forall a b. r a b -> compose c cr a b
+      by let h = (=) a in maximum o h a so c a h /\ cr h b
+
+
+  lemma complete_lift_step_simulation_2 : forall g1 g2,r:rel 'a 'b.
+    step_simulate g1 r g2 ->
+    let o = g1.progress in
+    let cr = complete_lift o r in
+    let cg = completed g1 in
+    step_simulate cg cr g2
+    by let invf = explicit_invf r g2 in
+      let invl = explicit_invl o r g2 in
+      let cinvf = complete_invf o r invf in
+      let cinvl = complete_invl o invl in
+      step_simulate_by cg cr g2 cinvf cinvl
+
+  clone SimComplete with goal complete_lift_composition,
+    goal complete_rel_simulation,
+    goal complete_lift_step_simulation,
+    goal complete_rel_simulation_explicit,
+    goal complete_lift_step_simulation_explicit
+
+end
+
+(* SimExtendedProof cut in 3 independent parts,
+   to avoid unwanted visibility of some proof arguments. *)
+module SimExtendedWf
+
+  use game.Game
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use SimExtendedDef
+
+  (* For some reasons, provers have a hard time dealing with bare
+     rprod definition. This proxy helps a lot. *)
+  predicate oo (o1:erel 'a) (o2:erel 'b) (x:'a) (y:'b) (z:'a) (t:'b) =
+    o1 x z /\ o2 y t
+  lemma oo_def : forall o1:erel 'a,o2:erel 'b,x y z t.
+    oo o1 o2 x y z t <-> rprod o1 o2 (x,y) (z,t)
+
+end
+
+module SimExtendedProof_Enrich
+
+  use game.Game
+  use game_no_strat.WinAlt
+  use game_no_strat.InvExtra
+  use SimExtendedWf
+  use SimDef
+  use SimExtendedDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.LimUniq
+  use order.Product
+  use order.ProductChain
+  use order.SubChain
+  use fn.Fun
+  use fn.Image
+
+  (* A few lemmas for simulation to the extended games. *)
+
+  (* Lemma that comes near everywhere:
+     the local invariants used inside extended_inv's definition
+     are indeed the expected victory invariants, under reasonable
+     conditions. *)
+  lemma extended_inv_local_victory_invariant :
+    forall g1 g2 p q inv invf invl hp,r:rel 'a 'b.
+      let o1 = g1.progress in let o2 = g2.progress in
+      let op = rprod o1 o2 in
+      let h1 = image fst hp in let x = sup o1 h1 in
+      step_simulate_by g1 r g2 invf invl /\ has_low_sync o1 r o2 hp ->
+        victory_invariant g1 p q inv /\ cropped o1 q inv ->
+        chain op hp /\ inv h1 /\ maximum o1 h1 x ->
+        let hl = inter hp (preimage fst ((=) x)) in
+        let hl2 = image snd hl in
+        let s = inter hl2 (r x) in
+        if inhabited s
+        then
+          let y = inf o2 s in
+          let target = inter (lower o1 x) (next_hist inv h1) in
+          let dtg = related r target in
+          let i = crop o2 dtg (invf x target) in
+          not q x /\ minimum o2 s y -> victory_invariant g2 ((=) y) dtg i
+            by let src = related r ((=) x) in
+              victory_invariant g2 src dtg i
+            by victory_invariant g2 src dtg (invf x target)
+            by exists a.
+              g1.transition x a /\ not a x /\ subset a (next_hist inv h1)
+            so subset a target
+        else let z = inf o2 hl2 in
+          let h1r = remove h1 x in
+          let f = get_mapping o2 r hp in
+          let i = invl h1r f in
+          inhabited h1r /\ supremum o1 h1r x /\ supremum o2 (image f h1r) z ->
+            victory_invariant g2 ((=) z) (r x) i
+            by (rel_mapping h1r f r by forall x'. h1r x' -> r x' (f x')
+              by let hl = inter hp (preimage fst ((=) x')) in
+              let hl2 = image snd hl in
+              let s = inter hl2 (r x') in
+              s (f x')
+            )
+            so (monotone_on h1r o1 f o2
+              by forall a b. h1r a /\ h1r b /\ o1 a b -> o2 (f a) (f b)
+              by let hla = inter hp (preimage fst ((=) a)) in
+                let hlb = inter hp (preimage fst ((=) b)) in
+                let hla2 = image snd hla in
+                let hlb2 = image snd hlb in
+                let sa = inter hla2 (r a) in
+                let sb = inter hlb2 (r b) in
+                sa (f a) /\ sb (f b)
+              so exists u. (hp u /\ fst u = a by hla u) /\ snd u = f a
+              so exists v. (hp v /\ fst v = b by hlb v) /\ snd v = f b
+              so op u v || (false by op v u so u = v by a = b by o1 b a)
+            )
+            so chain o1 h1r
+            so victory_invariant g2 ((=) z) (related r (supremum o1 h1r)) i
+            so sext (supremum o1 h1r) ((=) x)
+            /\ sext (related r ((=) x)) (r x)
+
+  predicate has_most_sync (o1:erel 'a) (r:rel 'a 'b)
+                          (o2:erel 'b) (hp:set ('a,'b)) (x:'a) =
+    let h1 = image fst hp in
+    (not exists y. hp (x,y) /\ r x y) /\
+    forall x0. h1 x0 /\ x0 <> x ->
+      let hl = inter hp (preimage fst ((=) x0)) in
+      let s = inter (image snd hl) (r x0) in minimum o2 s (inf o2 s)
+
+  (* yet another useful lemma: initialize the local invariant
+     that mimic a step in the first game. Used multiple times through
+     the proof: main initialisation, 'automagical' switching from
+     synchronisation, and changing the mimicked step.
+     (Other kind of initialization is used exactly once (ill-paired supremum),
+      hence does not deserve such a lemma) *)
+  lemma extended_inv_initialization :
+    forall g1 g2 p q inv invf invl hp x y,r:rel 'a 'b.
+      let o1 = g1.progress in let o2 = g2.progress in
+      let op = rprod o1 o2 in
+      step_simulate_by g1 r g2 invf invl ->
+      victory_invariant g1 p q inv /\ cropped o1 q inv ->
+      let invp = extended_inv o1 r o2 q inv invf invl in
+      let h1 = image fst hp in let ht1 = add h1 x in
+      let t = (x,y) in let htp = add hp t in
+      chain op hp /\ upper_bound op hp t /\ r x y /\ inv ht1 ->
+      has_most_sync o1 r o2 hp x ->
+      invp htp
+      by (ht1 = image fst htp by sext ht1 (image fst htp) by forall u.
+        ht1 u -> image fst htp u by if u = x then htp t /\ fst t = u else
+          exists v. (htp v by hp v) /\ fst v = u)
+      so chain op htp
+      so maximum o1 ht1 x
+      so (has_low_sync o1 r o2 htp by forall x0.
+        ht1 x0 /\ not maximum o1 ht1 x0 ->
+        let hl = inter htp (preimage fst ((=) x0)) in
+        let s = inter (image snd hl) (r x0) in minimum o2 s (inf o2 s)
+        by h1 x0 so x <> x0 so sext hl (inter hp (preimage fst ((=) x0)))
+      )
+      so x = sup o1 ht1
+      so let hl = inter htp (preimage fst ((=) x)) in
+        let hl2 = image snd hl in
+        let s = inter hl2 (r x) in
+        (s = (=) y by sext s ((=) y) by (s y by hl t /\ snd t = y)
+          /\ forall a. s a -> a = y by exists u. hl u /\ snd u = a
+            so let (b,c) = u in b = x /\ c = a so r x a /\ htp (x,a)
+            so not hp (x,a)
+        )
+      so minimum o2 s y so inhabited s so y = inf o2 s
+      so if q x then true else
+        let target = inter (lower o1 x) (next_hist inv ht1) in
+        let dtg = related r target in
+        let i = crop o2 dtg (invf x target) in
+        let hll = inter hl2 (o2 y) in
+        i hll
+        by hll = s by sext hll s by forall a. hll a -> a = y
+          by o2 y a so exists u. hl u /\ snd u = a
+          so let (b,c) = u in hp u -> op u t
+
+  (* Another useful lemma, factoring a common part
+     between local and supremum steps: if the local invariant
+     holds for the next local history, then the full extended
+     invariant holds as well (but the local invariant in consideration
+     may automagically change) *)
+  lemma extended_inv_propagation :
+    forall g1 g2 p q inv invf invl hp yt,r:rel 'a 'b.
+      let o1 = g1.progress in let o2 = g2.progress in
+      let op = rprod o1 o2 in
+      let h1 = image fst hp in let x = sup o1 h1 in
+      step_simulate_by g1 r g2 invf invl ->
+        victory_invariant g1 p q inv /\ cropped o1 q inv ->
+        let invp = extended_inv o1 r o2 q inv invf invl in
+        invp hp /\ maximum o1 h1 x /\ upper_bound op hp (x,yt) ->
+        let hl = inter hp (preimage fst ((=) x)) in
+        let hl2 = image snd hl in
+        let s = inter hl2 (r x) in
+        if inhabited s
+        then
+          let y = inf o2 s in
+          let target = inter (lower o1 x) (next_hist inv h1) in
+          let i = crop o2 (related r target) (invf x target) in
+          let hll = inter hl2 (o2 y) in
+          let htll = add hll yt in let t = (x,yt) in let htp = add hp (x,yt) in
+          i htll -> invp htp
+          (* Global stuff. Repeated as is for the second invariant. *)
+          by chain op htp
+          so let ht1 = image fst htp in
+            (ht1 = h1 by sext ht1 h1)
+          so (has_low_sync o1 r o2 htp
+            by forall x0. ht1 x0 /\ not maximum o1 ht1 x0 ->
+              let hl = inter htp (preimage fst ((=) x0)) in
+              let s = inter (image snd hl) (r x0) in
+              minimum o2 s (inf o2 s)
+            by h1 x0 /\ not maximum o1 h1 x0 so x <> x0
+            so sext hl (inter hp (preimage fst ((=) x0))))
+          so let htl = inter htp (preimage fst ((=) x)) in
+            (htl = add hl t by sext htl (add hl t))
+          so let htl2 = image snd htl in
+            (htl2 = add hl2 yt by sext htl2 (add hl2 yt)
+              by forall y. add hl2 yt y -> htl2 y
+              by if y = yt then htl t /\ snd t = yt else
+                exists u. (htl u by hl u) /\ snd u = y)
+          so let ts = inter htl2 (r x) in
+          (* Case-dependent stuff start here. *)
+            subset s ts
+          so inhabited ts
+          so (o2 y yt by hl2 y so exists u. hl u /\ snd u = y
+            so op u (x,yt))
+          so (minimum o2 ts y by forall y0. ts y0 -> s y0 \/ y0 = yt)
+          so y = inf o2 ts
+          so let htll' = inter htl2 (o2 y) in
+            (htll = htll' by sext htll' htll)
+        else let z = inf o2 hl2 in
+          let h1r = remove h1 x in
+          let f = get_mapping o2 r hp in
+          let htl2 = add hl2 yt in
+          let t = (x,yt) in
+          let htp = add hp t in
+          invl h1r f htl2 -> invp htp
+          (* Global stuff. Repeated as is from the first case. *)
+          by chain op htp
+          so let ht1 = image fst htp in
+            (ht1 = h1 by sext ht1 h1)
+          so (has_low_sync o1 r o2 htp
+            by forall x0. ht1 x0 /\ not maximum o1 ht1 x0 ->
+              let hl = inter htp (preimage fst ((=) x0)) in
+              let s = inter (image snd hl) (r x0) in
+              minimum o2 s (inf o2 s)
+            by h1 x0 /\ not maximum o1 h1 x0 so x <> x0
+            so sext hl (inter hp (preimage fst ((=) x0))))
+          so let htl = inter htp (preimage fst ((=) x)) in
+            (htl = add hl t by sext htl (add hl t))
+          so let htl2 = image snd htl in
+            (htl2 = add hl2 yt by sext htl2 (add hl2 yt)
+              by forall y. add hl2 yt y -> htl2 y
+              by if y = yt then htl t /\ snd t = yt else
+                exists u. (htl u by hl u) /\ snd u = y)
+          so let ts = inter htl2 (r x) in
+          (* Case-dependent stuff start here. *)
+          if not inhabited ts
+          then (* relatively similar to first case,
+                  but with a different invariant. *)
+            let y = inf o2 hl2 in
+            (minimum o2 htl2 y by o2 y yt
+              by hl2 y so exists u. hl u /\ snd u = y
+              so op u (x,yt) so let (_,b) = u in o2 b yt)
+            so y = inf o2 htl2
+            so let h1r = remove h1 x in
+              let ft = get_mapping o2 r htp in
+              let f = get_mapping o2 r hp in
+              f = ft by ext f ft by forall u. f u = ft u
+            by let hl_ = inter hp (preimage fst ((=) u)) in
+              let htl_ = inter htp (preimage fst ((=) u)) in
+              let hl2 = image snd hl_ in
+              let htl2 = image snd htl_ in
+              let s = inter hl2 (r u) in
+              let ts = inter htl2 (r u) in
+              inf o2 s = inf o2 ts
+            by if u <> x then sext hl_ htl_ else
+              hl_ = hl /\ htl_ = htl
+            so sext s ts by subset s ts
+          else (* Synchronisation point reached =>
+                  automagical local invariant change.
+                  Direct via the initialization lemma. *)
+            (ts yt by exists y. ts y so y = yt by htl2 y /\ not s y)
+            so r x yt
+            so (forall x0 y. hp (x0,y) /\ r x0 y -> not (x0 = x
+              so s y by let z = (x,y) in hl z /\ snd z = y))
+
+  (* Lengthy proof for the simulation from source game to
+     extended game. Mostly a technical proof due to
+     order/images commutations. Longest part is the chain condition
+     for which the above lemmas does not apply. *)
+  lemma simulation_to_extended_expl :
+    forall g1 g2,r:rel 'a 'b,invf invl p q inv.
+    step_simulate_by g1 r g2 invf invl ->
+      let o1 = g1.progress in let o2 = g2.progress in
+      let gp = extended_game o1 r g2 in
+      let op = gp.progress in
+      let er = extended_rel r in
+      let pr = related er p in let qr = related er q in
+      let invp = extended_inv g1.progress r g2.progress q inv invf invl in
+      victory_invariant g1 p q inv /\ cropped o1 q inv ->
+      victory_invariant gp pr qr invp
+      by op = rprod o1 o2
+      so (* Initialisation case.
+            Direct by initialization lemma (as expected) *)
+        ("stop_split" forall z. pr z -> let hz = (=) z in invp hz
+        by let hp = none in
+          sext (add hp z) hz
+        so sext none (image fst hp)
+        so let (x,y) = z in
+          sext (add (image fst hp) x) ((=) x)
+      ) /\ (* Step case. *)
+      ("stop_split" forall hp z. invp hp /\ not inhabited (inter hp qr) ->
+        maximum op hp z ->
+        (exists a. gp.transition z a /\ not a z /\ subset a (next_hist invp hp))
+        by let h1 = image fst hp in
+          let (xz,yz) = z in
+          maximum o1 h1 xz
+        so xz = sup o1 h1
+        so let hl = inter hp (preimage fst ((=) xz)) in
+          let hl2 = image snd hl in
+          let s = inter hl2 (r xz) in
+          (maximum o2 hl2 yz  by (maximum op hl z by hl z) so snd z = yz)
+          (* Case analysis. *)
+          so if inhabited s
+          then
+            let y = inf o2 s in
+            let tg = inter (lower o1 xz) (next_hist inv h1) in
+            let dtg = related r tg in
+            if dtg yz
+            then (* Case 1: we switch to another synchronised step.
+                    Correspond to a change within the g1's part. *)
+              exists xt. tg xt /\ r xt yz
+              so xt <> xz /\ o1 xz xt /\ inv (add h1 xt)
+              so let t = (xt,yz) in
+                let b = (=) t in
+                gp.transition z b
+              so not b z
+                (* Re-establish invariant, direct
+                   via the initialization lemma. *)
+              so "stop_split" subset b (next_hist invp hp)
+              by forall t. b t -> let htp = add hp t in
+                invp htp
+              by chain op hp
+                 /\ (upper_bound op hp t by op z t /\ transitive op)
+              so has_most_sync o1 r o2 hp xt
+              by not (exists y. hp (xt,y) so fst (xt,y) = xt so h1 xt)
+              /\ forall x0. h1 x0 ->
+                let hl_ = inter hp (preimage fst ((=) x0)) in
+                let s_ = inter (image snd hl_) (r x0) in
+                minimum o2 s_ (inf o2 s_)
+              by if x0 <> xz then has_low_sync o1 r o2 hp
+                else s_ = s so minimum o2 s y
+            else (* Case 2: mimic a step of the local invariant. *)
+              not (q xz so inter hp qr (xz,y) by er xz (xz,y) /\ hp (xz,y)
+                by (exists a. hl a /\ snd a = y so fst a = xz) by hl2 y)
+              so let i = crop o2 dtg (invf xz tg) in
+                let hll = inter hl2 (o2 y) in
+                maximum o2 hll yz
+              so (not inhabited (inter hll dtg)
+                  by subset (inter hll dtg) (maximum o2 hll))
+              so exists a.
+                g2.transition yz a /\ not a yz /\ subset a (next_hist i hll)
+              so let b = set_with_left xz a in
+                gp.transition z b
+              so not b z
+                (* Re-establish invariant, direct via the propagation lemma. *)
+              so "stop_split" subset b (next_hist invp hp)
+              by forall t. b t -> let htp = add hp t in
+                invp htp
+              by let (xt,yt) = t in
+                next_hist i hll yt so xt = xz
+              so upper_bound op hp t by transitive op /\ op z t by o2 yz yt
+          else (* Case 3: mimic a step of a limit synchronisation invariant. *)
+            let y = inf o2 hl2 in
+            let h1r = remove h1 xz in
+            let f = get_mapping o2 r hp in
+            let i = invl h1r f in
+            victory_invariant g2 ((=) y) (r xz) i
+            so exists a.
+              g2.transition yz a /\ not a yz /\ subset a (next_hist i hl2)
+            so let b = set_with_left xz a in
+              gp.transition z b
+            so not b z
+              (* Re-establish invariant, direct via the propagation lemma. *)
+            so "stop_split" subset b (next_hist invp hp)
+            by forall t. b t -> let htp = add hp t in
+              invp htp
+            by let (xt,yt) = t in
+              next_hist i hl2 yt so xt = xz
+            so upper_bound op hp t by transitive op /\ op z t by o2 yz yt
+      ) /\ (* Supremum case *)
+      ("stop_split" forall hp z. invp hp /\ supremum op hp z ->
+        let hpz = add hp z in
+        invp hpz
+        by let (xz,yz) = z in
+          let h1 = image fst hp in
+          let h1z = image fst hpz in
+          (h1z = add h1 xz by sext h1z (add h1 xz) by forall x.
+            add h1 xz x -> image fst hpz x
+            by if h1 x then exists u. (hpz u by hp u) /\ fst u = x
+              else hpz z /\ fst z = x)
+        so supremum o1 h1 xz
+        so maximum o1 h1z xz so xz = sup o1 h1z
+        so inv h1z
+        so (has_low_sync o1 r o2 hpz
+          by forall x. h1z x /\ not maximum o1 h1z x ->
+            let hlz = inter hpz (preimage fst ((=) x)) in
+            let hl = inter hp (preimage fst ((=) x)) in
+            hl = hlz /\ h1 x /\ not maximum o1 h1 x
+            by sext hl hlz
+        )
+        so upper_bound op hp z
+        so (* Case analysis to determine actual behavior *)
+          "case_split" if h1 xz
+          then (* Main case 1: supremum within a local step.
+                  Reduce to propagation lemma in most cases. *)
+            (h1 = h1z by sext h1 h1z)
+            so let hl = inter hp (preimage fst ((=) xz)) in
+              ("stop_split"
+                supremum op hl z by forall u. upper_bound op hl u ->
+                upper_bound op hp u by forall v. hp v -> op v u
+                by exists t. hp t /\ fst t = xz
+                so let (xt,yt) = t in
+                  xt = xz
+                so let (xv,yv) = v in
+                  (hl v by xv = xz by (o1 xt xv by rprod o1 o2 t v)
+                                   /\ (h1 xv by fst v = xv))
+                  \/ (op v t so (op t u by hl t) /\ transitive op)
+              )
+            so let hl2 = image snd hl in
+              supremum o2 hl2 yz
+            so let s = inter hl2 (r xz) in
+              "case_split" if inhabited s
+              then (* subcase 1.1: if xz was already winning+synchronised,
+                      it is fine even though it is not
+                      really a propagation step. *)
+                let y = inf o2 s in
+                if q xz
+                then let hlz = inter hpz (preimage fst ((=) xz)) in
+                    sext (add hl z) hlz
+                  so let hl2z = image snd hlz in
+                    (sext (add hl2 yz) hl2z by forall y. add hl2 yz y ->
+                      hl2z y by if hl2 y
+                        then exists u. (hlz u by hl u) /\ snd u = y
+                        else hlz z /\ snd z = y)
+                  so let sz = inter hl2z (r xz) in
+                    subset s sz /\ subset sz (add s yz)
+                  so minimum o2 sz y so y = inf o2 sz
+                else (* subcase 1.2: propagation step. *)
+                  let tg = inter (lower o1 xz) (next_hist inv h1) in
+                  let dtg = related r tg in
+                  let i = crop o2 dtg (invf xz tg) in
+                  let hll = inter hl2 (o2 y) in
+                    ("stop_split"
+                      supremum o2 hll yz by forall y0. upper_bound o2 hll y0 ->
+                      upper_bound o2 hl2 y0 by forall y1. hl2 y1 -> o2 y1 y0
+                      by (chain o2 hl2 by chain op hl)
+                      so (hll y1 by o2 y y1) \/
+                        (o2 y1 y so transitive o2 /\ o2 y y0 by hll y)
+                    )
+                  so let hllz = add hll yz in
+                    i hllz
+              else (* subcase 1.3: other propagation step. *)
+                let y = inf o2 hl2 in
+                let h1r = remove h1 xz in
+                let f = get_mapping o2 r hp in
+                let htl2 = add hl2 yz in
+                invl h1r f htl2
+                by victory_invariant g2 ((=) y) (r xz) (invl h1r f)
+          else (* Case 2: supremum accross paired steps. *)
+            inv h1z
+            so "case_split" if r xz yz
+            then (* subcase 2.1: synchronized supremum, direct
+                    by initialization. *)
+              has_most_sync o1 r o2 hp xz
+            else (* subcase 2.2: ill-synchronized supremum, must
+                    fully prove valid initialization of the
+                    synchronization invariant. *)
+              let hl = inter hpz (preimage fst ((=) xz)) in
+                (hl = (=) z by sext hl ((=) z))
+              so let hl2 = image snd hl in
+                (hl2 = (=) yz by sext hl2 ((=) yz) by snd z = yz)
+              so let s = inter hl2 (r xz) in
+                not inhabited s
+              so minimum o2 hl2 yz so yz = inf o2 hl2
+              so let h1r = remove h1z xz in
+                (h1 = h1r by sext h1r h1)
+              so (inhabited h1r by exists t. h1 (fst t) by hp t)
+                (* Transfer supremum through the mapping,
+                   since it induce synchronised pairs above any
+                   pair. *)
+              so let f = get_mapping o2 r hpz in
+                supremum o2 (image snd hp) yz
+              so ("stop_split" supremum o2 (image f h1) yz
+                by (forall u. h1 u -> hp (u,f u)
+                  by not maximum o1 h1 u
+                  so let hl = inter hp (preimage fst ((=) u)) in
+                    let s = inter (image snd hl) (r u) in
+                    s (inf o2 s)
+                  so (f u = inf o2 s
+                    by sext hl (inter hpz (preimage fst ((=) u))))
+                  so exists v. (hp v /\ fst v = u by hl v) /\ snd v = f u
+                )
+                so (upper_bound o2 (image f h1) yz
+                  by forall u. image f h1 u -> image snd hp u
+                  by exists v. h1 v /\ u = f v so hp (v,u) /\ snd (v,u) = u
+                ) /\ forall u. upper_bound o2 (image f h1) u ->
+                  o2 yz u by upper_bound o2 (image snd hp) u
+                by forall v. image snd hp v -> o2 v u
+                by exists v0. hp v0 /\ snd v0 = v
+                so let (xv,yv) = v0 in v = yv so (h1 xv by fst v0 = xv)
+                so not maximum o1 h1 xv
+                so exists xw. h1 xw /\ o1 xv xw /\ xv <> xw
+                so image f h1 (f xw)
+                so o2 (f xw) u so (o2 v (f xw) /\ transitive o2)
+                by let w = (xw,f xw) in hp w
+                so op v0 w
+                  || (false by op w v0 so o1 xw xv so antisymetric o1)
+              )
+              so let i = invl h1r f in
+                victory_invariant g2 ((=) yz) (r xz) i
+              so i hl2
+      ) /\ (* Chain case *)
+      ("stop_split" forall chp.
+        subset chp invp /\ chain (subchain op) chp /\ inhabited chp ->
+          let hpl = bigunion chp in
+          invp hpl
+          by let h1 = image fst hpl in
+            (* First check structural conditions. *)
+            chain op hpl
+          so ("stop_split"
+            inhabited hpl by exists hp. chp hp so exists u. hpl u by hp u)
+          so ("stop_split" inv h1 by let ch1 = image (image fst) chp in
+            (inhabited ch1 by exists hp. ch1 (image fst hp) by chp hp)
+            so subset ch1 inv
+            so (chain (subchain o1) ch1
+              by monotone (subchain op) (image fst) (subchain o1)
+              by forall a b. subchain op a b ->
+                subchain o1 (image fst a) (image fst b)
+              by forall u v. image fst a u /\ image fst b v ->
+                not image fst a v -> o1 u v
+              by exists w t. a w /\ fst w = u /\ b t /\ fst t = v
+              so op w t
+            )
+            so sext h1 (bigunion ch1)
+            by (forall x. h1 x -> bigunion ch1 x
+              by exists z. hpl z /\ fst z = x
+              so exists hp. chp hp /\ hp z so image fst hp x)
+            /\ (forall x. bigunion ch1 x -> h1 x
+              by exists h1. ch1 h1 /\ h1 x
+              so exists hp. h1 = image fst hp /\ chp hp
+              so exists u. (hpl u by hp u) /\ fst u = x
+            )
+          )
+          so ("stop_split"
+            forall hp x. chp hp /\ image fst hp x /\
+              not maximum o1 (image fst hp) x ->
+            let l = inter hp (preimage fst ((=) x)) in
+            let r = inter hpl (preimage fst ((=) x)) in
+            l = r by sext l r by subchain op hp hpl
+            so exists y. image fst hp y /\ not o1 y x
+            so exists py. hp py /\ fst py = y
+            so forall u. r u -> l u by fst u = x so hp u by op u py
+          )
+          so ("stop_split" has_low_sync o1 r o2 hpl
+            by forall x. h1 x /\ not maximum o1 h1 x ->
+              let hl = inter hpl (preimage fst ((=) x)) in
+              let s = inter (image snd hl) (r x) in
+              minimum o2 s (inf o2 s)
+            by exists y. h1 y /\ not o1 y x
+            so exists px. hpl px /\ fst px = x
+            so exists py. hpl py /\ fst py = y
+            so op px py || (false by op py px)
+            so exists hp. chp hp /\ hp py
+            so (hp px by subchain op hp hpl)
+            so let h_1 = image fst hp in
+              h_1 x /\ not maximum o1 h_1 x /\ has_low_sync o1 r o2 hp
+          )
+          (* Now that structural conditions are verified,
+             check local invariants -- if applicable.
+             Nasty technical details to find the relevant chains... *)
+          so let x = sup o1 h1 in
+          (* They are applicable iff maximum o1 h1 x. *)
+          maximum o1 h1 x ->
+          (* Micro-lemma proving that hpl is preserved by chopping
+             a prefix of chp (and that it creates an inhabited chain
+             indeed) *)
+          ("stop_split" forall h0. chp h0 ->
+            let ch1 = inter chp (subchain op h0) in
+            chain (subchain op) ch1 /\ (inhabited ch1 by ch1 h0) /\
+            (hpl = bigunion ch1 by sext hpl (bigunion ch1) by forall z.
+              hpl z -> bigunion ch1 z by exists hp. chp hp /\ hp z
+              so (not ch1 hp -> subchain op hp h0 so h0 z so ch1 h0))
+          )
+          (* Micro-lemmas proving that the functions used to build the
+             relevant local chains are monotonic+continuous. *)
+          so let f1 = fun h -> inter h (preimage fst ((=) x)) in
+          let f2 = image snd in
+          monotone (subchain op) f1 (subchain op)
+          so ("stop_split" forall ch.
+            let a = bigunion (image f1 ch) in let b = bigunion ch in
+            a = f1 b by sext a (f1 b)
+            by forall z. f1 b z -> a z
+            by fst z = x so exists h. ch h /\ h z so f1 h z
+          )
+          so ("stop_split" monotone (subchain op) f2 (subchain o2)
+            by forall h0 h1 u v. subchain op h0 h1 /\
+              f2 h0 u /\ f2 h1 v /\ not f2 h0 v -> o2 u v
+            by exists a b. h0 a /\ snd a = u /\ h1 b /\ snd b = v
+            so let (a1,a2) = a in let (b1,b2) = b in
+              ("stop_split" o1 a1 b1 /\ o2 a2 b2) by rprod o1 o2 a b
+          )
+          so ("stop_split" forall ch.
+            let a = bigunion (image f2 ch) in let b = bigunion ch in
+            a = f2 b by sext a (f2 b) by (forall z. a z -> f2 b z
+              by exists h. f2 h z /\ ch h
+              so exists u. h u /\ snd u = z
+              so b u
+            ) /\ (forall z. f2 b z -> a z
+              by exists u. b u /\ snd u = z
+              so exists h. ch h /\ h u
+              so f2 h z
+            )
+          )
+          (* Case disjunction to find applicable local invariants. *)
+          so let hl = inter hpl (preimage fst ((=) x)) in
+          let hl2 = image snd hl in
+          let s = inter hl2 (r x) in
+          if inhabited s
+          then (* Case where there is a related one: cut after any history
+                  proving the relation to x. *)
+            exists y. s y
+            so exists u. hl u /\ snd u = y so fst u = x
+            so exists hp0. chp hp0 /\ hp0 u
+            so let chp = inter chp (subchain op hp0) in
+              hpl = bigunion chp
+            so let chl = image f1 chp in
+              let chl2 = image f2 chl in
+              (chain (subchain o2) chl2 by chain (subchain op) chl)
+              (* Derive a few informations from invp,
+                 mostly synchronisation with s' minimum and
+                 equality with h1.
+                 Pb: hard to apply for provers, so wrap into a definition.
+                 FIXME: duplication because compute currently remove by/so.
+               *)
+            so
+              let prop = fun hp ->
+                hp u
+                && subchain op hp hpl
+                && let hl1 = image fst hp in
+                  hl1 = h1
+                && let lhl = inter hp (preimage fst ((=) x)) in
+                  let lhl2 = image snd lhl in
+                  let ls = inter lhl2 (r x) in
+                  inhabited ls
+                && let y = inf o2 ls in
+                  minimum o2 ls y
+                && minimum o2 s y
+                && y = inf o2 s
+              in
+            ("stop_split" forall hp. chp hp -> prop hp by
+                (hp u by subchain op hp0 hp)
+                && (subchain op hp hpl by supremum (subchain op) chp hpl)
+                && let hl1 = image fst hp in
+                ("stop_split" hl1 = h1 by sext h1 hl1
+                  by forall a. h1 a -> not (not hl1 a
+                  so exists v. hpl v /\ fst v = a
+                  so rprod o1 o2 u v so let (u1,u2) = u in let (v1,v2) = v in
+                    x = a by ("stop_split" o1 u1 v1 /\ o2 u2 v2) /\ o1 a x
+                ))
+                && let lhl = inter hp (preimage fst ((=) x)) in
+                  let lhl2 = image snd lhl in
+                  let ls = inter lhl2 (r x) in
+                  (inhabited ls by ls y by lhl u)
+                && let y = inf o2 ls in
+                  minimum o2 ls y
+                && ("stop_split" minimum o2 s y
+                  by (subset ls s by subset lhl2 hl2 by forall u. lhl2 u -> hl2 u
+                    by exists v. (hl v by lhl v) /\ snd v = u
+                  ) so forall u. s u -> o2 y u
+                  by if ls u then true else lhl2 y /\ hl2 u /\ not lhl2 u
+                    so exists v w. hl v /\ snd v = u /\ lhl w /\ snd w = y
+                    so not lhl v
+                    so let (xv,yv) = v in let (xw,yw) = w in
+                      hp w /\ hpl v /\ not hp v
+                    so ("stop_split" o1 xw xv /\ o2 yw yv) by rprod o1 o2 w v
+                  )
+                && y = inf o2 s
+            )
+            so let y = inf o2 s in
+              (minimum o2 s y by chp hp0
+               so let lhl = inter hp0 (preimage fst ((=) x)) in
+                 let lhl2 = image snd lhl in
+                 let ls = inter lhl2 (r x) in
+                 let y2 = inf o2 ls in
+                 minimum o2 ls y2
+               so minimum o2 s y2
+              )
+            (* In case we reached the target set, we already
+               proved all required elements. *)
+            so if q x then true else
+            (* Otherwise, we must build the right chain
+               for the local invariant. *)
+              let tg = inter (lower o1 x) (next_hist inv h1) in
+              let dtg = related r tg in
+              let i = crop o2 dtg (invf x tg) in
+              let hll = inter hl2 (o2 y) in
+              i hll
+            by let f3 = inter (o2 y) in
+              let chll = image f3 chl2 in
+            (* Step 1: check that it is structurally the expected chain. *)
+              (inhabited chll by chll (f3 (f2 (f1 hp0)))
+                by chl (f1 hp0))
+            so (chain (subchain o2) chll
+              by monotone (subchain o2) f3 (subchain o2)
+              by forall a b. subchain o2 a b -> subchain o2 (f3 a) (f3 b)
+            )
+            so ("stop_split" hll = bigunion chll by sext hll (bigunion chll)
+              by (bigunion chl2 = hl2 by sext hl (f1 hpl))
+              so (forall z. hll z -> bigunion chll z
+                by exists h2. chl2 h2 /\ h2 z so f3 h2 z /\ chll (f3 h2)
+              ) /\ forall z. bigunion chll z -> hll z
+                by exists h2. chll h2 /\ h2 z
+                so exists h3. chl2 h3 /\ h2 = f3 h3
+                so hl2 z
+            )
+            (* Step 2: establish the invariant on the whole chain,
+               so that local propagation conclude. *)
+            so ("stop_split" subset chll i by forall lhll. chll lhll -> i lhll
+              by exists lhl2. f3 lhl2 = lhll /\ chl2 lhl2
+              so sext lhll (inter lhl2 (o2 y))
+              so exists lhl. f2 lhl = lhl2 /\ chl lhl
+              so exists hp. chp hp /\ f1 hp = lhl
+              so prop hp
+              so sext lhl (inter hp (preimage fst ((=) x)))
+              so h1 = image fst hp /\ invp hp
+              so let ls = inter lhl2 (r x) in
+                inhabited ls /\ y = inf o2 ls
+            )
+          else (* Case where there is no related one:
+                  cut after any history that establish x. *)
+            exists u. hpl u /\ fst u = x
+            so exists hp0. chp hp0 /\ hp0 u
+            so let chp = inter chp (subchain op hp0) in
+              hpl = bigunion chp
+            so let chl = image f1 chp in
+              (* chl2 is already the desired chain. *)
+              let chl2 = image f2 chl in
+              (chain (subchain o2) chl2 by chain (subchain op) chl)
+            so (inhabited chl2 by chl2 (f2 (f1 (hp0))) by chp hp0)
+            so (hl2 = bigunion chl2 by sext (f1 hpl) hl)
+            so let h1r = remove h1 x in
+              let f = get_mapping o2 r hpl in
+              let y = inf o2 hl2 in
+              let i = invl h1r f in
+              (* Derive a few informations from invp,
+                 mostly synchronisation with hl2's minimum and hr,
+                 as well as equality with h1.
+                 Pb: hard to apply for provers, so wrap into a definition.
+                 FIXME: duplication because compute currently remove by/so.
+                 (FIXME?: duplication with a similar case above,
+                  even though the min-set is slightly different)
+               *)
+              let prop = fun hp ->
+                hp u
+                && subchain op hp hpl
+                && let hl1 = image fst hp in
+                  hl1 = h1
+                && let lhl = inter hp (preimage fst ((=) x)) in
+                  let lhl2 = image snd lhl in
+                  let ls = inter lhl2 (r x) in
+                  not inhabited ls
+                && let y = inf o2 lhl2 in
+                  minimum o2 lhl2 y
+                && minimum o2 hl2 y
+                && y = inf o2 hl2
+                && get_mapping o2 r hp = f
+              in
+            ("stop_split" forall hp. chp hp -> prop hp by
+                (hp u by subchain op hp0 hp)
+                && (subchain op hp hpl by supremum (subchain op) chp hpl)
+                && let hl1 = image fst hp in
+                ("stop_split" hl1 = h1 by sext h1 hl1
+                  by forall a. h1 a -> not (not hl1 a
+                  so exists v. hpl v /\ fst v = a
+                  so rprod o1 o2 u v so let (u1,u2) = u in let (v1,v2) = v in
+                    x = a by ("stop_split" o1 u1 v1 /\ o2 u2 v2) /\ o1 a x
+                ))
+                && let lhl = inter hp (preimage fst ((=) x)) in
+                  let lhl2 = image snd lhl in
+                  let ls = inter lhl2 (r x) in
+                  not (inhabited ls so exists y. s y by lhl2 y /\ r x y
+                    so subchain o2 lhl2 hl2)
+                && let y = inf o2 lhl2 in
+                  (minimum o2 lhl2 y by invp hp)
+                && (minimum o2 hl2 y by subchain o2 lhl2 hl2)
+                && y = inf o2 hl2
+                && "stop_split" let lf = get_mapping o2 r hp in
+                  lf = f by ext lf f by forall u. lf u = f u
+                 by let hl_ = inter hp (preimage fst ((=) u)) in
+                   let hll_ = inter hpl (preimage fst ((=) u)) in
+                   let s = inter (image snd hl_) (r u) in
+                   let ls = inter (image snd hll_) (r u) in
+                   inf o2 s = inf o2 ls
+                 by if u <> x
+                   then hl_ = hll_ by if h1 u
+                     then not maximum o1 h1 u
+                     else sext hl_ hll_ by subset hp hpl /\
+                       forall u. not hll_ u
+                   else sext s ls by hll_ = hl so subset s ls
+            )
+            so (minimum o2 hl2 y by prop hp0)
+            so (inhabited h1r /\ supremum o1 h1r x
+              /\ supremum o2 (image f h1r) y by prop hp0 so invp hp0)
+            so (subset chl2 i by forall lhl2. chl2 lhl2 -> i lhl2
+              by exists lhl. f2 lhl = lhl2 /\ chl lhl
+              so exists hp. chp hp /\ f1 hp = lhl
+              so prop hp /\ invp hp)
+            so i hl2
+      )
+
+end
+
+module SimExtendedProof_Reduce
+
+  use game.Game
+  use game_no_strat.WinAlt
+  use game_no_strat.InvExtra
+  use SimDef
+  use SimExtendedDef
+  use SimExtendedWf
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.LimUniq
+  use order.Product
+  use order.ProductChain
+  use order.SubChain
+  use fn.Fun
+  use fn.Image
+  use transfinite.ExtensionDet
+  use transfinite.Transport
+
+  lemma make_reducible_invariant : forall o1 g2 inv p q f,r:rel 'a 'b.
+    let o2 = g2.progress in
+    let gp = extended_game o1 r g2 in
+    let ang = red_ang o1 r o2 inv f in
+    let nang = crop_ang inv ang in
+    let sgp = span_game gp in
+    let rinv = strong_u_acc_s sgp nang p in
+    let op = rprod o1 o2 in
+    order o1 /\ victory_invariant gp p q inv /\ red_ang_choice o1 r f ->
+    (* First, check that the determinisation angel
+       indeed induce a winning cause. *)
+    (winning_cause sgp q inv ang
+     by op = sgp.progress /\
+       forall hp u. inv hp /\ maximum op hp u /\ not inhabited (inter hp q) ->
+       let a = ang hp in
+       let (x,y) = u in
+       let s0 = next_hist inv hp in
+       let a0 = remove s0 u in
+       let p0 = preimage snd ((=) y) in
+       let b0 = inter a0 p0 in
+       u = sup op hp
+       so (sgp.transition u a
+         by lower_bound op a u
+         so related subset (gp.transition u) a
+         by exists a1. gp.transition u a1 /\ not a1 u /\ subset a1 s0
+         so (exists ys. g2.transition y ys /\ a1 = set_with_left x ys
+           so subset a1 a by forall v. a1 v -> a v
+           by let (c,d) = v in
+             red_ang_core o1 r o2 inv f hp x c y d by a0 v so d <> y
+         ) \/ (exists rx. o1 x rx /\ r rx y /\ a1 = (=) (rx,y)
+           so (image fst b0 rx by a0 (rx,y) so b0 (rx,y))
+           so let rx = f x y (image fst b0) in
+             ("stop_split" r rx y /\ image fst b0 rx /\ o1 x rx)
+           so (a0 (rx,y) by exists z. b0 (rx,z) so p0 (rx,z) so z = y)
+           so let a1 = (=) (rx,y) in
+             gp.transition u a1 /\
+             (subset a1 a by red_ang_core o1 r o2 inv f hp x rx y y)
+         )
+       )
+       so (subset a s0 by forall v. a v -> s0 v by let (c,d) = v in
+         red_ang_core o1 r o2 inv f hp x c y d)
+       so not a u
+    ) &&
+    (* So we indeed obtain a sub-invariant from that inductive structure.
+       We now focus on proving reducibility for the newly build
+       invariant. *)
+    victory_invariant gp p q rinv &&
+    subset rinv inv &&
+    let succ = u_acc_step sgp nang in
+    let succ2 = fun u v -> succ u v /\ image snd u (snd v) in
+    tr_succ op succ && tr_succ op succ2 &&
+    (reducible o1 r o2 rinv
+      (* Downward closure: extension branches form ranges,
+         so immediate. *)
+      by ("stop_split"
+        forall h h'. inhabited h /\ subchain op h h' /\ rinv h' ->
+        rinv h by exists u. strong_u_acc sgp nang u h' /\ p u
+          so subchain op ((=) u) h
+            || (false by subchain op h ((=) u))
+      ) so ("stop_split" forall h. rinv h ->
+        (* Deterministic maximum along second-fixed chains:
+           Obtain that property by analyzing a deterministic
+           extension from h. *)
+        let hm = sup (subchain op) (extension op rinv h) in
+        maximum (subchain op) (extension op rinv h) hm
+        by exists u. strong_u_acc sgp nang u h /\ p u
+        (* Extensions are deterministic extensions from h by succ2. *)
+        so (forall h2. extension op rinv h h2 ->
+          exists v. strong_u_acc sgp nang v h2 /\ p v
+          so (v = u by let su = (=) u in let sv = (=) v in
+               subchain op su h2
+               so (sv u by subchain op su sv) \/ (su v by subchain op sv su))
+          so tr_ext_det op succ2 h h2
+          (* Step derived from the invariant steps. *)
+          by ("stop_split" tr_ext op succ2 h h2
+            by tr_ext op succ h h2
+            so transport_criterion op succ h h2
+            so transport_criterion op succ2 h h2
+            by forall h3 z. subchain op h h3 /\ subchain op (add h3 z) h2 /\
+              upper_bound op h3 z /\ not h3 z -> succ2 h3 z
+              by subset (image snd h) (image snd h3)
+              so (subset (image snd h3) (image snd h2) by subset h3 h2)
+              so image snd h2 (snd z) by h2 z
+          (* Determinism. *)
+          ) /\ ("stop_split" det_criterion op succ2 h h2 by forall h3 z t.
+            subchain op h h3 /\ subchain op h3 h2 /\ h2 <> h3 ->
+            succ2 h3 z /\ succ2 h3 t -> z = t
+            by let x = sup op h3 in
+              supremum op h3 x
+            so if h3 x
+              then let (xx,yx) = x in let (xz,yz) = z in let (xt,yt) = t in
+                (red_ang_core o1 r o2 inv f h3 xx xz yx yz
+                  by ang h3 z by nang h3 z)
+                /\ (red_ang_core o1 r o2 inv f h3 xx xt yx yt
+                  by ang h3 t by nang h3 t)
+                so image snd h3 yz /\ image snd h3 yt
+                so (yz = yx by o2 yz yx by exists u. h3 u /\ snd u = yz
+                            so op u x)
+                /\ (yt = yx by o2 yt yx by exists u. h3 u /\ snd u = yt
+                            so op u x)
+              else z = x = t
+          )
+          (* Derive the maximum as the chain-supremum along
+             the deterministic extension. *)
+        ) so let hm2 = bigunion (tr_ext_det op succ2 h) in
+            maximum (subchain op) (tr_ext_det op succ2 h) hm2
+          so maximum (subchain op) (extension op rinv h) hm2
+          by (rinv hm2 by tr_ext op succ h hm2
+            by transport_criterion op succ h hm2
+            by transport_criterion op succ2 h hm2
+          )
+          (* Check that along the extension, image snd _ is constant.
+             Mostly immediate by induction. *)
+          so "stop_split" extension op rinv h hm2
+          by (forall a b c h2. a = op /\ b = succ2 /\ c = h ->
+            ("induction" tr_ext_det a b c h2) -> image snd h2 = image snd h)
+          by (forall ch. chain (subchain op) ch /\ inhabited ch ->
+            subset ch (tr_ext_det op succ2 h) ->
+            (forall h2. ch h2 -> image snd h2 = image snd h) ->
+            image snd (bigunion ch) = image snd h
+            by sext (image snd (bigunion ch)) (image snd h)
+            by (forall x. image snd (bigunion ch) x -> image snd h x
+              by exists u. bigunion ch u /\ x = snd u
+              so exists h. ch h /\ h u)
+            /\ (forall x. image snd h x -> image snd (bigunion ch) x
+              by exists h0. ch h0
+              so exists u. h0 u /\ snd u = x so bigunion ch u
+            )
+          )
+        (* Final reducibility condition: using the inductive structure
+           of the invariant and the special nature of transitions,
+           show that limits on the first component reduce to limits
+           over a paired chain. *)
+      ) so "stop_split"
+        (* Inductive invariant is a bit convoluted due to possible
+           relational miss. We enforce transport of upper bound from
+           the paired chain to the regular one, which may not be enforced
+           originally. But that's not important as in that case, it is not
+           a true supremum. *)
+        let sing = fun h -> forall y z. h y /\ h z -> y = z in
+        let prop = fun h -> forall x.
+          upper_bound o1 (image fst (get_paired r h)) x ->
+          not sing (image fst h) ->
+          upper_bound o1 (image fst h) x
+        in
+        (* Recover the desired lemma from inductive invariant. *)
+        ("stop_split"
+          forall h. let h1 = image fst h in let hr = get_paired r h in
+            let hr1 = image fst hr in
+            rinv h /\ not maximum o1 h1 (sup o1 h1) ->
+            upper_bound o1 h1 = upper_bound o1 hr1
+            by sext (upper_bound o1 h1) (upper_bound o1 hr1)
+            by (subset hr1 h1 by forall u. hr u -> h u
+              by let (x,y) = u in r x y)
+            so (forall u. upper_bound o1 hr1 u ->
+              upper_bound o1 h1 u by prop h
+              so not (sing h1 so exists v. tr_ext op succ ((=) v) h
+              so subchain op ((=) v) h so h v
+              so h1 (fst v) so maximum o1 h1 (fst v)
+            ))
+        ) (* Establish the inductive invariant (obviously, by induction) *)
+        by (forall u a b c h. p u /\ a = op /\ b = succ /\ c = (=) u ->
+          ("induction" tr_ext a b c h) -> prop h)
+        by ("stop_split" forall h v. rinv h /\ succ h v /\ prop h ->
+          let hv = add h v in prop hv
+          by let hr = get_paired r h in let hvr = get_paired r hv in
+            let h1 = image fst h in let hv1 = image fst hv in
+            let hr1 = image fst hr in let hvr1 = image fst hvr in
+            let u = sup op h in let (x,y) = u in let (z,t) = v in
+            supremum op h u
+          so supremum o1 h1 x
+          so (hv1 = add h1 z by sext hv1 (add h1 z)
+            by forall w. add h1 z w -> hv1 w
+            by if w = z then hv v /\ fst v = z
+              else exists u. (hv u by h u) /\ fst u = w)
+          so forall xu. upper_bound o1 hvr1 xu /\ not sing hv1 ->
+            upper_bound o1 hv1 xu
+          by (upper_bound o1 hr1 xu by forall w. hr w -> hvr w
+            by let (_,_) = w in hv w)
+          so if h u
+            then ang h v
+              so red_ang_core o1 r o2 inv f h x z y t
+              so if x = z
+                then sext hv1 h1 by h1 z
+                else y = t /\ r z y so (hvr1 z by hvr (z,t))
+                  so o1 z xu
+                  so maximum o1 hv1 z
+            else x = z
+              so not (sing h1 so exists v. tr_ext op succ ((=) v) h
+                so subchain op ((=) v) h so h v
+                so h1 (fst v) so maximum o1 h1 (fst v) so sext hv1 h1
+              ) so upper_bound o1 h1 xu
+              so o1 x xu
+        ) /\ ("stop_split"
+          forall ch. chain (subchain op) ch /\ inhabited ch /\
+          subset ch prop ->
+          let hl = bigunion ch in prop hl
+          by let hlr = get_paired r hl in
+            let h1 = image fst hl in let hr1 = image fst hlr in
+            forall x. upper_bound o1 hr1 x /\ not sing h1 ->
+            forall x0. h1 x0 -> o1 x0 x
+            by exists u0. hl u0 /\ fst u0 = x0
+            so exists x1. h1 x1 /\ x1 <> x0
+            so exists u1. hl u1 /\ fst u1 = x1
+            so (exists h. ch h /\ h u0 /\ h u1
+              so image fst h x0 /\ image fst h x1
+              so (forall u. get_paired r h u -> get_paired r hl u
+                by let (_,_) = u in hl u)
+              so upper_bound o1 (image fst (get_paired r h)) x
+              so not sing (image fst h)
+              so upper_bound o1 (image fst h) x
+            ) by (exists h0. ch h0 /\ h0 u0
+              so exists h1. ch h1 /\ h1 u1
+              so (h1 u0 by subchain op h0 h1)
+              \/ (h0 u1 by subchain op h1 h0)
+            )
+        )
+    )
+
+
+end
+
+module SimExtendedProof_Forget
+
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use ho_rel.Prod
+  use order.SubChain
+  use order.Product
+  use SimExtendedWf
+  use SimExtendedDef
+
+  (* Utility lemma to transfer minima to sub-chains... *)
+  lemma minimum_downward : forall o:erel 'a,h1 h2 x.
+    order o ->
+    minimum o h2 x /\ subchain o h1 h2 /\ inhabited h1 ->
+    minimum o h1 x
+
+  (* Prelude lemma:
+     If we have an history that validate any version
+     of forget-core, all its prefix validate the 'false' version
+     of forget-core with their snd projection. *)
+  lemma forget_core_downward :
+    forall o1:erel 'a,o2:erel 'b,tog r inv f_p h h1 h2.
+    order o1 /\ order o2 ->
+    let op = rprod o1 o2 in
+    reducible o1 r o2 inv -> forget_core o1 o2 inv tog f_p h h2 ->
+    inhabited h1 /\ subchain op h1 h2 ->
+    forget_core o1 o2 inv false f_p (image snd h1) h1
+    by inv h1 /\ h = image snd h2
+    so let h0 = image snd h1 in
+      let mh = inf o2 h in
+      (inhabited h0 by exists u. h0 (snd u) by h1 u)
+    so (subchain o2 h0 h by forall a b. h0 a /\ h b /\ not h0 b ->
+      o2 a b by exists u. h1 u /\ snd u = a so exists v. h2 v /\ snd v = b
+      so op u v)
+    so minimum o2 h0 mh
+    so mh = inf o2 h0
+    so minimum op h1 (f_p mh)
+    so (forall h_1 x.
+      inhabited h_1 /\ subchain op (add h_1 x) h1 ->
+      upper_bound op h_1 x /\ not image snd h_1 (snd x) ->
+      let s = sup op h_1 in supremum op h_1 s /\ fst x = fst s
+      by subchain op (add h_1 x) h2
+    )
+    so ("stop_split" forall h_0. subchain o2 h_0 h0 ->
+      maximum o2 h_0 (sup o2 h_0) ->
+      let h_1 = inf (subchain op) (sub_proj_as op h_0 h1) in
+      let xt = extension op inv h_1 in
+      let s = sup (subchain op) xt in
+      minimum (subchain op) (sub_proj_as op h_0 h1) h_1 /\
+      (h0 <> h_0 -> subchain op s h1)
+      by subchain o2 h_0 h
+      so let h_2 = inf (subchain op) (sub_proj_as op h_0 h2) in
+        minimum (subchain op) (sub_proj_as op h_0 h2) h_2
+      so ("stop_split" h0 <> h_0 ->
+        forall h4. sub_proj_as op h_0 h2 h4 ->
+          if subchain op h4 h1 then true else false
+          by subchain op h4 h2
+          so subchain op h1 h4
+          so not (subset h0 h_0 so sext h0 h_0)
+          so exists u. h0 u /\ not h_0 u
+          so exists v. (h4 v by h1 v) /\ snd v = u
+          so image snd h4 u
+      )
+      so (minimum (subchain op) (sub_proj_as op h_0 h1) h_2
+        by (forall u. sub_proj_as op h_0 h1 u ->
+          subchain op h_2 u by sub_proj_as op h_0 h2 u)
+        so sub_proj_as op h_0 h1 h_2
+      )
+      so h_2 = h_1
+      so (maximum (subchain op) xt s by inv h_1
+        by subchain op h_1 h1 so inhabited h_1
+        by image snd h_1 = h_0 /\ h_0 (sup o2 h_0)
+      )
+      so h0 <> h_0 -> sub_proj_as op h_0 h2 s
+    )
+
+  (* Prelude lemma: variation that establish the 'true' version
+     of forget-core for the prefix. This way, (unique) witnesses
+     for the prefix can be re-established. *)
+  lemma forget_core_downward_2 :
+    forall o1:erel 'a,o2:erel 'b,tog r inv f_p h1 h2 hp2.
+    order o1 /\ order o2 ->
+    let op = rprod o1 o2 in
+    let hp1 = inter hp2 (preimage snd h1) in
+    reducible o1 r o2 inv /\ forget_core o1 o2 inv tog f_p h2 hp2 ->
+    inhabited h1 /\ subchain o2 h1 h2 /\ (tog \/ h1 <> h2) ->
+    subchain op hp1 hp2 /\ forget_core o1 o2 inv true f_p h1 hp1
+    by (subchain op hp1 hp2
+      by forall a b. hp1 a /\ hp2 b /\ not hp1 b ->
+        op a b || (false by op b a
+          so let (_,a) = a in let (_,c) = b in
+            h1 a /\ (h2 c by c = snd b) /\ not h1 c
+          so a = c by o2 a c /\ o2 c a)
+    ) so (h1 = image snd hp1 by sext (image snd hp1) h1
+        by forall x. h1 x -> image snd hp1 x
+        by h2 x so exists y. hp2 y /\ x = snd y so hp1 y)
+      so (inhabited hp1 by exists x. image snd hp1 x by h1 x)
+      so forget_core o1 o2 inv false f_p h1 hp1
+      so (forget_core o1 o2 inv true f_p h1 hp1
+        by let st = sub_proj_as op h1 hp1 in
+          let h_1 = inf (subchain op) st in
+          let xt = extension op inv h_1 in
+          let s = sup (subchain op) xt in
+          maximum o2 h1 (sup o2 h1) -> subchain op s hp1
+        by minimum (subchain op) st h_1
+        so transitive (subchain op)
+        so (subchain op h_1 hp1 by st hp1)
+        so let st2 = sub_proj_as op h1 hp2 in
+          (minimum (subchain op) st2 h_1
+           by transitive (subchain op)
+           so (st2 h_1 by st h_1)
+           so forall h0. st2 h0 -> if subchain op h_1 h0 then true else false
+           by subchain op h0 h_1 so subchain op h0 hp1 so st h0
+          )
+        so h_1 = inf (subchain op) st2
+        so subchain op s hp2 so subchain op s hp1
+        by forall u. s u -> hp1 u
+        by (xt s by maximum (subchain op) xt s by inv h_1
+          by inhabited h_1 by exists x. image snd h_1 x by h1 x
+        )
+        so h1 (snd u) by h1 = image snd s)
+
+  (* Critical lemma: move from one victory invariant to the other.
+     This lemma notably take care of all instances of maximal extensions
+     of a paired history. *)
+  lemma inv_implication : forall o1:erel 'a,o2:erel 'b,r inv f_p h.
+    order o1 /\ order o2 ->
+    reducible o1 r o2 inv -> forget_inv_a o1 o2 inv f_p h ->
+    forget_inv_b o1 o2 inv f_p h
+    by let coref = forget_core o1 o2 inv false f_p h in
+      let coret = forget_core o1 o2 inv true f_p h in
+      let op = rprod o1 o2 in
+      let hp = inf (subchain op) coref in
+      let mxh = sup o2 h in let mh = inf o2 h in
+      minimum (subchain op) coref hp
+    so (* Case when h has a max ('playable' history).
+          Perform an effective maximal extension. *)
+      if maximum o2 h mxh
+      then let xt = extension op inv hp in
+        let hpe = sup (subchain op) xt in
+        maximum (subchain op) xt hpe
+        so (forget_core o1 o2 inv true f_p h hpe
+          by image snd hpe = h
+          so (subchain op hp hpe by xt hp)
+          (* First two conditions are directly transferred. *)
+          so (minimum op hpe (f_p mh) by minimum op hp (f_p mh))
+          so ("stop_split"
+            forall h1 x. inhabited h1 /\ subchain op (add h1 x) hpe /\
+            upper_bound op h1 x /\ not image snd h1 (snd x) ->
+            let s = sup op h1 in supremum op h1 s /\ fst x = fst s
+            by subchain op (add h1 x) hp
+              || (false by subchain op hp (add h1 x)
+                so subchain op h1 hpe
+                so subchain op hp h1
+                so subset (image snd hp) (image snd h1)
+                so hpe x so image snd hpe (snd x))
+          )
+          (* Third condition: directly transferred for h0 <> h,
+             new instance otherwise. *)
+          so "stop_split"
+          forall h0. subchain o2 h0 h /\ maximum o2 h0 (sup o2 h0) ->
+            let h1 = inf (subchain op) (sub_proj_as op h0 hpe) in
+            let xt2 = extension op inv h1 in
+            let s = sup (subchain op) xt2 in
+            minimum (subchain op) (sub_proj_as op h0 hpe) h1
+            /\ subchain op s hpe
+          by if h <> h0
+            then
+              let h1' = inf (subchain op) (sub_proj_as op h0 hp) in
+                minimum (subchain op) (sub_proj_as op h0 hp) h1'
+              so (minimum (subchain op) (sub_proj_as op h0 hpe) h1'
+                by transitive (subchain op)
+                so sub_proj_as op h0 hp h1'
+                so sub_proj_as op h0 hpe h1'
+                so forall h3. sub_proj_as op h0 hpe h3 -> subchain op h1' h3
+                || (false by subchain op h3 h1' so sub_proj_as op h0 hp h3)
+              )
+              so h1 = h1'
+              so subchain op s hp
+            else
+              (* For h = h0: note that the minimum should be hp.
+                 Any counter-example would satisfy coref, which is impossible
+                 since h is the minimal witness. *)
+              ("stop_split" minimum (subchain op) (sub_proj_as op h hpe) hp
+                by forall h3. sub_proj_as op h hpe h3 ->
+                  if subchain op hp h3 then true else false
+                  by subchain op h3 hp
+                  so forget_core o1 o2 inv false f_p h h3
+                  by image snd h3 = h so inhabited h3
+              )
+              so h1 = hp
+              so s = hpe
+        )
+        (* Unicity in case of extension: note that any two witnesses
+           fall subject to their respective extension conditions,
+           hence are equal by subchain antisymmetry. *)
+        so "stop_split" (forall hp'. coret hp' -> hp' = hpe
+          by subchain op hp' hpe /\ subchain op hpe hp'
+        )
+        by (forall hp0. coret hp0 ->
+          let h0 = inf (subchain op) (sub_proj_as op h hp0) in
+          hp = h0
+          by minimum (subchain op) (sub_proj_as op h hp0) h0
+          so (inhabited h0 by image snd h0 mxh)
+          so forget_core o1 o2 inv false f_p h hp0
+          so (forget_core o1 o2 inv false f_p h h0 by subchain op h0 hp0)
+          so subchain op hp h0
+          so sub_proj_as op h hp0 hp
+        )
+        so (forall hp1 hp2. coret hp1 /\ coret hp2 -> subchain op hp1 hp2
+          by let h1 = inf (subchain op) (sub_proj_as op h hp1) in
+            let h2 = inf (subchain op) (sub_proj_as op h hp2) in
+          h1 = hp = h2
+          so let xt = extension op inv h1 in
+            let s = sup (subchain op) xt in
+            subchain op s hp2
+          so (maximum (subchain op) xt s by inv h1 by inv hp1
+            so inhabited h1 by image snd h1 mxh
+          )
+          so subchain op hp1 s by xt hp1
+            by minimum (subchain op) (sub_proj_as op h hp1) h1
+        )
+      else (* Case h limit: coret = coref, so we conclude
+              by minimum unicity. *)
+        (forget_core o1 o2 inv true f_p h hp by forall h0.
+          subchain o2 h0 h /\ maximum o2 h0 (sup o2 h0) -> h0 <> h)
+        so forall hp'. coret hp' -> hp' = hp
+        by sext hp' hp
+        by (subchain op hp hp'
+          by forget_core o1 o2 inv false f_p h hp')
+        so "stop_split" not (exists x y. hp' (x,y) /\ not hp (x,y)
+          so (h y by image snd hp' = h /\ snd (x,y) = y)
+          so not maximum o2 h y
+          so exists t. h t /\ not o2 t y
+          so image snd hp = h
+          so exists u. hp u /\ snd u = t
+          so let (z,_) = u in op (z,t) (x,y)
+        )
+
+  (* Other important lemma: infer ordering between
+     different forget_core witness.
+     If we have a unique true-witness for a 'small' history,
+     any witness for a strictly larger history will be bigger.
+     This is essential to recover ordering between witness from
+     a projected history.
+     Proof: a small witness can be reconstructed as a prefix from the
+     larger history (using the second downward lemma),
+     which by unicity is the desired one. *)
+  lemma core_monotonicity :
+    forall o1:erel 'a,o2:erel 'b,r inv f_p h1 hp1 h2 hp2.
+    let op = rprod o1 o2 in
+    order o1 /\ order o2 ->
+    reducible o1 r o2 inv /\ forget_inv_b o1 o2 inv f_p h1 ->
+    forget_core o1 o2 inv true f_p h1 hp1 ->
+    forget_core o1 o2 inv false f_p h2 hp2 ->
+    subchain o2 h1 h2 /\ h1 <> h2 ->
+    subchain op hp1 hp2
+    by if not inhabited hp1 then true else
+      let hp_1 = inter hp2 (preimage snd h1) in
+      subchain op hp_1 hp2 /\ forget_core o1 o2 inv true f_p h1 hp_1
+    so hp1 = hp_1
+
+  (* Another critical lemma: propagate invariant by one real step. *)
+  lemma forget_step : forall o1:erel 'a,o2:erel 'b,r inv f_p h1 hp1 x y z.
+    order o1 /\ order o2 ->
+    let op = rprod o1 o2 in
+    reducible o1 r o2 inv /\ forget_inv_b o1 o2 inv f_p h1 ->
+    forget_core o1 o2 inv true f_p h1 hp1 ->
+    supremum op hp1 (x,y) /\ o2 y z /\ not h1 z ->
+    let h2 = add h1 z in let hp2 = add hp1 (x,z) in
+    inv hp2 -> forget_inv_a o1 o2 inv f_p h2
+    by let core = forget_core o1 o2 inv false f_p h2 in
+      minimum (subchain op) core hp2
+    by order (subchain op)
+    so (subchain o2 h1 h2 by upper_bound o2 h1 z by upper_bound o2 h1 y)
+    so h1 <> h2
+    so (maximum o2 h2 z by forall a. h2 a -> o2 a z
+          by if a = z then o2 a z else o2 a y by upper_bound o2 h1 y)
+    so z = sup o2 h2
+    (* Within core: direct proof. *)
+    so ("stop_split" forget_core o1 o2 inv false f_p h2 hp2
+      by (image snd hp2 = h2 by sext (image snd hp2) h2
+        by (forall t. image snd hp2 t -> h2 t
+          by exists u. hp2 u /\ snd u = t
+          so (h1 t by hp1 u) \/ (t = z by u = (x,z))
+        ) /\ (forall t. h2 t -> image snd hp2 t
+          by if t = z then hp2 (x,z) /\ snd (x,z) = z else
+            h1 t so image snd hp1 t
+            so exists u. (hp2 u by hp1 u) /\ snd u = t
+      ))
+      so let mh = inf o2 h1 in
+        minimum o2 h2 mh
+      so mh = inf o2 h2
+      so (subchain op hp1 hp2 by upper_bound op hp1 (x,z)
+        by upper_bound op hp1 (x,y) /\ op (x,y) (x,z))
+      so (maximum op hp2 (x,z) by upper_bound op hp2 (x,z)
+        by upper_bound op hp1 (x,y) /\ op (x,y) (x,z))
+      so minimum op hp2 (f_p mh)
+      so ("stop_split"
+        forall h_1 t. inhabited h_1 /\ subchain op (add h_1 t) hp2 /\
+        upper_bound op h_1 t /\ not image snd h_1 (snd t) ->
+        let s = sup op h_1 in supremum op h_1 s /\ fst t = fst s
+        by if subchain op (add h_1 t) hp1 then true else
+          subchain op hp1 (add h_1 t)
+        so (h2 (snd t) by hp2 t)
+        so not (h1 (snd t) so image snd hp1 (snd t)
+          so exists u. hp1 u /\ snd u = snd t
+          so add h_1 t u so t = u || (false by h_1 u)
+          so forall v. add h_1 t v -> not (not hp1 v
+            so op t v so t = v || (false by op v t by h_1 v))
+        )
+        so not h_1 t
+        so sext h_1 hp1
+        so t = (x,z)
+      )
+      so ("stop_split"
+        forall h0. subchain o2 h0 h2 /\ maximum o2 h0 (sup o2 h0) ->
+        let st = sub_proj_as op h0 hp1 in
+        let st2 = sub_proj_as op h0 hp2 in
+        let h_1 = inf (subchain op) st in
+        let xt = extension op inv h_1 in
+        let s = sup (subchain op) xt in
+        h0 <> h2 ->
+        (if subchain o2 h0 h1 then true else false
+          by subchain o2 h1 h0 so sext h0 h2
+        ) && (minimum (subchain op) st2 h_1
+          by minimum (subchain op) st h_1
+          so st h_1
+          so st2 h_1
+          so forall u. st2 u -> if subchain op h_1 u then true else false
+          by subchain op u h_1 so subchain op u hp1 so st u
+        ) && h_1 = inf (subchain op) st2
+        && (subchain op s hp2 by subchain op s hp1)
+      ) so let st = sub_proj_as op h2 hp2 in
+        (minimum (subchain op) st hp2 by st hp2 /\
+        forall hp. st hp -> subchain op hp2 hp
+        by sext hp hp2
+        by subchain op hp hp2
+        so image snd hp = h2 /\ h2 z
+        so exists t. hp t /\ snd t = z
+        so t = (x,z)
+        so forall t. hp2 t ->
+          not (not hp t so op (x,z) t /\ op t (x,z))
+      )
+      so hp2 = inf (subchain op) st
+    )
+    (* Minimality: From the minimum existence condition of hp3,
+       downward lemma and unicity,
+       derive the decomposition hp1+{(a,z)} prefix hp3.
+       From step condition of hp3, we then get a = x, hence
+       the wanted inequality.
+     *)
+    so ("stop_split" forall hp3. core hp3 -> subchain op hp2 hp3
+      by let st = sub_proj_as op h2 hp3 in
+        let h_1 = inf (subchain op) st in
+        minimum (subchain op) st h_1
+      so subchain op h_1 hp3
+      so (chain op h_1 by forall a b. h_1 a /\ h_1 b -> op a b \/ op b a
+        by hp3 a /\ hp3 b /\ chain op hp3)
+        (* Show that h_1 as a unique element with snd projection z
+            (and hence that it must be its maximum). *)
+      so ("stop_split"
+        forall a b. h_1 a /\ h_1 b /\ snd a = z = snd b /\ op a b -> a = b
+        by let h__1 = fun u -> h_1 u /\ op u a in
+        (subchain op h__1 h_1 by forall c d. h__1 c /\ h_1 d /\ not h__1 d ->
+          op c d || (false by op d c so op c a so op d a by transitive op))
+        so (image snd h__1 = h2 by sext (image snd h__1) h2
+          by (forall x. image snd h__1 x -> h2 x by image snd h_1 x)
+          /\ (forall x. h2 x -> image snd h__1 x
+            by if x = z then (image snd h__1 z by h__1 a)
+            else image snd h_1 x so exists u. h__1 u /\ snd u = x
+              by h_1 u /\ snd u = x
+              so not (op a u so o2 z x so o2 x z)
+          )
+        )
+        so st h__1
+        so subchain op h_1 h__1
+      )
+      so (forall a b. h_1 a /\ h_1 b /\ snd a = z = snd b -> a = b
+        by op a b \/ op b a)
+      so image snd h_1 z
+      so exists a. h_1 a /\ snd a = z
+      so (maximum op h_1 a by forall x. h_1 x -> if op x a then true else false
+        by op a x so o2 z (snd x) so o2 (snd x) z by h2 (snd x)
+        so x = a
+      )
+      (* Show that removing a must yield hp1, and that it is a
+        prefix of hp3. *)
+      so let hp_1 = remove h_1 a in
+        subchain op hp_1 h_1
+      so subchain op hp_1 hp3
+      so ("stop_split" hp_1 = hp1
+        by let hp__1 = inter hp3 (preimage snd h1) in
+          inhabited h1
+        so subchain op hp__1 hp3 /\ forget_core o1 o2 inv true f_p h1 hp__1
+        so hp__1 = hp1
+        so sext hp__1 hp_1
+        by (forall x. hp_1 x -> hp__1 x
+           by h_1 x so hp3 x so (h2 (snd x) by image snd hp3 = h2)
+           so snd x <> z
+         ) /\ forall x. hp__1 x -> not (not hp_1 x
+           so hp3 x so not h_1 x so op a x so o2 z (snd x)
+           so o2 (snd x) z by h2 (snd x) by h1 (snd x)
+         )
+      )
+      (* Deduce that the step condition of hp3 apply,
+         so that hp2 is actually h_1, wihtin hp3. *)
+      so (h_1 = add hp1 a by sext h_1 (add hp1 a))
+      so fst a = x
+      by not image snd hp1 z
+      so upper_bound op hp1 a
+      so inhabited hp1
+      so let s = sup op hp1 in supremum op hp1 s /\ fst a = fst s
+      so s = (x,y)
+    )
+
+  use SimDef
+  use choice.Choice
+  use order.ProductChain
+
+  (* Limit pairing: we can reconstruct paired supremum
+     from supremum on second history alone. *)
+  lemma derive_supremum : forall o1:erel 'a,o2:erel 'b,r inv hp y.
+    let op = rprod o1 o2 in
+    let h2 = image snd hp in
+    order o1 /\ order o2 /\ pairing_pull_limits o1 r o2 /\ inhabited hp ->
+    reducible o1 r o2 inv /\ inv hp /\ supremum o2 h2 y ->
+    let a = sup op hp in supremum op hp a
+    (* Since we already have the second component, we only need to show
+       that the first one exists. *)
+    by let h1 = image fst hp in
+      let x = sup o1 h1 in
+      (supremum op hp (x,y) so a = (x,y))
+    by supremum o1 h1 x
+    (* Discard the trivial case where h1 admit a maximum. *)
+    by if maximum o1 h1 x then true else
+    (* Reduce the supremum analysis to a subset of hp,
+       decomposed as source chain + monotonic mapping. *)
+    let hr = get_paired r hp in
+    let hr1 = image fst hr in
+    let f = fun x -> choice (fun y -> hr (x,y)) in
+    let hrf = image f hr1 in
+    upper_bound o1 h1 = upper_bound o1 hr1
+    so (forall x. hr1 x -> hr (x,f x))
+    so (chain o1 hr1 by chain op hr)
+    so (monotone_on hr1 o1 f o2 by forall x y. hr1 x /\ hr1 y /\ o1 x y ->
+      o2 (f x) (f y) by op (x,f x) (y,f y) || (false by op (y,f y) (x,f x)))
+    so rel_mapping hr1 f r
+    (* Inhabitation of [hr1]: tricky part. If it is not inhabited,
+       then any inhabitant of [h1] is the minimum of [o1].
+       Since h1 is inhabited, [h1] is a singleton, and has a max,
+       a situation we already treated. *)
+    so ("stop_split" if inhabited hr1 then true else false
+      by let ia = inf o1 all in
+        (forall x. h1 x -> x = ia
+          by minimum o1 all x by forall u. o1 x u
+          by upper_bound o1 hr1 u)
+      so exists a. (h1 (fst a) by hp a)
+      so sext h1 ((=) ia)
+      so maximum o1 h1 ia
+    ) so ("stop_split" supremum o2 hrf y
+      by (forall v. hrf v -> h2 v by exists u. hr1 u /\ f u = v so hr (u,v))
+      so upper_bound o2 hrf y
+      so forall u. upper_bound o2 hrf u -> o2 y u
+      by upper_bound o2 h2 u by forall z. h2 z -> o2 z u
+      by exists a. hp a /\ snd a = z
+      so h1 (fst a)
+      so not (upper_bound o1 hr1 (fst a) so maximum o1 h1 (fst a))
+      so exists t. hr1 t /\ not o1 t (fst a)
+      so let b = (t,f t) in hr b
+      so (op a b || (false by op b a) by chain op hp /\ hp b)
+      so o2 z (snd b) /\ o2 (snd b) u
+    )
+    so let s = sup o1 hr1 in (supremum o1 h1 s so s = x)
+    by supremum o1 hr1 s
+
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use game.Game
+  use game_no_strat.StratLessDef
+
+  lemma sim_forget : forall o1:erel 'a,g2:game 'b,r p q inv f_p.
+    let gp = extended_game o1 r g2 in
+    let o2 = g2.progress in
+    let op = rprod o1 o2 in
+    order o1 /\ pairing_pull_limits o1 r o2 /\ antec_choice p f_p ->
+    victory_invariant gp p q inv /\ reducible o1 r o2 inv ->
+    let coref = forget_core o1 o2 inv false f_p in
+    let coret = forget_core o1 o2 inv true f_p in
+    let inv_a = forget_inv_a o1 o2 inv f_p in
+    let inv_b = forget_inv_b o1 o2 inv f_p in
+    let p2 = image snd p in let q2 = image snd q in
+    victory_invariant g2 p2 q2 inv_a /\ victory_invariant g2 p2 q2 inv_b
+    (* Base case: prove inv_a directly, inv_b fall. *)
+    by ("stop_split" forall y. p2 y ->
+      let ey = (=) y in
+      (inv_a ey by let u = f_p y in p u /\ snd u = y
+       so let eu = (=) u in
+         (forget_core o1 o2 inv false f_p ey eu
+         by minimum o2 ey y so y = inf o2 ey
+         so sext (image snd eu) ey
+         so (forall h1 x. inhabited h1 /\ subchain op (add h1 x) eu /\
+           not image snd h1 (snd x) -> false
+           by exists y. h1 y so eu y /\ eu x
+         )
+         so (forall h0. subchain o2 h0 ey /\ maximum o2 h0 (sup o2 h0) ->
+           let st = sub_proj_as op h0 eu in
+           let h1 = inf (subchain op) st in
+           h0 = ey && (minimum (subchain op) st eu
+             by (st eu by reflexive (subchain op))
+             /\ forall h. st h -> subchain op eu h
+             by subchain op h eu /\ inhabited h
+             by image snd h y
+           ) && h1 = eu
+         )
+       ) so minimum (subchain op) (coref ey) eu
+       by (forall hp. forget_core o1 o2 inv false f_p ey hp ->
+         subchain op eu hp)
+      ) && inv_b ey
+    ) (* Chain case: thanks to the implication,
+         reduce to a true limit chain of inv_b,
+         and prove the result satisfy inv_a. Then both propagations
+         follows. *)
+    /\ ("stop_split" forall ch. chain (subchain o2) ch /\ inhabited ch ->
+      let hl = bigunion ch in
+      (subset ch inv_b -> if ch hl then inv_b hl else
+        ("stop_split" inv_a hl
+         (* Create the chain of unique coret witnesses,
+            and apply limit propagation for inv. *)
+         by let chp = related coret ch in
+         (* Show that it is a chain using the monotonicity lemma. *)
+         ("stop_split"
+           chain (subchain op) chp by forall hp1 hp2. chp hp1 /\ chp hp2 ->
+           subchain op hp1 hp2 \/ subchain op hp2 hp1
+           by exists h1. ch h1 /\ coret h1 hp1
+           so exists h2. ch h2 /\ coret h2 hp2
+           so inv_b h1 /\ forget_core o1 o2 inv false f_p h1 hp1
+           so inv_b h2 /\ forget_core o1 o2 inv false f_p h2 hp2
+           so if h1 = h2 then hp1 = hp2 else
+             (subchain op hp1 hp2 by subchain o2 h1 h2)
+           \/ (subchain op hp2 hp1 by subchain o2 h2 h1)
+         )
+         so (inhabited chp
+           by exists h. ch h so exists hp. chp hp by coret h hp)
+         so subset chp inv
+         so supremum (subchain o2) ch hl so upper_bound (subchain o2) ch hl
+         so let hlp = bigunion chp in
+           supremum (subchain op) chp hlp so upper_bound (subchain op) chp hlp
+           (* Show that it is indeed within (coref hl) by
+               unrolling definitions, then prove minimality
+               using monotonicity lemma. *)
+         so ("stop_split" forget_core o1 o2 inv false f_p hl hlp
+             by inv hlp
+             so ("stop_split" sext (image snd hlp) hl
+               by (forall x. image snd hlp x -> hl x
+                 by exists y. hlp y /\ snd y = x
+                 so exists hp. chp hp /\ hp y
+                 so exists h. ch h /\ coret h hp
+                 so h x
+               ) /\ (forall x. hl x -> image snd hlp x
+                 by exists h. ch h /\ h x
+                 so exists hp. coret h hp so chp hp
+                 so exists y. hp y /\ snd y = x
+                 so hlp y
+               ))
+             so exists h. ch h so subchain o2 h hl
+             so exists hp. coret h hp so chp hp
+             so let mh = inf o2 h in
+               minimum o2 h mh so minimum o2 hl mh so mh = inf o2 hl
+             so (minimum op hlp (f_p mh)
+               by subchain op hp hlp
+               so minimum op hp (f_p mh))
+             so ("stop_split" forall h1 x.
+               inhabited h1 /\ subchain op (add h1 x) hlp ->
+               upper_bound op h1 x /\ not image snd h1 (snd x) ->
+               let s = sup op h1 in supremum op h1 s /\ fst x = fst s
+               by hlp x so exists hp. chp hp /\ hp x
+               so subchain op hp hlp so exists h. coret h hp
+               so subchain op (add h1 x) hp by forall u. add h1 x u -> hp u
+               by u = x || (hp u by h1 u so hlp u so op u x so not op x u)
+             )
+             so (forall h0. let s0 = sup o2 h0 in
+                 subchain o2 h0 hl /\ maximum o2 h0 s0 ->
+                 h0 s0 so hl s0 so exists h. ch h /\ h s0
+                 so (subchain o2 h0 h || (false by subchain o2 h hl
+                   so subchain o2 h h0 so forall x. h0 x -> not (not h x
+                   so hl x so o2 x s0 so not o2 s0 x)))
+                 so exists hp. coret h hp so chp hp
+                 so let h1 = inf (subchain op) (sub_proj_as op h0 hp) in
+                   minimum (subchain op) (sub_proj_as op h0 hp) h1
+                 so (minimum (subchain op) (sub_proj_as op h0 hlp) h1
+                   by transitive (subchain op)
+                   so sub_proj_as op h0 hp h1
+                   so sub_proj_as op h0 hlp h1
+                   so forall h3. sub_proj_as op h0 hlp h3 ->
+                     if subchain op h1 h3 then true else false
+                   by subchain op h3 h1 so sub_proj_as op h0 hp h3
+                 )
+                 so h1 = inf (subchain op) (sub_proj_as op h0 hlp)
+                 so let xt = extension op inv h1 in
+                   let s = sup (subchain op) xt in
+                   subchain op s hlp
+                 by subchain op s hp /\ subchain op hp hlp
+             )
+           )
+         so ("stop_split" forall hlp2. coref hl hlp2 -> subchain op hlp hlp2
+           by upper_bound (subchain op) chp hlp2
+           by forall hp. chp hp -> subchain op hp hlp2
+           by exists h. ch h /\ coret h hp
+           so h <> hl
+           so subchain o2 h hl
+         )
+         so minimum (subchain op) (coref hl) hlp
+        )
+        && inv_b hl)
+      && (subset ch inv_a -> inv_a hl by subset ch inv_b)
+    ) (* Supremum case: direct application of step lemma.
+         The paired supremum is obtained by the pairing limit lemma. *)
+    /\ ("stop_split" forall h y. supremum o2 h y ->
+      (inv_a h -> inv_a (add h y)) /\ (inv_b h -> inv_b (add h y))
+      by if h y then h = add h y by sext h (add h y) else
+      inv_b h -> inv_a (add h y)
+      by exists hp. coret h hp
+      so let a = sup op hp in
+        supremum op hp a
+      so let (_,z) = a in z = y
+      so inv (add hp a)
+    ) (* Step case: derive the step from the extended game,
+         ensuring that the step picked must be an inherited one
+         by taking a maximal history. Then propagation lemma conclude. *)
+    /\ ("stop_split"
+      forall h y. not inhabited (inter h q2) /\ maximum o2 h y /\ inv_b h ->
+      (exists a. g2.transition y a /\ not a y /\
+        (subset a (next_hist inv_a h) /\ subset a (next_hist inv_b h)
+        by subset a (next_hist inv_a h)))
+      by exists hp. coret h hp
+      so (* First note that hp admit a max as well,
+            cause: it must have a sup, and by extension maximality
+            this must be a max. *)
+        let s = sup op hp in
+        let st = sub_proj_as op h hp in
+        let h1 = inf (subchain op) st in
+        st h1 so subchain op h1 hp
+        so let xt = extension op inv h1 in
+          ("stop_split" upper_bound (subchain op) xt hp
+           by forall u. xt u -> subchain op u hp
+             by let sx = sup (subchain op) xt in
+             (maximum (subchain op) xt sx by inv h1 by inhabited h1
+              by image snd h1 y)
+             so subchain op u sx /\ subchain op sx hp
+          )
+        so (supremum op hp s by inhabited hp) so snd s = y
+        so ("stop_split" maximum op hp s
+          by hp s
+          by let hpn = add hp s in
+            (xt hpn by inv hpn
+             so (subchain op h1 hpn by subchain op hp hpn)
+             so sext (image snd hpn) h
+             by (forall z. h z -> image snd hpn z by image snd h1 z)
+             /\ forall z. image snd hpn z -> h z
+               by exists a. hpn a /\ snd a = z
+               so hp a \/ z = y
+            )
+          so subchain op hpn hp
+       )
+      so op = gp.progress
+      so not (inhabited (inter hp q) so exists u. inter hp q u
+        so inter h q2 (snd u))
+      so (* Hence hp can be played in the extended game,
+            and propagation for inv apply. Moreover, maximality
+            kicks in again and prove that the step must be an inherited
+            one. The base is obviously the desired transition
+            (validated by the step lemma) *)
+         exists ap. gp.transition s ap /\ not ap s
+           /\ subset ap (next_hist inv hp)
+      so let (x,_) = s in
+        ("stop_split" not exists x'. o1 x x' /\ r x' y /\ ap = (=) (x',y)
+        so x = x' by o1 x' x by op (x',y) s by
+          let hpn = add hp (x',y) in
+          subchain op hpn hp
+        by xt hpn by inv hpn
+        so (subchain op h1 hpn by subchain op hp hpn
+          by upper_bound op hp (x',y)
+          by upper_bound op hp (x,y) /\ op (x,y) (x',y) /\ transitive op)
+        so sext (image snd hpn) h
+        by (forall z. h z -> image snd hpn z by image snd h1 z)
+        /\ forall z. image snd hpn z -> h z
+        by exists a. hpn a /\ snd a = z
+        so hp a \/ z = y
+      )
+      so extended_transition o1 r g2 (x,y) ap
+      so exists a. g2.transition y a /\ ap = set_with_left x a
+      so not a y
+      so subset a (next_hist inv_a h)
+      by forall z. a z -> inv_a (add h z)
+      by not h z /\ o2 y z
+      so next_hist inv hp (x,z) by ap (x,z)
+    )
+
+end
+
+(* Conclusion for SimExtended proofs. *)
+module SimExtendedProof
+
+  use Util
+  use game.Game
+  use SimDef
+  use SimExtendedDef
+  use ho_set.Set
+  use fn.Fun
+  use fn.Image
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use choice.Choice
+  use game_no_strat.InvExtra
+  use SimExtendedWf
+  use SimExtendedProof_Enrich
+  use SimExtendedProof_Reduce
+  use SimExtendedProof_Forget
+
+  lemma simulation_to_extended : forall g1 g2,r:rel 'a 'b.
+    let o1 = g1.progress in
+    let gp = extended_game o1 r g2 in
+    let er = extended_rel r in
+    let invf = explicit_invf r g2 in
+    let invl = explicit_invl g1.progress r g2 in
+    (step_simulate g1 r g2 so step_simulate_by g1 r g2 invf invl) ->
+    simulate_alt g1 er gp
+    by forall p q i. victory_invariant g1 p q i ->
+      exists i2. victory_invariant gp (related er p) (related er q) i2
+    by i2 = extended_inv o1 r g2.progress q (crop o1 q i) invf invl
+
+  lemma proj2_related : forall s:set ('a,'b).
+    let a = related proj2 s in let b = image snd s in
+    a = b by sext a b
+    by (forall x. b x -> a x by exists y. s y /\ (proj2 y x by snd y = x))
+    /\ (forall x. a x -> b x
+      by exists y. s y /\ (snd y = x by proj2 y x so let (_,t) = y in t = x))
+
+  lemma simulation_from_extended : forall o,r:rel 'a 'b,g:game 'b.
+    let o2 = g.progress in
+    let gp = extended_game o r g in
+    order o /\ pairing_pull_limits o r o2 -> simulate gp proj2 g
+    by simulate_alt gp proj2 g
+    by forall p q i. victory_invariant gp p q i ->
+      let pr = related proj2 p in
+      let qr = related proj2 q in
+      (exists i2. victory_invariant g pr qr i2)
+    by let ch = fun z y s x -> s x /\ r x y /\ o z x in
+      let fa = fun z y s -> choice (ch z y s) in
+      (red_ang_choice o r fa by
+        forall z y s x. s x /\ r x y /\ o z x ->
+        let u = fa z y s in s u /\ r u y /\ o z u
+        by ch z y s u by ch z y s x)
+    so let ang = red_ang o r o2 i fa in
+      let ri = strong_u_acc_s (span_game gp) (crop_ang i ang) p in
+      victory_invariant gp p q ri /\ reducible o r o2 ri
+    so let ch = fun y u -> p u /\ snd u = y in
+      let f_p = fun y -> choice (ch y) in
+      (antec_choice p f_p by forall y. image snd p y ->
+        let v = f_p y in p v /\ snd v = y by ch y v
+        by exists u. p u /\ snd u = y so ch y u)
+    so victory_invariant g pr qr (forget_inv_a o o2 ri f_p)
+
+  lemma extended_rel_proj2_composition : forall r:rel 'a 'b.
+    let er = extended_rel r in
+    let rc = compose er proj2 in
+    rc = r by rext rc r by forall x y. r x y -> rc x y
+    by let z = (x,y) in er x z /\ proj2 z y
+
+  clone SimExtended with goal simulation_to_extended,
+    goal simulation_from_extended,
+    goal make_reducible_invariants,
+    goal simulation_to_extended_explicit,
+    goal proj2_related,
+    goal extended_rel_proj2_composition,
+    goal simulation_from_extended_invariant_link,
+    goal simulation_from_extended_explicit
+
+end
+
+(* Put everything together. *)
+module SimProof
+
+  use SimDef
+  use game.Game
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use ho_rel.RelSet
+
+  lemma rel_set_compose : forall r1:rel 'a 'b,r2:rel 'b 'c,s.
+    let rc = compose r1 r2 in
+    let a = related rc s in
+    let b = related r1 s in
+    let c = related r2 b in
+    a = c by sext a c by forall z. c z -> a z
+    by exists y. r2 y z /\ b y so exists x. r1 x y /\ s x so rc x z
+
+  lemma simulation_comp : forall g1:game 'a,r12,g2:game 'b,r23,g3:game 'c.
+    simulate g1 r12 g2 /\ simulate g2 r23 g3 ->
+    simulate g1 (compose r12 r23) g3
+
+  use SimComplete
+  use SimExtended
+  use order.SubChain
+  use order.ProductChain
+
+  lemma simulation : forall g1,r:rel 'a 'b,g2.
+    step_simulate g1 r g2 -> simulate g1 r g2
+    by let o1 = g1.progress in
+      let lr = complete_rel o1 in
+      let gc1 = completed g1 in
+      simulate g1 lr gc1
+    so let cr = complete_lift o1 r in
+      step_simulate gc1 cr g2
+    so let ecr = extended_rel cr in
+      let ol1 = gc1.progress in
+      let o2 = g2.progress in
+      let gp = extended_game ol1 cr g2 in
+      simulate gc1 ecr gp
+    so pairing_pull_limits ol1 cr o2
+    so simulate gp proj2 g2
+    so simulate gc1 (compose ecr proj2) g2
+    so simulate g1 (compose lr cr) g2
+
+  use ho_set.SetBigOps
+  use game_no_strat.StratLessDef
+  use game_no_strat.InvExtra
+  use SimExplicitDef
+
+  lemma simulation_explicit : forall g1,r:rel 'a 'b,g2 invf invl f.
+    step_simulate_by g1 r g2 invf invl ->
+    let o1 = g1.progress in let o2 = g2.progress in
+    let cr = complete_lift o1 r in
+    let lr = complete_rel o1 in
+    let ecr = extended_rel cr in
+    let cg1 = completed g1 in
+    let ol1 = cg1.progress in
+    red_ang_choice ol1 cr f ->
+    forall p f_p q inv.
+      let pl = related lr p in
+      let epl = related ecr pl in
+      let pr = related r p in
+      let qr = related r q in
+      let finv = sim_explicit g1 r g2 invf invl f p q f_p inv in
+      victory_invariant g1 p q inv /\ antec_choice epl f_p ->
+      victory_invariant g2 pr qr finv
+      (* Unroll the constructions in cascade. *)
+      by let linvf = complete_invf o1 r invf in
+        let linvl = complete_invl o1 invl in
+        step_simulate_by cg1 cr g2 linvf linvl
+      so let cinv = crop o1 q inv in
+        victory_invariant g1 p q cinv /\ cropped o1 q cinv
+      so let linv = complete_inv o1 cinv in
+        let ql = related lr q in
+        victory_invariant cg1 pl ql linv
+      (* Actually, linv is already cropped, so there is
+         no need to crop it any further. *)
+      so ("stop_split" cropped ol1 ql linv
+        by forall hh h. linv hh /\ inter hh ql h ->
+          maximum ol1 hh h
+        by exists x. maximum o1 h x /\ q x
+        so let h0 = inf ol1 hh in
+          let x0 = sup o1 h0 in
+          let df = remove h0 x0 in
+          let hhl = bigunion hh in
+          let hhd = diff hhl df in
+          (o1 x0 x by subchain o1 h0 h /\ h0 x0)
+        so (maximum o1 hhd x by inter hhd q x by hhd x
+          by not (df x so o1 x x0))
+        so (upper_bound o1 hhl x by forall y. hhl y -> o1 y x
+          by hhd y \/ (o1 y x0 /\ transitive o1 by df y))
+        so forall h1. hh h1 -> if subchain o1 h1 h then true else false
+        by subchain o1 h h1 so sext h h1 by forall y. h1 y -> not (not h y
+          so x = y by o1 x y so o1 y x)
+      )
+      so let gp = extended_game ol1 cr g2 in
+        let eql = related ecr ql in
+        let pinv = extended_inv ol1 cr o2 ql linv linvf linvl in
+        victory_invariant gp epl eql pinv
+      so let ang = red_ang ol1 cr o2 pinv f in
+        let rinv = strong_u_acc_s (span_game gp) (crop_ang pinv ang) epl in
+        victory_invariant gp epl eql rinv /\ reducible ol1 cr o2 rinv
+      so finv = forget_inv_a ol1 o2 rinv f_p
+      so victory_invariant g2 (image snd epl) (image snd eql) finv
+
+  clone Sim with goal simulation_comp,
+    goal simulation
+
+  clone SimExplicit with goal simulation_explicit
+
+end
+

@@ -12,11 +12,11 @@ See Gries, The Science of Programming, page 243
 
 module HammingSequence
 
-  use import int.Int
-  use import int.MinMax
-  use import number.Divisibility
-  use import number.Prime
-  use import number.Coprime  (* for Euclid's lemma *)
+  use int.Int
+  use int.MinMax
+  use number.Divisibility
+  use number.Prime
+  use number.Coprime  (* for Euclid's lemma *)
 
   predicate is_hamming (n:int) =
     forall d:int. prime d /\ divides d n -> d = 2 \/ d = 3 \/ d = 5
@@ -30,8 +30,8 @@ module HammingSequence
   lemma is_hamming_times5 :
     forall n:int. n >= 1 -> is_hamming n -> is_hamming (5*n)
 
-  use import array.Array
-  use import ref.Ref
+  use array.Array
+  use ref.Ref
 
   let hamming (n:int) : array int
     requires { n >= 1 }

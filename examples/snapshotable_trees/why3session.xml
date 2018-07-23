@@ -2,106 +2,55 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../snapshotable_trees.mlw">
-<theory name="Tree">
-</theory>
-<theory name="Enum">
- <goal name="WP_parameter enum" expl="VC for enum">
- <transf name="split_goal_right">
-  <goal name="WP_parameter enum.1" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.2" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter enum.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.06" steps="40"/></proof>
-  </goal>
- </transf>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../snapshotable_trees.mlw" proved="true">
+<theory name="Enum" proved="true">
+ <goal name="VC enum" expl="VC for enum" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="70"/></proof>
  </goal>
 </theory>
-<theory name="Iterator">
- <goal name="WP_parameter create_iterator" expl="VC for create_iterator">
- <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
+<theory name="Iterator" proved="true">
+ <goal name="VC create_iterator" expl="VC for create_iterator" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="WP_parameter hasNext" expl="VC for hasNext">
- <proof prover="1" timelimit="15" memlimit="1000"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="VC hasNext" expl="VC for hasNext" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
  </goal>
- <goal name="WP_parameter next" expl="VC for next">
- <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
- </goal>
-</theory>
-<theory name="BSTree">
- <goal name="WP_parameter bst_mem" expl="VC for bst_mem">
- <proof prover="1"><result status="valid" time="0.02" steps="123"/></proof>
- </goal>
- <goal name="WP_parameter bst_add" expl="VC for bst_add">
- <proof prover="1"><result status="valid" time="0.08" steps="378"/></proof>
+ <goal name="VC next" expl="VC for next" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="27"/></proof>
  </goal>
 </theory>
-<theory name="ITree">
- <goal name="WP_parameter create" expl="VC for create">
- <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+<theory name="BSTree" proved="true">
+ <goal name="VC bst_mem" expl="VC for bst_mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="208"/></proof>
  </goal>
- <goal name="WP_parameter contains" expl="VC for contains">
- <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
- </goal>
- <goal name="WP_parameter add" expl="VC for add">
- <transf name="split_goal_right">
-  <goal name="WP_parameter add.1" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter add.2" expl="type invariant">
-  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter add.3" expl="postcondition">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter add.3.1" expl="VC for add">
-   <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
-   </goal>
-   <goal name="WP_parameter add.3.2" expl="VC for add">
-   <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-   </goal>
-   <goal name="WP_parameter add.3.3" expl="VC for add">
-   <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter add.4" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter snapshot" expl="VC for snapshot">
- <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
- </goal>
- <goal name="WP_parameter iterator" expl="VC for iterator">
- <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="VC bst_add" expl="VC for bst_add" proved="true">
+ <proof prover="1"><result status="valid" time="0.08" steps="453"/></proof>
  </goal>
 </theory>
-<theory name="Harness">
- <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_right">
-  <goal name="WP_parameter test.1" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter test.2" expl="loop invariant init">
-  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter test.3" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter test.4" expl="type invariant">
-  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter test.5" expl="loop invariant preservation">
-  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter test.6" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.03" steps="20"/></proof>
-  </goal>
- </transf>
+<theory name="ITree" proved="true">
+ <goal name="VC itree" expl="VC for itree" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="VC contains" expl="VC for contains" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="34"/></proof>
+ </goal>
+ <goal name="VC snapshot" expl="VC for snapshot" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="VC iterator" expl="VC for iterator" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+</theory>
+<theory name="Harness" proved="true">
+ <goal name="VC test" expl="VC for test" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="111"/></proof>
  </goal>
 </theory>
 </file>

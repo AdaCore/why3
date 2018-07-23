@@ -176,7 +176,7 @@ let rec stats_of_goal ~root prefix_name stats ses goal =
       | [ (prover, _) ] ->
         stats.only_one_proof <-
           Sstr.add
-          (goal_name ^ " : " ^ (string_of_prover prover))
+          (goal_name ^ ": " ^ (string_of_prover prover))
           stats.only_one_proof
       | _ -> ()
     end
@@ -338,7 +338,7 @@ let print_stats ses r0 r1 stats =
   printf "== Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==@\n  @[";
   Hprover.iter (fun prover n ->
     let sum_times = Hprover.find stats.prover_sum_time prover in
-    printf "%-20s : %3d %6.2f %6.2f %6.2f@\n"
+    printf "%-20s: %3d %6.2f %6.2f %6.2f@\n"
       (string_of_prover prover) n
       (Hprover.find stats.prover_min_time prover)
       (Hprover.find stats.prover_max_time prover)

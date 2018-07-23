@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../mccarthy_vc_sp.mlw" proved="true">
+<theory name="McCarthy91" proved="true">
+ <goal name="VC f91" expl="VC for f91" proved="true">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <proof prover="4"><result status="valid" time="0.27" steps="532"/></proof>
+ </goal>
+ <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="McCarthy91Mach" proved="true">
+ <goal name="VC f91" expl="VC for f91" proved="true">
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

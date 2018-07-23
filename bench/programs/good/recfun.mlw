@@ -1,7 +1,7 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (** Recursive functions *)
 
@@ -31,10 +31,15 @@ module M
     requires { !a >= 0 } ensures { !x = old !x + old !a }
     = if !a > 0 then begin x := !x + 1; a := !a - 1; f4 a end
 
-  end
+  (** 5. The acid test:
+         partial application of a recursive function with effects *)
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/recfun"
-End:
-*)
+  let rec f5 (a b:ref int) variant { !a }
+    requires { !a >= 0 } ensures { result = old !a + old !b }
+    = if !a = 0 then !b else begin a := !a - 1; b := !b + 1; f5 a b end
+
+  let test_f5 () requires { !x >= 0 } ensures { result = old !x }
+    = let b = ref 0 in let f = f5 x in f b
+
+end
+

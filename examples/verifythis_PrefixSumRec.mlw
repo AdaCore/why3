@@ -8,13 +8,13 @@
 
 module PrefixSumRec
 
-   use import int.Int
-   use import int.ComputerDivision
-   use import int.Power
+   use int.Int
+   use int.ComputerDivision
+   use int.Power
 
-   use import map.Map as M
-   use import array.Array
-   use import array.ArraySum
+   use map.Map
+   use array.Array
+   use array.ArraySum
 
 (** {2 Preliminary lemmas on division by 2 and power of 2} *)
 
@@ -108,21 +108,20 @@ module PrefixSumRec
       a[right] = sum (old a) (left-space+1) (right+1) /\
       (forall i: int. i <= left-space -> a[i] = (old a)[i]) /\
       (forall i: int. i > right -> a[i] = (old a)[i]) }
-  = 'Init:
-    let space = right - left in
+  = let space = right - left in
     if right > left+1 then begin
       upsweep (left - div space 2) left a;
       upsweep (right - div space 2) right a;
-      assert { phase1 (left - div space 2) left (at a 'Init) a };
-      assert { phase1 (right - div space 2) right (at a 'Init) a };
-      assert { a[left] = sum (at a 'Init) (left-(right-left)+1) (left+1) };
-      assert { a[right] = sum (at a 'Init) (left+1) (right+1) }
+      assert { phase1 (left - div space 2) left (old a) a };
+      assert { phase1 (right - div space 2) right (old a) a };
+      assert { a[left] = sum (old a) (left-(right-left)+1) (left+1) };
+      assert { a[right] = sum (old a) (left+1) (right+1) }
     end;
     a[right] <- a[left] + a[right];
     assert {
-      right > left+1 -> phase1 (left - div space 2) left (at a 'Init) a };
+      right > left+1 -> phase1 (left - div space 2) left (old a) a };
     assert {
-      right > left+1 -> phase1 (right - div space 2) right (at a 'Init) a }
+      right > left+1 -> phase1 (right - div space 2) right (old a) a }
 
 (** {2 The downsweep phase} *)
 
@@ -142,8 +141,7 @@ module PrefixSumRec
     ensures { partial_sum left right a0 a }
     ensures { forall i: int. i <= left-(right-left) -> a[i] = (old a)[i] }
     ensures { forall i: int. i > right -> a[i] = (old a)[i] }
-  = 'Init:
-    let tmp = a[right] in
+  = let tmp = a[right] in
     assert { a[right] = sum a0 0 (left-(right-left) + 1) };
     assert { a[left] = sum a0 (left-(right-left)+1) (left+1) };
     a[right] <- a[right] + a[left];
@@ -151,8 +149,8 @@ module PrefixSumRec
     assert { a[right] = sum a0 0 (left + 1) };
     if right > left+1 then
     let space = right - left in
-    assert { phase1 (go_left left right) left a0 (at a 'Init) };
-    assert { phase1 (go_right left right) right a0 (at a 'Init) };
+    assert { phase1 (go_left left right) left a0 (old a) };
+    assert { phase1 (go_right left right) right a0 (old a) };
     assert { phase1 (go_right left right) right a0 a };
     downsweep (left - div space 2) left a0 a;
     assert { phase1 (go_right left right) right a0 a };

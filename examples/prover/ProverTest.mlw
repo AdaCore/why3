@@ -5,20 +5,20 @@ end
 
 module Impl
 
-  use import ProverMain.Impl
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_term_impl.Types
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_impl.Impl
-  use import int.Int
+  use ProverMain.Impl
+  use Firstorder_symbol_impl.Types
+  use Firstorder_term_impl.Types
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_term_impl.Logic
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_impl.Impl
+  use int.Int
 
   let imply (a b:nlimpl_fo_formula) : nlimpl_fo_formula
     requires { nlimpl_fo_formula_ok a }
@@ -324,7 +324,7 @@ module Impl
 
   use import FormulaTransformations.Impl as F
 
-  let test () : unit
+  let test (ghost st:'st) : unit
     diverges
     raises { F.Sat -> true }
     =
@@ -350,7 +350,7 @@ module Impl
     let nphi1 = construct_fo_formula (NLC_Not phi1) in
     let fl1 = construct_fo_formula_list (NLC_FOFCons nphi1 fonil) in
     let fl2 = construct_fo_formula_list (NLC_FOFCons phi0 fl1) in*)
-    let _ = main (zenon10 2) 1 in
+    let _ = main (zenon10 2) 1 st in
     ()
 
 end

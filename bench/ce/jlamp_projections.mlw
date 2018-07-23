@@ -1,7 +1,7 @@
 
 module Abstract
 
-use import int.Int
+use int.Int
 
 type byte
 function to_int byte : int
@@ -15,10 +15,10 @@ val of_int (x:int) : byte
   ensures { to_int result = x }
 
 val add (x y : byte) : byte
-  requires { "expl:integer overflow" in_range (to_int x + to_int y) }
+  requires { [@expl:integer overflow] in_range (to_int x + to_int y) }
   ensures { to_int result = to_int x + to_int y }
 
-use import ref.Ref
+use ref.Ref
 
 let p3 (a : ref byte) =
   a := add !a (of_int 1)
@@ -27,8 +27,8 @@ end
 
 module Record
 
-use import int.Int
-use import Abstract
+use int.Int
+use Abstract
 
 type r = {mutable f : byte; mutable g : bool}
 

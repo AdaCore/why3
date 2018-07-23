@@ -150,7 +150,7 @@ module type S =
     val translate : (elt -> elt) -> t -> t
     (** [translate f s] translates the elements in the set [s] by the
         function [f]. [f] must be strictly monotone on the elements of [s].
-        Otherwise it raises invalid_arg *)
+        Otherwise it raises [Invalid_arg]. *)
 
     val add_new : exn -> elt -> t -> t
     (** [add_new e x s] adds [x] to [s] if [s] does not contain [x],
@@ -161,6 +161,18 @@ module type S =
 
     val of_list: elt list -> t
     (** construct a set from a list of elements *)
+
+    val contains: t -> elt -> bool
+    (** [contains s x] is the same as [mem x s]. *)
+
+    val add_left: t -> elt -> t
+    (** [add_left s x] is the same as [add x s]. *)
+
+    val remove_left: t -> elt -> t
+    (** [remove_left s x] is the same as [remove x s]. *)
+
+    val print: (Format.formatter -> elt -> unit) ->
+               Format.formatter -> t -> unit
   end
 
 module MakeOfMap (M : Extmap.S) : S with module M = M

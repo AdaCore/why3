@@ -2,11 +2,11 @@
 
 module Flag
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
 
   type color = Blue | White | Red
 
@@ -33,13 +33,12 @@ module Flag
     let b = ref 0 in
     let i = ref 0 in
     let r = ref (length a) in
-    'Init:
     while !i < !r do
       invariant { 0 <= !b <= !i <= !r <= length a }
       invariant { monochrome a 0  !b Blue }
       invariant { monochrome a !b !i White }
       invariant { monochrome a !r (length a) Red }
-      invariant { permut_all (at a 'Init) a }
+      invariant { permut_all (old a) a }
       variant   { !r - !i }
       match a[!i] with
       | Blue ->

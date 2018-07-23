@@ -2,48 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../all_distinct.mlw">
-<theory name="AllDistinct">
- <goal name="WP_parameter all_distinct" expl="VC for all_distinct">
- <transf name="split_goal_right">
-  <goal name="WP_parameter all_distinct.1" expl="array creation size">
-  <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.2" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.3" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.4" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.5" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.6" expl="type invariant">
-  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.7" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.8" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.9" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.10" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.11" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter all_distinct.12" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
- </transf>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../all_distinct.mlw" proved="true">
+<theory name="AllDistinct" proved="true">
+ <goal name="VC all_distinct" expl="VC for all_distinct" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="263"/></proof>
  </goal>
 </theory>
 </file>

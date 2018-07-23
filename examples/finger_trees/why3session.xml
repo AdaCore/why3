@@ -2,60 +2,17 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../finger_trees.mlw" proved="true">
 <theory name="FingerTrees" proved="true">
- <goal name="WP_parameter node_cons_app" expl="VC for node_cons_app" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter node_cons_app.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="74"/></proof>
-  </goal>
-  <goal name="WP_parameter node_cons_app.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="80"/></proof>
-  </goal>
- </transf>
+ <goal name="VC node_cons_app" expl="VC for node_cons_app" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="165"/></proof>
  </goal>
- <goal name="WP_parameter d_cons" expl="VC for d_cons" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter d_cons.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="70"/></proof>
-  </goal>
-  <goal name="WP_parameter d_cons.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="75"/></proof>
-  </goal>
-  <goal name="WP_parameter d_cons.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
-  </goal>
-  <goal name="WP_parameter d_cons.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.31"/></proof>
-  </goal>
- </transf>
+ <goal name="VC d_cons" expl="VC for d_cons" proved="true">
+ <proof prover="0"><result status="valid" time="0.12" steps="1157"/></proof>
  </goal>
- <goal name="WP_parameter cons" expl="VC for cons" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter cons.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="151"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.18" steps="184"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="140"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.4" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07" steps="461"/></proof>
-  </goal>
- </transf>
+ <goal name="VC cons" expl="VC for cons" proved="true">
+ <proof prover="0"><result status="valid" time="0.30" steps="1351"/></proof>
  </goal>
 </theory>
 </file>

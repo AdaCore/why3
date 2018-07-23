@@ -5,13 +5,13 @@
 
 module Quicksort
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   predicate qs_partition (a1 a2: array int) (l m r: int) (v: int) =
     permut_sub a1 a2 l r /\
@@ -34,24 +34,29 @@ module Quicksort
   = if l + 1 < r then begin
       let v = a[l] in
       let m = ref l in
-  'L: for i = l + 1 to r - 1 do
+      label L in
+      for i = l + 1 to r - 1 do
         invariant { a[l] = v /\ l <= !m < i }
         invariant { forall j:int. l < j <= !m -> a[j] < v }
         invariant { forall j:int. !m < j <  i -> a[j] >= v }
-        invariant { permut_sub (at a 'L) a l r }
-    'K: if a[i] < v then begin
+        invariant { permut_sub (a at L) a l r }
+        label K in
+        if a[i] < v then begin
           m := !m + 1;
           swap a i !m;
-          assert { permut_sub (at a 'K) a l r }
+          assert { permut_sub (a at K) a l r }
         end
       done;
-  'M: swap a l !m;
-      assert { qs_partition (at a 'M) a l !m r v };
-  'N: quick_rec a l !m;
-      assert { qs_partition (at a 'N) a l !m r v };
-  'O: quick_rec a (!m + 1) r;
-      assert { qs_partition (at a 'O) a l !m r v };
-      assert { qs_partition (at a 'N) a l !m r v };
+      label M in
+      swap a l !m;
+      assert { qs_partition (a at M) a l !m r v };
+      label N in
+      quick_rec a l !m;
+      assert { qs_partition (a at N) a l !m r v };
+      label O in
+      quick_rec a (!m + 1) r;
+      assert { qs_partition (a at O) a l !m r v };
+      assert { qs_partition (a at N) a l !m r v };
     end
 
   let quicksort (a: array int) =
@@ -61,22 +66,23 @@ module Quicksort
 
 end
 
+(** {2 Knuth' shuffle} *)
+
 (* a realistic quicksort first shuffles the array *)
 
-module Shuffle "Knuth shuffle"
+module Shuffle
 
-  use import int.Int
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
   use random.Random
 
   let shuffle (a: array int) : unit
     writes  { a, Random.s }
     ensures { permut_all (old a) a }
-  = 'L:
-    for i = 1 to length a - 1 do
-      invariant { permut_all (at a 'L) a }
+  = for i = 1 to length a - 1 do
+      invariant { permut_all (old a) a }
       swap a i (Random.random_int (i+1))
     done
 
@@ -85,11 +91,11 @@ end
 
 module QuicksortWithShuffle
 
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArrayPermut
-  use import Shuffle
-  use import Quicksort
+  use array.Array
+  use array.IntArraySorted
+  use array.ArrayPermut
+  use Shuffle
+  use Quicksort
 
   let qs (a: array int) : unit =
     ensures { sorted a }
@@ -103,13 +109,13 @@ end
 
 module Quicksort3way
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Refint
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   predicate qs_partition (a1 a2: array int) (l ml mr r: int) (v: int) =
     permut_sub a1 a2 l r /\
@@ -134,31 +140,35 @@ module Quicksort3way
       let ml = ref l in
       let mr = ref r in
       let i  = ref (l + 1) in
-  'L: while !i < !mr do
+      label L in
+      while !i < !mr do
         invariant { l <= !ml < !i <= !mr <= r }
         invariant { forall j: int. l   <= j < !ml -> a[j] < v }
         invariant { forall j: int. !ml <= j < !i  -> a[j] = v }
         invariant { forall j: int. !mr <= j < r   -> a[j] > v }
-        invariant { permut_sub (at a 'L) a l r }
+        invariant { permut_sub (a at L) a l r }
         variant   { !mr - !i }
-    'K: if a[!i] < v then begin
+        label K in
+        if a[!i] < v then begin
           swap a !ml !i;
           incr ml;
           incr i;
-          assert { permut_sub (at a 'K) a l r }
+          assert { permut_sub (a at K) a l r }
         end else if a[!i] > v then begin
           decr mr;
           swap a !i !mr;
-          assert { permut_sub (at a 'K) a l r }
+          assert { permut_sub (a at K) a l r }
         end else
           incr i
       done;
-      assert { qs_partition (at a 'L) a l !ml !mr r v };
-  'N: quick_rec a l !ml;
-      assert { qs_partition (at a 'N) a l !ml !mr r v };
-  'O: quick_rec a !mr r;
-      assert { qs_partition (at a 'O) a l !ml !mr r v };
-      assert { qs_partition (at a 'N) a l !ml !mr r v }
+      assert { qs_partition (a at L) a l !ml !mr r v };
+      label N in
+      quick_rec a l !ml;
+      assert { qs_partition (a at N) a l !ml !mr r v };
+      label O in
+      quick_rec a !mr r;
+      assert { qs_partition (a at O) a l !ml !mr r v };
+      assert { qs_partition (a at N) a l !ml !mr r v }
     end
 
   let quicksort (a: array int) =
@@ -166,7 +176,7 @@ module Quicksort3way
     ensures { permut_all (old a) a }
     quick_rec a 0 (length a)
 
-  use import Shuffle
+  use Shuffle
 
   let qs (a: array int) : unit =
     ensures { sorted a }
@@ -178,9 +188,9 @@ end
 
 module Test
 
-  use import int.Int
-  use import array.Array
-  use import Quicksort
+  use int.Int
+  use array.Array
+  use Quicksort
 
   let test1 () =
     let a = make 3 0 in

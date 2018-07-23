@@ -9,16 +9,17 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
   predicate le elt elt
 
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
   type heap
 
-  function size heap : int
+  val function size heap : int
 
   function occ elt heap : int
 
@@ -38,9 +39,6 @@ module Heap
 
   val is_empty (h: heap) : bool
     ensures { result <-> size h = 0 }
-
-  val size (h: heap) : int
-    ensures { result = size h }
 
   val merge (h1 h2: heap) : heap
     ensures { forall x. occ x result = occ x h1 + occ x h2 }
@@ -71,10 +69,10 @@ end
 
 module Size
 
-  use import TreeRank
-  use import int.Int
+  use TreeRank
+  use int.Int
 
-  function size (t: tree 'a) : int = match t with
+  let rec function size (t: tree 'a) : int = match t with
     | E -> 0
     | N _ l _ r -> 1 + size l + size r
     end
@@ -86,8 +84,8 @@ end
 
 module Occ
 
-  use import TreeRank
-  use import int.Int
+  use TreeRank
+  use int.Int
 
   function occ (x: 'a) (t: tree 'a) : int = match t with
     | E -> 0
@@ -105,14 +103,15 @@ end
 module LeftistHeap
 
   type elt
-  predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  val predicate le elt elt
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
-  use import TreeRank
+  use TreeRank
   use export Size
   use export Occ
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   type t = tree elt
 
@@ -144,8 +143,8 @@ module LeftistHeap
   = match h with
     | E -> absurd
     | N _ l _ r ->
-       if l <> E then root_is_miminum l;
-       if r <> E then root_is_miminum r
+       match l with E -> () | _ -> root_is_miminum l end;
+       match r with E -> () | _ -> root_is_miminum r end
     end
 
   function rank (h: t) : int = match h with
@@ -172,11 +171,7 @@ module LeftistHeap
 
   let is_empty (h: t) : bool
     ensures { result <-> size h = 0 }
-  = h = E
-
-  let size (h: t) : int
-    ensures { result = size h }
-  = size h
+  = match h with E -> true | N _ _ _ _ -> false end
 
   let rank (h: t) : int
     requires { leftist_heap h }

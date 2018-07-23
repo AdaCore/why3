@@ -1,0 +1,29 @@
+
+theory T
+
+  scope A
+  goal g:true
+  end
+
+  scope B
+  goal g:false
+  end
+
+end
+
+
+module A
+
+  predicate p
+
+  predicate q
+
+  scope B
+    let f () : unit ensures { p } = ()
+  end
+
+  scope C
+    let f () : unit ensures { q <-> p } = ()
+  end
+
+end

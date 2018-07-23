@@ -1,0 +1,49 @@
+
+(** {2 Applicative sets} *)
+
+module Appset
+
+  use set.Fset
+
+  type elt
+
+  type t = abstract { contents: set elt }
+
+  val constant empty: t
+    ensures { is_empty result.contents }
+
+  val predicate is_empty (s: t) : bool
+    ensures { result <-> is_empty s.contents }
+
+  val function add (x: elt) (s: t) : t
+    ensures { result.contents = add x s.contents }
+
+  val function remove (x: elt) (s: t) : t
+    ensures { result.contents = remove x s.contents }
+
+  val predicate mem (x: elt) (s: t) : bool
+    ensures { result <-> mem x s.contents }
+
+  val predicate (==) (s1 s2: t) : bool
+    ensures { result <-> s1.contents == s2.contents }
+
+  val predicate subset (s1 s2: t) : bool
+    ensures { result <-> subset s1.contents s2.contents }
+
+  val function union (s1 s2: t) : t
+    ensures { result.contents = union s1.contents s2.contents }
+
+  val function inter (s1 s2: t) : t
+    ensures { result.contents = inter s1.contents s2.contents }
+
+  val function diff (s1 s2: t) : t
+    ensures { result.contents = diff s1.contents s2.contents }
+
+  val function choose (s: t) : elt
+    requires { not (Fset.is_empty s.contents) }
+    ensures  { Fset.mem result s.contents }
+
+  val function cardinal (s: t) : int
+    ensures { result = cardinal s.contents }
+
+end

@@ -20,26 +20,10 @@ ifeq ($(BENCH),yes)
 endif
 
 
-MLWUTIL=Nat
-
-MLWTYPES=BacktrackArray Firstorder_symbol_impl ISet Firstorder_term_impl \
-	Firstorder_formula_impl Firstorder_formula_list_impl \
-	Firstorder_tableau_impl Unification FormulaTransformations \
-	Prover
-
-MLWIMPL=$(MLWTYPES) ProverMain ProverTest
-
-BD=build
-MLUTIL=$(patsubst %,$(BD)/%__Nat,$(MLWUTIL))
-MLTYPES=$(patsubst %,$(BD)/%__Types,$(MLWTYPES))
-MLIMPL=$(patsubst %,$(BD)/%__Impl,$(MLWIMPL))
-MLALL=$(MLUTIL) $(MLTYPES) $(MLIMPL)
-ML=$(patsubst %,%.ml,$(MLALL))
-CMX=$(patsubst %,%.cmx,$(MLALL))
+BD=prover
 OCAMLC=ocamlopt.opt
-INCLUDES=-I $(BD) $(INCLUDEALL) -I ../../plugins/tptp
+INCLUDES=$(INCLUDEALL) -I ../../plugins/tptp
 LIBS=unix.cmxa nums.cmxa $(BIGINTLIB).cmxa dynlink.cmxa str.cmxa menhirLib.cmx zip.cmxa why3.cmxa why3extract.cmxa tptp_ast.cmx tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
-LIBSOLD=$(BD)/why3__BuiltIn.cmx $(BD)/int__Int.cmx $(BD)/array__Array.cmx
 WHY3FLAGS=-L . --debug ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
@@ -47,15 +31,15 @@ MLEXECFLAGS=
 
 .PHONY: clean depend extract replay
 
-$(BD)/prover: $(CMX) run.cmx
+$(BD): $(BD).cmx run.cmx
 	echo "WHY3SHARE="$(WHY3SHARE)
 	$(OCAMLC) $(INCLUDES) $(LIBS) $(MLFLAGS) $(MLEXECFLAGS) \
-		-o $(BD)/prover $^
+		-o $(BD) $^
 
 extract: $(ML)
 
-$(ML):
-	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD) ProverTest.mlw
+$(BD).ml:
+	why3 $(WHY3FLAGS) extract -D ocaml64 -o $(BD).ml ProverTest.mlw
 
 %.cmx: %.ml
 	$(OCAMLC) $(INCLUDES) $(MLFLAGS) -c $<
@@ -65,7 +49,9 @@ $(ML):
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:extract%=extract)" "extract"
+ifneq "$(MAKECMDGOALS:extract%=replay)" "replay"
 include .depend
+endif
 endif
 endif
 
@@ -87,5 +73,5 @@ depend: .depend
 
 clean:
 	rm -f $(BD)/*.o $(BD)/*.cmi $(BD)/*.cmx
-	rm -f $(BD)/*__*.ml
+	rm -f $(BD)*.ml
 	rm -f *~ *.o *.cmi *.cmx build/prover

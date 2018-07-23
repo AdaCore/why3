@@ -42,8 +42,7 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Config.datadir "theories";
-    Filename.concat Config.datadir "modules"; ]
+  [ Filename.concat Config.datadir "stdlib" ]
 
 let default_conf_file =
   match Config.localdir with
@@ -257,7 +256,7 @@ let load_plugins m =
   let load x =
     try Plugin.load x
     with exn ->
-      Format.eprintf "%s can't be loaded : %a@." x
+      Format.eprintf "%s can't be loaded: %a@." x
         Exn_printer.exn_printer exn in
   List.iter load m.plugins
 
@@ -605,8 +604,8 @@ let read_config conf_file =
   try
     get_config filenamerc
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    Format.fprintf str_formatter "%a" Exn_printer.exn_printer e;
-    raise (ConfigFailure (fst filenamerc, flush_str_formatter ()))
+    let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+    raise (ConfigFailure (fst filenamerc, s))
 
 (** filter prover *)
 type regexp_desc = { reg : Str.regexp; desc : string}
@@ -858,7 +857,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun 'why3 config'"
   | NonUniqueId ->
-    Format.fprintf fmt "InternalError : two provers share the same id"
+    Format.fprintf fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp
@@ -869,11 +868,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
       provers
   | ParseFilterProver s ->
     fprintf fmt
-      "Syntax error prover identification '%s' : \
+      "Syntax error prover identification '%s': \
        name[,version[,alternative]|,,alternative]" s
   | DuplicateShortcut s ->
     fprintf fmt
-      "Shortcut %s appears two times in the configuration file" s
+      "Shortcut %s appears twice in the configuration file" s
   | _ -> raise e)
 
 

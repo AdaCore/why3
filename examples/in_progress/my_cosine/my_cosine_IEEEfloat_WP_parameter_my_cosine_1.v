@@ -18,9 +18,6 @@ Require real.Trigonometry.
 Require ieee_float.GenericFloat.
 Require bv.Pow2int.
 
-(* Why3 assumption *)
-Definition unit := unit.
-
 Axiom t : Type.
 Parameter t_WhyType : WhyType t.
 Existing Instance t_WhyType.
@@ -48,10 +45,6 @@ Definition to_nearest (m:mode): Prop := (m = RNE) \/ (m = RNA).
 
 Parameter zeroF: t.
 
-Parameter abs: t -> t.
-
-Parameter neg: t -> t.
-
 Parameter add: mode -> t -> t -> t.
 
 Parameter sub: mode -> t -> t -> t.
@@ -59,6 +52,10 @@ Parameter sub: mode -> t -> t -> t.
 Parameter mul: mode -> t -> t -> t.
 
 Parameter div: mode -> t -> t -> t.
+
+Parameter abs: t -> t.
+
+Parameter neg: t -> t.
 
 Parameter fma: mode -> t -> t -> t -> t.
 
@@ -624,10 +621,11 @@ Axiom fliteral_axiom : (t'isFinite fliteral) /\
 Require Import Interval.Interval_tactic.
 
 (* Why3 goal *)
-Theorem WP_parameter_my_cosine : forall (x:t), (le (abs x) fliteral) ->
+Theorem VC_my_cosine : forall (x:t), (le (abs x) fliteral) ->
   (((Reals.Rbasic_fun.Rabs (t'real x)) <= (1 / 32)%R)%R ->
   ((Reals.Rbasic_fun.Rabs ((1%R - (((t'real x) * (t'real x))%R * (05 / 10)%R)%R)%R - (Reals.Rtrigo_def.cos (t'real x)))%R) <= (1 / 16777216)%R)%R).
 (* Why3 intros x h1 h2. *)
+Proof.
 intros x h1 h2.
 interval with (i_bisect_diff (t'real x)).
 Qed.

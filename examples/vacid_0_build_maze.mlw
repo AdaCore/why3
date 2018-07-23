@@ -7,7 +7,7 @@
 
 theory UnionFind_pure
 
-  use import int.Int
+  use int.Int
 
   type uf_pure
 
@@ -37,10 +37,10 @@ end
 
 module UnionFind_sig
 
-  use import int.Int
+  use int.Int
   use export UnionFind_pure
 
-  type uf model { mutable state : uf_pure }
+  type uf = private { ghost mutable state : uf_pure }
 
   val create (n:int) : uf
     requires { 0 <= n }
@@ -86,8 +86,8 @@ end
 
 module Graph_sig
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   clone export Graph with type vertex = int
 
@@ -108,11 +108,11 @@ end
 
 module BuildMaze
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
-  use import UnionFind_sig
-  use import Graph_sig
+  use UnionFind_sig
+  use Graph_sig
 
   val rand (s:int) : int requires { 0 < s } ensures { 0 <= result < s }
 

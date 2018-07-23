@@ -13,6 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require map.Map.
 Require map.Occ.
@@ -39,6 +40,7 @@ Theorem injective_implies_surjective:
   into n f ->
   injection n f ->
   surjection n f.
+Proof.
 induction n.
 (* case n = 0 *)
 unfold surjection; intros.
@@ -162,6 +164,7 @@ Theorem lifting:
     (forall x:Z, 0 <= x < n -> 0 <= f x < n) ->
     exists g:nat -> nat,
       forall i:nat, Z_of_nat i < n -> Z_of_nat (g i) = f (Z_of_nat i).
+Proof.
 intros n f Hpos.
 exists (fun n => Zabs_nat (f (Z_of_nat n))).
 intros i Hi_inf_n.
@@ -176,6 +179,7 @@ Theorem Zinjective_implies_surjective:
   (forall i:Z, 0 <= i < n -> 0 <= f i < n) ->
   (forall i j:Z, 0 <= i < n -> 0 <= j < n -> f i = f j -> i = j) ->
   forall i:Z, 0 <= i < n -> exists k:Z, 0 <= k < n /\ f k = i.
+Proof.
 intros n f Hinto.
 elim (lifting n f Hinto).
 intros g Heq_g_f Hinj i Hi_inf_n.
@@ -216,28 +220,24 @@ Qed.
 
 
 (* Why3 assumption *)
-Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop :=
-  forall (i:Z) (j:Z),
-   ((0%Z <= i)%Z /\ (i < n)%Z) ->
-   (((0%Z <= j)%Z /\ (j < n)%Z) ->
-    ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
+Definition injective (a:Z -> Z) (n:Z) : Prop :=
+  forall (i:Z) (j:Z), ((0%Z <= i)%Z /\ (i < n)%Z) ->
+  ((0%Z <= j)%Z /\ (j < n)%Z) -> ~ (i = j) -> ~ ((a i) = (a j)).
 
 (* Why3 assumption *)
-Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop :=
-  forall (i:Z),
-   ((0%Z <= i)%Z /\ (i < n)%Z) ->
-   exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((map.Map.get a j) = i).
+Definition surjective (a:Z -> Z) (n:Z) : Prop :=
+  forall (i:Z), ((0%Z <= i)%Z /\ (i < n)%Z) ->
+  exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((a j) = i).
 
 (* Why3 assumption *)
-Definition range (a:(map.Map.map Z Z)) (n:Z): Prop :=
-  forall (i:Z),
-   ((0%Z <= i)%Z /\ (i < n)%Z) ->
-   ((0%Z <= (map.Map.get a i))%Z /\ ((map.Map.get a i) < n)%Z).
+Definition range (a:Z -> Z) (n:Z) : Prop :=
+  forall (i:Z), ((0%Z <= i)%Z /\ (i < n)%Z) ->
+  (0%Z <= (a i))%Z /\ ((a i) < n)%Z.
 
 (* Why3 goal *)
 Lemma injective_surjective :
-forall (a:(map.Map.map Z Z)) (n:Z),
- (injective a n) -> ((range a n) -> (surjective a n)).
+  forall (a:Z -> Z) (n:Z), (injective a n) -> (range a n) -> surjective a n.
+Proof.
 unfold injective, range, surjective.
 intros a n h1 h2.
 intros.
@@ -253,8 +253,9 @@ Import Occ.
 
 (* Why3 goal *)
 Lemma injection_occ :
-forall (m:(map.Map.map Z Z)) (n:Z),
- (injective m n) <-> forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z.
+  forall (m:Z -> Z) (n:Z),
+  (injective m n) <-> forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z.
+Proof.
 intros m n; split.
 (* -> *)
 intros inj v.
@@ -283,7 +284,7 @@ elim (inj i j); omega.
 
 (* <- *)
 intros Hocc i j hi hj neq eq.
-pose (v := (Map.get m i)).
+pose (v := m i).
 assert (occ v m 0 n >= 2)%Z.
 assert (occ v m 0 n = occ v m 0 i + occ v m i n)%Z.
   apply occ_append; omega.

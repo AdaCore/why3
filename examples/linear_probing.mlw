@@ -7,54 +7,55 @@
 
 module HashedTypeWithDummy
 
-  use import int.Int
+  use int.Int
 
   type key
   type keym (** the logic model of a key *)
   function keym key: keym
-  predicate eq (x y: key) = keym x = keym y
-  val eq (x y: key) : bool ensures { result <-> eq x y }
-  predicate neq (x y: key) = keym x <> keym y
-  let neq (x y: key) : bool ensures { result <-> neq x y } = not (eq x y)
 
-  function hash key : int
+  val predicate eq (x y: key)
+    ensures { result <-> keym x = keym y }
+  let predicate neq (x y: key)
+    ensures { result <-> keym x <> keym y }
+  = not (eq x y)
+
+  val function hash key : int
   axiom hash_nonneg: forall k: key. 0 <= hash k
   axiom hash_eq: forall x y: key. eq x y -> hash x = hash y
 
-  constant dummy: key
+  val constant dummy: key
   constant dummym: keym = keym dummy
 
 end
 
 module LinearProbing
 
-  clone import HashedTypeWithDummy
+  clone HashedTypeWithDummy with axiom .
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import option.Option
-  use import list.Mem
-  use import map.Map
+  use int.Int
+  use int.ComputerDivision
+  use option.Option
+  use list.Mem
+  use map.Map
   use map.Const
-  use import ref.Ref
-  use import array.Array
+  use ref.Ref
+  use array.Array
 
-  function bucket (k: key) (n: int) : int = mod (hash k) n
+  let function bucket (k: key) (n: int) : int
+    requires { 0 < n }
+    ensures { 0 <= result < n }
+  = mod (hash k) n
 
-  lemma bucket_bounds:
-    forall n: int. 0 < n ->
-    forall k: key. 0 <= bucket k n < n
-
-  (** j lies between l and r, cyclically *)
+  (** `j` lies between `l` and `r`, cyclically *)
   predicate between (l j r: int) =
     l <= j < r || r < l <= j || j < r < l
 
-  (** number of dummy values in array [a] between [l] and [u] *)
-  namespace NumOfDummy
+  (** number of dummy values in array `a` between `l` and `u` *)
+  scope NumOfDummy
     use int.NumOf
 
     function numof (a: array key) (l u: int) : int =
-      NumOf.numof (\ i. eq a[i] dummy) l u
+      NumOf.numof (fun i -> eq a[i] dummy) l u
 
     let rec lemma numof_eq (a1 a2: array key) (l u: int) : unit
       requires { 0 <= l <= u <= length a1 = length a2 }
@@ -109,10 +110,10 @@ module LinearProbing
        ghost mutable loc : map keym int;  (* index where it is stored *)
     }
     (* at least one empty slot *)
-    invariant { 0 <= self.size < length self.data }
-    invariant { let n = Array.length self.data in
-                self.size + numofd self.data 0 n = n }
-    invariant { valid self.data self.view self.loc }
+    invariant { 0 <= size < length data }
+    invariant { let n = Array.length data in
+                size + numofd data 0 n = n }
+    invariant { valid data view loc }
 
   let create (n: int) : t
     requires { 0 < n }
@@ -130,7 +131,7 @@ module LinearProbing
     Array.fill h.data 0 (Array.length h.data) dummy;
     h.view <- Const.const false
 
-  function next (n i: int) : int =
+  let function next (n i: int) : int =
     let i = i+1 in if i = n then 0 else i
 
   let find (a: array key) (x: key) : int
@@ -190,11 +191,11 @@ module LinearProbing
                     forall j2: int. 0 <= j2 < n2 -> neq a[j2] x }
       let x = h.data[i] in
       if neq x dummy then begin
-        'L:
+        label L in
         let j = find a x in
         assert { eq a[j] dummy };
         a[j] <- x;
-        assert { numofd a 0 (j+1) = numofd (at a 'L) 0 (j+1) - 1 };
+        assert { numofd a 0 (j+1) = numofd (a at L) 0 (j+1) - 1 };
         l := Map.set !l (keym x) j
       end
     done;
@@ -206,21 +207,20 @@ module LinearProbing
     writes   { h.size, h.data, h.data.elts, h.view, h.loc }
     ensures  { h.view = Map.set (old h.view) (keym x) True }
    =
-    abstract
+    begin
       ensures { h.size + 1 < Array.length h.data }
       if 2 * (h.size + 1) >= Array.length h.data then resize h
     end;
     let i = find h.data x in
     if eq h.data[i] dummy then begin
-      'L:
+      label L in
       h.size <- h.size + 1;
       h.data[i] <- x;
       assert { numofd h.data 0 (i+1) =
-               numofd (at h.data 'L) 0 (i+1) - 1 }
+               numofd (h.data at L) 0 (i+1) - 1 }
     end;
-    ghost h.view <- Map.set h.view (keym x) True;
-    ghost h.loc <- Map.set h.loc (keym x) i;
-    ()
+    ghost (h.view <- Map.set h.view (keym x) True);
+    ghost (h.loc <- Map.set h.loc (keym x) i)
 
   let copy (h: t) : t
     ensures { result.view = h.view }
@@ -309,15 +309,15 @@ module LinearProbing
     let n = Array.length h.data in
     let j = find h.data x in
     if neq h.data[j] dummy then begin
-      'L:
+      label L in
       h.data[j] <- dummy;
       assert { numofd h.data 0 (j+1) =
-               numofd (at h.data 'L) 0 (j+1) + 1 };
-      ghost h.view <- Map.set h.view (keym x) False;
+               numofd (h.data at L) 0 (j+1) + 1 };
+      ghost (h.view <- Map.set h.view (keym x) False);
       let l = ref h.loc in
       let f0 = find_dummy h.data j (next n j) in
       delete h.data l h.view f0 j j;
-      ghost h.loc <- !l;
+      ghost (h.loc <- !l);
       h.size <- h.size - 1;
     end
 

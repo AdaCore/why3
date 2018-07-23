@@ -6,31 +6,259 @@
 [kernel] Parsing tests/demo/isqrt.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
-[jessie3] creating logic symbol 68 (sqr)
+[jessie3] Starting translation
 [jessie3] processing function isqrt
 [jessie3] created program function isqrt (69)
 [jessie3] processing function main
+[jessie3] lookup program function isqrt (69)
 [jessie3] created program function main (76)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] failure: Exception raised during translation to Why3:
-                   Ident isqrt is not yet declared
-[jessie3] failure: Exception raised when loading prover drivers:
-                   anomaly: Log.AbortFatal("jessie3")
-[kernel] Current source was: tests/demo/isqrt.c:22
-         The full backtrace is:
-         Raised at file "src/kernel/log.ml", line 524, characters 30-31
-         Called from file "src/kernel/log.ml", line 518, characters 9-16
-         Re-raised at file "src/kernel/log.ml", line 521, characters 15-16
-         Called from file "register.ml", line 87, characters 6-113
-         Called from file "queue.ml", line 134, characters 6-20
-         Called from file "src/kernel/boot.ml", line 37, characters 4-20
-         Called from file "src/kernel/cmdline.ml", line 763, characters 2-9
-         Called from file "src/kernel/cmdline.ml", line 216, characters 4-8
-         
-         Plug-in jessie3 aborted: internal error.
-         Please report as 'crash' at http://bts.frama-c.com/.
-         Your Frama-C version is Sodium-20150201.
-         Note that a version and a backtrace alone often do not contain enough
-         information to understand the bug. Guidelines for reporting bugs are at:
-         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines
+[jessie3] made 2 function(s)
+[jessie3] Running provers...
+[jessie3] running theory 1:
+[jessie3] theory Global_logic_declarations
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            function sqr (x:int) : int = x * x
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn.BuiltIn *)
+            
+            (* use why3.Bool.Bool *)
+            
+            (* use why3.Unit.Unit *)
+            
+            (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
+            
+            (* use real.Real *)
+            
+            (* use array.Array *)
+            
+            (* use Global_logic_declarations *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach.bv.BVCheck32 *)
+            
+            (* use mach.int.Int64 *)
+            
+            goal VC_isqrt :
+              forall x:t.
+               to_uint x <= 1000000000 /\ to_uint x >= 0 ->
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 0 /\ 0 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 0 /\ o1 = of_int 0 ->
+                        (0 <= 0 /\ 0 < two_power_size) /\
+                         (forall o2:t.
+                           to_uint o2 = 0 /\ o2 = of_int 0 ->
+                            (forall count:t.
+                              count = o2 ->
+                               (0 <= 1 /\ 1 < two_power_size) /\
+                                (forall o3:t.
+                                  to_uint o3 = 1 /\ o3 = of_int 1 ->
+                                   (forall sum:t.
+                                     sum = o3 ->
+                                      ((to_uint count >= 0 /\
+                                         to_uint x >= sqr (to_uint count + 0)) /\
+                                        to_uint sum = sqr (to_uint count + 1)) /\
+                                       (forall sum1:t, count1:t.
+                                         (to_uint count1 >= 0 /\
+                                           to_uint x >= sqr (to_uint count1 + 0)) /\
+                                          to_uint sum1 = sqr (to_uint count1 + 1) ->
+                                          (if true then (to_uint sum1 <= to_uint x <->
+                                                          ule sum1 x) ->
+                                                         (if to_uint sum1 <= to_uint x then 
+                                                         (0 <= 1 /\ 1 < two_power_size) /\
+                                                          (forall o4:t.
+                                                            to_uint o4 = 1 /\
+                                                             o4 = of_int 1 ->
+                                                             (0 <=
+                                                               (to_uint count1 +
+                                                                 to_uint o4) /\
+                                                               (to_uint count1 +
+                                                                 to_uint o4) <
+                                                                two_power_size) /\
+                                                              (forall o5:t.
+                                                                to_uint o5 =
+                                                                 (to_uint count1 +
+                                                                   to_uint o4) /\
+                                                                 o5 = add count1 o4 ->
+                                                                 (forall count2:t.
+                                                                   count2 = o5 ->
+                                                                    (0 <= 1 /\
+                                                                      1 <
+                                                                       two_power_size) /\
+                                                                     (forall o6:t.
+                                                                       to_uint o6 = 1 /\
+                                                                        o6 = of_int 1 ->
+                                                                        (0 <= 2 /\
+                                                                          2 <
+                                                                           two_power_size) /\
+                                                                         (forall o7:t.
+                                                                           to_uint o7 =
+                                                                            2 /\
+                                                                            o7 =
+                                                                             of_int 2 ->
+                                                                            (0 <=
+                                                                              (
+                                                                              to_uint
+                                                                              o7 *
+                                                                              to_uint
+                                                                              count2) /\
+                                                                              (to_uint
+                                                                              o7 *
+                                                                              to_uint
+                                                                              count2) <
+                                                                              two_power_size) /\
+                                                                             (let o8 = 
+                                                                             mul o7
+                                                                              count2 in
+                                                                             to_uint o8 =
+                                                                              (
+                                                                              to_uint
+                                                                              o7 *
+                                                                              to_uint
+                                                                              count2) ->
+                                                                              (0 <=
+                                                                              (to_uint
+                                                                              o8 +
+                                                                              to_uint
+                                                                              o6) /\
+                                                                              (to_uint
+                                                                              o8 +
+                                                                              to_uint
+                                                                              o6) <
+                                                                              two_power_size) /\
+                                                                              (forall o9:
+                                                                              t.
+                                                                              to_uint
+                                                                              o9 =
+                                                                              (to_uint
+                                                                              o8 +
+                                                                              to_uint
+                                                                              o6) /\
+                                                                              o9 =
+                                                                              add o8 o6 ->
+                                                                              (0 <=
+                                                                              (to_uint
+                                                                              sum1 +
+                                                                              to_uint
+                                                                              o9) /\
+                                                                              (to_uint
+                                                                              sum1 +
+                                                                              to_uint
+                                                                              o9) <
+                                                                              two_power_size) /\
+                                                                              (forall o10:
+                                                                              t.
+                                                                              to_uint
+                                                                              o10 =
+                                                                              (to_uint
+                                                                              sum1 +
+                                                                              to_uint
+                                                                              o9) /\
+                                                                              o10 =
+                                                                              add sum1
+                                                                              o9 ->
+                                                                              (forall sum2:
+                                                                              t.
+                                                                              sum2 =
+                                                                              o10 ->
+                                                                              ((to_uint
+                                                                              count2 >=
+                                                                              0 /\
+                                                                              to_uint x >=
+                                                                              sqr
+                                                                              (to_uint
+                                                                              count2 +
+                                                                              0)) /\
+                                                                              to_uint
+                                                                              sum2 =
+                                                                              sqr
+                                                                              (to_uint
+                                                                              count2 +
+                                                                              1)) /\
+                                                                              0 <=
+                                                                              (to_uint
+                                                                              x -
+                                                                              to_uint
+                                                                              count1) /\
+                                                                              (to_uint
+                                                                              x -
+                                                                              to_uint
+                                                                              count2) <
+                                                                              (to_uint
+                                                                              x -
+                                                                              to_uint
+                                                                              count1))))))))))
+                                                         else (to_uint count1 >= 0 /\
+                                                                sqr
+                                                                 (to_uint count1 + 0) <=
+                                                                 to_uint x) /\
+                                                               to_uint x <
+                                                                sqr
+                                                                 (to_uint count1 + 1))
+                                          else (to_uint count1 >= 0 /\
+                                                 sqr (to_uint count1 + 0) <= to_uint x) /\
+                                                to_uint x < sqr (to_uint count1 + 1)))))))))
+            
+            goal VC_main :
+              (0 <= 0 /\ 0 < two_power_size) /\
+               (forall o:t.
+                 to_uint o = 0 /\ o = of_int 0 ->
+                  (0 <= 17 /\ 17 < two_power_size) /\
+                   (forall o1:t.
+                     to_uint o1 = 17 /\ o1 = of_int 17 ->
+                      (to_uint o1 <= 1000000000 /\ to_uint o1 >= 0) /\
+                       (forall o2:t.
+                         (to_uint o2 >= 0 /\ sqr (to_uint o2 + 0) <= to_uint o1) /\
+                          to_uint o1 < sqr (to_uint o2 + 1) ->
+                          (forall r:t.
+                            r = o2 ->
+                             (to_uint r < 4 -> false) &&
+                              (to_uint r > 4 -> false) && to_uint r = 4))))
+            end
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC isqrt) (loop invariant init): Valid, Valid, Valid
+[jessie3] Task 6 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 7 (VC isqrt) (precondition): Valid, Unknown, Valid
+[jessie3] Task 8 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 9 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 10 (VC isqrt) (precondition): Valid, Unknown, Valid
+[jessie3] Task 11 (VC isqrt) (precondition): Valid, Valid, Valid
+[jessie3] Task 12 (VC isqrt) (precondition): Valid, Unknown, Valid
+[jessie3] Task 13 (VC isqrt) (loop invariant preservation): Timeout, Valid, Valid
+[jessie3] Task 14 (VC isqrt) (loop variant decrease): Timeout, Unknown, Valid
+[jessie3] Task 15 (VC isqrt) (postcondition): Valid, Valid, Valid
+[jessie3] Task 16 (VC isqrt) (postcondition): Valid, Valid, Valid
+[jessie3] Task 17 (VC main) (precondition): Valid, Valid, Valid
+[jessie3] Task 18 (VC main) (precondition): Valid, Valid, Valid
+[jessie3] Task 19 (VC main) (precondition): Valid, Valid, Valid
+[jessie3] Task 20 (VC main) (precondition): Valid, Valid, Valid
+[jessie3] Task 21 (VC main) (assertion): Valid, Timeout, Valid
+[jessie3] Task 22 (VC main) (assertion): Valid, Unknown, Valid
+[jessie3] Task 23 (VC main) (postcondition): Valid, Valid, Valid

@@ -13,37 +13,34 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require map.Map.
 Require map.Occ.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (m1:(map.Map.map Z a))
-  (m2:(map.Map.map Z a)) (l:Z) (u:Z): Prop :=
+Definition permut {a:Type} {a_WT:WhyType a} (m1:Z -> a) (m2:Z -> a) (l:Z)
+    (u:Z) : Prop :=
   forall (v:a), ((map.Occ.occ v m1 l u) = (map.Occ.occ v m2 l u)).
 
 (* Why3 goal *)
-Lemma permut_trans :
-forall {a:Type} {a_WT:WhyType a},
-forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)) (a3:(map.Map.map Z a)),
- forall (l:Z) (u:Z),
-  (permut a1 a2 l u) -> ((permut a2 a3 l u) -> (permut a1 a3 l u)).
-intros a a_WT a1 a2 a3 l u h1 h2.
+Lemma permut_trans {a:Type} {a_WT:WhyType a} :
+  forall (a1:Z -> a) (a2:Z -> a) (a3:Z -> a), forall (l:Z) (u:Z),
+  (permut a1 a2 l u) -> (permut a2 a3 l u) -> permut a1 a3 l u.
+Proof.
+intros a1 a2 a3 l u h1 h2.
 unfold permut in *.
 intros. transitivity (Occ.occ v a2 l u); auto.
 Qed.
 
 (* Why3 goal *)
-Lemma permut_exists :
-forall {a:Type} {a_WT:WhyType a},
-forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)) (l:Z) (u:Z) (i:Z),
- (permut a1 a2 l u) ->
- (((l <= i)%Z /\ (i < u)%Z) ->
-  exists j:Z,
-   ((l <= j)%Z /\ (j < u)%Z) /\ ((map.Map.get a1 j) = (map.Map.get a2 i))).
+Lemma permut_exists {a:Type} {a_WT:WhyType a} :
+  forall (a1:Z -> a) (a2:Z -> a) (l:Z) (u:Z) (i:Z), (permut a1 a2 l u) ->
+  ((l <= i)%Z /\ (i < u)%Z) ->
+  exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\ ((a1 j) = (a2 i)).
 Proof.
-intros a a_WT a1 a2 l u i h1 Hi.
-pose (v := Map.get a2 i).
+intros a1 a2 l u i h1 Hi.
+pose (v := a2 i).
 assert (0 < map.Occ.occ v a2 l u)%Z.
   apply map.Occ.occ_pos. assumption.
 rewrite <- h1 in H.

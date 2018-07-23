@@ -9,12 +9,13 @@
 
 module Heap
 
-  use import int.Int
+  use int.Int
 
   type elt
-  predicate le elt elt
+  val predicate le elt elt
 
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
   type heap
 
@@ -65,7 +66,7 @@ end
 
 module HeapType
 
-  use import bintree.Tree
+  use bintree.Tree
 
   type elt
   type heap = E | T elt (tree elt)
@@ -74,12 +75,12 @@ end
 
 module Size
 
-  use import HeapType
-  use import int.Int
-  use import bintree.Tree
-  use import bintree.Size as T
+  use HeapType
+  use int.Int
+  use bintree.Tree
+  use bintree.Size as T
 
-  function size (h: heap) : int = match h with
+  let function size (h: heap) : int = match h with
     | E -> 0
     | T _ r -> 1 + T.size r
     end
@@ -98,10 +99,10 @@ end
 
 module Occ
 
-  use import HeapType
-  use import int.Int
-  use import bintree.Tree
-  use import bintree.Occ as T
+  use HeapType
+  use int.Int
+  use bintree.Tree
+  use bintree.Occ as T
 
   function occ (x: elt) (h: heap) : int = match h with
     | E -> 0
@@ -122,16 +123,17 @@ end
 
 module PairingHeap
 
-  use import int.Int
-  use import bintree.Tree
-  use import bintree.Occ as T
-  use import bintree.Size as TS
-  use import HeapType
-  use import Size
-  use import Occ
+  use int.Int
+  use bintree.Tree
+  use bintree.Occ as T
+  use bintree.Size as TS
+  use HeapType
+  use Size
+  use Occ
 
-  predicate le elt elt
-  clone import relations.TotalPreOrder with type t = elt, predicate rel = le
+  val predicate le elt elt
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
   predicate le_root (e: elt) (h: heap) = match h with
     | E -> true
@@ -195,7 +197,7 @@ module PairingHeap
 
   let is_empty (h: heap) : bool
     ensures { result <-> size h = 0 }
-  = h = E
+  = match h with E -> true | _ -> false end
 
   let size (h: heap) : int
     ensures { result = size h }

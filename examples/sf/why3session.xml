@@ -2,115 +2,57 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="9" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../sf.mlw">
-<theory name="HoareLogic">
- <goal name="WP_parameter slow_subtraction" expl="VC for slow_subtraction">
- <proof prover="8"><result status="valid" time="0.00" steps="7"/></proof>
+<file name="../sf.mlw" proved="true">
+<theory name="HoareLogic" proved="true">
+ <goal name="VC slow_subtraction" expl="VC for slow_subtraction" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="WP_parameter reduce_to_zero" expl="VC for reduce_to_zero">
- <proof prover="8"><result status="valid" time="0.00" steps="4"/></proof>
+ <goal name="VC reduce_to_zero" expl="VC for reduce_to_zero" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter slow_addition" expl="VC for slow_addition">
- <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="VC slow_addition" expl="VC for slow_addition" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="even_noneg" expl="">
- <transf name="induction_pr">
-  <goal name="even_noneg.1" expl="">
-  <proof prover="7"><result status="valid" time="0.00" steps="2"/></proof>
+ <goal name="even_noneg" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="even_noneg.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="even_noneg.2" expl="">
+  <goal name="even_noneg.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="even_not_odd" expl="">
- <transf name="induction_pr">
-  <goal name="even_not_odd.1" expl="">
-  <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
+ <goal name="even_not_odd" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="even_not_odd.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="even_not_odd.2" expl="">
+  <goal name="even_not_odd.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter parity" expl="VC for parity">
- <proof prover="8"><result status="valid" time="0.07" steps="32"/></proof>
+ <goal name="VC parity" expl="VC for parity" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="58"/></proof>
  </goal>
- <goal name="WP_parameter sqrt" expl="VC for sqrt">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
- <proof prover="8" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
- <proof prover="9"><result status="valid" time="0.01"/></proof>
+ <goal name="VC sqrt" expl="VC for sqrt" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
- <goal name="WP_parameter factorial" expl="VC for factorial">
- <proof prover="8"><result status="valid" time="0.01" steps="19"/></proof>
+ <goal name="VC factorial" expl="VC for factorial" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
 </theory>
-<theory name="MoreHoareLogic">
- <goal name="WP_parameter list_sum" expl="VC for list_sum">
- <proof prover="8"><result status="valid" time="0.03" steps="47"/></proof>
+<theory name="MoreHoareLogic" proved="true">
+ <goal name="VC list_sum" expl="VC for list_sum" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="124"/></proof>
  </goal>
- <goal name="WP_parameter list_member" expl="VC for list_member">
- <transf name="split_goal_right">
-  <goal name="WP_parameter list_member.1" expl="loop invariant init">
-  <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.2" expl="precondition">
-  <proof prover="8"><result status="valid" time="0.01" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.3" expl="precondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.4" expl="loop invariant preservation">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter list_member.4.1" expl="VC for list_member">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter list_member.4.2" expl="VC for list_member">
-   <proof prover="8"><result status="valid" time="0.02" steps="31"/></proof>
-   </goal>
-   <goal name="WP_parameter list_member.4.3" expl="VC for list_member">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter list_member.5" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.6" expl="precondition">
-  <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.7" expl="loop invariant preservation">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter list_member.7.1" expl="VC for list_member">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter list_member.7.2" expl="VC for list_member">
-   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   <proof prover="4" timelimit="5"><result status="valid" time="0.02"/></proof>
-   <proof prover="5"><result status="valid" time="0.02"/></proof>
-   <proof prover="6"><result status="valid" time="0.02"/></proof>
-   <proof prover="8" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="31"/></proof>
-   </goal>
-   <goal name="WP_parameter list_member.7.3" expl="VC for list_member">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter list_member.8" expl="loop variant decrease">
-  <proof prover="8"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter list_member.9" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
- </transf>
+ <goal name="VC list_member" expl="VC for list_member" proved="true">
+ <proof prover="1"><result status="valid" time="0.12" steps="814"/></proof>
  </goal>
 </theory>
 </file>

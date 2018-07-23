@@ -2,141 +2,101 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../leftist_heap.mlw">
-<theory name="Heap">
-</theory>
-<theory name="TreeRank">
-</theory>
-<theory name="Size">
- <goal name="size_nonneg" expl="">
- <transf name="induction_ty_lex">
-  <goal name="size_nonneg.1" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../leftist_heap.mlw" proved="true">
+<theory name="Size" proved="true">
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="size_nonneg" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="size_nonneg.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_empty" expl="">
- <transf name="induction_ty_lex">
-  <goal name="size_empty.1" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Occ">
- <goal name="occ_nonneg" expl="">
- <transf name="induction_ty_lex">
-  <goal name="occ_nonneg.1" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+ <goal name="size_empty" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="size_empty.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="LeftistHeap">
- <goal name="le_root_trans" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
- </goal>
- <goal name="WP_parameter root_is_miminum" expl="VC for root_is_miminum">
- <proof prover="0"><result status="valid" time="0.13"/></proof>
- </goal>
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
- </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
- </goal>
- <goal name="WP_parameter size" expl="VC for size">
- <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
- </goal>
- <goal name="WP_parameter rank" expl="VC for rank">
- <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
- </goal>
- <goal name="WP_parameter make_n" expl="VC for make_n">
- <proof prover="1"><result status="valid" time="0.21" steps="819"/></proof>
- </goal>
- <goal name="WP_parameter merge" expl="VC for merge">
- <transf name="split_goal_right">
-  <goal name="WP_parameter merge.1" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.2" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.4" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.5" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.6" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.7" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.8" expl="postcondition">
+<theory name="Occ" proved="true">
+ <goal name="occ_nonneg" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="occ_nonneg.0" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.9" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+ </transf>
+ </goal>
+</theory>
+<theory name="LeftistHeap" proved="true">
+ <goal name="le_root_trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="19"/></proof>
+ </goal>
+ <goal name="VC root_is_miminum" expl="VC for root_is_miminum" proved="true">
+ <proof prover="1"><result status="valid" time="0.77" steps="1469"/></proof>
+ </goal>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+ </goal>
+ <goal name="VC rank" expl="VC for rank" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+ </goal>
+ <goal name="VC make_n" expl="VC for make_n" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="198"/></proof>
+ </goal>
+ <goal name="VC merge" expl="VC for merge" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC merge.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.03" steps="65"/></proof>
+  <goal name="VC merge.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="95"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="58"/></proof>
+  <goal name="VC merge.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="110"/></proof>
   </goal>
-  <goal name="WP_parameter merge.12" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
+  <goal name="VC merge.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
-  <goal name="WP_parameter merge.13" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.26"/></proof>
+  <goal name="VC merge.4" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
-  <goal name="WP_parameter merge.14" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
+  <goal name="VC merge.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="96"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="46"/></proof>
+  <goal name="VC merge.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="111"/></proof>
   </goal>
-  <goal name="WP_parameter merge.16" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="16"/></proof>
+  <goal name="VC merge.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter merge.17" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="66"/></proof>
+  <goal name="VC merge.8" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="221"/></proof>
   </goal>
-  <goal name="WP_parameter merge.18" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="58"/></proof>
+  <goal name="VC merge.9" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="392"/></proof>
   </goal>
-  <goal name="WP_parameter merge.19" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.20" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.36"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.21" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.22" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.23" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC merge.10" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <proof prover="1"><result status="valid" time="0.04" steps="124"/></proof>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="140"/></proof>
  </goal>
- <goal name="WP_parameter find_min" expl="VC for find_min">
- <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+ <goal name="VC find_min" expl="VC for find_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
- <goal name="WP_parameter delete_min" expl="VC for delete_min">
- <proof prover="1"><result status="valid" time="0.03" steps="126"/></proof>
+ <goal name="VC delete_min" expl="VC for delete_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="228"/></proof>
  </goal>
 </theory>
 </file>

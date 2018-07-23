@@ -16,7 +16,7 @@ open Task
 open Trans
 
 let meta_select_kept = register_meta_excl "select_kept" [MTstring]
-  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding : kept':@;  \
+  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding:kept':@;  \
     @[\
       - none: @[don't@ mark@ any@ type@ automatically@]@\n\
       - goal: @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
@@ -31,7 +31,7 @@ let meta_enco_kept = register_meta_excl "enco_kept" [MTstring]
   ~desc:"Specify@ the@ type@ protection@ transformation:@;  \
     @[\
       - @[<hov 2>twin: use@ conversion@ functions@ between@ the@ kept@ types@ \
-            and@ the@ universal@ type@]@\
+            and@ the@ universal@ type@]\
     @]"
 
 let meta_enco_poly = register_meta_excl "enco_poly" [MTstring]
@@ -40,7 +40,7 @@ let meta_enco_poly = register_meta_excl "enco_poly" [MTstring]
       - @[<hov 2>tags: protect@ variables@ in@ equalities@ \
             with@ type@ annotations@]@\n\
       - @[<hov 2>guards: protect@ variables@ in@ equalities@ \
-            with@ type@ conditions@]\n\
+            with@ type@ conditions@]@\n\
       - @[<hov 2>tags_full: put@ type@ annotations@ on@ top@ \
             of@ every@ term@]@\n\
       - @[<hov 2>guards_full: add@ type@ conditions@ for@ every@ variable.@]\

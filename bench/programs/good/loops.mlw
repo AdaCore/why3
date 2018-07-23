@@ -1,7 +1,7 @@
 module M
 
-use import int.Int
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 (** 1. A loop increasing [i] up to 10. *)
 
@@ -32,8 +32,3 @@ let loop2 (u:unit) requires { !x <= 10 }
 
 end
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/loops"
-End:
-*)

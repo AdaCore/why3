@@ -3,6 +3,8 @@
   <head>
     <title>Why3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/solid.css" integrity="sha384-Rw5qeepMFvJVEZdSo1nDQD5B6wX0m7c5Z/pLNvjkB14W6Yki1hKbSEQaX9ffUbWe" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/fontawesome.css" integrity="sha384-GVa9GOgVQgOk+TNYXu7S/InPTfSDTtBalSgkgqQ7sCik56N9ztlkoTr2f/T44oKV" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="why3.css" />
     <link rel="stylesheet" type="text/css" href="why3_custom.css"/>
 
@@ -26,11 +28,11 @@
  	<div class="why3-button-group">
 	  <button id="why3-button-open"  class="why3-button"
                   title="Open file (ctrl-o)">
-	    <span class="fa-folder-open"></span>
+	    <span class="fas fa-folder-open"></span>
 	  </button>
 	  <button id="why3-button-save"  class="why3-button"
                   title="Save file (ctrl-s)">
-	    <span class="fa-cloud-download"></span>
+	    <span class="fas fa-save"></span>
 	  </button>
  	</div>
 
@@ -38,18 +40,18 @@
  	<div class="why3-button-group">
 	  <button id="why3-button-undo"  class="why3-button"
                   title="Undo edit (ctrl-z)">
-	    <span class="fa-undo"></span>
+	    <span class="fas fa-undo"></span>
 	  </button>
 	  <button id="why3-button-redo"  class="why3-button"
                   title="Repeat edit (ctrl-y)">
-	    <span class="fa-repeat"></span>
+	    <span class="fas fa-redo"></span>
 	  </button>
  	</div>
 
 	<div class="why3-separator" style="width:2em;"></div>
 
 	<div class="why3-button-group">
-	  <span id="why3-example-label" class="fa fa-refresh why3-icon"></span>
+	  <span id="why3-example-label" class="fas fa-refresh why3-icon"></span>
 	  <select  id="why3-select-example"
 		   title="Choose a predefined example">
 	    <option disabled="disabled" selected="selected">&nbsp;</option>
@@ -60,28 +62,28 @@
 
 	<div class="why3-button-group">
           <button id="why3-button-compile" class="why3-button" title="Compile buffer">
-	    <span class="fa-cogs"></span>
+	    <span class="fas fa-cogs"></span>
 	  </button>
 	  <button id="why3-button-execute" class="why3-button" title="Execute buffer">
-	    <span class="fa-arrow-circle-right"></span>
+	    <span class="fas fa-arrow-circle-right"></span>
 	  </button>
 	  <button id="why3-button-stop" class="why3-button" title="Interrupt">
-	    <span class="fa-ban"></span>
+	    <span class="fas fa-ban"></span>
 	  </button>
 	</div>
 
 	<div class="why3-button-group why3-flushright">
 	  <button id="why3-button-settings" class="why3-button"
 		  title="Settings…">
-	    <span class="fa-wrench"></span>
+	    <span class="fas fa-wrench"></span>
 	  </button>
 	  <button id="why3-button-help" class="why3-button"
 		  title="Help">
-	    <span class="fa-question-circle"></span>
+	    <span class="fas fa-question-circle"></span>
 	  </button>
 	  <button id="why3-button-about" class="why3-button"
 		  title="About">
-	    <span class="fa-info-circle"></span>
+	    <span class="fas fa-info-circle"></span>
 	  </button>
 	</div>
 
@@ -164,19 +166,19 @@
     <!-- context menu -->
     <div class="why3-contextmenu why3-widget" id="why3-task-menu">
       <ul>
-	<li id="why3-split-menu-entry"><span class="fa-share-alt
+	<li id="why3-split-menu-entry"><span class="fas fa-share-alt
 						    why3-icon"></span> Split and prove </li>
-	<li id="why3-prove-menu-entry"><span class="fa-check-square
+	<li id="why3-prove-menu-entry"><span class="fas fa-check-square
 						    why3-icon"></span>
 						    Prove (default) </li>
-	<li id="why3-prove100-menu-entry"><span class="fa-check-square
+	<li id="why3-prove100-menu-entry"><span class="fas fa-check-square
 						    why3-icon"></span>
 						    Prove (100
 	  steps) </li>
-	<li id="why3-prove1000-menu-entry"><span class="fa-check-square
+	<li id="why3-prove1000-menu-entry"><span class="fas fa-check-square
 							why3-icon"></span>
 	  Prove (1000 steps) </li>
-	<li id="why3-clean-menu-entry"><span class="fa-unlink why3-icon"></span>
+	<li id="why3-clean-menu-entry"><span class="fas fa-unlink why3-icon"></span>
 	  Clean </li>
       </ul>
     </div>
@@ -212,11 +214,11 @@
 	  <p>TryWhy3 is a Javascript based version of
 	    the <a href="http://why3.lri.fr/" target="_blank">Why3
 	    Verification Platform</a></p>
-	  <p>© 2010-2016,   Inria - CNRS - Paris-Sud University<br/>
+	  <p>© 2010-2017,   Inria - CNRS - Paris-Sud University<br/>
 	    This software is distributed under the terms of the GNU Lesser
 	    General Public License version 2.1, with the special exception
 	    on linking described in the
-	    file <a href="https://scm.gforge.inria.fr/anonscm/gitweb?p=why3/why3.git;a=blob_plain;f=LICENSE"
+	    file <a href="https://gitlab.inria.fr/why3/why3/raw/master/LICENSE"
 	            target="_blank">LICENSE</a>.
 	  </p>
 	  <p>TryWhy3 relies on the following excellent open source
@@ -231,7 +233,7 @@
 	    the <a href="http://ocsigen.org/"  target="_blank">Ocsigen</a>
 	      project.</li>
 
-	    <li>The <a href="https://fortawesome.github.io/Font-Awesome/"
+	    <li>The <a href="https://fontawesome.com/"
 		 target="_blank">Font
 		Awesome</a> font and CSS toolkit.</li>
 	    <li>The <a href="https://ace.c9.io/"  target="_blank">ACE</a> Web editor.</li>
@@ -240,7 +242,7 @@
 	<button id="why3-close-dialog-button"
 		style="float:right;"
 		class="why3-button"
-		title="Close"><span class="fa-times"></span></button>
+		title="Close"><span class="fas fa-times"></span></button>
       </div>
     </div>
   </body>

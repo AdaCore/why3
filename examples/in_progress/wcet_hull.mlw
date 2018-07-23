@@ -7,12 +7,12 @@ module M
    the body of the inner loop is executed.
 *)
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
-  constant n : int
-  axiom N_non_negative : n >= 0
+  val constant n : int
+    ensures { 0 <= result }
 
   let hull (a: array int) (b: array int) =
     let j = ref 0 in

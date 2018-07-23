@@ -22,9 +22,9 @@ Require Import Rbasic_fun.
 
 (* Why3 goal *)
 Lemma min_def :
-forall (x:R) (y:R),
- ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x))
- /\ ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmin x y) = y)).
+  forall (x:R) (y:R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
@@ -38,9 +38,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma max_def :
-forall (x:R) (y:R),
- ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y))
- /\ ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmax x y) = x)).
+  forall (x:R) (y:R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
 intros x y.
 split ; intros H.
@@ -51,34 +51,35 @@ Qed.
 
 (* Why3 goal *)
 Lemma Min_r :
-forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmin x y) = y).
+  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmin x y) = y).
 exact Rmin_right.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_l :
-forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmax x y) = x).
+  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmax x y) = x).
 exact Rmax_left.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_comm :
-forall (x:R) (y:R),
- ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
+  forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
 exact Rmin_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_comm :
-forall (x:R) (y:R),
- ((Reals.Rbasic_fun.Rmax x y) = (Reals.Rbasic_fun.Rmax y x)).
+  forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rmax x y) = (Reals.Rbasic_fun.Rmax y x)).
 exact Rmax_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_assoc :
-forall (x:R) (y:R) (z:R),
- ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) = (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
+  forall (x:R) (y:R) (z:R),
+  ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) =
+   (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
 Proof.
 intros x y z.
 destruct (Rle_or_lt x y) as [Hxy|Hxy].
@@ -100,8 +101,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Max_assoc :
-forall (x:R) (y:R) (z:R),
- ((Reals.Rbasic_fun.Rmax (Reals.Rbasic_fun.Rmax x y) z) = (Reals.Rbasic_fun.Rmax x (Reals.Rbasic_fun.Rmax y z))).
+  forall (x:R) (y:R) (z:R),
+  ((Reals.Rbasic_fun.Rmax (Reals.Rbasic_fun.Rmax x y) z) =
+   (Reals.Rbasic_fun.Rmax x (Reals.Rbasic_fun.Rmax y z))).
 Proof.
 intros x y z.
 destruct (Rle_or_lt x y) as [Hxy|Hxy].

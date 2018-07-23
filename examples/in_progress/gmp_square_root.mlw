@@ -16,9 +16,8 @@
 
 module GmpModel
 
-  use export int.Int
-  use export int.ComputerDivision
-  use export array.Array
+  use int.Int
+  use array.Array
 
   constant beta' : int
   axiom one_lt_beta' : 1 < beta'
@@ -27,7 +26,7 @@ module GmpModel
   type memory = array int
 
   val m: memory
-    (** invariant: each cell contains an integer in [0..beta[ *)
+    (** invariant: each cell contains an integer in [\[0..beta\[] *)
 
   type pointer = int
   type size = int
@@ -39,11 +38,11 @@ module GmpModel
     p1 + s1 <= p2 \/ p2 + s2 <= p1
 
   function i (m: memory) (p: pointer) (s: size) : int
-    (** the GMP integer in m[p..p+s[ *)
+    (** the GMP integer in [m\[p..p+s\[] *)
 
   predicate modifies (m1 m2: memory) (p: pointer) (s: size) =
     forall q: pointer. (q < p \/ p + s <= q) -> m2[q] = m1[q]
-    (** nothing modified apart from [p..p+s[ *)
+    (** nothing modified apart from [\[p..p+s\[] *)
 
   axiom frame:
     forall m1 m2: memory, p: pointer, s: size.
@@ -54,7 +53,7 @@ module GmpModel
                       (p1: pointer) (s1: size) (p2: pointer) (s2: size) =
     forall q: pointer. (   (q < p1 \/ p1 + s1 <= q)
                         /\ (q < p2 \/ p2 + s2 <= q)) -> m2[q] = m1[q]
-    (** nothing modified apart from [p1..p1+s1[ and [p2..p2+s2[ *)
+    (** nothing modified apart from [\[p1..p1+s1\[] and [\[p2..p2+s2\[] *)
 
   axiom frame2:
     forall m1 m2: memory, p1 p2: pointer, s1 s2: size.
@@ -75,8 +74,11 @@ end
 module GmpAuxiliaryfunctions
 
   use export GmpModel
-  use export ref.Ref
-  use export int.Power
+  use int.Int
+  use int.ComputerDivision
+  use int.Power
+  use ref.Ref
+  use array.Array
 
   val rb: ref bool
 
@@ -166,8 +168,8 @@ end
 
 module GmpSquareRoot
 
-  use import GmpAuxiliaryfunctions
-  use import ref.Ref
+  use GmpAuxiliaryfunctions
+  use ref.Ref
 
 (**
   let division_step (np sp: pointer) (nn l h: size) (c q: ref int) : unit

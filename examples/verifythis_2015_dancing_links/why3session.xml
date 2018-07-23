@@ -2,81 +2,49 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2015_dancing_links.mlw">
-<theory name="DancingLinks">
- <goal name="WP_parameter remove" expl="VC for remove">
- <transf name="split_goal_right">
-  <goal name="WP_parameter remove.1" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../verifythis_2015_dancing_links.mlw" proved="true">
+<theory name="DancingLinks" proved="true">
+ <goal name="VC dll" expl="VC for dll" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <proof prover="0"><result status="valid" time="2.24" steps="1484"/></proof>
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC remove.0" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter remove.2" expl="index in array bounds">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <goal name="VC remove.1" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter remove.3" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+  <goal name="VC remove.2" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter remove.4" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="VC remove.3" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter remove.5" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC remove.4" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter remove.6" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="VC remove.5" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
-  <goal name="WP_parameter remove.7" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC remove.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter remove.8" expl="assertion">
-  <proof prover="3"><result status="valid" time="0.02" steps="27"/></proof>
+  <goal name="VC remove.7" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="60"/></proof>
   </goal>
-  <goal name="WP_parameter remove.9" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC remove.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="358"/></proof>
   </goal>
-  <goal name="WP_parameter remove.10" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.11" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.12" steps="34"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.12" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.21"/></proof>
+  <goal name="VC remove.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.71" steps="1472"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter put_back" expl="VC for put_back">
- <transf name="split_goal_right">
-  <goal name="WP_parameter put_back.1" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.2" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.3" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.4" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.5" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.6" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.7" expl="type invariant">
-  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.8" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter put_back.9" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.25"/></proof>
-  </goal>
- </transf>
+ <goal name="VC put_back" expl="VC for put_back" proved="true">
+ <proof prover="0"><result status="valid" time="1.52" steps="1675"/></proof>
  </goal>
 </theory>
 </file>

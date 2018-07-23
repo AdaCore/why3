@@ -1,0 +1,190 @@
+module Intf
+
+  use int.Int
+
+  type t = private {
+                  size: int;        (* elements are 0,1,...,size-1 *)
+    ghost mutable repr: int -> int;
+  } invariant {
+    0 <= size /\
+    (forall i. 0 <= i < size -> 0 <= repr i < size) /\
+    (forall i. 0 <= i < size -> repr (repr i) = repr i)
+  } by { size = 0; repr = fun i -> i }
+
+  val create (n: int) : t
+    requires { 0 <= n }
+    ensures  { result.size = n }
+    ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
+
+  val find (uf: t) (x: int) : int
+    requires { 0 <= x < uf.size }
+    ensures  { result = uf.repr x }
+
+  predicate same (repr: int -> int) (x y: int) =
+    repr x = repr y
+
+  val union (uf: t) (x y: int) : unit
+    requires { 0 <= x < uf.size }
+    requires { 0 <= y < uf.size }
+    writes   { uf.repr }
+    ensures  { same uf.repr x y }
+    ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
+               same uf.repr i j <->
+                 same (old uf.repr) i j \/
+                 same (old uf.repr) i x /\ same (old uf.repr) y j \/
+                 same (old uf.repr) i y /\ same (old uf.repr) x j }
+
+end
+
+module Impl
+
+  use int.Int
+  use array.Array
+
+  (* there is a path from x to y of length at most d *)
+  inductive path (size: int) (link: array int) (x d y: int) =
+  | path_zero: forall size link x d.
+               0 <= x < size -> link[x] = x -> 0 <= d ->
+               path size link x d x
+  | path_succ: forall size link.
+               forall x d z. 0 <= x < size -> link[x] <> x ->
+               path size link link[x] d z ->
+               path size link x (d + 1) z
+
+  lemma path_dist_nonneg:
+    forall size link x d y. path size link x d y -> 0 <= d
+
+  lemma path_src:
+    forall size link x d y. path size link x d y -> 0 <= x < size
+
+  lemma path_dst:
+    forall size link x d y. path size link x d y -> 0 <= y < size
+
+  let rec lemma path_unique (size: int) (link: array int) (x d1 d2 y1 y2: int)
+    requires { length link = size }
+    requires { path size link x d1 y1 }
+    requires { path size link x d2 y2 }
+    variant  { d1 + d2 }
+    ensures  { y1 = y2 }
+  = if x <> link[x] then begin
+      path_unique size link link[x] (d1-1) (d2-1) y1 y2;
+    end
+
+  let rec lemma path_last (size: int) (link: array int) (x d y: int)
+    requires { length link = size }
+    requires { path size link x d y }
+    variant  { d }
+    ensures  { link[y] = y }
+  = if x <> link[x] then path_last size link link[x] (d-1) y
+
+  type t = {
+                  size: int;        (* elements are 0,1,...,size-1 *)
+                  link: array int;
+                  rank: array int;
+    ghost mutable repr: int -> int;
+    ghost mutable dist: int -> int;
+  } invariant {
+    0 <= size = length link = length rank /\
+    (forall i. 0 <= i < size -> 0 <= repr i < size) /\
+    (forall i. 0 <= i < size -> repr (repr i) = repr i) /\
+    (forall i. 0 <= i < size -> link[i] <> i -> dist link[i] < dist i) /\
+    (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
+  } by {
+    size = 0; link = Array.make 0 0; rank = Array.make 0 0;
+    repr = (fun i -> i); dist = (fun i -> 0)
+  }
+
+  let create (n: int) : t
+    requires { 0 <= n }
+    ensures  { result.size = n }
+    ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
+  = let link = Array.make n 0 in
+    for i = 0 to n - 1 do
+      invariant { forall j. 0 <= j < i -> link[j] = j }
+      link[i] <- i
+    done;
+    let rank = Array.make n 0 in
+    { size = n; link = link; rank = rank;
+      repr = (fun i -> i); dist = (fun i -> 0) }
+
+  let rec lemma path_dist (size: int) (link: array int) (dist: int -> int)
+                          (x d y: int)
+    requires { length link = size }
+    requires { path size link x d y }
+    requires { forall i. 0 <= i < size -> link[i] <> i -> dist link[i] < dist i}
+    requires { x <> y }
+    variant  { d }
+    ensures  { dist y < dist x }
+  = if x <> link[x] && link[x] <> y then
+      path_dist size link dist link[x] (d-1) y
+
+  let rec lemma path_compression
+    (size: int) (link: array int) (x dx rx: int) (i di ri: int)
+    requires { length link = size }
+    requires { path size link x dx rx }
+    requires { x <> rx }
+    requires { path size link i di ri }
+    variant  { di }
+    ensures  { path size link[x <- rx] i di ri }
+  = if i = x then ()
+    else if link[i] = i then ()
+    else path_compression size link x dx rx link[i] (di-1) ri
+
+  let rec find (uf: t) (x: int) : int
+    requires { 0 <= x < uf.size }
+    writes   { uf.link(* , uf.dist *) }
+    variant  { uf.dist x }
+    ensures  { result = uf.repr x }
+    ensures  { path uf.size uf.link x (uf.dist x) result }
+  = let y = uf.link[x] in
+    if y <> x then begin
+      assert { path uf.size uf.link y (uf.dist x - 1) (uf.repr x) };
+      let r = find uf y in
+      assert { x <> r };
+      uf.link[x] <- r; (* path compression *)
+      r
+    end else
+      x
+
+  predicate same (repr: int -> int) (x y: int) =
+    repr x = repr y
+
+  let union (uf: t) (x y: int) : unit
+    requires { 0 <= x < uf.size }
+    requires { 0 <= y < uf.size }
+    writes   { uf.link, uf.rank, uf.repr, uf.dist }
+    ensures  { same uf.repr x y }
+    ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
+               same uf.repr i j <->
+                 same (old uf.repr) i j \/
+                 same (old uf.repr) i x /\ same (old uf.repr) y j \/
+                 same (old uf.repr) i y /\ same (old uf.repr) x j }
+  = let rx = find uf x in
+    let ry = find uf y in
+    if rx <> ry then
+      let oldr = uf.repr in
+      let oldd = uf.dist in
+      if uf.rank[rx] <= uf.rank[ry] then begin
+        uf.link[rx] <- ry;
+        uf.repr <- (fun i -> if oldr i = rx then ry else oldr i);
+        uf.dist <- pure { fun i -> if oldr i = rx then oldd i + 1 else oldd i };
+        assert { forall i. 0 <= i < uf.size ->
+             if oldr i = rx then path uf.size uf.link i (oldd i + 1) ry
+                            else path uf.size uf.link i (oldd i)     (oldr i)};
+        if uf.rank[rx] = uf.rank[ry] then
+          uf.rank[ry] <- uf.rank[ry] + 1
+      end else begin
+        uf.link[ry] <- rx;
+        uf.repr <- (fun i -> if oldr i = ry then rx else oldr i);
+        uf.dist <-
+          pure { fun i -> if oldr i = ry then oldd i + 1 else oldd i };
+
+      end
+
+  clone Intf with
+    type t = t,
+    val  create = create,
+    val  find = find,
+    val  union = union
+
+end

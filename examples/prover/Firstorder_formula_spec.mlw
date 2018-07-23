@@ -1,12 +1,12 @@
 module Spec
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_term_spec.Spec
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_term_spec.Spec
   type fo_formula 'b0 'b1 =
     | Forall (fo_formula 'b0 (option 'b1))
     | Exists (fo_formula 'b0 (option 'b1))
@@ -73,8 +73,8 @@ module Spec
           ()
     end
   
-  function rename_fo_formula (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0)
-    (s1:func 'b1 'c1) : fo_formula 'c0 'c1 =
+  function rename_fo_formula (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0)
+    (s1:'b1 -> 'c1) : fo_formula 'c0 'c1 =
     match t with | Forall v0 -> Forall (rename_fo_formula v0 s0 (olift s1))
       | Exists v0 -> Exists (rename_fo_formula v0 s0 (olift s1))
       | And v0 v1 ->
@@ -88,8 +88,8 @@ module Spec
     end
   
   let rec lemma renaming_composition_lemma_fo_formula (t:fo_formula 'b0 'b1)
-    (s10:func 'b0 'c0) (s11:func 'b1 'c1) (s20:func 'c0 'd0)
-    (s21:func 'c1 'd1) : unit
+    (s10:'b0 -> 'c0) (s11:'b1 -> 'c1) (s20:'c0 -> 'd0) (s21:'c1 -> 'd1) :
+    unit
     ensures { rename_fo_formula (rename_fo_formula t s10 s11) s20 s21 =
       rename_fo_formula t (rcompose s10 s20) (rcompose s11 s21) }
     variant { size_fo_formula t } =
@@ -132,8 +132,8 @@ module Spec
           renaming_identity_lemma_fo_term_list v1 ; ()
     end
   
-  function subst_fo_formula (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)) : fo_formula 'c0 'c1 =
+  function subst_fo_formula (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)) : fo_formula 'c0 'c1 =
     match t with
       | Forall v0 ->
         Forall
@@ -167,8 +167,8 @@ module Spec
     end
   
   let rec lemma rename_then_subst_composition_lemma_fo_formula
-    (t:fo_formula 'b0 'b1) (s10:func 'b0 'c0) (s11:func 'b1 'c1)
-    (s20:func 'c0 (symbol 'd0)) (s21:func 'c1 (fo_term 'd0 'd1)) : unit
+    (t:fo_formula 'b0 'b1) (s10:'b0 -> 'c0) (s11:'b1 -> 'c1)
+    (s20:'c0 -> (symbol 'd0)) (s21:'c1 -> (fo_term 'd0 'd1)) : unit
     ensures { subst_fo_formula (rename_fo_formula t s10 s11) s20 s21 =
       subst_fo_formula t (rcompose s10 s20) (rcompose s11 s21) }
     variant { size_fo_formula t } =
@@ -209,9 +209,8 @@ module Spec
     end
   
   let rec lemma subst_then_rename_composition_lemma_fo_formula
-    (t:fo_formula 'b0 'b1) (s10:func 'b0 (symbol 'c0))
-    (s11:func 'b1 (fo_term 'c0 'c1)) (s20:func 'c0 'd0) (s21:func 'c1 'd1) :
-    unit
+    (t:fo_formula 'b0 'b1) (s10:'b0 -> (symbol 'c0))
+    (s11:'b1 -> (fo_term 'c0 'c1)) (s20:'c0 -> 'd0) (s21:'c1 -> 'd1) : unit
     ensures { rename_fo_formula (subst_fo_formula t s10 s11) s20 s21 =
       subst_fo_formula t (rename_subst_symbol s10 s20)
         (rename_subst_fo_term s11 s20 s21)
@@ -256,8 +255,8 @@ module Spec
     end
   
   let rec lemma subst_composition_lemma_fo_formula (t:fo_formula 'b0 'b1)
-    (s10:func 'b0 (symbol 'c0)) (s11:func 'b1 (fo_term 'c0 'c1))
-    (s20:func 'c0 (symbol 'd0)) (s21:func 'c1 (fo_term 'd0 'd1)) : unit
+    (s10:'b0 -> (symbol 'c0)) (s11:'b1 -> (fo_term 'c0 'c1))
+    (s20:'c0 -> (symbol 'd0)) (s21:'c1 -> (fo_term 'd0 'd1)) : unit
     ensures { subst_fo_formula (subst_fo_formula t s10 s11) s20 s21 =
       subst_fo_formula t (subst_compose_symbol s10 s20)
         (subst_compose_fo_term s11 s20 s21)
@@ -334,7 +333,7 @@ module Spec
     end
   
   let rec lemma renaming_preserve_size_fo_formula (t:fo_formula 'b0 'b1)
-    (s0:func 'b0 'c0) (s1:func 'b1 'c1) : unit
+    (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : unit
     ensures { size_fo_formula (rename_fo_formula t s0 s1) = size_fo_formula t
       }
     variant { size_fo_formula t } =
@@ -387,7 +386,7 @@ module Spec
     end
   
   let rec ghost rename_free_var_constructive_inversion_symbol_fo_formula
-    (x:'c0) (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : 'b0
+    (x:'c0) (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : 'b0
     requires { is_symbol_free_var_in_fo_formula x (rename_fo_formula t s0 s1)
       }
     ensures { is_symbol_free_var_in_fo_formula result t /\ s0 result = x }
@@ -470,7 +469,7 @@ module Spec
     end
   
   with lemma rename_free_var_inversion_symbol_fo_formula (x:'c0)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : unit
     requires { is_symbol_free_var_in_fo_formula x (rename_fo_formula t s0 s1)
       }
     ensures { exists y:'b0. is_symbol_free_var_in_fo_formula y t /\ s0 y = x
@@ -481,7 +480,7 @@ module Spec
     in ()
   
   with ghost rename_free_var_constructive_inversion_fo_term_fo_formula
-    (x:'c1) (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : 'b1
+    (x:'c1) (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : 'b1
     requires {
       is_fo_term_free_var_in_fo_formula x (rename_fo_formula t s0 s1) }
     ensures { is_fo_term_free_var_in_fo_formula result t /\ s1 result = x }
@@ -558,7 +557,7 @@ module Spec
     end
   
   with lemma rename_free_var_inversion_fo_term_fo_formula (x:'c1)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : unit
     requires {
       is_fo_term_free_var_in_fo_formula x (rename_fo_formula t s0 s1) }
     ensures { exists y:'b1. is_fo_term_free_var_in_fo_formula y t /\ s1 y = x
@@ -569,7 +568,7 @@ module Spec
     in ()
   
   let rec lemma rename_free_var_propagation_symbol_fo_formula (x:'b0)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : unit
     ensures { is_symbol_free_var_in_fo_formula x t ->
       is_symbol_free_var_in_fo_formula (s0 x) (rename_fo_formula t s0 s1) }
     variant { size_fo_formula t } =
@@ -595,7 +594,7 @@ module Spec
     end
   
   with lemma rename_free_var_propagation_fo_term_fo_formula (x:'b1)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 'c0) (s1:func 'b1 'c1) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> 'c0) (s1:'b1 -> 'c1) : unit
     ensures { is_fo_term_free_var_in_fo_formula x t ->
       is_fo_term_free_var_in_fo_formula (s1 x) (rename_fo_formula t s0 s1) }
     variant { size_fo_formula t } =
@@ -621,8 +620,8 @@ module Spec
     end
   
   let rec ghost subst_free_var_constructive_inversion_symbol_fo_formula
-    (x:'c0) (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)) : sum ('b0) ('b1)
+    (x:'c0) (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)) : sum ('b0) ('b1)
     requires { is_symbol_free_var_in_fo_formula x (subst_fo_formula t s0 s1)
       }
     ensures { let sumx = result in
@@ -837,8 +836,8 @@ module Spec
     end
   
   with lemma subst_free_var_inversion_symbol_fo_formula (x:'c0)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)) : unit
     requires { is_symbol_free_var_in_fo_formula x (subst_fo_formula t s0 s1)
       }
     ensures {
@@ -854,8 +853,8 @@ module Spec
     in match sumx with | Left sumx -> () | Right sumx -> () end
   
   with ghost subst_free_var_constructive_inversion_fo_term_fo_formula (x:'c1)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)) : 'b1
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)) : 'b1
     requires { is_fo_term_free_var_in_fo_formula x (subst_fo_formula t s0 s1)
       }
     ensures { let sumx = result in is_fo_term_free_var_in_fo_formula sumx t
@@ -988,8 +987,8 @@ module Spec
     end
   
   with lemma subst_free_var_inversion_fo_term_fo_formula (x:'c1)
-    (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)) : unit
+    (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)) : unit
     requires { is_fo_term_free_var_in_fo_formula x (subst_fo_formula t s0 s1)
       }
     ensures {
@@ -1002,8 +1001,8 @@ module Spec
     in ()
   
   let rec lemma subst_free_var_propagation_symbol_symbol_fo_formula (x:'b0)
-    (y:'c0) (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)):  unit
+    (y:'c0) (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)):  unit
     ensures {
       is_symbol_free_var_in_fo_formula x t /\
         is_symbol_free_var_in_symbol y (s0 x) ->
@@ -1097,8 +1096,8 @@ module Spec
     end
   
   with lemma subst_free_var_propagation_fo_term_symbol_fo_formula (x:'b1)
-    (y:'c0) (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)):  unit
+    (y:'c0) (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)):  unit
     ensures {
       is_fo_term_free_var_in_fo_formula x t /\
         is_symbol_free_var_in_fo_term y (s1 x) ->
@@ -1200,8 +1199,8 @@ module Spec
     end
   
   with lemma subst_free_var_propagation_fo_term_fo_term_fo_formula (x:'b1)
-    (y:'c1) (t:fo_formula 'b0 'b1) (s0:func 'b0 (symbol 'c0))
-    (s1:func 'b1 (fo_term 'c0 'c1)):  unit
+    (y:'c1) (t:fo_formula 'b0 'b1) (s0:'b0 -> (symbol 'c0))
+    (s1:'b1 -> (fo_term 'c0 'c1)):  unit
     ensures {
       is_fo_term_free_var_in_fo_formula x t /\
         is_fo_term_free_var_in_fo_term y (s1 x) ->
@@ -1303,9 +1302,9 @@ module Spec
     end
   
   let rec lemma free_var_equivalence_of_subst_fo_formula
-    (t:fo_formula 'b0 'b1) (s10:func 'b0 (symbol 'c0))
-    (s20:func 'b0 (symbol 'c0)) (s11:func 'b1 (fo_term 'c0 'c1))
-    (s21:func 'b1 (fo_term 'c0 'c1)) : unit
+    (t:fo_formula 'b0 'b1) (s10:'b0 -> (symbol 'c0))
+    (s20:'b0 -> (symbol 'c0)) (s11:'b1 -> (fo_term 'c0 'c1))
+    (s21:'b1 -> (fo_term 'c0 'c1)) : unit
     requires {
       forall x:'b0. is_symbol_free_var_in_fo_formula x t -> s10 x = s20 x }
     requires {
@@ -1444,8 +1443,8 @@ module Spec
     end
   
   let lemma free_var_equivalence_of_rename_fo_formula (t:fo_formula 'b0 'b1)
-    (s10:func 'b0 'c0) (s20:func 'b0 'c0) (s11:func 'b1 'c1)
-    (s21:func 'b1 'c1) : unit
+    (s10:'b0 -> 'c0) (s20:'b0 -> 'c0) (s11:'b1 -> 'c1) (s21:'b1 -> 'c1) :
+    unit
     requires {
       forall x:'b0. is_symbol_free_var_in_fo_formula x t -> s10 x = s20 x }
     requires {
@@ -1456,9 +1455,9 @@ module Spec
       (subst_of_rename_fo_term s21)
   
   let rec lemma free_var_derive_equivalence_of_subst_fo_formula
-    (t:fo_formula 'b0 'b1) (s10:func 'b0 (symbol 'c0))
-    (s20:func 'b0 (symbol 'c0)) (s11:func 'b1 (fo_term 'c0 'c1))
-    (s21:func 'b1 (fo_term 'c0 'c1)) : unit
+    (t:fo_formula 'b0 'b1) (s10:'b0 -> (symbol 'c0))
+    (s20:'b0 -> (symbol 'c0)) (s11:'b1 -> (fo_term 'c0 'c1))
+    (s21:'b1 -> (fo_term 'c0 'c1)) : unit
     ensures {
       forall x:'b0. is_symbol_free_var_in_fo_formula x t -> s10 x = s20 x }
     ensures {
@@ -1789,8 +1788,8 @@ module Spec
     end
   
   let lemma free_var_derive_equivalence_of_rename_fo_formula
-    (t:fo_formula 'b0 'b1) (s10:func 'b0 'c0) (s20:func 'b0 'c0)
-    (s11:func 'b1 'c1) (s21:func 'b1 'c1) : unit
+    (t:fo_formula 'b0 'b1) (s10:'b0 -> 'c0) (s20:'b0 -> 'c0) (s11:'b1 -> 'c1)
+    (s21:'b1 -> 'c1) : unit
     ensures {
       forall x:'b0. is_symbol_free_var_in_fo_formula x t -> s10 x = s20 x }
     ensures {

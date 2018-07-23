@@ -57,13 +57,17 @@ let add_opt_theory x =
       Queue.push (x, p, t, glist,elist) tlist;
       opt_theory := Some glist
 
-let add_opt_goal x = match !opt_theory with
-  | None ->
-      eprintf "Option '-G'/'--goal' requires a theory.@.";
-      exit 1
-  | Some glist ->
-      let l = Strings.split '.' x in
-      Queue.push (x, l) glist
+let add_opt_goal x =
+  let glist = match !opt_theory, !opt_input with
+    | None, None -> eprintf
+        "Option '-G'/'--goal' requires an input file or a library theory.@.";
+        exit 1
+    | None, Some _ ->
+        add_opt_theory "Top";
+        Opt.get !opt_theory
+    | Some glist, _ -> glist in
+  let l = Strings.split '.' x in
+  Queue.push (x, l) glist
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
@@ -248,7 +252,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         let call =
           Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
-        printf "%s %s %s : %a@." fname tname
+        printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res;
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
@@ -285,7 +289,7 @@ let do_theory env drv fname tname th glist elist =
     let drv = Opt.get drv in
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
-    let tasks = List.rev (split_theory th sel !opt_task) in
+    let tasks = Task.split_theory th sel !opt_task in
     List.iter (do_tasks env drv fname tname th) tasks;
     let eval (x,l) =
       let ls = try ns_find_ls th.th_export l with Not_found ->
@@ -296,11 +300,13 @@ let do_theory env drv fname tname th glist elist =
       | None -> eprintf "Symbol '%s' has no definition in theory '%s'.@." x tname;
         exit 1
       | Some d ->
-        let l,t = Decl.open_ls_defn d in
+        let l,_t = Decl.open_ls_defn d in
         match l with
         | [] ->
+(* TODO
           let t = Mlw_interp.eval_global_term env th.th_known t in
           printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Mlw_interp.print_value t
+*) ()
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
           exit 1

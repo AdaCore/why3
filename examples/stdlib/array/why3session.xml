@@ -2,96 +2,188 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="2250"/>
-<prover id="2" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="2250"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2250"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2250"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="2250"/>
-<prover id="6" name="Coq" version="8.7.1" timelimit="2" steplimit="0" memlimit="0"/>
-<file name="../../../modules/array.mlw" proved="true">
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Coq" version="8.7.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../../../stdlib/array.mlw" proved="true">
 <theory name="Array" proved="true">
- <goal name="WP_parameter defensive_get" expl="VC for defensive_get" proved="true">
- <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <goal name="VC array" expl="VC for array" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="WP_parameter defensive_set" expl="VC for defensive_set" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <goal name="VC defensive_get" expl="VC for defensive_get" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter fill" expl="VC for fill" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <goal name="VC defensive_set" expl="VC for defensive_set" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter self_blit" expl="VC for self_blit" proved="true">
- <proof prover="4"><result status="valid" time="0.10" steps="148"/></proof>
+ <goal name="VC fill" expl="VC for fill" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="102"/></proof>
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
-</theory>
-<theory name="IntArraySorted" proved="true">
-</theory>
-<theory name="Sorted" proved="true">
-</theory>
-<theory name="ArrayEq" proved="true">
-</theory>
-<theory name="ArrayExchange" proved="true">
+ <goal name="VC self_blit" expl="VC for self_blit" proved="true">
+ <proof prover="3"><result status="valid" time="0.32" steps="641"/></proof>
+ </goal>
 </theory>
 <theory name="ArrayPermut" proved="true">
  <goal name="exchange_permut_sub" proved="true">
- <proof prover="6" timelimit="4" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.53"/></proof>
+ <proof prover="5" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.57"/></proof>
  </goal>
  <goal name="permut_sub_weakening" proved="true">
- <proof prover="6" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.50"/></proof>
+ <proof prover="5" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.51"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
 <theory name="ArraySwap" proved="true">
- <goal name="WP_parameter swap" expl="VC for swap" proved="true">
- <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <goal name="VC swap" expl="VC for swap" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="ArraySum" proved="true">
-</theory>
-<theory name="NumOf" proved="true">
-</theory>
-<theory name="NumOfEq" proved="true">
-</theory>
 <theory name="ToList" proved="true">
- <goal name="WP_parameter to_list_append" expl="VC for to_list_append" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
+ <goal name="VC to_list" expl="VC for to_list" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="VC to_list_append" expl="VC for to_list_append" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="119"/></proof>
  </goal>
 </theory>
 <theory name="ToSeq" proved="true">
- <goal name="WP_parameter to_seq_length" expl="VC for to_seq_length" proved="true">
+ <goal name="VC to_seq_sub" expl="VC for to_seq_sub" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="VC to_seq_length" expl="VC for to_seq_length" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter to_seq_length.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="VC to_seq_length.0" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_length.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="VC to_seq_length.1" expl="precondition" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_length.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter to_seq_length.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC to_seq_length.2" expl="postcondition" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter to_seq_nth" expl="VC for to_seq_nth" proved="true">
+ <goal name="VC to_seq_nth" expl="VC for to_seq_nth" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter to_seq_nth.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC to_seq_nth.0" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC to_seq_nth.1" expl="precondition" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC to_seq_nth.2" expl="postcondition" proved="true">
+  <proof prover="3" timelimit="6"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.3" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </transf>
+ </goal>
+ <goal name="VC to_seq" expl="VC for to_seq" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+</theory>
+<theory name="Inversions" proved="true">
+ <goal name="VC exchange_inversion" expl="VC for exchange_inversion" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC exchange_inversion.0" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.2" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC exchange_inversion.2.0" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.2.1" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.2.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.25" steps="1001"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.2.3" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.85" steps="815"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.2.4" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.92"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.2.5" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC exchange_inversion.2.5.0" expl="assertion" proved="true">
+    <proof prover="6"><result status="valid" time="4.97"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC exchange_inversion.2.6" expl="VC for exchange_inversion" proved="true">
+   <proof prover="3"><result status="valid" time="0.01" steps="23"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exchange_inversion.3" expl="assertion" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC exchange_inversion.3.0" expl="assertion" proved="true">
+   <proof prover="6"><result status="valid" time="0.43"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exchange_inversion.4" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC exchange_inversion.4.0" expl="VC for exchange_inversion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC exchange_inversion.4.0.0" expl="VC for exchange_inversion" proved="true">
+    <proof prover="6"><result status="valid" time="0.26"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC exchange_inversion.4.1" expl="VC for exchange_inversion" proved="true">
+   <proof prover="3"><result status="valid" time="0.87" steps="441"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exchange_inversion.5" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC exchange_inversion.5.0" expl="VC for exchange_inversion" proved="true">
+   <proof prover="3"><result status="valid" time="0.06" steps="158"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.5.1" expl="VC for exchange_inversion" proved="true">
+   <proof prover="3"><result status="valid" time="0.02" steps="63"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.5.2" expl="VC for exchange_inversion" proved="true">
+   <proof prover="6"><result status="valid" time="0.25"/></proof>
+   </goal>
+   <goal name="VC exchange_inversion.5.3" expl="VC for exchange_inversion" proved="true">
+   <proof prover="6"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exchange_inversion.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.8" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.9" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.10" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="48"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.11" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="VC exchange_inversion.13" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="2.36"/></proof>
   </goal>
  </transf>
  </goal>

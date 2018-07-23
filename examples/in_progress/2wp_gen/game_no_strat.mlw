@@ -1,0 +1,603 @@
+
+
+(* Definitions of tools that allow reasoning on games without strategy:
+   defines u-accessibility and victory invariants. *)
+module StratLessDef
+
+  use game.Game
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.Chain
+  use transfinite.ExtensionDef
+
+  (* u-accessibility of an history: can be reached by some demon. *)
+  predicate u_acc (g:game 'a) (ang:angel 'a) (x:'a) (h:set 'a) =
+    exists dmn. tr_ext g.progress (step g ang dmn) ((=) x) h
+
+  predicate u_acc_s (g:game 'a) (ang:angel 'a) (start:set 'a) (h:set 'a) =
+    exists x. start x /\ u_acc g ang x h
+
+  (* Strong u-accessibility: can be extended through u_acc_step. *)
+  predicate u_acc_step (g:game 'a) (ang:angel 'a) (h:set 'a) (n:'a) =
+    let x = sup g.progress h in
+    let a = ang h in
+    supremum g.progress h x /\
+    if h x then g.transition x a /\ a n /\ not a x else n = x
+
+  predicate strong_u_acc (g:game 'a) (ang:angel 'a) (x:'a) (h:set 'a) =
+    tr_ext g.progress (u_acc_step g ang) ((=) x) h
+
+  predicate strong_u_acc_s (g:game 'a) (ang:angel 'a) (start h:set 'a) =
+    exists u. start u /\ strong_u_acc g ang u h
+
+  lemma u_acc_step_is_tr_succ : forall g:game 'a,ang.
+    tr_succ g.progress (u_acc_step g ang)
+    by let o = g.progress in
+      forall h n. u_acc_step g ang h n -> upper_bound o h n
+      by o (sup g.progress h) n
+
+  (* The angel defininetely lose at some point iff:
+     . it did not win
+     . Either it makes an invalid choice, or allows a loop. *)
+  predicate lose_at (g:game 'a) (ang:angel 'a) (win h:set 'a) =
+    (forall u. h u -> not win u) /\
+    exists x. maximum g.progress h x /\
+      let a = ang h in not g.transition x a \/ a x
+
+  (* Alternative proof objects for enforce: victory invariants. *)
+  predicate next_hist (inv:set (set 'a)) (h:set 'a) (y:'a) =
+    inv (add h y)
+  predicate victory_invariant (g:game 'a) (p q:set 'a) (inv:set (set 'a)) =
+    let o = g.progress in
+    (forall x. p x -> inv ((=) x)) /\
+    (forall h x. inv h /\ not inhabited (inter h q) /\ maximum o h x ->
+      exists a. g.transition x a /\ not a x /\ subset a (next_hist inv h)) /\
+    (forall ch. subset ch inv /\ chain (subchain o) ch /\ inhabited ch ->
+      inv (bigunion ch)) /\
+    (forall h x. inv h /\ supremum o h x -> inv (add h x))
+
+  (* More precise link: victory invariant can prove strategy winning. *)
+  predicate winning_cause (g:game 'a) (q:set 'a)
+                          (inv:set (set 'a)) (ang:angel 'a) =
+    forall h x. inv h /\ maximum g.progress h x /\ not inhabited (inter h q) ->
+      let a = ang h in
+      subset a (next_hist inv h) /\ g.transition x a /\ not a x
+
+end
+
+ (* Properties about u-accessibilities *)
+module Uacc "W:non_conservative_extension:N" (* => UaccProof *)
+
+  use game.Game
+  use export StratLessDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.Chain
+  use transfinite.ExtensionDef
+
+  (* Propagation rules. *)
+  axiom u_acc_base : forall g ang,x:'a. u_acc g ang x ((=) x)
+
+  axiom u_acc_next : forall g ang h,x0 x y:'a.
+    u_acc g ang x0 h /\ maximum g.progress h x ->
+    let a = ang h in g.transition x a /\ a y /\ not a x ->
+    u_acc g ang x0 (add h y)
+
+  axiom u_acc_lim : forall g ang ch,x0:'a.
+    chain (subchain g.progress) ch /\ inhabited ch ->
+    subset ch (u_acc g ang x0) -> u_acc g ang x0 (bigunion ch)
+
+  axiom u_acc_sup : forall g ang h,x0 x:'a.
+    supremum g.progress h x /\ u_acc g ang x0 h -> u_acc g ang x0 (add h x)
+
+  (* In particular, contains the least fixpoint of propagation rules. *)
+  axiom u_acc_by_step : forall g ang h,x0:'a.
+    strong_u_acc g ang x0 h -> u_acc g ang x0 h
+
+  (* Refinement on the next version that builds explicitly a demon
+     in order to map the angel transition to the choice, also
+     working in the case of loops. *)
+  axiom u_acc_rebuild : forall g ang h,x0 x y:'a.
+    u_acc g ang x0 h /\ maximum g.progress h x ->
+    let a = ang h in g.transition x a /\ a y /\ (a x -> y = x) ->
+    exists dmn. tr_ext g.progress (step g ang dmn) ((=) x0) h /\ dmn a = y
+
+end
+
+(* Alternative criterions for winning strategies (and win-strat existence) *)
+module WinAlt "W:non_conservative_extension:N" (* => WinAltProof *)
+
+  use game.Game
+  use export StratLessDef
+  use transfinite.ExtensionDef
+
+  (* a strategy is winning iff there are no losing history
+     among (strong) u-accessible. *)
+  axiom u_acc_losing : forall g:game 'a,ang x0 win.
+    winning_strat g x0 win ang <->
+      forall h. u_acc g ang x0 h -> not lose_at g ang win h
+
+  axiom strong_u_acc_losing : forall g:game 'a,ang x0 win.
+    winning_strat g x0 win ang <->
+      forall h. strong_u_acc g ang x0 h -> not lose_at g ang win h
+
+  (* Victory invariant realise alternative proof objects. *)
+  axiom victory_invariant_ok : forall g:game 'a,start win.
+    (exists inv. victory_invariant g start win inv)
+    <-> have_uniform_winning_strat g start win
+
+  (* Derivation of winning strategies from victory invariant. *)
+  axiom win_strat_from_victory_invariant : forall g:game 'a,ang inv start win.
+    victory_invariant g start win inv /\ winning_cause g win inv ang ->
+    uniform_winning_strat g start win ang
+
+  (* Victory invariant from winning strategies:
+     (strongly) u-accessibles. *)
+  axiom victory_invariant_from_win_strat_1 : forall g:game 'a,ang start win.
+    uniform_winning_strat g start win ang ->
+    victory_invariant g start win (u_acc_s g ang start)
+
+  axiom victory_invariant_from_win_strat_2 : forall g:game 'a,ang start win.
+    uniform_winning_strat g start win ang ->
+    victory_invariant g start win (strong_u_acc_s g ang start)
+
+end
+
+(* Basic manipulation on victory invariant. *)
+module InvExtraDef
+
+  use game.Game
+  use order.Ordered
+  use ho_set.Set
+  use ho_rel.RelSet
+  use StratLessDef
+
+  (* Cropping: enforce the absence of history past the winning set. *)
+  predicate cropped (o:erel 'a) (win:set 'a) (inv:set (set 'a)) =
+    forall h x. inv h /\ inter h win x -> maximum o h x
+  function crop (o:erel 'a) (win:set 'a) (inv:set (set 'a)) : set (set 'a) =
+    fun h -> inv h /\ forall x. inter h win x -> maximum o h x
+
+  (* accessibility reduction: if we have a 'super-strategy'
+     (which gives some supersets of transitions instead of regular
+      transitions) for which a victory invariant is winning cause,
+      then the (strongly) u-accessible history for that strategy
+      that were accessible through the invariant form a smaller invariant.
+      For the 'super-transitions' to be feasible, we need to take
+      (strong) u-accessibility in a larger but equivalent game
+      where those are feasible.
+      Of course, the most useful case is strong u-accessibility,
+      which add an inductive structure to the victory invariant.
+   *)
+  let ghost function span_game (g:game {'a}) : game {'a} =
+    { progress = g.progress;
+      transition = pure { fun x s -> related subset (g.transition x) s
+        /\ lower_bound g.progress s x } }
+  function crop_ang (inv:set (set 'a)) (ang:angel 'a) : angel 'a =
+    fun h x -> inv (add h x) /\ ang h x
+
+end
+
+module InvExtra "W:non_conservative_extension:N" (* => InvExtraProof *)
+
+  use game.Game
+  use ho_set.Set
+  use export InvExtraDef
+  use export StratLessDef
+
+  axiom cropping : forall g:game 'a,start win inv.
+    victory_invariant g start win inv ->
+    victory_invariant g start win (crop g.progress win inv)
+
+  axiom cropping_access : forall g:game 'a,start win ang inv.
+    victory_invariant g start win inv /\
+    winning_cause (span_game g) win inv ang ->
+    let ninv = strong_u_acc_s (span_game g) (crop_ang inv ang) start in
+    subset ninv inv /\
+    victory_invariant g start win ninv
+
+end
+
+module UaccProof
+
+  use game.Game
+  use StratLessDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.SubChain
+  use fn.Fun
+  use choice.Choice
+  use transfinite.ExtensionDet
+  use transfinite.Transport
+
+  lemma u_acc_base : forall g ang,x:'a. u_acc g ang x ((=) x)
+    by exists dmn. true so tr_ext g.progress (step g ang dmn) ((=) x) ((=) x)
+
+  predicate dmn_witness (g:game 'a) (ang:angel 'a)
+                        (x:'a) (h:set 'a) (dmn:demon 'a) =
+    tr_ext g.progress (step g ang dmn) ((=) x) h
+
+  predicate same_choices (g:game 'a) (ang:angel 'a) (h:set 'a)
+                         (dmn1 dmn2:demon 'a) =
+    forall h0 x. subchain g.progress h0 h /\ maximum g.progress h0 x /\
+      h <> h0 -> dmn1 (ang h0) = dmn2 (ang h0)
+
+  (* With fixed angel/start, two demons reach the same history iff
+     they made the same choice before. Direct consequence of
+     transport of transfinite extensions. *)
+  lemma dmn_witness_criterion : forall g ang x0 h,dmn1 dmn2:demon 'a.
+    dmn_witness g ang x0 h dmn1 ->
+      (dmn_witness g ang x0 h dmn2 <-> same_choices g ang h dmn1 dmn2)
+    by let o = g.progress in
+      let st1 = step g ang dmn1 in
+      let st2 = step g ang dmn2 in
+      let ex = (=) x0 in
+      (same_choices g ang h dmn1 dmn2 <->
+        transport_criterion o st2 ex h)
+    by transport_criterion o st1 ex h
+    so (same_choices g ang h dmn1 dmn2 ->
+      forall h0 x. subchain o ex h0 /\ subchain o (add h0 x) h /\
+        upper_bound o h0 x /\ not h0 x -> st2 h0 x
+      by st1 h0 x
+      so let s = sup o h0 in
+        let a = ang h0 in
+        (h0 s -> dmn1 a = dmn2 a by maximum o h0 s /\ subchain o h0 h)
+    ) /\ (transport_criterion o st2 ex h ->
+      forall h0 x. subchain o h0 h /\ maximum o h0 x /\ h <> h0 ->
+        let a = ang h0 in
+        let y = dmn1 a in
+        y = dmn2 a
+        by (subchain o ex h0 || (false by sext h0 ex by subchain o h0 ex))
+        so (st1 h0 y /\ not h0 y)
+          || (false by maximum (subchain o) (tr_ext o st1 ex) h0)
+        so st2 h0 y
+        by not (not subchain o (add h0 y) h
+                so subchain o h (add h0 y)
+                so not sext h h0)
+        so upper_bound o h0 y
+    )
+
+  lemma u_acc_rebuild : forall g ang h,x0 x y:'a.
+    let o = g.progress in
+    u_acc g ang x0 h /\ maximum o h x ->
+    let a = ang h in g.transition x a /\ a y /\ (a x -> y = x) ->
+    let ex = (=) x0 in
+    exists dmn. let st = step g ang dmn in
+      tr_ext o st ex h /\ dmn a = y
+    by exists dmn0. let st0 = step g ang dmn0 in
+      tr_ext o st0 ex h /\ dmn = update dmn0 a y
+    so same_choices g ang h dmn dmn0
+    by forall h0 x0. subchain o h0 h /\ maximum o h0 x0 /\ h <> h0 ->
+      not (dmn (ang h0) <> dmn0 (ang h0)
+           so ang h0 = a
+           so subchain o ex h0 || (false by subchain o h0 ex so sext h0 none)
+           so st0 h0 (dmn0 a)
+             || (false by maximum (subchain o) (tr_ext o st0 ex) h0)
+           so let h1 = add h0 (dmn0 a) in
+             if subchain o h1 h
+             then o x (dmn0 a) /\ o (dmn0 a) x
+             else false by subchain o h h1 so not sext h h0
+          )
+
+  lemma u_acc_next : forall g ang h,x0 x y:'a.
+    let o = g.progress in
+    u_acc g ang x0 h /\ maximum o h x ->
+    let a = ang h in g.transition x a /\ a y /\ not a x ->
+    u_acc g ang x0 (add h y)
+    by exists dmn. tr_ext o (step g ang dmn) ((=) x0) h /\ dmn a = y
+    so tr_ext o (step g ang dmn) ((=) x0) (add h y)
+
+  lemma u_acc_sup : forall g ang h,x0 x:'a.
+    let o = g.progress in
+    supremum o h x /\ u_acc g ang x0 h ->
+    u_acc g ang x0 (add h x)
+    by if h x then sext h (add h x) else true
+
+  lemma u_acc_lim : forall g ang ch,x0:'a.
+    let o = g.progress in let hl = bigunion ch in
+    chain (subchain o) ch /\ inhabited ch ->
+    subset ch (u_acc g ang x0) -> u_acc g ang x0 hl
+    by supremum (subchain o) ch hl
+      (* Choice of demons for each history in the chain *)
+    so let dmn_h= fun h -> choice (dmn_witness g ang x0 h) in
+      (forall h. ch h -> dmn_witness g ang x0 h (dmn_h h)
+        by exists dmn. dmn_witness g ang x0 h dmn)
+    so (* Choice of super-chain given any history. *)
+      let p0 = fun h0 s -> subchain o h0 s /\ h0 <> s /\ ch s in
+      let supr = fun h0 -> choice (p0 h0) in
+      (* (choice which must always exists for strict subchains of hl) *)
+      (forall h0. subchain o h0 hl /\ h0 <> hl ->
+        let spr = supr h0 in
+        subchain o h0 spr /\ h0 <> spr /\ ch spr
+        by if exists u. p0 h0 u then true else
+          false by upper_bound (subchain o) ch h0
+          by forall h1. ch h1 -> subchain o h1 h0 || (false by p0 h0 h1)
+      )
+    so (* Construction of limit demon: first choose a strict subchain h of hl
+          such that ang(h) = X, then a strict super-chain of h in chh,
+          and apply the demon of h. *)
+       let ch_by =
+         fun s h0 -> exists x.
+           subchain o h0 hl /\ maximum o h0 x /\ h0 <> hl /\ ang h0 = s in
+       let dmn_l = fun s -> dmn_h (supr (choice (ch_by s))) s in
+       forall h1. ch h1 -> dmn_witness g ang x0 h1 dmn_l
+       by let dmn = dmn_h h1 in
+         same_choices g ang h1 dmn dmn_l
+       by forall h0 x. subchain o h0 h1 /\ maximum o h0 x /\ h1 <> h0 ->
+         let s = ang h0 in dmn s = dmn_l s
+       by let h_ = choice (ch_by s) in
+         ch_by s h0 || (false by subchain o h0 hl so h0 <> hl)
+       so ch_by s h_
+       so let h2 = supr h_ in
+         p0 h_ h2
+       so let dmn2 = dmn_h h2 in
+         dmn_witness g ang x0 h2 dmn2 /\ dmn_witness g ang x0 h1 dmn
+       so if subchain o h2 h1
+         then same_choices g ang h2 dmn2 dmn
+           by dmn_witness g ang x0 h2 dmn
+         else same_choices g ang h1 dmn dmn2
+           by subchain o h1 h2
+           so dmn_witness g ang x0 h1 dmn2
+
+  lemma u_acc_by_step : forall g ang h,x0:'a.
+    ("induction" tr_ext g.progress (u_acc_step g ang) ((=) x0) h) ->
+    u_acc g ang x0 h
+
+
+  clone Uacc with goal u_acc_base,
+    goal u_acc_next,
+    goal u_acc_lim,
+    goal u_acc_sup,
+    goal u_acc_by_step,
+    goal u_acc_rebuild
+
+end
+
+module WinAltProof
+
+  use game.Game
+  use fn.Fun
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.SubChain
+  use transfinite.ExtensionDet
+  use transfinite.Transport
+  use Uacc
+
+  (* Winning -> no losing u-acc: by contradiction, suppose there is one.
+     1) Consider a demon that get to the losing history,
+        enforcing a loop if possible.
+     2) The losing history must be maximal.
+     3) There is a winning history, and since it is subchain of the losing one,
+        the possible winning conditions show that it must be maximal as well
+     4) The losing/winning history are equal, which is a contradiction
+        since the loop is enforced. *)
+  lemma u_acc_losing_1 : forall g:game 'a,ang x0 win h.
+    winning_strat g x0 win ang /\ u_acc g ang x0 h ->
+    not (lose_at g ang win h
+      so let o = g.progress in let ex = (=) x0 in let s = sup o h in
+        maximum o h s
+      so let a = ang h in
+        exists dmn. let st = step g ang dmn in
+          tr_ext o st ex h /\ (g.transition s a /\ a s -> dmn a = s)
+      so maximum (subchain o) (tr_ext o st ex) h
+      so win_against g x0 win ang dmn
+      so exists h0. tr_ext o st ex h0 /\ win_at g win ang dmn h0
+      so subchain o h0 h
+      so maximum (subchain o) (tr_ext o st ex) h0
+    )
+
+  (* no losing u-acc -> winning: take any demon, and consider the maximum
+       history hl.
+     1) If winning at hl, done.
+     2) hl has a sup (max because it is maximum), hence one strategy
+        fails or a loop is created.
+     3) since there are no losing u-acc, there must be a winning state
+        within hl.
+     4) the portion of hl up to that winning state is an effective witness. *)
+  lemma u_acc_losing_2 : forall g:game 'a,ang x0 win.
+    (forall h. u_acc g ang x0 h -> not lose_at g ang win h) ->
+    winning_strat g x0 win ang
+    by forall dmn. win_against g x0 win ang dmn
+    by let o = g.progress in let st = step g ang dmn in let ex = (=) x0 in
+      let ch = tr_ext o st ex in
+      chain (subchain o) ch /\ ch ex
+    so let hl = bigunion ch in
+      maximum (subchain o) ch hl
+    so if win_at g win ang dmn hl then true else
+      let s = sup o hl in
+      (maximum o hl s
+       by supremum o hl s so hl s || (false by ch (add hl s)))
+    so not lose_at g ang win hl
+    so (let a = ang hl in g.transition s a -> a s
+      by let d = dmn a in
+        a d so o s d so o d s by hl d by ch (add hl d) by st hl d)
+    so exists u. hl u /\ win u
+    so let hw = fun s -> hl s /\ o s u in
+      subchain o hw hl
+    so maximum o hw u
+    so subchain o ex hw || (false by subchain o hw ex)
+    so tr_ext o st ex hw
+    so win_at g win ang dmn hw
+
+  (* no losing strong u-acc -> winning: simply show that if there
+     is a losing u-acc, there is one which is strongly u-acc.
+     We obtain it by minimality (e.g well-foundedness) *)
+  lemma u_acc_losing_3 : forall g:game 'a,ang x0 win.
+    (forall h. strong_u_acc g ang x0 h -> not lose_at g ang win h) ->
+    winning_strat g x0 win ang
+    by forall h. u_acc g ang x0 h /\ lose_at g ang win h -> false
+    by let o = g.progress in let ex = (=) x0 in
+      exists dmn. let st = step g ang dmn in tr_ext o st ex h
+    so let s0 = fun h -> lose_at g ang win h /\ tr_ext o st ex h in
+      subset s0 (tr_ext_det o st ex) /\ s0 h
+    so let h2 = inf (subchain o) s0 in minimum (subchain o) s0 h2
+    so strong_u_acc g ang x0 h2
+    by let ust = u_acc_step g ang in
+      transport_criterion o ust ex h2
+    by forall h_ x_. subchain o ex h_ /\ subchain o (add h_ x_) h2 /\
+      upper_bound o h_ x_ /\ not h_ x_ -> ust h_ x_
+      by (st h_ x_ by transport_criterion o st ex h2)
+      so subchain o h_ h2
+      so if ust h_ x_ then true else false
+      by let s = sup o h_ in
+        let a = ang h_ in
+        h_ s
+      so g.transition s a
+      so a s /\ (maximum o h_ s by supremum o h_ s)
+      so lose_at g ang win h_
+      so h2 x_
+      so subchain o h2 h_ by s0 h_ by tr_ext o st ex h_
+
+  lemma win_strat_from_victory_invariant : forall g:game 'a,ang inv start win.
+    victory_invariant g start win inv ->
+    winning_cause g win inv ang ->
+    uniform_winning_strat g start win ang
+    by forall x. start x -> winning_strat g x win ang
+    by forall h. strong_u_acc g ang x h /\ lose_at g ang win h -> false
+    by let o = g.progress in
+      let ust = u_acc_step g ang in let ex = (=) x in
+      ((forall a b c h. a = o /\ b = ust /\ c = ex ->
+          ("induction" tr_ext a b c h) -> not inhabited (inter h win) -> inv h)
+        by (forall h x.
+          (not inhabited (inter h win) -> inv h) /\ ust h x
+          /\ not inhabited (inter (add h x) win) ->
+          next_hist inv h x by forall y. inter h win y -> false
+            by inter (add h x) win y)
+        /\ (forall ch h. let hl = bigunion ch in
+          not inhabited (inter hl win) /\ ch h -> not inhabited (inter h win)
+          by forall y. inter h win y -> false by inter hl win y
+        )
+      )
+
+  lemma victory_invariant_from_win_strat_both :
+    forall g:game 'a,ang start win bl.
+    uniform_winning_strat g start win ang ->
+    let inv = if bl then u_acc_s g ang start else strong_u_acc_s g ang start in
+    victory_invariant g start win inv
+    by let o = g.progress in
+    (forall h x. inv h /\ not inhabited (inter h win) /\ maximum o h x ->
+      exists a. g.transition x a /\ not a x /\ subset a (next_hist inv h)
+      by a = ang h
+      so not lose_at g ang win h /\ (forall x. h x -> not win x)
+      so g.transition x a /\ not a x
+      so forall y. a y -> inv (add h y)
+      by u_acc_step g ang h y
+    ) /\ (forall h x. inv h /\ supremum o h x -> inv (add h x)
+      by if h x then sext h (add h x) else u_acc_step g ang h x
+    ) /\ (forall ch. subset ch inv /\ chain (subchain o) ch /\ inhabited ch ->
+      let hl = bigunion ch in
+      inv hl
+      by let inv_x = if bl then u_acc g ang else strong_u_acc g ang in
+         (forall h x. inv_x x h -> minimum o h x)
+      so exists h0. ch h0
+      so exists x. start x /\ inv_x x h0
+      so (forall h. ch h -> inv_x x h
+        by exists y. inv_x y h
+        so x = y
+        by (minimum o h x by subchain o h0 h)
+        \/ (minimum o h0 y by subchain o h h0)
+      )
+    )
+
+  use choice.Choice
+
+  lemma victory_invariant_ok_1 : forall g:game 'a,inv start win.
+    victory_invariant g start win inv ->
+      have_uniform_winning_strat g start win
+      by let o = g.progress in
+        let covered = fun h a -> let m = sup o h in
+          g.transition m a /\ not a m /\ subset a (next_hist inv h) in
+        let ang = fun h -> choice (covered h) in
+        winning_cause g win inv ang
+      by forall h x. inv h /\ maximum o h x /\ not inhabited (inter h win) ->
+        let a = ang h in
+        covered h a
+        by exists a. covered h a
+        by g.transition x a /\ not a x /\ subset a (next_hist inv h)
+
+  lemma victory_invariant_ok_2 : forall g:game 'a,start win.
+    have_uniform_winning_strat g start win ->
+    exists inv. victory_invariant g start win inv
+    by exists ang. uniform_winning_strat g start win ang
+      /\ inv = u_acc_s g ang start
+
+  clone WinAlt with goal u_acc_losing,
+    goal strong_u_acc_losing,
+    goal victory_invariant_ok,
+    goal win_strat_from_victory_invariant,
+    goal victory_invariant_from_win_strat_1,
+    goal victory_invariant_from_win_strat_2
+
+end
+
+module InvExtraProof
+
+  use game.Game
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use order.Ordered
+  use order.Chain
+  use InvExtraDef
+  use Uacc
+  use WinAlt
+  use transfinite.ExtensionDef
+
+  lemma victory_inv_span : forall g:game 'a,start win inv.
+    let sg = span_game g in
+    (victory_invariant g start win inv <->
+      victory_invariant sg start win inv)
+    by forall x a. g.transition x a -> sg.transition x a
+    by related subset (g.transition x) a
+
+  lemma cropping_access : forall g:game 'a,start win ang inv.
+    let sg = span_game g in
+    victory_invariant g start win inv /\ winning_cause sg win inv ang ->
+    let nang = crop_ang inv ang in
+    let ninv = strong_u_acc_s sg nang start in
+    (subset ninv inv by forall h. ninv h -> inv h
+      by exists u. start u /\ strong_u_acc sg nang u h
+      so (forall a b c h. a = g.progress /\ b = u_acc_step sg nang ->
+        c = (=) u -> ("induction" tr_ext a b c h) -> inv h)
+    ) && (victory_invariant g start win ninv
+      by winning_cause sg win inv nang
+      by forall h x.
+        inv h /\ maximum g.progress h x /\ not inhabited (inter h win) ->
+        nang h = ang h by sext (nang h) (ang h)
+    )
+
+  lemma cropping : forall g:game 'a,start win inv.
+    victory_invariant g start win inv ->
+    let o = g.progress in let i = crop o win inv in
+    victory_invariant g start win i
+    by (forall h x. inv h /\ not inhabited (inter h win) /\ maximum o h x ->
+      exists a. g.transition x a /\ not a x /\ subset a (next_hist i h)
+       by g.transition x a /\ not a x /\ subset a (next_hist inv h)
+       so forall y. a y -> let hy = add h y in i hy
+       by forall z. inter hy win z -> maximum o hy z
+       by y = z \/ (false by inter h win z)
+       so forall z. hy z -> o z y by y = z \/ h z /\ o x y
+    ) /\ (forall ch. subset ch i /\ chain (subchain o) ch /\ inhabited ch ->
+      let hl = bigunion ch in i hl
+      by forall z. inter hl win z -> maximum o hl z
+      by forall t. hl t -> o t z
+      by (exists h. ch h /\ h z /\ h t
+        so maximum o h z
+      ) by (exists h1 h2. ch h1 /\ h1 z /\ ch h2 /\ h2 t
+        so (h2 z by subchain o h1 h2) \/ (h1 t by subchain o h2 h1)
+      )
+    ) /\ (forall h x. i h /\ supremum o h x -> let hx = add h x in i hx
+      by forall z. inter hx win z -> maximum o hx z
+      by not (x <> z so maximum o h z)
+    )
+
+  clone InvExtra with goal cropping,
+    goal cropping_access
+
+end
+
+

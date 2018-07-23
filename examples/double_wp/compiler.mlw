@@ -7,32 +7,32 @@
 module Compile_aexpr
 
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
 
   (* Compilation scheme: the generated code for arithmetic expressions
      put the result of the expression on the stack. *)
   function aexpr_post (a:aexpr) (len:pos) : post 'a =
-    \_ p ms ms'. let VMS _ s m = ms in ms' = VMS (p+len) (push (aeval m a) s) m
+    fun _ p ms ms' -> let VMS _ s m = ms in ms' = VMS (p+len) (push (aeval m a) s) m
   meta rewrite_def function aexpr_post
 
   let rec compile_aexpr (a:aexpr) :  hl 'a
-    ensures { result.pre = trivial_pre /\ hl_correctness result }
-    ensures { result.post = aexpr_post a result.code.length }
+    ensures { result.pre --> trivial_pre }
+    ensures { result.post --> aexpr_post a result.code.length }
     variant { a }
     = let c = match a with
       | Anum n     -> $ iconstf n
       | Avar x     -> $ ivarf x
-      | Aadd a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ iaddf ()
-      | Asub a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ isubf ()
-      | Amul a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ imulf ()
+      | Aadd a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --  $ iaddf ()
+      | Asub a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --  $ isubf ()
+      | Amul a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --  $ imulf ()
       end in
       hoare trivial_pre c (aexpr_post a c.wcode.length)
 
@@ -50,33 +50,33 @@ end
 (* Compiler for boolean expressions. *)
 module Compile_bexpr
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
 
   (* Compilation scheme: the generated code perform a jump
      iff the boolean expression evaluate to cond. *)
   function bexpr_post (b:bexpr) (cond: bool) (out_t:ofs) (out_f:ofs) : post 'a =
-    \_ p ms ms'. let VMS _ s m = ms in if beval m b = cond
+    fun _ p ms ms' -> let VMS _ s m = ms in if beval m b = cond
         then ms' = VMS (p + out_t) s m
         else ms' = VMS (p + out_f) s m
   meta rewrite_def function bexpr_post
 
   function exec_cond (b1:bexpr) (cond:bool) : pre 'a =
-    \_ _ ms. let VMS _ _ m = ms in beval m b1 = cond
+    fun _ _ ms -> let VMS _ _ m = ms in beval m b1 = cond
   meta rewrite_def function exec_cond
 
   let rec compile_bexpr (b:bexpr) (cond:bool) (ofs:ofs) :  hl 'a
-    ensures { result.pre = trivial_pre /\ hl_correctness result }
-    ensures { result.post =
-              bexpr_post b cond (result.code.length + ofs) result.code.length }
+    ensures { result.pre --> trivial_pre }
+    ensures { result.post --> let len = result.code.length in
+      bexpr_post b cond (len + ofs) len }
     variant { b }
   = let c = match b with
     | Btrue      -> $ if cond then ibranchf ofs else inil ()
@@ -85,10 +85,10 @@ module Compile_bexpr
     | Band b1 b2 ->
       let c2  = $ compile_bexpr b2 cond ofs % exec_cond b1 true in
       let ofs = if cond then length c2.wcode else ofs + length c2.wcode in
-      $ compile_bexpr b1 false ofs ~ c2
-    | Beq a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+      $ compile_bexpr b1 false ofs -- c2
+    | Beq a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --
                    $ if cond then ibeqf ofs else ibnef ofs
-    | Ble a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+    | Ble a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --
                    $ if cond then iblef ofs else ibgtf ofs
     end in
     let ghost post = bexpr_post b cond (c.wcode.length + ofs) c.wcode.length in
@@ -109,76 +109,83 @@ end
 
 module Compile_com
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
-  use import specs.VM_instr_spec
-  use import Compile_aexpr
-  use import Compile_bexpr
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use imp.Imp
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
+  use specs.VM_instr_spec
+  use Compile_aexpr
+  use Compile_bexpr
 
   (* Compilation scheme: the generated code for a command
      simulates the command on the memory part of the machine state. *)
   (* As we specify only terminating behavior, we have to require
      that the source program terminates in the initial conditions. *)
   function com_pre (cmd:com) : pre 'a =
-    \_ p ms. let VMS p' _ m = ms in p = p' /\ exists m'. ceval m cmd m'
+    fun _ p ms -> let VMS p' _ m = ms in p = p' /\ exists m'. ceval m cmd m'
   meta rewrite_def function com_pre
 
   function com_post (cmd:com) (len:pos) : post 'a =
-    \_ _ ms ms'. let VMS p s m = ms in let VMS p' s' m' = ms' in
+    fun _ _ ms ms' -> let VMS p s m = ms in let VMS p' s' m' = ms' in
       p' = p + len /\ s' = s /\ ceval m cmd m'
   meta rewrite_def function com_post
 
   function exec_cond_old (b1:bexpr) (cond:bool) : pre ('a,machine_state) =
-    \x _ _. let VMS _ _ m = snd x in beval m b1 = cond
+    fun x _ _ -> let VMS _ _ m = snd x in beval m b1 = cond
   meta rewrite_def function exec_cond_old
 
   (* Invariant for loop compilation: any intermediate state
      would evaluate to the same final state as the initial state. *)
   function loop_invariant (c:com) : pre ('a,machine_state) =
-    \x p msi. let VMS _ s0 m0 = snd x in let VMS pi si mi = msi in
+    fun x p msi -> let VMS _ s0 m0 = snd x in let VMS pi si mi = msi in
       pi = p /\ s0 = si /\ exists mf. ceval m0 c mf /\ ceval mi c mf
   meta rewrite_def function loop_invariant
 
-  function loop_post (c : com) (len: pos) : pre ('a,machine_state) =
-    \x p msf. let VMS _ s0 m0 = snd x in let VMS pf sf mf = msf in
-      pf = p + len /\ s0 = sf /\ ceval m0 c mf
-  meta rewrite_def function loop_post
-
   function loop_variant (c:com) (test:bexpr) : post 'a =
-    \_ _ msj msi. let VMS pj sj mj = msj in let VMS pi si mi = msi in
-       pj = pi /\ sj = si /\ ceval mi c mj /\ beval mi test
-  meta rewrite_def function loop_variant
+    fun _ _ msj msi -> let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
+       ceval mi c mj /\ beval mi test
+  lemma loop_variant_lemma : forall c test,x:'a,p msj msi.
+    loop_variant c test x p msj msi =
+      let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
+      ceval mi c mj /\ beval mi test
+  meta rewrite lemma loop_variant_lemma
+
+  (* Well-foundedness of the loop variant. *)
+  lemma loop_variant_acc : forall c test,x:'a,p mi mj.
+    let wh = Cwhile test c in let var = (loop_variant c test x p) in
+    (ceval mi wh mj -> forall pi si. acc var (VMS pi si mi))
+    by forall pi si mi mj mf. ceval mi c mj /\ beval mi test ->
+      ceval mj wh mf /\ (forall pj sj. acc var (VMS pj sj mj)) ->
+      acc var (VMS pi si mi) by
+      (forall pk sk mk. var (VMS pk sk mk) (VMS pi si mi) -> mk = mj)
 
   let rec compile_com (cmd: com) : hl 'a
-    ensures  { result.pre = com_pre cmd /\ hl_correctness result }
-    ensures  { result.post = com_post cmd result.code.length }
+    ensures { result.pre --> com_pre cmd }
+    ensures { result.post --> let len = result.code.length in com_post cmd len }
     variant  { cmd }
   = let res = match cmd with
     | Cskip              -> $ inil ()
-    | Cassign x a        -> $ compile_aexpr a  ~ $ isetvarf x
-    | Cseq cmd1 cmd2     -> $ compile_com cmd1 ~ $ compile_com cmd2
+    | Cassign x a        -> $ compile_aexpr a  -- $ isetvarf x
+    | Cseq cmd1 cmd2     -> $ compile_com cmd1 -- $ compile_com cmd2
     | Cif cond cmd1 cmd2 -> let code_false = compile_com cmd2 in
-      let code_true = $ compile_com cmd1 ~ $ ibranchf code_false.code.length in
-      $ compile_bexpr cond false code_true.wcode.length ~
-      (code_true % exec_cond cond true) ~
+      let code_true = $ compile_com cmd1 -- $ ibranchf code_false.code.length in
+      $ compile_bexpr cond false code_true.wcode.length --
+      (code_true % exec_cond cond true) --
       ($ code_false % exec_cond_old cond false)
-    | Cwhile test body  -> let code_body = compile_com body in
+    | Cwhile test body  ->
+      let code_body = compile_com body in
       let body_length = length code_body.code + 1 in
       let code_test = compile_bexpr test false body_length in
       let ofs = length code_test.code + body_length in
-      let wp_while = $ code_test ~
-          ($ code_body ~ $ ibranchf (- ofs)) % exec_cond test true in
-      let ghost inv  = loop_invariant cmd in
-      let ghost var  = loop_variant body test  in
-      let ghost post = loop_post cmd ofs in
-      let hl_while = hoare inv wp_while (loop_progress inv post var) in
-      $ inil () ~ $ make_loop_hl hl_while inv post var
+      let wp_while = $ code_test --
+          ($ code_body -- $ ibranchf (- ofs)) % exec_cond test true in
+      let ghost inv = loop_invariant cmd in
+      let ghost var = loop_variant body test in
+      $ inil () -- make_loop wp_while inv (exec_cond test true) var
     end in
     hoare (com_pre cmd) res (com_post cmd res.wcode.length)
 
@@ -188,7 +195,7 @@ module Compile_com
       transition_star c (VMS p s m) (VMS (p + length result) s m') }
   = let res = compile_com com : hl unit in
     assert { forall c p s m m'. ceval m com m' -> codeseq_at c p res.code ->
-      res.pre () p (VMS p s m) && (forall ms'. res.post () p (VMS p s m) ms' ->
+     res.pre () p (VMS p s m) && (forall ms'. res.post () p (VMS p s m) ms' ->
       ms' = VMS (p + length res.code) s m') };
     res.code
 

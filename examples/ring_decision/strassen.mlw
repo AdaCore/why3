@@ -1,0 +1,866 @@
+theory InfMatrixGen
+
+use int.Int
+
+type mat 'a
+
+clone algebra.UnitaryCommutativeRing as F with axiom .
+
+function get (mat F.t) int int : F.t
+function set (mat F.t) int int F.t : mat F.t
+
+function row_zeros (mat F.t) int : int
+function col_zeros (mat F.t) int : int
+
+axiom row_zeros_def:
+  forall m: mat F.t, i j: int. 0 <= i -> j >= row_zeros m i -> get m i j = F.zero
+
+axiom col_zeros_def:
+  forall m: mat F.t, i j: int. 0 <= j -> i >= col_zeros m j -> get m i j = F.zero
+
+axiom row_zeros_nonneg:
+  forall m: mat F.t, i: int. 0 <= i -> 0 <= row_zeros m i
+
+axiom col_zeros_nonneg:
+  forall m: mat F.t, j: int. 0 <= j -> 0 <= col_zeros m j
+(*FIXME should be invariants*)
+
+axiom set_def_changed:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  get (set m i j v) i j = v
+
+axiom set_def_unchanged:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  forall i' j': int. 0 <= i' -> 0 <= j' -> (i <> i' \/ j <> j') ->
+  get (set m i j v) i' j' = get m i' j'
+
+axiom set_def_rowz_changed:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  j >= row_zeros m i -> row_zeros (set m i j v) i = j+1
+
+axiom set_def_colz_changed:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  i >= col_zeros m j -> col_zeros (set m i j v) j = i+1
+
+axiom set_def_rowz_unchanged:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  j < row_zeros m i -> row_zeros (set m i j v) i = row_zeros m i
+
+axiom set_def_colz_unchanged:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  i < col_zeros m j -> col_zeros (set m i j v) j = col_zeros m j
+
+axiom set_def_other_rowz:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  forall i': int. 0 <= i' -> i <> i' ->
+  row_zeros (set m i j v) i' = row_zeros m i'
+
+axiom set_def_other_colz:
+  forall m: mat F.t, i j: int, v: F.t. 0 <= i -> 0 <= j ->
+  forall j': int. 0 <= j' -> j <> j' ->
+  col_zeros (set m i j v) j' = col_zeros m j'
+
+predicate (==) (m1 m2: mat F.t) =
+  forall i j: int. 0 <= i -> 0 <= j -> get m1 i j = get m2 i j
+
+axiom extensionality:
+  forall m1 m2: mat F.t. m1 == m2 -> m1 = m2
+
+predicate (===) (m1 m2: mat F.t) =
+  forall i j: int. 0 <= i -> 0 <= j ->
+  row_zeros m1 i = row_zeros m2 i /\ col_zeros m1 j = col_zeros m2 j
+
+predicate in_bounds (m: mat F.t) (i j: int) =
+  0 <= i < col_zeros m j /\ 0 <= j < row_zeros m i
+
+let lemma ext_by_bounds (m1 m2: mat F.t)
+  requires { m1 === m2 }
+  requires { forall i j. in_bounds m1 i j -> get m1 i j = get m2 i j }
+  ensures  { m1 == m2 }
+= ()
+
+lemma oob_zero:
+  forall m: mat F.t, i j: int. 0 <= i -> 0 <= j -> not in_bounds m i j
+  -> get m i j = F.zero
+
+predicate size (m: mat F.t) (r c: int) =
+  (forall i: int. 0 <= i -> row_zeros m i = c)
+  /\ (forall j: int. 0 <= j -> col_zeros m j = r)
+
+lemma size_to_bounds:
+  forall m: mat F.t, r c i j: int. size m r c -> (in_bounds m i j <-> (0 <= i < r /\ 0 <= j < c))
+
+lemma iso_size:
+  forall a b: mat F.t, r c: int. a === b -> (size a r c <-> size b r c)
+
+lemma size_rows_ib:
+  forall a: mat F.t, r c i: int. size a r c ->
+  0 <= i < r -> row_zeros a i = c
+  by forall j: int. in_bounds a i j -> 0 <= j < c
+
+lemma size_iso:
+  forall a b: mat F.t, r c: int. size a r c -> size b r c -> a === b
+
+end
+
+module InfMatrix
+
+  type t
+  constant tzero: t
+
+  clone export algebra.UnitaryCommutativeRing with
+    type t = t, constant zero = tzero, axiom .
+
+  use int.Int
+  clone export relations.MinMax with
+    type t = int, predicate le = (<=),
+    axiom . (* FIXME: replace with "goal" and prove *)
+
+  type mat
+
+  val function get mat int int : t
+
+  val function row_zeros mat int : int
+  val function col_zeros mat int : int
+
+  val function create (rz: int -> int) (cz: int -> int) (f: int -> int -> t)
+             : mat
+
+  axiom create_rowz:
+    forall rz cz: int -> int, f: int -> int -> t, i: int.
+    0 <= i -> 0 <= rz i -> row_zeros (create rz cz f) i = rz i
+
+  axiom create_colz:
+    forall rz cz: int -> int, f: int -> int -> t, j: int.
+    0 <= j -> 0 <= cz j -> col_zeros (create rz cz f) j = cz j
+
+  axiom create_get_ib:
+    forall rz cz: int -> int, f: int -> int -> t, i j: int.
+    0 <= i < cz j -> 0 <= j < rz i -> get (create rz cz f) i j = f i j
+
+  axiom create_get_oob:
+    forall rz cz: int -> int, f: int -> int -> t, i j: int.
+    0 <= i -> 0 <= j -> (i >= cz j \/ j >= rz i) ->
+    get (create rz cz f) i j = tzero
+
+  let ghost function set (m: mat) (i j:int) (v:t) : mat =
+    if 0 <= i && 0 <= j
+    then
+    create
+      (fun i1 -> if i1 = i then max (j+1) (row_zeros m i) else row_zeros m i1)
+      (fun j1 -> if j1 = j then max (i+1) (col_zeros m j) else col_zeros m j1)
+      (fun i1 j1 -> if i1 = i && j1 = j then v else get m i1 j1)
+    else m
+
+  clone export InfMatrixGen with type mat 'a = mat,
+    type F.t = t,
+    function get = get,
+    function set = set,
+    function row_zeros = row_zeros,
+    function col_zeros = col_zeros,
+    lemma set_def_changed,
+    lemma set_def_unchanged,
+    lemma set_def_colz_changed,
+    lemma set_def_colz_unchanged,
+    lemma set_def_rowz_changed,
+    lemma set_def_rowz_unchanged,
+    lemma set_def_other_rowz,
+    lemma set_def_other_colz,
+    axiom . (* FIXME: replace with "goal" and prove *)
+
+  let ghost function fcreate (r c: int) (f: int -> int -> t) : mat =
+    create (fun _ -> max 0 c) (fun _ -> max 0 r) f
+
+  lemma fcreate_get_ib:
+    forall r c i j: int, f: int -> int -> t.
+    0 <= i < r -> 0 <= j < c -> get (fcreate r c f) i j = f i j
+
+  lemma fcreate_get_oob:
+    forall r c i j: int, f: int -> int -> t.
+    0 <= i -> 0 <= j -> (i >= r \/ j >= c) -> get (fcreate r c f) i j = tzero
+
+  lemma fcreate_size:
+    forall r c: int, f: int -> int -> t. 0 <= r -> 0 <= c ->
+    size (fcreate r c f) r c
+
+
+end
+
+(* copied over from verifythis_2016_matrix_multiplication *)
+module Sum_extended
+
+  use int.Int
+  use int.Sum
+
+  function addf (f g:int -> int) : int -> int = fun x -> f x + g x
+
+  function smulf (f:int -> int) (l:int) : int -> int = fun x -> l * f x
+
+  let rec lemma sum_mult (f:int -> int) (a b l:int) : unit
+    ensures { sum (smulf f l) a b = l * sum f a b }
+    variant { b - a }
+  = if b > a then sum_mult f a (b-1) l
+
+
+  let rec lemma sum_add (f g:int -> int) (a b:int) : unit
+    ensures { sum (addf f g) a b = sum f a b + sum g a b }
+    variant { b - a }
+  = if b > a then sum_add f g a (b-1)
+
+
+  function sumf (f:int -> int -> int) (a b:int) : int -> int = fun x -> sum (f x) a b
+
+  let rec lemma fubini (f1 f2: int -> int -> int) (a b c d: int) : unit
+    requires { forall x y. a <= x < b /\ c <= y < d -> f1 x y = f2 y x }
+    ensures  { sum (sumf f1 c d) a b = sum (sumf f2 a b) c d }
+    variant  { b - a }
+  = if b <= a
+    then assert { forall x. sumf f2 a b x = 0 }
+    else begin
+      fubini f1 f2 a (b-1) c d;
+      assert { let ha = addf (sumf f2 a (b-1)) (f1 (b-1)) in
+        sum (sumf f2 a b) c d = sum ha c d
+        by forall y. c <= y < d -> sumf f2 a b y = ha y }
+    end
+
+  let ghost sum_ext (f g: int -> int) (a b: int) : unit
+    requires { forall i. a <= i < b -> f i = g i }
+    ensures  { sum f a b  = sum g a b }
+  = ()
+
+end
+
+theory MaxFun
+
+  use int.Int
+  use int.MinMax
+
+  (* maximum of a function over an interval; always at least 0 *)
+
+  let rec function maxf (f: int -> int) (a b: int) : int
+    variant { b - a }
+  = if b <= a then zero else max (maxf f a (b - 1)) (f (b-1))
+
+  let rec lemma maxf_nonneg (f: int -> int) (a b: int)
+    requires { a <= b }
+    ensures { maxf f a b >= 0 }
+    variant { b - a }
+  = if a = b then () else maxf_nonneg f a (b-1)
+
+  let rec lemma maxf_larger (f: int -> int) (a b i: int)
+    requires { a <= i < b }
+    variant { b - a }
+    ensures { maxf f a b >= f i }
+  = if i = b-1 then () else maxf_larger f a (b-1) i
+
+  let rec lemma max_left (f: int -> int) (a b: int)
+    requires { a < b }
+    ensures { maxf f a b = max (f a) (maxf f (a+1) b) }
+    variant { b - a }
+  = if a = b-1 then () else max_left f a (b-1)
+
+  let rec lemma max_ext (f g: int -> int) (a b: int)
+    requires { a < b }
+    variant { b - a }
+    requires { forall i. a <= i < b -> f i = g i }
+    ensures { maxf f a b = maxf g a b }
+  = if a = b-1 then () else max_ext f g a (b-1)
+
+  let rec lemma max_decomp (f: int -> int) (a b c: int)
+    requires { a <= b <= c }
+    variant { c - b }
+    ensures  { maxf f a c = max (maxf f a b) (maxf f b c) }
+  = if b = c
+    then assert { maxf f a c = max (maxf f a b) (maxf f b c)
+                  by maxf f b c = 0
+                  so maxf f a b >= 0 }
+    else begin
+      max_decomp f a b (c-1);
+      assert { maxf f a c = max (maxf f a b) (maxf f b c)
+               by maxf f a c = max (maxf f a (c-1)) (f (c-1))
+               so maxf f b c = max (maxf f b (c-1)) (f (c-1))
+               so maxf f a c = max (max (maxf f a b) (maxf f b (c-1))) (f (c-1))
+                             = max (maxf f a b) (maxf f b c) }
+    end
+
+  let rec lemma max_constant (f: int -> int) (v a b: int)
+      requires { v >= 0 }
+      requires { a < b }
+      requires { forall i. a <= i < b -> f i = v }
+      ensures  { maxf f a b = v }
+      variant  { b-a }
+  = if a = b-1 then () else max_constant f v a (b-1)
+
+end
+
+module InfIntMatrix
+
+  use int.Int
+  clone export InfMatrix with
+    type t = int, constant tzero = zero,
+    axiom . (* FIXME: replace with "goal" and prove *)
+  use int.Sum
+
+  use int.Int (*FIXME needed so i < i+1 ?*)
+
+  (* Zero matrix *)
+
+  let constant zerof : int -> int -> int = fun _ _ -> 0
+
+  let ghost constant mzero : mat = fcreate 0 0 zerof
+
+  let ghost function zerorc (r c: int) : mat = fcreate r c zerof
+
+  (* Identity matrix *)
+
+  let constant idf : int -> int -> int = fun x y -> if x = y then 1 else 0
+
+  let constant id : mat = create (fun i -> i+1) (fun j -> j+1) idf
+
+  lemma id_def:
+    forall i. 0 <= i -> get id i i = 1
+
+  function idrc (r c: int) : mat = fcreate r c idf
+
+  (* Matrix addition *)
+
+  let ghost function add2f (a b: mat) : int -> int -> int =
+    fun x y -> get a x y + get b x y
+
+  function f_add (a b: mat) : mat =
+    create (fun i -> max (row_zeros a i) (row_zeros b i))
+           (fun j -> max (col_zeros a j) (col_zeros b j))
+           (add2f a b)
+
+  val function add (a b: mat) : mat
+    ensures { result = f_add a b }
+
+  lemma add_get:
+    forall a b: mat, i j: int. 0 <= i -> 0 <= j ->
+    get (add a b) i j = get a i j + get b i j
+
+  lemma add_iso:
+    forall a b: mat. a === b -> a === add a b === b
+
+  lemma add_size:
+    forall a b: mat, r c: int. size a r c -> size b r c -> size (add a b) r c
+    by (forall i j:int.
+       (in_bounds a i j \/ in_bounds b i j) <-> in_bounds (add a b) i j)
+
+  lemma add_assoc:
+    forall a b c: mat. add (add a b) c = add a (add b c)
+    by add (add a b) c == add a (add b c)
+
+  lemma add_commutative:
+    forall a b: mat. add a b = add b a by add a b == add b a
+
+  lemma zero_neutral:
+    forall a. add a mzero = a by add a mzero == a
+
+  (* Matrix additive inverse *)
+  function opp2f (a: mat) : int -> int -> int =
+    fun x y -> - get a x y
+
+  function f_opp (a: mat) : mat =
+    create (row_zeros a) (col_zeros a) (opp2f a)
+
+  val function opp (a: mat) : mat
+    ensures { result = f_opp a }
+
+  let function sub (a b: mat) : mat = add a (opp b)
+
+  lemma sub_size:
+    forall a b: mat, r c: int. size a r c -> size b r c -> size (sub a b) r c
+    by (forall i j:int.
+       (in_bounds a i j \/ in_bounds b i j) <-> in_bounds (sub a b) i j)
+
+  lemma opp_involutive:
+    forall m. opp (opp m) = m by opp (opp m) == m
+
+  (* Matrix multiplication *)
+
+  function mul_atom (a b: mat) (i j: int) : int -> int =
+    fun k -> get a i k * get b k j
+
+  lemma atom_oob:
+    forall a b: mat, i j k: int. 0 <= i -> 0 <= j ->
+    k >= row_zeros a i \/ k >= col_zeros b j -> mul_atom a b i j k = 0
+    by if k >= row_zeros a i then get a i k = 0
+       else k >= col_zeros b j so get b k j = 0
+
+  function mul_cell_bound (a b: mat) (i j: int) : int
+    = min (row_zeros a i) (col_zeros b j) (* row_zeros a i*)
+
+  function mul_cell (a b: mat) : int -> int -> int =
+    fun i j -> sum (mul_atom a b i j) 0 (mul_cell_bound a b i j)
+
+  use MaxFun
+
+  lemma cell_oob_r:
+    forall a b: mat, i j: int.
+    j >= maxf (fun k -> row_zeros b k) 0 (row_zeros a i) ->
+    mul_cell a b i j = 0
+    by forall k. 0 <= k < mul_cell_bound a b i j ->
+       mul_atom a b i j k = 0
+       by 0 <= k < row_zeros a i
+       so j >= row_zeros b k
+       so get b k j = 0
+
+  lemma cell_oob_c:
+    forall a b: mat, i j: int.
+    i >= maxf (fun k -> col_zeros a k) 0 (col_zeros b j) ->
+    mul_cell a b i j = 0
+    by forall k. 0 <= k < mul_cell_bound a b i j ->
+       mul_atom a b i j k = 0
+       by 0 <= k < col_zeros b j
+       so i >= col_zeros a k
+       so get a i k = 0
+
+  function f_mul (a b: mat) : mat =
+    create (fun i -> maxf (fun k -> row_zeros b k) 0 (row_zeros a i))
+           (fun j -> maxf (fun k -> col_zeros a k) 0 (col_zeros b j))
+           (mul_cell a b)
+
+  val function mul (a b: mat) : mat
+    ensures { result = f_mul a b }
+
+  let lemma mul_sizes (m1 m2: mat) (m n p: int)
+    requires { size m1 m n /\ size m2 n p }
+    requires { 0 < m /\ 0 < n /\ 0 < p }
+    ensures  { size (mul m1 m2) m p }
+  =
+    let r = mul m1 m2 in
+    max_constant (fun k -> row_zeros m2 k) p 0 n;
+    assert { forall i. 0 <= i -> row_zeros r i = p };
+    max_constant (fun k -> col_zeros m1 k) m 0 n;
+    assert { forall j. 0 <= j -> col_zeros r j = m }
+
+
+  lemma id_neutral_r:
+    forall m: mat. mul m id = m
+    by (mul m id == m
+       by (forall i j. in_bounds m i j -> mul_cell m id i j = get m i j)
+          /\ (forall i j. 0 <= i -> 0 <= j -> not (in_bounds m i j)
+             -> mul_cell m id i j = 0 = get m i j))
+
+  lemma id_neutral_l:
+    forall m: mat. mul id m = m
+    by (mul id m == m
+       by (forall i j. in_bounds m i j ->
+             mul_cell id m i j = get m i j
+             by let t = mul_cell_bound id m i j in
+             sum (mul_atom id m i j) 0 i = 0
+             so sum (mul_atom id m i j) (i+1) t = 0
+             so mul_cell id m i j
+             = sum (mul_atom id m i j) 0 t
+             = sum (mul_atom id m i j) 0 i + mul_atom id m i j i + sum (mul_atom id m i j) (i+1) t
+             = 0 + (get id i i)*(get m i j) + 0
+             = get m i j)
+          /\ (forall i j. 0 <= i -> 0 <= j -> not (in_bounds m i j)
+            -> (forall k. 0 <= k < mul_cell_bound id m i j -> mul_atom id m i j k = 0)
+               so mul_cell id m i j
+               = sum (fun k -> mul_atom id m i j k) 0 (mul_cell_bound id m i j)
+               = 0 = get m i j))
+
+  use Sum_extended
+
+  function ft1 (a b c: mat) (i j: int)  : int -> int -> int =
+                fun k -> smulf (mul_atom a b i k) (get c k j)
+
+  function ft2 (a b c: mat) (i j: int) : int -> int -> int =
+                fun k -> smulf (mul_atom b c k j) (get a i k)
+
+  let lemma mul_assoc_get (a b c: mat) (i j: int)
+    requires { 0 <= i /\ 0 <= j }
+    ensures  { get (mul (mul a b) c) i j = get (mul a (mul b c)) i j }
+  = let ft1 = ft1 a b c i j in
+    let ft2 = ft2 a b c i j in
+    let ab = mul a b in
+    let bc = mul b c in
+    let m_ab_c = mul_cell_bound ab c i j in
+    let m_a_bc = mul_cell_bound a bc i j in
+    fubini ft1 ft2 0 m_ab_c 0 m_a_bc;
+    assert { forall k. 0 <= k < m_ab_c -> mul_cell_bound a b i k <= m_a_bc
+             by mul_cell_bound a b i k <= row_zeros a i
+             so mul_cell_bound a b i k <= col_zeros b k
+             so col_zeros bc j = maxf (fun k -> col_zeros b k) 0 (col_zeros c j)
+             so 0 <= k < col_zeros c j
+             so col_zeros b k <= maxf (fun k -> col_zeros b k) 0 (col_zeros c j)
+             so col_zeros b k <= col_zeros bc j };
+    assert { forall k. 0 <= k < m_ab_c ->
+                sumf ft1 0 m_a_bc k = sumf ft1 0 (mul_cell_bound a b i k) k
+             by sumf ft1 0 m_a_bc k
+                = sum (ft1 k) 0 m_a_bc
+                = sum (ft1 k) 0 (mul_cell_bound a b i k)
+                  + sum (ft1 k) (mul_cell_bound a b i k) m_a_bc
+                = sumf ft1 0 (mul_cell_bound a b i k) k
+                  + sum (ft1 k) (mul_cell_bound a b i k) m_a_bc
+             so (forall l. l >= mul_cell_bound a b i k ->
+                 mul_atom a b i k l = 0
+                 so ft1 k l = 0)
+             so sum (ft1 k) (mul_cell_bound a b i k) m_a_bc = 0 };
+    assert { forall k. 0 <= k < m_ab_c ->
+             mul_atom ab c i j k = sumf ft1 0 m_a_bc k
+             by get ab i k = mul_cell a b i k
+             so sumf ft1 0 m_a_bc k
+                = sumf ft1 0 (mul_cell_bound a b i k) k
+                = sum (ft1 k) 0 (mul_cell_bound a b i k)
+                = sum (smulf (mul_atom a b i k) (get c k j))
+                      0 (mul_cell_bound a b i k)
+                = get c k j * sum (mul_atom a b i k) 0 (mul_cell_bound a b i k)
+                = get c k j * get ab i k
+                = mul_atom ab c i j k };
+    sum_ext (mul_atom ab c i j) (sumf ft1 0 m_a_bc) 0 m_ab_c;
+    assert { get (mul ab c) i j = sum (sumf ft1 0 m_a_bc) 0 m_ab_c };
+    assert { forall k. 0 <= k < m_a_bc -> mul_cell_bound b c k j <= m_ab_c
+             by mul_cell_bound b c k j <= col_zeros c j
+             so mul_cell_bound b c k j <= row_zeros b k
+             so row_zeros ab i = maxf (fun k -> row_zeros b k) 0 (row_zeros a i)
+             so 0 <= k < row_zeros a i
+             so row_zeros b k <= maxf (fun k -> row_zeros b k) 0 (row_zeros a i)
+             so row_zeros b k <= row_zeros ab i };
+    assert { forall k. 0 <= k < m_a_bc ->
+                sumf ft2 0 m_ab_c k = sumf ft2 0 (mul_cell_bound b c k j) k
+             by sumf ft2 0 m_ab_c k
+                = sum (ft2 k) 0 m_ab_c
+                = sum (ft2 k) 0 (mul_cell_bound b c k j)
+                  + sum (ft2 k) (mul_cell_bound b c k j) m_ab_c
+                = sumf ft2 0 (mul_cell_bound b c k j) k
+                  + sum (ft2 k) (mul_cell_bound b c k j) m_ab_c
+             so (forall l. l >= mul_cell_bound b c k j ->
+                 mul_atom b c k j l = 0
+                 so ft2 k l = 0)
+             so sum (ft2 k) (mul_cell_bound b c k j) m_ab_c = 0 };
+    assert { forall k. 0 <= k < m_a_bc ->
+             mul_atom a bc i j k = sumf ft2 0 m_ab_c k
+             by get bc k j = mul_cell b c k j
+             so sumf ft2 0 m_ab_c k
+                = sumf ft2 0 (mul_cell_bound b c k j) k
+                = sum (ft2 k) 0 (mul_cell_bound b c k j)
+                = sum (smulf (mul_atom b c k j) (get a i k))
+                      0 (mul_cell_bound b c k j)
+                = get a i k * sum (mul_atom b c k j) 0 (mul_cell_bound b c k j)
+                = get a i k * get bc k j
+                = mul_atom a bc i j k };
+    sum_ext (mul_atom a bc i j) (sumf ft2 0 m_ab_c) 0 m_a_bc;
+    assert { get (mul a bc) i j = sum (sumf ft2 0 m_ab_c) 0 m_a_bc }
+
+  lemma mul_assoc:
+    forall a b c: mat.
+    let ab = mul a b in
+    let bc = mul b c in
+    let a_bc = mul a bc in
+    let ab_c = mul ab c in
+    a_bc =  ab_c by a_bc == ab_c
+
+
+  let lemma mul_distr_right_get (a b c: mat) (i j: int)
+    requires { 0 <= i /\ 0 <= j }
+    ensures  { get (mul (add a b) c) i j = get (add (mul a c) (mul b c)) i j }
+  = let mac = mul_atom a c i j in
+    let mbc = mul_atom b c i j in
+    let b_ac = mul_cell_bound a c i j in
+    let b_bc = mul_cell_bound b c i j in
+    let ma = max b_ac b_bc in
+    assert { get (add (mul a c) (mul b c)) i j = sum (addf mac mbc) 0 ma
+             by sum mac 0 ma = sum mac 0 b_ac + sum mac b_ac ma
+             so forall k. k >= b_ac -> mac k = 0
+             so sum mac b_ac ma = 0
+             so sum mac 0 b_ac = sum mac 0 ma
+             so sum mbc 0 ma = sum mbc 0 b_bc + sum mbc b_bc ma
+             so forall k. k >= b_bc -> mbc k = 0
+             so sum mbc b_bc ma = 0
+             so sum mbc 0 b_bc = sum mbc 0 ma
+             so get (mul a c) i j = sum mac 0 b_ac
+             so get (mul b c) i j = sum mbc 0 b_bc
+             so get (add (mul a c) (mul b c)) i j
+             = get (mul a c) i j + get (mul b c) i j
+             = sum mac 0 b_ac + sum mbc 0 b_bc
+             = sum mac 0 ma + sum mbc 0 ma
+             = sum (addf mac mbc) 0 ma };
+    sum_ext (addf mac mbc) (mul_atom (add a b) c i j) 0 ma;
+    assert { get (mul (add a b) c) i j = mul_cell (add a b) c i j }
+
+
+(* External product *)
+
+function extf (c: int) (a: mat): int -> int -> int =
+  fun x y -> c * (get a x y)
+
+function f_extp (c: int) (a: mat) : mat =
+  create (fun i -> row_zeros a i) (fun j -> col_zeros a j) (extf c a)
+
+val function extp (c: int) (a: mat) : mat
+  ensures { result = f_extp c a }
+
+lemma ext_iso:
+  forall m: mat, r: int. extp r m === m
+
+lemma ext_get:
+  forall m: mat, r i j: int. 0 <= i -> 0 <= j ->
+  get (extp r m) i j = r * (get m i j)
+
+lemma ext_dist_sum_mat:
+  forall x y: mat, r: int. extp r (add x y) = add (extp r x) (extp r y)
+  by extp r (add x y) == add (extp r x) (extp r y)
+
+lemma ext_dist_sum_r:
+  forall x: mat, r s: int. extp (r+s) x = add (extp r x) (extp s x)
+  by extp (r+s) x == add (extp r x) (extp s x)
+
+lemma assoc_mul_ext:
+  forall x: mat, r s: int. extp (r*s) x = extp r (extp s x)
+  by extp (r*s) x == extp r (extp s x)
+
+lemma unit_ext:
+  forall x: mat. extp 1 x = x by extp 1 x == x
+
+let lemma comm_mul_ext_ij (x y: mat) (r i j: int)
+  requires { 0 <= i /\ 0 <= j }
+  ensures { get (mul (extp r x) y) i j = r * (get (mul x y) i j) }
+  ensures { get (mul x (extp r y)) i j = r * (get (mul x y) i j) }
+=
+  let b = mul_cell_bound x y i j in
+  assert { mul_cell_bound (extp r x) y i j = b
+           = mul_cell_bound x (extp r y) i j };
+  sum_ext (mul_atom (extp r x) y i j) (smulf (mul_atom x y i j) r) 0 b;
+  sum_ext (mul_atom x (extp r y) i j) (smulf (mul_atom x y i j) r) 0 b;
+  sum_mult (mul_atom (extp r x) y i j) 0 b r;
+  sum_mult (mul_atom x (extp r y) i j) 0 b r;
+  assert { get (mul (extp r x) y) i j
+           = r * (get (mul x y) i j)
+           = get (mul x (extp r y)) i j
+           by get (mul (extp r x) y) i j
+              = mul_cell (extp r x) y i j
+              = r * mul_cell x y i j
+              = mul_cell x (extp r y) i j
+              = get (mul x (extp r y)) i j
+           so r * mul_cell x y i j = r * (get (mul x y) i j) }
+
+lemma comm_mul_ext:
+  forall x y: mat, r: int.
+     extp r (mul x y) = mul (extp r x) y = mul x (extp r y)
+  by extp r (mul x y) == mul (extp r x) y == mul x (extp r y)
+
+end
+
+module InfIntMatrixDecision
+
+use InfIntMatrix
+use int.Int
+
+let predicate eq0_int (x:int) = x = 0
+
+clone export ringdecision.AssocAlgebraDecision with type r = int, type a = mat, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = mzero, val aone = id, val aplus = add, val aopp = opp, val atimes = mul, val asub = sub, val ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r, goal asub_def, goal A.Inv_def_l, goal A.Inv_def_r,
+  axiom . (* FIXME: replace with "goal" and prove *)
+
+end
+
+module MatrixTests
+  use InfIntMatrix
+  use int.Int
+
+  use InfIntMatrixDecision
+  use int.Sum
+  use Sum_extended
+
+  function cols (a: mat) : int (* if matrix is a finite rectangle, return number of cols *)
+  function rows (a: mat) : int
+
+ (* lemma t: forall a: mat, r1 r2 c: int. size a r1 c -> size a r2 c -> r1 = r2*)
+
+  axiom rows_def:
+    forall a: mat, r c: int. 0 <= r -> 0 <= c -> size a r c -> rows a = r
+
+  axiom cols_def:
+    forall a: mat, r c: int. 0 <= r -> 0 <= c -> size a r c -> cols a = c
+
+  predicate is_finite (m: mat) = size m m.rows m.cols
+
+  function ofs2 (a: mat) (ai aj: int) : int -> int -> int
+    = fun i j -> get a (ai + i) (aj + j)
+
+  function block (a: mat) (r dr c dc: int) : mat =
+    fcreate dr dc (ofs2 a r c)
+
+  predicate c_blocks (a a1 a2: mat) =
+    0 <= a1.cols <= a.cols /\ a1 = block a 0 a.rows 0 a1.cols /\
+    a2 = block a 0 a.rows a1.cols (a.cols - a1.cols)
+
+  predicate r_blocks (a a1 a2: mat) =
+    0 <= a1.rows <= a.rows /\ a1 = block a 0 a1.rows 0 a.cols /\
+    a2 = block a a1.rows (a.rows - a1.rows) 0 a.cols
+
+  let rec lemma block_mul_ij (a a1 a2 b b1 b2: mat) (k: int)
+    requires { a.cols = b.rows /\ a1.cols = b1.rows}
+    requires { 0 <= k <= a.cols }
+    requires { c_blocks a a1 a2 /\ r_blocks b b1 b2 }
+    ensures  { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+                 0 <= k <= a1.cols ->
+                   sum (mul_atom a b i j) 0 k = sum (mul_atom a1 b1 i j) 0 k }
+    ensures  { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+                a1.cols <= k <= a.cols ->
+                  sum (mul_atom a b i j) 0 k =
+	            sum (mul_atom a1 b1 i j) 0 a1.cols +
+		    sum (mul_atom a2 b2 i j) 0 (k - a1.cols) }
+    variant { k }
+  = if 0 < k then begin
+      let k = k - 1 in
+      assert { forall i j. 0 <= i < a.rows -> 0 <= j < b.cols ->
+                if k < a1.cols
+                then mul_atom a b i j k = mul_atom a1 b1 i j k
+	        else (mul_atom a b i j k = mul_atom a2 b2 i j (k - a1.cols)
+                      by get a i k = get a2 i (k - a1.cols)
+                      so get b k j = get b2 (k-a1.cols) j)};
+      block_mul_ij a a1 a2 b b1 b2 k
+    end
+
+  let lemma mul_split (a a1 a2 b b1 b2: mat) : unit
+    requires { is_finite a /\ is_finite b }
+    requires { a.cols = b.rows /\ a1.cols = b1.rows}
+    requires { 0 < a.rows /\ 0 < a.cols /\ 0 < b.cols
+               /\ 0 < a1.cols /\ 0 < a2.cols }
+    requires { c_blocks a a1 a2 /\ r_blocks b b1 b2 }
+    ensures  { add (mul a1 b1) (mul a2 b2) = mul a b }
+  = block_mul_ij a a1 a2 b b1 b2 a.cols;
+    mul_sizes a b a.rows a.cols b.cols;
+    mul_sizes a1 b1 a.rows a1.cols b.cols;
+    mul_sizes a2 b2 a.rows (a.cols - a1.cols) b.cols;
+    assert { add (mul a1 b1) (mul a2 b2) === mul a b
+             by size (add (mul a1 b1) (mul a2 b2)) a.rows b.cols
+             so size (mul a b) a.rows b.cols };
+    assert { forall i j. in_bounds (mul a b) i j ->
+             get (add (mul a1 b1) (mul a2 b2)) i j = get (mul a b) i j
+             by mul_cell_bound a1 b1 i j = a1.cols
+                     so mul_cell_bound a2 b2 i j = a2.cols = a.cols - a1.cols
+                     so get (mul a b) i j
+                     = mul_cell a b i j
+                     = sum (mul_atom a b i j) 0 a.cols
+                     =  sum (mul_atom a1 b1 i j) 0 a1.cols
+		        + sum (mul_atom a2 b2 i j) 0 (a.cols - a1.cols)
+                     = get (mul a1 b1) i j + get (mul a2 b2) i j
+                     = get (add (mul a1 b1) (mul a2 b2)) i j };
+    ext_by_bounds (add (mul a1 b1) (mul a2 b2)) (mul a b)
+
+  let lemma mul_block_cell (a b: mat) (r dr c dc i j: int) : unit
+    requires { is_finite a /\ is_finite b }
+    requires { a.cols = b.rows }
+    requires { 0 <= r /\ r + dr <= a.rows }
+    requires { 0 <= c /\ c + dc <= b.cols }
+    requires { 0 <= i < dr /\ 0 <= j < dc }
+    ensures  { ofs2 (mul a b) r c i j =
+               get (mul (block a r dr 0 a.cols) (block b 0 b.rows c dc)) i j }
+  = let a' = block a r dr 0 a.cols in
+    let b' = block b 0 b.rows c dc in
+    sum_ext (mul_atom a b (i + r) (j + c)) (mul_atom a' b' i j) 0 a.cols;
+    assert { ofs2 (mul a b) r c i j = get (mul a b) (i+r) (j+c)
+             = sum (mul_atom a b (i+r) (j+c)) 0 a.cols
+             = sum (mul_atom a' b' i j) 0 a.cols
+             = get (mul a' b') i j }
+
+  let lemma mul_block (a b a' b' m': mat) (r dr c dc: int)
+    requires { a.cols = b.rows }
+    requires { 0 <= r <= r + dr <= a.rows }
+    requires { 0 <= c <= c + dc <= b.cols }
+    requires { a' = block a r dr 0 a.cols }
+    requires { b' = block b 0 b.rows c dc }
+    requires { m' = block (mul a b) r dr c dc }
+    ensures  { m' =  mul a' b' }
+  = assert { m' == mul a' b' }
+
+  predicate quarters (a a11 a12 a21 a22: mat) =
+    (is_finite a /\ is_finite a11 /\ is_finite a12 /\ is_finite a21 /\ is_finite a22) /\
+    (rows a11 = rows a12 = rows a21 = rows a22 = cols a11 = cols a12 = cols a21 = cols a22) /\
+    rows a = cols a = 2 * rows a11 /\
+    a11 = block a 0 a11.rows 0 a11.cols /\ a12 = block a 0 a11.rows a11.cols a11.cols /\
+    a21 = block a a11.rows a11.rows 0 a11.cols /\ a22 = block a a11.rows a11.rows a11.cols a11.cols
+
+  let lemma naive_blocks (a b c a11 a12 a21 a22 b11 b12 b21 b22 c11 c12 c21 c22: mat)
+    requires { is_finite a /\ is_finite b /\ is_finite c }
+    requires { quarters a a11 a12 a21 a22 }
+    requires { quarters b b11 b12 b21 b22 }
+    requires { quarters c c11 c12 c21 c22 }
+    requires { c11 = add (mul a11 b11) (mul a12 b21) }
+    requires { c12 = add (mul a11 b12) (mul a12 b22) }
+    requires { c21 = add (mul a21 b11) (mul a22 b21) }
+    requires { c22 = add (mul a21 b12) (mul a22 b22) }
+    ensures  { c = mul a b }
+  =
+    assert { c == mul a b }
+
+  use int.Power
+  use number.Parity
+  use int.ComputerDivision
+
+  let ghost function cut_quarters (a: mat) : (mat, mat, mat, mat)
+    requires { is_finite a }
+    requires { rows a = cols a }
+    requires { even (rows a) }
+    returns  { (a11, a12, a21, a22) -> quarters a a11 a12 a21 a22 }
+  =
+    let s = div (rows a) 2 in
+    (block a 0 s 0 s, block a 0 s s s, block a s s 0 s, block a s s s s)
+
+  let ghost function paste_quarters (a11 a12 a21 a22: mat): mat
+    requires { is_finite a11 /\ is_finite a12 /\ is_finite a21 /\ is_finite a22 }
+    requires { rows a11 = rows a12 = rows a21 = rows a22
+               = cols a11 = cols a12 = cols a21 = cols a22 }
+    ensures  { quarters result a11 a12 a21 a22 }
+  =
+    let s = rows a11 in
+    let r = fcreate (2 * s) (2 * s)
+            (fun i j -> if i < s && j < s then get a11 i j
+                        else if i < s then get a12 i (j-s)
+                        else if j < s then get a21 (i-s) j
+                        else get a22 (i-s) (j-s)) in
+    assert { a11 = block r 0 s 0 s by a11 == block r 0 s 0 s };
+    assert { a12 = block r 0 s s s by a12 == block r 0 s s s };
+    assert { a21 = block r s s 0 s by a21 == block r s s 0 s };
+    assert { a22 = block r s s s s by a22 == block r s s s s };
+    r
+
+  meta "compute_max_steps" 0x100000
+
+  let rec ghost function strassen_pow2 (a b: mat) (ghost k: int)
+    requires { 0 <= k }
+    requires { size a (power 2 k) (power 2 k) }
+    requires { size b (power 2 k) (power 2 k) }
+    ensures  { result = mul a b }
+    variant  { k }
+  =
+    let cutoff = begin ensures { result >= 1 } 4 end in
+    if k <= cutoff then mul a b
+    else begin
+      let (a11, a12, a21, a22) = cut_quarters a in
+      let (b11, b12, b21, b22) = cut_quarters b in
+      let s = power 2 (k-1) in
+      assert { s > 0 by k-1 >= 1 so power 2 (k-1) >= power 2 1 = 2};
+      assert { size a11 s s /\ size a12 s s /\ size a21 s s /\ size a22 s s };
+      assert { size b11 s s /\ size b12 s s /\ size b21 s s /\ size b22 s s };
+      let ghost c11 = add (mul a11 b11) (mul a12 b21) in
+      let ghost c12 = add (mul a11 b12) (mul a12 b22) in
+      let ghost c21 = add (mul a21 b11) (mul a22 b21) in
+      let ghost c22 = add (mul a21 b12) (mul a22 b22) in
+      mul_sizes a11 b11 s s s;
+      assert { size c11 s s /\ size c12 s s /\ size c21 s s /\ size c22 s s };
+      let ghost c = paste_quarters c11 c12 c21 c22 in
+      assert { c = mul a b };
+      let m1 = strassen_pow2 (add a11 a22) (add b11 b22) (k-1) in
+      let m2 = strassen_pow2 (add a21 a22) b11 (k-1) in
+      let m3 = strassen_pow2 a11 (sub b12 b22) (k-1) in
+      let m4 = strassen_pow2 a22 (sub b21 b11) (k-1) in
+      let m5 = strassen_pow2 (add a11 a12) b22 (k-1) in
+      let m6 = strassen_pow2 (sub a21 a11) (add b11 b12) (k-1) in
+      let m7 = strassen_pow2 (sub a12 a22) (add b21 b22) (k-1) in
+      let s11 = add m1 (add m4 (sub m7 m5)) in
+      let s12 = add m3 m5 in
+      let s21 = add m2 m4 in
+      let s22 = add m1 (add m3 (sub m6 m2)) in
+      (* assertions proved by reflection *)
+      assert { s11 = c11 };
+      assert { s12 = c12 };
+      assert { s21 = c21 };
+      assert { s22 = c22 };
+      paste_quarters s11 s12 s21 s22
+      end
+end

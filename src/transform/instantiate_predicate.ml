@@ -90,15 +90,15 @@ let trans spr task_hd (((lpr, past), task) as current) =
     | _ -> current in
   (current, Task.add_tdecl task task_hd.Task.task_decl)
 
-let meta = Theory.register_meta "instantiate : auto" [Theory.MTprsymbol]
+let meta = Theory.register_meta "instantiate:auto" [Theory.MTprsymbol]
   ~desc:"Mark@ proposition@ that@ should@ be@ automatically@ instantiated@ \
     by@ the@ 'instantiate_predicate'@ transformation."
 
-(** all the symbols (unary predicates) that have the "instantiate : auto"
+(** all the symbols (unary predicates) that have the "instantiate:auto"
     meta are marked for instantiation by the above transformation *)
 let () =
   Trans.register_transform "instantiate_predicate"
     (Trans.on_tagged_pr meta (fun spr ->
       Trans.fold_map (trans spr) ([], Sterm.empty) None))
-    ~desc:"Instantiate@ proposition@ marked@ by@ 'instantiate : auto'.@ \
+    ~desc:"Instantiate@ proposition@ marked@ by@ 'instantiate:auto'.@ \
            Used@ for@ Gappa."

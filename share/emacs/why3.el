@@ -25,11 +25,8 @@
 
 (defconst why3-font-lock-keywords-1
   (list
-   ;; Note: comment font-lock is guaranteed by suitable syntax entries
-   '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
-;   '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
-   `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "returns" "raises" "reads" "writes" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "try" "with" "theory" "uses" "module" "converter" "fun" "by" "so" "meta")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "pure" "returns" "raises" "reads" "writes" "alias" "assert" "assume" "check")) . font-lock-type-face)
+   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "return" "break" "continue" "try" "with" "theory" "uses" "module" "converter" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 
@@ -42,21 +39,23 @@
 
 ;; syntax
 
-(defvar why3-mode-syntax-table nil
-  "Syntax table for why3-mode")
-
-(defun why3-create-syntax-table ()
-  (if why3-mode-syntax-table
-      ()
-    (setq why3-mode-syntax-table (make-syntax-table))
-    (set-syntax-table why3-mode-syntax-table)
-    (modify-syntax-entry ?' "w" why3-mode-syntax-table)
-    (modify-syntax-entry ?_ "w" why3-mode-syntax-table)
+(defvar why3-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    ; identifiers
+    (modify-syntax-entry ?' "w" st)
+    (modify-syntax-entry ?_ "w" st)
+    ; strings
+    (modify-syntax-entry ?\" "\"" st)
     ; comments
-    (modify-syntax-entry ?\( ". 1" why3-mode-syntax-table)
-    (modify-syntax-entry ?\) ". 4" why3-mode-syntax-table)
-    (modify-syntax-entry ?* ". 23" why3-mode-syntax-table)
-    ))
+    (modify-syntax-entry ?\( "()1n" st)
+    (modify-syntax-entry ?\) ")(4n" st)
+    (modify-syntax-entry ?* ". 23" st)
+    ; attributes
+    (modify-syntax-entry ?[ "(]1b" st)
+    (modify-syntax-entry ?@ ". 2b" st)
+    (modify-syntax-entry ?] "> b" st)
+    st)
+  "Syntax table for why3-mode")
 
 ;indentation
 
@@ -145,9 +144,6 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
-(add-hook 'why3-mode-hook
-          (lambda () (modify-syntax-entry ?_ "w")))
-
 ;; setting the mode
 (defun why3-mode ()
   "Major mode for editing Why3 programs.
@@ -155,10 +151,10 @@
 \\{why3-mode-map}"
   (interactive)
   (kill-all-local-variables)
-  (why3-create-syntax-table)
   ; hilight
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults '(why3-font-lock-keywords))
+  (set-syntax-table why3-mode-syntax-table)
+  (set (make-local-variable 'font-lock-defaults) '(why3-font-lock-keywords))
+  (set (make-local-variable 'font-lock-multiline) t)
   ; indentation
   ;(make-local-variable 'indent-line-function)
   ;(setq indent-line-function 'why3-indent-line)

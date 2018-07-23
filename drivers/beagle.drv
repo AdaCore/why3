@@ -46,8 +46,8 @@ theory BuiltIn
   syntax type int  "$int"
   syntax type real "$real"
 
-  meta "encoding : kept" type int
-  meta "encoding : kept" type real
+  meta "encoding:kept" type int
+  meta "encoding:kept" type real
   meta "eliminate_algebraic" "no_index"
 end
 
@@ -65,16 +65,16 @@ theory int.Int
   syntax predicate (>=) "$greatereq(%1,%2)"
   syntax predicate (>)  "$greater(%1,%2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -105,16 +105,16 @@ theory real.Real
   syntax predicate (>=) "$greatereq(%1,%2)"
   syntax predicate (>)  "$greater(%1,%2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -147,7 +147,7 @@ end
 theory tptp.Univ
   syntax type iType "$i"
 
-  meta "encoding : kept" type iType
+  meta "encoding:kept" type iType
 end
 
 theory tptp.IntTrunc
@@ -196,16 +196,16 @@ theory tptp.Rat
   syntax predicate is_int  "$is_int(%1)"
   syntax predicate is_rat  "$is_rat(%1)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -215,7 +215,7 @@ theory tptp.Rat
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type rat
+  meta "encoding:kept" type rat
 end
 
 theory tptp.RatTrunc

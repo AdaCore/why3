@@ -23,17 +23,17 @@ Esterel compiler.
 
 module Esterel
 
-  use import int.Int
-  use import int.MinMax
-  use import set.Fsetint
-  use import bv.BV64
+  use int.Int
+  use int.MinMax
+  use set.Fsetint
+  use bv.BV64
 
   type s = {
           bv : BV64.t;  (* a 64-bit bitvector *)
     ghost mdl: set int; (* its interpretation as a set *)
   }
   invariant {
-    forall i: int. (0 <= i < size /\ nth self.bv i) <-> mem i self.mdl
+    forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl
   }
 
 
@@ -73,8 +73,8 @@ module Esterel
     in
     assert {
       forall x. mem x res.mdl ->
-        let (y,z) =
-          if mem x a.mdl then (x,min_elt b.mdl) else (min_elt a.mdl,x)
+        let y,z =
+          if mem x a.mdl then x, min_elt b.mdl else min_elt a.mdl, x
         in
           mem y a.mdl /\ mem z b.mdl /\ x = max y z };
     res

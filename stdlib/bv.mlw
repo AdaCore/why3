@@ -1,0 +1,618 @@
+(** {1 Bit Vectors} *)
+
+(** {2 Powers of two} *)
+
+module Pow2int
+
+  use int.Int
+
+  function pow2 (i:int) : int
+
+  axiom Power_0 : pow2 0 = 1
+
+  axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2 * pow2 n
+
+  lemma Power_1 : pow2 1 = 2
+
+  lemma Power_sum :
+    forall n m: int. n >= 0 /\ m >= 0 -> pow2 (n+m) = pow2 n * pow2 m
+
+  lemma pow2pos: forall i:int. i >= 0 -> pow2 i > 0
+
+  lemma pow2_0: pow2 0   =                  0x1
+  lemma pow2_1: pow2 1   =                  0x2
+  lemma pow2_2: pow2 2   =                  0x4
+  lemma pow2_3: pow2 3   =                  0x8
+  lemma pow2_4: pow2 4   =                 0x10
+  lemma pow2_5: pow2 5   =                 0x20
+  lemma pow2_6: pow2 6   =                 0x40
+  lemma pow2_7: pow2 7   =                 0x80
+  lemma pow2_8: pow2 8   =                0x100
+  lemma pow2_9: pow2 9   =                0x200
+  lemma pow2_10: pow2 10 =                0x400
+  lemma pow2_11: pow2 11 =                0x800
+  lemma pow2_12: pow2 12 =               0x1000
+  lemma pow2_13: pow2 13 =               0x2000
+  lemma pow2_14: pow2 14 =               0x4000
+  lemma pow2_15: pow2 15 =               0x8000
+  lemma pow2_16: pow2 16 =              0x10000
+  lemma pow2_17: pow2 17 =              0x20000
+  lemma pow2_18: pow2 18 =              0x40000
+  lemma pow2_19: pow2 19 =              0x80000
+  lemma pow2_20: pow2 20 =             0x100000
+  lemma pow2_21: pow2 21 =             0x200000
+  lemma pow2_22: pow2 22 =             0x400000
+  lemma pow2_23: pow2 23 =             0x800000
+  lemma pow2_24: pow2 24 =            0x1000000
+  lemma pow2_25: pow2 25 =            0x2000000
+  lemma pow2_26: pow2 26 =            0x4000000
+  lemma pow2_27: pow2 27 =            0x8000000
+  lemma pow2_28: pow2 28 =           0x10000000
+  lemma pow2_29: pow2 29 =           0x20000000
+  lemma pow2_30: pow2 30 =           0x40000000
+  lemma pow2_31: pow2 31 =           0x80000000
+  lemma pow2_32: pow2 32 =          0x100000000
+  lemma pow2_33: pow2 33 =          0x200000000
+  lemma pow2_34: pow2 34 =          0x400000000
+  lemma pow2_35: pow2 35 =          0x800000000
+  lemma pow2_36: pow2 36 =         0x1000000000
+  lemma pow2_37: pow2 37 =         0x2000000000
+  lemma pow2_38: pow2 38 =         0x4000000000
+  lemma pow2_39: pow2 39 =         0x8000000000
+  lemma pow2_40: pow2 40 =        0x10000000000
+  lemma pow2_41: pow2 41 =        0x20000000000
+  lemma pow2_42: pow2 42 =        0x40000000000
+  lemma pow2_43: pow2 43 =        0x80000000000
+  lemma pow2_44: pow2 44 =       0x100000000000
+  lemma pow2_45: pow2 45 =       0x200000000000
+  lemma pow2_46: pow2 46 =       0x400000000000
+  lemma pow2_47: pow2 47 =       0x800000000000
+  lemma pow2_48: pow2 48 =      0x1000000000000
+  lemma pow2_49: pow2 49 =      0x2000000000000
+  lemma pow2_50: pow2 50 =      0x4000000000000
+  lemma pow2_51: pow2 51 =      0x8000000000000
+  lemma pow2_52: pow2 52 =     0x10000000000000
+  lemma pow2_53: pow2 53 =     0x20000000000000
+  lemma pow2_54: pow2 54 =     0x40000000000000
+  lemma pow2_55: pow2 55 =     0x80000000000000
+  lemma pow2_56: pow2 56 =    0x100000000000000
+  lemma pow2_57: pow2 57 =    0x200000000000000
+  lemma pow2_58: pow2 58 =    0x400000000000000
+  lemma pow2_59: pow2 59 =    0x800000000000000
+  lemma pow2_60: pow2 60 =   0x1000000000000000
+  lemma pow2_61: pow2 61 =   0x2000000000000000
+  lemma pow2_62: pow2 62 =   0x4000000000000000
+  lemma pow2_63: pow2 63 =   0x8000000000000000
+  lemma pow2_64: pow2 64 =  0x10000000000000000
+
+  (*** use int.EuclideanDivision
+
+   lemma Div_pow: forall x i:int.
+     i > 0 -> pow2 (i-1) <= x < pow2 i -> div x (pow2 (i-1)) = 1
+
+   lemma Div_div_pow: forall x i j:int.
+     i > 0 /\ j > 0 -> div (div x (pow2 i)) (pow2 j) = div x (pow2 (i+j))
+
+   lemma Mod_pow2_gen: forall x i k :int.
+     0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
+   *)
+
+end
+
+(** {2 Generic theory of Bit Vectors (arbitrary length)} *)
+
+module BV_Gen
+
+  use export bool.Bool
+  use int.Int
+
+  constant size : int
+  axiom size_pos : size > 0
+
+  type t
+
+  (** `nth b n` is the `n`-th bit of `b`. Bit 0 is
+      the least significant bit *)
+  val function nth t int : bool
+
+  axiom nth_out_of_bound: forall x n. n < 0 \/ n >= size -> nth x n = False
+
+  val constant zeros : t
+  axiom Nth_zeros:
+    forall n:int. nth zeros n = False
+
+  val constant one : t
+
+  val constant ones : t
+  axiom Nth_ones:
+    forall n. 0 <= n < size -> nth ones n = True
+
+  (** Bitwise operators *)
+
+  (* /!\ NOTE : both bw_and and bw_or don't need guard on n because of
+  nth out of bound axiom *)
+  val function bw_and (v1 v2 : t) : t
+  axiom Nth_bw_and:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  val function bw_or (v1 v2 : t) : t
+  axiom Nth_bw_or:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  val function bw_xor (v1 v2 : t) : t
+  axiom Nth_bw_xor:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  val function bw_not (v : t) : t
+  axiom Nth_bw_not:
+    forall v:t, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+  (** Shift operators *)
+
+  (** Warning: shift operators of an amount greater than or equal to
+      the size are specified here, in concordance with SMTLIB. This is
+      not necessarily the case in hardware, where the amount of the
+      shift might be taken modulo the size, eg. `lsr x 64` might be
+      equal to `x`, whereas in this theory it is 0.
+  *)
+
+  val function lsr t int : t
+
+  axiom Lsr_nth_low:
+    forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s < size ->
+      nth (lsr b s) n = nth b (n+s)
+
+  axiom Lsr_nth_high:
+    forall b:t,n s:int. 0 <= s -> 0 <= n -> n+s >= size ->
+      nth (lsr b s) n = False
+
+  lemma lsr_zeros: forall x. lsr x 0 = x
+
+  val function asr t int : t
+
+  axiom Asr_nth_low:
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s < size ->
+      nth (asr b s) n = nth b (n+s)
+
+  axiom Asr_nth_high:
+    forall b:t,n s:int. 0 <= s -> 0 <= n < size -> n+s >= size ->
+      nth (asr b s) n = nth b (size-1)
+
+  lemma asr_zeros: forall x. asr x 0 = x
+
+  val function lsl t int : t
+
+  axiom Lsl_nth_high:
+    forall b:t,n s:int. 0 <= s <= n < size ->
+      nth (lsl b s) n = nth b (n-s)
+
+  axiom Lsl_nth_low:
+    forall b:t,n s:int. 0 <= n < s ->
+      nth (lsl b s) n = False
+
+  lemma lsl_zeros: forall x. lsl x 0 = x
+
+  use int.EuclideanDivision
+
+  function rotate_right t int : t
+
+  axiom Nth_rotate_right :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_right v n) i = nth v (mod (i + n) size)
+
+  function rotate_left t int : t
+
+  axiom Nth_rotate_left :
+    forall v n i. 0 <= i < size -> 0 <= n ->
+      nth (rotate_left v n) i = nth v (mod (i - n) size)
+
+
+  (** Conversions from/to integers *)
+
+  use Pow2int
+
+  constant two_power_size : int
+  constant max_int : int
+
+  axiom two_power_size_val : two_power_size = pow2 size
+  axiom max_int_val : max_int = two_power_size - 1
+
+  predicate is_signed_positive t
+
+  function to_uint t : int
+  val to_uint (x:t) : int  ensures { result = to_uint x }
+  val function of_int int : t
+
+  function to_int (x:t) : int =
+    if (is_signed_positive x) then (to_uint x) else (- (two_power_size - (to_uint x)))
+  val to_int (x:t) : int ensures { result = to_int x }
+
+  axiom to_uint_extensionality :
+    forall v,v':t. to_uint v = to_uint v' -> v = v'
+
+  axiom to_int_extensionality:
+    forall v,v':t. to_int v = to_int v' -> v = v'
+
+(*  *)
+  predicate uint_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
+(*  *)
+
+  axiom to_uint_bounds :
+(*
+    forall v:t. uint_in_range (to_uint v)
+*)
+    forall v:t. 0 <= to_uint v < two_power_size
+
+  axiom to_uint_of_int :
+    forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
+
+  constant size_bv : t
+
+  axiom to_uint_size_bv : to_uint size_bv = size
+  axiom to_uint_zeros   : to_uint zeros = 0
+  axiom to_uint_one     : to_uint one = 1
+  axiom to_uint_ones    : to_uint ones = max_int
+
+  (** comparison operators *)
+
+  let predicate ult (x y : t) =
+    Int.(<) (to_uint x) (to_uint y)
+
+  let predicate ule (x y : t) =
+    Int.(<=) (to_uint x) (to_uint y)
+
+  let predicate ugt (x y : t) =
+    Int.(>) (to_uint x) (to_uint y)
+
+  let predicate uge (x y : t) =
+    Int.(>=) (to_uint x) (to_uint y)
+
+  let predicate slt (v1 v2 : t) =
+    Int.(<) (to_int v1) (to_int v2)
+
+  let predicate sle (v1 v2 : t) =
+    Int.(<=) (to_int v1) (to_int v2)
+
+  let predicate sgt (v1 v2 : t) =
+    Int.(>) (to_int v1) (to_int v2)
+
+  let predicate sge (v1 v2 : t) =
+    Int.(>=) (to_int v1) (to_int v2)
+
+  axiom positive_is_ge_zeros:
+    forall x. is_signed_positive x = sge x zeros
+
+  (** Arithmetic operators *)
+
+  val function add (v1 v2 : t) : t
+  axiom to_uint_add:
+    forall v1 v2. to_uint (add v1 v2) =  mod (Int.(+) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_add_bounded:
+    forall v1 v2.
+      to_uint v1 + to_uint v2 < two_power_size ->
+      to_uint (add v1 v2) = to_uint v1 + to_uint v2
+
+  val function sub (v1 v2 : t) : t
+  axiom to_uint_sub:
+    forall v1 v2. to_uint (sub v1 v2) = mod (Int.(-) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_sub_bounded:
+    forall v1 v2.
+      0 <= to_uint v1 - to_uint v2 < two_power_size ->
+      to_uint (sub v1 v2) = to_uint v1 - to_uint v2
+
+  val function neg (v1 : t) : t
+  axiom to_uint_neg:
+    forall v. to_uint (neg v) = mod (Int.(-_) (to_uint v)) two_power_size
+
+  val function mul (v1 v2 : t) : t
+  axiom to_uint_mul:
+    forall v1 v2. to_uint (mul v1 v2) = mod (Int.( * ) (to_uint v1) (to_uint v2)) two_power_size
+  lemma to_uint_mul_bounded:
+    forall v1 v2.
+      to_uint v1 * to_uint v2 < two_power_size ->
+      to_uint (mul v1 v2) = to_uint v1 * to_uint v2
+
+  val function udiv (v1 v2 : t) : t
+  axiom to_uint_udiv:
+    forall v1 v2. to_uint (udiv v1 v2) = div (to_uint v1) (to_uint v2)
+
+  val function urem (v1 v2 : t) : t
+  axiom to_uint_urem:
+    forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
+
+  (** Bitvector alternatives for shifts, rotations and nth *)
+
+  (** logical shift right *)
+  val function lsr_bv t t : t
+
+  axiom lsr_bv_is_lsr:
+    forall x n.
+      lsr_bv x n = lsr x (to_uint n)
+
+  axiom to_uint_lsr:
+    forall v n : t.
+      to_uint (lsr_bv v n) = div (to_uint v) (pow2 ( to_uint n ))
+
+  (** arithmetic shift right *)
+  val function asr_bv t t : t
+
+  axiom asr_bv_is_asr:
+    forall x n.
+      asr_bv x n = asr x (to_uint n)
+
+  (** logical shift left *)
+  val function lsl_bv t t : t
+
+  axiom lsl_bv_is_lsl:
+    forall x n.
+      lsl_bv x n = lsl x (to_uint n)
+
+  axiom to_uint_lsl:
+    forall v n : t.
+         to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
+
+  (** rotations *)
+
+  val function rotate_right_bv (v n : t) : t
+
+  val function rotate_left_bv (v n : t) : t
+
+  axiom rotate_left_bv_is_rotate_left :
+    forall v n. rotate_left_bv v n = rotate_left v (to_uint n)
+
+  axiom rotate_right_bv_is_rotate_right :
+    forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
+
+  val function nth_bv t t: bool
+
+  axiom nth_bv_def:
+    forall x i.
+      nth_bv x i = not (bw_and (lsr_bv x i) one = zeros)
+
+  axiom Nth_bv_is_nth:
+    forall x i.
+      nth x (to_uint i) = nth_bv x i
+
+  axiom Nth_bv_is_nth2:
+    forall x i. 0 <= i < two_power_size ->
+      nth_bv x (of_int i) = nth x i
+
+  (** equality axioms *)
+
+  predicate eq_sub_bv t t t t
+
+  axiom eq_sub_bv_def: forall a b i n.
+    let mask = lsl_bv (sub (lsl_bv one n) one) i in
+      eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
+
+  predicate eq_sub (a b:t) (i n:int) =
+    forall j. i <= j < i + n -> nth a j = nth b j
+
+  axiom eq_sub_equiv: forall a b i n:t.
+      eq_sub    a b (to_uint i) (to_uint n)
+  <-> eq_sub_bv a b i n
+
+  predicate (==) (v1 v2 : t) =
+    eq_sub v1 v2 0 size
+
+  axiom Extensionality [@W:non_conservative_extension:N] :
+    forall x y : t [x == y]. x == y -> x = y
+
+  val eq (v1 v2 : t) : bool
+    ensures { result <-> v1 = v2 }
+
+end
+
+(** {2 Bit Vectors of common sizes, 8/16/32/64} *)
+
+module BV64
+  constant size           : int = 64
+  constant two_power_size : int = 0x1_0000_0000_0000_0000
+
+  use int.Int as Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
+
+  clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
+    constant size = size,
+    constant two_power_size = two_power_size,
+    constant max_int = t'maxInt,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
+
+end
+
+module BV32
+  constant size           : int = 32
+  constant two_power_size : int = 0x1_0000_0000
+
+  use int.Int as Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF_FFFF >
+
+  clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
+    constant size = size,
+    constant two_power_size = two_power_size,
+    constant max_int = t'maxInt,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
+
+end
+
+module BV16
+  constant size : int = 16
+  constant two_power_size : int = 0x1_0000
+
+  use int.Int as Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF >
+
+  clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
+    constant size = size,
+    constant two_power_size = two_power_size,
+    constant max_int = t'maxInt,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
+
+end
+
+module BV8
+  constant size           : int = 8
+  constant two_power_size : int = 0x1_00
+
+  use int.Int as Int (* needed to use range types *)
+
+  type t = < range 0 0xFF >
+
+  clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
+    constant size = size,
+    constant two_power_size = two_power_size,
+    constant max_int = t'maxInt,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
+
+end
+
+(** {2 Generic Converter} *)
+
+module BVConverter_Gen
+
+  type bigBV
+  type smallBV
+
+  predicate in_small_range bigBV
+
+  function to_uint_small smallBV : int
+  function to_uint_big bigBV : int
+
+  val function toBig smallBV : bigBV
+  val function toSmall bigBV : smallBV
+
+  axiom toSmall_to_uint :
+    forall x:bigBV. in_small_range x ->
+      to_uint_big x = to_uint_small (toSmall x)
+
+  axiom toBig_to_uint :
+    forall x:smallBV.
+      to_uint_small x = to_uint_big (toBig x)
+
+end
+
+(** {2 Converters of common size_bvs} *)
+
+module BVConverter_32_64
+  use BV32 as BV32
+  use BV64 as BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF_FFFF:BV64.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV64.t,
+    type smallBV = BV32.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV32.t'int,
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+
+end
+
+module BVConverter_16_64
+  use BV16 as BV16
+  use BV64 as BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF:BV64.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV64.t,
+    type smallBV = BV16.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV16.t'int,
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end
+
+module BVConverter_8_64
+  use BV8 as BV8
+  use BV64 as BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFF:BV64.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV64.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV64.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end
+
+module BVConverter_16_32
+  use BV16 as BV16
+  use BV32 as BV32
+
+  predicate in_range (b : BV32.t) = BV32.ule b (0xFFFF:BV32.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV32.t,
+    type smallBV = BV16.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV16.t'int,
+    function to_uint_big = BV32.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end
+
+module BVConverter_8_32
+  use BV8 as BV8
+  use BV32 as BV32
+
+  predicate in_range (b : BV32.t) = BV32.ule b (0xFF:BV32.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV32.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV32.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end
+
+module BVConverter_8_16
+  use BV8 as BV8
+  use BV16 as BV16
+
+  predicate in_range (b : BV16.t) = BV16.ule b (0xFF:BV16.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV16.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV16.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end

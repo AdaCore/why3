@@ -170,9 +170,9 @@ let bypass_pretty s id =
       fprintf fmt "Bad constructor: %a" (print_ls s id) ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" (print_ls s id) ls
-  | Decl.RecordFieldMissing (_cs,ls) ->
+  | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" (print_ls s id) ls
-  | Decl.DuplicateRecordField (_cs,ls) ->
+  | Decl.DuplicateRecordField ls ->
       fprintf fmt "Field %a is used twice in the same constructor" (print_ls s id) ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
@@ -218,7 +218,7 @@ let bypass_pretty s id =
 
 let get_exception_message ses id e =
   match e with
-  | Controller_itp.Noprogress ->
+  | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
@@ -279,8 +279,8 @@ module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
-let debug_labels = Debug.register_info_flag "print_labels"
-  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let debug_attrs = Debug.register_info_flag "print_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
 
 (****************)
 (* Command list *)
@@ -839,13 +839,13 @@ end
     in
     task_text, loc_color_list
 
-  let create_ce_tab ~print_labels s res any list_loc =
+  let create_ce_tab ~print_attrs s res any list_loc =
     let f = get_encapsulating_file s any in
     let filename = Sysutil.absolutize_filename
       (Session_itp.get_dir s) (file_name f)
     in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ~print_labels ?start_comment:None ?end_comment:None
+    Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
       ~source_code:source_code ~locations:list_loc
 
@@ -879,7 +879,7 @@ end
       | ATh t ->
           P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
       | APa pid ->
-          let print_labels = Debug.test_flag debug_labels in
+          let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
@@ -894,7 +894,7 @@ end
                     res.Call_provers.pr_answer
                 in
                 let ce_result =
-                  Pp.string_of (Model_parser.print_model_human ~print_labels ?me_name_trans:None)
+                  Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
                   res.Call_provers.pr_model
                 in
                 if ce_result = "" then
@@ -908,7 +908,7 @@ end
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
                     let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session ~print_labels res any old_list_loc
+                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc
                     in
                     P.notify (Source_and_ce (source_result, list_loc));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
@@ -984,7 +984,9 @@ end
          (s,n,p) :: acc) (Whyconf.get_provers config) []
     in
     load_strategies c;
-    let transformation_list = List.map (fun (a, b) -> (a, Format.sprintf "%( %)" b)) (list_transforms ()) in
+    let transformation_list = List.map
+      (fun (a, b) -> (a, Format.sprintf "@[%(%)@]" b))
+      (list_transforms ()) in
     let strategies_list = list_strategies c in
     let infos =
       {
@@ -1302,7 +1304,7 @@ end
      match r with
      | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
-     | Exit_req | Get_global_infos -> true
+     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1394,7 +1396,7 @@ end
             in
             focused_node := Focus_on [focus_on];
             reset_and_send_the_whole_tree ()
-        | Unfocus_req -> unfocus ()
+        | Server_utils.Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
@@ -1425,6 +1427,7 @@ end
     | Set_prover_policy(p,u)   ->
        let c = d.cont in
        Controller_itp.set_session_prover_upgrade_policy c p u
+    | Unfocus_req             -> unfocus ()
     | Exit_req                -> exit 0
      )
     with

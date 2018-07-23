@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Spass" version="3.7" timelimit="30" steplimit="0" memlimit="1000"/>
+<file name="../union_find.mlw" expanded="true">
+<theory name="Intf" sum="84b887f4d700191b5f211a4b4bc066d3">
+ <goal name="VC t" expl="VC for t">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+</theory>
+<theory name="Impl" sum="d4602926cdf8cff9b260d5182bf61d68" expanded="true">
+ <goal name="path_dist_nonneg" expl="">
+ <transf name="induction_pr">
+  <goal name="path_dist_nonneg.1" expl="">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="path_dist_nonneg.2" expl="">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="path_src" expl="">
+ <transf name="induction_pr">
+  <goal name="path_src.1" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="path_src.2" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="path_dst" expl="">
+ <transf name="induction_pr">
+  <goal name="path_dst.1" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="path_dst.2" expl="">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC path_unique" expl="VC for path_unique">
+ <transf name="split_goal_right">
+  <goal name="VC path_unique.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC path_unique.2" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.00" steps="22"/></proof>
+  </goal>
+  <goal name="VC path_unique.3" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_unique.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC path_unique.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="43"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_unique.6" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_unique.7" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC path_last" expl="VC for path_last">
+ <transf name="split_goal_right">
+  <goal name="VC path_last.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_last.2" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC path_last.3" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_last.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="VC path_last.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC path_last.6" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC t" expl="VC for t">
+ <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create">
+ <proof prover="0"><result status="valid" time="0.01" steps="120"/></proof>
+ </goal>
+ <goal name="VC path_dist" expl="VC for path_dist">
+ <transf name="split_goal_right">
+  <goal name="VC path_dist.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC path_dist.2" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC path_dist.3" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC path_dist.4" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
+  </goal>
+  <goal name="VC path_dist.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC path_dist.6" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+  <goal name="VC path_dist.7" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC path_dist.8" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC path_dist.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC path_compression" expl="VC for path_compression">
+ <transf name="split_goal_right">
+  <goal name="VC path_compression.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="VC path_compression.2" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+  <goal name="VC path_compression.3" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC path_compression.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="VC path_compression.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC path_compression.6" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC path_compression.7" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
+  </goal>
+  <goal name="VC path_compression.8" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.08" steps="219"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC find" expl="VC for find" expanded="true">
+ <transf name="split_goal_right" expanded="true">
+  <goal name="VC find.1" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC find.2" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC find.3" expl="variant decrease">
+  <transf name="split_goal_right">
+   <goal name="VC find.3.1" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+   </goal>
+   <goal name="VC find.3.2" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="VC find.5" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
+  </goal>
+  <goal name="VC find.6" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.00" steps="24"/></proof>
+  </goal>
+  <goal name="VC find.7" expl="type invariant" expanded="true">
+  <transf name="split_goal_right" expanded="true">
+   <goal name="VC find.7.1" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
+   </goal>
+   <goal name="VC find.7.2" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+   </goal>
+   <goal name="VC find.7.3" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+   </goal>
+   <goal name="VC find.7.4" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.00" steps="31"/></proof>
+   </goal>
+   <goal name="VC find.7.5" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+   </goal>
+   <goal name="VC find.7.6" expl="VC for find">
+   <proof prover="0"><result status="valid" time="0.02" steps="31"/></proof>
+   </goal>
+   <goal name="VC find.7.7" expl="VC for find">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC find.7.8" expl="VC for find" expanded="true">
+   <proof prover="6"><result status="timeout" time="30.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find.8" expl="postcondition">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC find.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="64"/></proof>
+  </goal>
+  <goal name="VC find.10" expl="postcondition">
+  <transf name="split_goal_right">
+   <goal name="VC find.10.1" expl="postcondition">
+   <proof prover="4"><result status="valid" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC find.11" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC union" expl="VC for union" expanded="true">
+ <transf name="split_goal_right" expanded="true">
+  <goal name="VC union.1" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC union.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
+  </goal>
+  <goal name="VC union.3" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="92"/></proof>
+  </goal>
+  <goal name="VC union.4" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="92"/></proof>
+  </goal>
+  <goal name="VC union.5" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="99"/></proof>
+  </goal>
+  <goal name="VC union.6" expl="assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="1" obsolete="true"><undone/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="unknown" time="0.14"/></proof>
+  <proof prover="4" obsolete="true"><undone/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <transf name="split_goal_right">
+   <goal name="VC union.6.1" expl="assertion">
+   <proof prover="0"><result status="timeout" time="4.99"/></proof>
+   <proof prover="1" obsolete="true"><result status="unknown" time="10.07"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   </goal>
+   <goal name="VC union.6.2" expl="assertion">
+   <proof prover="0"><result status="timeout" time="4.99"/></proof>
+   <proof prover="1" obsolete="true"><result status="unknown" time="9.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC union.7" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.04" steps="125"/></proof>
+  </goal>
+  <goal name="VC union.8" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="125"/></proof>
+  </goal>
+  <goal name="VC union.9" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="132"/></proof>
+  </goal>
+  <goal name="VC union.10" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.03" steps="132"/></proof>
+  </goal>
+  <goal name="VC union.11" expl="type invariant">
+  <proof prover="0"><result status="timeout" time="4.97"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="5.32"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="VC union.12" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="64"/></proof>
+  </goal>
+  <goal name="VC union.13" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.69" steps="609"/></proof>
+  </goal>
+  <goal name="VC union.14" expl="type invariant">
+  <transf name="split_goal_right">
+   <goal name="VC union.14.1" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="49"/></proof>
+   </goal>
+   <goal name="VC union.14.2" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="51"/></proof>
+   </goal>
+   <goal name="VC union.14.3" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="52"/></proof>
+   </goal>
+   <goal name="VC union.14.4" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="149"/></proof>
+   </goal>
+   <goal name="VC union.14.5" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="149"/></proof>
+   </goal>
+   <goal name="VC union.14.6" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.11" steps="227"/></proof>
+   </goal>
+   <goal name="VC union.14.7" expl="VC for union">
+   <proof prover="0"><result status="timeout" time="4.98"/></proof>
+   <proof prover="1" obsolete="true"><result status="unknown" time="4.94"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   </goal>
+   <goal name="VC union.14.8" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.23" steps="304"/></proof>
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC union.15" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="58"/></proof>
+  </goal>
+  <goal name="VC union.16" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.48" steps="567"/></proof>
+  <proof prover="1"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="VC union.17" expl="index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02" steps="99"/></proof>
+  </goal>
+  <goal name="VC union.18" expl="type invariant">
+  <transf name="split_goal_right">
+   <goal name="VC union.18.1" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="48"/></proof>
+   </goal>
+   <goal name="VC union.18.2" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.02" steps="50"/></proof>
+   </goal>
+   <goal name="VC union.18.3" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.01" steps="51"/></proof>
+   </goal>
+   <goal name="VC union.18.4" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.05" steps="148"/></proof>
+   </goal>
+   <goal name="VC union.18.5" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.05" steps="148"/></proof>
+   </goal>
+   <goal name="VC union.18.6" expl="VC for union">
+   <proof prover="0"><result status="valid" time="0.11" steps="226"/></proof>
+   </goal>
+   <goal name="VC union.18.7" expl="VC for union">
+   <proof prover="0"><result status="timeout" time="5.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="unknown" time="5.09"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   </goal>
+   <goal name="VC union.18.8" expl="VC for union">
+   <proof prover="0"><result status="timeout" time="4.98"/></proof>
+   <proof prover="1" obsolete="true"><result status="unknown" time="4.96"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC union.19" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="56"/></proof>
+  </goal>
+  <goal name="VC union.20" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.53" steps="621"/></proof>
+  </goal>
+  <goal name="VC union.21" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="VC union.22" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="45"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Intf.VC t" expl="VC for t">
+ <proof prover="0"><result status="valid" time="0.00" steps="23"/></proof>
+ </goal>
+ <goal name="Intf.VC create" expl="VC for create">
+ <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+ </goal>
+ <goal name="Intf.VC find" expl="VC for find">
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="Intf.VC union" expl="VC for union">
+ <transf name="split_goal_right">
+  <goal name="VC union.1" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC union.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC union.3" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC union.4" expl="postcondition">
+  <transf name="inline_all">
+   <goal name="VC union.4.1" expl="postcondition">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

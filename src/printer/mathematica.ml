@@ -81,8 +81,8 @@ let find_th env file th =
 
 let get_info env task =
   (* unary minus for constants *)
-  int_minus := find_th env "int" "Int" "prefix -";
-  real_minus := find_th env "real" "Real" "prefix -";
+  int_minus := find_th env "int" "Int" (op_prefix "-");
+  real_minus := find_th env "real" "Real" (op_prefix "-");
   (* handling of inequalities *)
   let ops = on_meta arith_meta (fun acc meta_arg ->
     match meta_arg with
@@ -134,22 +134,20 @@ let print_const fmt c =
 let constant_value =
   fun t -> match t.t_node with
     | Tconst c ->
-        fprintf str_formatter "%a" print_const c;
-        flush_str_formatter ()
+        asprintf "%a" print_const c
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" print_const c;
-        flush_str_formatter ()
+        asprintf "-%a" print_const c
     | _ -> raise Not_found
 
 
 let rel_error_pat =
-  PatApp (["real"], "Real", ["infix <="], [
+  PatApp (["real"], "Real", [op_infix "<="], [
     PatApp (["real"], "Abs", ["abs"], [
-      PatApp (["real"], "Real", ["infix -"], [
+      PatApp (["real"], "Real", [op_infix "-"], [
         PatHole 0;
         PatHole 1])]);
-    PatApp (["real"], "Real", ["infix *"], [
+    PatApp (["real"], "Real", [op_infix "*"], [
       PatHole 2;
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])
@@ -415,7 +413,7 @@ let prepare info defs ((params,funs,preds,eqs,hyps,goal,types) as acc) d =
     | Dind _ ->
         unsupportedDecl d
           "please remove inductive definitions before calling Mathematica printer"
-    | Dprop ((Plemma|Pskip), _, _) ->
+    | Dprop (Plemma, _, _) ->
         unsupportedDecl d
           "math: lemmas are not supported"
 

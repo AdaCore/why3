@@ -13,55 +13,30 @@
 
 open Format
 
-val print_option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
-val print_option_or_default :
-  string -> (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
-val print_list_pre :
-  (formatter -> unit -> unit) ->
-  (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
-val print_list_suf :
-  (formatter -> unit -> unit) ->
-  (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
-val print_list :
-  (formatter -> unit -> unit) ->
-  (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
-val print_list_or_default :
-  string -> (formatter -> unit -> unit) ->
-  (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
-val print_list_par :
-  (Format.formatter -> unit -> 'a) ->
-  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
+type 'a pp = formatter -> 'a -> unit
+
+val print_option : 'a pp -> 'a option pp
+val print_option_or_default : string -> 'a pp -> 'a option pp
+val print_list_pre : unit pp -> 'a pp -> 'a list pp
+val print_list_suf : unit pp -> 'a pp -> 'a list pp
+val print_list : unit pp -> 'a pp -> 'a list pp
+val print_list_or_default : string -> unit pp -> 'a pp -> 'a list pp
+val print_list_par : (formatter -> unit -> 'a) -> 'b pp -> 'b list pp
+val print_list_next : unit pp -> (bool -> 'a pp) -> 'a list pp
 val print_list_delim :
-  start:(Format.formatter -> unit -> unit) ->
-  stop:(Format.formatter -> unit -> unit) ->
-  sep:(Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
+  start:unit pp -> stop:unit pp -> sep:unit pp -> 'b pp -> 'b list pp
 
 val print_pair_delim :
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
+  unit pp -> unit pp -> unit pp -> 'a pp -> 'b pp -> ('a * 'b) pp
 (** [print_pair_delim left_delim middle_delim right_delim] *)
-
-val print_pair :
-  (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'b -> unit) -> Format.formatter -> 'a * 'b -> unit
+val print_pair : 'a pp -> 'b pp -> ('a * 'b) pp
 
 val print_iter1 :
-  (('a -> unit) -> 'b -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'b -> unit
+  (('a -> unit) -> 'b -> unit) -> unit pp -> 'a pp -> 'b pp
 
 val print_iter2:
   (('a -> 'b -> unit) -> 'c -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter -> 'c -> unit
+  unit pp -> unit pp -> 'a pp -> 'b pp -> 'c pp
 (**  [print_iter2 iter sep1 sep2 print1 print2 fmt t]
      iter iterator on [t : 'c]
      print1 k sep2 () print2 v sep1 () print1  sep2 () ...
@@ -69,9 +44,9 @@ val print_iter2:
 
 val print_iter22:
   (('a -> 'b -> unit) -> 'c -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> 'a -> 'b -> unit) ->
-  Format.formatter -> 'c -> unit
+  unit pp ->
+  (formatter -> 'a -> 'b -> unit) ->
+  'c pp
 (**  [print_iter22 iter sep print fmt t]
      iter iterator on [t : 'c]
      print k v sep () print k v sep () ...
@@ -82,44 +57,44 @@ val print_iter22:
 type formatted = (unit, unit, unit, unit, unit, unit) format6
 val empty_formatted : formatted
 
-val space : formatter -> unit -> unit
-val alt : formatter -> unit -> unit
-val alt2 : formatter -> unit -> unit
-val newline : formatter -> unit -> unit
-val newline2 : formatter -> unit -> unit
-val dot : formatter -> unit -> unit
-val comma : formatter -> unit -> unit
-val star : formatter -> unit -> unit
-val simple_comma : formatter -> unit -> unit
-val semi : formatter -> unit -> unit
-val colon : formatter -> unit -> unit
-val underscore : formatter -> unit -> unit
-val slash : formatter -> unit -> unit
-val equal : formatter -> unit -> unit
-val arrow : formatter -> unit -> unit
-val lbrace : formatter -> unit -> unit
-val rbrace : formatter -> unit -> unit
-val lsquare : formatter -> unit -> unit
-val rsquare : formatter -> unit -> unit
-val lparen : formatter -> unit -> unit
-val rparen : formatter -> unit -> unit
-val lchevron : formatter -> unit -> unit
-val rchevron : formatter -> unit -> unit
-val nothing : formatter -> 'a -> unit
-val string : formatter -> string -> unit
-val float : formatter -> float -> unit
-val int : formatter -> int -> unit
-val constant_string : string -> formatter -> unit -> unit
+val space : unit pp
+val alt : unit pp
+val alt2 : unit pp
+val newline : unit pp
+val newline2 : unit pp
+val dot : unit pp
+val comma : unit pp
+val star : unit pp
+val simple_comma : unit pp
+val semi : unit pp
+val colon : unit pp
+val underscore : unit pp
+val slash : unit pp
+val equal : unit pp
+val arrow : unit pp
+val lbrace : unit pp
+val rbrace : unit pp
+val lsquare : unit pp
+val rsquare : unit pp
+val lparen : unit pp
+val rparen : unit pp
+val lchevron : unit pp
+val rchevron : unit pp
+val nothing : 'a pp
+val string : string pp
+val float : float pp
+val int : int pp
+val constant_string : string -> unit pp
 val formatted : formatter -> formatted -> unit
-val constant_formatted : formatted -> formatter -> unit -> unit
-val print0 : formatter -> unit -> unit
-val hov : int -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit
-val indent : int -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+val constant_formatted : formatted -> unit pp
+val print0 : unit pp
+val hov : int -> 'a pp -> 'a pp
+val indent : int -> 'a pp -> 'a pp
 (** add the indentation at the first line *)
 
-val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+val add_flush : 'a pp -> 'a pp
 
-val asd : (formatter -> 'a -> unit) -> (formatter -> 'a -> unit)
+val asd : 'a pp -> 'a pp
 (** add string delimiter  " " *)
 
 val open_formatter : ?margin:int -> out_channel -> formatter
@@ -127,22 +102,20 @@ val close_formatter : formatter -> unit
 val open_file_and_formatter : ?margin:int -> string -> out_channel * formatter
 val close_file_and_formatter : out_channel * formatter -> unit
 val print_in_file_no_close :
-  ?margin:int -> (Format.formatter -> unit) -> string -> out_channel
-val print_in_file : ?margin:int -> (Format.formatter -> unit) -> string -> unit
+  ?margin:int -> (formatter -> unit) -> string -> out_channel
+val print_in_file : ?margin:int -> (formatter -> unit) -> string -> unit
 
 
 val print_list_opt :
-  (formatter -> unit -> unit) ->
-  (formatter -> 'a -> bool) -> formatter -> 'a list -> bool
+  unit pp -> (formatter -> 'a -> bool) -> formatter -> 'a list -> bool
 
 
-val string_of : ?max_boxes:int ->
-  (Format.formatter -> 'a -> unit) -> 'a -> string
+val string_of : ?max_boxes:int -> 'a pp -> 'a -> string
 
-val string_of_wnl : (Format.formatter -> 'a -> unit) -> 'a -> string
+val string_of_wnl : 'a pp -> 'a -> string
   (** same as {!string_of} but without newline *)
 
-val wnl : Format.formatter -> unit
+val wnl : formatter -> unit
 
 val sprintf :
   ('b,  formatter, unit, string) Pervasives.format4 -> 'b
@@ -150,15 +123,15 @@ val sprintf :
 val sprintf_wnl :
   ('b,  formatter, unit, string) Pervasives.format4 -> 'b
 
-val html_char : Format.formatter -> char -> unit
-val html_string : Format.formatter -> string -> unit
+val html_char : char pp
+val html_string : string pp
   (** formats the string by escaping special HTML characters
       quote, double quote, <, > and & *)
 
 
 module Ansi :
 sig
-  val set_column : Format.formatter -> int -> unit
+  val set_column : formatter -> int -> unit
 end
 
 type formatter = Format.formatter

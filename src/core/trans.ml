@@ -182,8 +182,9 @@ let on_meta_tds t fn =
   let fn = Wtds.memoize 17 fn in
   fun task -> fn (find_meta_tds task t) task
 
-let on_theory th fn =
+let on_cloned_theory th fn =
   let add td acc = match td.td_node with
+    | Use _ -> acc
     | Clone (_,sm) -> sm::acc
     | _ -> assert false
   in
@@ -197,8 +198,12 @@ let on_meta t fn =
   on_meta_tds t (fun tds -> fn (Stdecl.fold add tds.tds_set []))
 
 let on_used_theory th fn =
-  let td = create_null_clone th in
-  on_theory_tds th (fun tds -> fn (Stdecl.mem td tds.tds_set))
+  let check td = match td.td_node with
+    | Use _ -> true
+    | Clone _ -> false
+    | _ -> assert false
+  in
+  on_theory_tds th (fun tds -> fn (Stdecl.exists check tds.tds_set))
 
 let on_meta_excl t fn =
   if not t.meta_excl then raise (NotExclusiveMeta t);
@@ -286,7 +291,6 @@ let create_debugging_trans trans_name (tran : Task.task trans) =
     print_task_goal t2;
     Debug.dprintf debug "@.@.";
     t2;
-
   end in
   store new_trans
 
@@ -351,6 +355,7 @@ let list_transforms_l () =
 type naming_table = {
     namespace : namespace;
     known_map : known_map;
+    coercion : Coercion.t;
     printer : Ident.ident_printer;
     aprinter : Ident.ident_printer;
   }
@@ -463,18 +468,18 @@ let on_flag_find m ft s = try Hstr.find ft s with
 let on_flag_gen m ft def_name def arg =
   on_meta_excl m (fun alo ->
     let t, tr_name = match alo with
-      | None -> def, Printf.sprintf "%s %s" m.meta_name def_name
+      | None -> def, Printf.sprintf "%s%s" m.meta_name def_name
       | Some [MAstr s] ->
-          on_flag_find m ft s, Printf.sprintf "%s : %s" m.meta_name s
+          on_flag_find m ft s, Printf.sprintf "%s:%s" m.meta_name s
       | _ -> raise (IllegalFlagTrans m)
     in
     named tr_name (t arg))
 
-let on_flag m ft def arg =
-  let tdef x = on_flag_find m ft def x in
-  on_flag_gen m ft (Printf.sprintf ": %s" def) tdef arg
+let on_flag m ft def_name arg =
+  let def x = on_flag_find m ft def_name x in
+  on_flag_gen m ft (Printf.sprintf ":%s" def_name) def arg
 
-let on_flag_t m ft def arg = on_flag_gen m ft "(default)" def arg
+let on_flag_t m ft def arg = on_flag_gen m ft " (default)" def arg
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->

@@ -17,13 +17,11 @@ open Theory
 open Task
 open Args_wrapper
 
-
-
-let lab_ind = create_label "induction"
+let attr_ind = create_attribute "induction"
 
 (*
-let desc_labels = [label_induction,
-                   ("Make the induction on the labeled variables." :
+let desc_attrs = [attr_ind,
+                   ("Make the induction on the tagged variables." :
                        Pp.formatted)]
 *)
 
@@ -99,8 +97,8 @@ let print_vset vset =
     Format.printf "] "
   in
   Format.printf "************** t_candidates_lex *****************\n";
-  Format.printf "Candidates found : %d @." (Svsl.cardinal vset);
-  Format.printf "Candidates : [ ";
+  Format.printf "Candidates found: %d @." (Svsl.cardinal vset);
+  Format.printf "Candidates: [ ";
   Svsl.iter (fun vl -> aux vl) vset;
   Format.printf "]\n@.";
   Pretty.forget_all ()
@@ -112,7 +110,7 @@ let print_heuristic_lex vl =
   Format.printf "Induction variables (in lexicographic order): [ ";
   List.iter (Format.printf "%a " Pretty.print_vs) vl;
   Format.printf "]@.";
-  Format.printf "Lex. order map : [ ";
+  Format.printf "Lex. order map: [ ";
   Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
   Format.printf "]\n@.";
   Pretty.forget_all ()
@@ -161,12 +159,8 @@ let decompose_forall t =
   in
   let qvl, t = aux [] t in (List.fold_right Svs.add qvl Svs.empty), qvl, t
 
-
-
-
-
-let qvl_labeled qvl =
-  List.filter (fun v -> Slab.mem lab_ind v.vs_name.id_label) qvl
+let qvl_tagged qvl =
+  List.filter (fun v -> Sattr.mem attr_ind v.vs_name.id_attrs) qvl
 
 (*HEURISTICS SEARCH FOR CANDIDATES IN THE BODY OF THE FORMULA*)
 (* This function collects lists of variables corresponding to
@@ -185,7 +179,7 @@ let qvl_labeled qvl =
    decreases on [a;b], but is called with some not-variable term T for argument
    b, then the resulting list will be [a].
 *)
-let t_candidates_lex km qvs labeledvl t =
+let t_candidates_lex km qvs taggedvl t =
   (* let int_candidates _tl acc = acc
    List.fold_left (fun acc t -> match t.t_node with
      | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int ->
@@ -219,8 +213,8 @@ let t_candidates_lex km qvs labeledvl t =
       | _ ->  acc
     in t_fold t_candidates acc t
   in
-  if labeledvl <> []
-  then Svsl.add labeledvl Svsl.empty
+  if taggedvl <> []
+  then Svsl.add taggedvl Svsl.empty
   else t_candidates Svsl.empty t
 
 
@@ -318,7 +312,7 @@ let make_induction_lex lexl rql t =
 
 let induction_ty_lex km t0 =
   let qvs, qvl, t = decompose_forall t0 in
-  let lblvl = qvl_labeled qvl in
+  let lblvl = qvl_tagged qvl in
   let vset = t_candidates_lex km qvs lblvl t in
   let vl = heuristic_lex vset in
   let lexl, rightmost_qvl = qsplit km vl qvl in
@@ -369,7 +363,7 @@ let () = wrap_and_register
 (***************************************************************************)
 
 (* induction_int_lex :   induction tactic for ordered int tuples.
-No heuristic is provided. Use labels. Generalized variables inside
+No heuristic is provided. Use attributes. Generalized variables inside
 the induction hypothesis are the variables on the right of the rightmost
 induction variable.*)
 
@@ -383,18 +377,18 @@ let decompose_int_forall t =
   in aux [] t
 *)
 
-(* find labeled variables (for induction variables),
-and the rest of the quantified variables after the last labeled variable
+(* find tagged variables (for induction variables),
+and the rest of the quantified variables after the last tagged variable
 (for the variables to generalize inside induction hypothesis).
 Ex: the result of Va.x1.b.x2.c.x3.d.P is [a.x1.b.x2.c.x3][x1.x2.x3][d]*)
 (* dead code
-let split_int_qlv_labeled qvl =
+let split_int_qlv_tagged qvl =
   let rec aux left_acc ind_acc gen_acc = function
     | [] -> List.rev left_acc, List.rev ind_acc, gen_acc
     | v :: tl ->
       let lbls =
-	Slab.filter (fun v -> v.lab_string = "induction") v.vs_name.id_label
-      in if not (Slab.is_empty lbls)
+	Sattr.filter (fun v -> v.attr_string = "induction") v.vs_name.id_attrs
+      in if not (Sattr.is_empty lbls)
 	then aux (v :: (gen_acc @ left_acc)) (v :: ind_acc) [] tl
 	else aux left_acc ind_acc (v :: gen_acc) tl
   in aux [] [] [] qvl
@@ -460,7 +454,7 @@ let int_strong_induction_lex (le_int,lt_int) ivl rvl t =
 (* dead code
 let induction_int_lex _km (le_int,lt_int) t0 =
   let qvl, t = decompose_int_forall t0 in
-  let lvl,ivl, genl =  split_int_qlv_labeled qvl in
+  let lvl,ivl, genl = split_int_qlv_tagged qvl in
   if (ivl = [])
   then [t0]
   else
@@ -481,8 +475,8 @@ let induction_int_lex th_int = function
 	task_prev = prev; task_known = km } as t ->
     begin
       try
-	let le_int = ns_find_ls th_int.th_export ["infix <="] in
-	let lt_int = ns_find_ls th_int.th_export ["infix <"] in
+	let le_int = ns_find_ls th_int.th_export [Ident.op_infix "<="] in
+	let lt_int = ns_find_ls th_int.th_export [Ident.op_infix "<"] in
 	if not (Mid.mem le_int.ls_name km) then raise Exit;
 	List.map (add_prop_decl prev Pgoal pr)
 	  (induction_int_lex km (le_int, lt_int) f)
@@ -497,10 +491,4 @@ let () =
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
-*)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3.byte"
-End:
 *)

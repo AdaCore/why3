@@ -251,6 +251,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
 
 (** {2 proved status} *)
 
+val pa_proved : session -> proofAttemptID -> bool
 val th_proved : session -> theory -> bool
 val pn_proved : session -> proofNodeID -> bool
 val tn_proved : session -> transID -> bool

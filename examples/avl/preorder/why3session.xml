@@ -2,34 +2,32 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="3" steplimit="0" memlimit="1000"/>
-<file name="../preorder.mlw">
-<theory name="Full">
- <goal name="Eq.Refl">
- <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../preorder.mlw" proved="true">
+<theory name="Full" proved="true">
+ <goal name="Eq.Refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="Eq.Trans">
- <proof prover="1"><result status="valid" time="0.03" steps="31"/></proof>
+ <goal name="Eq.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="48"/></proof>
  </goal>
- <goal name="Eq.Symm">
- <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+ <goal name="Eq.Symm" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="Lt.Trans">
- <proof prover="1"><result status="valid" time="0.03" steps="35"/></proof>
+ <goal name="Lt.Trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
  </goal>
- <goal name="Lt.Asymm">
- <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
- </goal>
-</theory>
-<theory name="TotalFull">
- <goal name="Lt.Total">
- <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
- </goal>
- <goal name="lt_def2">
- <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
+ <goal name="Lt.Asymm" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="Computable">
+<theory name="TotalFull" proved="true">
+ <goal name="Lt.Total" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+ </goal>
+ <goal name="lt_def2" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+ </goal>
 </theory>
 </file>
 </why3session>

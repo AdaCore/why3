@@ -27,6 +27,6 @@
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 generic.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 generic.c"
 End:
 */

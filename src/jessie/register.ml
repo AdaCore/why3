@@ -20,11 +20,16 @@ module OutputFile =
 
 *)
 
+
 open Why3
 
 (*
 let () = Debug.set_flag Call_provers.debug
 *)
+
+let limit = Call_provers.{ limit_time = 1 ;
+                           limit_mem  = 1000;
+                           limit_steps = -1;}
 
 let run_on_task fmt prover prover_driver t =
   let limit = { Call_provers.empty_limit with Call_provers.limit_time = 3 } in
@@ -70,11 +75,7 @@ let process () =
       List.fold_left
         (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
         []
-        [ (*"Z432", "Z3,4.3.2,";
-          "Z440", "Z3,4.4.0,";
-          "C241", "CVC3,2.4.1,";
-          "C414", "CVC4,1.4,";
-          "A991", "Alt-Ergo,0.99.1,";*)
+        [ "C415", "CVC4,1.5,";
           "Z460", "Z3,4.6.0,";
           "A220", "Alt-Ergo,2.2.0,";
         ]
@@ -83,32 +84,42 @@ let process () =
         Exn_printer.exn_printer e
   in
   let theories =
-    try
+    (* try *)
       ACSLtoWhy3.Self.result "Translating to Why3...";
       ACSLtoWhy3.prog prog
-    with e ->
-      ACSLtoWhy3.Self.fatal "Exception raised while translating to Why3:@ %a"
-        Exn_printer.exn_printer e
+    (* with e -> *)
+    (*   ACSLtoWhy3.Self.fatal "Exception raised while translating to Why3:@ %a" *)
+    (*     Exn_printer.exn_printer e *)
   in
   try
     ACSLtoWhy3.Self.result "Running provers...";
-    List.iter (fun th ->
-      ACSLtoWhy3.Self.result "running theory 1:";
-      ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
-      let tasks = List.rev (Task.split_theory th None None) in
-      ACSLtoWhy3.Self.result "@[<h 0>Provers: %a@]"
-        (Pp.print_list Pp.comma
-           (fun fmt (_n,p,_d) ->
-             let p = p.Whyconf.prover in
-             Format.fprintf fmt "%s %s" p.Whyconf.prover_name p.Whyconf.prover_version))
-        provers;
-      let _ =
-        List.fold_left (fun n t ->
-          let g = Task.task_goal t in
-          ACSLtoWhy3.Self.result "@[<h 0>Task %d (%s): %a@]" n g.Decl.pr_name.Ident.id_string
-            (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t))
-            provers;
-          n+1) 1 tasks
+    List.iter
+      (fun th ->
+       let th = th.Pmodule.mod_theory in
+       ACSLtoWhy3.Self.result "running theory 1:";
+       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
+       let tasks = Task.split_theory th None None in
+       ACSLtoWhy3.Self.result "@[<h 0>Provers: %a@]"
+                              (Pp.print_list Pp.comma
+                                             (fun fmt (_n,p,_d) ->
+                                              let p = p.Whyconf.prover in
+                                              Format.fprintf fmt "%s %s" p.Whyconf.prover_name p.Whyconf.prover_version))
+                              provers;
+       let _ =
+        List.fold_left
+          (fun n t ->
+           let l = Trans.apply_transform "split_goal_wp" ACSLtoWhy3.env t in
+           List.fold_left
+             (fun n t ->
+              let (g,expl,t) = Termcode.goal_expl_task ~root:false t in
+              ACSLtoWhy3.Self.result
+                "@[<h 0>Task %d (%s) (%a): %a@]" n g.Ident.id_string
+                (Pp.print_option Format.pp_print_string) expl
+                (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t))
+                provers;
+              n+1)
+             n l)
+          1 tasks
       in ())
     theories
   with e ->
@@ -126,8 +137,8 @@ let (_unused : (unit -> unit) -> unit -> unit) =
 let run () =  if ACSLtoWhy3.Enabled.get () then process ()
 
 let () =
-  try
+  (* try *)
     Db.Main.extend run
-  with e ->
-    ACSLtoWhy3.Self.fatal "Exception raised when loading Jessie3:@ %a"
-      Exn_printer.exn_printer e
+  (* with e -> *)
+  (*   ACSLtoWhy3.Self.fatal "Exception raised when loading Jessie3:@ %a" *)
+  (*     Exn_printer.exn_printer e *)

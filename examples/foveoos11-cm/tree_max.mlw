@@ -25,8 +25,8 @@ appropriate.
 
 theory BinTree
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   type tree = Null | Tree int tree tree
 
@@ -51,9 +51,9 @@ end
 
 module TreeMax
 
-  use import int.Int
+  use int.Int
   use int.MinMax
-  use import BinTree
+  use BinTree
 
   let rec max_aux (t:tree) (acc:int) variant {t}
     ensures { ge_tree result t /\ result >= acc /\

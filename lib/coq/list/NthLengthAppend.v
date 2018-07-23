@@ -23,13 +23,12 @@ Require list.NthLength.
 Require list.Append.
 
 (* Why3 goal *)
-Lemma nth_append_1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (l1:(list a)) (l2:(list a)) (i:Z),
- (i < (list.Length.length l1))%Z ->
- ((list.Nth.nth i (Init.Datatypes.app l1 l2)) = (list.Nth.nth i l1)).
+Lemma nth_append_1 {a:Type} {a_WT:WhyType a} :
+  forall (l1:(list a)) (l2:(list a)) (i:Z),
+  (i < (list.Length.length l1))%Z ->
+  ((list.Nth.nth i (Init.Datatypes.app l1 l2)) = (list.Nth.nth i l1)).
 Proof.
-intros a a_WT l1.
+intros l1.
 induction l1 as [|x l1].
 intros l2 i.
 apply NthLength.nth_none_1.
@@ -45,14 +44,13 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma nth_append_2 :
-forall {a:Type} {a_WT:WhyType a},
-forall (l1:(list a)) (l2:(list a)) (i:Z),
- ((list.Length.length l1) <= i)%Z ->
- ((list.Nth.nth i (Init.Datatypes.app l1 l2)) = (list.Nth.nth (i - (list.Length.length l1))%Z
-                                                  l2)).
+Lemma nth_append_2 {a:Type} {a_WT:WhyType a} :
+  forall (l1:(list a)) (l2:(list a)) (i:Z),
+  ((list.Length.length l1) <= i)%Z ->
+  ((list.Nth.nth i (Init.Datatypes.app l1 l2)) =
+   (list.Nth.nth (i - (list.Length.length l1))%Z l2)).
 Proof.
-intros a a_WT l1.
+intros l1.
 induction l1 as [|x l1].
 intros l2 i _.
 simpl.

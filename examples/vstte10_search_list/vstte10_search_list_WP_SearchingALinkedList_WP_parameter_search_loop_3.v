@@ -3,69 +3,62 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require option.Option.
 Require list.List.
 Require list.Length.
 Require list.Nth.
-Require option.Option.
 Require list.HdTl.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-(* Why3 assumption *)
 Definition zero_at (l:(list Z)) (i:Z): Prop := ((list.Nth.nth i
-  l) = (Some 0%Z)) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
-  ~ ((list.Nth.nth j l) = (Some 0%Z)).
+  l) = (Init.Datatypes.Some 0%Z)) /\ forall (j:Z), ((0%Z <= j)%Z /\
+  (j < i)%Z) -> ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z)).
 
 (* Why3 assumption *)
 Definition no_zero (l:(list Z)): Prop := forall (j:Z), ((0%Z <= j)%Z /\
-  (j < (list.Length.length l))%Z) -> ~ ((list.Nth.nth j l) = (Some 0%Z)).
+  (j < (list.Length.length l))%Z) -> ~ ((list.Nth.nth j
+  l) = (Init.Datatypes.Some 0%Z)).
 
 (* Why3 assumption *)
-Inductive ref (a:Type) {a_WT:WhyType a} :=
+Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a] [a_WT]].
+Implicit Arguments mk_ref [[a]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(@ref a a_WT)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
 
 (* Why3 goal *)
-Theorem WP_parameter_search_loop : forall (l:(list Z)), forall (s:(list Z))
-  (i:Z), ((0%Z <= i)%Z /\
+Theorem VC_search_loop : forall (l:(list Z)), forall (s:(list Z)) (i:Z),
+  ((0%Z <= i)%Z /\
   (((i + (list.Length.length s))%Z = (list.Length.length l)) /\
   ((forall (j:Z), (0%Z <= j)%Z -> ((list.Nth.nth j
   s) = (list.Nth.nth (i + j)%Z l))) /\ forall (j:Z), ((0%Z <= j)%Z /\
-  (j < i)%Z) -> ~ ((list.Nth.nth j l) = (Some 0%Z))))) -> ((~ (s = nil)) ->
-  ((~ (s = nil)) -> forall (o:Z),
-  match s with
-  | nil => False
-  | (cons h _) => (o = h)
-  end -> ((~ (o = 0%Z)) -> forall (i1:Z), (i1 = (i + 1%Z)%Z) ->
-  ((~ (s = nil)) -> forall (o1:(list Z)),
-  match s with
-  | nil => False
-  | (cons _ t) => (o1 = t)
-  end -> forall (s1:(list Z)), (s1 = o1) -> forall (j:Z), (0%Z <= j)%Z ->
-  ((list.Nth.nth j s1) = (list.Nth.nth (i1 + j)%Z l)))))).
-(* Why3 intros l s i (h1,(h2,(h3,h4))) h5 h6 o h7 h8 i1 h9 h10 o1 h11 s1 h12
-        j h13. *)
-intuition.
+  (j < i)%Z) -> ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z))))) ->
+  (((list.List.is_nil s) <-> (s = Init.Datatypes.nil)) -> forall (o:bool),
+  (((~ (list.List.is_nil s)) /\ exists o1:Z,
+  ((list.HdTl.hd s) = (Init.Datatypes.Some o1)) /\ (((o1 = 0%Z) /\
+  (o = false)) \/ ((~ (o1 = 0%Z)) /\ (o = true)))) \/ ((list.List.is_nil
+  s) /\ (o = false))) -> ((o = true) -> forall (i1:Z), (i1 = (i + 1%Z)%Z) ->
+  forall (o1:(list Z)), ((list.HdTl.tl s) = (Init.Datatypes.Some o1)) ->
+  forall (s1:(list Z)), (s1 = o1) -> forall (j:Z), (0%Z <= j)%Z ->
+  ((list.Nth.nth j s1) = (list.Nth.nth (i1 + j)%Z l)))).
+Proof.
+intros l s i (h1,(h2,(h3,h4))) h5 o h6 h7 i1 h8 o1 h9 s1 h10 j h11.
+subst.
 destruct s.
-destruct H9.
+easy.
+injection h9. clear h9.
+intros.
 subst.
 assert (hj: (0 <= j+1)%Z) by omega.
-generalize (H3 (j+1)%Z hj).
-generalize (Nth.nth_def (j+1)%Z (cons z s)).
-intuition.
-ring_simplify (j+1-1)%Z in H4.
-ring_simplify (i+(j+1))%Z in H7.
-ring_simplify (i+1+j)%Z.
-transitivity (Nth.nth (j + 1) (cons z s)); auto.
+replace (i + 1 + j)%Z with (i + (j + 1))%Z by ring.
+rewrite <- (h3 _ hj).
+destruct (Nth.nth_def (j+1)%Z (cons z o1)) as [_ ->].
+now ring_simplify (j+1-1)%Z.
+omega.
 Qed.
-
-

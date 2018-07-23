@@ -1,17 +1,17 @@
 module Array
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   type t
 
   function to_int  t : int
   meta "model_projection" function to_int
 
-  function two : t
+  val function two : t
   axiom two_def : to_int two = 2
 
-  function three : t
+  val function three : t
   axiom three_def : to_int three = 3
 
 

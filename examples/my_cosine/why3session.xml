@@ -2,28 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Gappa" version="1.3.0" timelimit="2" steplimit="0" memlimit="0"/>
+<prover id="0" name="Gappa" version="1.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../my_cosine.mlw">
-<theory name="M">
- <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
- <transf name="split_goal_right">
-  <goal name="WP_parameter my_cosine.1" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.17"/></proof>
-  <proof prover="3" edited="my_cosine_M_WP_parameter_my_cosine_1.v"><result status="valid" time="1.79"/></proof>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../my_cosine.mlw" proved="true">
+<theory name="M" proved="true">
+ <goal name="VC my_cosine" expl="VC for my_cosine" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC my_cosine.0" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="3" edited="my_cosine_M_VC_my_cosine_1.v"><result status="valid" time="1.78"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.2" expl="precondition">
+  <goal name="VC my_cosine.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC my_cosine.2" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05" steps="54"/></proof>
+  </goal>
+  <goal name="VC my_cosine.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter my_cosine.3" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter my_cosine.4" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter my_cosine.5" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <goal name="VC my_cosine.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

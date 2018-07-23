@@ -1,7 +1,7 @@
 
 module Types
   
-  use import list.List
+  use list.List
   
   type iset = list int
   
@@ -9,10 +9,10 @@ end
 
 module Logic
   
-  use import list.List
-  use import list.Mem
-  use import Types
-  use import int.Int
+  use list.List
+  use list.Mem
+  use Types
+  use int.Int
   
   inductive iset_ok (l:iset) =
     | Set_empty : iset_ok Nil
@@ -35,11 +35,11 @@ end
 
 module Impl
   
-  use import list.List
-  use import list.Mem
-  use import Types
-  use import int.Int
-  use import Logic
+  use list.List
+  use list.Mem
+  use Types
+  use int.Int
+  use Logic
   
   (* Very stupid integer sets. *)
   

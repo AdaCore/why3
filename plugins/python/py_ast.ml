@@ -24,7 +24,7 @@ type binop =
 
 type expr = {
   expr_desc: expr_desc;
-  expr_loc : Why3.Loc.position;
+  expr_loc : Loc.position;
 }
 
 and expr_desc =
@@ -49,11 +49,11 @@ and stmt_desc =
   | Sif of expr * block * block
   | Sreturn of expr
   | Sassign of ident * expr
-  | Swhile of expr * Ptree.loop_annotation * block
+  | Swhile of expr * Ptree.invariant * Ptree.variant * block
   | Sfor of ident * expr * Ptree.invariant * block
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
-  | Sassert of Ptree.assertion_kind * Ptree.term
+  | Sassert of Expr.assertion_kind * Ptree.term
   | Sbreak
   | Slabel of ident
 

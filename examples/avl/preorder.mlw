@@ -8,7 +8,7 @@ theory Full
   (** Standard preorder theory. *)
   type t
   predicate le t t
-  clone export relations.PreOrder with type t = t, predicate rel = le
+  clone export relations.PreOrder with type t = t, predicate rel = le, axiom .
   (** Definable symbols for equality and strict ordering. *)
   predicate eq t t
   axiom eq_def : forall x y. eq x y <-> le x y /\ le y x
@@ -28,10 +28,9 @@ end
 (** {2 Total preorder} *)
 theory TotalFull
 
-  clone export Full
-  clone export relations.Total with type t = t, predicate rel = le
-  clone relations.Total as Lt with type t = t,
-    predicate rel = le, goal Total
+  clone export Full with axiom .
+  clone export relations.Total with type t = t, predicate rel = le, axiom Total
+  clone relations.Total as Lt with type t = t, predicate rel = le, goal Total
   lemma lt_def2 : forall x y. lt x y <-> not le y x
 
 end
@@ -39,13 +38,14 @@ end
 (** {2 Computable total preorder} *)
 module Computable
 
-  use import int.Int
-  clone export TotalFull
+  use int.Int
+  clone export TotalFull with axiom .
 
   (** Comparison is computable. *)
   val compare (x y:t) : int
-    ensures { (result > 0 <-> lt y x) /\
-      (result < 0 <-> lt x y) /\ (result = 0 <-> eq x y) }
+    ensures { result > 0 <-> lt y x }
+    ensures { result < 0 <-> lt x y }
+    ensures { result = 0 <-> eq x y }
 
 end
 

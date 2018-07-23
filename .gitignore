@@ -122,20 +122,26 @@ why3.conf
 /doc/manual.ist
 /doc/manual.out
 /doc/manual.image.out
+/doc/manual.synctex.gz
 /doc/*.haux
 /doc/*.pdf
+/doc/generated/
 /doc/html/
 /doc/*.hind
 /doc/*.htoc
 /doc/bnf
 /doc/bnf.ml
-/doc/*_bnf.tex
 /doc/apidoc.tex
 /doc/apidoc/
 /doc/stdlibdoc/
+/doc/texput.log
+/doc/extract_ocaml_code
 /doc/*__*.ml
+/doc/*_bnf.tex
 
 # /lib
+/lib/why3-cpulimit
+/lib/why3-cpulimit.exe
 /lib/why3cpulimit
 /lib/why3cpulimit.exe
 /lib/why3server
@@ -151,20 +157,18 @@ why3.conf
 /share/emacs/semantic.cache
 /share/Makefile.config
 /share/drivers
-/share/modules
-/share/theories
+/share/stdlib
 
 # /src/
 /src/config.sh
 
-# Coq tactic
-/src/coq-tactic/why3tac.ml
-
 # Coq
+/lib/coq/version
 
 # PVS
 .pvscontext
 orphaned-proofs.prf
+/lib/pvs/version
 /lib/pvs/*/*.summary
 pvsbin/
 
@@ -199,6 +203,8 @@ pvsbin/
 /src/parser/parser.ml
 /src/parser/parser.mli
 /src/parser/parser.conflicts
+/src/parser/handcrafted.messages.temp
+/src/parser/parser_messages.ml
 
 # /src/why3doc/
 /src/why3doc/doc_lexer.ml
@@ -282,37 +288,31 @@ pvsbin/
 /examples/*/*/*/*.tex
 /examples/use_api/runstrat/makejob.opt
 /examples/use_api/runstrat/runstrat.opt
-/examples/vstte10_max_sum/*__*.ml
-/examples/euler001/*__*.ml
-/examples/sudoku/*__*.ml
+/examples/vstte10_max_sum/vstte10_max_sum.ml
+/examples/euler001/euler001.ml
+/examples/sudoku/sudoku.ml
 /examples/sudoku/jsmain.js
 /examples/in_progress/sudoku_reloaded/*__*.ml
 /examples/in_progress/sudoku_reloaded/jsmain.js
-/examples/gcd/*__*.ml
+/examples/gcd/euclideanAlgorithm63.ml
 /examples/gcd/jsmain.js
-/examples/defunctionalization/*__*.ml
+/examples/defunctionalization/defunctionalization.ml
 /examples/vstte12_combinators/jsmain.js
-/examples/vstte12_combinators/*__*.ml
+/examples/vstte12_combinators/vstte12_combinators.ml
 /examples/in_progress/bigInt/jsmain.js
 /examples/in_progress/bigInt/*__*.ml
 /examples/in_progress/mp/jsmain.js
 /examples/in_progress/mp/*__*.ml
-/examples/prover/build/*__*.ml
 /examples/prover/.depend
-/examples/prover/build/prover
+/examples/prover/prover
+/examples/prover/prover.ml
 /examples/prover/bench/*/*.out
 /examples/prover/bench/*/*.txt
 /examples/prover/bench1
 /examples/prover/bench2
-
-# modules
-/modules/string/
-/modules/stack/
-/modules/queue/
-/modules/pqueue/
-/modules/mach/array/
-/modules/mach/int/
-/modules/python/
+/examples/prover/macro_generator/depend
+/examples/prover/macro_generator/build
+/examples/in_progress/multiprecision/build/
 
 # Try Why3
 /src/trywhy3/trywhy3.byte

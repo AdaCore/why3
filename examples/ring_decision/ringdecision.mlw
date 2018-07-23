@@ -1,0 +1,475 @@
+module UnitaryCommutativeRingDecision
+
+clone algebra.UnitaryCommutativeRing as C with axiom .
+
+clone algebra.UnitaryCommutativeRing as Z with axiom .
+
+function morph Z.t : C.t
+
+axiom morph_zero: morph Z.zero = C.zero
+axiom morph_one: morph Z.one = C.one
+axiom morph_add: forall z1 z2:Z.t. morph (Z.(+) z1 z2) = C.(+) (morph z1) (morph z2)
+axiom morph_mul: forall z1 z2:Z.t. morph (Z.(*) z1 z2)
+                                   = C.(*) (morph z1) (morph z2)
+axiom morph_inv: forall z:Z.t. morph (Z.(-_) z) = C.(-_) (morph z)
+
+val predicate eq0 (x:Z.t) ensures { result <-> x = Z.zero }
+
+use int.Int
+use list.List
+
+type t = Var int | Add t t | Mul t t | Cst Z.t
+
+type vars = int -> C.t
+
+function interp (x:t) (y:vars) : C.t =
+  match x with
+  | Var n -> y n
+  | Add x1 x2 -> C.(+) (interp x1 y) (interp x2 y)
+  | Mul x1 x2 -> C.(*) (interp x1 y) (interp x2 y)
+  | Cst c -> morph c end
+
+predicate eq (x1 x2:t) = forall y: vars. interp x1 y = interp x2 y
+
+(** Conversion *)
+
+type m = M Z.t (list int)
+type t' = list m (* sum of monomials *)
+
+function mon (x:list int) (y:vars) : C.t =
+  match x with
+  | Nil -> C.one
+  | Cons x r -> C.(*) (y x) (mon r y) end
+
+function interp' (x:t') (y:vars) : C.t =
+  match x with
+  | Nil -> C.zero
+  | Cons (M a m) r -> C.(+) (C.(*) (morph a) (mon m y)) (interp' r y) end
+
+predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
+predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
+
+use list.Append
+use list.Length
+
+let rec lemma mon_append (x1 x2: list int) (y:vars)
+  ensures { mon (x1 ++ x2) y = C.(*) (mon x1 y) (mon x2 y) }
+  variant { x1 }
+=
+  match x1 with Nil -> () | Cons _ x -> mon_append x x2 y end
+
+lemma interp_nil : forall y:vars. interp' Nil y = C.zero
+lemma interp_cons : forall m:m, x:t', y:vars.
+      interp' (Cons m x) y = C.(+) (interp' (Cons m Nil) y) (interp' x y)
+let rec lemma interp_sum (x1 x2:t') (y:vars)
+    ensures { interp' (x1 ++ x2) y = C.(+) (interp' x1 y) (interp' x2 y) }
+    variant { x1 }
+=
+  match x1 with
+    | Nil -> ()
+    | Cons _ x -> interp_sum x x2 y
+  end
+
+let ghost function append_mon (m1 m2:m)
+  ensures { forall y. interp' (Cons result Nil) y
+              = C.(*) (interp' (Cons m1 Nil) y) (interp' (Cons m2 Nil) y) }
+= match m1,m2 with M a1 l1, M a2 l2 -> M (Z.(*) a1 a2) (l1 ++ l2) end
+
+let rec ghost function mul_mon (x:t') (mon:m) : t'
+  ensures { forall y.
+            interp' result y = C.(*) (interp' x y) (interp' (Cons mon Nil) y) }
+= match x with
+  | Nil -> Nil
+  | Cons m r ->
+    let mr = append_mon m mon in
+    let lr = mul_mon r mon in
+    Cons mr lr
+end
+
+let rec ghost function mul_devel (x1 x2:t') : t'
+  ensures { forall y. interp' result y = C.(*) (interp' x1 y) (interp' x2 y) } =
+  match x1 with
+  | Nil -> Nil
+  | Cons (M a m) r -> (mul_mon x2 (M a m)) ++ (mul_devel r x2)
+  end
+
+let rec ghost function conv (x:t) : t'
+  ensures { forall y. interp x y = interp' result y } =
+  match x with
+  | Var v -> Cons (M Z.one (Cons v Nil)) Nil
+  | Add x1 x2 -> (conv x1) ++ (conv x2)
+  | Mul x1 x2 -> mul_devel (conv x1) (conv x2)
+  | Cst n -> Cons (M n Nil) Nil
+  end
+
+
+(** Normalisation *)
+
+let rec function insert (x: int) (l: list int) : list int
+  ensures  { eq_mon (Cons x l) result }
+  variant  { l }
+= match l with
+  | Nil -> Cons x Nil
+  | Cons y r -> if x <= y then Cons x l else Cons y (insert x r)
+  end
+
+(*no need to prove that this actually sorts the list*)
+let rec function insertion_sort (l: list int) : list int
+  ensures { eq_mon l result }
+  variant { l }
+= match l with
+  | Nil -> Nil
+  | Cons x r -> insert x (insertion_sort r)
+  end
+
+let function sort_mon (x:m) : m
+  ensures { eq' (Cons x Nil) (Cons result Nil) }
+= match x with M a m -> M a (insertion_sort m) end
+
+let rec function sort_mons (x:t') : t'
+  ensures { eq' result x }
+  variant { x }
+= match x with Nil -> Nil | Cons m r -> Cons (sort_mon m) (sort_mons r) end
+
+(*lexicographic order on monomials with variables sorted using sort_mons*)
+let rec function le_mon (x1 x2: list int) : bool
+= (length x1 < length x2) ||
+  ((length x1 = length x2) &&
+  match x1, x2 with
+  | Nil, _ -> true
+  | _, Nil -> false
+  | Cons v1 r1, Cons v2 r2 ->  v1 <= v2 && le_mon r1 r2
+  end)
+
+let rec function same (l1 l2: list int) : bool
+  ensures { result -> eq_mon l1 l2 }
+= match l1, l2 with
+  | Nil, Nil -> true
+  | Nil, _ | _, Nil -> false
+  | Cons x1 l1, Cons x2 l2 -> x1 = x2 && same l1 l2
+  end
+
+lemma squash_sum: forall a1 a2:Z.t, l1 l2: list int. same l1 l2 ->
+      eq' (Cons (M a1 l1) (Cons (M a2 l2) Nil)) (Cons (M (Z.(+) a1 a2) l1) Nil)
+
+let lemma squash_append (a1 a2:Z.t) (l1 l2: list int) (r:t')
+      requires { same l1 l2 }
+      ensures { eq' (Cons (M a1 l1) (Cons (M a2 l2) r))
+                    (Cons (M (Z.(+) a1 a2) l1) r) }
+= ()
+
+let rec ghost function insert_mon (m: m) (x: t') : t'
+  ensures { eq' result (Cons m x) }
+  variant { length x }
+= match m,x with
+  | _,Nil -> Cons m Nil
+  | M a1 l1, Cons (M a2 l2) r ->
+      if same l1 l2
+      then
+        let s = Z.(+) a1 a2 in
+        if eq0 s
+        then (assert { eq' r (Cons m x)
+                       by eq' r (Cons (M s l1) r)
+                       so eq' (Cons (M s l1) r) (Cons m x)};
+              r)
+        else Cons (M s l1) r
+      else if le_mon l1 l2 then Cons m x else Cons (M a2 l2) (insert_mon m r)
+  end
+
+let rec ghost function insertion_sort_mon (x: t') : t'
+  ensures { eq' result x }
+  variant { x }
+= match x with
+  | Nil -> Nil
+  | Cons m r -> insert_mon m (insertion_sort_mon r)
+  end
+
+let ghost function normalize (x: t') : t'
+  ensures { eq' result x }
+=
+  (* sort inside each monomial *)
+  let x = sort_mons x in
+  (* sort monomials lexicographically *)
+  insertion_sort_mon x
+
+lemma norm': forall x1 x2:t', y:vars.
+      normalize x1 = normalize x2 -> interp' x1 y = interp' x2 y
+
+lemma norm: forall x1 x2:t, y:vars.
+      normalize (conv x1) = normalize (conv x2) -> interp x1 y = interp x2 y
+
+end
+
+
+
+(** Tests *)
+module Tests
+
+use int.Int
+
+function id (x:int) : int = x
+let predicate eq0_int (x:int) = x = 0
+
+
+clone export UnitaryCommutativeRingDecision with type C.t = int, constant C.zero = zero, constant C.one = one, function C.(-_) = (-_), function C.(+) = (+), function C.(*) = (*), type Z.t = int, constant Z.zero = zero, constant Z.one = one, function Z.(-_) = (-_), function Z.(+) = (+), function Z.(*) = (*), function morph = id, goal morph_zero, goal morph_one, goal morph_add, goal morph_mul, goal morph_inv, val eq0 = eq0_int,
+  axiom . (* FIXME: replace with "goal" and prove *)
+
+meta "compute_max_steps" 0x10000000
+
+goal g: forall x. (x+3)*(x+2) = x*x + 5*x + 6
+(* introduce_premises -> reflection_l norm *)
+
+end
+
+theory AssocAlgebra
+
+type r
+type a
+
+function (+) a a : a
+function (*) a a : a
+
+clone algebra.UnitaryCommutativeRing as R with type t = r, axiom .
+clone algebra.Ring as A with type t = a, function (+) = (+), function (*) = (*), axiom .
+constant one : a
+constant zero : a = A.zero
+axiom AUnitary : forall x:a. one * x = x * one = x
+axiom ANonTrivial : A.zero <> one
+
+(* A is an associative algebra over R *)
+
+val function ($) r a : a
+
+
+axiom ExtDistSumA : forall r: r, x y: a. r $ (x + y) = r $ x + r $ y
+axiom ExtDistSumR : forall r s: r, x: a. (R.(+) r s)$x = r$x + s$x
+axiom AssocMulExt : forall r s: r, x: a. (R.(*) r s)$x = r$(s$x)
+axiom UnitExt     : forall x: a.         R.one $ x = x
+axiom CommMulExt  : forall r: r, x y: a. r$(x*y) = (r$x)*y = x*(r$y)
+
+val predicate eq0 (r: r) ensures { result <-> r = R.zero }
+
+end
+
+module AssocAlgebraDecision
+
+
+use int.Int
+use list.List
+
+type r
+type a
+
+val constant rzero : r
+val constant rone : r
+val constant aone : a
+val ghost constant azero : a
+
+val function rplus r r : r
+val function rtimes r r : r
+val function ropp r : r
+
+val function aplus a a : a
+val function atimes a a : a
+val function aopp a : a
+
+clone export AssocAlgebra with type r = r, type a = a, constant one = aone, constant A.zero = azero, constant R.zero = rzero, constant R.one = rone, function R.(+) = rplus, function R.(*) = rtimes, function R.(-_) = ropp, function (+) = aplus, function (*) = atimes, function A.(-_) = aopp, axiom .
+
+(*axiom azero_def: azero = A.zero*) (* FIXME *)
+
+type t = Var int | Add t t | Mul t t | Ext r t | Sub t t
+type vars = int -> a
+
+val function asub (x y:a) : a
+
+axiom asub_def: forall x y: a. asub x y = aplus x (aopp y)
+
+lemma ext_minone:
+  forall a: a. ($) (ropp rone) a = aopp a
+
+let rec function interp (x: t) (y: vars) : a =
+  match x with
+  | Var n -> y n
+  | Add x1 x2 -> aplus (interp x1 y) (interp x2 y)
+  | Mul x1 x2 -> atimes (interp x1 y) (interp x2 y)
+  | Sub x1 x2 -> asub (interp x1 y) (interp x2 y)
+  | Ext r x -> ($) r (interp x y)
+  end
+
+predicate eq (x1 x2:t) = forall y: vars. interp x1 y = interp x2 y
+
+(** Conversion to sum of monomials *)
+
+type m = M r (list int)
+type t' = list m
+
+let rec function mon (x: list int) (y: vars) : a =
+  match x with
+  | Nil -> aone
+  | Cons x l -> atimes (y x) (mon l y)
+  end
+
+let rec ghost function interp' (x: t') (y: vars) : a =
+  match x with
+  | Nil -> azero
+  | Cons (M r m) l -> aplus (($) r (mon m y)) (interp' l y) end
+
+predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
+predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
+
+use list.Append
+use list.Length
+
+let rec lemma mon_append (x1 x2: list int) (y: vars)
+  ensures { mon (x1 ++ x2) y = atimes (mon x1 y) (mon x2 y) }
+  variant { x1 }
+= match x1 with Nil -> () | Cons _ x -> mon_append x x2 y end
+
+lemma interp_cons : forall m:m, x:t', y:vars.
+      interp' (Cons m x) y = aplus (interp' x y) (interp' (Cons m Nil) y)
+
+let rec lemma interp_sum (x1 x2: t')
+    ensures { forall y: vars.
+              interp' (x1++x2) y = aplus (interp' x1 y) (interp' x2 y) }
+    variant { x1 }
+= match x1 with
+  | Nil -> ()
+  | Cons _ x -> interp_sum x x2 end
+
+let function append_mon (m1 m2:m)
+  ensures { forall y. interp' (Cons result Nil) y
+              = atimes (interp' (Cons m1 Nil) y) (interp' (Cons m2 Nil) y) }
+= match m1,m2 with M r1 l1, M r2 l2 -> M (rtimes r1 r2) (l1 ++ l2) end
+
+let rec function mul_mon (mon: m) (x:t'): t'  (* mon*x *)
+  ensures { forall y. interp' result y =
+                      atimes (interp' (Cons mon Nil) y) (interp' x y) }
+= match x with
+  | Nil -> Nil
+  | Cons m l ->
+    let mr = append_mon mon m in
+    let lr = mul_mon mon l in
+    Cons mr lr
+  end
+
+let rec function mul_devel (x1 x2:t') : t'
+  ensures { forall y. interp' result y = atimes (interp' x1 y) (interp' x2 y) }
+= match x1 with
+  | Nil -> Nil
+  | Cons (M r m) l -> mul_mon (M r m) x2 ++ mul_devel l x2
+  end
+
+let rec function ext (c:r) (x:t') : t'
+  ensures { forall y. interp' result y = ($) c (interp' x y) }
+= match x with
+  | Nil -> Nil
+  | Cons (M r m) l -> Cons (M (rtimes c r) m) (ext c l) end
+
+lemma ext_sub:
+  forall x:t', y:vars. interp' (ext (ropp rone) x) y = aopp (interp' x y)
+
+let rec function conv (x:t) : t'
+  ensures { forall y. interp x y = interp' result y }
+= match x with
+  | Var v -> Cons (M rone (Cons v Nil)) Nil
+  | Add x1 x2 -> (conv x1) ++ (conv x2)
+  | Mul x1 x2 -> mul_devel (conv x1) (conv x2)
+  | Ext r x -> ext r (conv x)
+  | Sub x1 x2 -> (conv x1) ++ (ext (ropp rone) (conv x2))
+  end
+
+
+(** Normalisation *)
+
+(*lexicographic order on monomials with variables sorted using sort_mons*)
+let rec function le_mon (x1 x2: list int) : bool
+= (length x1 < length x2) ||
+  ((length x1 = length x2) &&
+  match x1, x2 with
+  | Nil, _ -> true
+  | _, Nil -> false
+  | Cons v1 r1, Cons v2 r2 ->  v1 <= v2 && le_mon r1 r2
+  end)
+
+let rec function same (l1 l2: list int) : bool
+  ensures { result -> eq_mon l1 l2 }
+= match l1, l2 with
+  | Nil, Nil -> true
+  | Nil, _ | _, Nil -> false
+  | Cons x1 l1, Cons x2 l2 -> x1 = x2 && same l1 l2
+  end
+
+lemma squash_append: forall r1 r2: r, l1 l2: list int, l: t'. same l1 l2 ->
+      eq' (Cons (M r1 l1) (Cons (M r2 l2) l)) (Cons (M (rplus r1 r2) l1) l)
+
+let rec function insert_mon (m: m) (x: t') : t'
+  ensures { eq' result (Cons m x) }
+  variant { length x }
+= match m,x with
+  | _,Nil -> Cons m Nil
+  | M r1 l1, Cons (M r2 l2) l ->
+      if same l1 l2
+      then
+        let s = rplus r1 r2 in
+        if eq0 s
+        then (assert { eq' l (Cons m x)
+                       by eq' l (Cons (M s l1) l)
+                       so eq' (Cons (M s l1) l) (Cons m x)};
+              l)
+        else Cons (M s l1) l
+      else if le_mon l1 l2 then Cons m x else Cons (M r2 l2) (insert_mon m l)
+  end
+
+let rec function insertion_sort_mon (x:t') : t'
+  ensures { eq' result x }
+  variant { x }
+= match x with
+  | Nil -> Nil
+  | Cons m l -> insert_mon m (insertion_sort_mon l)
+  end
+
+let function normalize' (x:t') : t'
+  ensures { eq' result x }
+= insertion_sort_mon x
+
+let function normalize (x:t) : t'
+  ensures { eq' result (conv x) }
+= normalize' (conv x)
+
+let lemma norm (x1 x2: t) (y:vars)
+    requires { normalize x1 = normalize x2 }
+    ensures  { interp x1 y = interp x2 y }
+= ()
+
+let lemma norm' (x1 x2: t')
+    requires { normalize' x1 = normalize' x2 }
+    ensures  { eq' x1 x2 }
+= ()
+
+let norm_f (x1 x2: t) : bool
+  ensures { forall y: vars. result = true -> interp x1 y = interp x2 y }
+= match normalize' (conv (Sub x1 x2)) with
+  | Nil -> true
+  | _ -> false
+  end
+
+meta rewrite_def function interp
+
+end
+
+module ReifyTests
+
+use int.Int
+
+let predicate eq0_int (x:int) = x=0
+
+let function ($$) (x y:int) :int = x * y
+
+clone export AssocAlgebraDecision with type r = int, type a = int, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = Int.zero, val aone = Int.one, val aplus = (+), val aopp = (-_), val atimes = (*), val ($) = ($$), goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc,
+  axiom . (* FIXME: replace with "goal" and prove *)
+
+
+goal g: forall x y. x + y = y + x
+goal h: forall x y z. x $$ (y * z) = (x $$ y) * z
+end
+

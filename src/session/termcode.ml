@@ -50,13 +50,12 @@ let concat_expls = function
   | [l] -> Some l
   | l :: ls -> Some (l ^ " (" ^ String.concat ". " ls ^ ")")
 
-
-let search_labels callback =
+let search_attrs callback =
   let rec aux acc f =
     if f.t_ty <> None then acc
-    else if Ident.Slab.mem Split_goal.stop_split f.Term.t_label then acc
+    else if Ident.Sattr.mem Term.stop_split f.Term.t_attrs then acc
     else
-      let res = callback f.Term.t_label in
+      let res = callback f.Term.t_attrs in
       if res = [] then match f.t_node with
         | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
         | Term.Tbinop (Term.Timplies, _, f) -> aux acc f
@@ -69,7 +68,7 @@ let search_labels callback =
   aux []
 
 let get_expls_fmla =
-  let search = search_labels collect_expls in
+  let search = search_attrs collect_expls in
   fun f -> try search f with Exit -> []
 
 let goal_expl_task ~root task =
@@ -79,7 +78,7 @@ let goal_expl_task ~root task =
     concat_expls
       (if res <> [] && not root
        then res
-       else collect_expls gid.Ident.id_label)
+       else collect_expls gid.Ident.id_attrs)
   in
   let info =
     match info with
@@ -235,9 +234,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 4
+let current_shape_version = 5
 
-type shape_version = SV1 | SV2 | SV3
+type shape_version = SV1 | SV2 | SV3 | SV4
 
 (* similarity code of terms, or of "shapes"
 
@@ -268,15 +267,17 @@ let tag_var = 'V'
 let tag_wild = 'w'
 let tag_as = 'z'
 
+exception ShapeTooLong
+
 let shape_buffer = Buffer.create 17
 
 let push s =
   Buffer.add_string shape_buffer s;
-  if Buffer.length shape_buffer >= 256 then raise Exit
+  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
 
 let pushc c =
   Buffer.add_char shape_buffer c;
-  if Buffer.length shape_buffer >= 256 then raise Exit
+  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
 
 let ident h id =
   let x =
@@ -306,9 +307,29 @@ let id_string_shape id = push id
 let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
+open Number
+
+let integer_const_shape = function
+  | IConstRaw i -> push (BigInt.to_string i)
+  | IConstDec s -> push s
+  | IConstHex s -> push "0x"; push s
+  | IConstOct s -> push "0o"; push s
+  | IConstBin s -> push "0b"; push s
+
+let real_const_shape = function
+  | RConstDec (i,f,None)   -> push i; push "."; push f
+  | RConstDec (i,f,Some e) -> push i; push "."; push f; push "e"; push e
+  | RConstHex (i,f,Some e) -> push "0x"; push i; push "."; push f; push "p"; push e
+  | RConstHex (i,f,None)   -> push "0x"; push i; push "."; push f
+
+let sign_shape is_negative =
+  if is_negative then pushc '-'
+
 let const_shape c =
-  Format.fprintf Format.str_formatter "%a" Number.print_constant c;
-  push (Format.flush_str_formatter ())
+  match c with
+  | ConstInt c -> sign_shape c.ic_negative; integer_const_shape c.ic_abs
+  | ConstReal c -> sign_shape c.rc_negative; real_const_shape c.rc_abs
+
 
 let rec pat_shape c m p : 'a =
   match p.pat_node with
@@ -334,7 +355,7 @@ let rec t_shape ~version c m t =
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
@@ -344,7 +365,7 @@ let rec t_shape ~version c m t =
             pat_shape c m p;
             pat_rename_alpha c m p;
             t_shape ~version c m t2
-          | SV3 ->
+          | SV3 | SV4 ->
             pat_rename_alpha c m p;
             t_shape ~version c m t2;
             pat_shape c m p
@@ -354,7 +375,7 @@ let rec t_shape ~version c m t =
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 ->
+        | SV3 | SV4 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -396,29 +417,52 @@ let rec t_shape ~version c m t =
           match version with
             | SV1 ->
                pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 ->
+            | SV2 | SV3 | SV4 ->
                      (* t2 first, intentionally *)
                      t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 -> pushc tag_not; fn f
+      | SV3 | SV4 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
 
 let t_shape_task ~version ~expl t =
   Buffer.clear shape_buffer;
-  begin match version with
-  | SV1 | SV2 -> ()
-  | SV3 -> push expl
-  end;
   let f = Task.task_goal_fmla t in
+  let c = ref (-1) in
+  let m = ref Ident.Mid.empty in
   let () =
     try
-      t_shape ~version (ref (-1)) (ref Ident.Mid.empty) f
-    with Exit -> ()
+      (* expl *)
+      begin match version with
+      | SV1 | SV2 -> ()
+      | SV3 | SV4 -> push expl end;
+      (* goal shape *)
+      t_shape ~version c m f;
+      (* introduced premises shape *)
+      begin match version with
+      | SV1 | SV2 | SV3 -> ()
+      | SV4 ->
+         let open Decl in
+         let introduced id = Ident.Sattr.mem
+                               Introduction.intro_attr
+                               id.Ident.id_attrs in
+         let do_td td = match td.Theory.td_node with
+           | Theory.Decl d ->
+              begin match d.d_node with
+              | Dparam _ls -> ()
+              | Dprop (_, pr, f) when introduced pr.pr_name ->
+                 t_shape ~version c m f
+              | _ -> ()
+              end
+           | _ -> () in
+         let _, prev = Task.task_separate_goal t in
+         Task.task_iter do_td prev
+      end
+    with ShapeTooLong -> ()
   in
   Buffer.contents shape_buffer
 
@@ -428,7 +472,7 @@ let time = ref 0.0
 
 let t_shape_task ?(version=current_shape_version) ~expl t =
   let version = match version with
-    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3
+    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4
     | _ -> assert false
   in
 (*
@@ -487,16 +531,31 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-(*
-  let _integer_constant b c =
-    Number.print_integer_constant Format.str_formatter c;
-    let s = Format.flush_str_formatter () in
-    string b s
-*)
+  let integer_const b = function
+    | IConstRaw i -> raw_string b (BigInt.to_string i)
+    | IConstDec s -> raw_string b s
+    | IConstHex s -> raw_string b "0x"; raw_string b s
+    | IConstOct s -> raw_string b "0o"; raw_string b s
+    | IConstBin s -> raw_string b "0b"; raw_string b s
+
+  let real_const b = function
+    | RConstDec (i,f,None)   ->
+       raw_string b i; raw_string b "."; raw_string b f
+    | RConstDec (i,f,Some e) ->
+       raw_string b i; raw_string b "."; raw_string b f; raw_string b "e"; raw_string b e
+    | RConstHex (i,f,Some e) ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f;
+       raw_string b "p"; raw_string b e
+    | RConstHex (i,f,None)   ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f
+
+  let sign b is_negative =
+    if is_negative then raw_string b "-"
 
   let const b c =
-    Format.fprintf Format.str_formatter "%a" Number.print_constant c;
-    raw_string b (Format.flush_str_formatter ())
+    match c with
+    | ConstInt c -> sign b c.ic_negative; integer_const b c.ic_abs
+    | ConstReal c -> sign b c.rc_negative; real_const b c.rc_abs
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -566,7 +625,6 @@ module Checksum = struct
     ident b ls.ls_name;
     list ty b ls.ls_args;
     option ty b ls.ls_value;
-    list tvsymbol b (Ty.Stv.elements ls.ls_opaque);
     int b ls.ls_constr
 
   (* start: T G F D R L I P (C M) *)
@@ -598,7 +656,6 @@ module Checksum = struct
           | Decl.Plemma -> "PL"
           | Decl.Paxiom -> "PA"
           | Decl.Pgoal  -> "PG"
-          | Decl.Pskip  -> "PS"
         in
         string b tag;
         ident b n.Decl.pr_name;
@@ -624,6 +681,19 @@ module Checksum = struct
     | Theory.MApr pr -> char b 'p'; ident b pr.Decl.pr_name
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
+
+  let tdecl b d = match d.Theory.td_node with
+    | Theory.Decl d -> decl b d
+    | Theory.Use th
+    | Theory.Clone (th, _) ->
+        char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
+    | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+(* not used anymore
+
+  NOTE: if we come back to checksumming theories, use the separate recursive
+        [tdecl] function for it. [Use] in a theory requires a recursive call
+        (as below), [Use] in a task is just a witness declaration.
 
   let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
@@ -651,7 +721,6 @@ module Checksum = struct
         Ident.Wid.set table t.Theory.th_name v;
         v
 
-(* not used anymore
   let theory ~version t = match version with
     | CV1 -> assert false
     | CV2 -> theory_v2 t
@@ -705,7 +774,7 @@ let time = ref 0.0
 let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
-    | 4 -> CV2
+    | 4 | 5 -> CV2
     | _ -> assert false
   in
 (*
@@ -807,12 +876,6 @@ module Pairing(Old: S)(New: S) = struct
 
   (* priority queues for pairs of nodes *)
 
-  module E = struct
-    type t = int * (node * node)
-    let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
-  end
-  module PQ = Pqueue.Make(E)
-
   let dprintf = Debug.dprintf debug
 
   let associate oldgoals newgoals =
@@ -869,15 +932,21 @@ module Pairing(Old: S)(New: S) = struct
     let allgoals = List.sort compare allgoals in
     build_list allgoals;
     if allgoals <> [] then begin
-      let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n) in
-      let pq = PQ.create ~dummy in
+      let module E = struct
+        let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n)
+        type t = int * (node * node)
+        let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
+      end in
+      let module PQ = Pqueue.Make(E) in
+      let pq = PQ.create () in
       let add x y = match x.elt, y.elt with
-        | Old _, New _ | New _, Old _ -> PQ.add pq (lcp x.shape y.shape, (x, y))
+        | Old _, New _ | New _, Old _ ->
+            PQ.insert (lcp x.shape y.shape, (x, y)) pq
         | Old _, Old _ | New _, New _ -> () in
       iter_pairs add allgoals;
       (* FIXME: exit earlier, as soon as we get min(old,new) pairs *)
       while not (PQ.is_empty pq) do
-        let _, (x, y) = PQ.extract_min pq in
+        let _, (x, y) = PQ.extract_min_exn pq in
         if x.valid && y.valid then begin
           let o, n = match x.elt, y.elt with
             | New n, Old o | Old o, New n -> o, n | _ -> assert false in

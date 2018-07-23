@@ -25,5 +25,5 @@ Axiom mode_WhyType : WhyType mode.
 Existing Instance mode_WhyType.
 
 (* Why3 assumption *)
-Definition to_nearest (m:mode): Prop := (m = RNE) \/ (m = RNA).
+Definition to_nearest (m:mode) : Prop := (m = RNE) \/ (m = RNA).
 

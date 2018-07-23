@@ -19,11 +19,11 @@ let debug = Debug.register_info_flag "encoding"
   ~desc:"Print@ debugging@ messages@ about@ polymorphism@ encoding."
 
 (* meta to tag the protected types *)
-let meta_kept = register_meta "encoding : kept" [MTty]
+let meta_kept = register_meta "encoding:kept" [MTty]
   ~desc:"Specify@ a@ type@ to@ keep@ during@ polymorphism@ encoding."
 
 (* meta to tag the custom base type *)
-let meta_base = register_meta_excl "encoding : base" [MTty]
+let meta_base = register_meta_excl "encoding:base" [MTty]
   ~desc:"Specify@ the@ base@ type@ for@ monomorphic@ \
     polymorphism@ encoding@ (`int'@ or@ `real'@ only)."
 
@@ -110,14 +110,14 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label = Ident.create_label "encoding : unprotected"
-let unprotecting_label = Ident.create_label "encoding : unprotecting"
+let unprotected_attr = Ident.create_attribute "encoding:unprotected"
+let unprotecting_attr = Ident.create_attribute "encoding:unprotecting"
 
-let id_unprotected n = id_fresh ~label:(Slab.singleton unprotected_label) n
-let id_unprotecting n = id_fresh ~label:(Slab.singleton unprotecting_label) n
+let id_unprotected n = id_fresh ~attrs:(Sattr.singleton unprotected_attr) n
+let id_unprotecting n = id_fresh ~attrs:(Sattr.singleton unprotecting_attr) n
 
-let is_protected_id id = not (Slab.mem unprotected_label id.id_label)
-let is_protecting_id id = not (Slab.mem unprotecting_label id.id_label)
+let is_protected_id id = not (Sattr.mem unprotected_attr id.id_attrs)
+let is_protecting_id id = not (Sattr.mem unprotecting_attr id.id_attrs)
 
 let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
@@ -132,7 +132,7 @@ let vs_monomorph ty_base kept vs =
   then vs else create_vsymbol (id_clone vs.vs_name) ty_base
 
 let t_monomorph ty_base kept lsmap consts vmap t =
-  let rec t_mono vmap t = t_label_copy t (match t.t_node with
+  let rec t_mono vmap t = t_attr_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
     | Tconst _ when ty_equal (t_type t) ty_base ||
@@ -248,7 +248,7 @@ let monomorphise_task =
       when ts_equal ts ts_int || ts_equal ts ts_real ->
         ty, create_ty_decl ts
     | Some [MAty _] -> Loc.errorm
-        "the \"enconding : base\" meta can only apply to `int' or `real'"
+        "the \"encoding:base\" meta can only apply to `int' or `real'"
     | Some _ -> assert false
     | None -> ty_base, d_ts_base in
   Trans.on_tagged_ty meta_kept (fun kept ->

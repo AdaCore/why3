@@ -76,14 +76,14 @@ let add_prover_binary config (id,file) =
 let install_plugin main p =
   begin match Plugin.check_plugin p with
     | Plugin.Plubad ->
-        Debug.dprintf Plugin.debug "Unknown extension (.cmo|.cmxs) : %s@." p;
+        Debug.dprintf Plugin.debug "Unknown extension (.cmo|.cmxs): %s@." p;
         raise Exit
     | Plugin.Pluother ->
         Debug.dprintf Plugin.debug
           "The plugin %s cannot be used with this kind of compilation@." p;
         raise Exit
     | Plugin.Plufail exn ->
-        eprintf "The plugin %s dynlink failed :@.%a@."
+        eprintf "The plugin %s dynlink failed:@.%a@."
           p Exn_printer.exn_printer exn;
         raise Exit
     | Plugin.Plugood ->

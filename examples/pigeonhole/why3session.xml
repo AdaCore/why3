@@ -2,46 +2,40 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../pigeonhole.mlw">
-<theory name="Pigeonhole">
- <goal name="WP_parameter below" expl="VC for below">
- <proof prover="0"><result status="valid" time="0.01" steps="72"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../pigeonhole.mlw" proved="true">
+<theory name="Pigeonhole" proved="true">
+ <goal name="VC below" expl="VC for below" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="87"/></proof>
  </goal>
- <goal name="WP_parameter pigeonhole" expl="VC for pigeonhole">
- <transf name="split_goal_right">
-  <goal name="WP_parameter pigeonhole.1" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeonhole.2" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeonhole.3" expl="unreachable point">
-  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeonhole.4" expl="loop invariant init">
+ <goal name="VC pigeonhole" expl="VC for pigeonhole" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC pigeonhole.0" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.5" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC pigeonhole.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.6" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
+  <goal name="VC pigeonhole.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.7" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC pigeonhole.3" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.8" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="53"/></proof>
+  <goal name="VC pigeonhole.4" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.9" expl="precondition">
+  <goal name="VC pigeonhole.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.10" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <goal name="VC pigeonhole.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter pigeonhole.11" expl="unreachable point">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC pigeonhole.7" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="VC pigeonhole.8" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>
  </goal>

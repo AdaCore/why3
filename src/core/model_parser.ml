@@ -303,8 +303,8 @@ type model_element_kind =
 type model_element_name = {
   men_name   : string;
   men_kind   : model_element_kind;
-  (* Labels associated to the id of the men *)
-  men_labels : Slab.t;
+  (* Attributes associated to the id of the men *)
+  men_attrs : Sattr.t;
 }
 
 type model_element = {
@@ -331,7 +331,7 @@ let create_model_element ~name ~value ?location ?term () =
   let me_name = {
     men_name = name;
     men_kind = me_kind;
-    men_labels = match term with | None -> Slab.empty | Some t -> t.t_label;
+    men_attrs = match term with | None -> Sattr.empty | Some t -> t.t_attrs;
   } in
   {
     me_name = me_name;
@@ -340,13 +340,13 @@ let create_model_element ~name ~value ?location ?term () =
     me_term = term;
   }
 
-let construct_name (name: string) labels : model_element_name =
+let construct_name (name: string) attrs : model_element_name =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
   | "result" -> Result
   | "old" -> Old
   | _ -> Other in
-  {men_name = name; men_kind = me_kind; men_labels = labels}
+  {men_name = name; men_kind = me_kind; men_attrs = attrs}
 
 (*
 let print_location fmt m_element =
@@ -390,27 +390,27 @@ type raw_model_parser =
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element ~print_labels print_model_value me_name_trans fmt m_element =
+let print_model_element ~print_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
     let me_name = me_name_trans m_element.me_name in
-    if print_labels then
+    if print_attrs then
       fprintf fmt  "%s, [%a] = %a"
         me_name
-        (Pp.print_list Pp.comma Pretty.print_label)
-        (Slab.elements m_element.me_name.men_labels)
+        (Pp.print_list Pp.comma Pretty.print_attr)
+        (Sattr.elements m_element.me_name.men_attrs)
         print_model_value m_element.me_value
     else
       fprintf fmt  "%s = %a"
         me_name
         print_model_value m_element.me_value
 
-let print_model_elements ~print_labels ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element ~print_labels print_model_value me_name_trans) fmt m_elements
+let print_model_elements ~print_attrs ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element ~print_attrs print_model_value me_name_trans) fmt m_elements
 
-let print_model_file ~print_labels ~print_model_value fmt me_name_trans filename model_file =
+let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename model_file =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -418,7 +418,7 @@ let print_model_file ~print_labels ~print_model_value fmt me_name_trans filename
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements ~print_labels print_model_value me_name_trans fmt m_elements)
+      print_model_elements ~print_attrs print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -429,7 +429,7 @@ let why_name_trans me_name =
   | _  -> me_name.men_name
 
 let print_model
-    ~print_labels
+    ~print_attrs
     ?(me_name_trans = why_name_trans)
     ~print_model_value
     fmt
@@ -438,7 +438,7 @@ let print_model
    FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
    *)
   let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file ~print_labels ~print_model_value fmt me_name_trans k e) l
+  List.iter (fun (k, e) -> print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e) l
 
 let print_model_human
     ?(me_name_trans = why_name_trans)
@@ -446,16 +446,15 @@ let print_model_human
     model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
 let print_model ?(me_name_trans = why_name_trans)
-    ~print_labels
+    ~print_attrs
     fmt
-    model = print_model ~print_labels ~me_name_trans ~print_model_value fmt model
+    model = print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let model_to_string
-    ~print_labels
+    ~print_attrs
     ?(me_name_trans = why_name_trans)
     model =
-  print_model ~print_labels ~me_name_trans str_formatter model;
-  flush_str_formatter ()
+  Format.asprintf "%a" (print_model ~print_attrs ~me_name_trans) model
 
 let get_model_file model filename =
   try
@@ -471,7 +470,7 @@ let get_elements model_file line_number =
 
 (* TODO unused
 let print_model_vc_term
-    ~print_labels
+    ~print_attrs
     ?(me_name_trans = why_name_trans)
     ?(sep = "\n")
     fmt
@@ -483,15 +482,14 @@ let print_model_vc_term
       let (filename, line_number, _, _) = Loc.get pos in
       let model_file = get_model_file model.model_files filename in
       let model_elements = get_elements model_file line_number in
-      print_model_elements ~print_labels ~sep print_model_value me_name_trans fmt model_elements
+      print_model_elements ~print_attrs ~sep print_model_value me_name_trans fmt model_elements
 
 let model_vc_term_to_string
-    ~print_labels
+    ~print_attrs
     ?(me_name_trans = why_name_trans)
     ?(sep = "\n")
     model =
-  print_model_vc_term ~print_labels ~me_name_trans ~sep str_formatter model;
-  flush_str_formatter ()
+  Format.asprintf "%a" (print_model_vc_term ~print_attrs ~me_name_trans ~sep) model
 *)
 
 let get_padding line =
@@ -528,7 +526,7 @@ let add_offset off (loc, a) =
   (Loc.user_position f (l + off) fc lc, a)
 
 let interleave_line
-    ~print_labels
+    ~print_attrs
     start_comment
     end_comment
     me_name_trans
@@ -541,10 +539,12 @@ let interleave_line
   let list_loc = List.map (add_offset offset) list_loc in
   try
     let model_elements = IntMap.find line_number model_file in
-    print_model_elements ~print_labels print_model_value_human me_name_trans str_formatter model_elements ~sep:"; ";
     let cntexmp_line =
-     (get_padding line) ^ start_comment ^ (flush_str_formatter ()) ^ end_comment
-    in
+      asprintf "%s%s%a%s"
+        (get_padding line)
+        start_comment
+        (print_model_elements ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
+        end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -558,7 +558,7 @@ let interleave_line
 
 
 let interleave_with_source
-    ~print_labels
+    ~print_attrs
     ?(start_comment="(* ")
     ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
@@ -586,7 +586,7 @@ let interleave_with_source
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
-        (interleave_line ~print_labels
+        (interleave_line ~print_attrs
            start_comment end_comment me_name_trans model_file)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file)
@@ -595,8 +595,9 @@ let interleave_with_source
   with Not_found ->
     source_code, locations
 
-let print_labels_json (me: model_element_name) fmt =
-  Json_base.list (fun fmt lab -> Json_base.string fmt lab.lab_string) fmt (Slab.elements me.men_labels)
+let print_attrs_json (me: model_element_name) fmt =
+  Json_base.list (fun fmt attr -> Json_base.string fmt attr.attr_string) fmt
+    (Sattr.elements me.men_attrs)
 
 (*
 **  Quering the model - json
@@ -612,8 +613,8 @@ let print_model_element_json me_name_to_str fmt me =
     | Other -> fprintf fmt "%a" Json_base.string "other" in
   let print_name fmt =
     Json_base.string fmt (me_name_to_str me) in
-  let print_json_labels fmt =
-    print_labels_json me.me_name fmt in
+  let print_json_attrs fmt =
+    print_attrs_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer =
     printer fmt in
   Json_base.map_bindings
@@ -621,7 +622,7 @@ let print_model_element_json me_name_to_str fmt me =
     print_value_or_kind_or_name
     fmt
     [("name", print_name);
-     ("labels", print_json_labels);
+     ("attrs", print_json_attrs);
      ("value", print_value);
      ("kind", print_kind)]
 
@@ -672,8 +673,7 @@ let model_to_string_json
     ?(me_name_trans = why_name_trans)
     ?(vc_line_trans = (fun i -> string_of_int i))
     model =
-  print_model_json str_formatter ~me_name_trans ~vc_line_trans model;
-  flush_str_formatter ()
+  asprintf "%a" (print_model_json ~me_name_trans ~vc_line_trans) model
 
 
 (*
@@ -700,7 +700,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
       (
        let t = Mstr.find raw_element_name term_map in
        let real_model_trace =
-         construct_name (get_model_trace_string ~labels:t.t_label) t.t_label
+         construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
        in
        let model_element = {
 	 me_name = real_model_trace;
@@ -736,7 +736,7 @@ let handle_contradictory_vc model_files vc_term_loc =
 	let me_name = {
 	  men_name = "the check fails with all inputs";
 	  men_kind = Error_message;
-          men_labels = Slab.empty;
+          men_attrs = Sattr.empty;
 	} in
 	let me = {
 	  me_name = me_name;

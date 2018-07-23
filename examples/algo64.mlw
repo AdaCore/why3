@@ -13,18 +13,18 @@ Pages: 321 - 322
 
 module Algo64
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArrayPermut
-  use import array.IntArraySorted
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArrayPermut
+  use array.IntArraySorted
 
   (* Algorithm 63 *)
 
   val partition (a: array int) (m n: int) (i j: ref int) (ghost x: ref int) :
     unit
     requires { 0 <= m < n < length a }
-    writes   { a, i, j}
+    writes   { a, i, j }
     ensures  { m <= !j < !i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
     ensures  { forall r:int. m <= r <= !j -> a[r] <= !x }
@@ -49,10 +49,12 @@ module Algo64
       let j = ref 0 in
       let ghost x = ref 42 in
       partition a m n i j x;
-'L1:  quicksort a m !j;
-      assert { qs_partition (at a 'L1) a m n !i !j !x };
-'L2:  quicksort a !i n;
-      assert { qs_partition (at a 'L2) a m n !i !j !x }
+    label L1 in
+      quicksort a m !j;
+      assert { qs_partition (a at L1) a m n !i !j !x };
+    label L2 in
+      quicksort a !i n;
+      assert { qs_partition (a at L2) a m n !i !j !x }
     end
 
   let qs (a:array int) : unit

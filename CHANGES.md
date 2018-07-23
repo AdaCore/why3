@@ -1,5 +1,75 @@
 :x: marks a potential source of incompatibility
 
+Version 1.0.0, June 25, 2018
+----------------------------
+
+Core
+  * improved support of counter-examples
+  * attribute `[@vc:sp]` on an expression switches from traditional WP
+    to Flanagan-Saxe-like VC generation
+  * type invariants now produce logical axioms;
+    a type with an invariant must be proved to be inhabited :x:
+  * logical symbols can no longer be used in non-ghost code;
+    in particular, there is no polymorphic equality in programs any more,
+    so equality functions must be declared/defined on a per-type basis
+    (already done for type `int` in the standard library) :x:
+
+Language
+  * numerous changes to syntax, see documentation appendix :x:
+  * `let function`, `let predicate`, `val function`, and `val predicate`
+    introduce symbols in both logic and programs
+  * added overloading of program symbols
+  * new contract clause `alias { <term> with <term>, ... }` :x:
+  * support for parallel assignment `<term>,... <- <term>,...`
+  * support for local exceptions using `exception ... in ...`
+  * added `break`, `continue`, and `return` statements
+  * support for `exception` branches in `match` constructs
+  * support for `for` loops on range types
+    (including machine integers from the standard library)
+  * support for type coercions in logic using `meta coercion`
+  * keyword `theory` is deprecated; use `module` instead
+  * term on the left of sequence `;` must be of type `unit` :x:
+  * cloned axioms turn into lemmas; use `with axiom my_axiom`
+    or `with axiom .` to keep them as axioms :x:
+  * `any <type> <spec>` produces an existential precondition;
+    use `val f : <type> <spec> in ...` (unsafe!) instead :x:
+  * `use T` and `clone T` now import the generated namespace T;
+    use `use T as T` and `clone T as T` to prevent this :x:
+  * `pure { <term> }` produces a ghost value in program code
+
+Standard library
+  * machine integers in `mach.int.*` are now range types :x:
+  * added a minimal memory model for the C language in `mach.c`
+
+Extraction
+  * improved extraction to OCaml
+  * added partial extraction to C using the memory model of `mach.c`
+  * added extraction to CakeML (using `why3 extract -D cakeml ...`)
+
+Transformations
+  * transformations can now have arguments
+  * added transformations `assert`, `apply`, `cut`, `rewrite`, etc., à la Coq
+  * added transformations for reflection-based proofs
+
+Drivers
+  * support for `use` in theory drivers
+
+IDE
+  * replaced left toolbar by a contextual menu
+  * source is now editable
+  * premises are no longer implicitly introduced
+  * added textual interface to call transformations and provers
+
+Tools
+  * deprecated `.why` file extension; use `.mlw` instead
+
+Provers
+  * removed the `why3` Coq tactic :x:
+  * dropped support for Coq 8.4 :x:
+
+Miscellaneous
+  * moved the opam base package to `why3`; added `why3-ide` and `why3-coq`
+
 Version 0.88.3, January 11, 2018
 --------------------------------
 
@@ -66,12 +136,15 @@ User features
     floating-point values, support for Z3 in addition to CVC4.
     More details in the manual, section 6.3.5 "Displaying Counterexamples".
 
+Plugins
+  * new input format for a small subset of Python
+
 Provers
   * support for Isabelle 2017 (released Oct 2017)
-  * discarded support for Isabelle 2016 (2016-1 still supported) :x:
+  * dropped support for Isabelle 2016 (2016-1 still supported) :x:
   * support for Coq 8.6.1 (released Jul 25, 2017)
   * tentative support for Coq 8.7
-  * discarded tactic support for Coq 8.4 (proofs still supported) :x:
+  * dropped tactic support for Coq 8.4 (proofs still supported) :x:
   * support for CVC4 1.5 (released Jul 10, 2017)
   * support for E 2.0 (released Jul 4, 2017)
   * support for E 1.9.1 (release Aug 31, 2016)
@@ -87,7 +160,7 @@ Provers
   * support for Alt-Ergo 1.30 (released Nov 21, 2016)
   * support for Coq 8.6 (released Dec 8, 2016)
   * support for Gappa 1.3 (released Jul 20, 2016)
-  * discarded support for Isabelle 2015 :x:
+  * dropped support for Isabelle 2015 :x:
   * support for Isabelle 2016-1 (released Dec 2016)
   * support for Z3 4.5.0 (released Nov 8, 2016)
 
@@ -137,13 +210,13 @@ Encoding
     format is direct :x:
 
 Provers
-  * discarded support for Alt-Ergo versions older than 0.95.2 :x:
+  * dropped support for Alt-Ergo versions older than 0.95.2 :x:
   * support for Alt-Ergo 1.01 (released Feb 16, 2016) and
     non-free versions 1.10 and 1.20
   * support for Coq 8.4pl6 (released Apr 9, 2015)
   * support for Coq 8.5 (released Jan 21, 2016)
   * support for Gappa 1.2.0 (released May 19, 2015)
-  * discarded support for Isabelle 2014 :x:
+  * dropped support for Isabelle 2014 :x:
   * support for Isabelle 2015 (released May 25, 2015) and
     Isabelle 2016 (released Feb 17, 2016)
   * support for Z3 4.4.0 (released Apr 29, 2015) and
@@ -321,7 +394,7 @@ Provers
   * new version of prover: Coq 8.4pl3
   * new version of prover: Gappa 1.1.0
   * new version of prover: E prover 1.8
-  * Coq 8.3 is no longer supported :x:
+  * dropped support for Coq 8.3 :x:
   * improved support for Isabelle2013-2
   * fixed Coq printer (former Coq proofs may have to be updated, with
     extra qualification of imported symbols) :x:

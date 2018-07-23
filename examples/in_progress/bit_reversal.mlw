@@ -1,0 +1,67 @@
+
+module BitReversal
+
+  use int.Int
+  use bv.BV32
+  use array.Init
+
+
+  let swap (a:array 'a) (i j : t)
+    requires { 0 <= t'int i < a.length }
+    requires { 0 <= t'int j < a.length }
+    writes { a }
+    ensures { a[t'int i] = old a[t'int j] }
+    ensures { a[t'int j] = old a[t'int i] }
+    ensures { forall k. 0 <= k < a.length ->
+                k <> t'int i /\ k <> t'int j -> a[k] = (old a)[k] }
+  =
+    let tmp = a[to_uint i] in
+    a[to_uint i] <- a[to_uint j];
+    a[to_uint j] <- tmp
+
+(* a's size must be a power of two. *)
+
+  let rec aux (a:array t) (i di h hi:t)
+    (ghost loglen masklen logdi loghi:t)
+    requires { ult loglen (of_int 32) }
+    requires { masklen = lsl_bv ones loglen }
+    requires { a.length = t'int (lsl_bv (of_int 1) loglen) }
+    requires { ult logdi (of_int 32) && di = lsl_bv (of_int 1) logdi }
+    requires { ult loghi (of_int 32) && hi = lsl_bv (of_int 1) loghi }
+    requires { t'int logdi + t'int loghi = t'int loglen }
+    requires { t'int i < a.length }
+    requires { t'int di <= a.length }
+    requires { t'int h < a.length }
+    requires { di <> of_int 0 }
+    writes { a }
+    variant { t'int di }
+  =
+   if eq di (of_int 1) then (if ult i h then swap a i h) else
+    let dj = lsr_bv di (of_int 1) in
+    let hj = lsl_bv hi (of_int 1) in
+    assert { t'int logdi >= 1 };
+    assert { ule dj (lsl_bv (of_int 1) (BV32.sub logdi (of_int 1))) };
+    assert { bw_and dj masklen = zeros };
+    assert { ult i (lsl_bv (of_int 1) loglen) };
+    assert { bw_and i masklen = zeros };
+    assert { ult h (lsl_bv (of_int 1) loglen) };
+    assert { bw_and h masklen = zeros };
+    aux a i dj h hj loglen masklen
+      (BV32.sub logdi (of_int 1)) (BV32.add loghi (of_int 1));
+    aux a (bw_or i dj) dj (bw_or h hi) hj loglen masklen
+      (BV32.sub logdi (of_int 1)) (BV32.add loghi (of_int 1))
+
+let bit_rev (a:array t) (ghost loglen:t)
+  requires { ult loglen (of_int 32) && a.length = t'int (lsl_bv (of_int 1) loglen) }
+  =
+  aux a (of_int 0) (of_int a.length) (of_int 0) (of_int 1)
+        loglen (lsl_bv ones loglen) loglen (of_int 0)
+
+
+let main () =
+  let n = lsl_bv (of_int 1) (of_int 25) in
+  let a = init (to_uint n) (fun i -> of_int i) in
+  bit_rev a (of_int 25)
+
+
+end

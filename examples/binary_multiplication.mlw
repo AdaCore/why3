@@ -10,8 +10,8 @@
 
 module BinaryMultiplication
 
-  use import mach.int.Int
-  use import ref.Ref
+  use mach.int.Int
+  use ref.Ref
 
   let binary_mult (a b: int)
     requires { b >= 0 }
@@ -30,4 +30,3 @@ module BinaryMultiplication
     !z
 
 end
-

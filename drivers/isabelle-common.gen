@@ -19,6 +19,11 @@ theory BuiltIn
   syntax predicate  (=)   "<app><const name=\"HOL.eq\"/>%1%2</app>"
 end
 
+theory HighOrd
+  syntax type (->) "<fun>%1%2</fun>"
+  syntax function (@) "<app>%1%2</app>"
+end
+
 theory Bool
   syntax type bool   "<type name=\"HOL.bool\"/>"
 
@@ -48,16 +53,16 @@ theory int.Int
   syntax predicate (>=) "<app><const name=\"Orderings.ord_class.less_eq\"/>%2%1</app>"
   syntax predicate (>)  "<app><const name=\"Orderings.ord_class.less\"/>%2%1</app>"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -128,22 +133,10 @@ theory option.Option
 end
 
 theory map.Map
-  syntax type  map "<fun>%1%2</fun>"
-
   syntax function get "<app>%1%2</app>"
   syntax function ([]) "<app>%1%2</app>"
   syntax function set "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
   syntax function ([<-]) "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
-end
-
-theory map.Const
-  syntax function const "<app><const name=\"_type_constraint_\"><fun>%t0%t0</fun></const><abs name=\"\"><type name=\"dummy\"/>%1</abs></app>"
-
-end
-
-theory set.SetGen
-  syntax predicate (==) "<app><const name=\"HOL.eq\"/>%1%2</app>"
-  syntax predicate subset "<app><const name=\"Orderings.ord_class.less_eq\"/>%1%2</app>"
 end
 
 theory set.Fset
@@ -190,16 +183,16 @@ theory real.Real
   syntax predicate (>=) "<app><const name=\"Orderings.ord_class.less_eq\"/>%2%1</app>"
   syntax predicate (>)  "<app><const name=\"Orderings.ord_class.less\"/>%2%1</app>"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans

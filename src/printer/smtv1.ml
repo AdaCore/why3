@@ -108,9 +108,9 @@ let rec print_term info fmt t = match t.t_node with
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase _ -> unsupportedTerm t
-      "smtv1 : you must eliminate match"
+      "smtv1: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "smtv1 : you must eliminate epsilon"
+      "smtv1: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
@@ -160,7 +160,7 @@ and print_fmla info fmt f = match f.t_node with
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
   | Tcase _ -> unsupportedTerm f
-      "smtv1 : you must eliminate match"
+      "smtv1: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 (*
@@ -197,13 +197,13 @@ let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata _ -> unsupportedDecl d
-      "smtv1 : algebraic types are not supported"
+      "smtv1: algebraic types are not supported"
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic _ -> unsupportedDecl d
-      "smtv1 : predicate and function definitions are not supported"
+      "smtv1: predicate and function definitions are not supported"
   | Dind _ -> unsupportedDecl d
-      "smtv1 : inductive definitions are not supported"
+      "smtv1: inductive definitions are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>;; %s@\n:assumption@ %a@]@\n@\n"
@@ -215,7 +215,7 @@ let print_decl info fmt d = match d.d_node with
         | Some loc -> fprintf fmt " @[;; %a@]@\n" Loc.gen_report_position loc
         | None -> ());
       fprintf fmt "  @[(not@ %a)@]@\n" (print_fmla info) f
-  | Dprop ((Plemma|Pskip), _, _) -> assert false
+  | Dprop (Plemma, _, _) -> assert false
 
 let print_decls =
   let print_decl (sm,ct) fmt d =

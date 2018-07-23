@@ -55,7 +55,7 @@ theory Nat
 end
 
 theory List
-  use import Nat
+  use Nat
 
   type list 'a = Nil | Cons 'a  (list 'a)
 
@@ -130,8 +130,6 @@ theory List
   | Cons y ys -> if x = y then Suc (count x ys) else count x ys
   end
 
-  use import HighOrd
-
   function map (f: 'a -> 'b) (l: list 'a) : list 'b = match l with
   | Nil      -> Nil
   | Cons x xs -> Cons (f x) (map f xs)
@@ -197,7 +195,7 @@ end
 
 theory Tree
 
-  use import Nat
+  use Nat
 
   type tree 'a =
   | Leaf
@@ -233,9 +231,9 @@ end
 (******************************************************************************)
 theory IsaPlanner_all
 
-  use import Nat
-  use import List
-  use import Tree
+  use Nat
+  use List
+  use Tree
 
   goal P1: forall l: list 'a, n : nat.
   take n l ++ drop n l = l
@@ -258,7 +256,7 @@ theory IsaPlanner_all
   goal P7: forall n m: nat.
   (n + m) - n = m
 
-  goal P8: forall  k "induction" n m: nat.
+  goal P8: forall  k [@induction] n m: nat.
   (k + m) - (k + n) = (m - n)
 
   goal P9: forall i j k: nat.
@@ -302,7 +300,7 @@ theory IsaPlanner_all
   goal P21: forall n m: nat.
   n <= (n + m)
 
-  goal P22: forall a "induction" b "induction" c "induction": nat .
+  goal P22: forall a [@induction] b [@induction] c [@induction]: nat .
   max (max a b) c = max a (max b c)
 
   goal P23: forall a b: nat.
@@ -329,7 +327,7 @@ theory IsaPlanner_all
   goal P30: forall l: list 'a, x: 'a.
   mem x (insert x l)
 
-  goal P31: forall a "induction" b "induction" c "induction": nat.
+  goal P31: forall a [@induction] b [@induction] c [@induction]: nat.
   min (min a b) c = min a (min b c)
 
   goal P32: forall a b: nat.
@@ -389,9 +387,9 @@ end
 
 theory IsaPlanner_beyond
 
-  use import Nat
-  use import List
-  use import Tree
+  use Nat
+  use List
+  use Tree
 
   goal P48: forall xs : list 'a.
   xs <> Nil  -> butlast xs ++ (Cons (last xs) Nil) = xs
@@ -414,18 +412,18 @@ theory IsaPlanner_beyond
   goal P54: forall m n: nat.
   (m + n) - n = m
 
-  goal P55: forall i "induction" k "induction" j "induction" : nat.
+  goal P55: forall i [@induction] k [@induction] j [@induction] : nat.
   (i - j) - k = i - (k - j)
 
   goal P56: forall xs ys: list 'a, n: nat.
   drop n (xs ++ ys) = drop n xs ++ drop (n - (len xs)) ys
 
-  goal P57: forall n "induction" m "induction": nat,
-  xs "induction": list nat.
+  goal P57: forall n [@induction] m [@induction]: nat,
+  xs [@induction]: list nat.
   drop n (drop m xs) = drop (n + m) xs
 
-  goal P58: forall xs "induction": list 'a,
-  m "induction" n "induction": nat.
+  goal P58: forall xs [@induction]: list 'a,
+  m [@induction] n [@induction]: nat.
   drop n (take m xs) = take (m - n) (drop n xs)
 
 end

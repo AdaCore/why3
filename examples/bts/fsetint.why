@@ -1,13 +1,13 @@
 
 theory Th1
-   use import set.Fsetint
+   use set.Fsetint
 (* proved with vampire 0.6 and eprover 1.4 *)
    lemma l_false : false
 end
 
 
 theory Th2
-  use import set.Fsetint
+  use set.Fsetint
 
   function integer : set int
   lemma mem_integer: forall x:int. mem x integer
@@ -19,7 +19,7 @@ end
 
 theory Th3
 
-  use import int.Int
+  use int.Int
 
   type set 'a
 

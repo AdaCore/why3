@@ -1,5 +1,4 @@
-
-(* Two programs to compute the factorial.
+(* Two programs to compute the factorial
 
    Note: function "fact" from module int.Fact (already imported)
    can be used in specifications.
@@ -12,20 +11,19 @@
 
       b. Prove its termination.
 
-   2. In module FactLoop
+   2. In module FactLoop:
 
-      a. Prove soundness of function fact_loop
+      a. Prove soundness of function fact_loop.
 
-      b. Prove its termination
+      b. Prove its termination.
 
       c. Change the code to use a for loop instead of a while loop.
-
 *)
 
 module FactRecursive
 
-  use import int.Int
-  use import int.Fact
+  use int.Int
+  use int.Fact
 
   let rec fact_rec (n: int) : int
     requires { true }
@@ -37,9 +35,9 @@ end
 
 module FactLoop
 
-  use import int.Int
-  use import int.Fact
-  use import ref.Ref
+  use int.Int
+  use int.Fact
+  use ref.Ref
 
   let fact_loop (n: int) : int
     requires { true }

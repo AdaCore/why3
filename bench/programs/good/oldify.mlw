@@ -1,6 +1,6 @@
 module M
 
-  use import ref.Ref
+  use ref.Ref
 
   predicate q1 int int int
 
@@ -10,7 +10,7 @@ module M
 
   let g1 () ensures { q1 !r (old !r) (old !r) } = f1 !r
 
-  function foo int : int
+  val function foo int : int
   predicate q int int int
 
   val f (t:ref int) (x:int) : unit writes {t} ensures { q !t (old !t) x }
@@ -18,9 +18,3 @@ module M
   let g (t:ref int) ensures { q !t (old !t) (foo (old !t)) } = f t (foo !t)
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/oldify"
-End:
-*)

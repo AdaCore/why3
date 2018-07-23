@@ -1,0 +1,47 @@
+module StdIO
+
+  use string.Char
+  (*i use string.String *)
+
+  (** ghost references to represent the standard output *)
+  use int.Int
+  use list.List
+  use list.Reverse
+  use ref.Ref
+
+  type prdata = PrChar char | PrInt int
+
+  val ghost flushed : ref (list (list prdata))
+  val ghost current_line : ref (list prdata)
+  val ghost cur_pos : ref int
+  val ghost cur_linenum: ref int
+
+  (** prints a character on standard output. *)
+  val print_char (c:char) : unit
+    writes  { cur_pos, current_line }
+    ensures { !cur_pos = (old !cur_pos) + 1 }
+    ensures { !current_line = Cons (PrChar c) (old !current_line) }
+
+  (*i val print_string (s:string) : unit *)
+  (*i prints a string on standard output. *)
+
+  val print_int (n: int) : unit
+    writes  { cur_pos, current_line }
+  (** prints an integer, in decimal, on standard output. *)
+
+  (*i val print_real (r:real) : unit *)
+  (*i prints a real number on standard output. *)
+
+  (*i val print_endline (s:string) : unit *)
+  (*i prints a string, followed by a newline character, on standard output
+      and flushes standard output. *)
+
+  (** prints a newline character on standard output, and flushes standard output. *)
+  val print_newline (u:unit) : unit
+    writes  { cur_pos, current_line, cur_linenum, flushed }
+    ensures { !cur_pos = 0 }
+    ensures { !current_line = Nil }
+    ensures { !cur_linenum = (old !cur_linenum) + 1 }
+    ensures { !flushed = Cons (reverse (old !current_line)) (old !flushed) }
+
+end

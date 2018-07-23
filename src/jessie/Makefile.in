@@ -21,13 +21,16 @@ literals.ml: literals.mll
 	$(OCAMLLEX) $<
 
 Jessie3.cma: $(addsuffix .cmo, $(MODULES))
-	ocamlc.opt -a $(FLAGS) $(INCLUDE) -o $@ nums.cma unix.cma dynlink.cma str.cma $(addsuffix .cmo, @MENHIRLIB@) $(addsuffix .cma, @ZIPLIB@) $(WHYLIB)/why3.cma $^
+	ocamlc.opt -a $(FLAGS) $(INCLUDE) -o $@ nums.cma unix.cma dynlink.cma str.cma menhirLib.cmo $(addsuffix .cma, @ZIPLIB@) $(WHYLIB)/why3.cma $^
 
 Jessie3.cmx: $(addsuffix .cmx, $(MODULES))
 	ocamlopt.opt $(FLAGS) $(INCLUDE) -o $@ -pack $^
 
 Jessie3.cmxs: Jessie3.cmx
-	ocamlopt.opt -shared $(FLAGS) $(INCLUDE) -o $@ nums.cmxa $(addsuffix .cmx, @MENHIRLIB@) $(addsuffix .cmxa, @ZIPLIB@) $(WHYLIB)/why3.cmxa $^
+	ocamlopt.opt -shared $(FLAGS) $(INCLUDE) -o $@ nums.cmxa menhirLib.cmx $(addsuffix .cmxa, @ZIPLIB@) $(WHYLIB)/why3.cmxa $^
+
+%.cmi: %.mli
+	ocamlc.opt $(FLAGS) $(INCLUDE) -c $^
 
 %.cmo: %.ml
 	ocamlc.opt $(FLAGS) $(INCLUDE) -c $^
@@ -61,8 +64,11 @@ tests/ptests_config: Makefile
 	chmod a-w tests/ptests_config
 
 clean:
+	rm -f $(addsuffix .cmi, $(MODULES))
 	rm -f $(addsuffix .cmo, $(MODULES))
 	rm -f $(addsuffix .cmx, $(MODULES))
 	rm -f Jessie3.cma Jessie3.cmxs
 
 register.cmx: ACSLtoWhy3.cmx
+
+register.cmo: ACSLtoWhy3.cmo

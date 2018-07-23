@@ -2,31 +2,23 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../add_list.mlw">
-<theory name="SumList">
+<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../add_list.mlw" proved="true">
+<theory name="AddListRec" proved="true">
+ <goal name="VC sum" expl="VC for sum" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="92"/></proof>
+ </goal>
+ <goal name="VC main" expl="VC for main" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
 </theory>
-<theory name="AddListRec">
- <goal name="WP_parameter sum" expl="VC for sum">
+<theory name="AddListImp" proved="true">
+ <goal name="VC sum" expl="VC for sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC main" expl="VC for main" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.02" steps="49"/></proof>
- </goal>
- <goal name="WP_parameter main" expl="VC for main">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
-</theory>
-<theory name="AddListImp">
- <goal name="WP_parameter sum" expl="VC for sum">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="WP_parameter main" expl="VC for main">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 </file>

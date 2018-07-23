@@ -12,29 +12,23 @@ Implement and verify a program finding such two values.
 You may assume that the array contains values between 0 and n-1.
 *)
 
-theory Option
-
-  type option 'a = None | Some 'a
-
-  predicate eq_opt (x:'a) (o:option 'a) =
-    match o with
-    | None -> false
-    | Some v -> v=x
-    end
-
-end
-
 module Duplets
 
-  use import int.Int
-  use import Option
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use option.Option
+  use ref.Ref
+  use array.Array
 
   (* duplet in array a is a pair of indexes (i,j) in the bounds of array
      a such that a[i] = a[j] *)
   predicate is_duplet (a:array int) (i:int) (j:int) =
      0 <= i < j < length a /\ a[i] = a[j]
+
+  let predicate eq_opt (x:int) (o:option int) =
+    match o with
+    | None -> false
+    | Some v -> v=x
+    end
 
   exception Break
 

@@ -10,15 +10,15 @@
 
 module WarshallAlgorithm
 
-  use import int.Int
-  use import matrix.Matrix
+  use int.Int
+  use matrix.Matrix
 
   (* path m i j k =
      there is a path from i to j, using only vertices smaller than k *)
   inductive path (matrix bool) int int int =
   | Path_empty:
       forall m: matrix bool, i j k: int.
-      get m i j -> path m i j k
+       m.elts i j -> path m i j k
   | Path_cons:
       forall m: matrix bool, i x j k: int.
       0 <= x < k -> path m i x k -> path m x j k -> path m i j k
@@ -35,22 +35,22 @@ module WarshallAlgorithm
     requires { m.rows = m.columns }
     ensures  { let n = m.rows in
                forall x y: int. 0 <= x < n -> 0 <= y < n ->
-               get result x y <-> path m x y n }
+               result.elts x y <-> path m x y n }
   =
     let t = copy m in
     let n = m.rows in
     for k = 0 to n - 1 do
       invariant { forall x y. 0 <= x < n -> 0 <= y < n ->
-                  get t x y <-> path m x y k }
+                  t.elts x y <-> path m x y k }
       for i = 0 to n - 1 do
         invariant { forall x y. 0 <= x < n -> 0 <= y < n ->
-                    get t x y <->
+                    t.elts x y <->
                     if x < i
                     then path m x y (k+1)
                     else path m x y k }
         for j = 0 to n - 1 do
           invariant { forall x y. 0 <= x < n -> 0 <= y < n ->
-                      get t x y <->
+                      t.elts x y <->
                       if x < i \/ (x = i /\ y < j)
                       then path m x y (k+1)
                       else path m x y k }

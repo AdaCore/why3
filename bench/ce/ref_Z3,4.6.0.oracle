@@ -1,238 +1,110 @@
-bench/ce/ref.mlw M WP_parameter test_post : Unknown (other)
+bench/ce/ref.mlw M VC test_post: Timeout
 Counter-example model:File ref.mlw:
 Line 6:
-x, ["model_trace:x"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "1" }
-y.contents, ["model_trace:y.contents"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 7:
-old x, ["model_trace:x@old"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "1" }
-old y.contents, ["model_trace:y.contents@old"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 9:
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "0" }
 
-bench/ce/ref.mlw M WP_parameter test_post2 : Unknown (other)
+bench/ce/ref.mlw M VC test_post2: Timeout
 Counter-example model:File ref.mlw:
 Line 11:
-x, ["model_trace:x"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "43" }
-y.contents, ["model_trace:y.contents"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 13:
-old x, ["model_trace:x@old"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "43" }
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "42" }
-old y.contents, ["model_trace:y.contents@old"] = {"type" : "Integer" ,
-"val" : "0" }
 Line 15:
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "42" }
 
-bench/ce/ref.mlw M WP_parameter incr : Unknown (other)
+bench/ce/ref.mlw M VC incr: Timeout
 Counter-example model:File ref.mlw:
 Line 21:
-y.contents, ["model_trace:y.contents@init"] = {"type" : "Integer" ,
-"val" : "0" }
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
+"val" : "1" }
 Line 23:
-x23.contents, ["model_trace:x23.contents"] = {"type" : "Integer" ,
+x23, [[@introduced], [@model_trace:x23]] = {"type" : "Integer" ,
 "val" : "-1" }
 Line 24:
-x23.contents, ["model_trace:x23.contents@call"] = {"type" : "Integer" ,
+x23, [[@introduced], [@model_trace:x23]] = {"type" : "Integer" ,
 "val" : "1" }
-old x23.contents, ["model_trace:x23.contents@old"] = {"type" : "Integer" ,
-"val" : "-1" }
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "1" }
 Line 27:
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
-"val" : "1" }
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
+"val" : "2" }
 Line 28:
-x23.contents, ["model_trace:x23.contents@call"] = {"type" : "Integer" ,
+x23, [[@introduced], [@model_trace:x23]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 29:
-x23.contents, ["model_trace:x23.contents@call"] = {"type" : "Integer" ,
+x23, [[@introduced], [@model_trace:x23]] = {"type" : "Integer" ,
 "val" : "1" }
 
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 34:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "2" }
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 36:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "2" }
-
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 34:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "0" }
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
-"val" : "-2" }
-Line 35:
-x.contents, ["model_trace:x.contents@loop"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 36:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 38:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "0" }
-
-bench/ce/ref.mlw M WP_parameter test_loop : Valid
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 32:
-x.contents, ["model_trace:x.contents@loop"] = {"type" : "Integer" ,
-"val" : "0" }
-old x.contents, ["model_trace:x.contents@old"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 34:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Integer" ,
-"val" : "-1" }
-y.contents, ["model_trace:y.contents@call"] = {"type" : "Integer" ,
-"val" : "-3" }
-Line 35:
-x.contents, ["model_trace:x.contents@loop"] = {"type" : "Integer" ,
-"val" : "0" }
-
-bench/ce/ref.mlw M WP_parameter test_post : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 6:
-x, ["model_trace:x"] = {"type" : "Integer" ,
-"val" : "1" }
-y.contents, ["model_trace:y.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 7:
-old x, ["model_trace:x@old"] = {"type" : "Integer" ,
-"val" : "1" }
-old y.contents, ["model_trace:y.contents@old"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 9:
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "0" }
-
-bench/ce/ref.mlw M WP_parameter test_post2 : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 11:
-x, ["model_trace:x"] = {"type" : "Integer" ,
-"val" : "43" }
-y.contents, ["model_trace:y.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 13:
-old x, ["model_trace:x@old"] = {"type" : "Integer" ,
-"val" : "43" }
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "42" }
-old y.contents, ["model_trace:y.contents@old"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 15:
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "42" }
-
-bench/ce/ref.mlw M WP_parameter incr : Unknown (other)
+bench/ce/ref.mlw M VC test_loop: Timeout
 Counter-example model:File ref.mlw:
 Line 21:
-y.contents, ["model_trace:y.contents"] = {"type" : "Integer" ,
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 "val" : "0" }
-Line 23:
-x23.contents, ["model_trace:x23.contents"] = {"type" : "Integer" ,
-"val" : "-1" }
-Line 24:
-x23, ["model_trace:x23@call"] = {"type" : "Integer" ,
-"val" : "1" }
-old x23.contents, ["model_trace:x23.contents@old"] = {"type" : "Integer" ,
-"val" : "-1" }
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 27:
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 28:
-x23, ["model_trace:x23@call"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 29:
-x23, ["model_trace:x23@call"] = {"type" : "Integer" ,
-"val" : "1" }
-
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
-Counter-example model:File ref.mlw:
 Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
-Line 34:
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
-"val" : "2" }
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 36:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
-"val" : "2" }
-
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
-Counter-example model:File ref.mlw:
-Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 34:
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
-"val" : "0" }
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "-2" }
 Line 35:
-x, ["model_trace:x@loop"] = {"type" : "Integer" ,
-"val" : "1" }
-Line 36:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
-"val" : "0" }
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
-"val" : "0" }
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "2" }
 Line 38:
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 
-bench/ce/ref.mlw M WP_parameter test_loop : Valid
-bench/ce/ref.mlw M WP_parameter test_loop : Unknown (other)
+bench/ce/ref.mlw M VC test_loop: Valid
+bench/ce/ref.mlw M VC test_loop: Timeout
 Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
+"val" : "-2" }
 Line 31:
-x.contents, ["model_trace:x.contents"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 35:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 37:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "1" }
+Line 38:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 40:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/ref.mlw M VC test_loop: Timeout
+Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
+"val" : "-3" }
+Line 31:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 32:
-x.contents, ["model_trace:x.contents@try"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
-old x.contents, ["model_trace:x.contents@old"] = {"type" : "Integer" ,
-"val" : "0" }
-Line 34:
-x, ["model_trace:x@call"] = {"type" : "Integer" ,
-"val" : "-1" }
-y, ["model_trace:y@call"] = {"type" : "Integer" ,
-"val" : "-3" }
 Line 35:
-x, ["model_trace:x@loop"] = {"type" : "Integer" ,
-"val" : "0" }
-x.contents, ["model_trace:x.contents@try"] = {"type" : "Integer" ,
-"val" : "0" }
-x, ["model_trace:x@try"] = {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 37:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 

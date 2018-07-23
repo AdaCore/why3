@@ -16,7 +16,7 @@ theory bv.BV_Gen
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax predicate eq "(= %1 %2)"
+  syntax predicate (==) "(= %1 %2)"
 
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
@@ -160,7 +160,7 @@ theory bv.BV8
 end
 
 theory bv.BVConverter_Gen
-   remove allprops
+  remove allprops
 end
 
 theory bv.BVConverter_32_64

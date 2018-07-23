@@ -135,6 +135,8 @@ let ident_printer () =
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
+type version = V20 | V26
+
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
@@ -144,6 +146,7 @@ type info = {
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
   mutable list_projs : Sstr.t;
+  info_version : version;
   meta_model_projection : Sls.t;
   mutable list_records : ((string * string) list) Mstr.t;
   info_cntexample_need_push : bool;
@@ -166,8 +169,13 @@ let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
 (** type *)
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
+  | Tyvar s ->
+      begin match info.info_version with
+      | V20 -> unsupported "smtv2: you must encode type polymorphism"
+      | V26 -> fprintf fmt "%s" (id_unique info.info_printer s.tv_name)
+      end
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
@@ -200,11 +208,11 @@ let print_var_list info fmt vsl =
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && (has_a_model_label ls.ls_name) then
+  if ls.ls_args = [] && (has_a_model_attr ls.ls_name) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 let number_format = {
   Number.long_int_support = true;
@@ -227,7 +235,7 @@ let number_format = {
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
 
-  if Slab.exists is_model_trace_label t.t_label then
+  if Sattr.exists is_model_trace_attr t.t_attrs then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -275,14 +283,14 @@ let rec print_term info fmt t =
 	      match vc_term_info.vc_loc with
 	      | None -> ()
 	      | Some loc ->
-		let labels = (* match vc_term_info.vc_func_name with
-		  | None -> *)
-		    ls.ls_name.id_label
-		  (* | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term
+                let attrs = (* match vc_term_info.vc_func_name with
+                  | None -> *)
+                    ls.ls_name.id_attrs
+                  (* | Some _ ->
+                    model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
                    *)
 in
-		let _t_check_pos = t_label ~loc labels t in
+		let _t_check_pos = t_attr_set ~loc attrs t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
@@ -324,10 +332,9 @@ in
 
   check_exit_vc_term t info.info_in_goal info.info_vc_term;
 
-
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
-  if Slab.exists is_model_trace_label f.t_label then
+  if Sattr.exists is_model_trace_attr f.t_attrs then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
@@ -500,8 +507,7 @@ let print_info_model info =
     begin
       let model_map =
 	S.fold (fun f acc ->
-          fprintf str_formatter "%a" (print_fmla info) f;
-          let s = flush_str_formatter () in
+          let s = asprintf "%a" (print_fmla info) f in
 	  Mstr.add s f acc)
 	info_model
 	Mstr.empty in
@@ -580,7 +586,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 Printer.list_records = info.list_records}
-  | Plemma| Pskip -> assert false
+  | Plemma -> assert false
 
 let print_constructor_decl info fmt (ls,args) =
   let field_names =
@@ -598,9 +604,10 @@ let print_constructor_decl info fmt (ls,args) =
                   fprintf fmt "(%s" field_name;
                   let trace_name =
                     try
-                      let lab = Slab.choose (Slab.filter (fun x ->
-                        Strings.has_prefix "model_trace:" x.lab_string) pr.ls_name.id_label) in
-                      Strings.remove_prefix "model_trace:" lab.lab_string
+                      let attr = Sattr.choose (Sattr.filter (fun l ->
+                        Strings.has_prefix "model_trace:" l.attr_string)
+                        pr.ls_name.id_attrs) in
+                      Strings.remove_prefix "model_trace:" attr.attr_string
                     with
                       Not_found -> ""
                   in
@@ -627,14 +634,36 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
+let print_data_def info fmt (ts,cl) =
+  if ts.ts_args <> [] then
+    let args = List.map (fun arg -> arg.tv_name) ts.ts_args in
+    fprintf fmt "@[(par (%a) (%a))@]"
+      (print_list space (print_ident info)) args
+      (print_list space (print_constructor_decl info)) cl
+  else
+    fprintf fmt "@[(%a)@]"
+      (print_list space (print_constructor_decl info)) cl
+
+let print_sort_decl info fmt (ts,_) =
+  fprintf fmt "@[(%a %d)@]"
+    (print_ident info) ts.ts_name
+    (List.length ts.ts_args)
+
 let print_decl vc_loc args info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-        (print_list space (print_data_decl info)) dl
+      begin match info.info_version with
+      | V20 ->
+          fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+            (print_list space (print_data_decl info)) dl
+      | V26 ->
+          fprintf fmt "@[<v>(declare-datatypes (%a)@ (%a))@,@]"
+            (print_list space (print_sort_decl info)) dl
+            (print_list space (print_data_def info)) dl
+      end
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
@@ -662,7 +691,7 @@ let meta_incremental =
   Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
                             ~desc:"Internal@ use@ only"
 
-let print_task args ?old:_ fmt task =
+let print_task version args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
@@ -684,6 +713,7 @@ let print_task args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_printer = ident_printer ();
     list_projs = Sstr.empty;
+    info_version = version;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
     list_records = Mstr.empty;
     info_cntexample_need_push = need_push;
@@ -712,5 +742,7 @@ let print_task args ?old:_ fmt task =
   print_decls task;
   pp_print_flush fmt ()
 
-let () = register_printer "smtv2" print_task
+let () = register_printer "smtv2" (print_task V20)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."
+let () = register_printer "smtv2.6" (print_task V26)
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 2.6@ format."

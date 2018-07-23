@@ -34,14 +34,16 @@ Unset Printing Implicit Defensive.
 
 end
 
+theory Unit
+  syntax type unit "unit"
+end
+
 theory HighOrd
-  syntax type func "(%1 -> %2)"
-  syntax type pred "(%1 -> bool)"
+  syntax type (->) "(%1 -> %2)"
   syntax function (@)  "(%1 %2)"
 end
 
 theory Bool
-
   syntax type bool   "bool"
 
   syntax function True  "true"
@@ -49,22 +51,15 @@ theory Bool
 end
 
 theory bool.Bool
-
   syntax function andb  "(Init.Datatypes.andb %1 %2)"
   syntax function orb   "(Init.Datatypes.orb %1 %2)"
   syntax function xorb  "(Init.Datatypes.xorb %1 %2)"
   syntax function notb  "(Init.Datatypes.negb %1)"
   syntax function implb "(Init.Datatypes.implb %1 %2)"
-
 end
 
 theory map.Map
-  syntax type     map "(%1 -> %2)%type"
   syntax function get "(%1 %2)"
-end
-
-theory map.Const
-  remove prop Const
 end
 
 theory int.Int
@@ -87,16 +82,16 @@ Local Open Scope ring_scope."
   syntax predicate (>=) "(%1 >= %2)%R"
   syntax predicate (>)  "(%1 > %2)%R"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -113,10 +108,9 @@ theory array.Array
 
   syntax type array "(array %1)"
 
-  syntax function get "(get %1 %2)"
+  syntax function ([]) "(get %1 %2)"
   syntax function length "(size %1 : int)"
   syntax function elts "(get %1)"
-  syntax function set "(set %1 %2 %3)"
 (* does not exist anymore
   syntax function make "(make %1 %2)"
 *)
@@ -127,11 +121,9 @@ theory matrix.Matrix
 
   syntax type matrix "(matrix %1)"
 
-  syntax function get "(matrix_get %1 %2 %3)"
   syntax function rows "(nrows %1 : int)"
   syntax function columns "(ncols %1 : int)"
   syntax function elts "(matrix_get_curry %1)"
-  syntax function set "(matrix_set %1 %2 %3)"
 (* does not exist anymore
   syntax function make "(matrix_make %1 %2)"
 *)

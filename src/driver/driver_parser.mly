@@ -18,18 +18,21 @@
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
+%token <string> RIGHTSQ_QUOTE
+%token <string> RIGHTPAR_QUOTE
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
+%token INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
-%token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR DOT DOTDOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL CONVERTER LITERAL
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
-%token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
+%token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
 
-%nonassoc SYNTAX REMOVE PRELUDE
+%nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
 
 %start <Driver_ast.file> file
@@ -91,6 +94,7 @@ trule:
 | REMOVE ALL                     { Rremoveall }
 | META ident meta_args           { Rmeta      ($2, $3) }
 | META STRING meta_args          { Rmeta      ($2, $3) }
+| USE qualid                     { Ruse       ($2)     }
 
 meta_args: separated_nonempty_list(COMMA,meta_arg) { $1 }
 
@@ -118,6 +122,7 @@ ident:
 | SYNTAX       { "syntax" }
 | REMOVE       { "remove" }
 | PRELUDE      { "prelude" }
+| INTERFACE    { "interface" }
 | BLACKLIST    { "blacklist" }
 | PRINTER      { "printer" }
 | STEPS        { "steps" }
@@ -132,16 +137,24 @@ ident:
 | PLUGIN       { "plugin" }
 
 ident_rich:
-| ident                     { $1 }
-| LEFTPAR_STAR_RIGHTPAR     { Ident.infix "*" }
-| LEFTPAR operator RIGHTPAR { $2 }
+| ident                             { $1 }
+| LEFTPAR operator RIGHTPAR         { $2 }
+| LEFTPAR operator RIGHTPAR_QUOTE   { $2 ^ $3 }
 
 operator:
-| OPERATOR              { Ident.infix $1 }
-| OPERATOR UNDERSCORE   { Ident.prefix $1 }
-| LEFTSQ RIGHTSQ        { Ident.mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ { Ident.mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW { Ident.mixfix "[]<-" }
+| o = OPERATOR                      { if o.[0] <> '!' && o.[0] <> '?' then
+                                      Ident.op_infix o else Ident.op_prefix o }
+| OPERATOR UNDERSCORE               { Ident.op_prefix $1 }
+| LEFTSQ rightsq                    { Ident.op_get $2 }
+| LEFTSQ rightsq LARROW             { Ident.op_set $2 }
+| LEFTSQ LARROW rightsq             { Ident.op_update $3 }
+| LEFTSQ DOTDOT rightsq             { Ident.op_cut $3 }
+| LEFTSQ UNDERSCORE DOTDOT rightsq  { Ident.op_rcut $4 }
+| LEFTSQ DOTDOT UNDERSCORE rightsq  { Ident.op_lcut $4 }
+
+rightsq:
+| RIGHTSQ         { "" }
+| RIGHTSQ_QUOTE   { $1 }
 
 (* Types *)
 
@@ -197,6 +210,7 @@ module_:
 
 mrule:
 | trule                          { MRtheory $1 }
+| INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
 | SYNTAX VAL qualid STRING       { MRval ($3, $4) }
 

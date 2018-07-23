@@ -11,12 +11,12 @@
 theory GilbreathCardTrickPure
 
   use export int.Int
-  use import option.Option
+  use option.Option
   use export list.List
   use export list.Length
   use export list.Append
   use export list.Reverse
-  use import list.Nth
+  use list.Nth
 
   constant m: int
   axiom m_positive: 0 < m
@@ -67,19 +67,18 @@ end
 (* a program implementing the card trick using stacks *)
 module GilbreathCardTrick
 
-  use import GilbreathCardTrickPure
-  use import stack.Stack
+  use GilbreathCardTrickPure
+  use stack.Stack
 
   let shuffle (a b: t int)
     ensures { a.elts = Nil /\ b.elts = Nil /\
       shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
-  = 'Init:
-    let c = create () in
+  = let c = create () in
     let ghost a' = create () in
     let ghost b' = create () in
     while not (is_empty a && is_empty b) do
-      invariant { reverse (at a.elts 'Init) = reverse a.elts ++ a'.elts }
-      invariant { reverse (at b.elts 'Init) = reverse b.elts ++ b'.elts }
+      invariant { reverse (old a.elts) = reverse a.elts ++ a'.elts }
+      invariant { reverse (old b.elts) = reverse b.elts ++ b'.elts }
       invariant { shuffle a'.elts b'.elts c.elts }
       variant   { length a + length b }
       if not (is_empty a) && (is_empty b || any bool) then begin
@@ -95,16 +94,15 @@ module GilbreathCardTrick
   let card_trick (a: t int)
     requires { length a = n*m /\ suit_ordered a.elts }
     ensures { length result = n*m && suit_sorted result.elts }
-  = 'Init:
-    (* cut a into c;d and reverse d in d_ *)
+  = (* cut a into c;d and reverse d in d_ *)
     let d_ = create () in
     let cut = any int ensures { 0 <= result <= n*m } in
     for i = 1 to cut do
       invariant { length a = n*m-i+1 /\ length d_ = i-1 /\
-                  at a.elts 'Init = reverse d_.elts ++ a.elts }
+                  old a.elts = reverse d_.elts ++ a.elts }
       push (safe_pop a) d_
     done;
-    assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
+    assert { old a.elts = reverse d_.elts ++ a.elts };
     (* then suffle c (that is a) and d_ to get b *)
     shuffle a d_
 

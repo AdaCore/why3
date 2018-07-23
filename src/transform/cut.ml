@@ -128,7 +128,11 @@ let clear_but (l: prsymbol list) =
   Trans.bind get_local (clear_but l)
 
 let use_th th =
-  Trans.add_tdecls [Theory.create_use th]
+  Trans.store Task.(function
+  | Some { task_decl = { Theory.td_node = Theory.Decl d }; task_prev = prev } ->
+      add_decl (use_export prev th) d
+  | _ -> assert false)
+  (*Trans.add_tdecls [Theory.create_use th]*)
 
 (* Equivalent of Coq pose (x := term). Adds a new constant of appropriate type
    and an hypothesis x = term.

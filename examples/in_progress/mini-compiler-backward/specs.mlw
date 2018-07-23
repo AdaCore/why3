@@ -3,20 +3,19 @@ module VM_instr_spec
 
   meta compute_max_steps 0x10000
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import vm.Vm
-  use import vm.VMClock
-  use import state.State
-  use import HighOrd
-  use import logic.Compiler_logic
+  use int.Int
+  use list.List
+  use list.Length
+  use vm.Vm
+  use vm.VMClock
+  use state.State
+  use logic.Compiler_logic
 
   function ifun_post (f:machine_state -> machine_state) : post 'a =
     \x p mc mc'. let VMC p s m c = mc in
       let VMC p' s' m' c' = mc' in VMS p' s' m' = f (VMS p s m) /\ c' = c + 1
   meta rewrite_def function ifun_post
-  
+
   let ifunf (ghost pre:pre 'a) (code_f:code)
     (ghost f:machine_state -> machine_state) : hl 'a
     requires { forall c p. codeseq_at c p code_f ->
@@ -55,7 +54,7 @@ module VM_instr_spec
     \a p ms ms'. forall s m clock.
       ms = VMC p s m clock -> ms' = VMC (p+1) (push m[x] s) m (clock+1)
   meta rewrite_def function ivar_post
-  
+
   function ivar_fun (x:id) : machine_state -> machine_state =
     \ms. let VMS p s m = ms in VMS (p+1) (push m[x] s) m
   meta rewrite_def function ivar_fun
@@ -149,7 +148,7 @@ module VM_instr_spec
       (cond n1 n2 -> ms' = VMC (p + ofs + 1) s m (c+1)) /\
       (not cond n1 n2 -> ms' = VMC (p+1) s m (c+1))
   meta rewrite_def function icjump_post
-  
+
   function icjump_fun (cond:cond) (ofs:int) : machine_state -> machine_state =
     \ms. match ms with
       | VMS p (Cons n2 (Cons n1 s)) m ->

@@ -24,7 +24,7 @@ The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $\mathit{true} \lor
 \mathit{false}$.
-\lstinputlisting{logic__opening.ml}
+\lstinputlisting{generated/logic__opening.ml}
 The library uses the common type \texttt{term} both for terms
 (\ie expressions that produce a value of some particular type)
 and formulas (\ie boolean-valued expressions).
@@ -35,7 +35,7 @@ and formulas (\ie boolean-valued expressions).
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
-\lstinputlisting{logic__printformula.ml}
+\lstinputlisting{generated/logic__printformula.ml}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
@@ -50,12 +50,12 @@ formula 1 is: true \/ false
 Let us now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
-\lstinputlisting{logic__declarepropvars.ml}
+\lstinputlisting{generated/logic__declarepropvars.ml}
 The type \texttt{lsymbol} is the type of function and predicate symbols (which
 we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
 by the general function for applying a predicate symbol to a list of terms.
 Here we just need the empty list of arguments.
-\lstinputlisting{logic__declarepropatoms.ml}
+\lstinputlisting{generated/logic__declarepropatoms.ml}
 
 As expected, the output is as follows.
 \begin{verbatim}
@@ -74,7 +74,7 @@ tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
 \texttt{add\_*\_decl} of module \texttt{Task}. For the formula $\mathit{true} \lor
 \mathit{false}$ above, this is done as follows.
-\lstinputlisting{logic__buildtask.ml}
+\lstinputlisting{generated/logic__buildtask.ml}
 To make the formula a goal, we must give a name to it, here ``goal1''. A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
@@ -86,12 +86,12 @@ Notice that lemmas are not allowed in tasks
 and can only be used in theories.
 
 Once a task is built, it can be printed.
-\lstinputlisting{logic__printtask.ml}
+\lstinputlisting{generated/logic__printtask.ml}
 
 The task for our second formula is a bit more complex to build, because
 the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
-\lstinputlisting{logic__buildtask2.ml}
+\lstinputlisting{generated/logic__buildtask2.ml}
 
 Execution of our OCaml program now outputs:
 \begin{verbatim}
@@ -111,50 +111,51 @@ end
 \end{verbatim}
 
 \section{Calling External Provers}
+\label{sec:api:callingprovers}
 
 To call an external prover, we need to access the \why configuration
 file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
-\lstinputlisting{logic__getconf.ml}
+\lstinputlisting{generated/logic__getconf.ml}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
 prover is a record with a name, a version, and an alternative description
 (to differentiate between various configurations of a given prover). Its
 definition is in the module \texttt{Whyconf}:
-\lstinputlisting{whyconf__provertype.ml}
+\lstinputlisting{generated/whyconf__provertype.ml}
 The map \texttt{provers} provides the set of existing provers.
 In the following, we directly
 attempt to access a prover named ``Alt-Ergo'', any version.
-\lstinputlisting{logic__getanyaltergo.ml}
+\lstinputlisting{generated/logic__getanyaltergo.ml}
 We could also get a specific version with :
-\lstinputlisting{logic__getaltergo200.ml}
+\lstinputlisting{generated/logic__getaltergo200.ml}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
-\lstinputlisting{logic__getdriver.ml}
+\lstinputlisting{generated/logic__getdriver.ml}
 
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
 termination. Here is a simple way to proceed:
-\lstinputlisting{logic__callprover.ml}
+\lstinputlisting{generated/logic__callprover.ml}
 This way to call a prover is in general too naive, since it may never
 return if the prover runs without time limit. The function
 \texttt{prove\_task} has an optional parameter \texttt{limit}, a record defined
 in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers__resourcelimit.ml}
+\lstinputlisting{generated/call_provers__resourcelimit.ml}
 where the field \texttt{limit\_time} is the maximum allowed running time in seconds,
 and \texttt{limit\_mem} is the maximum allowed memory in megabytes.  The type
 \texttt{prover\_result} is a record defined in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers__proverresult.ml}
+\lstinputlisting{generated/call_provers__proverresult.ml}
 with in particular the fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
 \end{itemize}
 A \texttt{pr\_answer} is the sum type defined in module \texttt{Call\_provers}:
-\lstinputlisting{call_provers__proveranswer.ml}
+\lstinputlisting{generated/call_provers__proveranswer.ml}
 corresponding to these kinds of answers:
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover.
@@ -173,7 +174,7 @@ corresponding to these kinds of answers:
 \end{itemize}
 Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
-\lstinputlisting{logic__calltimelimit.ml}
+\lstinputlisting{generated/logic__calltimelimit.ml}
 The output of our program is now as follows.
 \begin{verbatim}
 On task 1, alt-ergo answers Valid (0.01s)
@@ -188,31 +189,31 @@ constructed.
 
 Here is the way we build the formula $2+2=4$. The main difficulty is to
 access the internal identifier for addition: it must be retrieved from
-the standard theory \texttt{Int} of the file \texttt{int.why} (see
-Chap~\ref{sec:library}).
-\lstinputlisting{logic__buildfmla.ml}
+the standard theory \texttt{Int} of the file \texttt{int.why}.
+% (see Chap~\ref{sec:library}).
+\lstinputlisting{generated/logic__buildfmla.ml}
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
 the constructor \texttt{t\_app\_infer} infers the type of the resulting
 term. One could also provide the expected type as follows.
-\lstinputlisting{logic__buildtermalt.ml}
+\lstinputlisting{generated/logic__buildtermalt.ml}
 
 When building a task with this formula, we need to declare that we use
 theory \texttt{Int}:
-\lstinputlisting{logic__buildtaskimport.ml}
+\lstinputlisting{generated/logic__buildtaskimport.ml}
 
 \section{Building Quantified Formulas}
 
 To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
-\lstinputlisting{logic__quantfmla1.ml}
+\lstinputlisting{generated/logic__quantfmla1.ml}
 The next step is to introduce the variable $x$ with the type int.
-\lstinputlisting{logic__quantfmla2.ml}
+\lstinputlisting{generated/logic__quantfmla2.ml}
 The formula $x*x \geq 0$ is obtained as in the previous example.
-\lstinputlisting{logic__quantfmla3.ml}
+\lstinputlisting{generated/logic__quantfmla3.ml}
 To quantify on $x$, we use the appropriate smart constructor as follows.
-\lstinputlisting{logic__quantfmla4.ml}
+\lstinputlisting{generated/logic__quantfmla4.ml}
 
 \section{Building Theories}
 
@@ -225,33 +226,33 @@ be done by a sequence of calls:
 \end{itemize}
 
 Creation of a theory named \verb|My_theory| is done by
-\lstinputlisting{logic__buildth1.ml}
+\lstinputlisting{generated/logic__buildth1.ml}
 First let us add formula 1 above as a goal:
-\lstinputlisting{logic__buildth2.ml}
+\lstinputlisting{generated/logic__buildth2.ml}
 Note that we reused the goal identifier \verb|goal_id1| that we
 already defined to create task 1 above.
 
 Adding formula 2 needs to add the declarations of predicate variables A
 and B first:
-\lstinputlisting{logic__buildth3.ml}
+\lstinputlisting{generated/logic__buildth3.ml}
 
 Adding formula 3 is a bit more complex since it uses integers, thus it
 requires to ``use'' the theory \verb|int.Int|. Using a theory is
 indeed not a primitive operation in the API: it must be done by a
 combination of an ``export'' and the creation of a namespace. We
 provide a helper function for that:
-\lstinputlisting{logic__buildth4.ml}
+\lstinputlisting{generated/logic__buildth4.ml}
 Addition of formula 3 is then
-\lstinputlisting{logic__buildth5.ml}
+\lstinputlisting{generated/logic__buildth5.ml}
 
 Addition of goal 4 is nothing more complex:
-\lstinputlisting{logic__buildth6.ml}
+\lstinputlisting{generated/logic__buildth6.ml}
 
 Finally, we close our theory under construction as follows.
-\lstinputlisting{logic__buildth7.ml}
+\lstinputlisting{generated/logic__buildth7.ml}
 
 We can inspect what we did by printing that theory:
-\lstinputlisting{logic__printtheory.ml}
+\lstinputlisting{generated/logic__printtheory.ml}
 which outputs
 \begin{verbatim}
 my new theory is as follows:
@@ -277,23 +278,30 @@ end
 
 From a theory, one can compute at once all the proof tasks it contains
 as follows:
-\lstinputlisting{logic__splittheory.ml}
+\lstinputlisting{generated/logic__splittheory.ml}
 Note that the tasks are returned in reverse order, so we reverse the
 list above.
 
 We can check our generated tasks by printing them:
-\lstinputlisting{logic__printalltasks.ml}
+\lstinputlisting{generated/logic__printalltasks.ml}
 
 One can run provers on those tasks exactly as we did above.
 
-\section{Applying Transformations}
+\section{Operations on Terms and Formulas, Transformations}
 
-[TO BE COMPLETED]
+The following code illustrates a simple recursive functions of
+formulas. It explores the formula and when a negation is found, it
+tries to push it down below a conjunction, a disjunction or a
+quantifier.
+\lstinputlisting{generated/transform__negate.ml}
 
-\section{Writing New Functions on Terms}
+The following illustrates how to turn such an OCaml function into a
+transformation in the sense of the Why3 API. Moreover, it registers that
+transformation to make it available for example in Why3 IDE.
+\lstinputlisting{generated/transform__register.ml}
 
-[TO BE COMPLETED]
-% pattern-matching on terms, opening a quantifier
+The directory \verb|src/transform| contains the code for the many
+transformations that are already available in Why3.
 
 \section{Proof Sessions}
 
@@ -303,24 +311,65 @@ from an OCaml program.
 
 \section{ML Programs}
 
-There are two ways for building \whyml programs from OCaml. The first
-is to build untyped syntax trees for such \whyml programs, and then
-call the \why typing procedure to build typed declarations. The second
-way is to directly build typed programs using smart constructors that
-check well-typedness at each step.
+The simplest way to build \whyml programs from OCaml is to build
+untyped syntax trees for such programs, and then
+call the \why typing procedure to build typed declarations.
 
-The first approach, building untyped trees and then typing them, is
-examplified in file \verb|examples/use_api/mlw_tree.ml| of the
-distribution. The second approach is
-examplified in file \verb|examples/use_api/mlw.ml|. The first approach
-is significantly simpler to do since the internal typing mechanism
-using regions remains implicit, whereas when one uses the second
-approach one should care about such typing. On the other hand, the
-second approach is more ``efficient'' in the sense that no
-intermediate form needs to be built in memory.
+The examples of this section are available in the file
+\verb|examples/use_api/mlw_tree.ml| of the distribution.
 
+The first step is to build an environment as already illustrated in
+Section~\ref{sec:api:callingprovers}, and open the OCaml module
+\verb|Ptree| which contains most of the OCaml functions we need in
+this section.
+\lstinputlisting{generated/mlw_tree__buildenv.ml}
 
+To contain all the example programs we are going to build we need a
+module. We start the creation of that module using the following
+declarations, that first introduces a pseudo ``file'' to hold the
+module, then the module itself called \verb|Program|.
+\lstinputlisting{generated/mlw_tree__openmodule.ml}
+Notice the use of a first
+simple helper function \verb|mk_ident| to build an identifier without
+any attributes nor any location.
 
+To write our programs, we need to import some other modules from the
+standard library. The following introduces two helper functions for
+building qualified identifiers and importing modules, and finally
+imports \verb|int.Int|.
+\lstinputlisting{generated/mlw_tree__useimport.ml}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{generated/mlw_tree__source1.ml}
+
+The OCaml code that programmatically build this Why3 function is as follows.
+\lstinputlisting{generated/mlw_tree__code1.ml}
+This code makes uses of helper functions that are given in Figure~\ref{fig:helpers}.
+\begin{figure}[t]
+  \lstinputlisting{generated/mlw_tree__helper1.ml}
+  \caption{Helper functions for building WhyML programs}
+  \label{fig:helpers}
+\end{figure}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{generated/mlw_tree__source2.ml}
+We need to import the \verb|ref.Ref| module first. The rest is similar to the first example, the code is as follows
+\lstinputlisting{generated/mlw_tree__code2.ml}
+
+The next example makes use of arrays.
+\lstinputlisting[language=why3]{generated/mlw_tree__source3.ml}
+The corresponding OCaml code is as follows
+\lstinputlisting{generated/mlw_tree__code3.ml}
+
+Having declared all the programs we wanted to write, we can now close
+the module and the file, and get as a result the set of modules of our
+file, under the form of a map of module names to modules.
+\lstinputlisting{generated/mlw_tree__closemodule.ml}
+
+We can then construct the proofs tasks for our module, and then try to
+call the Alt-Ergo prover. The rest of that code is using OCaml
+functions that were already introduced before.
+\lstinputlisting{generated/mlw_tree__checkingvcs.ml}
 
 %%% Local Variables:
 %%% mode: latex

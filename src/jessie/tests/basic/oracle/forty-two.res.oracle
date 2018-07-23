@@ -6,13 +6,16 @@
 [kernel] Parsing tests/basic/forty-two.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
 [jessie3] processing function f
 [jessie3] created program function f (67)
 [jessie3] processing function g
 [jessie3] created program function g (69)
+[jessie3] processing function h
+[jessie3] created program function h (72)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
-[jessie3] made 2 function(s)
+[jessie3] made 3 function(s)
 [jessie3] Running provers...
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
@@ -22,33 +25,55 @@
             
             (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude.Prelude *)
-            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use ref.Ref *)
             
             (* use mach.bv.BVCheck32 *)
             
-            goal WP_parameter_f : (6 * 7) = 42
+            (* use mach.int.Int64 *)
             
-            goal WP_parameter_g :
-              (0 <= 0 /\ 0 < two_power_size) &&
-               (to_uint (of_int 0) = 0 ->
-                 (0 <= 7 /\ 7 < two_power_size) && (let o = of_int 7 in
-                  to_uint o = 7 ->
-                   (0 <= 6 /\ 6 < two_power_size) && (let o1 = of_int 6 in
-                    to_uint o1 = 6 ->
-                     (0 <= (to_uint o1 * to_uint o) /\
-                       (to_uint o1 * to_uint o) < two_power_size) &&
-                      (let o2 = mul o1 o in
-                      to_uint o2 = (to_uint o1 * to_uint o) ->
-                       (forall us_retres:t. us_retres = o2 -> to_uint us_retres = 42)))))
+            goal VC_f : (6 * 7) = 42
+            
+            goal VC_g :
+              (0 <= 0 /\ 0 < two_power_size) /\
+               (forall o:t.
+                 to_uint o = 0 /\ o = of_int 0 ->
+                  (0 <= 6 /\ 6 < two_power_size) /\
+                   (forall o1:t.
+                     to_uint o1 = 6 /\ o1 = of_int 6 ->
+                      (forall x:t. x = o1 -> (to_uint x * 7) = 42)))
+            
+            goal VC_h :
+              (0 <= 0 /\ 0 < two_power_size) /\
+               (forall o:t.
+                 to_uint o = 0 /\ o = of_int 0 ->
+                  (0 <= 7 /\ 7 < two_power_size) /\
+                   (forall o1:t.
+                     to_uint o1 = 7 /\ o1 = of_int 7 ->
+                      (0 <= 6 /\ 6 < two_power_size) /\
+                       (forall o2:t.
+                         to_uint o2 = 6 /\ o2 = of_int 6 ->
+                          (0 <= (to_uint o2 * to_uint o1) /\
+                            (to_uint o2 * to_uint o1) < two_power_size) /\
+                           (let o3 = mul o2 o1 in
+                           to_uint o3 = (to_uint o2 * to_uint o1) ->
+                            (forall us_retres:t.
+                              us_retres = o3 -> to_uint us_retres = 42)))))
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2 (WP_parameter g): Valid, Valid, Valid, Valid, Timeout
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC f) (assertion): Valid, Valid, Valid
+[jessie3] Task 2 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC g) (precondition): Valid, Valid, Valid
+[jessie3] Task 4 (VC g) (assertion): Valid, Valid, Valid
+[jessie3] Task 5 (VC h) (precondition): Valid, Valid, Valid
+[jessie3] Task 6 (VC h) (precondition): Valid, Valid, Valid
+[jessie3] Task 7 (VC h) (precondition): Valid, Valid, Valid
+[jessie3] Task 8 (VC h) (precondition): Valid, Valid, Valid
+[jessie3] Task 9 (VC h) (postcondition): Valid, Valid, Valid

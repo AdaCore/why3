@@ -4,12 +4,12 @@
 
 module M
 
-  use import ref.Ref
-  use import int.Int
+  use ref.Ref
+  use int.Int
 
   (*** In all cases, records are decomposed using match eval ***)
 
-  type r = {f "model_trace:.my_field_f" :int; g:bool}
+  type r = {f [@model_trace:.my_field_f] :int; g:bool}
 
   let record_match_eval_test1 (x : r) : int
     ensures { result = 1 }
@@ -45,12 +45,14 @@ module M
 
 end
 
+
+
 module Mutable
 
-  use import int.Int
+  use int.Int
 
- 
-  type r = {mutable f "model_trace:.my_field_f" :int; mutable g:bool}
+
+  type r = {mutable f [@model_trace:.my_field_f] :int; mutable g:bool}
 
   let record_match_eval_test1 (x : r) : int
     ensures { result = 1 }
@@ -69,7 +71,7 @@ module Mutable
     ensures { x.g }
   =
     x.f <- 6
-    
+
   let record_match_eval_test4 (x : r) : r
     ensures { result.g }
   =

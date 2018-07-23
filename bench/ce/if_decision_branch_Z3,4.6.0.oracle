@@ -1,34 +1,17 @@
-bench/ce/if_decision_branch.mlw Other WP_parameter f : Unknown (other)
+bench/ce/if_decision_branch.mlw Other VC f: Valid
+bench/ce/if_decision_branch.mlw Other VC f: Unknown (other)
 Counter-example model:File if_decision_branch.mlw:
-Line 17:
-a, ["model_trace:a"] = {"type" : "Integer" ,
-"val" : "0" }
 Line 18:
-TEMP_NAME.sel_path, ["node_id=121",
-"model_trace:TEMP_NAME.sel_path@assign"] = {"type" : "Boolean" ,
-"val" : false }
-Line 21:
-TEMP_NAME.sel_path, ["node_id=5454",
-"model_trace:TEMP_NAME.sel_path@assign"] = {"type" : "Boolean" ,
-"val" : false }
-Line 25:
-TEMP_NAME.sel_path, ["node_id=121",
-"model_trace:TEMP_NAME.sel_path@assign"] = {"type" : "Boolean" ,
-"val" : false }
-
-bench/ce/if_decision_branch.mlw Other WP_parameter f : Unknown (other)
-Counter-example model:File if_decision_branch.mlw:
-Line 17:
-a, ["model_trace:a"] = {"type" : "Integer" ,
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "0" }
-Line 18:
+Line 19:
 the check fails with all inputs
-Line 21:
-TEMP_NAME, ["node_id=5454",
-"model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
+Line 22:
+TEMP_NAME, [[@introduced], [@model],
+[@model_trace:TEMP_NAME]] = {"type" : "Boolean" ,
 "val" : false }
-Line 25:
-TEMP_NAME, ["node_id=121",
-"model_trace:TEMP_NAME@assign"] = {"type" : "Boolean" ,
+Line 26:
+TEMP_NAME, [[@introduced], [@model],
+[@model_trace:TEMP_NAME]] = {"type" : "Boolean" ,
 "val" : false }
 

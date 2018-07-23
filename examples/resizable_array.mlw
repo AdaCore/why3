@@ -1,24 +1,25 @@
 
 module ResizableArraySpec
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
   use map.Const
 
-  type rarray 'a model { mutable length: int; mutable data: map int 'a }
+  type rarray 'a = private {
+    ghost mutable length: int;
+    ghost mutable data: map int 'a
+  }
 
   function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
-  function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a =
-    { r with data = Map.set r.data i v }
+  val function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a
+    ensures { result.length = r.length }
+    ensures { result.data = Map.set r.data i v }
 
   val make (len: int) (dummy: 'a) : rarray 'a
     requires { 0 <= len }
     ensures  { result.length = len }
     ensures  { result.data = Const.const dummy }
     (* ensures  { forall i: int. 0 <= i < len -> result[i] = dummy } *)
-
-  val length (r: rarray 'a) : int
-    ensures { result = r.length }
 
   val ([]) (r: rarray 'a) (i: int) : 'a
     requires { 0 <= i < r.length } ensures { result = r[i] }
@@ -42,19 +43,18 @@ end
 
 module ResizableArrayImplem (* : ResizableArraySpec *)
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
   use array.Array as A
 
   type rarray 'a =
     { dummy: 'a; mutable length: int; mutable data: A.array 'a }
-    invariant { 0 <= self.length <= A.length self.data }
-    invariant { forall i: int. self.length <= i < A.length self.data ->
-                  A.get self.data i = self.dummy }
+    invariant { 0 <= length <= A.length data }
+    invariant { forall i: int. length <= i < A.length data ->
+                  A.([]) data i = dummy }
+    by { dummy = any 'a; length = 0; data = A.make 0 (any 'a) }
 
-  function ([]) (r: rarray 'a) (i: int) : 'a = A.get r.data i
-  function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a =
-    { r with data = A.set r.data i v }
+  function ([]) (r: rarray 'a) (i: int) : 'a = A.([]) r.data i
 
 (*
 function make (len: int) (dummy: 'a) : rarray 'a =
@@ -65,17 +65,18 @@ function make (len: int) (dummy: 'a) : rarray 'a =
     requires { 0 <= len }
     ensures { result.dummy = dummy }
     ensures { result.length = len }
-    ensures { forall i:int. 0 <= i < len -> A.get result.data i = dummy }
+    ensures { forall i:int. 0 <= i < len -> A.([]) result.data i = dummy }
     =
     { dummy = dummy; length = len; data = A.make len dummy }
 
   let ([]) (r: rarray 'a) (i: int) : 'a
-    requires { 0 <= i < r.length } ensures { result = r[i] }
+    requires { 0 <= i < r.length }
     =
     A.([]) r.data i
 
   let ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
-    requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
+    requires { 0 <= i < r.length }
+    ensures { r.data.A.elts = A.Map.([<-]) (old r).data.A.elts i v }
     =
     A.([]<-) r.data i v
 
@@ -133,8 +134,8 @@ end
 
 module Test
 
-  use import int.Int
-  use import ResizableArrayImplem
+  use int.Int
+  use ResizableArrayImplem
 
   let test1 () =
     let r = make 10 0 in

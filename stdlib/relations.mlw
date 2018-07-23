@@ -1,0 +1,172 @@
+
+(** {1 Relations} *)
+
+(** {2 Relations and orders} *)
+
+module EndoRelation
+  type t
+  predicate rel t t
+end
+
+module Reflexive
+  clone export EndoRelation
+  axiom Refl : forall x:t. rel x x
+end
+
+module Irreflexive
+  clone export EndoRelation
+  axiom Strict : forall x:t. not rel x x
+end
+
+module Transitive
+  clone export EndoRelation
+  axiom Trans : forall x y z:t. rel x y -> rel y z -> rel x z
+end
+
+module Symmetric
+  clone export EndoRelation
+  axiom Symm : forall x y:t. rel x y -> rel y x
+end
+
+module Asymmetric
+  clone export EndoRelation
+  axiom Asymm : forall x y:t. rel x y -> not rel y x
+end
+
+module Antisymmetric
+  clone export EndoRelation
+  axiom Antisymm : forall x y:t. rel x y -> rel y x -> x = y
+end
+
+module Total
+  clone export EndoRelation
+  axiom Total : forall x y:t. rel x y \/ rel y x
+end
+
+module PreOrder
+  clone export Reflexive with axiom Refl
+  clone export Transitive with type t = t, predicate rel = rel, axiom Trans
+end
+
+module Equivalence
+  clone export PreOrder with axiom Refl, axiom Trans
+  clone export Symmetric with type t = t, predicate rel = rel, axiom Symm
+end
+
+module TotalPreOrder
+  clone export PreOrder with axiom Refl, axiom Trans
+  clone export Total with type t = t, predicate rel = rel, axiom Total
+end
+
+module PartialOrder
+  clone export PreOrder with axiom Refl, axiom Trans
+  clone export Antisymmetric with
+    type t = t, predicate rel = rel, axiom Antisymm
+end
+
+module TotalOrder
+  clone export PartialOrder with axiom .
+  clone export Total with type t = t, predicate rel = rel, axiom Total
+end
+
+module PartialStrictOrder
+  clone export Transitive with axiom Trans
+  clone export Asymmetric with type t = t, predicate rel = rel, axiom Asymm
+end
+
+module TotalStrictOrder
+  clone export PartialStrictOrder with axiom Trans, axiom Asymm
+  axiom Trichotomy : forall x y:t. rel x y \/ rel y x \/ x = y
+end
+
+module Inverse
+  clone export EndoRelation
+
+  predicate inv_rel (x y : t) = rel y x
+end
+
+(** {2 Closures} *)
+
+module ReflClosure
+  clone export EndoRelation
+
+  inductive relR t t =
+  | BaseRefl : forall x:t. relR x x
+  | StepRefl : forall x y:t. rel x y -> relR x y
+end
+
+module TransClosure
+  clone export EndoRelation
+
+  inductive relT t t =
+  | BaseTrans : forall x y:t. rel x y -> relT x y
+  | StepTrans : forall x y z:t. relT x y -> rel y z -> relT x z
+
+  lemma relT_transitive:
+    forall x y z: t. relT x y -> relT y z -> relT x z
+end
+
+module ReflTransClosure
+  clone export EndoRelation
+
+  inductive relTR t t =
+  | BaseTransRefl : forall x:t. relTR x x
+  | StepTransRefl : forall x y z:t. relTR x y -> rel y z -> relTR x z
+
+  lemma relTR_transitive:
+    forall x y z: t. relTR x y -> relTR y z -> relTR x z
+end
+
+(** {2 Lexicographic ordering} *)
+
+module Lex
+
+  type t1
+  type t2
+
+  predicate rel1 t1 t1
+  predicate rel2 t2 t2
+
+  inductive lex (t1, t2) (t1, t2) =
+  | Lex_1: forall x1 x2 : t1, y1 y2 : t2.
+       rel1 x1 x2 -> lex (x1,y1) (x2,y2)
+  | Lex_2: forall x : t1, y1 y2 : t2.
+       rel2 y1 y2 -> lex (x,y1) (x,y2)
+
+end
+
+(** {2 Minimum and maximum for total orders} *)
+
+module MinMax
+
+  type t
+  predicate le t t
+
+  clone TotalOrder as TO with type t = t, predicate rel = le, axiom .
+
+  function min (x y : t) : t = if le x y then x else y
+  function max (x y : t) : t = if le x y then y else x
+
+  lemma Min_r : forall x y:t. le y x -> min x y = y
+  lemma Max_l : forall x y:t. le y x -> max x y = x
+
+  lemma Min_comm : forall x y:t. min x y = min y x
+  lemma Max_comm : forall x y:t. max x y = max y x
+
+  lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
+  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
+
+end
+
+(** {2 Well-founded relation} *)
+
+module WellFounded
+
+  inductive acc (r: 'a -> 'a -> bool) (x: 'a) =
+  | acc_x: forall r, x: 'a. (forall y. r y x -> acc r y) -> acc r x
+
+  predicate well_founded (r: 'a -> 'a -> bool) =
+    forall x. acc r x
+
+end
+

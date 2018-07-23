@@ -80,6 +80,7 @@ module type S =
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
     val of_list : (key * 'a) list -> 'a t
+    val contains: 'a t -> key -> bool
     val domain : 'a t -> unit t
     val subdomain : (key -> 'a -> bool) -> 'a t -> unit t
     val is_num_elt : int -> 'a t -> bool
@@ -575,7 +576,7 @@ module Make(Ord: OrderedType) = struct
             | None -> ()
             | Some last ->
               if Ord.compare last v >= 0
-              then invalid_arg "Map.translate : given function incorrect"
+              then invalid_arg "Map.translate: invalid function parameter"
           end;
           let r,last = aux (Some v) r in
           Node(l,v,d,r,h),last in
@@ -642,6 +643,8 @@ module Make(Ord: OrderedType) = struct
 
     let of_list l =
       List.fold_left (fun acc (k,d) -> add k d acc) empty l
+
+    let contains m x = mem x m
 
     let domain m = map ignore m
 

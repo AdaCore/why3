@@ -27,7 +27,7 @@ theory BuiltIn
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Int
@@ -47,16 +47,16 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -88,16 +88,16 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -108,30 +108,25 @@ theory real.Real
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
 end
 
 (*
 (* L'encodage des types sommes bloquent cette théorie builtin *)
+
 theory Bool
-   syntax type bool   "bool"
-   syntax function True  "true"
-   syntax function False "false"
-   meta "encoding_decorate : kept" type bool
+  syntax type bool   "bool"
+  syntax function True  "true"
+  syntax function False "false"
+
+  meta "encoding_decorate:kept" type bool
 end
+
 theory bool.Bool
-   syntax function andb  "(and %1 %2)"
-   syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
-   syntax function notb  "(not %1)"
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function xorb  "(xor %1 %2)"
+  syntax function notb  "(not %1)"
 end
-*)
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
 *)

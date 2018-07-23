@@ -17,18 +17,19 @@
 
 module BraunHeaps
 
-  use import int.Int
-  use import bintree.Tree
+  use int.Int
+  use bintree.Tree
   use export bintree.Size
   use export bintree.Occ
 
   type elt
 
-  predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  val predicate le elt elt
+
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (* [e] is no greater than the root of [t], if any *)
-  predicate le_root (e: elt) (t: tree elt) = match t with
+  let predicate le_root (e: elt) (t: tree elt) = match t with
     | Empty -> true
     | Node _ x _ -> le e x
   end
@@ -49,12 +50,9 @@ module BraunHeaps
      requires { heap t && 0 < size t }
      ensures  { is_minimum (minimum t) t }
      variant  { t }
-  = match t with
-    | Empty -> absurd
-    | Node l _ r ->
-        if l <> Empty then root_is_min l;
-        if r <> Empty then root_is_min r
-    end
+  = let Node l _ r = t in
+    if not is_empty l then root_is_min l;
+    if not is_empty r then root_is_min r
 
   predicate inv (t: tree elt) = match t with
   | Empty      -> true
@@ -67,16 +65,6 @@ module BraunHeaps
     ensures { size result = 0 }
     ensures { forall e. not (mem e result) }
     = Empty
-
-  let is_empty (t: tree elt) : bool
-    ensures { result <-> size t = 0 }
-  =
-    t = Empty
-
-  let size (t: tree elt) : int
-    ensures { result = size t }
-  =
-    size t
 
   let get_min (t: tree elt) : elt
     requires { heap t && 0 < size t }
@@ -112,7 +100,7 @@ module BraunHeaps
      requires { inv t }
      requires { 0 < size t }
      variant  { t }
-     ensures  { let (e, t') = result in
+     ensures  { let e, t' = result in
                 heap t' && inv t' && size t' = size t - 1 &&
                 occ e t' = occ e t - 1 &&
                 forall x. x <> e -> occ x t' = occ x t }
@@ -122,10 +110,10 @@ module BraunHeaps
         absurd
     | Node Empty y r ->
         assert { r = Empty };
-        (y, Empty)
+        y, Empty
     | Node l y r ->
-        let (x, l) = extract l in
-        (x, Node r y l)
+        let x, l = extract l in
+        x, Node r y l
     end
 
   let rec replace_min (x: elt) (t: tree elt)
@@ -174,7 +162,7 @@ module BraunHeaps
         if le lx ly then
           Node r lx (merge ll lr)
         else
-          let (x, l) = extract l in
+          let x, l = extract l in
           Node (replace_min x r) ly l
     | Empty, _ ->
         absurd
@@ -202,7 +190,7 @@ module BraunHeaps
         Chris Okasaki
         J. Functional Programming 7 (6) 661–666, November 1997 *)
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   let rec diff (m: int) (t: tree elt)
     requires { inv t }
@@ -235,8 +223,8 @@ module BraunHeaps
 
   (** A Braun tree has a logarithmic height *)
 
-  use import bintree.Height
-  use import int.Power
+  use bintree.Height
+  use int.Power
 
   let rec lemma size_height (t1 t2: tree elt)
     requires { inv t1 && inv t2 }

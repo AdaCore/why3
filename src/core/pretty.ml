@@ -22,17 +22,24 @@ open Task
 let why3_keywords =
   ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
    "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-   "namespace"; "import"; "export"; "end";
+   "scope"; "import"; "export"; "end";
    "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
    "let"; "in"; "match"; "with"; "as"; "epsilon" ]
 
-    module type Printer = sig
+let coercion_attr = create_attribute "coercion"
+
+module type Printer = sig
+
+    val tprinter : ident_printer  (* type symbols *)
+    val aprinter : ident_printer  (* type variables *)
+    val sprinter : ident_printer  (* variables and functions *)
+    val pprinter : ident_printer  (* propoition names *)
 
     val forget_all : unit -> unit     (* flush id_unique *)
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
     val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
 
-    val print_id_labels : formatter -> ident -> unit  (* labels and location *)
+    val print_id_attrs : formatter -> ident -> unit   (* attributes and location *)
 
     val print_tv : formatter -> tvsymbol -> unit      (* type variable *)
     val print_vs : formatter -> vsymbol -> unit       (* variable *)
@@ -51,7 +58,7 @@ let why3_keywords =
     val print_pat : formatter -> pattern -> unit      (* pattern *)
     val print_term : formatter -> term -> unit        (* term *)
 
-    val print_label : formatter -> label -> unit
+    val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
@@ -79,16 +86,18 @@ let why3_keywords =
 
   end
 
-
-let debug_print_labels =
+let debug_print_attrs =
   Debug.register_info_flag
-    "print_labels"
-    ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+    "print_attributes"
+    ~desc:"Print@ attributes@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let create iprinter aprinter tprinter pprinter do_forget_all =
+let debug_print_coercions = Debug.register_info_flag "print_coercions"
+  ~desc:"Print@ coercions@ in@ logical@ formulas."
+
+let create sprinter aprinter tprinter pprinter do_forget_all =
   (module (struct
 
 let forget_tvs () =
@@ -96,22 +105,22 @@ let forget_tvs () =
   (* if do_forget_all then *) forget_all aprinter
 
 let forget_all () =
-  if do_forget_all then forget_all iprinter;
+  if do_forget_all then forget_all sprinter;
   if do_forget_all then forget_all aprinter;
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
 
-let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
-let print_labels = print_iter1 Slab.iter space print_label
+let print_attr fmt a = fprintf fmt "[@%s]" a.attr_string
+let print_attrs = print_iter1 Sattr.iter space print_attr
 
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
 
-let print_id_labels fmt id =
-  if Debug.test_flag debug_print_labels &&
-      not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label;
+let print_id_attrs fmt id =
+  if Debug.test_flag debug_print_attrs &&
+      not (Sattr.is_empty id.id_attrs) then
+    fprintf fmt "@ %a" print_attrs id.id_attrs;
   if Debug.test_flag debug_print_locs then
     Opt.iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
@@ -122,49 +131,28 @@ let print_tv fmt tv =
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
   let sanitizer = Strings.uncapitalize in
-  pp_print_string fmt (id_unique iprinter ~sanitizer vs.vs_name)
+  Ident.print_decoded fmt (id_unique sprinter ~sanitizer vs.vs_name)
 
-let forget_var vs = forget_id iprinter vs.vs_name
-
-(* pretty-print infix and prefix logic symbols *)
-
-let extract_op s =
-  (*let s = ls.ls_name.id_string in*)
-  match Ident.kind_of_fix s with
-  | `None | `Mixfix _ -> None
-  | `Prefix s | `Infix s -> Some s
-
-let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
-
-let escape_op s =
-  let len = String.length s in
-  if len = 0 then s else
-    let s = if String.get s (len - 1) = '*' then s ^ " " else s in
-    let s = if String.get s 0 = '*' then " " ^ s else s in
-   s
+let forget_var vs = forget_id sprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
+  pp_print_string fmt (id_unique sprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique tprinter ts.ts_name)
-
-let print_ls fmt ls =
-  if ls.ls_name.id_string = "mixfix []" then fprintf fmt "([])" else
-  if ls.ls_name.id_string = "mixfix [<-]" then fprintf fmt "([<-])" else
-  let s = id_unique iprinter ls.ls_name in
-  match extract_op s with
-  | Some s -> fprintf fmt "(%s)" (escape_op s)
-  | None   -> fprintf fmt "%s" s
+  if ts_equal ts ts_func then pp_print_string fmt "(->)" else
+  pp_print_string fmt (id_unique tprinter ts.ts_name)
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
+  pp_print_string fmt (id_unique sprinter ~sanitizer ls.ls_name)
+
+let print_ls fmt ls =
+  Ident.print_decoded fmt (id_unique sprinter ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
+  Ident.print_decoded fmt (id_unique pprinter pr.pr_name)
 
 (** Types *)
 
@@ -175,6 +163,8 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
   | Tyapp (ts, [t1;t2]) when ts_equal ts Ty.ts_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_ty_node 1) t1 (print_ty_node 0) t2
+  | Tyapp (ts, []) when is_ts_tuple ts ->
+      fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list comma (print_ty_node 0)) tl
   | Tyapp (ts, []) -> print_ts fmt ts
@@ -182,6 +172,14 @@ let rec print_ty_node pri fmt ty = match ty.ty_node with
       print_ts ts (print_list space (print_ty_node 2)) tl
 
 let print_ty fmt ty = print_ty_node 0 fmt ty
+
+let print_vsty fmt v =
+  fprintf fmt "%a%a:@,%a" print_vs v
+    print_id_attrs v.vs_name print_ty v.vs_ty
+
+let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
+let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -202,10 +200,10 @@ let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
       fprintf fmt "_"
   | Pvar v ->
-      print_vs fmt v; print_id_labels fmt v.vs_name
+      print_vs fmt v; print_id_attrs fmt v.vs_name
   | Pas (p, v) ->
       fprintf fmt (protect_on (pri > 1) "%a as %a%a")
-        (print_pat_node 1) p print_vs v print_id_labels v.vs_name
+        (print_pat_node 1) p print_vs v print_id_attrs v.vs_name
   | Por (p, q) ->
       fprintf fmt (protect_on (pri > 0) "%a | %a")
         (print_pat_node 0) p (print_pat_node 0) q
@@ -219,10 +217,6 @@ let rec print_pat_node pri fmt p = match p.pat_node with
         print_cs cs (print_list space (print_pat_node 2)) pl
 
 let print_pat = print_pat_node 0
-
-let print_vsty fmt v =
-  fprintf fmt "%a%a:@,%a" print_vs v
-    print_id_labels v.vs_name print_ty v.vs_ty
 
 let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
@@ -242,45 +236,58 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  let print_tlab pri fmt t =
-    if Debug.test_flag debug_print_labels && not (Slab.is_empty t.t_label)
+  let print_tattr pri fmt t =
+    if Debug.test_flag debug_print_attrs && not (Sattr.is_empty t.t_attrs)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      print_labels t.t_label (print_tnode 0) t
+      print_attrs t.t_attrs (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (print_option print_loc) t.t_loc (print_tlab 0) t
-    else print_tlab pri fmt t in
+      (print_option print_loc) t.t_loc (print_tattr 0) t
+    else print_tattr pri fmt t in
   print_tloc pri fmt t
 
 and print_app pri ls fmt tl =
-  let s = id_unique iprinter ls.ls_name in
-  match extract_op s, tl with
-  | _, [] ->
-      print_ls fmt ls
-  | Some s, [t1] when tight_op s ->
+  if tl = [] then print_ls fmt ls else
+  let s = id_unique sprinter ls.ls_name in
+  match Ident.sn_decode s, tl with
+  | Ident.SNtight s, [t1] ->
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
-  | Some s, [t1] ->
+  | Ident.SNprefix s, [t1] ->
       fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
         s (print_lterm 6) t1
-  | Some s, [t1;t2] ->
+  | Ident.SNinfix s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
-  | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
-        (print_lterm 7) t1 print_term t2
-  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
-        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
-  | _, tl ->
-      fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
-        print_ls ls (print_list space (print_lterm 7)) tl
+  | Ident.SNget s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]%s@]")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNupdate s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]%s@]")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3 s
+  | Ident.SNset s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 5) "@[%a@,[%a]%s <-@ %a@]")
+        (print_lterm 6) t1 print_term t2 s (print_lterm 6) t3
+  | Ident.SNcut s, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..%a]%s")
+        (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3 s
+  | Ident.SNrcut s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "%a[%a..]%s")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNlcut s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 7) "%a[..%a]%s")
+        (print_lterm 7) t1 print_term t2 s
+  | Ident.SNword s, tl ->
+      fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
+        s (print_list space (print_lterm 7)) tl
+  | _, tl -> (* do not fail, just print the string *)
+      fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
+        s (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
@@ -295,6 +302,9 @@ and print_tnode pri fmt t = match t.t_node with
                             print_ty ty
        | None -> assert false
      end
+  | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
+                        Debug.test_noflag debug_print_coercions ->
+      print_lterm pri fmt (t_attr_set t1.t_attrs t1)
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
@@ -309,7 +319,7 @@ and print_tnode pri fmt t = match t.t_node with
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0)
                               "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
-        print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
+        print_vs v print_id_attrs v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
@@ -322,8 +332,8 @@ and print_tnode pri fmt t = match t.t_node with
           print_vsty v print_term f;
         forget_var v
       end else begin
-        fprintf fmt (protect_on (pri > 0) "@[<hov 1>\\ %a%a.@ %a@]")
-          (print_list comma print_vsty) vl print_tl tl print_term e;
+        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun%a%a ->@ %a@]")
+          (print_list nothing print_vs_arg) vl print_tl tl print_term e;
         List.iter forget_var vl
       end
   | Tquant (q,fq) ->
@@ -336,15 +346,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when Slab.mem Term.asym_label f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a so@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+    when Sattr.mem Term.asym_split f2.t_attrs ->
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
-    when Slab.mem Term.asym_label f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a by@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+    when Sattr.mem Term.asym_split f2.t_attrs ->
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label f1.t_label in
+      let asym = Sattr.mem Term.asym_split f1.t_attrs in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -362,10 +372,6 @@ and print_tl fmt tl =
 
 (** Declarations *)
 
-let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
-let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
-
 let print_constr fmt (cs,pjl) =
   let add_pj pj ty pjl = (pj,ty)::pjl in
   let print_pj fmt (pj,ty) = match pj with
@@ -373,19 +379,25 @@ let print_constr fmt (cs,pjl) =
     | None -> print_ty_arg fmt ty
   in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
-    print_id_labels cs.ls_name
+    print_id_attrs cs.ls_name
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_ty_decl fmt ts =
   let print_def fmt = function
-    | NoDef -> ()
-    | Alias ty -> fprintf fmt " =@ %a" print_ty ty
-    | Range _  -> fprintf fmt " =@ <range ...>" (* TODO *)
-    | Float _  -> fprintf fmt " =@ <float ...>" (* TODO *)
+    | NoDef     -> ()
+    | Alias ty  -> fprintf fmt " =@ %a" print_ty ty
+    | Range ir  ->
+        fprintf fmt " =@ <range %s %s>"
+          (BigInt.to_string ir.Number.ir_lower)
+          (BigInt.to_string ir.Number.ir_upper)
+    | Float irf ->
+        fprintf fmt " =@ <float %d %d>"
+          irf.Number.fp_exponent_digits
+          irf.Number.fp_significand_digits
   in
   fprintf fmt "@[<hov 2>type %a%a%a%a@]"
-    print_ts ts print_id_labels ts.ts_name
+    print_ts ts print_id_attrs ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     print_def ts.ts_def;
   forget_tvs ()
@@ -393,7 +405,7 @@ let print_ty_decl fmt ts =
 let print_data_decl fst fmt (ts,csl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
     (if fst then "type" else "with") print_ts ts
-    print_id_labels ts.ts_name
+    print_id_attrs ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     (print_list newline print_constr) csl;
   forget_tvs ()
@@ -407,7 +419,7 @@ let ls_kind ls =
 let print_param_decl fmt ls =
   fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
     (ls_kind ls) print_ls ls
-    print_id_labels ls.ls_name
+    print_id_attrs ls.ls_name
     (print_list nothing print_ty_arg) ls.ls_args
     (print_option print_ls_type) ls.ls_value;
   forget_tvs ()
@@ -416,7 +428,7 @@ let print_logic_decl fst fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
     (if fst then ls_kind ls else "with") print_ls ls
-    print_id_labels ls.ls_name
+    print_id_attrs ls.ls_name
     (print_list nothing print_vs_arg) vl
     (print_option print_ls_type) ls.ls_value print_term e;
   List.iter forget_var vl;
@@ -424,7 +436,7 @@ let print_logic_decl fst fmt (ls,ld) =
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
-    print_pr pr print_id_labels pr.pr_name print_term f
+    print_pr pr print_id_attrs pr.pr_name print_term f
 
 let ind_sign = function
   | Ind   -> "inductive"
@@ -433,7 +445,7 @@ let ind_sign = function
 let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]"
     (if fst then ind_sign s else "with") print_ls ps
-    print_id_labels ps.ls_name
+    print_id_attrs ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl;
   forget_tvs ()
@@ -442,13 +454,12 @@ let sprint_pkind = function
   | Paxiom -> "axiom"
   | Plemma -> "lemma"
   | Pgoal  -> "goal"
-  | Pskip  -> "skip"
 
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
-    print_pr pr print_id_labels pr.pr_name print_term f;
+    print_pr pr print_id_attrs pr.pr_name print_term f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function
@@ -471,6 +482,11 @@ let print_next_logic_decl = print_logic_decl false
 let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl Ind false
 let print_ind_decl fmt s  = print_ind_decl s true fmt
+
+let print_inst_ty fmt (ts1,ty2) =
+  fprintf fmt "type %a%a = %a" print_ts ts1
+    (print_list_pre space print_tv) ts1.ts_args
+    print_ty ty2; forget_tvs ()
 
 let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
@@ -508,23 +524,23 @@ let print_tdecl fmt td = match td.td_node with
       print_decl fmt d
   | Use th ->
       fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
-  | Clone (th,sm) when is_empty_sm sm ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
+      let ym = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ty [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]"
-        print_qt th (print_list comma print_inst_ts) tm
-                    (print_list comma print_inst_ls) lm
-                    (print_list comma print_inst_pr) pm
+      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]"
+        print_qt th (print_list_suf comma print_inst_ts) tm
+                    (print_list_suf comma print_inst_ty) ym
+                    (print_list_suf comma print_inst_ls) lm
+                    (print_list_suf comma print_inst_pr) pm
   | Meta (m,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]"
         m.meta_name (print_list comma print_meta_arg) al
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
-    print_th th print_id_labels th.th_name
+    print_th th print_id_attrs th.th_name
     (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =
@@ -543,12 +559,12 @@ module NsTree = struct
       let k, _ = find_prop_decl kn p in
       Leaf (sprint_pkind k ^ " " ^ s) :: acc in
     let add_ls s ls acc =
-      if s = "infix ="  && ls_equal ls ps_equ then acc else
+      if ls_equal ls ps_equ then acc else
         Leaf (ls_kind ls ^ " " ^ s) :: acc
     in
     let add_ts s ts acc =
-      if s = "int"  && ts_equal ts ts_int  then acc else
-      if s = "real" && ts_equal ts ts_real then acc else
+      if ts_equal ts ts_int  then acc else
+      if ts_equal ts ts_real then acc else
         Leaf ("type " ^ s) :: acc
     in
     let acc = Mstr.fold add_ns ns.ns_ns []  in
@@ -578,7 +594,7 @@ let print_goal fmt d =
 
 let local_decls task symbmap =
   let rec skip t = function
-    | { td_node = Clone (th,_) } :: rest
+    | { td_node = Use th } :: rest
       when id_equal t.th_name th.th_name -> rest
     | _ :: rest -> skip t rest
     | [] -> []
@@ -609,23 +625,25 @@ let print_sequent fmt task =
   fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld1;
   fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld2;
+  fprintf fmt "@[<v 0>%a@]" aux ld2
 
-
+let sprinter = sprinter
+let aprinter = aprinter
+let tprinter = tprinter
+let pprinter = pprinter
 
             end) : Printer) (* end of the first class module *)
 
 
-
 module LegacyPrinter =
-  (val (let iprinter,aprinter,tprinter,pprinter =
+  (val (let sprinter,aprinter,tprinter,pprinter =
     let same = fun x -> x in
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same
   in
-  create iprinter aprinter tprinter pprinter true))
+  create sprinter aprinter tprinter pprinter true))
 
 include LegacyPrinter
 
@@ -695,9 +713,9 @@ let () = Exn_printer.register
       fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
-  | Decl.RecordFieldMissing (_cs,ls) ->
+  | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" print_ls ls
-  | Decl.DuplicateRecordField (_cs,ls) ->
+  | Decl.DuplicateRecordField ls ->
       fprintf fmt "Field %a is used twice in the same constructor" print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
@@ -722,20 +740,20 @@ let () = Exn_printer.register
   | Decl.UnboundVar vs ->
       fprintf fmt "Unbound variable: %a" print_vsty vs
   | Decl.ClashIdent id ->
-      fprintf fmt "Ident %s is defined twice" id.id_string
+      fprintf fmt "Ident %a is defined twice" Ident.print_decoded id.id_string
   | Decl.EmptyDecl ->
       fprintf fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" print_ts ts
   | Decl.EmptyIndDecl ls ->
       fprintf fmt "Inductive predicate %a has no constructors" print_ls ls
-  | Decl.KnownIdent id ->
-      fprintf fmt "Ident %s is already declared" id.id_string
-  | Decl.UnknownIdent id ->
-      fprintf fmt "Ident %s is not yet declared" id.id_string
-  | Decl.RedeclaredIdent id ->
-      fprintf fmt "Ident %s is already declared, with a different declaration"
-        id.id_string
+  | Decl.KnownIdent {id_string = s} ->
+      fprintf fmt "Ident %a is already declared" Ident.print_decoded s
+  | Decl.UnknownIdent {id_string = s} ->
+      fprintf fmt "Ident %a is not yet declared" Ident.print_decoded s
+  | Decl.RedeclaredIdent {id_string = s} ->
+      fprintf fmt "Ident %a is already declared, with a different declaration"
+        Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
   | _ -> raise exn

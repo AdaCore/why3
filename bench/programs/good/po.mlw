@@ -1,7 +1,7 @@
 module M
 
-use import int.Int
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 (* Tests for proof obligations. *)
 
@@ -67,9 +67,3 @@ val incrx2 () : int writes {x} ensures { !x = old !x + 1 /\ result = !x }
 let p14 () requires { !x = 0 } ensures { result = 1 } = incrx2 ()
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/po"
-End:
-*)

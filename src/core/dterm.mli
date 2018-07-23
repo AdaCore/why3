@@ -22,6 +22,19 @@ val dty_fresh : unit -> dty
 
 val dty_of_ty : ty -> dty
 
+val dty_var : tvsymbol -> dty
+val dty_app : tysymbol -> dty list -> dty
+
+val dty_match : dty -> ty  -> unit (* raises Exit on failure *)
+val dty_unify : dty -> dty -> unit (* raises Exit on failure *)
+
+val dty_int  : dty
+val dty_real : dty
+val dty_bool : dty
+
+val dty_fold : (tysymbol -> 'a list -> 'a) ->
+               (tvsymbol -> 'a) -> (int -> 'a) -> dty -> 'a
+
 (** Patterns, terms, and formulas *)
 
 type dpattern = private {
@@ -37,10 +50,10 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
-  | DPcast of dpattern * ty
+  | DPcast of dpattern * dty
 
 type dbinop =
-  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
 
 type dquant =
   | DTforall | DTexists | DTlambda
@@ -56,7 +69,7 @@ type dterm = private {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * ty
+  | DTconst of Number.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -68,9 +81,9 @@ and dterm_node =
   | DTnot of dterm
   | DTtrue
   | DTfalse
-  | DTcast of dterm * ty
+  | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
-  | DTlabel of dterm * Slab.t
+  | DTattr of dterm * Sattr.t
 
 (** Environment *)
 
@@ -89,7 +102,8 @@ val denv_add_let : denv -> dterm -> preid -> denv
 
 val denv_add_quant : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dty -> denv
+val denv_add_term_pat : denv -> dpattern -> dterm -> denv
 
 val denv_get : denv -> string -> dterm_node (** raises UnboundVar *)
 
@@ -99,11 +113,12 @@ val denv_get_opt : denv -> string -> dterm_node option
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
-val dterm : ?loc:Loc.position -> dterm_node -> dterm
+val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
 
 (** Final stage *)
 
 val debug_ignore_unused_var : Debug.flag
+val attr_w_unused_var_no : Ident.attribute
 
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 

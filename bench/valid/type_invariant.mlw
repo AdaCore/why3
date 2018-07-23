@@ -1,0 +1,10 @@
+module A
+  use int.Int
+  type t = private { a: int } invariant { a >= 0 } by { a = 0 }
+end
+
+module B
+  use int.Int
+  type t = { a: int; b: int } invariant { a >= b >= 0 } by { a = 0; b = 0 }
+  clone A with type t = t
+end

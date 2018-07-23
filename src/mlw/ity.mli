@@ -16,17 +16,24 @@ open Term
 (** {2 Individual types (first-order types without effects)} *)
 
 type itysymbol = private {
-  its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
-  its_privmut : bool;           (** private mutable record type *)
+  its_ts      : tysymbol;       (** logical type symbol *)
+  its_nonfree : bool;           (** has no constructors *)
+  its_private : bool;           (** private type *)
+  its_mutable : bool;           (** mutable type *)
+  its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
-  its_regions : region list;    (** mutable shareable components *)
-  its_arg_imm : bool list;      (** non-updatable type parameters *)
-  its_arg_exp : bool list;      (** exposed type parameters *)
-  its_arg_vis : bool list;      (** non-ghost type parameters *)
-  its_arg_frz : bool list;      (** irreplaceable type parameters *)
-  its_reg_vis : bool list;      (** non-ghost shareable components *)
-  its_reg_frz : bool list;      (** irreplaceable shareable components *)
+  its_regions : region list;    (** shareable components *)
+  its_arg_flg : its_flag list;  (** flags for type args *)
+  its_reg_flg : its_flag list;  (** flags for regions *)
   its_def     : ity type_def;   (** type definition *)
+}
+
+and its_flag = private {
+  its_frozen  : bool;   (** cannot be updated *)
+  its_exposed : bool;   (** directly reachable from a field *)
+  its_liable  : bool;   (** exposed in the type invariant *)
+  its_fixed   : bool;   (** exposed in a non-mutable field *)
+  its_visible : bool;   (** visible from the non-ghost code *)
 }
 
 and ity = private {
@@ -38,10 +45,8 @@ and ity = private {
 and ity_node = private
   | Ityreg of region
     (** record with mutable fields and shareable components *)
-  | Ityapp of itysymbol * ity list * region list
-    (** algebraic type with shareable components *)
-  | Itypur of itysymbol * ity list
-    (** immutable type or a snapshot of a mutable type *)
+  | Ityapp of itysymbol * ity list * ity list
+    (** immutable type with shareable components *)
   | Ityvar of tvsymbol
     (** type variable *)
 
@@ -49,7 +54,7 @@ and region = private {
   reg_name : ident;
   reg_its  : itysymbol;
   reg_args : ity list;
-  reg_regs : region list;
+  reg_regs : ity list;
 }
 
 and pvsymbol = private {
@@ -93,76 +98,98 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
-exception ImpureField of ity
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
-(** creation of a symbol for type in programs *)
+(** creation of a type symbol in programs *)
 
-val create_itysymbol_pure : preid -> tvsymbol list -> itysymbol
-(** [create_itysymbol_pure id args] creates a new type symbol with
-    immutable type arguments and with no mutable fields or subregions.
-    This function should be used for all immutable non-updatable types:
-    abstract types, private immutable records, immutable records with
-    invariant, and recursive algebraic types. *)
+val create_plain_record_itysymbol : priv:bool -> mut:bool ->
+  preid -> tvsymbol list -> bool Mpv.t -> term list -> itysymbol
+(** [create_plain_record_itysymbol ~priv ~mut id args fields invl] creates
+    a new type symbol for a non-recursive record type, possibly private
+    or mutable. Every known field is represented by a [pvsymbol] mapped
+    to its mutability status in [fields]. Variables corresponding to
+    mutable fields are stored in the created type symbol and used in
+    effects. The [priv] flag should be set to [true] for private records.
+    The [mut] flag should be set to [true] to mark the new type as mutable
+    even if it does not have known mutable fields. The [invl] parameter
+    contains the list of invariant formulas that may only depend on
+    variables from [fields]. Abstract types are considered to be private
+    immutable records with no fields. *)
 
-val create_itysymbol_alias : preid -> tvsymbol list -> ity -> itysymbol
-(** [create_itysymbol_alias id args def] creates a new type alias. *)
+val create_plain_variant_itysymbol :
+  preid -> tvsymbol list -> Spv.t list -> itysymbol
+(** [create_plain_variant_itysymbol id args fields] creates a new type
+    symbol for a non-recursive algebraic type. *)
 
-val create_itysymbol_rich :
-  preid -> tvsymbol list -> bool -> bool Mpv.t -> itysymbol
-(** [create_itysymbol_rich id args privmut fields] creates a new type symbol.
-    Each field is represented by a [pvsymbol] mapped to its mutability status
-    in [fields]. The variables corresponding to mutable fields are stored in
-    the created type symbol and used in effects. If [privmut] is [true],
-    then all types in [fields] must be pure. *)
+val create_rec_itysymbol : preid -> tvsymbol list -> itysymbol
+(** [create_rec_itysymbol id args] creates a new type symbol for
+    a recursively defined type. *)
+
+val create_alias_itysymbol : preid -> tvsymbol list -> ity -> itysymbol
+(** [create_alias_itysymbol id args def] creates a new type alias. *)
+
+val create_range_itysymbol : preid -> Number.int_range -> itysymbol
+(** [create_range_itysymbol id r] creates a new range type. *)
+
+val create_float_itysymbol : preid -> Number.float_format -> itysymbol
+(** [create_float_itysymbol id f] creates a new float type. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
 
-val its_mutable : itysymbol -> bool
-(** [its_mutable s] checks if [s] is a mutable record or an alias for one *)
+(* {2 Basic properties} *)
 
-val its_impure : itysymbol -> bool
-(** [its_impure s] checks if [s] is mutable or has mutable components *)
+val its_pure : itysymbol -> bool
+(** a pure type symbol is immutable and has no mutable components *)
+
+val ity_closed : ity -> bool
+(** a closed type contains no type variables *)
+
+val ity_fragile : ity -> bool
+(** a fragile type may contain a component with a broken invariant *)
 
 (** {2 Type constructors} *)
 
 exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
-exception NonUpdatable of itysymbol * ity
 
-val create_region : preid -> itysymbol -> ity list -> region list -> region
-(** the type symbol must be mutable, aliases are allowed *)
+val create_region : preid -> itysymbol -> ity list -> ity list -> region
+(** [create_region id s tl rl] creates a fresh region.
+    Type symbol [s] must be a mutable record or an alias for one.
+    If [rl] is empty, fresh subregions are created when needed. *)
+
+val ity_app : itysymbol -> ity list -> ity list -> ity
+(** [ity_app s tl rl] creates
+    - an [Ityapp] type, if [s] is immutable, or
+    - an [Ityreg] type on top of a fresh region, otherwise.
+    If [rl] is empty, fresh subregions are created when needed. *)
+
+val ity_app_pure : itysymbol -> ity list -> ity list -> ity
+(** [ity_app s tl rl] creates an [Ityapp] type.
+    If [rl] is empty, pure snapshots are substituted when needed. *)
 
 val ity_reg : region -> ity
+
 val ity_var : tvsymbol -> ity
 
-val ity_pur : itysymbol -> ity list -> ity
-(** [ity_pur] may be applied to mutable type symbols to create a snapshot *)
-
-val ity_app : itysymbol -> ity list -> region list -> ity
-(** [ity_app s tl rl] creates
-  - a fresh region and an [Ityreg] type if [s] is mutable
-  - an [Itypur] type if [s] is not mutable and [rl] is empty
-  - an [Ityapp] type otherwise *)
-
-val ity_app_fresh : itysymbol -> ity list -> ity
-(** [ity_app_fresh] creates fresh regions where needed *)
-
-val ty_of_ity : ity -> ty
-(** all aliases expanded, all regions removed *)
+val ity_purify : ity -> ity
+(** replaces regions with pure snapshots *)
 
 val ity_of_ty : ty -> ity
-(** snapshot type, raises [Invalid_argument] for any non-its *)
+(** fresh regions are created when needed.
+    Raises [Invalid_argument] for any non-its tysymbol. *)
 
-val ity_purify : ity -> ity
-(** snapshot type *)
+val ity_of_ty_pure : ty -> ity
+(** pure snapshots are substituted when needed.
+    Raises [Invalid_argument] for any non-its tysymbol. *)
+
+val ty_of_ity : ity -> ty
 
 (** {2 Generic traversal functions} *)
 
-val ity_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
-val reg_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> region -> 'a
+val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
+val reg_fold : ('a -> ity -> 'a) -> 'a -> region -> 'a
 
 (** {2 Traversal functions on type symbols} *)
 
@@ -174,31 +201,36 @@ val reg_s_fold : ('a -> itysymbol -> 'a) -> 'a -> region -> 'a
 val ity_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ity -> 'a
 val reg_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> region -> 'a
 
-(** {2 Traversal functions on top regions} *)
-
-val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
-val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
-
-(** {2 Miscellaneous type utilities} *)
-
 val ity_freevars : Stv.t -> ity -> Stv.t
 val reg_freevars : Stv.t -> region -> Stv.t
 
 val ity_v_occurs : tvsymbol -> ity -> bool
 val reg_v_occurs : tvsymbol -> region -> bool
 
+(** {2 Traversal functions on top regions} *)
+
+val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
+
+val ity_freeregs : Sreg.t -> ity -> Sreg.t
+val reg_freeregs : Sreg.t -> region -> Sreg.t
+
 val ity_r_occurs : region -> ity -> bool
 val reg_r_occurs : region -> region -> bool
 
-val ity_r_stale  : region -> Sreg.t -> ity -> bool
-val reg_r_stale  : region -> Sreg.t -> region -> bool
+(** {2 Traversal functions on exposed and reachable regions} *)
 
-val ity_closed    : ity -> bool
+val ity_exp_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_exp_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
 
-(* detect non-ghost type variables and regions *)
+val ity_rch_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_rch_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
 
-val ity_r_visible : Sreg.t -> ity -> Sreg.t
-val ity_v_visible : Stv.t  -> ity -> Stv.t
+val ity_r_reachable : region -> ity -> bool
+val reg_r_reachable : region -> region -> bool
+
+val ity_r_stale : Sreg.t -> Sreg.t -> ity -> bool
+val reg_r_stale : Sreg.t -> Sreg.t -> region -> bool
 
 (** {2 Built-in types} *)
 
@@ -210,7 +242,6 @@ val its_real : itysymbol
 val its_bool : itysymbol
 val its_unit : itysymbol
 val its_func : itysymbol
-val its_pred : itysymbol
 
 val ity_int  : ity
 val ity_real : ity
@@ -225,8 +256,8 @@ val ity_tuple : ity list -> ity
 (** {2 Type matching and instantiation} *)
 
 type ity_subst = private {
-  isb_tv  : ity Mtv.t;
-  isb_reg : region Mreg.t;
+  isb_var : ity Mtv.t;
+  isb_reg : ity Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
@@ -234,7 +265,10 @@ exception TypeMismatch of ity * ity * ity_subst
 val isb_empty : ity_subst
 
 val ity_match : ity_subst -> ity -> ity -> ity_subst
-val reg_match : ity_subst -> region -> region -> ity_subst
+val reg_match : ity_subst -> region -> ity -> ity_subst
+
+val its_match_args : itysymbol -> ity list -> ity_subst
+val its_match_regs : itysymbol -> ity list -> ity list -> ity_subst
 
 val ity_freeze : ity_subst -> ity -> ity_subst (* self-match *)
 val reg_freeze : ity_subst -> region -> ity_subst (* self-match *)
@@ -243,7 +277,7 @@ val ity_equal_check : ity -> ity -> unit
 val reg_equal_check : region -> region -> unit
 
 val ity_full_inst : ity_subst -> ity -> ity
-val reg_full_inst : ity_subst -> region -> region
+val reg_full_inst : ity_subst -> region -> ity
 
 (** {2 Program variables} *)
 
@@ -256,39 +290,63 @@ val t_freepvs : Spv.t -> term -> Spv.t
 (** raises [Not_found] if the term contains a free variable
     which is not a [pv_vs] *)
 
-val pvs_of_vss : Spv.t -> Svs.t -> Spv.t
+val pvs_of_vss : Spv.t -> 'a Mvs.t -> Spv.t
 
 (** {2 Exception symbols} *)
+
+type mask =
+  | MaskVisible
+  | MaskTuple of mask list
+  | MaskGhost
+
+val mask_ghost : mask -> bool
+
+val mask_of_pv : pvsymbol -> mask
+
+val mask_union : mask -> mask -> mask
+
+val mask_equal : mask -> mask -> bool
+
+val mask_spill : mask -> mask -> bool
 
 type xsymbol = private {
   xs_name : ident;
   xs_ity  : ity; (** closed and immutable *)
+  xs_mask : mask;
 }
 
-module Mexn : Extmap.S with type key = xsymbol
-module Sexn : Extset.S with module M = Mexn
+module Mxs : Extmap.S with type key = xsymbol
+module Sxs : Extset.S with module M = Mxs
 
 val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
-val xs_hash: xsymbol -> int
+val xs_hash : xsymbol -> int
 
-val create_xsymbol : preid -> ity -> xsymbol
+val create_xsymbol : preid -> ?mask:mask -> ity -> xsymbol
 
 (** {2 Effects} *)
 
+exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception AssignSnapshot of ity
+exception WriteImmutable of region * pvsymbol
+exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
+exception IllegalAssign of region * region * region
+exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
 type effect = private {
   eff_reads  : Spv.t;         (* known variables *)
-  eff_writes : Spv.t Mreg.t;  (* modifications to specific fields *)
-  eff_covers : Sreg.t Mreg.t; (* confinement of regions to covers *)
-  eff_taints : Sreg.t;        (* ghost modifications *)
-  eff_raises : Sexn.t;        (* raised exceptions *)
+  eff_writes : Spv.t Mreg.t;  (* writes to fields *)
+  eff_taints : Sreg.t;        (* ghost code writes *)
+  eff_covers : Sreg.t;        (* surviving writes *)
+  eff_resets : Sreg.t;        (* locked by covers *)
+  eff_raises : Sxs.t;         (* raised exceptions *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -311,43 +369,56 @@ val eff_read_single_pre  : pvsymbol -> effect -> effect
 val eff_read_single_post : effect -> pvsymbol -> effect
 val eff_bind_single      : pvsymbol -> effect -> effect
 
-val eff_reset : effect -> region -> effect  (* confine to an empty cover *)
-val eff_strong : effect -> effect (* confine all subregions under writes *)
+val eff_reset : effect -> Sreg.t -> effect    (* confine to an empty cover *)
+val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
 
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
 
-val eff_diverge : effect -> effect            (* forbidden if ghost *)
-val eff_ghostify : bool -> effect -> effect   (* forbidden if diverges *)
+val eff_spoil : effect -> ity -> effect
 
-val eff_contagious : effect -> bool           (* ghost and raising exceptions *)
+val eff_diverge : effect -> effect                (* forbidden if ghost *)
+val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)
+val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
+
+val mask_adjust : effect -> ity -> mask -> mask
+
+val eff_escape : effect -> ity -> Sity.t
 
 (** {2 Computation types (higher-order types with effects)} *)
 
 type pre = term   (** precondition: pre_fmla *)
 type post = term  (** postcondition: eps result . post_fmla *)
 
-val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
+val open_post_with : term -> post -> term
+val clone_post_result : post -> preid
+
+val create_post : vsymbol -> term -> post
+
+val annot_attr : attribute
+val break_attr : attribute
 
 type cty = private {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
   cty_post   : post list;
-  cty_xpost  : post list Mexn.t;
+  cty_xpost  : post list Mxs.t;
   cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
+  cty_mask   : mask;
   cty_freeze : ity_subst;
 }
 
-val create_cty : pvsymbol list ->
-  pre list -> post list -> post list Mexn.t ->
+val create_cty : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
-(** [create_cty args pre post xpost oldies effect result] creates a cty.
+(** [create_cty ?mask ?defensive args pre post xpost oldies effect result]
+    creates a new cty. [post] and [mask] must be consistent with [result].
     The [cty_xpost] field does not have to cover all raised exceptions.
     [cty_effect.eff_reads] is completed wrt the specification and [args].
     [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
@@ -355,8 +426,15 @@ val create_cty : pvsymbol list ->
     Fresh regions in [result] are reset. Every type variable in [pre],
     [post], and [xpost] must come from [cty_reads], [args] or [result].
     [oldies] maps ghost pure snapshots of the parameters and external
-    reads to the original pvsymbols: these snaphosts are removed from
+    reads to the original pvsymbols: these snapshots are removed from
     [cty_effect.eff_reads] and replaced with the originals. *)
+
+val create_cty_defensive : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t ->
+  pvsymbol Mpv.t -> effect -> ity -> cty
+(** same as [create_cty], except that type variables in the result
+    and exceptional results are spoiled and fresh regions in the
+    result and exceptional results are reset. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
@@ -364,8 +442,25 @@ val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
     and returns the computation type of the result, [rest -> res],
     with every type variable and region in [pvl] being frozen. *)
 
+val cty_tuple : pvsymbol list -> cty
+(** [cty_tuple pvl] returns a nullary tuple-valued cty with
+    an appropriate [cty_mask]. *)
+
+val cty_exec : cty -> cty
+(** [cty_exec cty] converts a cty of a partial application into
+    a cty of a fully applied application, returning a mapping.
+    The original cty must be effectless. *)
+
+val cty_exec_post : cty -> post list
+(** [cty_exec_post cty] returns a post-condition appropriate
+    for use with local let-functions in VC generation. *)
+
 val cty_ghost : cty -> bool
 (** [cty_ghost cty] returns [cty.cty_effect.eff_ghost] *)
+
+val cty_pure : cty -> bool
+(** [cty_pure cty] verifies that [cty] has no side effects
+    except allocations. *)
 
 val cty_ghostify : bool -> cty -> cty
 (** [cty_ghostify ghost cty] ghostifies the effect of [cty]. *)
@@ -373,8 +468,13 @@ val cty_ghostify : bool -> cty -> cty
 val cty_reads : cty -> Spv.t
 (** [cty_reads cty] returns the set of external dependencies of [cty]. *)
 
-val cty_add_reads : cty -> Spv.t -> cty
-(** [cty_add_reads cty pvs] adds [pvs] to [cty.cty_effect.eff_reads].
+val cty_read_pre : Spv.t -> cty -> cty
+(** [cty_read_pre pvs cty] adds [pvs] to [cty.cty_effect.eff_reads].
+    This function performs capture: if some variables in [pvs] occur
+    in [cty.cty_args], they are not frozen. *)
+
+val cty_read_post : cty -> Spv.t -> cty
+(** [cty_read_post cty pvs] adds [pvs] to [cty.cty_effect.eff_reads].
     This function performs capture: if some variables in [pvs] occur
     in [cty.cty_args], they are not frozen. *)
 
@@ -394,6 +494,8 @@ val cty_add_post : cty -> post list -> cty
 
 val forget_reg : region -> unit   (* flush id_unique for a region *)
 val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
+val forget_xs  : xsymbol -> unit  (* flush for a local exception *)
+val forget_cty : cty -> unit      (* forget arguments and oldies *)
 
 val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
 val print_reg : Format.formatter -> region -> unit    (* region *)
@@ -406,5 +508,5 @@ val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
 val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
 
 val print_spec :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t ->
-    effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)
+  pvsymbol list -> pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t
+    -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)

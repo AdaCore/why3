@@ -169,7 +169,7 @@ let ty_v_all pr ty = Util.all ty_v_fold pr ty
 let ty_v_any pr ty = Util.any ty_v_fold pr ty
 
 let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
-let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
+let ty_freevars s ty = ty_v_fold Stv.add_left s ty
 let ty_closed ty = ty_v_all Util.ffalse ty
 
 (* smart constructors *)
@@ -201,11 +201,17 @@ let create_tysymbol name args def =
   end;
   mk_ts name args def
 
+let ts_match_args s tl =
+  try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty
+  with Invalid_argument _ -> raise (BadTypeArity (s, List.length tl))
+
+let ty_match_args ty = match ty.ty_node with
+  | Tyapp (s,tl) -> ts_match_args s tl
+  | _ -> invalid_arg "Ty.ty_match_args"
+
 let ty_app s tl = match s.ts_def with
   | Alias ty ->
-      let mv = try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty with
-        | Invalid_argument _ -> raise (BadTypeArity (s, List.length tl)) in
-      ty_full_inst mv ty
+      ty_full_inst (ts_match_args s tl) ty
   | NoDef | Range _ | Float _ ->
       if List.length s.ts_args <> List.length tl then
         raise (BadTypeArity (s, List.length tl));
@@ -261,16 +267,12 @@ let ty_bool = ty_app ts_bool []
 let ts_func =
   let tv_a = create_tvsymbol (id_fresh "a") in
   let tv_b = create_tvsymbol (id_fresh "b") in
-  create_tysymbol (id_fresh "func") [tv_a;tv_b] NoDef
+  let id = id_fresh (op_infix "->") in
+  create_tysymbol id [tv_a;tv_b] NoDef
 
 let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
 
-let ts_pred =
-  let tv_a = create_tvsymbol (id_fresh "a") in
-  let def = Alias (ty_func (ty_var tv_a) ty_bool) in
-  create_tysymbol (id_fresh "pred") [tv_a] def
-
-let ty_pred ty_a = ty_app ts_pred [ty_a]
+let ty_pred ty_a = ty_app ts_func [ty_a;ty_bool]
 
 let ts_tuple_ids = Hid.create 17
 
@@ -310,4 +312,3 @@ let oty_cons = Opt.fold (fun tl t -> t::tl)
 
 let ty_equal_check ty1 ty2 =
   if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
-

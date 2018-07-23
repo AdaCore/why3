@@ -20,12 +20,11 @@ Require list.Nth.
 Require option.Option.
 
 (* Why3 goal *)
-Lemma nth_none_1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)) (i:Z),
- (i < 0%Z)%Z -> ((list.Nth.nth i l) = Init.Datatypes.None).
+Lemma nth_none_1 {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)) (i:Z), (i < 0%Z)%Z ->
+  ((list.Nth.nth i l) = Init.Datatypes.None).
 Proof.
-intros a a_WT l.
+intros l.
 induction l as [|h q].
 easy.
 intros i H.
@@ -40,13 +39,11 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma nth_none_2 :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)) (i:Z),
- ((list.Length.length l) <= i)%Z ->
- ((list.Nth.nth i l) = Init.Datatypes.None).
+Lemma nth_none_2 {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)) (i:Z), ((list.Length.length l) <= i)%Z ->
+  ((list.Nth.nth i l) = Init.Datatypes.None).
 Proof.
-intros a a_WT l.
+intros l.
 induction l as [|h q].
 easy.
 intros i H.
@@ -66,13 +63,11 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma nth_none_3 :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)) (i:Z),
- ((list.Nth.nth i l) = Init.Datatypes.None) ->
- ((i < 0%Z)%Z \/ ((list.Length.length l) <= i)%Z).
+Lemma nth_none_3 {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)) (i:Z), ((list.Nth.nth i l) = Init.Datatypes.None) ->
+  (i < 0%Z)%Z \/ ((list.Length.length l) <= i)%Z.
 Proof.
-intros a a_WT l.
+intros l.
 induction l as [|h q].
 intros i _.
 simpl.

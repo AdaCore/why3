@@ -15,8 +15,8 @@ inequality</a>}
 
 theory CauchySchwarzInequality
 
-  use import real.Real
-  use import real.Square
+  use real.Real
+  use real.Square
 
   (** dot product, a.k.a. scalar product, of two vectors *)
   function dot (x1:real) (x2:real) (y1:real) (y2:real) : real =
@@ -105,9 +105,9 @@ end
 
 theory TriangleInequality
 
-  use import real.Real
-  use import real.Square
-  use import CauchySchwarzInequality
+  use real.Real
+  use real.Square
+  use CauchySchwarzInequality
 
 (** Triangle inequality, proved thanks to
   ||x+y||² = ||x||² + 2<x,y> + ||y||²

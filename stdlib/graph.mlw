@@ -1,0 +1,99 @@
+
+(** {1 Graph theory} *)
+
+module Path
+
+  use list.List
+  use list.Append
+
+  type vertex
+
+  predicate edge vertex vertex
+
+  inductive path vertex (list vertex) vertex =
+  | Path_empty:
+      forall x: vertex. path x Nil x
+  | Path_cons:
+      forall x y z: vertex, l: list vertex.
+      edge x y -> path y l z -> path x (Cons x l) z
+  (** `path v0 [v0; v1; ...; vn-1] vn`
+     means a path from `v0` to `vn` composed of `n` edges `(vi,vi+1)`. *)
+
+  lemma path_right_extension:
+    forall x y z: vertex, l: list vertex.
+    path x l y -> edge y z -> path x (l ++ Cons y Nil) z
+
+  lemma path_right_inversion:
+    forall x z: vertex, l: list vertex. path x l z ->
+       (x = z /\ l = Nil)
+    \/ (exists y: vertex, l': list vertex.
+        path x l' y /\ edge y z /\ l = l' ++ Cons y Nil)
+
+  lemma path_trans:
+    forall x y z: vertex, l1 l2: list vertex.
+    path x l1 y -> path y l2 z -> path x (l1 ++ l2) z
+
+  lemma empty_path:
+    forall x y: vertex. path x Nil y -> x = y
+
+  lemma path_decomposition:
+    forall x y z: vertex, l1 l2: list vertex.
+    path x (l1 ++ Cons y l2) z -> path x l1 y /\ path y (Cons y l2) z
+
+end
+
+module IntPathWeight
+
+  clone export Path
+  use int.Int
+  use list.List
+  use list.Append
+
+  val function weight vertex vertex : int
+
+  function path_weight (l: list vertex) (dst: vertex) : int = match l with
+    | Nil -> 0
+    | Cons x Nil -> weight x dst
+    | Cons x ((Cons y _) as r) -> weight x y + path_weight r dst
+  end
+  (** the total weight of a path `path _ l dst` *)
+
+  lemma path_weight_right_extension:
+    forall x y: vertex, l: list vertex.
+    path_weight (l ++ Cons x Nil) y = path_weight l x + weight x y
+
+  lemma path_weight_decomposition:
+    forall y z: vertex, l1 l2: list vertex.
+    path_weight (l1 ++ Cons y l2) z =
+    path_weight l1 y + path_weight (Cons y l2) z
+
+end
+
+(***
+module SimplePath
+
+  use list.List
+  use list.Mem
+
+  type graph
+
+  type vertex
+
+  predicate edge graph vertex vertex
+
+  (** `simple_path g src [x1;...;xn] dst` is a path
+     src --> x1 --> x2 --> ... --> xn --> dst without repetition. *)
+  inductive simple_path graph vertex (list vertex) vertex =
+  | Path_empty :
+      forall g:graph, v:vertex. simple_path g v (Nil : list vertex) v
+  | Path_cons  :
+      forall g:graph, src v dst : vertex, l : list vertex.
+      edge g src v -> src <> v ->
+      simple_path g v l dst -> not mem src l ->
+      simple_path g src (Cons v l) dst
+
+  predicate simple_cycle (g : graph) (v : vertex) =
+    exists l : list vertex. l <> Nil /\ simple_path g v l v
+
+end
+*)

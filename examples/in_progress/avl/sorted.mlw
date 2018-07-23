@@ -3,8 +3,8 @@
 
 theory Base
   
-  use import list.List
-  use import list.Mem
+  use list.List
+  use list.Mem
   
   clone import key_type.KeyType as K
   clone import relations_params.TransitiveParam as O with type t = key
@@ -37,9 +37,9 @@ end
 module Increasing
   
   clone export Base
-  use import list.List
-  use import list.Append
-  use import list.Mem
+  use list.List
+  use list.Append
+  use list.Mem
   
   predicate increasing (o:O.param 'a) (l:list (K.t 'a 'b)) =
     match l with
@@ -79,9 +79,9 @@ end
 (*module Decreasing
   
   clone export Base
-  use import list.List
-  use import list.Append
-  use import list.Mem
+  use list.List
+  use list.Append
+  use list.Mem
   
   predicate decreasing (o:O.param 'a) (l:list (K.t 'a 'b)) =
     match l with
@@ -121,8 +121,8 @@ end
 (* This cannot be done nicely now (namely, this is a diamond). *)
 module IncDec
   
-  use import list.Reverse
-  use import list.Mem
+  use list.Reverse
+  use list.Mem
   
   clone export Increasing
   clone Decreasing as D with namespace K = K, namespace O = O

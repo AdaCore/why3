@@ -1,0 +1,49 @@
+
+(** {1 Theory of regular expressions} *)
+
+module Regexp
+
+  type char
+
+  (** Syntax *)
+
+  type regexp =
+    | Empty
+    | Epsilon
+    | Char    char
+    | Alt     regexp regexp
+    | Concat  regexp regexp
+    | Star    regexp
+
+  (** Semantics *)
+
+  (** Words are list of characters. *)
+
+  use export list.List
+  use export list.Append
+
+  type word = list char
+
+  (** Inductive predicate `mem w r` means
+      "word `w` belongs to the language of `r`". *)
+
+  inductive mem (w: word) (r: regexp) =
+    | mem_eps:
+        mem Nil Epsilon
+    | mem_char:
+        forall c: char. mem (Cons c Nil) (Char c)
+    | mem_altl:
+        forall w: word, r1 r2: regexp. mem w r1 -> mem w (Alt r1 r2)
+    | mem_altr:
+        forall w: word, r1 r2: regexp. mem w r2 -> mem w (Alt r1 r2)
+    | mem_concat:
+        forall w1 w2: word, r1 r2: regexp.
+        mem w1 r1 -> mem w2 r2 -> mem (w1 ++ w2) (Concat r1 r2)
+    | mems1:
+        forall r: regexp. mem Nil (Star r)
+    | mems2:
+        forall w1 w2: word, r: regexp.
+        mem w1 r -> mem w2 (Star r) -> mem (w1 ++ w2) (Star r)
+
+end
+

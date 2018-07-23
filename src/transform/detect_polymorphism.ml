@@ -44,7 +44,9 @@ let meta_monomorphic_types_only =
 
 
 let check_ts ign_ts ts =
-  ts.Ty.ts_args <> [] && not (Ty.Sts.mem ts ign_ts)
+  ts.Ty.ts_args <> [] &&
+  ts.Ty.ts_def = Ty.NoDef &&
+  not (Ty.Sts.mem ts ign_ts)
 
 let check_ls ign_ls ls =
   not (Term.Sls.mem ls ign_ls) &&

@@ -2,31 +2,77 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vm.mlw">
-<theory name="ReflTransClosure">
- <goal name="transition_star_one" expl="">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+<prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../vm.mlw" proved="true">
+<theory name="ReflTransClosure" proved="true">
+ <goal name="transition_star_one" proved="true">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="transition_star_transitive" expl="">
- <transf name="induction_pr">
-  <goal name="transition_star_transitive.1" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="transition_star_transitive" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="transition_star_transitive.0" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="transition_star_transitive.0.0" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="transition_star_transitive.2" expl="">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <goal name="transition_star_transitive.1" proved="true">
+  <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+   <goal name="transition_star_transitive.1.0" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Vm">
- <goal name="codeseq_at_app_right" expl="">
- <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
+<theory name="Vm" proved="true">
+ <goal name="codeseq_at_app_right" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
- <goal name="codeseq_at_app_left" expl="">
- <proof prover="2"><result status="valid" time="0.07" steps="60"/></proof>
+ <goal name="codeseq_at_app_left" proved="true">
+ <proof prover="2"><result status="valid" time="0.03" steps="59"/></proof>
+ </goal>
+ <goal name="VC push" expl="VC for push" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC iconst" expl="VC for iconst" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ivar" expl="VC for ivar" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC isetvar" expl="VC for isetvar" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC iadd" expl="VC for iadd" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC isub" expl="VC for isub" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC imul" expl="VC for imul" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibeq" expl="VC for ibeq" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ible" expl="VC for ible" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibne" expl="VC for ibne" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibgt" expl="VC for ibgt" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ibranch" expl="VC for ibranch" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC ihalt" expl="VC for ihalt" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
 </file>

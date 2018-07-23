@@ -4,15 +4,15 @@
 
 module SimplePrioriyQueue
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import bag.Bag
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use bag.Bag
 
   type elt
-  function priority elt : int
+  val function priority elt : int
 
-  use import array.NumOfEq
+  use array.NumOfEq
 
   type t = {
     elems: array elt;
@@ -20,12 +20,12 @@ module SimplePrioriyQueue
     mutable h    : int; (* index of the highest priority element, if any *)
     ghost mutable bag: bag elt;
   }
-  invariant { 0 <= self.size <= self.elems.length }
-  invariant { self.size = 0 \/ 0 <= self.h < self.size }
+  invariant { 0 <= size <= elems.length }
+  invariant { size = 0 \/ 0 <= h < size }
   invariant { forall e: elt.
-              numof self.elems e 0 self.size = nb_occ e self.bag }
-  invariant { self.size > 0 -> forall e: elt. mem e self.bag ->
-              priority e <= priority self.elems[self.h] }
+              numof elems e 0 size = nb_occ e bag }
+  invariant { size > 0 -> forall e: elt. mem e bag ->
+              priority e <= priority elems[h] }
 
   lemma numof_occ:
     forall a: array elt, e: elt, l u: int.

@@ -1,0 +1,90 @@
+module Cursor
+
+  use seq.Seq
+
+  type cursor 'a = private {
+    ghost mutable visited : seq 'a;
+  }
+
+  predicate permitted (cursor 'a)
+  axiom permitted_empty: forall c: cursor 'a. c.visited = empty -> permitted c
+
+  predicate complete  (cursor 'a)
+
+  val next (c: cursor 'a) : 'a
+    requires { not (complete c) }
+    requires { permitted c }
+    writes   { c.visited }
+    ensures  { c.visited = snoc (old c).visited result }
+    ensures  { permitted c }
+
+  val has_next (c: cursor 'a) : bool
+    requires { permitted c }
+    ensures  { result <-> not (complete c) }
+
+end
+
+module ListCursor
+
+  use seq.Seq
+  use seq.OfList
+  use list.List
+  use int.Int
+
+  type cursor 'a = private {
+    ghost mutable visited    : seq 'a;
+    ghost         collection : list 'a;
+  }
+
+  predicate permitted (c: cursor 'a) =
+    length c.visited <= length c.collection /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.collection[i]
+
+  predicate complete  (c: cursor 'a) =
+    length c.visited = length c.collection
+
+  val create (l: list 'a) : cursor 'a
+    ensures { permitted result }
+    ensures { result.visited = empty }
+    ensures { result.collection = l }
+
+  clone Cursor as C with
+    type cursor = cursor,
+    predicate permitted = permitted,
+    predicate complete  = complete,
+    goal permitted_empty
+
+end
+
+module ArrayCursor
+
+  use array.Array
+  use array.ToSeq
+  use seq.Seq
+  use seq.OfList
+  use int.Int
+
+  type cursor 'a = private {
+    ghost mutable visited    : seq 'a;
+    ghost         collection : seq 'a;
+  }
+
+  predicate permitted (c: cursor 'a) =
+    length c.visited <= length c.collection /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.collection[i]
+
+  predicate complete  (c: cursor 'a) =
+    length c.visited = length c.collection
+
+  val create (a: array 'a) : cursor 'a
+    ensures { permitted result }
+    ensures { result.visited = empty }
+    ensures { result.collection = to_seq a }
+
+  clone Cursor as C with
+    type cursor = cursor,
+    predicate permitted = permitted,
+    predicate complete  = complete,
+    goal permitted_empty
+
+end

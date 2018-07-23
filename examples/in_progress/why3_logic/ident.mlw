@@ -11,8 +11,8 @@ end
 
 module Label
   
-  use import String
-  use import Loc
+  use String
+  use Loc
   
   type label model { lab_string : string }
   
@@ -35,13 +35,13 @@ end
 
 module Ident
   
-  use import int.Int
-  use import String
-  use import Loc
-  use import Label
-  use import option.Option
-  use import list.List
-  use import support.HO
+  use int.Int
+  use String
+  use Loc
+  use Label
+  use option.Option
+  use list.List
+  use support.HO
   
   (* Abstract name type. *)
   type ident_name

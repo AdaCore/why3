@@ -39,7 +39,8 @@ let p6 () ensures { false } raises { E -> true | F _ -> false }
 
 (* composition of exceptions with side-effect on a reference *)
 
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 val x : ref int
 
@@ -104,9 +105,3 @@ let p17 () ensures { false } raises { E -> !x=0 }
   = (x := 0; (raise E; x := 1))
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/exns"
-End:
-*)

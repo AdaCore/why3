@@ -21,6 +21,10 @@ theory Word
   use export list.Length
 
   type char
+
+  val eq (c1 c2:char) : bool
+    ensures { result <-> c1 = c2 }
+
   type word = list char
 
   inductive dist word word int =
@@ -109,10 +113,10 @@ end
 
 module EditDistance
 
-  use import Word
-  use import list.Length as L
-  use import ref.Ref
-  use import array.Array
+  use Word
+  use list.Length as L
+  use ref.Ref
+  use array.Array
 
   (* Auxiliary definitions for the program and its specification. *)
 
@@ -158,7 +162,7 @@ module EditDistance
         invariant { min_suffix w1 w2 (i+1) (j+1) !oldt }
         let temp = !oldt in
         oldt := t[j];
-        if w1[i] = w2[j] then
+        if eq w1[i] w2[j] then
           t[j] <- temp
         else
           t[j] <- (min t[j] t[j + 1]) + 1

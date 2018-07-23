@@ -2,24 +2,34 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../monoid.mlw">
-<theory name="Monoid">
-</theory>
-<theory name="MonoidSum">
- <goal name="WP_parameter sum_append" expl="VC for sum_append">
- <proof prover="1"><result status="valid" time="0.03" steps="27"/></proof>
+<prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../monoid.mlw" proved="true">
+<theory name="MonoidSumDef" proved="true">
+ <goal name="VC agg" expl="VC for agg" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
-</theory>
-<theory name="MonoidSumDef">
- <goal name="sum_def_nil" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="agg_sing_core" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
  </goal>
- <goal name="sum_def_cons" expl="">
- <proof prover="1"><result status="valid" time="0.02" steps="1"/></proof>
+ <goal name="VC agg_cat" expl="VC for agg_cat" proved="true">
+ <proof prover="2"><result status="valid" time="0.07" steps="375"/></proof>
  </goal>
-</theory>
-<theory name="ComputableMonoid">
+ <goal name="MS.M.assoc" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="MS.M.neutral" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="MS.agg_empty" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="MS.agg_sing" proved="true">
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="MS.agg_cat" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
 </theory>
 </file>
 </why3session>

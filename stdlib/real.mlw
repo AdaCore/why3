@@ -1,0 +1,421 @@
+
+(** {1 Theory of reals}
+
+This file provides the basic theory of real numbers, and several
+additional theories for classical real functions.
+
+*)
+
+(** {2 Real numbers and the basic unary and binary operators} *)
+
+module Real
+
+  constant zero : real = 0.0
+  constant one  : real = 1.0
+
+  val (=) (x y : real) : bool ensures { result <-> x = y }
+
+  val function  (-_) real : real
+  val function  (+)  real real : real
+  val function  (*)  real real : real
+  val predicate (<)  real real : bool
+
+  let (-)  (x y : real) = x + -y
+  let predicate (>)  (x y : real) = y < x
+  let predicate (<=) (x y : real) = x < y || x = y
+  let predicate (>=) (x y : real) = y <= x
+
+  clone export algebra.OrderedField with type t = real,
+    constant zero = zero, constant one = one,
+    function (-_) = (-_), function (+) = (+),
+    function (*) = (*), predicate (<=) = (<=)
+
+  val (/) (x y:real) : real
+    requires { y <> 0.0 }
+    ensures  { result = x / y }
+
+(***
+  lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
+*)
+
+end
+
+(** {2 Alternative Infix Operators}
+
+This theory should be used instead of Real when one wants to use both
+integer and real binary operators.
+
+*)
+
+module RealInfix
+
+  use Real
+
+  let function (+.) (x:real) (y:real) : real = x + y
+  let function (-.) (x:real) (y:real) : real = x - y
+  let function ( *.) (x:real) (y:real) : real = x * y
+  function (/.) (x:real) (y:real) : real = x / y
+  let function (-._) (x:real) : real = - x
+  function inv (x:real) : real = Real.inv x
+
+  let predicate (<=.) (x:real) (y:real) = x <= y
+  let predicate (>=.) (x:real) (y:real) = x >= y
+  let predicate ( <.) (x:real) (y:real) = x < y
+  let predicate ( >.) (x:real) (y:real) = x > y
+
+  val (/.) (x y:real) : real
+    requires { y <> 0.0 }
+    ensures  { result = x /. y }
+
+end
+
+(** {2 Absolute Value} *)
+
+module Abs
+
+  use Real
+
+  function abs(x : real) : real = if x >= 0.0 then x else -x
+
+  lemma Abs_le: forall x y:real. abs x <= y <-> -y <= x <= y
+
+  lemma Abs_pos: forall x:real. abs x >= 0.0
+
+(***
+  lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
+*)
+
+  lemma Abs_sum: forall x y:real. abs(x+y) <= abs x + abs y
+
+  lemma Abs_prod: forall x y:real. abs(x*y) = abs x * abs y
+
+  lemma triangular_inequality:
+    forall x y z:real. abs(x-z) <= abs(x-y) + abs(y-z)
+
+end
+
+(** {2 Minimum and Maximum} *)
+
+module MinMax
+
+  use Real
+  clone export relations.MinMax with type t = real, predicate le = (<=), goal .
+
+end
+
+(** {2 Injection of integers into reals} *)
+
+module FromInt
+
+  use int.Int as Int
+  use Real
+
+  function from_int int : real
+
+  axiom Zero: from_int 0 = 0.0
+  axiom One: from_int 1 = 1.0
+
+  axiom Add:
+    forall x y:int. from_int (Int.(+) x y) = from_int x + from_int y
+  axiom Sub:
+    forall x y:int. from_int (Int.(-) x y) = from_int x - from_int y
+  axiom Mul:
+    forall x y:int. from_int (Int.(*) x y) = from_int x * from_int y
+  axiom Neg:
+    forall x:int. from_int (Int.(-_) (x)) = - from_int x
+
+  lemma Injective:
+    forall x y: int. from_int x = from_int y -> x = y
+  axiom Monotonic:
+    forall x y:int. Int.(<=) x y -> from_int x <= from_int y
+
+end
+
+(** {2 Various truncation functions} *)
+
+module Truncate
+
+  use Real
+  use FromInt
+
+  (** truncate: rounds towards zero *)
+
+  function truncate real : int
+
+  axiom Truncate_int :
+    forall i:int. truncate (from_int i) = i
+
+  axiom Truncate_down_pos:
+    forall x:real. x >= 0.0 ->
+      from_int (truncate x) <= x < from_int (Int.(+) (truncate x) 1)
+
+  axiom Truncate_up_neg:
+    forall x:real. x <= 0.0 ->
+      from_int (Int.(-) (truncate x) 1) < x <= from_int (truncate x)
+
+  axiom Real_of_truncate:
+    forall x:real. x - 1.0 <= from_int (truncate x) <= x + 1.0
+
+  axiom Truncate_monotonic:
+    forall x y:real. x <= y -> Int.(<=) (truncate x) (truncate y)
+
+  axiom Truncate_monotonic_int1:
+    forall x:real, i:int. x <= from_int i -> Int.(<=) (truncate x) i
+
+  axiom Truncate_monotonic_int2:
+    forall x:real, i:int. from_int i <= x -> Int.(<=) i (truncate x)
+
+  (** roundings up and down *)
+
+  function floor real : int
+  function ceil real : int
+
+  axiom Floor_int :
+    forall i:int. floor (from_int i) = i
+
+  axiom Ceil_int :
+    forall i:int. ceil (from_int i) = i
+
+  axiom Floor_down:
+    forall x:real. from_int (floor x) <= x < from_int (Int.(+) (floor x) 1)
+
+  axiom Ceil_up:
+    forall x:real. from_int (Int.(-) (ceil x) 1) < x <= from_int (ceil x)
+
+  axiom Floor_monotonic:
+    forall x y:real. x <= y -> Int.(<=) (floor x) (floor y)
+
+  axiom Ceil_monotonic:
+    forall x y:real. x <= y -> Int.(<=) (ceil x) (ceil y)
+
+end
+
+(** {2 Square and Square Root} *)
+
+module Square
+
+  use Real
+
+  function sqr (x : real) : real = x * x
+
+  function sqrt real : real
+
+  axiom Sqrt_positive:
+    forall x:real. x >= 0.0 -> sqrt x >= 0.0
+
+  axiom Sqrt_square:
+    forall x:real. x >= 0.0 -> sqr (sqrt x) = x
+
+  axiom Square_sqrt:
+    forall x:real. x >= 0.0 -> sqrt (x*x) = x
+
+  axiom Sqrt_mul:
+    forall x y:real. x >= 0.0 /\ y >= 0.0 ->
+      sqrt (x*y) = sqrt x * sqrt y
+
+  axiom Sqrt_le :
+    forall x y:real. 0.0 <= x <= y -> sqrt x <= sqrt y
+
+end
+
+(** {2 Exponential and Logarithm} *)
+
+module ExpLog
+
+  use Real
+
+  function exp real : real
+  axiom Exp_zero : exp(0.0) = 1.0
+  axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
+
+  constant e : real = exp 1.0
+
+  function log real : real
+  axiom Log_one : log 1.0 = 0.0
+  axiom Log_mul :
+    forall x y:real. x > 0.0 /\ y > 0.0 -> log (x*y) = log x + log y
+
+  axiom Log_exp: forall x:real. log (exp x) = x
+
+  axiom Exp_log: forall x:real. x > 0.0 -> exp (log x) = x
+
+  function log2 (x : real) : real = log x / log 2.0
+  function log10 (x : real) : real = log x / log 10.0
+
+end
+
+(** {2 Power of a real to an integer} *)
+
+module PowerInt
+
+  use int.Int
+  use RealInfix
+
+  clone export int.Exponentiation with
+    type t = real, constant one = Real.one, function (*) = Real.(*),
+    goal Assoc, goal Unit_def_l, goal Unit_def_r, axiom Power_0, axiom Power_s
+
+  lemma Pow_ge_one:
+    forall x:real, n:int. 0 <= n /\ 1.0 <=. x -> 1.0 <=. power x n
+
+end
+
+(** {2 Power of a real to a real exponent} *)
+
+module PowerReal
+
+  use Real
+  use ExpLog
+
+  function pow real real : real
+
+  axiom Pow_def:
+    forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
+
+  lemma Pow_pos:
+    forall x y. x > 0.0 -> pow x y > 0.0
+
+  lemma Pow_plus :
+    forall x y z. z > 0.0 -> pow z (x + y) = pow z x * pow z y
+
+  lemma Pow_mult :
+    forall x y z. x > 0.0 -> pow (pow x y) z = pow x (y * z)
+
+  lemma Pow_x_zero:
+    forall x:real. x > 0.0 -> pow x 0.0 = 1.0
+
+  lemma Pow_x_one:
+    forall x:real. x > 0.0 -> pow x 1.0 = x
+
+  lemma Pow_one_y:
+    forall y:real. pow 1.0 y = 1.0
+
+  use Square
+
+  lemma Pow_x_two:
+    forall x:real. x > 0.0 -> pow x 2.0 = sqr x
+
+  lemma Pow_half:
+    forall x:real. x > 0.0 -> pow x 0.5 = sqrt x
+
+  use FromInt
+  use int.Power
+
+  lemma pow_from_int: forall x y: int. Int.(<) 0 x -> Int.(<=) 0 y ->
+                      pow (from_int x) (from_int y) = from_int (power x y)
+
+
+end
+
+(** {2 Trigonometric Functions}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikipedia page</a>}.
+
+*)
+
+module Trigonometry
+
+  use Real
+  use Square
+  use Abs
+
+  function cos real : real
+  function sin real : real
+
+  axiom Pythagorean_identity:
+    forall x:real. sqr (cos x) + sqr (sin x) = 1.0
+
+  lemma Cos_le_one: forall x:real. abs (cos x) <= 1.0
+  lemma Sin_le_one: forall x:real. abs (sin x) <= 1.0
+
+  axiom Cos_0: cos 0.0 = 1.0
+  axiom Sin_0: sin 0.0 = 0.0
+
+  constant pi : real
+
+  axiom Pi_double_precision_bounds:
+    0x1.921fb54442d18p+1 < pi < 0x1.921fb54442d19p+1
+(*
+  axiom Pi_interval:
+   3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196
+   < pi <
+   3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197
+*)
+
+  axiom Cos_pi: cos pi = -1.0
+  axiom Sin_pi: sin pi = 0.0
+
+  axiom Cos_pi2: cos (0.5 * pi) = 0.0
+  axiom Sin_pi2: sin (0.5 * pi) = 1.0
+
+  axiom Cos_plus_pi: forall x:real. cos (x + pi) = - cos x
+  axiom Sin_plus_pi: forall x:real. sin (x + pi) = - sin x
+
+  axiom Cos_plus_pi2: forall x:real. cos (x + 0.5*pi) = - sin x
+  axiom Sin_plus_pi2: forall x:real. sin (x + 0.5*pi) = cos x
+
+  axiom Cos_neg:
+    forall x:real. cos (-x) = cos x
+  axiom Sin_neg:
+    forall x:real. sin (-x) = - sin x
+
+  axiom Cos_sum:
+    forall x y:real. cos (x+y) = cos x * cos y - sin x * sin y
+  axiom Sin_sum:
+    forall x y:real. sin (x+y) = sin x * cos y + cos x * sin y
+
+  function tan (x : real) : real = sin x / cos x
+  function atan real : real
+  axiom Tan_atan:
+    forall x:real. tan (atan x) = x
+
+end
+
+(** {2 Hyperbolic Functions}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia page</a>}.
+
+*)
+
+module Hyperbolic
+
+  use Real
+  use Square
+  use ExpLog
+
+  function sinh (x : real) : real = 0.5 * (exp x - exp (-x))
+  function cosh (x : real) : real = 0.5 * (exp x + exp (-x))
+  function tanh (x : real) : real = sinh x / cosh x
+
+  function asinh (x : real) : real = log (x + sqrt (sqr x + 1.0))
+  function acosh (x : real) : real
+  axiom Acosh_def:
+    forall x:real. x >= 1.0 -> acosh x = log (x + sqrt (sqr x - 1.0))
+  function atanh (x : real) : real
+  axiom Atanh_def:
+    forall x:real. -1.0 < x < 1.0 -> atanh x = 0.5 * log ((1.0+x)/(1.0-x))
+
+end
+
+(** {2 Polar Coordinates}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}.
+
+*)
+
+module Polar
+
+  use Real
+  use Square
+  use Trigonometry
+
+  function hypot (x y : real) : real = sqrt (sqr x + sqr y)
+  function atan2 real real : real
+
+  axiom X_from_polar:
+    forall x y:real. x = hypot x y * cos (atan2 y x)
+
+  axiom Y_from_polar:
+    forall x y:real. y = hypot x y * sin (atan2 y x)
+
+end

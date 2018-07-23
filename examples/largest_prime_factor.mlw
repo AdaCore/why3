@@ -9,13 +9,13 @@ What is the largest prime factor of the number 600851475143 ?
 
 module PrimeFactor
 
-  use import int.ComputerDivision
-  use import number.Divisibility
-  use import number.Prime
-  use import number.Coprime
+  use mach.int.Int
+  use number.Divisibility
+  use number.Prime
+  use number.Coprime
 
-  (** returns the smallest divisor of [n] greater than or equal to [d],
-      assuming no divisor between 2 and [d]. *)
+  (** returns the smallest divisor of `n` greater than or equal to `d`,
+      assuming no divisor between 2 and `d`. *)
   let rec smallest_divisor (d n:int) : int
     requires { 2 <= n }
     requires { 2 <= d <= n }
@@ -29,13 +29,11 @@ module PrimeFactor
         i >= d && let u = div n i in u * i = n && divides u n &&
         u * i = n && (u >= d -> n >= d * i >= d * d && false)
         && u >= 2 && u < n && false } ; n
-    end else if d >= 2 && mod n d = 0 then d else
+    end else if d >= 2 && n % d = 0 then d else
   smallest_divisor (d+1) n
 
-  use import ref.Ref
-  use import list.List
-
-  val factors : ref (list int)
+  use ref.Ref
+  use list.List
 
   let largest_prime_factor (n:int) : int
     requires { 2 <= n }
@@ -44,8 +42,7 @@ module PrimeFactor
     ensures { forall i:int. result < i <= n -> not (prime i /\ divides i n) }
   = let d = smallest_divisor 2 n in
     let factor = ref d in
-    let target = ref (div n d) in
-    factors := Cons d Nil;
+    let target = ref (n / d) in
     assert { !target * d = n && divides !target n } ;
     assert { forall i:int. prime i /\ divides i n /\ i > d ->
       coprime d i && divides i !target };
@@ -59,14 +56,13 @@ module PrimeFactor
       invariant { forall i:int. prime i /\ divides i n /\ i > !factor ->
         divides i !target }
       variant { !target }
-      let ghost oldt = !target in
+      let oldt = ghost !target in
       let ghost oldf = !factor in
       assert { divides !target !target && !target >= 2 && !target >= !factor };
       let d = smallest_divisor !factor !target in
       assert { prime d };
       factor := d;
-      factors := Cons d !factors;
-      target := div !target d;
+      target := !target / d;
       assert { !target * d = oldt && divides !target oldt } ;
       assert { forall i:int. prime i /\ divides i n /\ i > d ->
         i > oldf && divides i oldt && 1 <= d < i

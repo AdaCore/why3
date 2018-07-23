@@ -158,11 +158,11 @@ let defined_arith ~loc denv env impl dw tl =
   in
   add_theory env impl th;
   let ls = match dw with
-    | DF DFumin -> ns_find_ls th.th_export ["prefix -"]
-    | DF DFsum -> ns_find_ls th.th_export ["infix +"]
-    | DF DFdiff -> ns_find_ls th.th_export ["infix -"]
-    | DF DFprod -> ns_find_ls th.th_export ["infix *"]
-    | DF DFquot -> ns_find_ls th.th_export ["infix /"]
+    | DF DFumin -> ns_find_ls th.th_export [op_prefix "-"]
+    | DF DFsum -> ns_find_ls th.th_export [op_infix "+"]
+    | DF DFdiff -> ns_find_ls th.th_export [op_infix "-"]
+    | DF DFprod -> ns_find_ls th.th_export [op_infix "*"]
+    | DF DFquot -> ns_find_ls th.th_export [op_infix "/"]
     | DF DFquot_e -> ns_find_ls th.th_export ["div"]
     | DF DFquot_t -> ns_find_ls th.th_export ["div_t"]
     | DF DFquot_f -> ns_find_ls th.th_export ["div_f"]
@@ -176,10 +176,10 @@ let defined_arith ~loc denv env impl dw tl =
     | DF DFtoint -> ns_find_ls th.th_export ["to_int"]
     | DF DFtorat -> ns_find_ls th.th_export ["to_rat"]
     | DF DFtoreal -> ns_find_ls th.th_export ["to_real"]
-    | DP DPless -> ns_find_ls th.th_export ["infix <"]
-    | DP DPlesseq -> ns_find_ls th.th_export ["infix <="]
-    | DP DPgreater -> ns_find_ls th.th_export ["infix >"]
-    | DP DPgreatereq -> ns_find_ls th.th_export ["infix >="]
+    | DP DPless -> ns_find_ls th.th_export [op_infix "<"]
+    | DP DPlesseq -> ns_find_ls th.th_export [op_infix "<="]
+    | DP DPgreater -> ns_find_ls th.th_export [op_infix ">"]
+    | DP DPgreatereq -> ns_find_ls th.th_export [op_infix ">="]
     | DP DPisint -> ns_find_ls th.th_export ["is_int"]
     | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
     | DP (DPtrue|DPfalse|DPdistinct) | DT _ -> assert false
@@ -576,9 +576,9 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
 let flush_impl ~strict env uc impl =
   let update_th _ e uc = match e with
     | Suse th ->
-        let uc = open_namespace uc th.th_name.id_string in
+        let uc = open_scope uc th.th_name.id_string in
         let uc = use_export uc th in
-        close_namespace uc false
+        close_scope uc ~import:false
     | _ -> uc
   in
   let update s e (env,uc) = match e with

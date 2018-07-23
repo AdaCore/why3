@@ -384,6 +384,11 @@ type int_range = {
   ir_upper : BigInt.t;
 }
 
+let create_range lo hi =
+  { ir_lower = lo;
+    ir_upper = hi;
+}
+
 exception OutOfRange of integer_constant
 
 let check_range c {ir_lower = lo; ir_upper = hi} =

@@ -13,14 +13,14 @@ Pages: 321 - 322
 
 module Algo65
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.ArrayPermut
 
   (* algorithm 63 *)
 
-  val partition (a:array int) (m n: int) (i j: ref int) (ghost x: ref int) :
+  val partition (a: array int) (m n: int) (i j: ref int) (ghost x: ref int) :
     unit
     requires { 0 <= m < n < length a }
     writes   { a, i, j }
@@ -32,7 +32,7 @@ module Algo65
 
   (* Algorithm 65 (fixed version) *)
 
-  let rec find (a:array int) (m n:int) (k:int) : unit
+  let rec find (a: array int) (m n: int) (k: int) : unit
     requires { 0 <= m <= k <= n < length a }
     variant  { n - m }
     ensures  { permut_sub (old a) a m (n+1) }
@@ -43,19 +43,19 @@ module Algo65
       let j = ref 0 in
       let ghost x = ref 42 in
       partition a m n i j x;
-'L1:
+    label L1 in
       if k <= !j then find a m !j k;
-      assert { permut_sub (at a 'L1) a m (n+1) };
-      assert { forall r:int. !j < r <= n -> a[r] = (at a 'L1)[r] };
+      assert { permut_sub (a at L1) a m (n+1) };
+      assert { forall r:int. !j < r <= n -> a[r] = (a at L1)[r] };
       assert { forall r:int. m <= r <= !j ->
-        (exists s:int. m <= s <= !j /\ a[r] = (at a 'L1)[s]) &&
+        (exists s:int. m <= s <= !j /\ a[r] = (a at L1)[s]) &&
         a[r] <= a[!j+1] };
-'L2:
+    label L2 in
       if !i <= k then find a !i n k;
-      assert { permut_sub (at a 'L2) a m (n+1) };
-      assert { forall r:int. m <= r < !i -> a[r] = (at a 'L2)[r] };
+      assert { permut_sub (a at L2) a m (n+1) };
+      assert { forall r:int. m <= r < !i -> a[r] = (a at L2)[r] };
       assert { forall r:int. !i <= r <= n ->
-        (exists s:int. !i <= s <= n /\ a[r] = (at a 'L2)[s]) &&
+        (exists s:int. !i <= s <= n /\ a[r] = (a at L2)[s]) &&
         a[r] >= a[!i-1] }
     end
 

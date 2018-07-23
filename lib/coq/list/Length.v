@@ -35,21 +35,19 @@ now rewrite inj_S, Zplus_comm, IHl.
 Qed.
 
 (* Why3 goal *)
-Lemma Length_nonnegative :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)), (0%Z <= (length l))%Z.
+Lemma Length_nonnegative {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)), (0%Z <= (length l))%Z.
 Proof.
-intros a a_WT l.
+intros l.
 rewrite length_std.
 apply Zle_0_nat.
 Qed.
 
 (* Why3 goal *)
-Lemma Length_nil :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)), ((length l) = 0%Z) <-> (l = Init.Datatypes.nil).
+Lemma Length_nil {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)), ((length l) = 0%Z) <-> (l = Init.Datatypes.nil).
 Proof.
-intros a a_WT [|h t] ; split ; try easy.
+intros [|h t] ; split ; try easy.
 unfold length. fold length.
 intros H.
 exfalso.

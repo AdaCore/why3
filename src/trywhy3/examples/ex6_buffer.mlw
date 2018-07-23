@@ -1,4 +1,3 @@
-
 (* Ring buffer (from the 2nd Verified Software Competition 2012)
 
    Implement operations create, clear, push, head, and pop below (that
@@ -8,9 +7,9 @@
 
 module RingBuffer
 
-  use import int.Int
-  use import seq.Seq
-  use import array.Array
+  use int.Int
+  use seq.Seq
+  use array.Array
 
   type queue 'a = {
     mutable first: int;
@@ -20,15 +19,15 @@ module RingBuffer
     ghost mutable sequence: Seq.seq 'a;
   }
   invariant {
-    self.capacity = Array.length self.data /\
-    0 <= self.first <  self.capacity /\
-    0 <= self.len   <= self.capacity /\
-    self.len = Seq.length self.sequence /\
-    forall i: int. 0 <= i < self.len ->
-       Seq.([]) self.sequence i =
-         self.data[if self.first + i < self.capacity
-         	   then self.first + i
-		   else self.first + i - self.capacity]
+    capacity = Array.length data /\
+    0 <= first <  capacity /\
+    0 <= len   <= capacity /\
+    len = Seq.length sequence /\
+    forall i: int. 0 <= i < len ->
+       Seq.([]) sequence i =
+         data[if first + i < capacity
+              then first + i
+              else first + i - capacity]
   }
 
   val create (n: int) (dummy: 'a) : queue 'a

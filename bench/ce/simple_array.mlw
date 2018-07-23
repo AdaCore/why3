@@ -1,8 +1,8 @@
 theory ModelArray
 
-use import map.Map
+use map.Map
 
-goal t1 : forall t :map int int, i: int.
+goal t1 : forall t: map int int, i: int.
    get (set t 0 42) i = get t i
 
 end

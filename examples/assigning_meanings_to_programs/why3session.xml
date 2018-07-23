@@ -2,17 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
-<file name="../assigning_meanings_to_programs.mlw">
-<theory name="Sum">
- <goal name="WP_parameter sum" expl="VC for sum">
- <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../assigning_meanings_to_programs.mlw" proved="true">
+<theory name="Sum" proved="true">
+ <goal name="VC sum" expl="VC for sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="39"/></proof>
  </goal>
 </theory>
-<theory name="Division">
- <goal name="WP_parameter division" expl="VC for division">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+<theory name="Division" proved="true">
+ <goal name="VC division" expl="VC for division" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
  </goal>
 </theory>
 </file>

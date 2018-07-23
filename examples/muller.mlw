@@ -7,24 +7,24 @@
 
 module Muller
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
   use int.NumOf as N
 
   function numof (a: array int) (l u: int) : int =
-    N.numof (\ i. a[i] <> 0) l u
+    N.numof (fun i -> a[i] <> 0) l u
 
   let compact (a: array int) =
     let count = ref 0 in
     for i = 0 to length a - 1 do
-      invariant { 0 <= !count = numof a 0 i <= i}
+      invariant { !count = numof a 0 i }
       if a[i] <> 0 then incr count
     done;
     let u = make !count 0 in
     count := 0;
     for i = 0 to length a - 1 do
-      invariant { 0 <= !count = numof a 0 i <= i }
+      invariant { !count = numof a 0 i }
       if a[i] <> 0 then begin u[!count] <- a[i]; incr count end
     done
 

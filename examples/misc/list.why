@@ -1,14 +1,12 @@
 theory Map
-  use import list.List
+  use list.List
 
-  use HighOrd as HO
-
-  function map (fn : HO.func 'a 'b) (l : list 'a) : list 'b = match l with
+  function map (fn : 'a -> 'b) (l : list 'a) : list 'b = match l with
     | Cons x r -> Cons (fn x) (map fn r)
     | Nil -> Nil
   end
 
-  predicate forall2 (pr : HO.func 'a (HO.pred 'b)) (l1 : list 'a) (l2 : list 'b) =
+  predicate forall2 (pr : 'a -> 'b -> bool) (l1 : list 'a) (l2 : list 'b) =
     match l1, l2 with
     | Cons x1 r1, Cons x2 r2 -> pr x1 x2 /\ forall2 pr r1 r2
     | _, _ -> true
@@ -16,18 +14,18 @@ theory Map
 
   use export int.Int
 
-  function double (l : list int) : list int = map (\ i : int . i * 2) l
+  function double (l : list int) : list int = map (fun i -> i * 2) l
   function double_let (l : list int) : list int =
     let x = 2 in
-    map (\ i : int . i * x) l
+    map (fun i -> i * x) l
 
   predicate lequal (l1 l2 : list int) =
-    forall2 (\ i1 i2 : int . i1 = i2) l1 l2
+    forall2 (fun (i1 i2 : int) -> i1 = i2) l1 l2
 end
 
 theory Induction2
-  use import list.List
-  use import list.Length
+  use list.List
+  use list.Length
 
   predicate p (list 'a) (list 'b)
 

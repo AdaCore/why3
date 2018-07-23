@@ -1,0 +1,10 @@
+module M
+
+  use int.Int
+  use ref.Ref
+
+  let test (a: (ref int, int))
+    ensures { let (x, _) = a in !x = (old !x) + 1 }
+  = let (r,_) = a in r := !r + 1
+
+end

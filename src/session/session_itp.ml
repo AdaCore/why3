@@ -39,7 +39,7 @@ type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
   theory_parent_name            : string;
-  theory_is_detached            : bool;
+  mutable theory_is_detached    : bool;
 }
 
 let theory_name t = t.theory_name
@@ -670,24 +670,24 @@ let file_proved s f =
     Hstr.add s.file_state f.file_name b;
     b
 
+let pa_proved s paid =
+  let pa = get_proof_attempt_node s paid in
+  match pa.proof_state with
+  | None -> false
+  | Some pa ->
+     begin
+       match pa.Call_provers.pr_answer with
+       | Call_provers.Valid -> true
+       | _ -> false
+     end
+
 let any_proved s any : bool =
   match any with
   | AFile file -> file_proved s file
   | ATh th -> th_proved s th
   | ATn tn -> tn_proved s tn
   | APn pn -> pn_proved s pn
-  | APa pa ->
-      begin
-        let pa = get_proof_attempt_node s pa in
-        match pa.proof_state with
-        | None -> false
-        | Some pa ->
-          begin
-            match pa.Call_provers.pr_answer with
-            | Call_provers.Valid -> true
-            | _ -> false
-          end
-      end
+  | APa pa -> pa_proved s pa
 
 
 
@@ -970,14 +970,14 @@ let load_option attr g =
 
 let load_ident elt =
   let name = string_attribute "name" elt in
-  let label = List.fold_left
+  let attrs = List.fold_left
       (fun acc label ->
          match label with
          | {Xml.name = "label"} ->
-           let lab = string_attribute "name" label in
-           Ident.Slab.add (Ident.create_label lab) acc
+           let name = string_attribute "name" label in
+           Ident.Sattr.add (Ident.create_attribute name) acc
          | _ -> acc
-      ) Ident.Slab.empty elt.Xml.elements in
+      ) Ident.Sattr.empty elt.Xml.elements in
   let preid =
     try
       let load_exn attr g = List.assoc attr g.Xml.attributes in
@@ -986,9 +986,9 @@ let load_ident elt =
       let cnumb = int_of_string (load_exn "loccnumb" elt) in
       let cnume = int_of_string (load_exn "loccnume" elt) in
       let pos = Loc.user_position file lnum cnumb cnume in
-      Ident.id_user ~label name pos
+      Ident.id_user ~attrs name pos
     with Not_found | Invalid_argument _ ->
-      Ident.id_fresh ~label name in
+      Ident.id_fresh ~attrs name in
   Ident.id_register preid
 
 (* [load_goal s op p g id] loads the goal of parent [p] from the xml
@@ -1344,12 +1344,10 @@ let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
   in
-  { theory_name = detached_theory.theory_name;
-    theory_is_detached = true;
-    theory_goals = goalsID;
-    theory_parent_name = parent_name }
-
-
+  assert (detached_theory.theory_parent_name = parent_name);
+  detached_theory.theory_goals <- goalsID;
+  detached_theory.theory_is_detached <- true;
+  detached_theory
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
@@ -1361,11 +1359,18 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 
 exception NoProgress
 
+let () = Exn_printer.register
+    (fun fmt e ->
+      match e with
+      | NoProgress ->
+          Format.fprintf fmt "The transformation made no progress.\n"
+      | _ -> raise e)
+
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task,table = get_task_name_table s id in
   let subtasks = Trans.apply_transform_args name env args table task in
   (* If any generated task is equal to the former task, then we made no
-         progress because we need to prove more lemmas than before *)
+     progress because we need to prove more lemmas than before *)
   match subtasks with
   | [t'] when Task.task_equal t' task && not allow_no_effect ->
      Debug.dprintf debug "[apply_trans_to_goal] apply_transform made no progress@.";
@@ -1521,7 +1526,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
     mk_proof_node ~version:s.session_shape_version ~expl
                   s name task parent id;
   in
-  let tasks = List.rev (Task.split_theory th None None) in
+  let tasks = Task.split_theory th None None in
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
   let theory = { theory_name = th.Theory.th_name;
                  theory_is_detached = detached;

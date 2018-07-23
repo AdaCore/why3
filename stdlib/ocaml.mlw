@@ -1,0 +1,54 @@
+(* FIXME: this module should go into the vocal directory *)
+
+module Sys
+
+  use int.Int
+  use mach.int.Int63
+
+  val constant max_array_length : int63
+  axiom non_neg_max_array_length : 0 <= max_array_length
+
+end
+
+module Pervasives
+
+  exception Exit
+  exception Not_found
+
+  use int.Int
+  use mach.int.Int63
+
+  val succ (x: int63) : int63
+    requires { [@expl:integer overflow] in_bounds (to_int x + 1) }
+    ensures  { to_int result = to_int x + 1 }
+
+  val pred (x: int63) : int63
+    requires { [@expl:integer overflow] in_bounds (to_int x - 1) }
+    ensures  { to_int result = to_int x - 1 }
+
+  exception AssertFailure
+
+  val ocaml_assert (b: bool) : unit
+    raises { AssertFailure }
+
+  exception Invalid_argument
+
+end
+
+module OCaml
+
+  use export int.Int
+  use mach.int.Int63 as Int63
+  use export int.MinMax
+  use export option.Option
+  use export Pervasives
+  use Sys
+
+  use mach.array.Array63 as Array
+  type array 'a = Array.array 'a
+
+  type int63 = Int63.int63
+
+  let function to_int (n: Int63.int63) : int = Int63.to_int n
+
+end

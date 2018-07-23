@@ -273,10 +273,13 @@ module type S =
         given to {!Extmap.Make}. *)
 
     val of_list: (key * 'a) list -> 'a t
-    (** construct a map from a pair of bindings *)
+    (** construct a map from a list of bindings. *)
+
+    val contains: 'a t -> key -> bool
+    (** [contains m x] is the same as [mem x m]. *)
 
     val domain : 'a t -> unit t
-    (** [domain m] returns the set of keys of binding [m] *)
+    (** [domain m] returns the set of keys of bindings in [m] *)
 
     val subdomain : (key -> 'a -> bool) -> 'a t -> unit t
     (** [subdomain pr m] returns the set of keys of bindings in [m]

@@ -65,7 +65,7 @@ let timestamp = register_info_flag "timestamp"
 let time_start = Unix.gettimeofday ()
 
 let set_debug_formatter f =
-  (** enable the usual behavior of stderr: flush at every new line *)
+  (* enable the usual behavior of stderr: flush at every new line *)
   let o = Format.pp_get_formatter_out_functions f () in
   Format.pp_set_formatter_out_functions f
     { o with Format.out_newline =
@@ -180,9 +180,10 @@ module Stats = struct
   let () = at_exit (fun () ->
     print ();
     Format.pp_print_flush !formatter ())
-(** SIGXCPU cpu time limit reached *)
+
+  (** SIGXCPU cpu time limit reached *)
   let _ =
-  (** TODO? have a possible callback for printing different message*)
+    (* TODO? have a possible callback for printing different message*)
     Sys.signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 2))
 
   let register ~print ~name ~init =

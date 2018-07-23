@@ -5,50 +5,42 @@
 
 module PQueue
 
-  use import int.Int
-  use import avl.SelectionTypes
-  use import option.Option
-  use import ref.Ref
-  use import list.List
-  use import list.Append
-  use import list.Mem
-  use import list.Length
+  use int.Int
+  use avl.SelectionTypes
+  use option.Option
+  use ref.Ref
+  use import seq.Seq as S
+  use seq.FreeMonoid
+  use mach.peano.Peano as I
 
   (** {2 Implementation parameters} *)
 
   (** Balancing level is kept abstract. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
+  val constant balancing : I.t
+    ensures { result > 0 }
 
   (** The Elements of the priority queue are indexed by totally ordered keys.
       Moreover, this order can be effectively decided. *)
-  namespace D type t 'a end
-  namespace K type t end
-  clone export key_type.ProgramKeyType with type t = D.t, type key = K.t
-  constant default_element : D.t 'a
-  clone preorder.Computable as CO with type t = K.t
+  scope D type t 'a end
+  scope K type t end
+  clone export key_type.KeyType with type t = D.t, type key = K.t
+  clone preorder.Computable as CO with type t = K.t, axiom .
 
   (** {2 Instantiation of the AVL tree module} *)
-
-  clone sorted.Increasing as S with type K.t = D.t,
-    type K.key = K.t,
-    function K.key = key,
-    predicate O.rel = CO.le,
-    goal O.Trans
 
   (** Use the minimum monoid to measure sequence of elements by their
       minimum value. We extend it with a minimum element in order to measure
       empty sequences. *)
-  namespace M
+  scope M
     type t = option K.t
     constant zero : t = None
     function op (x y:t) : t = match x with
       | None -> y
       | Some a -> match y with
         | None -> x
-        | Some b -> if CO.lt a b
-          then x
-          else y
+        | Some b -> if CO.lt b a
+          then y
+          else x
         end
       end
     let lemma assoc_m (x y z:t) : unit
@@ -75,42 +67,30 @@ module PQueue
       | None -> y
       | Some a -> match y with
         | None -> x
-        | Some b -> if CO.compare a b < 0
-          then x
-          else y
+        | Some b -> if CO.compare b a < 0
+          then y
+          else x
         end
       end
 
   end
   (** Elements are measured by their keys. *)
-  namespace D
-    (* Morally equivalent to
-       [function measure (d:D.t 'a) : M.t = Some d.key],
-       but left axiomatized for technical reasons. *)
-    (*** Using a definition here triggers a minor glitch which makes
-         some goals logically unprovable (sound but incomplete behaviour).
-         It is caused by a harmful interference between inlining during WP
-         and the current treatment of higher-order objects.
-         Note: if some purist want to eliminate such axioms, that is still
-         possible by performing one more step of cloning over the current
-         module. *)
-    function measure (d:D.t 'a) : M.t
-    axiom measure_def : forall d:D.t 'a. measure d = Some d.key
-    let measure (d:D.t 'a) : M.t
-      ensures { result = measure d }
-    = Some (get_key d)
+  scope D
+    let function measure (d:D.t 'a) : M.t = Some d.key
   end
 
   (** In priority queue, we are looking for the minimum element.
-      No extra information is required to perform such search. *)
+      No outside information is required to perform such search. *)
   type selector = unit
 
-  (** We can only select the minimum in a non-empty sequeuence. *)
+  (** We can only select the minimum in a non-empty sequence. *)
+  predicate selection_possible 'e (s:seq 'g) = length s <> 0
 
-  predicate selection_possible 'e (l:list 'g) = l <> Nil
+  predicate lower_bound (x:K.t) (s:seq (D.t 'a)) =
+    forall i. 0 <= i < length s -> CO.le x s[i].key
 
-  predicate lower_bound_strict (x:K.t) (l:list (D.t 'a)) =
-    (forall y. mem y l -> CO.lt x y.key)
+  predicate lower_bound_strict (x:K.t) (s:seq (D.t 'a)) =
+    forall i. 0 <= i < length s -> CO.lt x s[i].key
 
   (** We are interested in split where the middle element
       is the minimum of the sequence. In order to make sure
@@ -119,106 +99,81 @@ module PQueue
   predicate selected 'e (e:split (D.t 'a)) =
       match e.middle with
       | None -> false
-      | Some d -> S.lower_bound d.key e.right /\
-        lower_bound_strict d.key e.left
+      | Some d -> lower_bound d.key e.right /\ lower_bound_strict d.key e.left
       end
 
   (** The summary of a sequence is indeed its minimum element. *)
-  let rec lemma monoid_sum_is_min (l:list (D.t 'a)) : unit
-    ensures { let x = M.sum D.measure l in
-      match x with
-      | None -> l = Nil
-      | Some a -> S.lower_bound a l /\ (exists d. mem d l /\ CO.eq d.key a)
+  let rec lemma monoid_sum_is_min (s:seq (D.t 'a)) : unit
+    ensures {
+      match M.agg D.measure s with
+      | None -> length s = 0
+      | Some a -> lower_bound a s /\
+        exists i. 0 <= i < length s /\ CO.eq s[i].key a
       end }
-    variant { l }
-  = match l with Cons _ q -> monoid_sum_is_min q | _ -> () end
+    variant { length s }
+  = if length s <> 0
+    then begin
+      let q = s[1 ..] in
+      monoid_sum_is_min q;
+      assert { M.agg D.measure s = M.op (D.measure s[0]) (M.agg D.measure q) };
+      assert { forall i. 0 <= i < length q -> q[i] = s[i+1] }
+    end
 
   (** The middle element of a selected split is indeed the minimum. *)
   let lemma selected_is_min (s:'d) (e:split (D.t 'a)) : unit
     requires { selected s e }
-    ensures { let l = rebuild e in match e.middle with
+    ensures { let s = rebuild e in match e.middle with
       | None -> false
-      | Some d -> S.lower_bound d.key l && match M.sum D.measure l with
-        | None -> false
-        | Some k -> CO.eq d.key k
-        end
+      | Some d -> M.agg D.measure s = Some d.key
       end }
   = match e.middle with
     | None -> absurd
-    | Some d -> assert { S.lower_bound d.key e.right && CO.le d.key d.key }
+    | Some d ->
+      monoid_sum_is_min e.left; monoid_sum_is_min e.right;
+      assert {
+        let l = M.agg D.measure e.left in
+        let r = M.agg D.measure e.right in
+        let t = M.agg D.measure (rebuild e) in
+        let v0 = Some d.key in
+        t = v0 by t = M.op l (M.op v0 r) /\ M.op l v0 = v0 = M.op v0 r
+      }
     end
 
-  let selected_part (ghost llis:list (D.t 'a))
-    (ghost rlis:list (D.t 'a))
+  let selected_part (ghost lseq rseq:seq (D.t 'a))
     (s:unit) (sl:M.t) (d:D.t 'a) (sr:M.t) : part_base unit
-    requires { sl = M.sum D.measure llis /\ sr = M.sum D.measure rlis }
-    returns { Here -> let e2 = { left = llis;
+    requires { sl = M.agg D.measure lseq /\ sr = M.agg D.measure rseq }
+    returns { Here -> let e2 = { left = lseq;
         middle = Some d;
-        right = rlis } in selected s e2
-      | Left sl -> selection_possible sl llis /\
-        forall e. selected sl e /\ rebuild e = llis ->
-          selected s (right_extend e d rlis)
-      | Right sr -> selection_possible sr rlis /\
-        forall e. selected sr e /\ rebuild e = rlis ->
-          selected s (left_extend llis d e) }
-  = let kd = get_key d in
-    monoid_sum_is_min llis;
-    monoid_sum_is_min rlis;
+        right = rseq } in selected s e2
+      | Left sl -> selection_possible sl lseq /\
+        forall e. selected sl e /\ rebuild e = lseq ->
+          selected s (right_extend e d rseq)
+          by match e.middle with
+            | None -> false
+            | Some d2 -> M.agg D.measure lseq = Some d2.key
+              so lower_bound d2.key (cons d rseq)
+              /\ lower_bound d2.key e.right
+            end
+      | Right sr -> selection_possible sr rseq /\
+        forall e. selected sr e /\ rebuild e = rseq ->
+          selected s (left_extend lseq d e)
+          by match e.middle with
+            | None -> false
+            | Some d2 -> M.agg D.measure rseq = Some d2.key
+              so lower_bound_strict d2.key (snoc lseq d)
+              /\ lower_bound_strict d2.key e.left
+            end
+    }
+  = let kd = d.key in
+    monoid_sum_is_min lseq;
+    monoid_sum_is_min rseq;
     match sl , sr with
     | None , None -> Here
     | None , Some a -> if CO.compare kd a <= 0 then Here else Right ()
     | Some a , None -> if CO.compare kd a < 0 then Here else Left ()
     | Some a , Some b -> if CO.compare kd b <= 0
-      then if CO.compare a kd <= 0
-        then Left ()
-        else Here
-      else if CO.compare a b <= 0
-      then Left ()
-      else Right ()
-    end
-
-  (** Extract the first minimum element of a sequence. *)
-  function first_minimum_acc (acc:D.t 'a) (l:list (D.t 'a)) : D.t 'a =
-    match l with
-    | Nil -> acc
-    | Cons x q -> if CO.le acc.key x.key
-      then first_minimum_acc acc q
-      else first_minimum_acc x q
-    end
-
-  function first_minimum (l:list (D.t 'a)) : D.t 'a = match l with
-    | Nil -> default_element
-    | Cons x q -> first_minimum_acc x q
-    end
-
-  (** the first_minimum function and the selected predicate both
-      describe the minimum element. *)
-  let rec lemma first_minimum_caracterisation (e:split (D.t 'a)) : unit
-    requires { e.middle <> None /\ selected () e }
-    ensures { match e.middle with
-      | Some x -> first_minimum (rebuild e) = x
-      | None -> false
-      end }
-    variant { e.right }
-  = let mid = match e.middle with None -> absurd | Some x -> x end in
-    let rec aux (e:split (D.t 'a)) : unit
-      requires { e.middle = Some mid /\ selected () e }
-      ensures { forall acc:D.t 'a.
-        CO.lt mid.key acc.key -> first_minimum_acc acc (rebuild e) = mid }
-      variant { length e.left + length e.right }
-    = match e.left with
-      | Nil -> match e.right with
-        | Nil -> ()
-        | Cons _ q -> aux { e with right = q }
-        end
-      | Cons _ q -> aux { e with left = q }
-      end in
-    match e.left with
-    | Nil -> match e.right with
-      | Nil -> ()
-      | Cons _ q -> first_minimum_caracterisation { e with right = q }
-      end
-    | Cons _ q -> aux { e with left = q }
+      then if CO.compare a kd <= 0 then Left () else Here
+      else if CO.compare a b <= 0 then Left () else Right ()
     end
 
   (** Full instantiation of the avl module. *)
@@ -227,19 +182,18 @@ module PQueue
     predicate selected = selected,
     val selected_part = selected_part,
     goal selection_empty,
-    constant balancing = balancing,
-    goal balancing_positive,
+    val balancing = balancing,
     type D.t = D.t,
-    function D.measure = D.measure,
     val D.measure = D.measure,
     type M.t = M.t,
     constant M.zero = M.zero,
     function M.op = M.op,
     goal M.assoc,
     goal M.neutral,
-    function M.sum = M.sum,
-    goal M.sum_def_nil,
-    goal M.sum_def_cons,
+    function M.agg = M.agg,
+    goal M.agg_empty,
+    goal M.agg_sing,
+    goal M.agg_cat,
     val M.zero = M.zero,
     val M.op = M.op
 
@@ -257,108 +211,123 @@ module PQueue
     card : int;
   }
 
-  (** Convert a list to a bag. *)
-  constant empty_bag : 'a -> int = \_:'a. 0
-  function add_bag (x:'a) (f:'a -> int) : 'a -> int =
-    \y:'a. if y = x then f y + 1 else f y
+  (** Conversion from sequences to bags:
+      from number of occurences. *)
+  use seq.Occ
 
-  function as_bag (l:list 'a) : 'a -> int = match l with
-    | Nil -> empty_bag
-    | Cons x q -> add_bag x (as_bag q)
-    end
+  let ghost function to_bag (s:seq 'a) : 'a -> int =
+    fun x -> occ x s 0 (length s)
 
-  (** A few lemmas about the bag representation of a list. *)
-  let rec lemma as_bag_append (l r:list 'a) : unit
-    ensures { forall x:'a. as_bag (l++r) x = as_bag l x + as_bag r x }
-    variant { l }
-  = match l with Nil -> () | Cons _ q -> as_bag_append q r end
+  let lemma to_bag_mem (x:'a) (s:seq 'a)
+    ensures { s.to_bag x > 0 <-> exists i. 0 <= i < length s /\ s[i] = x}
+  = assert { forall i. 0 <= i < length s /\ s[i] = x ->
+      to_bag s x > 0
+      by to_bag s x = to_bag s[.. i] x + to_bag s[i ..] x
+      /\ to_bag s[i ..] x = to_bag s[i ..][1 ..] x + to_bag s[i ..][.. 1] x
+      /\ to_bag s[i ..][.. 1] x = 1
+    }
 
-  let rec lemma as_bag_bounds (l:list 'a) : unit
-    ensures { forall x:'a. 0 <= as_bag l x <= length l }
-    variant { l }
-  = match l with Nil -> () | Cons _ q -> as_bag_bounds q end
+  (** Minimum extraction from a sequence.
+      Partial function. *)
+  let ghost function get_minimum_index (s:seq (D.t 'a)) : int
+    requires { length s <> 0 }
+    ensures { 0 <= result < length s }
+    ensures { M.agg D.measure s = Some s[result].key }
+    ensures { lower_bound_strict s[result].key s[.. result] }
+    ensures { lower_bound s[result].key s[result ..] }
+  = let r = ref 0 in
+    for i = 0 to length s - 1 do
+      invariant { lower_bound_strict s[!r].key s[.. !r] }
+      invariant { lower_bound s[!r].key s[!r .. i] }
+      invariant { 0 <= !r <= i /\ !r < length s }
+      assert { s[.. i] == s[.. !r] ++ s[!r .. i] };
+      if CO.compare s[i].key s[!r].key < 0 then r := i;
+    done;
+    assert {
+      let e = { left = s[.. !r]; middle = Some s[!r]; right = s[!r+1 ..] } in
+      selected () e /\ rebuild e == s
+    };
+    !r
 
-  let rec lemma as_bag_membership (d:'a) (l:list 'a) : unit
-    ensures { as_bag l d > 0 <-> mem d l }
-    variant { l }
-  = match l with Nil -> () | Cons _ q -> as_bag_membership d q end
+  let lemma split_gives_minimum (e:split (D.t 'a))
+    requires { selected () e }
+    ensures { e.middle = Some (rebuild e)[get_minimum_index (rebuild e)] }
+  = let i = length e.left in
+    let s = rebuild e in
+    let j = get_minimum_index s in
+    let ki = match e.middle with None -> absurd | Some d -> d.key end in
+    assert { ki = s[i].key };
+    let kj = s[j].key in
+    if i <> j
+    then
+      let (ki,kj) = if i < j
+        then (ki,kj)
+        else (assert { s[j] = e.left[j] }; (kj,ki))
+      in
+      assert { CO.lt kj ki /\ CO.le ki kj }
 
   (** Convert the avl tree to logical model. *)
   function m (t:t 'a) : m 'a =
-    { bag = as_bag t.Sel.m.Sel.lis;
-      card = length t.Sel.m.Sel.lis;
-      minimum = first_minimum t.Sel.m.Sel.lis }
-
-  let ghost m (t:t 'a) : m 'a
-    ensures { result = t.m }
-  = { bag = as_bag t.Sel.m.Sel.lis;
-      card = length t.Sel.m.Sel.lis;
-      minimum = first_minimum t.Sel.m.Sel.lis }
-
-  (** Invariant *)
-  predicate c (t:t 'a) = Sel.c t
+    { bag = to_bag t;
+      card = length t;
+      minimum = t[get_minimum_index t] }
+  meta coercion function m
 
   (** Invariant over the logical model. *)
   let lemma correction (t:t 'a) : unit
-    requires { c t }
-    ensures { forall d:D.t 'a. 0 <= t.m.bag d <= t.m.card }
-    ensures { t.m.card >= 0 /\ (t.m.card > 0 -> t.m.bag t.m.minimum > 0) }
-    ensures { forall d:D.t 'a. 0 < t.m.bag d -> CO.le t.m.minimum.key d.key }
+    ensures { forall d. 0 <= t.bag d <= t.card }
+    ensures { t.card >= 0 /\ (t.card > 0 -> t.bag t.minimum > 0) }
+    ensures { forall d. 0 < t.bag d -> CO.le t.minimum.key d.key }
   = if t.m.card > 0
     then let r0 = Sel.default_split () in
-      let _ = Sel.split r0 () t in ()
+      let _ = Sel.split r0 () t in
+      ()
 
   (** Create an empty priority queue. *)
   let empty () : t 'a
     ensures { forall d:D.t 'a. result.m.bag d = 0 }
-    ensures { result.m.card = 0 /\ c result }
+    ensures { result.m.card = 0 }
   = Sel.empty ()
 
   (** Create a one-element priority queue. *)
   let singleton (d:D.t 'a) : t 'a
     ensures { result.m.bag d = 1 /\
       forall d2:D.t 'a. d2 <> d -> result.m.bag d2 = 0 }
-    ensures { result.m.card = 1 /\ c result }
+    ensures { result.m.card = 1 }
   = Sel.singleton d
 
   (** Test emptyness of a priority queue. *)
   let is_empty (ghost rd:ref (D.t 'a)) (t:t 'a) : bool
-    requires { c t }
-    ensures { result -> forall d:D.t 'a. t.m.bag d = 0 }
-    ensures { not result -> t.m.bag !rd > 0 }
-    ensures { result <-> t.m.card = 0 }
+    ensures { result -> forall d:D.t 'a. t.bag d = 0 }
+    ensures { not result -> t.bag !rd > 0 }
+    ensures { result <-> t.card = 0 }
   = let res = Sel.is_empty t in
-    ghost if not res
-    then match t.Sel.m.Sel.lis with
-      | Nil -> absurd
-      | Cons d _ -> rd := d
-      end;
+    ghost if not res then rd := t.Sel.m.Sel.seq[0];
     res
 
   (** Merge two priority queues. *)
   let merge (l r:t 'a) : t 'a
-    requires { c l /\ c r }
-    ensures { forall d. result.m.bag d = l.m.bag d + r.m.bag d }
-    ensures { result.m.card = l.m.card + r.m.card /\ c result }
+    ensures { forall d. result.bag d = l.bag d + r.bag d }
+    ensures { result.card = l.card + r.card }
   = Sel.concat l r
 
-  (** Additional lemma about bag created from a list
+  (** Additional lemma about bag created from a sequence
       (removal in the middle). *)
-  let lemma remove_count (l:list 'a) (d:'a) (r:list 'a) : unit
-    ensures { as_bag (l ++ Cons d r) d = as_bag (l++r) d + 1 }
-    ensures { forall e. e <> d -> as_bag (l++Cons d r) e = as_bag (l++r) e }
-  = ()
+  let lemma remove_count (l:seq 'a) (d:'a) (r:seq 'a) : unit
+    ensures { to_bag (l ++ singleton d ++ r) d = to_bag (l++r) d + 1 }
+    ensures { forall e. e <> d ->
+      to_bag (l ++ singleton d ++ r) e = to_bag (l++r) e }
+  = assert { forall e. to_bag (singleton d) e = if d = e then 1 else 0 }
 
   (** Get and remove minimum element. *)
   let extract_min (t:t 'a) : option (D.t 'a,t 'a)
-    requires { c t }
-    returns { None -> t.m.card = 0 /\ (forall d. t.m.bag d = 0)
-      | Some (d,e) -> t.m.card = e.m.card + 1 /\ t.m.bag d = e.m.bag d + 1 /\
-        (forall d2. d2 <> d -> t.m.bag d2 = e.m.bag d2) /\
-        d = t.m.minimum /\ c e }
+    returns { None -> t.card = 0 /\ (forall d. t.bag d = 0)
+      | Some (d,e:t 'a) -> t.card = e.card + 1 /\ t.bag d = e.bag d + 1 /\
+        d = t.minimum /\ forall d2. d2 <> d -> t.bag d2 = e.bag d2 }
   = if Sel.is_empty t
     then None
-    else let (o,e) = Sel.extract (Sel.default_split ()) () t in
+    else
+      let (o,e) = Sel.extract (Sel.default_split ()) () t in
       match o with
       | None -> absurd
       | Some d -> Some (d,e)
@@ -366,8 +335,8 @@ module PQueue
 
   (** Get minimum element. *)
   let min (t:t 'a) : D.t 'a
-    requires { t.m.card >= 1 /\ c t }
-    ensures { t.m.bag result > 0 /\ t.m.card > 0 /\ result = t.m.minimum }
+    requires { t.card > 0 }
+    ensures { t.bag result > 0 /\ result = t.minimum }
   = match Sel.get (Sel.default_split ()) () t with
     | None -> absurd
     | Some d -> d
@@ -375,21 +344,24 @@ module PQueue
 
   (** Pop minimum element. *)
   let pop_min (t:t 'a) : t 'a
-    requires { t.m.card >= 1 /\ c t }
-    ensures { t.m.card = result.m.card + 1 /\ c result /\
-      t.m.bag t.m.minimum = result.m.bag t.m.minimum + 1 /\
-      (forall d2. d2 <> t.m.minimum -> t.m.bag d2 = result.m.bag d2) }
-  = let r0 = Sel.default_split () in
-    let res = Sel.remove r0 () t in
-    assert { match !r0.middle with None -> false | Some _ -> true end };
+    requires { t.card > 0 }
+    ensures { t.card = result.card + 1 /\
+      t.bag t.minimum = result.bag t.minimum + 1 /\
+      (forall d2. d2 <> t.minimum -> t.bag d2 = result.bag d2) }
+  = let r = Sel.default_split () in
+    let res = Sel.remove r () t in
+    ghost match !r.middle with
+    | None -> absurd
+    | Some _ -> split_gives_minimum !r
+    end;
     res
 
   let add (d:D.t 'a) (t:t 'a) : t 'a
-    requires { c t }
-    ensures { result.m.bag d = t.m.bag d + 1 /\
-      (forall d2. d2 <> d -> result.m.bag d2 = t.m.bag d2) }
-    ensures { result.m.card = t.m.card + 1 /\ c result }
-  = Sel.cons d t
+    ensures { result.bag d = t.bag d + 1 /\
+      (forall d2. d2 <> d -> result.bag d2 = t.bag d2) }
+    ensures { result.card = t.card + 1 }
+  = assert { forall d2. (singleton d).to_bag d2 = if d2 = d then 1 else 0 };
+    Sel.cons d t
 
 end
 

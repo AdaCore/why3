@@ -1,0 +1,63 @@
+module Tree
+
+  use list.List
+
+  type forest 'a = list (tree 'a)
+  with tree 'a   = Node 'a (forest 'a)
+
+end
+
+module Size
+
+  use Tree
+  use list.List
+  use int.Int
+
+  let rec function size_forest (f: forest 'a) : int
+    ensures { result >= 0 }
+  = match f with
+    | Nil      -> 0
+    | Cons t f -> size_tree t + size_forest f
+    end
+  with function size_tree (t: tree 'a) : int
+    ensures { result > 0 }
+  = match t with
+    | Node _ f -> 1 + size_forest f
+    end
+
+end
+
+module Forest
+
+  use int.Int
+
+  type forest 'a =
+    | E
+    | N 'a (forest 'a) (forest 'a)
+
+end
+
+module SizeForest
+
+  use Forest
+  use int.Int
+
+  let rec function size_forest (f: forest 'a) : int
+    ensures { result >= 0 }
+  = match f with
+    | E -> 0
+    | N _ f1 f2 -> 1 + size_forest f1 + size_forest f2
+    end
+
+end
+
+module MemForest
+
+  use Forest
+
+  predicate mem_forest (n: 'a) (f: forest 'a) = match f with
+    | E -> false
+    | N i f1 f2 -> i = n || mem_forest n f1 || mem_forest n f2
+    end
+
+end

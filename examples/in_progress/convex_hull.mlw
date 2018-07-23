@@ -47,9 +47,9 @@ goal test1 :
    turns_left {x=0.0;y=0.0} {x=1.0;y=0.0} {x=1.0;y=1.0}
 
 
-use import list.List
-use import list.Length
-use import list.NthNoOpt
+use list.List
+use list.Length
+use list.NthNoOpt
 
 type path = list pt
 
@@ -97,12 +97,12 @@ si q = p0: fini
 
 *)
 
-use import ConvexSet
-use import set.Fset
-use import ref.Ref
+use ConvexSet
+use set.Fset
+use ref.Ref
 
-predicate lower (p q:pt) =
-  p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x)
+val predicate lower (p q:pt)
+  ensures { result <-> p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x) }
 
 let lowest_pt (s:set pt) : (pt, set pt)
   requires { not (is_empty s) }
@@ -112,6 +112,7 @@ let lowest_pt (s:set pt) : (pt, set pt)
   let p = ref (choose s) in
   let r = ref (remove !p s) in
   while not (is_empty !r) do
+     variant { cardinal !r }
      invariant { mem !p s }
      invariant { subset !r s }
      invariant { forall q:pt. mem q s /\ not (mem q !r) -> lower !p q }
@@ -152,7 +153,7 @@ end
 module Graham
 
 
-use import ConvexSet
+use ConvexSet
 
 (*
 let convex_hull (l:path) : path =

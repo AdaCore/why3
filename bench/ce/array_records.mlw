@@ -2,8 +2,8 @@
 
 module Array_records
 
-   use import int.Int
-   use import array.Array
+   use int.Int
+   use array.Array
 
    type value = int
    type index = int
@@ -13,9 +13,9 @@ module Array_records
 
    type basic_record =
    {
-      flag "model_trace:flag" : bool;
-      first_value "model_trace:first_val" : value;
-      second_value "model_trace:sec_val" : value;
+      flag [@model_trace:flag] : bool;
+      first_value [@model_trace:first_val] : value;
+      second_value [@model_trace:sec_val] : value;
    }
 
    type array_of_records = array basic_record

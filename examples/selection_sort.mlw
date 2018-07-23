@@ -3,21 +3,20 @@
 
 module SelectionSort
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   let selection_sort (a: array int)
     ensures { sorted a /\ permut_all (old a) a } =
-'L:
     let min = ref 0 in
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
-      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a /\
+      invariant { sorted_sub a 0 i /\ permut_all (old a) a /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
       (* let min = ref i in *) min := i;
       for j = i + 1 to length a - 1 do
@@ -25,14 +24,14 @@ module SelectionSort
           i <= !min < j && forall k: int. i <= k < j -> a[!min] <= a[k] }
         if a[j] < a[!min] then min := j
       done;
-'L1:
+      label L in
       if !min <> i then swap a !min i;
-      assert { permut_all (at a 'L1) a }
+      assert { permut_all (a at L) a }
     done
 
   let test1 () =
     let a = make 3 0 in
-    a[0] <- 7; a[1] <- 3; a[2] <- 1; 
+    a[0] <- 7; a[1] <- 3; a[2] <- 1;
     selection_sort a;
     a
 

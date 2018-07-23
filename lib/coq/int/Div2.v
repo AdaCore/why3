@@ -19,7 +19,7 @@ Require Import int.EuclideanDivision.
 
 (* Why3 goal *)
 Lemma div2 :
-forall (x:Z), exists y:Z, (x = (2%Z * y)%Z) \/ (x = ((2%Z * y)%Z + 1%Z)%Z).
+  forall (x:Z), exists y:Z, (x = (2%Z * y)%Z) \/ (x = ((2%Z * y)%Z + 1%Z)%Z).
 Proof.
 intros x.
 exists (div x 2).

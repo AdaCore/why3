@@ -2,23 +2,21 @@
 (* Basic arrow definitions *)
 module Fun
 
-  use export HighOrd
-
   predicate ext (f g:'a -> 'b) = forall x. f x = g x
   predicate equalizer (a:'a -> bool) (f g:'a -> 'b) =
     forall x. a x -> f x = g x
 
-  function compose (g:'b -> 'c) (f:'a -> 'b) : 'a -> 'c = \x. g (f x)
+  function compose (g:'b -> 'c) (f:'a -> 'b) : 'a -> 'c = fun x -> g (f x)
   function rcompose (f:'a -> 'b) (g:'b -> 'c) : 'a -> 'c = compose g f
 
-  function id : 'a -> 'a = \x.x
-  function const (x:'b) : 'a -> 'b = \_.x
+  function id : 'a -> 'a = fun x -> x
+  function const (x:'b) : 'a -> 'b = fun _ -> x
   function fst (x:('a,'b)) : 'a = let (x,_) = x in x
   function snd (x:('a,'b)) : 'b = let (_,x) = x in x
-  function flip (f:'a -> 'b -> 'c) : 'b -> 'a -> 'c = \x y. f y x
+  function flip (f:'a -> 'b -> 'c) : 'b -> 'a -> 'c = fun x y -> f y x
 
   function update (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b =
-    \z. if z = x then y else f z
+    fun z -> if z = x then y else f z
   function ([<-]) (f:'a -> 'b) (x:'a) (y:'b) : 'a -> 'b = update f x y
 
 end
@@ -53,11 +51,11 @@ end
 (* Proofs of above Fun modules *)
 module FunProofs
 
-  use import Fun
+  use Fun
 
   predicate hack (f g h:'a -> 'b) = f = g = h
   lemma ext : forall f g:'a -> 'b.
-    ext f g -> f = g by hack f (\x. (\y.y) (f x)) g
+    ext f g -> f = g by hack f (fun x -> (fun y -> y) (f x)) g
 
   lemma assoc : forall f:'a -> 'b,g,h:'c -> 'd.
     ext (compose (compose h g) f) (compose h (compose g f))
@@ -73,42 +71,43 @@ end
 (* Basic definition on sets-as-arrows *)
 module Set
 
-  use import Fun
+  use Fun
 
   type set 'a = 'a -> bool
 
   predicate subset (a b:set 'a) = forall x. a x -> b x
+  predicate inhabited (s:set 'a) = exists x. s x
   predicate sext (a b:set 'a) = forall x. a x <-> b x
   lemma sext_is_ext : forall a b:set 'a. sext a b -> ext a b
 
-  function neg (s:set 'a) : set 'a = \x. not (s x)
-  function union (a b:set 'a) : set 'a = \x. a x \/ b x
-  function inter (a b:set 'a) : set 'a = \x. a x /\ b x
+  function neg (s:set 'a) : set 'a = fun x -> not (s x)
+  function union (a b:set 'a) : set 'a = fun x -> a x \/ b x
+  function inter (a b:set 'a) : set 'a = fun x -> a x /\ b x
   function diff (a b:set 'a) : set 'a = inter a (neg b)
 
-  constant all : set 'a = \_. true
-  constant none : set 'a = \_. false
+  constant all : set 'a = fun _ -> true
+  constant none : set 'a = fun _ -> false
   function sing (x:'a) : set 'a = (=) x
 
-  function add (s:set 'a) (x:'a) : set 'a = \y. s y \/ x = y
-  function remove (s:set 'a) (x:'a) : set 'a = \y. s y /\ y <> x
+  function add (s:set 'a) (x:'a) : set 'a = fun y -> s y \/ x = y
+  function remove (s:set 'a) (x:'a) : set 'a = fun y -> s y /\ y <> x
 
 end
 
 (* Some usual big operators on sets. *)
 module SetBigOps
 
-  use import Set
+  use Set
 
-  function bigunion (c:set (set 'a)) : set 'a = \x. exists s. c s /\ s x
-  function biginter (c:set (set 'a)) : set 'a = \x. forall s. c s -> s x
+  function bigunion (c:set (set 'a)) : set 'a = fun x -> exists s. c s /\ s x
+  function biginter (c:set (set 'a)) : set 'a = fun x -> forall s. c s -> s x
 
 end
 
 (* Basic definition on relations-as-arrows *)
 module Rel
 
-  use import Fun
+  use Fun
 
   type rel 'a 'b = 'a -> 'b -> bool
   type erel 'a = rel 'a 'a
@@ -120,6 +119,8 @@ module Rel
   predicate transitive (r:erel 'a) = forall x y z. r x y /\ r y z -> r x z
   predicate antisymetric (r:erel 'a) = forall x y. r x y /\ r y x -> x = y
   predicate total (r:erel 'a) = forall x y. r x y \/ r y x
+  predicate det_related (r:rel 'a 'b) (x:'a) = forall y z. r x y /\ r x z -> y = z
+  predicate deterministic (r:rel 'a 'b) = forall x. det_related r x
   predicate preorder (r:erel 'a) = reflexive r /\ transitive r
   predicate order (r:erel 'a) = preorder r /\ antisymetric r
   predicate equivalence (r:erel 'a) = preorder r /\ symetric r
@@ -129,9 +130,9 @@ module Rel
   predicate wf_on (r:erel 'a)  (s:'a -> bool) = forall x. s x -> acc_on r s x
 
   constant id : rel 'a 'a = (=)
-  function of_func (f:'a -> 'b) : rel 'a 'b = \x y. y = f x
+  function of_func (f:'a -> 'b) : rel 'a 'b = fun x y -> y = f x
   function compose (r1:rel 'a 'b) (r2:rel 'b 'c) : rel 'a 'c =
-    \x z. exists y. r1 x y /\ r2 y z
+    fun x z -> exists y. r1 x y /\ r2 y z
   function reverse (r:rel 'a 'b) : rel 'b 'a = flip r
 
 end
@@ -177,7 +178,7 @@ end
 (* Elements related to a set. *)
 module RelSet
 
-  use import Set
+  use Set
   use export Rel
 
   predicate related (r:rel 'a 'b) (s:set 'a) (y:'b) = exists x. s x /\ r x y
@@ -188,8 +189,8 @@ end
 
 module RelProofs
 
-  use import FunExt
-  use import Rel
+  use FunExt
+  use Rel
 
   lemma extensionality : forall r1 r2:rel 'a 'b. rext r1 r2 -> r1 = r2
     by ext r1 r2 by forall x. ext (r1 x) (r2 x)
@@ -224,7 +225,7 @@ end
 module SubsetOrder "W:non_conservative_extension:N" (* => SetProofs *)
 
   use export Set
-  use import Rel
+  use Rel
 
   axiom subset_order : order (subset:erel (set 'a))
 
@@ -232,8 +233,8 @@ end
 
 module SetProofs
 
-  use import FunExt
-  use import Set
+  use FunExt
+  use Set
 
   lemma anti_subset : forall s1 s2:set 'a.
     subset s1 s2 /\ subset s2 s1 -> sext s1 s2
@@ -244,11 +245,127 @@ end
 
 module Image
 
-  use import Fun
-  use import Set
+  use Fun
+  use Set
 
   predicate image (f:'a -> 'b) (s:set 'a) (y:'b) = exists x. s x /\ f x = y
 
   predicate preimage (f:'a -> 'b) (s:set 'b) (x:'a) = s (f x)
+
+end
+
+module PartialFun "W:non_conservative_extension:N" (* => PartialFunInstance *)
+
+  use Fun
+  use Set
+
+  type pfun 'a 'b
+
+  (* TODO/FIXME: seems weird that it is necessary to
+     separate the function/val definition so that they
+     can be used with the dot notation. *)
+  function domain (pfun 'a 'b) : set 'a
+  function eval (pfun 'a 'b) : 'a -> 'b
+
+  val ghost function of_fun (f:{'a -> 'b}) : {pfun 'a 'b}
+    ensures { result.domain = all /\ result.eval = f }
+  val ghost function restrict (p:set {'a}) (f:{pfun 'a 'b}) : {pfun 'a 'b}
+    ensures { result.domain = inter p f.domain }
+    ensures { forall x. result.domain x -> result.eval x = f.eval x }
+  val ghost function extends (f g:{pfun 'a 'b}) : {pfun 'a 'b}
+    ensures { result.domain = union f.domain g.domain }
+    ensures { forall x. g.domain x -> result.eval x = g.eval x }
+    ensures { forall x. f.domain x /\ not g.domain x ->
+      result.eval x = f.eval x }
+  val ghost function join (f g:{pfun 'a 'b}) : {pfun 'a 'b}
+    requires { equalizer (inter f.domain g.domain) f.eval g.eval }
+    ensures { result.domain = union f.domain g.domain }
+    ensures { forall x. g.domain x -> result.eval x = g.eval x }
+    ensures { forall x. f.domain x -> result.eval x = f.eval x }
+  val ghost function psing (x:{'a}) (y:{'b}) : {pfun 'a 'b}
+    ensures { result.domain = sing x }
+    ensures { result.eval x = y }
+  val ghost function padd (f:{pfun 'a 'b}) (x:{'a}) (y:{'b}) : {pfun 'a 'b}
+    ensures { result.domain = add f.domain x }
+    ensures { result.eval x = y }
+    ensures { forall x0. result.domain x0 /\ x <> x0 ->
+      result.eval x0 = f.eval x0 }
+  val ghost function premove (f:{pfun 'a 'b}) (x:{'a}) : {pfun 'a 'b}
+    ensures { result.domain = remove f.domain x }
+    ensures { forall x. result.domain x -> result.eval x = f.eval x }
+
+  predicate pext (f g:pfun 'a 'b) =
+    f.domain = g.domain && equalizer f.domain f.eval g.eval
+  axiom extensional : forall f g:pfun 'a 'b. pext f g -> f = g
+
+  predicate subfun (f g:pfun 'a 'b) =
+    subset f.domain g.domain && equalizer f.domain f.eval g.eval
+
+end
+
+module PartialFunInstance
+
+  use FunExt
+  use Set
+
+  type o 'a = N | S 'a
+
+  type pfun 'a 'b = 'a -> o 'b
+
+  let function dummy () : 'b
+    requires { false }
+  = absurd
+
+  function domain (f:pfun 'a 'b) : set 'a =
+    fun x -> match f x with N -> false | _ -> true end
+  function eval (f:pfun 'a 'b) : 'a -> 'b =
+    fun x -> match f x with N -> dummy () | S u -> u end
+
+  let ghost function of_fun (f:{'a -> 'b}) : {pfun 'a 'b}
+    ensures { sext result.domain all }
+    ensures { ext result.eval f }
+  = fun x -> S (f x)
+  let ghost function restrict (p:set {'a}) (f:{pfun 'a 'b}) : {pfun 'a 'b}
+    ensures { sext result.domain (inter p f.domain) }
+  = fun x -> if p x then f x else N
+  let ghost function extends (f g:{pfun 'a 'b}) : {pfun 'a 'b}
+    ensures { sext result.domain (union f.domain g.domain) }
+  = fun x -> match g x with S u -> S u | N -> f x end
+  let ghost function psing (x:{'a}) (y:{'b}) : {pfun 'a 'b}
+  = restrict ({sing} x) (of_fun ({const} y))
+  let ghost function padd (f:{pfun 'a 'b}) (x:{'a}) (y:{'b}) : {pfun 'a 'b}
+  = extends f (psing x y)
+  let ghost function premove (f:{pfun 'a 'b}) (x:{'a}) : {pfun 'a 'b}
+  = restrict ({remove} f.domain x) f
+
+  lemma extensional : forall f g:pfun 'a 'b.
+    f.domain = g.domain /\ equalizer f.domain f.eval g.eval ->
+    f = g by ext f g by forall x. f x = g x
+    by match f x with
+      | N -> not g.domain x
+      | _ -> g.domain x so g.eval x = f.eval x
+      end
+
+  clone PartialFun with type pfun 'a 'b = pfun 'a 'b,
+    function domain = domain,
+    function eval = eval,
+    val of_fun = of_fun,
+    val restrict = restrict,
+    val extends = extends,
+    val join = extends,
+    val psing = psing,
+    val padd = padd,
+    val premove = premove,
+    goal extensional
+
+end
+
+module SubFunOrder
+
+  use export PartialFun
+  use Rel
+
+  lemma subfun_order : order (subfun:erel (pfun 'a 'b))
+    by forall f g:pfun 'a 'b. subfun f g /\ subfun g f -> f = g by pext f g
 
 end

@@ -2,26 +2,26 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Functions.mlw">
-<theory name="Func">
- <goal name="update_eq" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../Functions.mlw" proved="true">
+<theory name="Func" proved="true">
+ <goal name="update_eq" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
- <goal name="update_neq" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
+ <goal name="update_neq" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter compose_associative" expl="VC for compose_associative">
- <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+ <goal name="VC compose_associative" expl="VC for compose_associative" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
- <goal name="WP_parameter identity_neutral" expl="VC for identity_neutral">
- <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
+ <goal name="VC identity_neutral" expl="VC for identity_neutral" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
  </goal>
- <goal name="WP_parameter const_compose_left" expl="VC for const_compose_left">
- <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
+ <goal name="VC const_compose_left" expl="VC for const_compose_left" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
- <goal name="WP_parameter const_compose_right" expl="VC for const_compose_right">
- <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="VC const_compose_right" expl="VC for const_compose_right" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,0 +1,262 @@
+
+
+(** {1 Theory of maps} *)
+
+(** {2 Generic Maps} *)
+
+module Map
+
+  type map 'a 'b = 'a -> 'b
+
+  let function get (f: map 'a 'b) (x: 'a) : 'b = f x
+
+  let ghost function set (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b =
+    fun y -> if pure {y = x} then v else f y
+
+  (** syntactic sugar *)
+  let function ([]) (f: map 'a 'b) (x: 'a) : 'b = f x
+  let ghost function ([<-]) (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b = set f x v
+
+end
+
+module Const
+
+  use Map
+
+  let function const (v: 'b) : map 'a 'b = fun _ -> v
+
+end
+
+module MapExt
+
+  predicate (==) (m1 m2: 'a -> 'b) = forall x: 'a. m1 x = m2 x
+
+  lemma extensionality:
+    forall m1 m2: 'a -> 'b. m1 == m2 -> m1 = m2
+  (* This lemma is actually provable in Why3, because of how
+     eliminate_epsilon handles equality to a lambda-term. *)
+
+end
+
+(** {2 Sorted Maps (indexed by integers)} *)
+
+module MapSorted
+
+  use int.Int
+  use Map
+
+  type elt
+
+  predicate le elt elt
+
+  predicate sorted_sub (a : map int elt) (l u : int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
+  (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
+      is sorted w.r.t order relation `le` *)
+
+end
+
+(** {2 Maps Equality (indexed by integers)} *)
+
+module MapEq
+
+  use int.Int
+  use Map
+
+  predicate map_eq_sub (a1 a2 : map int 'a) (l u : int) =
+    forall i:int. l <= i < u -> a1[i] = a2[i]
+
+end
+
+module MapExchange
+
+  use int.Int
+  use Map
+
+  predicate exchange (a1 a2: map int 'a) (l u i j: int) =
+    l <= i < u /\ l <= j < u /\
+    a1[i] = a2[j] /\ a1[j] = a2[i] /\
+    (forall k:int. l <= k < u -> k <> i -> k <> j -> a1[k] = a2[k])
+
+  lemma exchange_set :
+    forall a: map int 'a, l u i j: int.
+    l <= i < u -> l <= j < u ->
+    exchange a a[i <- a[j]][j <- a[i]] l u i j
+
+end
+
+(** {2 Sum of elements of a map (indexed by integers)} *)
+
+module MapSum
+
+  use int.Int
+  use export Map
+
+  (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
+
+  type container = map int int
+  clone export sum.Sum with
+    type container = container, function f = get, axiom .
+
+end
+
+(** {2 Number of occurrences} *)
+
+(* TODO: we could define Occ using theory int.NumOf *)
+module Occ
+
+  use int.Int
+  use Map
+
+  function occ (v: 'a) (m: map int 'a) (l u: int) : int
+    (** number of occurrences of `v` in `m` between `l` included and `u` excluded *)
+
+  axiom occ_empty:
+    forall v: 'a, m: map int 'a, l u: int.
+    u <= l -> occ v m l u = 0
+
+  axiom occ_right_no_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[u-1] <> v -> occ v m l u = occ v m l (u-1)
+
+  axiom occ_right_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[u-1] = v -> occ v m l u = 1 + occ v m l (u-1)
+
+  lemma occ_left_no_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[l] <> v -> occ v m l u = occ v m (l+1) u
+
+  lemma occ_left_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[l] = v -> occ v m l u = 1 + occ v m (l+1) u
+
+  lemma occ_bounds:
+    forall v: 'a, m: map int 'a, l u: int.
+    l <= u -> 0 <= occ v m l u <= u - l
+    (* direct when l>=u, by induction on u when l <= u *)
+
+  lemma occ_append:
+    forall v: 'a, m: map int 'a, l mid u: int.
+    l <= mid <= u -> occ v m l u = occ v m l mid + occ v m mid u
+    (* by induction on u *)
+
+  lemma occ_neq:
+    forall v: 'a, m: map int 'a, l u: int.
+    (forall i: int. l <= i < u -> m[i] <> v) -> occ v m l u = 0
+    (* by induction on u *)
+
+  lemma occ_exists:
+    forall v: 'a, m: map int 'a, l u: int.
+    occ v m l u > 0 -> exists i: int. l <= i < u /\ m[i] = v
+
+  lemma occ_pos:
+    forall m: map int 'a, l u i: int.
+    l <= i < u -> occ m[i] m l u > 0
+
+  lemma occ_eq:
+    forall v: 'a, m1 m2: map int 'a, l u: int.
+    (forall i: int. l <= i < u -> m1[i] = m2[i]) -> occ v m1 l u = occ v m2 l u
+    (* by induction on u *)
+
+  lemma occ_exchange :
+    forall m: map int 'a, l u i j: int, x y z: 'a.
+    l <= i < u -> l <= j < u -> i <> j ->
+    occ z m[i <- x][j <- y] l u =
+    occ z m[i <- y][j <- x] l u
+
+end
+
+module MapPermut
+
+  use int.Int
+  use Map
+  use Occ
+
+  predicate permut (m1 m2: map int 'a) (l u: int) =
+    forall v: 'a. occ v m1 l u = occ v m2 l u
+
+  lemma permut_trans: (* provable, yet useful *)
+    forall a1 a2 a3 : map int 'a. forall l u : int.
+    permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u
+
+  lemma permut_exists :
+    forall a1 a2: map int 'a, l u i: int.
+    permut a1 a2 l u -> l <= i < u ->
+    exists j: int. l <= j < u /\ a1[j] = a2[i]
+
+end
+
+
+(** {2 Injectivity and surjectivity for maps (indexed by integers)} *)
+
+module MapInjection
+
+  use int.Int
+  use export Map
+
+  predicate injective (a: map int int) (n: int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+  (** `injective a n` is true when `a` is an injection
+      on the domain `(0..n-1)` *)
+
+  predicate surjective (a: map int int) (n: int) =
+    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
+  (** `surjective a n` is true when `a` is a surjection
+      from `(0..n-1)` to `(0..n-1)` *)
+
+  predicate range (a: map int int) (n: int) =
+    forall i: int. 0 <= i < n -> 0 <= a[i] < n
+  (** `range a n` is true when `a` maps the domain
+      `(0..n-1)` into `(0..n-1)` *)
+
+  lemma injective_surjective:
+    forall a: map int int, n: int.
+    injective a n -> range a n -> surjective a n
+  (** main lemma: an injection on `(0..n-1)` that
+      ranges into `(0..n-1)` is also a surjection *)
+
+  use Occ
+
+  lemma injection_occ:
+    forall m: map int int, n: int.
+    injective m n <-> forall v:int. (occ v m 0 n <= 1)
+
+end
+
+(***
+
+(** {2 Parametric Maps} *)
+
+module MapParam
+
+  type idx
+  type elt
+  type map
+
+  (** if `'b` is an infinite type, then `map 'a 'b` is infinite *)
+  meta "material_type_arg" type map, 1
+
+  function get (map 'a 'b) 'a : 'b
+  function set (map 'a 'b) 'a 'b : map 'a 'b
+
+  (** syntactic sugar *)
+  function ([])   (a : map 'a 'b) (i : 'a) : 'b = get a i
+  function ([<-]) (a : map 'a 'b) (i : 'a) (v : 'b) : map 'a 'b = set a i v
+
+  axiom Select_eq :
+    forall m : map 'a 'b. forall a1 a2 : 'a.
+    forall b : 'b [m[a1 <- b][a2]].
+    a1 = a2 -> m[a1 <- b][a2]  = b
+
+  axiom Select_neq :
+    forall m : map 'a 'b. forall a1 a2 : 'a.
+    forall b : 'b [m[a1 <- b][a2]].
+    a1 <> a2 -> m[a1 <- b][a2] = m[a2]
+
+  function const 'b : map 'a 'b
+
+  axiom Const : forall b:'b, a:'a. (const b)[a] = b
+
+end
+*)

@@ -91,7 +91,7 @@ let code =
   "let" | "val" | "exception"
 let annotation =
   "requires" | "ensures" | "returns" | "raises" | "reads" | "writes" |
-  "variant" | "invariant" | "assert" | "assume" | "check"
+  "variant" | "invariant" | "assert" | "assume" | "check" | "alias"
 
 let digit = ['0'-'9']
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']

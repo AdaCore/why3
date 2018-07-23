@@ -2,69 +2,68 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../pairing_heap_bin.mlw">
-<theory name="Heap">
-</theory>
-<theory name="HeapType">
-</theory>
-<theory name="Size">
- <goal name="WP_parameter size_nonneg" expl="VC for size_nonneg">
- <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../pairing_heap_bin.mlw" proved="true">
+<theory name="Size" proved="true">
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="size_empty" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+ <goal name="VC size_nonneg" expl="VC for size_nonneg" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
-</theory>
-<theory name="Occ">
- <goal name="WP_parameter occ_nonneg" expl="VC for occ_nonneg">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <goal name="size_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="PairingHeap">
- <goal name="le_root_trans" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+<theory name="Occ" proved="true">
+ <goal name="VC occ_nonneg" expl="VC for occ_nonneg" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="le_root_tree_trans" expl="">
- <transf name="induction_ty_lex">
-  <goal name="le_root_tree_trans.1" expl="">
-  <proof prover="1"><result status="valid" time="0.01" steps="40"/></proof>
+</theory>
+<theory name="PairingHeap" proved="true">
+ <goal name="le_root_trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+ </goal>
+ <goal name="le_root_tree_trans" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="le_root_tree_trans.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mem_heap_tree" expl="VC for mem_heap_tree">
- <proof prover="1"><result status="valid" time="0.03" steps="83"/></proof>
+ <goal name="VC mem_heap_tree" expl="VC for mem_heap_tree" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="224"/></proof>
  </goal>
- <goal name="WP_parameter mem_heap" expl="VC for mem_heap">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="VC mem_heap" expl="VC for mem_heap" proved="true">
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="root_is_minimum" expl="">
- <proof prover="1"><result status="valid" time="0.06" steps="212"/></proof>
+ <goal name="root_is_minimum" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="135"/></proof>
  </goal>
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+ <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="WP_parameter size" expl="VC for size">
- <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="WP_parameter merge" expl="VC for merge">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <goal name="VC merge" expl="VC for merge" proved="true">
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter insert" expl="VC for insert">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter find_min" expl="VC for find_min">
- <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+ <goal name="VC find_min" expl="VC for find_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="WP_parameter merge_pairs" expl="VC for merge_pairs">
- <proof prover="0"><result status="valid" time="0.20"/></proof>
+ <goal name="VC merge_pairs" expl="VC for merge_pairs" proved="true">
+ <proof prover="3"><result status="valid" time="0.27"/></proof>
  </goal>
- <goal name="WP_parameter delete_min" expl="VC for delete_min">
- <proof prover="1"><result status="valid" time="0.03" steps="122"/></proof>
+ <goal name="VC delete_min" expl="VC for delete_min" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="174"/></proof>
  </goal>
 </theory>
 </file>

@@ -8,8 +8,8 @@
 
 module InvertingAnInjection
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
   use map.MapInjection as M
 
   predicate injective (a: array int) (n: int) = M.injective a.elts n
@@ -18,23 +18,23 @@ module InvertingAnInjection
 
   predicate range (a: array int) (n: int) = M.range a.elts n
 
-  let inverting (a: array int) (b: array int) (n: int)
+  let inverting (a: array int) (b: array int) (n: int) : unit
     requires { n = length a = length b /\ injective a n /\ range a n }
-    ensures { injective b n }
+    ensures  { injective b n }
   = for i = 0 to n - 1 do
-      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      invariant { forall j. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done
 
   (* variant where array b is returned /\ with additional post *)
 
-  let inverting2 (a: array int) (n: int)
+  let inverting2 (a: array int) (n: int) : array int
     requires { n = length a /\ injective a n /\ range a n }
-    ensures { length result = n /\ injective result n /\
-      forall i: int. 0 <= i < n -> result[a[i]] = i }
+    ensures  { length result = n /\ injective result n /\
+               forall i. 0 <= i < n -> result[a[i]] = i }
   = let b = make n 0 in
     for i = 0 to n - 1 do
-      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      invariant { forall j. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done;
     b
@@ -43,8 +43,8 @@ end
 
 module Test
 
-  use import array.Array
-  use import InvertingAnInjection
+  use array.Array
+  use InvertingAnInjection
 
   let test () =
     let a = make 10 0 in

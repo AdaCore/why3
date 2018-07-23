@@ -1,0 +1,296 @@
+
+(** Flexible arrays
+
+    Flexible arrays are arrays whose size can be changed by adding or
+    removing elements at either end (one at a time).
+
+    This is an implementation of flexible arrays using Braun trees,
+    following
+
+      Rob Hoogerwoord
+      A logarithmic implementation of flexible arrays
+      http://alexandria.tue.nl/repository/notdare/772185.pdf
+
+    All operations (get, set, le, lr, he, hr) have logarithmic complexity.
+
+    Note: Braun trees can also be used to implement priority queues.
+    See braun_trees.mlw. This file also contains a proof that Braun
+    trees have logarithmic height.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module FlexibleArray
+
+  use int.Int
+  use int.ComputerDivision
+  use bintree.Tree
+  use export bintree.Size
+  use ref.Ref
+  use import seq.Seq as S
+  use import queue.Queue as Q
+  use list.List
+  use list.Append
+  use list.Mem
+
+  (* to be a Braun tree *)
+  predicate inv (t: tree 'a) = match t with
+  | Empty      -> true
+  | Node l _ r -> (size l = size r || size l = size r + 1) && inv l && inv r
+  end
+
+  type t 'a = {
+    length: int;
+      tree: tree 'a;
+  } invariant {
+    length = size tree && inv tree
+  }
+
+  let empty () : t 'a
+    ensures { result.length = 0 }
+    = { length = 0; tree = Empty }
+
+  let is_empty (t: t 'a) : bool
+    ensures  { result <-> t.length = 0 }
+  =
+    t.length = 0
+
+  let rec function get_aux (t: tree 'a) (i: int) : 'a
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+       if i = 0 then x
+       else if mod i 2 = 1 then get_aux l (div i 2) else get_aux r (div i 2 - 1)
+    end
+
+  let function get (t: t 'a) (i: int) : 'a
+    requires { 0 <= i < t.length }
+  = get_aux t.tree i
+
+  let rec set_aux (t: tree 'a) (i: int) (v: 'a) : tree 'a
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t }
+    ensures  { forall j. 0 <= j < size t -> j <> i ->
+               get_aux result j = get_aux t j }
+    ensures  { get_aux result i = v }
+  = match t with
+    | Empty -> absurd
+    | Node l x r ->
+       if i = 0 then Node l v r
+       else if mod i 2 = 1 then Node (set_aux l (div i 2) v) x r
+       else Node l x (set_aux r (div i 2 - 1) v)
+    end
+
+  let set (t: t 'a) (i: int) (v: 'a) : t 'a
+    requires { 0 <= i < t.length }
+    ensures  { result.length = t.length }
+    ensures  { forall j. 0 <= j < t.length -> j <> i -> get result j = get t j }
+    ensures  { get result i = v }
+  = { length = t.length; tree = set_aux t.tree i v }
+
+  (* low extension *)
+  let rec le_aux (v: 'a) (t: tree 'a) : tree 'a
+    requires { inv t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t + 1 }
+    ensures  { get_aux result 0 = v }
+    ensures  { forall j. 0 <= j < size t ->
+               get_aux result (j + 1) = get_aux t j }
+  = match t with
+    | Empty -> Node Empty v Empty
+    | Node l x r -> Node (le_aux x r) v l
+    end
+
+  let rec le (v: 'a) (t: t 'a) : t 'a
+    ensures  { result.length = t.length + 1 }
+    ensures  { get result 0 = v }
+    ensures  { forall j. 0 <= j < t.length -> get result (j + 1) = get t j }
+  = { length = t.length + 1; tree = le_aux v t.tree }
+
+  (* low removal *)
+  let rec lr_aux (t: tree 'a) : tree 'a
+    requires { inv t }
+    requires { size t > 0 }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t - 1 }
+    ensures  { forall j. 0 <= j < size result ->
+               get_aux result j = get_aux t (j + 1) }
+  = match t with
+    | Empty -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l _ r -> Node r (get_aux l 0) (lr_aux l)
+    end
+
+  let lr (t: t 'a) : t 'a
+    requires { t.length > 0 }
+    ensures  { result.length = t.length - 1 }
+    ensures  { forall j. 0 <= j < result.length ->
+               get result j = get t (j + 1) }
+  = { length = t.length - 1; tree = lr_aux t.tree }
+
+  (* high extension *)
+  let rec he_aux (s: int) (t: tree 'a) (v: 'a) : tree 'a
+    requires { inv t }
+    requires { s = size t }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t + 1 }
+    ensures  { get_aux result (size t) = v }
+    ensures  { forall j. 0 <= j < size t -> get_aux result j = get_aux t j }
+  = match t with
+    | Empty -> Node Empty v Empty
+    | Node l x r -> if mod s 2 = 1 then Node (he_aux (div s 2) l v) x r
+                                   else Node l x (he_aux (div s 2 - 1) r v)
+    end
+
+  let he (t: t 'a) (v: 'a) : t 'a
+    ensures  { result.length = t.length + 1 }
+    ensures  { get result t.length = v }
+    ensures  { forall j. 0 <= j < t.length -> get result j = get t j }
+  =
+    { length = t.length + 1; tree = he_aux t.length t.tree v }
+
+  (* high removal *)
+  let rec hr_aux (s: int) (t: tree 'a) : tree 'a
+    requires { inv t }
+    requires { s = size t > 0 }
+    variant  { t }
+    ensures  { inv result }
+    ensures  { size result = size t - 1 }
+    ensures  { forall j. 0 <= j < size result ->
+               get_aux result j = get_aux t j }
+  = match t with
+    | Empty -> absurd
+    | Node Empty _ Empty -> Empty
+    | Node l x r -> if mod s 2 = 0 then Node (hr_aux (div s 2) l) x r
+                                   else Node l x (hr_aux (div s 2) r)
+    end
+
+  let hr (t: t 'a) : t 'a
+    requires { t.length > 0 }
+    ensures  { result.length = t.length - 1 }
+    ensures  { forall j. 0 <= j < result.length -> get result j = get t j }
+  =
+    { length = t.length - 1; tree = hr_aux t.length t.tree }
+
+  (* the sequence of elements, in order *)
+
+  function interleave (x y: seq 'a) : seq 'a =
+    S.create
+      (S.length x + S.length y)
+      (fun i -> if mod i 2 = 0 then x[div i 2] else y[div i 2])
+
+  function elements_aux (t: tree 'a): seq 'a =
+    match t with
+    | Empty -> S.empty
+    | Node l x r -> cons x (interleave (elements_aux l) (elements_aux r))
+    end
+
+  let rec lemma elements_aux_length (t: tree 'a)
+    variant  { t }
+    ensures  { S.length (elements_aux t) = size t }
+  = match t with
+    | Empty -> ()
+    | Node l _ r -> elements_aux_length l; elements_aux_length r
+    end
+
+  let rec lemma elements_aux_correct (t: tree 'a) (i: int)
+    requires { 0 <= i < size t }
+    requires { inv t }
+    variant  { t }
+    ensures  { (elements_aux t)[i] = get_aux t i }
+  = match t with
+    | Empty -> ()
+    | Node l _ r ->
+        elements_aux_length l; elements_aux_length r;
+        if i = 0 then () else
+        if mod i 2 = 1 then elements_aux_correct l (div i 2)
+                       else elements_aux_correct r (div i 2 - 1)
+    end
+
+  function elements (a: t 'a) : seq 'a =
+    elements_aux a.tree
+
+  lemma elements_correct:
+    forall a: t 'a.
+    S.length (elements a) = a.length /\
+    forall i. 0 <= i < a.length -> (elements a)[i] = get a i
+
+  (* traversing the elements, in order, in linear time *)
+
+  let non_empty (t: tree 'a) : bool
+    ensures { result <-> t <> Empty }
+  = match t with
+    | Empty      -> false
+    | Node _ _ _ -> true
+    end
+
+  function size_list (l: list (tree 'a)) : int =
+    match l with
+    | Nil      -> 0
+    | Cons t s -> size t + size_list s
+    end
+
+  let rec lemma size_list_nonneg (l: list (tree 'a)) : unit
+    variant { l }
+    ensures { size_list l >= 0 }
+  = match l with Nil -> () | Cons _ s -> size_list_nonneg s end
+
+  let rec lemma size_list_append (l1 l2: list (tree 'a)) : unit
+    variant { l1 }
+    ensures { size_list (l1 ++ l2) = size_list l1 + size_list l2 }
+  = match l1 with Nil -> () | Cons _ s1 -> size_list_append s1 l2 end
+
+  lemma size_list_snoc:
+    forall l: list (tree 'a), t: tree 'a.
+    size_list (l ++ Cons t Nil) = size_list l + size t
+
+  (* FIXME: In practice, such a function iter would have a visitor function
+     as argument. Here, we only intend to prove the soundness of such
+     an iteration. So we simply store the visited elements in a ghost
+     sequence and then prove at this end that this sequence is in order,
+     with an assertion. *)
+
+  let iter (a: t 'a) : unit =
+    let ghost visited = ref S.empty in
+    let q = Q.create () in
+    let left = Q.create () in
+    let right = Q.create () in
+    if non_empty a.tree then begin
+      Q.push a.tree q;
+      while not (Q.is_empty q) do
+        invariant { not (mem Empty q.elts) }
+        invariant { not (mem Empty left.elts) }
+        invariant { not (mem Empty right.elts) }
+        invariant { S.length !visited + size_list q.elts +
+                    size_list left.elts + size_list right.elts = a.length }
+        invariant { forall i. 0 <= i < S.length !visited ->
+                    !visited[i] = get a i }
+        invariant { Q.length q = 0 -> Q.length left = Q.length right = 0 }
+        variant   { a.length - S.length !visited }
+        let x = Q.safe_pop q in
+        match x with
+          | Empty -> absurd
+          | Node l y r ->
+            (* visit y here *)
+            ghost visited := snoc !visited y;
+            if non_empty l then Q.push l left;
+            if non_empty r then Q.push r right;
+        end;
+        if Q.is_empty q then begin
+          Q.transfer right left;
+          Q.transfer left q;
+        end
+      done
+    end;
+    assert { forall i. 0 <= i < a.length -> !visited[i] = get a i }
+
+end

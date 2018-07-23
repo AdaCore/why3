@@ -1,4 +1,3 @@
-
 (* (Exercise borrowed from Rustan Leino's Dafny tutorial at VSTTE 2012)
 
    Function "fill" below stores the elements of tree "t" in array "a",
@@ -8,7 +7,7 @@
 
    Questions:
 
-   1. Prove safety i.e. the absence of array access out of bounds.
+   1. Prove safety, i.e. the absence of array access out of bounds.
       (You have to strengthen the precondition.)
 
    2. Show that, after the execution of "fill", the elements in
@@ -19,13 +18,12 @@
       "contains" below).
 
    4. Prove termination of function "fill".
-
 *)
 
 module Fill
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   type elt
   type tree = Null | Node tree elt tree

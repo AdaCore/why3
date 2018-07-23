@@ -30,8 +30,6 @@ int main () {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 isqrt.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 isqrt.c"
 End:
 */
-
-

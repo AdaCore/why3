@@ -4,13 +4,13 @@
 <why3session shape_version="4">
 <prover id="0" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../array_max.mlw">
-<theory name="ArrayMax">
- <goal name="WP_parameter max" expl="VC for max">
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../array_max.mlw" proved="true">
+<theory name="ArrayMax" proved="true">
+ <goal name="VC max" expl="VC for max" proved="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="3"><result status="valid" time="4.15" steps="3814"/></proof>
+ <proof prover="2"><result status="valid" time="0.31" steps="860"/></proof>
  </goal>
 </theory>
 </file>

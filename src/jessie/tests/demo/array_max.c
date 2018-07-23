@@ -17,7 +17,7 @@ an element maximal in the array.
 */
 
 /*@ requires len > 0;
-  @ // requires \valid(a+(0..(len-1)));
+  @ requires \valid(a+(0..(len-1)));
   @ ensures 0 <= \result < len;
   @ // ensures \forall integer i; 0 <= i < len ==> a[i] <= a[\result];
   @*/
@@ -41,6 +41,6 @@ int max(int *a, int len) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 array_max.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 array_max.c"
 End:
 */

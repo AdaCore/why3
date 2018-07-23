@@ -42,9 +42,9 @@
 
 module Conjugate
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
   predicate is_partition (a: array int) =
     (* at least one element *)
@@ -74,7 +74,7 @@ module Conjugate
       invariant { 0 <= !partc < a.length }
       invariant { forall j: int. a[!partc] <= j < b.length -> numofgt a b[j] j }
       variant   { a.length - !partc }
-      'L:
+      label L in
       let ghost start = !partc in
       let edge = a[!partc] in
       incr partc;
@@ -85,7 +85,7 @@ module Conjugate
         incr partc
       done;
       for i = a[!partc] to edge - 1 do
-        invariant { forall j: int. edge <= j < b.length -> b[j] = (at b 'L)[j] }
+        invariant { forall j: int. edge <= j < b.length -> b[j] = (b at L)[j] }
         invariant { forall j: int. a[!partc] <= j < i -> b[j] = !partc }
         b[i] <- !partc
       done
@@ -97,9 +97,9 @@ end
 
 module Test
 
-  use import int.Int
-  use import array.Array
-  use import Conjugate
+  use int.Int
+  use array.Array
+  use Conjugate
 
   let test () ensures { result.length >= 4 } =
     let a = make 5 0 in

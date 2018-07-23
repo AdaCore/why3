@@ -1,0 +1,144 @@
+(** {1 Characters and Strings} *)
+
+(** {2 Characters} *)
+
+module Char
+
+  use int.Int
+
+  type char = private { code : int }
+    invariant { 0 <= code <= 255 }
+
+  val function uppercase char : char
+  val function lowercase char : char
+
+  axiom uppercase_alpha:
+    forall c:char. 97 <= c.code <= 122 ->
+      (uppercase c).code = c.code - 32
+
+  axiom uppercase_other:
+    forall c:char. 0 <= c.code < 97 \/ 122 < c.code <= 127 ->
+      (uppercase c).code = c.code
+
+  axiom lowercase_alpha:
+    forall c:char. 65 <= c.code <= 90 ->
+      (lowercase c).code = c.code + 32
+
+  axiom lowercase_other:
+    forall c:char. 0 <= c.code < 65 \/ 90 < c.code <= 127 ->
+      (lowercase c).code = c.code
+
+  val chr (x:int) : char
+    requires { 0 <= x <= 255 }
+    ensures  { result.code = x }
+
+  (*** TODO
+     - compare ?
+   *)
+
+end
+
+(** {2 Strings} *)
+
+module String
+
+  use int.Int
+  use Char
+  use map.Map as M
+
+  type string = private {
+    mutable ghost chars: M.map int char;
+                 length: int
+  } invariant { length >= 0 }
+
+  val create (len:int) : string
+    requires { len >= 0 } ensures { length result = len }
+
+  function ([]) (s: string) (i: int) : char = M.([]) s.chars i
+  function get  (s: string) (i: int) : char = M.([]) s.chars i
+
+  val make (len:int) (c:char) : string
+    requires { len >= 0 }
+    ensures  { length result = len }
+    ensures  { forall i:int. 0 <= i < len -> result[i] = c }
+
+  val get (s:string) (i:int) : char
+    requires { 0 <= i < length s } ensures { result = s[i] }
+
+  val unsafe_get (s:string) (i:int) : char
+    ensures { result = s[i] }
+
+  val set (s:string) (i:int) (v:char) : unit writes {s}
+    requires { 0 <= i < length s }
+    ensures  { s.chars = old M.(s.chars[i <- v]) }
+
+  val unsafe_set (s:string) (i:int) (v:char) : unit writes {s}
+    ensures { s.chars = old M.(s.chars[i <- v]) }
+
+  val copy (s:string) : string
+    ensures { length result = length s }
+    ensures { forall i:int. 0 <= i < length result -> result[i] = s[i] }
+
+  val uppercase (s:string) : string
+    ensures { length result = length s }
+    ensures { forall i:int.
+      0 <= i < length result -> result[i] = Char.uppercase s[i] }
+
+  val lowercase (s:string) : string
+    ensures { length result = length s }
+    ensures { forall i:int.
+      0 <= i < length result -> result[i] = Char.lowercase s[i] }
+
+  (*** TODO
+     - copy
+     - sub
+     - fill
+     - blit
+     - concat
+     - index / rindex / index_from / rindex_from
+     - contains / contains_from / rcontains_from
+     - capitalize / uncapitalize
+  *)
+
+end
+
+(** {2 Buffers} *)
+
+module Buffer
+
+  use int.Int
+  use Char
+  use import String as S
+  use import map.Map as M
+
+  type t = private {
+    ghost mutable  chars: map int char;
+          mutable length: int
+  } invariant { length >= 0 }
+
+  val create (size:int) : t
+    requires { size >= 0 } ensures { result.length = 0 }
+    (** `size` is only given as a hint for the initial size *)
+
+  val contents (b:t) : string
+    ensures { S.length result = length b }
+
+  val add_char (b:t) (c:char) : unit writes {b}
+    ensures { length b = old (length b) + 1 }
+    ensures { forall i: int.
+      0 <= i < length b -> b.chars[i] = old b.chars[i] }
+    ensures { b.chars[length b - 1] = c }
+
+  val add_string (b:t) (s:string) : unit writes {b}
+    ensures { length b = old (length b) + S.length s }
+    ensures { forall i: int.
+      0 <= i < old (length b) -> b.chars[i] = old b.chars[i] }
+    ensures { forall i: int.
+      0 <= i < S.length s -> b.chars[old (length b) + i] = S.get s i }
+
+  (*** TODO
+     - add_substring
+     - add_buffer
+  *)
+
+end

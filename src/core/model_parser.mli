@@ -92,7 +92,7 @@ type model_element_name = {
     (** The name of the source-code element.  *)
   men_kind   : model_element_kind;
     (** The kind of model element. *)
-  men_labels : Ident.Slab.t;
+  men_attrs : Ident.Sattr.t;
 }
 
 (** Counter-example model elements. Each element represents
@@ -142,7 +142,7 @@ val default_model : model
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->
-  print_labels:bool ->
+  print_attrs:bool ->
   Format.formatter ->
   model ->
   unit
@@ -152,15 +152,15 @@ val print_model :
       names. The input is information about model element name. The
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
-    @param print_labels: when set to true, the name is printed together with the
-    labels associated to the specific ident.
+    @param print_attrs: when set to true, the name is printed together with the
+    attrs associated to the specific ident.
 *)
 
 val print_model_human :
   ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
-  print_labels:bool ->
+  print_attrs:bool ->
   unit
 (** Same as print_model but is intended to be human readable.
 
@@ -168,7 +168,7 @@ val print_model_human :
 
 
 val model_to_string :
-  print_labels:bool ->
+  print_attrs:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
   string
@@ -176,7 +176,7 @@ val model_to_string :
 
 (* TODO probably deprecated.
 val print_model_vc_term :
-  print_labels:bool ->
+  print_attrs:bool ->
   ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   Format.formatter ->
@@ -191,7 +191,7 @@ val print_model_vc_term :
 *)
 
 val model_vc_term_to_string :
-  print_labels:bool ->
+  print_attrs:bool ->
   ?me_name_trans: (model_element_name -> string) ->
   ?sep: string ->
   model ->
@@ -222,7 +222,7 @@ val print_model_json :
       This transformation can be used to store the counterexample information
       related to this term in dedicated JSON field.
     @param model the counter-example model to print.
-    @param print_labels if set to true, add labels associated to the name id to
+    @param print_attrs if set to true, add attrs associated to the name id to
       the counterexample output
 
     The format is the following:
@@ -269,7 +269,7 @@ val model_to_string_json :
 (** See print_model_json *)
 
 val interleave_with_source :
-  print_labels:bool ->
+  print_attrs:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->

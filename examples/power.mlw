@@ -3,9 +3,9 @@
 
 module FastExponentiation
 
-  use import int.Int
-  use import int.Power
-  use import int.ComputerDivision
+  use int.Int
+  use int.Power
+  use int.ComputerDivision
 
   (* recursive implementation *)
 
@@ -21,7 +21,7 @@ module FastExponentiation
 
   (* non-recursive implementation using a while loop *)
 
-  use import ref.Ref
+  use ref.Ref
 
   let fast_exp_imperative x n
     requires { 0 <= n }
@@ -32,12 +32,12 @@ module FastExponentiation
     while !e > 0 do
       invariant { 0 <= !e /\ !r * power !p !e = power x n }
       variant   { !e }
-      'L:
+      label L in
       if mod !e 2 = 1 then r := !r * !p;
       p := !p * !p;
       e := div !e 2;
       assert { power !p !e =
-               let x = power (at !p 'L) !e in x * x }
+               let x = power (!p at L) !e in x * x }
     done;
     !r
 

@@ -1,62 +1,62 @@
-bench/ce/map.mlw ModelMap t1 : Unknown (other)
+bench/ce/map.mlw ModelMap t1: Unknown (other)
 Counter-example model:File map.mlw:
 Line 5:
-i, ["model_trace:i"] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "0" }
-t, ["model_trace:t"] = {"type" : "Array" ,
+t, [[@introduced], [@model_trace:t]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "43" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 
-bench/ce/map.mlw M WP_parameter test_map : Unknown (other)
+bench/ce/map.mlw M VC test_map: Unknown (other)
 Counter-example model:File map.mlw:
 Line 16:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 Line 17:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 Line 19:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 
-bench/ce/map.mlw M WP_parameter test_map_multidim1 : Unknown (other)
+bench/ce/map.mlw M VC test_map_multidim1: Unknown (other)
 Counter-example model:File map.mlw:
 Line 22:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 Line 23:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 Line 25:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 
-bench/ce/map.mlw M WP_parameter test_map_multidim2 : Unknown (other)
+bench/ce/map.mlw M VC test_map_multidim2: Unknown (other)
 Counter-example model:File map.mlw:
 Line 27:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 Line 28:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
@@ -66,7 +66,7 @@ x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 Line 32:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
@@ -76,161 +76,43 @@ x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 
-bench/ce/map.mlw M WP_parameter proj_map_test1 : Unknown (other)
+bench/ce/map.mlw M VC proj_map_test1: Unknown (other)
 Counter-example model:File map.mlw:
 Line 34:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 Line 35:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 Line 37:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 
-bench/ce/map.mlw M WP_parameter proj_map_test2 : Unknown (other)
+bench/ce/map.mlw M VC proj_map_test2: Unknown (other)
 Counter-example model:File map.mlw:
 Line 39:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 Line 40:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Boolean" , "val" : true } },
 {"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 Line 42:
-x.contents, ["model_trace:x.contents@call"] = {"type" : "Array" ,
+x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Boolean" , "val" : true } },
 {"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] }
-
-bench/ce/map.mlw ModelMap t1 : Unknown (other)
-Counter-example model:File map.mlw:
-Line 5:
-i, ["model_trace:i"] = {"type" : "Integer" ,
-"val" : "0" }
-t, ["model_trace:t"] = {"type" : "Array" ,
-"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "43" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-
-bench/ce/map.mlw M WP_parameter test_map : Unknown (other)
-Counter-example model:File map.mlw:
-Line 16:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
-"val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-Line 17:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-Line 19:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-
-bench/ce/map.mlw M WP_parameter test_map_multidim1 : Unknown (other)
-Counter-example model:File map.mlw:
-Line 22:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-Line 23:
-x, ["model_trace:x@call"] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-Line 25:
-x, ["model_trace:x@call"] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-
-bench/ce/map.mlw M WP_parameter test_map_multidim2 : Unknown (other)
-Counter-example model:File map.mlw:
-Line 27:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
-"val" : [{"indice" : "1" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-Line 28:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-Line 32:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
-"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] } }] }
-
-bench/ce/map.mlw M WP_parameter proj_map_test1 : Unknown (other)
-Counter-example model:File map.mlw:
-Line 34:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
-"val" : [{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-Line 35:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-Line 37:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-
-bench/ce/map.mlw M WP_parameter proj_map_test2 : Unknown (other)
-Counter-example model:File map.mlw:
-Line 39:
-x.contents, ["model_trace:x.contents"] = {"type" : "Array" ,
-"val" : [{"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] }
-Line 40:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] }
-Line 42:
-x, ["model_trace:x@call"] = {"type" : "Array" , "val" : [{"indice" : "0" ,
-"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
-"value" : {"type" : "Boolean" , "val" : true } },
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 

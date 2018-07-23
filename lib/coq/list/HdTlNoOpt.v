@@ -16,32 +16,30 @@ Require BuiltIn.
 Require list.List.
 
 (* Why3 goal *)
-Definition hd: forall {a:Type} {a_WT:WhyType a}, (list a) -> a.
-intros a a_WT [|h _].
+Definition hd {a:Type} {a_WT:WhyType a} : (list a) -> a.
+intros [|h _].
 exact why_inhabitant.
 exact h.
 Defined.
 
 (* Why3 goal *)
-Lemma hd_cons :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (r:(list a)), ((hd (Init.Datatypes.cons x r)) = x).
+Lemma hd_cons {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (r:(list a)), ((hd (Init.Datatypes.cons x r)) = x).
 Proof.
-now intros a a_WT x r.
+now intros x r.
 Qed.
 
 (* Why3 goal *)
-Definition tl: forall {a:Type} {a_WT:WhyType a}, (list a) -> (list a).
-intros a a_WT [|_ t].
+Definition tl {a:Type} {a_WT:WhyType a} : (list a) -> (list a).
+intros [|_ t].
 exact nil.
 exact t.
 Defined.
 
 (* Why3 goal *)
-Lemma tl_cons :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (r:(list a)), ((tl (Init.Datatypes.cons x r)) = r).
+Lemma tl_cons {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (r:(list a)), ((tl (Init.Datatypes.cons x r)) = r).
 Proof.
-now intros a a_WT x r.
+now intros x r.
 Qed.
 

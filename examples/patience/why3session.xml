@@ -2,525 +2,356 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../patience.mlw">
-<theory name="PigeonHole">
- <goal name="WP_parameter pigeon_hole" expl="VC for pigeon_hole">
- <transf name="split_goal_right">
-  <goal name="WP_parameter pigeon_hole.1" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
+<prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../patience.mlw" proved="true">
+<theory name="PigeonHole" proved="true">
+ <goal name="VC pigeon_hole" expl="VC for pigeon_hole" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC pigeon_hole.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.2" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="VC pigeon_hole.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.3" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="VC pigeon_hole.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.4" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="VC pigeon_hole.3" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.5" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC pigeon_hole.4" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.6" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC pigeon_hole.5" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.7" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02" steps="44"/></proof>
+  <goal name="VC pigeon_hole.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.8" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC pigeon_hole.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.9" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
+  <goal name="VC pigeon_hole.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.10" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC pigeon_hole.9" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.11" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <goal name="VC pigeon_hole.10" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.12" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC pigeon_hole.11" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.13" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="VC pigeon_hole.12" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.14" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC pigeon_hole.13" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.15" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.03" steps="46"/></proof>
+  <goal name="VC pigeon_hole.14" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.16" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC pigeon_hole.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter pigeon_hole.17" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.18" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.19" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.20" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.21" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.22" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.23" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.24" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter pigeon_hole.25" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="VC pigeon_hole.16" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="PatienceCode">
- <goal name="WP_parameter wf_rev_append_stacks" expl="VC for wf_rev_append_stacks">
- <proof prover="4"><result status="valid" time="0.03" steps="161"/></proof>
+<theory name="PatienceCode" proved="true">
+ <goal name="VC wf_rev_append_stacks" expl="VC for wf_rev_append_stacks" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="236"/></proof>
  </goal>
- <goal name="WP_parameter push_card" expl="VC for push_card">
- <transf name="split_goal_right">
-  <goal name="WP_parameter push_card.1" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.04" steps="46"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.2" expl="unreachable point">
-  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.3" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.07" steps="93"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.4" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.5" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.6" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.04" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter push_card.7" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
- </transf>
+ <goal name="VC push_card" expl="VC for push_card" proved="true">
+ <proof prover="3"><result status="valid" time="0.07" steps="485"/></proof>
  </goal>
- <goal name="WP_parameter play_cards" expl="VC for play_cards">
- <proof prover="4"><result status="valid" time="0.01" steps="30"/></proof>
+ <goal name="VC play_cards" expl="VC for play_cards" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
  </goal>
- <goal name="WP_parameter play_game" expl="VC for play_game">
- <proof prover="4"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="VC play_game" expl="VC for play_game" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test">
- <proof prover="4"><result status="valid" time="0.02" steps="1"/></proof>
+ <goal name="VC test" expl="VC for test" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="PatienceAbstract">
- <goal name="WP_parameter play_card" expl="VC for play_card">
- <transf name="split_goal_right">
-  <goal name="WP_parameter play_card.1" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.04" steps="42"/></proof>
+<theory name="PatienceAbstract" proved="true">
+ <goal name="VC play_card" expl="VC for play_card" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC play_card.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.2" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter play_card.3" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter play_card.4" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter play_card.4.1" expl="postcondition">
-   <transf name="split_goal_right">
-    <goal name="WP_parameter play_card.4.1.1" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.03" steps="8"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.2" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.3" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.03" steps="10"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.4" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.04" steps="12"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.5" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.05"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.6" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.05"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.7" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.11" steps="42"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.8" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.16" steps="61"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.9" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.21" steps="58"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.10" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.19" steps="53"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.11" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.58" steps="62"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.12" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.07"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.13" expl="VC for play_card">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.14" expl="VC for play_card">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.15" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.10" steps="28"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.16" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.13" steps="25"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.17" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.16" steps="61"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.18" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.20" steps="97"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.19" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.22" steps="70"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.20" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.33" steps="153"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.4.1.21" expl="VC for play_card">
-    <proof prover="4"><result status="valid" time="0.39" steps="130"/></proof>
+  <goal name="VC play_card.1" expl="postcondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC play_card.1.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC play_card.1.0.0" expl="postcondition" proved="true">
+    <transf name="split_goal_right" proved="true" >
+     <goal name="VC play_card.1.0.0.0" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.05" steps="48"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.1" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.05" steps="49"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.2" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.05" steps="49"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.3" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.05" steps="56"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.4" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.5" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.6" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.09" steps="95"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.7" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.09" steps="95"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.8" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.09" steps="99"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.9" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.16" steps="115"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.10" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.09" steps="111"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.11" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.23" steps="136"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.12" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.13" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.14" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.15" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.16" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.17" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.18" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.21" steps="104"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.19" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC play_card.1.0.0.20" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter play_card.5" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC play_card.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.6" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="VC play_card.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="50"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.7" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.12" steps="68"/></proof>
+  <goal name="VC play_card.4" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.8" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.46" steps="125"/></proof>
+  <goal name="VC play_card.5" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="66"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.9" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="36"/></proof>
+  <goal name="VC play_card.6" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.10" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter play_card.10.1" expl="postcondition">
-   <transf name="split_goal_right">
-    <goal name="WP_parameter play_card.10.1.1" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    <proof prover="4"><result status="valid" time="0.03" steps="9"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.2" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.04" steps="9"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.3" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.03" steps="10"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.4" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.13"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.04" steps="13"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.5" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.05"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.6" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.7" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.16"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.05" steps="23"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.8" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.15"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.08" steps="37"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.9" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.20"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.06" steps="27"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.10" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.22"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.30" steps="54"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.11" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.64"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.14" steps="44"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.12" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.05"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.13" expl="VC for play_card">
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.14" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.09"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.15" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="1.23"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    <proof prover="4"><result status="valid" time="0.08" steps="23"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.16" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.96"/></proof>
-    <proof prover="2"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.07" steps="22"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.17" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="1.43"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.22" steps="86"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.18" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.12"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.17" steps="107"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.19" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.15"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    <proof prover="4"><result status="valid" time="0.22" steps="95"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.20" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.16"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    <proof prover="4"><result status="valid" time="0.20" steps="121"/></proof>
-    </goal>
-    <goal name="WP_parameter play_card.10.1.21" expl="VC for play_card">
-    <proof prover="0"><result status="valid" time="0.34"/></proof>
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    <proof prover="4"><result status="valid" time="0.34" steps="146"/></proof>
+  <goal name="VC play_card.7" expl="postcondition" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC play_card.7.0" expl="postcondition" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC play_card.7.0.0" expl="postcondition" proved="true">
+    <transf name="split_goal_right" proved="true" >
+     <goal name="VC play_card.7.0.0.0" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.04" steps="52"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.1" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.04" steps="53"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.2" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.04" steps="53"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.3" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.05" steps="60"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.4" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.5" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.6" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.06" steps="79"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.7" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.06" steps="79"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.8" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.06" steps="81"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.9" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.08" steps="104"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.10" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.08" steps="99"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.11" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.12" steps="149"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.12" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.13" expl="VC for play_card" proved="true">
+     <proof prover="2" timelimit="1"><result status="valid" time="0.07"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.14" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.15" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.16" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.17" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.18" expl="VC for play_card" proved="true">
+     <proof prover="3"><result status="valid" time="0.08" steps="99"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.19" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="VC play_card.7.0.0.20" expl="VC for play_card" proved="true">
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter play_card.11" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC play_card.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter play_card.12" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC play_card.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="54"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter play_cards" expl="VC for play_cards">
- <transf name="split_goal_right">
-  <goal name="WP_parameter play_cards.1" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.2" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.3" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.4" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.5" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.03" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.6" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.7" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.8" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.9" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter play_cards.10" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.06" steps="43"/></proof>
+  <goal name="VC play_card.10" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="52"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter play_game" expl="VC for play_game">
- <transf name="split_goal_right">
-  <goal name="WP_parameter play_game.1" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+ <goal name="VC play_cards" expl="VC for play_cards" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="128"/></proof>
+ </goal>
+ <goal name="VC play_game" expl="VC for play_game" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC play_game.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.2" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC play_game.1" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.3" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC play_game.2" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.4" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="16"/></proof>
+  <goal name="VC play_game.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.5" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC play_game.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.6" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC play_game.5" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.7" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC play_game.6" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.8" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC play_game.7" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.9" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC play_game.8" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.10" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC play_game.9" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.11" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC play_game.10" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.12" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC play_game.11" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.13" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
+  <goal name="VC play_game.12" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="65"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.14" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.03" steps="18"/></proof>
+  <goal name="VC play_game.13" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="94"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.15" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC play_game.14" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.16" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC play_game.15" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.17" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC play_game.16" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.18" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC play_game.17" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.19" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.20" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.03" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.21" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.08" steps="54"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.22" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.23" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.18" steps="93"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.24" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.11" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.25" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.12" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.26" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.24" steps="46"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.27" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.28" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.36" steps="66"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.29" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.30" expl="assertion">
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter play_game.31" expl="assertion">
+  <goal name="VC play_game.18" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.32" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="16"/></proof>
+  <goal name="VC play_game.19" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter play_game.33" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="VC play_game.20" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="90"/></proof>
+  </goal>
+  <goal name="VC play_game.21" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC play_game.22" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC play_game.23" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="225"/></proof>
+  </goal>
+  <goal name="VC play_game.24" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
+  </goal>
+  <goal name="VC play_game.25" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="134"/></proof>
+  </goal>
+  <goal name="VC play_game.26" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal_right">
- </transf>
+ <goal name="VC test" expl="VC for test" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
-</theory>
-<theory name="PatienceFull">
 </theory>
 </file>
 </why3session>

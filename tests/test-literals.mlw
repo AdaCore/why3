@@ -1,0 +1,63 @@
+
+module Range
+
+  use int.Int
+
+  type byte = < range -128 127 >
+
+  meta "literal:keep" type byte
+  meta "syntax_literal" type byte,"#b%8b",0
+
+  let constant zero = (0:byte)
+
+  let constant c42 = (42:byte)
+
+  let constant cm17 = (-17:byte)
+
+(* rejected as expected
+  let constant cm200 = (-200:byte)
+*)
+
+  goal g : byte'int (-1:byte) < 0
+
+  type word = < range -0x8000 0x7fff >
+
+  meta "literal:keep" type word
+  meta "syntax_literal" type word,"#x%4x",0
+
+  let constant wzero = (0:word)
+
+  let constant w42 = (0x42:word)
+
+  let constant wm17 = (-17:word)
+
+(* rejected as expected
+  let constant wm200 = (32768:byte)
+*)
+
+  goal wg : word'int wm17 < 0
+
+
+end
+
+
+module Float
+
+  use ieee_float.Float32
+
+  let constant x = (-0.125:Float32.t)
+
+   goal g : Float32.lt (-1.0:Float32.t) x
+
+end
+
+
+module M
+
+  use int.Int
+
+  let constant x = -42
+
+  let f (y:int) = y + x
+
+end

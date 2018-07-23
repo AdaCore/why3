@@ -1,0 +1,1567 @@
+
+(* Define a (bare) Hoare-type intuitionnistic logic on games....
+   TODO/FIXME: in practice, there does not seem to be a real role
+   for the arrow... could simply remove it. *)
+module Fmla
+
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use order.Ordered
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+  use game.Game
+  use game_simulation.SimDef
+  use subgame.SubGame
+
+  (* Game formula: monotonic predicates over games. *)
+  type fmla 'a = { interp : set (game 'a) }
+    invariant { forall g1 g2. interp g1 /\ subgame g1 g2 -> interp g2 }
+    by { interp = fun _ -> false }
+
+  (* Basic formula: enforce within the underlying game. *)
+  let ghost function enforce (p q:{set 'a}) : {fmla 'a} =
+    assert { forall s:set 'a. related (=) s = s by sext s (related (=) s) };
+    { interp = fun g -> have_uniform_winning_strat g p q }
+
+  (* Intuitionnistic arrow. *)
+  let ghost function arrow (f1 f2:{fmla 'a}) : {fmla 'a} =
+    { interp = pure { fun g ->
+      forall g2. subgame g g2 /\ f1.interp g2 -> f2.interp g2 } }
+
+  (* (Bounded) Universal quantification. *)
+  let ghost function uquant (p:{set 'q}) (f:'q -> fmla 'a) : {fmla 'a} =
+    { interp = pure { fun g -> forall y. p y -> (f y).interp g } }
+
+  (* Conjonction. Could actually be defined from uquant,
+     but that would be less practical. *)
+  let ghost function conj (p q:{fmla 'a}) : {fmla 'a} =
+    { interp = pure { fun g -> p.interp g /\ q.interp g } }
+
+  let ghost function ordering (o:{erel 'a}) : {fmla 'a} =
+    { interp = pure { fun g -> g.progress = o } }
+
+  (* Sequent validity. *)
+  predicate holds (c f:fmla 'a) = forall g. c.interp g -> f.interp g
+
+  (* Predicate definitions for transfinite loop rules. *)
+  (* State that is later than another (e.g one more loop turn) *)
+  predicate later (o:erel 'b) (i:rel 'b 'a) (x:'b) (y:'a) =
+    exists x'. i x' y /\ o x x' /\ x' <> x
+  (* Same as later, but for limit steps. *)
+  predicate later_limit (o:erel 'b) (i:rel 'b 'a) (h:set 'b) (y:'a) =
+    exists x. i x y /\ upper_bound o h x
+  (* Conditions for being an invariant. *)
+  predicate is_inv (c:fmla 'a) (o:erel 'b) (go:erel 'a) (i:rel 'b 'a) =
+    (forall x. holds c (enforce (i x) (later o i x)))
+    /\ forall h f. chain o h /\ monotone_on h o f go /\ inhabited h /\
+      not maximum o h (sup o h) /\ rel_mapping h f i ->
+      holds c (enforce (supremum go (image f h)) (later_limit o i h))
+
+  (* Predicate definition for transfinite recursion rule. *)
+
+  function henforce (p q:rel 'b 'a) : 'b -> fmla 'a =
+    fun x -> enforce (p x) (q x)
+  predicate is_rec (c:fmla 'a) (o:erel 'b) (go:erel 'a) (p q:rel 'b 'a) =
+    (forall x. let recursive = uquant (lower o x) (henforce p q) in
+      holds (conj c recursive) (enforce (p x) (q x)))
+  /\ (forall h f. chain o h /\ monotone_on h o f go /\ inhabited h /\
+    not maximum o h (sup o h) /\ rel_mapping h f p ->
+    let recursive = uquant (upper_bound o h) (henforce p q) in
+    let target = bigunion (image q h) in
+    let recover = enforce (supremum go (image f h)) target in
+    holds (conj c recursive) recover)
+
+end
+
+module FmlaRules "W:non_conservative_extension:N" (* => FmlaProof *)
+
+  use ho_set.Set
+  use ho_rel.Rel
+  use game.Game
+  use export Fmla
+
+  (* Usual core rules of intuitionnistic logic. *)
+  axiom abstraction : forall c f1 f2:fmla 'a.
+    holds c (arrow f1 f2) <-> holds (conj c f1) f2
+  axiom modus_ponens : forall c f1 f2:fmla 'a.
+    holds c (arrow f1 f2) /\ holds c f1 -> holds c f2
+  (* Combination of rules that corresponds to the variable rule. *)
+  axiom reflexive : forall f:fmla 'a. holds f f
+  axiom conj_left : forall c f1 f2:fmla 'a. holds c f2 -> holds (conj c f1) f2
+  axiom conj_right : forall c f1 f2:fmla 'a. holds c f2 -> holds (conj f1 c) f2
+
+  (* Consequence rule. *)
+  axiom enforce_monotonic : forall c,p1 p2 q1 q2:set 'a.
+    holds c (enforce p1 q1) /\ subset p2 p1 /\ subset q1 q2 ->
+    holds c (enforce p2 q2)
+
+  (* Other kind of consequence rules, coming from the underlying game order. *)
+  axiom enforce_does_progress : forall c o x,q:set 'a.
+    holds c (enforce ((=) x) q) /\ holds c (ordering o) ->
+    holds c (enforce ((=) x) (inter q (o x)))
+
+  (* Analog to the skip rule. *)
+  axiom enforce_reflexivity : forall c,p q:set 'a.
+    subset p q -> holds c (enforce p q)
+
+  (* Sequence rule. *)
+  axiom sequence : forall c,p q r:set 'a.
+    holds c (enforce p q) /\ holds c (enforce q r) -> holds c (enforce p r)
+
+  (* Extra program rule: Continuation rule. *)
+  axiom kont_intro : forall c,p q:set 'a.
+    holds (conj c (enforce q none)) (enforce p q) ->
+    holds c (enforce p q)
+
+  (* Externalize the precondition ('partition' rule, which
+     is the essence of conditional rules) *)
+  axiom external_pre : forall c,p q:set 'a.
+    (forall y. p y -> holds c (enforce ((=) y) q)) -> holds c (enforce p q)
+
+  (* Transfinite loop rule (analog to the while rule).
+     If we have an invariant I such that (is_inv definition)
+     . I enforce I at later moment for a user-given ordering
+     . From supremum of an I-chain, we can reach I at a later point as
+       well
+     Then from I, we can enforce Nothing.
+     Note that we can recover more classical statement
+     (with a postcondition) thanks to the continuation rule.
+     We can also introduce an exit guard using partitionning. *)
+  axiom trampoline : forall c go,i:rel 'b 'a,o:erel 'b,x.
+    holds c (ordering go) /\ order o /\ is_inv c o go i ->
+    holds c (enforce (i x) none)
+
+
+  (* Transfinite recursion rule.
+     If we have a parametric pre/post couple P,Q such that for all x:
+     G,(forall y > x. {P y -> Q y}) |- {P x -> Q x}
+     And from any transfinite 'stack overflow' (H,f):
+     G,(forall y >= H. { P y -> Q y }) |- { {sup f(H)} -> exists y\in H. Q y }
+     Then G |- { P x -> Q x } unconditionnaly.
+   *)
+  axiom recursion : forall c go,p q:rel 'b 'a,o:erel 'b,x.
+    holds c (ordering go) /\ order o /\ is_rec c o go p q ->
+    holds c (enforce (p x) (q x))
+
+end
+
+module FmlaProof
+
+  use Fmla
+  use game.Game
+  use subgame.SubGame
+  use game.BasicStrats
+  use game_no_strat.WinAlt
+  use ho_set.Set
+  use order.Ordered
+  use transfinite.Extension
+
+  (* Mostly proved in BasicStrats. *)
+  lemma enforce_monotonic : forall c,p1 p2 q1 q2:set 'a.
+    holds c (enforce p1 q1) /\ subset p2 p1 /\ subset q1 q2 ->
+    holds c (enforce p2 q2)
+    by forall g. c.interp g -> have_uniform_winning_strat g p2 q2
+    by exists ang. uniform_winning_strat g p2 q2 ang
+    by uniform_winning_strat g p1 q1 ang
+
+  (* Direct from progression of the transfinite iteration process
+     with respect to the winning strategies. *)
+  lemma enforce_does_progress : forall c o x,q:set 'a.
+    let ex = (=) x in let q2 = inter q (o x) in
+    holds c (enforce ex q) /\ holds c (ordering o) -> holds c (enforce ex q2)
+    by forall g. c.interp g -> have_uniform_winning_strat g ex q2
+    by have_winning_strat g x q2
+    by (have_winning_strat g x q by have_uniform_winning_strat g ex q)
+    so exists ang. winning_strat g x q2 ang
+    by winning_strat g x q ang
+    so forall dmn. win_against g x q2 ang dmn
+    by win_against g x q ang dmn
+    so exists h. tr_ext o (step g ang dmn) ex h /\
+      win_at g q ang dmn h
+    so win_at g q2 ang dmn h
+
+  (* Continuation introduction: the principle of the proof
+     is to use a game with extra empty transitions on Q-states,
+     on which (Q enforce Nothing) is trivial. Then, this larger game satisfy
+     P enforce Q. But since those extra transitions are only used to exit Q,
+     any winning strategy/victory invariant from this larger game can
+     be readily mapped to the smaller one, hence ok.
+     (Here, we choose the victory invariant path) *)
+  let ghost function game_with_kont (g:{game 'a}) (q:{set 'a}) : {game 'a} =
+    { progress = g.progress;
+      transition = pure { fun x s -> g.transition x s \/ (q x /\ s = none) } }
+  lemma kont_intro : forall c,p q:set 'a.
+    holds (conj c (enforce q none)) (enforce p q) ->
+    holds c (enforce p q)
+    by forall g. c.interp g -> have_uniform_winning_strat g p q
+    by let gk = game_with_kont g q in
+      let o = g.progress in
+      subgame g gk
+    so ((enforce p q).interp gk by (enforce q none).interp gk
+      by forall x. q x -> have_winning_strat gk x none by gk.transition x none)
+    so exists i. victory_invariant g p q i by victory_invariant gk p q i
+    so forall h x.
+      (i h /\ not inhabited (inter h q) /\ maximum o h x so not q x) ->
+      exists a. (g.transition x a by gk.transition x a) /\
+        not a x /\ subset a (next_hist i h)
+
+  lemma reflexivity : forall c,p q:set 'a. subset p q ->
+    holds c (enforce p q)
+    by holds c (enforce p p)
+    by holds (conj c (enforce p none)) (enforce p p)
+    by holds (conj c (enforce p none)) (enforce p none)
+      /\ subset none p
+
+  lemma external_pre : forall c,p q:set 'a.
+    (forall y. p y -> holds c (enforce ((=) y) q)) -> holds c (enforce p q)
+    by forall g. c.interp g -> have_uniform_winning_strat g p q
+    by forall y. p y -> have_winning_strat g y q
+
+  use ho_rel.Prod
+  use ho_rel.RelSet
+  use order.Product
+  use order.Chain
+  use order.ProductChain
+  use choice.Choice
+  use fn.Fun
+  use fn.Image
+  use pfn.Pfun
+  use pfn.SubFunOrder
+  use order.SubChain
+  use order.SubFunLimit
+  use game_simulation.Sim
+
+  (* Loop rule: direct consequence of the simulation theorem.
+     Source game:
+       . domain = transfinite (increasing) map-sequences: 'b -> 'a.
+       . transitions = universal-type, can choose about anything later
+     Destination game: current
+     Relation:
+       . invariant holds on the whole transfinite sequence
+       . sequence is increasing (not easy to enforce directly on the domain)
+       . Current state is the supremum of the mapped sequence.
+       . domain = ('b,'a) with a modification of the product order
+       (such that if (x,y) < (z,t), then x < z is mandatory)
+       . transitions = universal-type, can choose anything later that
+         satisfy the invariant.
+       (the fact that the source game admit a winning strategy
+        is basically Zorn's lemma, and is immediate via victory invariant
+        since the set of all history is one.)
+   *)
+  predicate lorder (o:erel 'a) (f g:pfun 'a 'b) =
+    subchain o f.domain g.domain /\ subfun f g
+  predicate ltr (o:erel 'a) (f:pfun 'a 'b) (s:set (pfun 'a 'b)) =
+    s = lower (lorder o) f
+  predicate lrel (o1:erel 'a) (i:rel 'a 'b) (o2:erel 'b)
+                 (f:pfun 'a 'b) (x:'b) =
+    inhabited f.domain /\
+    chain o1 f.domain /\
+    monotone_on f.domain o1 f.eval o2 /\
+    rel_mapping f.domain f.eval i /\
+    supremum o2 (image f.eval f.domain) x
+  let ghost function game_loop (o:{erel 'a}) : {game (pfun 'a 'b)}
+    requires { order o }
+  = { progress = lorder o; transition = ltr o }
+
+  (* Builder lemma. *)
+  lemma extends_pfun_related : forall o1 o2,i:rel 'a 'b,f y x' y'.
+    order o1 /\ order o2 /\ lrel o1 i o2 f y /\ i x' y' /\ o2 y y' ->
+    upper_bound o1 f.domain x' -> not f.domain x' ->
+    let g = padd f x' y' in
+    lorder o1 f g && (lrel o1 i o2 g y'
+      by (monotone_on g.domain o1 g.eval o2
+        by forall u v. g.domain u /\ g.domain v /\ o1 u v ->
+          o2 (g.eval u) (g.eval v)
+        by if u = v then true else if f.domain u /\ f.domain v then true
+          else f.domain u so v = x' so o2 (g.eval u) y /\ o2 y y'
+      ) so maximum o2 (image g.eval g.domain) y'
+    )
+
+  lemma trampoline : forall c go,i:rel 'b 'a,o:erel 'b,x.
+    holds c (ordering go) /\ order o /\ is_inv c o go i ->
+    holds c (enforce (i x) none)
+    by forall g. c.interp g -> have_uniform_winning_strat g (i x) none
+    by let gl = game_loop o in
+      let r = lrel o i go in
+      let p0 = fun z -> exists y. z = psing x y in
+      (related r none = none by sext (related r none) none)
+    /\ (related r p0 = i x by sext (i x) (related r p0)
+      by (forall y. i x y -> related r p0 y by let z = psing x y in
+        r z y by sext (image z.eval z.domain) ((=) y) so maximum go ((=) y) y
+      )
+      /\ (forall y. related r p0 y -> i x y by exists z. p0 z /\ r z y
+        so exists y'. z = psing x y'
+        so sext (image z.eval z.domain) ((=) y')
+        so maximum go ((=) y') y'
+        so y = y' /\ i x y')
+    )
+    /\ (have_uniform_winning_strat gl p0 none
+      by victory_invariant gl p0 none all
+      by forall h x. exists a. (gl.transition x a by ltr o x a)
+        so not a x so subset a (next_hist all h)
+    ) /\ (simulate gl r g
+      by step_simulate gl r g
+      by ("stop_split" forall f y s. gl.transition f s /\ r f y ->
+        have_winning_strat g y (related r s)
+        by let ey = (=) y in
+          have_uniform_winning_strat g ey (related r s)
+        by s = lower (lorder o) f
+        so let h0 = f.domain in let f0 = f.eval in
+          let x = sup o h0 in let h1 = image f0 h0 in
+          (* Case-split: if there is a maximum, regular is_inv condition.
+             Otherwise, limit one. *)
+          "case_split" if maximum o h0 x
+          then maximum go h1 (f0 x)
+            so f0 x = y
+            so let q = inter (later o i x) (go y) in
+              (have_uniform_winning_strat g ey q by holds c (enforce ey q)
+               by subset ey (i x))
+            so subset q (related r s)
+            by forall y'. go y y' /\ later o i x y' -> related r s y'
+            by exists x'. i x' y' /\ o x x' /\ x' <> x
+            so let g = padd f x' y' in
+              (s g by lorder o f g /\ f <> g) /\ r g y'
+            by upper_bound o h0 x'
+          else
+            let p1 = supremum go (image f0 h0) in
+            let q1 = later_limit o i h0 in
+            let q2 = inter q1 (go y) in
+            (have_uniform_winning_strat g ey q2 by holds c (enforce p1 q1)
+              so (holds c (enforce ey q1) by subset ey p1)
+              so holds c (enforce ey q2))
+            so subset q2 (related r s)
+            by forall y'. q2 y' -> related r s y'
+            by exists x'. i x' y' /\ upper_bound o h0 x'
+            so let g = padd f x' y' in
+              (s g by lorder o f g /\ f <> g) /\ r g y'
+            by upper_bound o h0 x' so not (h0 x' so maximum o h0 x')
+      ) /\ ("stop_split" forall ch fh y.
+        chain (lorder o) ch /\ inhabited ch ->
+        monotone_on ch (lorder o) fh go /\ rel_mapping ch fh r ->
+        supremum go (image fh ch) y ->
+        let target = related r (supremum (lorder o) ch) in
+        have_winning_strat g y target
+        by target y by let f = pbigunion ch in
+          (forall a b:pfun 'b 'a. lorder o a b -> subfun a b)
+        so chain subfun ch
+        so supremum subfun ch f
+        so (chain (subchain o) (image domain ch)
+          by monotone (lorder o:erel (pfun 'b 'a)) domain (subchain o))
+        so supremum (subchain o) (image domain ch) f.domain
+        so (supremum (lorder o) ch f
+            by (forall u. upper_bound (lorder o) ch u -> lorder o f u
+              by upper_bound subfun ch u
+              so upper_bound (subchain o) (image domain ch) u.domain
+              by forall s. image domain ch s -> subchain o s u.domain
+                by exists g. (lorder o g u by ch g) /\ g.domain = s)
+            /\ (upper_bound (lorder o) ch f by
+              forall u. ch u -> lorder o u f
+              by image domain ch u.domain)
+          )
+        so r f y
+        by (inhabited f.domain
+            by exists g. ch g so r g (fh g)
+            so exists x. f.domain x by g.domain x)
+        so (chain o f.domain by forall s. image domain ch s ->
+            chain o s by exists g. ch g /\ g.domain = s so r g (fh g))
+        so (rel_mapping f.domain f.eval i by forall x. f.domain x ->
+          i x (f.eval x) by exists s. image domain ch s /\ s x
+          so exists g. ch g /\ g.domain = s so r g (fh g))
+        so (monotone_on f.domain o f.eval go
+          by forall a b. f.domain a /\ f.domain b /\ o a b ->
+            go (f.eval a) (f.eval b)
+          by exists s. image domain ch s /\ s b
+          so exists g. ch g /\ g.domain = s
+          so r g (fh g) /\ subchain o g.domain f.domain
+          so s a)
+        so let h = image f.eval f.domain in
+          supremum go h y
+        by (upper_bound go h y by forall u. h u -> go u y
+          by exists a. f.domain a /\ f.eval a = u
+          so exists s. image domain ch s /\ s a
+          so exists g. ch g /\ g.domain = s
+          so r g (fh g)
+          so transitive go
+          /\ (go (fh g) y by image fh ch (fh g))
+          /\ (go u (fh g) by upper_bound go (image g.eval g.domain) (fh g))
+        ) /\ (forall u. upper_bound go h u -> go y u
+          by upper_bound go (image fh ch) u by forall v. image fh ch v ->
+          go v u by exists g. ch g /\ fh g = v
+          so supremum go (image g.eval g.domain) v
+          so upper_bound go (image g.eval g.domain) u
+          by forall v. image g.eval g.domain v -> go v u by h v
+        )
+      )
+    )
+
+
+  (* Immediately derive sequence from trampoline and continuation rules:
+     {P -> Q}, {Q -> R}, {R -> Nothing} |- forall n. { I n -> I (n+1) }
+       with I 0 = P, I 1 = Q, I 2 = R, others = Nothing.
+       maxless I-chains cannot exists (at most 3 elements),
+       hence limit condition is trivial.
+       By trampoline:
+     {P -> Q}, {Q -> R}, {R -> Nothing} |- { P = I 0 -> Nothing }
+       By (weakening+) continuation:
+     {P -> Q}, {Q -> R} |- {P -> R}
+     Qed.
+   *)
+  use int.Int
+
+  lemma sequence : forall c,p q r:set 'a.
+    holds c (enforce p q) /\ holds c (enforce q r) ->
+    holds c (enforce p r)
+    by forall g. c.interp g -> (enforce p r).interp g
+    by let go = g.progress in let c = conj c (ordering go) in
+      holds c (enforce p r)
+    by let c = conj c (enforce r none) in
+      holds c (enforce p r)
+    by holds c (enforce p none) /\ subset none r
+    by let i = fun n -> if n = 0 then p
+                        else if n = 1 then q
+                        else if n = 2 then r
+                        else none
+    in holds c (enforce (i 0) none)
+    by let o = (<=) in order o so is_inv c o go i
+    by (forall n. holds c (enforce (i n) (later o i n))
+      by holds c (enforce (i n) (i (n+1))) /\ subset (i (n+1)) (later o i n))
+    so forall h f.
+      inhabited h /\ not maximum o h (sup o h) /\ rel_mapping h f i -> false
+    by (forall x. h x -> 0 <= x <= 2 by i x (f x))
+    so if h 2 then maximum o h 2 else if h 1 then maximum o h 1
+      else maximum o h 0
+
+  use ho_set.SetBigOps
+
+  (* Proof of transfinite loop rule: generic derecursification.
+     Note that if:
+     G,(forall y > x. {P y -> Q y}) |- {P x -> Q x} holds,
+     then any game satisfying G can be (minimally) extended
+     to a larger game that satisfy the recursive hypothesis.
+     We then follow the invariant on that larger game.
+     If any step that does not exists in the origin game is required,
+     we recursively simulate this step by the same method.
+     This process explicitly create a stack, which may overflow.
+     This is where the transfinite overflow condition intervene:
+       to continue the process util one of the underlying step can
+       be closed, in which case a whole section of the stack is discarded.
+     ===> Proof can be done through the trampoline rule, using stack
+     as auxiliary data. In order to describe progress, we use a
+     modified lexicographic order on the stack.
+     Also, this mean that at first we will only prove G |- {P x -> Q x}
+     when Q x = Nothing. Of course, the regular theorem can be recovered
+     through continuations.
+  *)
+
+  (* Construction of an extended game that validates recursive calls. *)
+  predicate tr_rec (o:erel 'a) (p q:rel 'a 'b) (g:game 'b) (h:set 'a)
+                   (x:'b) (s:set 'b) =
+    g.transition x s \/ exists z. upper_bound o h z /\ not h z /\ p z x
+                                  /\ s = inter (q z) (g.progress x)
+  let ghost function game_rec (o:{erel 'a}) (p q:{rel 'a 'b}) (g:{game 'b})
+                              (h:{set 'a}) : {game 'b}
+  = { progress = g.progress; transition = tr_rec o p q g h }
+
+  (* Describe a 'stack frame'. *)
+  type frame 'a = {
+    str : 'a; (* Starting point of the frame. *)
+    log : set 'a; (* History of the frame. *)
+    inv : set (set 'a); (* Victory invariant for the current frame. *)
+  }
+
+  (* Raw stacks. *)
+  type stack 'a 'b = pfun 'a (frame 'b)
+
+  (* Lexicographic order on stack: either a prefix,
+     or the stack goes from a structure a ++ [x] ++ b to a ++[y] ++ c
+     and y is 'later' than x. Moreover, we enforce that
+     (y/x) dominate a++[x]++b to control the progression
+     within the underlying order. *)
+  predicate stack_lex_witness (o1:erel 'a) (o2:erel 'b) (s1 s2:stack 'a 'b)
+                              (h:set 'a) (x:'a) =
+    maximum o1 h x /\ subchain o1 h s1.domain /\ subchain o1 h s2.domain /\
+    lower (subchain o2) (s1.eval x).log (s2.eval x).log /\
+    equalizer (remove h x) s1.eval s2.eval /\
+    (s1.eval x).inv = (s2.eval x).inv /\
+    (s1.eval x).str = (s2.eval x).str /\
+    (forall y u. (s2.eval x).log u /\ not (s1.eval x).log u /\ s1.domain y ->
+      upper_bound o2 (s1.eval y).log u)
+  predicate stack_lex (o1:erel 'a) (o2:erel 'b) (s1 s2:stack 'a 'b) =
+    lorder o1 s1 s2 \/ exists h x. stack_lex_witness o1 o2 s1 s2 h x
+
+  lemma stack_less_order : forall o1:erel 'a,o2:erel 'b.
+    let s_o = stack_lex o1 o2 in
+    order o1 /\ order o2 -> order s_o
+    by (forall s1 s2. s_o s1 s2 /\ s_o s2 s1 -> s1 = s2
+      by (forall a b h x.
+        subfun a b /\ stack_lex_witness o1 o2 a b h x -> false
+      ) so (forall a b h1 x1 h2 x2. stack_lex_witness o1 o2 a b h1 x1 /\
+        stack_lex_witness o1 o2 b a h2 x2 /\ subchain o1 h1 h2 -> false)
+      so (forall h1 x1 h2 x2. stack_lex_witness o1 o2 s1 s2 h1 x1 /\
+        stack_lex_witness o1 o2 s2 s1 h2 x2 -> false)
+      so subfun s1 s2 /\ subfun s2 s1)
+    so forall s1 s2 s3. s_o s1 s2 /\ s_o s2 s3 ->
+      s_o s1 s3
+    by (forall h x. stack_lex_witness o1 o2 s1 s2 h x /\ lorder o1 s2 s3 ->
+      stack_lex_witness o1 o2 s1 s3 h x)
+    so (forall h x. stack_lex_witness o1 o2 s2 s3 h x /\ lorder o1 s1 s2 ->
+      not lorder o1 s1 s3 ->
+      stack_lex_witness o1 o2 s1 s3 h x
+      by if subchain o1 h s1.domain then true else false
+      by subchain o1 s1.domain h so if not s1.domain x then true else false
+      by sext s1.domain h by forall y. h y -> s1.domain y by o1 y x
+    ) so (forall h1 h2 x. subchain o1 h1 h2 ->
+       maximum o1 h1 x /\ maximum o1 h2 x -> h1 = h2
+       by sext h1 h2 by forall y. h2 y -> h1 y by o1 y x
+     )
+    so (forall h1 x1 h2 x2. stack_lex_witness o1 o2 s1 s2 h1 x1 ->
+      stack_lex_witness o1 o2 s2 s3 h2 x2 ->
+      (exists h3 x3. stack_lex_witness o1 o2 s1 s3 h3 x3)
+      by if h1 = h2
+        then stack_lex_witness o1 o2 s1 s3 h1 x1
+          by x1 = x2
+          so forall y u.
+            (s3.eval x1).log u /\ not (s1.eval x1).log u /\ s1.domain y ->
+            upper_bound o2 (s1.eval y).log u
+          by not (s2.eval x1).log u ->
+          not sext (s2.eval x1).log (s1.eval x1).log
+          so exists k. (s2.eval x1).log k /\ not (s1.eval x1).log k
+          so upper_bound o2 (s1.eval y).log k
+          so transitive o2 so o2 k u by upper_bound o2 (s2.eval x1).log u
+        else if subchain o1 h1 h2
+        then stack_lex_witness o1 o2 s1 s3 h1 x1 by x1 <> x2
+        else stack_lex_witness o1 o2 s1 s3 h2 x2
+          by subchain o1 h2 h1 so x1 <> x2
+          so forall y u.
+            (s3.eval x2).log u /\ not (s1.eval x2).log u /\ s1.domain y ->
+            upper_bound o2 (s1.eval y).log u
+            by not sext (s2.eval x1).log (s1.eval x1).log
+            so exists k. (s2.eval x1).log k /\ not (s1.eval x1).log k
+            so upper_bound o2 (s1.eval y).log k
+            so transitive o2 so o2 k u by upper_bound o2 (s2.eval x1).log u
+    )
+
+  (* Return linking. *)
+  predicate linked (o1:erel 'a) (s:stack (set 'a) 'b) (h:set 'a) (x:'b) =
+    exists hl. s.domain hl /\ lower (subchain o1) hl h /\
+    let f = s.eval hl in f.inv (add f.log x)
+  (* Stack invariant. Note that we index the stack by chains
+     in order to handle correctly limit frames. *)
+  predicate is_stack (o1:erel 'a) (p q:rel 'a 'b) (g:game 'b)
+                     (s:stack (set 'a) 'b) =
+    (* Stack must be well-founded (to avoid infinite return chains) *)
+    wf_chain (subchain o1) s.domain /\
+    (* Stack must be downward closed (to get the correct limit
+       behavior). *)
+    (forall h1 h2. s.domain h2 /\ inhabited h1 /\ subchain o1 h1 h2 ->
+      s.domain h1) /\
+    (* Frame are correctly ordered. *)
+    (forall h1 h2. s.domain h1 /\ s.domain h2 /\ subchain o1 h1 h2 ->
+      h1 <> h2 -> upper_bound g.progress (s.eval h1).log (s.eval h2).str) /\
+    (* Frame represent a proper 'victory path' in the
+       associated recursive game, and their finishing condition is
+       linked to a step in a lower frame. Also, keys must be chains. *)
+    forall h. s.domain h ->
+      let f = s.eval h in
+      let target = bigunion (image q h) in
+      let lg = game_rec o1 p q g h in
+      f.inv f.log
+      /\ chain o1 h /\ inhabited h
+      /\ (maximum o1 h (sup o1 h) -> p (sup o1 h) f.str)
+      /\ minimum g.progress f.log f.str
+      /\ victory_invariant lg ((=) f.str) target f.inv
+      /\ not inhabited (inter f.log target)
+      /\ (forall x. target x /\ upper_bound g.progress f.log x ->
+        linked o1 s h x)
+
+  predicate is_stack_top (o1:erel 'a) (o2:erel 'b)
+                         (s:stack (set 'a) 'b) (h:set 'a) (x:'b) =
+    maximum (subchain o1) s.domain h /\ maximum o2 (s.eval h).log x
+
+  (* Invariant to perform recursion from trampoline rule. *)
+  predicate rc_inv (o1:erel 'a) (p q:rel 'a 'b) (g:game 'b)
+                   (s:stack (set 'a) 'b) (x:'b) =
+    is_stack o1 p q g s /\
+    exists h. is_stack_top o1 g.progress s h x
+
+  let ghost function glarger (g:{game 'a}) : {fmla 'a} =
+    { interp = pure { subgame g } }
+
+  lemma recursion_v1 : forall g,p q:rel 'b 'a,o:erel 'b,x_0.
+    let c = glarger g in let go = g.progress in
+    order o /\ is_rec c o go p q /\ q x_0 = none ->
+    holds c (enforce (p x_0) none)
+    by forall y_0. p x_0 y_0 -> holds c (enforce ((=) y_0) none)
+    (* First remark: the 'recursive' game does satisfy
+       the recursive context. *)
+    by ("stop_split" forall h. not maximum o h (sup o h) ->
+      let recursive = uquant (upper_bound o h) (henforce p q) in
+      let c' = conj c recursive in
+      let lg = game_rec o p q g h in
+        c'.interp lg by recursive.interp lg by forall x. upper_bound o h x ->
+        have_uniform_winning_strat lg (p x) (q x)
+      by forall y. p x y -> have_winning_strat lg y (q x)
+      by let q2 = inter (q x) (go y) in
+        lg.transition y (inter (q x) (go y)) by not (h x so maximum o h x)
+    ) /\ ("stop_split" forall h x. maximum o h x ->
+      let recursive = uquant (lower o x) (henforce p q) in
+      let c' = conj c recursive in
+      let lg = game_rec o p q g h in
+        c'.interp lg by recursive.interp lg by forall z. lower o x z ->
+        have_uniform_winning_strat lg (p z) (q z)
+      by forall y. p z y -> have_winning_strat lg y (q z)
+      by let q2 = inter (q z) (go y) in
+        lg.transition y (inter (q z) (go y))
+      by upper_bound o h z so not h z
+    )
+      (* Second remark (consequence): for all stack identifiant
+         admitting a max, the desired victory invariant exists. *)
+    so ("stop_split" forall h x y. maximum o h x /\ p x y ->
+      let lg = game_rec o p q g h in
+      let target = bigunion (image q h) in
+        (exists inv. victory_invariant lg ((=) y) target inv)
+        by have_uniform_winning_strat lg ((=) y) target
+        by let recursive = uquant (lower o x) (henforce p q) in
+          let c' = conj c recursive in
+          holds c' (enforce ((=) y) target)
+        by holds c' (enforce (p x) (q x))
+        so subset ((=) y) (p x)
+        so subset (q x) target
+      )
+    (* Initialise the loop invariant. *)
+    so let i = rc_inv o p q g in
+      let s_o = stack_lex (subchain o) go in
+      order s_o
+    so let h0 = (=) x_0 in
+      let lg0 = game_rec o p q g h0 in
+      let tg0 = bigunion (image q h0) in
+      maximum o h0 x_0
+    so exists iv0. victory_invariant lg0 ((=) y_0) tg0 iv0
+    so let f0 = { str = y_0; log = ((=) y_0); inv = iv0 } in
+      let s0 = psing h0 f0 in
+      (subset ((=) y_0) (i s0) by i s0 y_0
+        by is_stack_top o go s0 h0 y_0 so is_stack o p q g s0
+        by (tg0 = none by sext tg0 none by forall y. not (tg0 y
+          so exists s. image q h0 s /\ s y
+          so exists x. s = q x /\ h0 x
+        )) so (forall h1. subchain o h1 h0 /\ inhabited h1 ->
+          h1 = h0 by sext h0 h1)
+    ) /\ (holds c (enforce (i s0) none)
+      by is_inv c s_o go i
+      (* First, prove a few practical lemma about stack manipulation. *)
+      (* 'transversal run' lemma: under some ordering conditions,
+         we can simply cut the stack to a frame and extends its log
+         instead, creating a later state. Base for: transversal limits,
+         in-frame run, and return lemma. *)
+      by let tr_cond = fun s lg0 lg1 ->
+          forall h x. s.domain h /\ lg1 x /\ not lg0 x ->
+            upper_bound go (s.eval h).log x
+      in
+      ("stop_split" forall s h lg1. is_stack o p q g s /\ s.domain h ->
+        let f0 = s.eval h in let target = bigunion (image q h) in
+        lower (subchain go) f0.log lg1 /\ f0.inv lg1 ->
+        not inhabited (inter lg1 target) /\ tr_cond s f0.log lg1 ->
+        let under = flip (subchain o) h in
+        let f1 = { f0 with log = lg1 } in
+        let s_c = restrict under s in
+        let s_r = padd s_c h f1 in
+        s_o s s_r /\ s <> s_r /\ is_stack o p q g s_r
+        /\ (maximum go lg1 (sup go lg1) ->
+            is_stack_top o go s_r h (sup go lg1))
+        by stack_lex_witness (subchain o) go s s_r s_c.domain h
+        so (s_r.domain = s_c.domain = inter under s.domain
+          by sext s_r.domain s_c.domain by s_c.domain h)
+        so (forall h1 h2.
+          s_r.domain h2 /\ inhabited h1 /\ subchain o h1 h2 ->
+          s_r.domain h1 by s.domain h1 so under h)
+        so (forall h1 h2.
+          s_r.domain h1 /\ s_r.domain h2 /\ subchain o h1 h2 ->
+            h1 <> h2 -> upper_bound go (s_r.eval h1).log (s_r.eval h2).str
+          by not (h1 = h so subchain o h2 h)
+          so s_r.eval h1 = s.eval h1
+          so (s_r.eval h2).str = (s.eval h2).str)
+        so (forall h_. s_r.domain h_ ->
+          let f = s_r.eval h_ in
+          let target = bigunion (image q h_) in
+          let lg = game_rec o p q g h_ in
+          ("case_split" if h_ = h then f = f1
+                        else s.domain h_ /\ f = s.eval h_)
+          so f.inv f.log
+          so (victory_invariant lg ((=) f.str) target f.inv
+            /\ (maximum o h_ (sup o h_) -> p (sup o h_) f.str)
+            /\ (forall x. target x /\ upper_bound go f.log x ->
+              linked o s_r h_ x
+              by upper_bound go (s.eval h_).log x
+              so linked o s h_ x
+            )
+            by f.str = (s.eval h_).str /\ f.inv = (s.eval h_).inv)
+          so (minimum go f.log f.str by minimum go f0.log f0.str)
+        )
+      )
+      (* 'return' lemma: if we satisfy the target of the stack,
+         then the invariant is later-satisfied. Necessary stack is
+         build through the transversal run at a well-chosen level. *)
+      so let ret_cond = fun s x ->
+        forall h. s.domain h ->
+          upper_bound go (s.eval h).log x
+      in
+      ("stop_split" forall s h x. is_stack o p q g s /\ s.domain h ->
+        bigunion (image q h) x /\ ret_cond s x -> later s_o i s x
+        by let valid = fun h -> s.domain h /\ bigunion (image q h) x in
+          let h0 = inf (subchain o) valid in
+          (minimum (subchain o) valid h0 by valid h)
+        so linked o s h0 x
+        so exists hl. let f0 = s.eval hl in let lg1 = add f0.log x in
+          s.domain hl /\ lower (subchain o) hl h0 /\ f0.inv lg1
+        so let s_r = padd (restrict (flip (subchain o) hl) s)
+                          hl { f0 with log = lg1 } in
+          ("stop_split" s_o s s_r /\ s <> s_r /\ i s_r x)
+        by let target = bigunion (image q hl) in
+          (* Critical use of the well-foundedness hypothesis here. *)
+          not (inhabited (inter lg1 target) so valid hl
+            by (exists y. lg1 y /\ target y so y = x
+                by not inter f0.log target y))
+        so (lower (subchain go) f0.log lg1 by upper_bound go f0.log x
+          so not (f0.log x so
+            (subchain o hl h by subchain o h0 h by valid h)
+            so h <> hl
+            so upper_bound go f0.log (s.eval h).str
+            so minimum go (s.eval h).log (s.eval h).str
+            so upper_bound go (s.eval h).log x
+            so (x = (s.eval h).str
+              by go x (s.eval h).str /\ go (s.eval h).str x)
+            so inter (s.eval h).log (bigunion (image q h)) x
+        ))
+        so tr_cond s f0.log lg1
+        so maximum go lg1 x so sup go lg1 = x
+      )
+      (* 'next' lemma: Hybrid of the transversal and return lemmas
+         (apply whichever is relevant).
+         If we could extend a transversal frame by a single value
+         (except that it may returns),
+         then the invariant is later-satisfied. *)
+      so ("stop_split" forall s h x. is_stack o p q g s /\ s.domain h ->
+        let f0 = s.eval h in let lg = f0.log in let lg1 = add lg x in
+        ret_cond s x /\ f0.inv lg1 /\ not lg x -> later s_o i s x
+        by let target = bigunion (image q h) in
+        not target x ->
+          let s_r = padd (restrict (flip (subchain o) h) s)
+                         h { f0 with log = lg1 }
+        in
+        (("stop_split" s_o s s_r /\ s <> s_r /\ is_stack o p q g s_r
+         /\ is_stack_top o go s_r h x) so i s_r x)
+        by (lower (subchain go) lg lg1)
+        so (not inhabited (inter lg1 target)
+          by not inhabited (inter lg target))
+        so tr_cond s lg lg1
+      )
+      (* 'call' lemma: addition of a single stack frame on top
+         of an extended target. *)
+      so let call_cond = fun s h x ->
+        (forall h2. inhabited h2 /\ lower (subchain o) h2 h -> s.domain h2)
+        /\ (forall y. bigunion (image q h) y /\ go x y ->
+          not bigunion (image q (bigunion s.domain)) y ->
+          linked o s h y)
+        /\ (forall h2. s.domain h2 -> upper_bound go (s.eval h2).log x)
+      in
+      ("stop_split" forall s h x iv. is_stack o p q g s ->
+        let rg = game_rec o p q g h in
+        let target = bigunion (image q h) in
+        upper_bound (subchain o) s.domain h /\ not s.domain h /\ chain o h /\
+        inhabited h ->
+        call_cond s h x /\ victory_invariant rg ((=) x) target iv ->
+        (maximum o h (sup o h) -> p (sup o h) x) /\ not target x ->
+        let f0 = { str = x; log = (=) x; inv = iv } in
+        let s_r = padd s h f0 in
+        is_stack o p q g s_r /\ s_r <> s /\ s_o s s_r
+        /\ is_stack_top o go s_r h x
+        by lorder (subchain o) s s_r
+        so (forall h1 h2.
+          s_r.domain h2 /\ inhabited h1 /\ subchain o h1 h2 ->
+          s_r.domain h1 by if h1 = h then true else s.domain h1
+          by if h2 <> h then s.domain h2 else lower (subchain o) h1 h2)
+        so (forall h1 h2.
+          s_r.domain h1 /\ s_r.domain h2 /\ subchain o h1 h2 /\ h1 <> h2 ->
+          upper_bound go (s_r.eval h1).log (s_r.eval h2).str
+          by s.domain h1
+        ) so forall h_. s_r.domain h_ ->
+          let f = s_r.eval h_ in
+          let target = bigunion (image q h_) in
+          let lg = game_rec o p q g h_ in
+          ("case_split" (h = h_ /\ f = f0) \/ (s.domain h_ /\ f = s.eval h_))
+        so chain o h_ so inhabited h_
+        so (f.inv f.log by f0.inv f0.log)
+        so (maximum o h_ (sup o h_) -> p (sup o h_) f.str)
+        so minimum go f.log f.str
+        so victory_invariant lg ((=) f.str) target f.inv
+        so not inhabited (inter f.log target)
+        so (forall y. target y /\ upper_bound go f.log y ->
+          linked o s_r h_ y
+          by if h <> h_ then linked o s h_ y so linked o s_r h_ y
+          else (exists h1. bigunion (image q h1) y /\ s.domain h1
+            so let f1 = s.eval h1 in
+              (upper_bound go f1.log y by upper_bound go f1.log x
+               so go x y /\ transitive go)
+            so linked o s h1 y so
+              exists hl. let fl = s.eval hl in
+                s.domain hl /\ lower (subchain o) hl h1 /\
+                fl.inv (add fl.log y)
+            so s_r.domain hl /\ lower (subchain o) hl h
+          ) || (
+            let bs = bigunion s.domain in
+            let btg = bigunion (image q bs) in
+            not (btg y so exists s0. image q bs s0 /\ s0 y
+              so exists u. bs u /\ s0 = q u
+              so exists h. s.domain h /\ h u
+              so bigunion (image q h) y
+            ) so linked o s h y so linked o s_r h y
+          )
+        )
+      )
+      (* Using those lemmas, establish that i is indeed
+         an invariant. *)
+      (* Prove the step case for invariant. Case disjunction,
+         using exactly two of the above lemmas.
+         . Try to use a present step ==> next lemma.
+         . Try to use a recursive step ==> call lemma.
+       *)
+      so ("stop_split" forall s. holds c (enforce (i s) (later s_o i s))
+        by forall x. i s x -> holds c (enforce ((=) x) (later s_o i s))
+        (* Derive step from the victory invariant. *)
+        by exists h. is_stack_top o go s h x
+        so let f = s.eval h in
+          let lg0 = f.log in
+          let lg = game_rec o p q g h in
+          let tg = bigunion (image q h) in
+          victory_invariant lg ((=) f.str) tg f.inv
+        so not inhabited (inter lg0 tg) so f.inv lg0
+        so exists a.
+          lg.transition x a /\ not a x /\ subset a (next_hist f.inv lg0)
+        so (* Regular transition: process normally at the stack top
+              (call lemma). *)
+          if g.transition x a
+          then
+            (holds c (enforce ((=) x) a)
+              by forall g2. c.interp g2 ->
+                have_uniform_winning_strat g2 ((=) x) a
+              by have_uniform_winning_strat g ((=) x) a
+              by have_winning_strat g x a)
+            so subset a (later s_o i s) by forall y. a y -> later s_o i s y
+            by let lg1 = add lg0 y in
+              (maximum go lg1 y
+              by upper_bound go lg0 y by go x y /\ transitive go)
+            so not (lg0 y so x = y by go y x /\ go x y)
+            (* Shared because it implies tr_cond. *)
+            so (ret_cond s y by forall h_. s.domain h_ ->
+              let f0 = s.eval h_ in
+              upper_bound go f0.log y
+              by h <> h_ -> upper_bound go f0.log f.str
+              so go f.str x /\ go x y /\ transitive go
+            )
+            (* 'Recursive call' transition: add a stack frame,
+                use the call lemma. *)
+          else
+            exists z. upper_bound o h z /\ not h z /\ p z x /\
+              a = inter (q z) (go x)
+            so let hn = add h z in
+              maximum o hn z
+            so let lg = game_rec o p q g hn in
+              let target = bigunion (image q hn) in
+              exists iv. victory_invariant lg ((=) x) target iv
+            so let f_ = { str = x; log = (=) x; inv = iv } in
+            let s_r = padd s hn f_ in
+            (("stop_split" is_stack o p q g s_r /\ s_r <> s /\ s_o s s_r
+             /\ is_stack_top o go s_r hn x) so i s_r x)
+            by z = sup o hn
+            so subchain o h hn
+            so (upper_bound (subchain o) s.domain hn
+                by transitive (subchain o))
+            so not (s.domain hn so hn = h by subchain o hn h)
+            so not (target x so exists s0. image q hn s0 /\ s0 x
+              so exists u. hn u /\ s0 = q u
+              so (u = z by not (h u so tg x so inter lg0 tg x))
+            )
+            so call_cond s hn x
+            by (forall h2. inhabited h2 /\ lower (subchain o) h2 hn ->
+              s.domain h2 by subchain o h2 h || (false by subchain o h h2
+                so sext h2 hn)
+            )
+            so (forall h2. s.domain h2 ->
+              upper_bound go (s.eval h2).log x
+              by h <> h2 -> subchain o h2 h
+              so upper_bound go (s.eval h2).log f.str
+              so (go f.str x by lg0 f.str) so transitive go)
+            (* Establish extra return links. *)
+            so (forall y. bigunion (image q hn) y /\ go x y ->
+              not bigunion (image q (bigunion s.domain)) y ->
+              linked o s hn y
+              by s.domain h /\ lower (subchain o) h hn /\
+                f.inv (add f.log y)
+              by a y by exists s0. image q hn s0 /\ s0 y
+              so exists u. hn u /\ s0 = q u
+              so (u = z by not (h u so bigunion s.domain u
+                so image q (bigunion s.domain) s0))
+            )
+      )
+      (* Prove the limit case for invariant.
+         Mostly a case disjunction on the limit nature:
+         . Either the limit is obtained by a transversal limit
+           at some fixed level. Then, one can obtain a valid
+           stack by taking the chain supremum at the transversal
+           level (transversal run lemma, giving the exact
+           same mapping from all source)
+           and then recover the invariant via the next lemma.
+         . Either the limit corresponds to a transfinite stack overflow.
+           In that case, we have an obvious 'supremum' for the
+           stack chain, which is a stack by continuity.
+           Now, either the supremum is a target by chance (===> return lemma),
+           otherwise we use the call lemma to add a 'limit frame'.
+         The nature of the limit is determined by analysing
+         the set of eventually stable prefix of the stack.
+       *)
+      /\ ("stop_split" forall hs fs.
+        chain s_o hs /\ monotone_on hs s_o fs go /\ inhabited hs /\
+        not maximum s_o hs (sup s_o hs) /\ rel_mapping hs fs i ->
+        let fhs = image fs hs in
+        holds c (enforce (supremum go fhs) (later_limit s_o i hs))
+        by forall xs. supremum go fhs xs ->
+          holds c (enforce ((=) xs) (later_limit s_o i hs))
+        by subset ((=) xs) (later_limit s_o i hs) by later_limit s_o i hs xs
+        by (* Evident remark, but mostly out
+              of reach of provers otherwise. *)
+           (forall s. hs s -> is_stack o p q g s by i s (fs s))
+        so (* Eventually stable prefixes of hs. *)
+          let sb = subchain o in
+          let sbb = subchain sb in
+          let lo = lorder sb in
+          let paf = fun p s0 ->
+            forall s1. hs s1 /\ s_o s0 s1 -> lo p s1 in
+          let evp = fun p -> exists s0. hs s0 /\ paf p s0 in
+          (* Eventually stable prefixes form a chain for lorder. *)
+        ("stop_split"
+          chain lo evp /\ chain subfun evp
+          by forall p1 p2. evp p1 /\ evp p2 ->
+          (lo p1 p2 so subfun p1 p2) \/ (lo p2 p1 so subfun p2 p1)
+          by (exists s3. lo p1 s3 /\ lo p2 s3
+            so (lo p1 p2 by sbb p1.domain p2.domain)
+            \/ (lo p2 p1 by sbb p2.domain p1.domain)
+          )
+          by exists s1. hs s1 /\ paf p1 s1 so exists s2. hs s2 /\ paf p2 s2
+          so (lo p1 s2 /\ lo p2 s2 by s_o s1 s2)
+          \/ (lo p1 s1 /\ lo p2 s1 by s_o s2 s1)
+        )
+          (* In particular, eventually stable prefixes have a supremum. *)
+        so let limp = pbigunion evp in
+        ("stop_split" supremum lo evp limp
+          by supremum subfun evp limp
+          so (chain sbb (image domain evp) by monotone lo domain sbb)
+          so supremum sbb (image domain evp) limp.domain
+          so (forall u. upper_bound lo evp u -> lo limp u
+            by upper_bound subfun evp u
+            so upper_bound sbb (image domain evp) u.domain
+            by forall s. image domain evp s ->
+              sbb s u.domain
+              by exists g. (lo g u by evp g) /\ g.domain = s)
+          /\ (upper_bound lo evp limp by
+            forall u. evp u -> lo u limp
+            by image domain evp u.domain)
+        )
+        so if evp limp
+          then (* corresponds to transfinite transversal run.
+                  The supremum corresponds to the level right
+                  above limp. *)
+            (* First, find a stack which is strictly bigger than
+               limp (as well as all stack after it). *)
+            ("stop_split" (exists s0. hs s0 /\ paf limp s0 /\ s0 <> limp)
+             by exists s0. hs s0 /\ paf limp s0
+             so limp = s0 -> not maximum s_o hs s0
+             so exists s1. hs s1 /\ not s_o s1 s0
+             so s_o s0 s1 so paf limp s1
+             so s1 <> limp)
+            so exists s0. hs s0 /\ paf limp s0 /\ s0 <> limp
+            (* For those stack, find the relevant frame *)
+            so ("stop_split" forall s. hs s /\ s_o s0 s ->
+              let select = diff s.domain limp.domain in
+              let h = inf sb select in
+              let hh = add limp.domain h in
+              minimum sb select h
+              && subchain sb limp.domain hh && subchain sb hh s.domain
+              by lo limp s so subchain sb limp.domain s.domain
+              so not (not inhabited select
+                  so (forall x. s.domain x -> limp.domain x by not select x)
+                  so sext s.domain limp.domain so pext limp s)
+              so subset select s.domain /\ wf_chain sb s.domain
+             ) so let h0 = inf sb (diff s0.domain limp.domain) in
+               let hh0 = add limp.domain h0 in
+            (minimum sb (diff s0.domain limp.domain) h0
+              /\ subchain sb limp.domain hh0
+              /\ subchain sb hh0 s0.domain by s_o s0 s0)
+            so maximum sb hh0 h0
+            (* Show that the relevant frame is always at the
+               same level. *)
+            so ("stop_split" forall s. hs s /\ s_o s0 s ->
+               let h = inf sb (diff s.domain limp.domain) in
+               h = h0
+               by minimum sb (diff s.domain limp.domain) h
+               so (equalizer limp.domain limp.eval s.eval by lo limp s)
+               /\ (equalizer limp.domain limp.eval s0.eval by lo limp s0)
+               so if lo s0 s
+               then h = h0 by
+                 minimum sb (diff s.domain limp.domain) h0
+                 by subchain sb s0.domain s.domain
+                 so diff s.domain limp.domain h0
+               else exists hh_ h_. stack_lex_witness sb go s0 s hh_ h_
+                 so let hh = add limp.domain h in
+                 (subchain sb hh0 hh_ || (false
+                   by subchain sb hh_ hh0
+                   so s0.eval h_ = s.eval h_ by limp.domain h_
+                   by not (h_ = h0 so sext hh_ hh0 by forall u. hh0 u ->
+                     hh_ u by u = h_ \/ not sb h_ u by sb u h_)
+                 ))
+                 /\ (subchain sb hh hh_ || (false
+                   by subchain sb hh_ hh
+                   so s0.eval h_ = s.eval h_ by limp.domain h_
+                   by not (h_ = h so sext hh_ hh by forall u. hh u ->
+                     hh_ u by u = h_ \/ not sb h_ u by sb u h_)
+                 ))
+                 so (subchain sb hh hh0 so hh0 h)
+                 \/ (subchain sb hh0 hh so hh h0)
+            )
+            so let hsr = inter hs (s_o s0) in
+            (* Deduce that all lex-witness within hsr occur above
+               above hh0. *)
+            ("stop_split" forall hh_ h_ s1 s2. hsr s1 /\ hsr s2 /\
+              stack_lex_witness sb go s1 s2 hh_ h_ ->
+              (subchain sb hh0 hh_ || (false
+                by subchain sb hh_ hh0
+                so s1.eval h_ = s2.eval h_ by limp.domain h_
+                /\ (equalizer limp.domain limp.eval s1.eval by lo limp s1)
+                /\ (equalizer limp.domain limp.eval s2.eval by lo limp s2)
+                by not (h_ = h0 so sext hh_ hh0 by forall u. hh0 u ->
+                  hh_ u by u = h_ \/ not sb h_ u by sb u h_)
+              )) by subchain sb hh0 s1.domain
+              by inf sb (diff s1.domain limp.domain) = h0
+            )
+            (* Prove that any element within the chain is eventually
+               exceeded through a witness at lowest possible level. *)
+            so ("stop_split" forall s. hsr s ->
+              (exists s2. hsr s2 /\ stack_lex_witness sb go s s2 hh0 h0)
+              by let sr = restrict hh0 s in
+                (subchain sb hh0 s.domain
+                 by inf sb (diff s.domain limp.domain) = h0)
+              so (sr.domain = hh0 by sext hh0 sr.domain)
+              so (lorder sb limp sr by lorder sb limp s
+                 so forall x. limp.domain x ->
+                 limp.eval x = s.eval x = sr.eval x by hh0 x)
+              so not (evp sr so limp = sr by lo sr limp)
+              so not paf sr s
+              so exists s2. s_o s s2 /\ hs s2 /\ not lo sr s2
+              so hsr s2 so stack_lex_witness sb go s s2 hh0 h0
+              by (lorder sb sr s) so not lo s s2
+              so exists hh_ h_. stack_lex_witness sb go s s2 hh_ h_
+              so subchain sb hh0 hh_
+              so if hh0 h_
+                then (sext hh_ hh0 by forall u. hh_ u -> hh0 u
+                    by u = h_ \/ not sb h_ u by sb u h_) so h_ = h0
+                else false by equalizer sr.domain sr.eval s2.eval
+                  so subchain sb sr.domain s2.domain
+            )
+            (* Now, we can introduce the chain of frames
+               associated to h0, and prove that it is indeed
+               a chain. *)
+            so let fn = fun s -> (s.eval h0).log in
+              let ch = image fn hsr in
+            ("stop_split" forall a b. hsr a /\ hsr b /\ s_o a b ->
+              subchain go (fn a) (fn b)
+              /\ (a.eval h0).inv = (b.eval h0).inv
+              /\ (a.eval h0).str = (b.eval h0).str
+              by if lo a b
+              then a.eval h0 = b.eval h0
+                by subchain sb a.domain b.domain
+                so (subchain sb hh0 a.domain
+                  by inf sb (diff a.domain limp.domain) = h0)
+                so equalizer a.domain a.eval b.eval /\ a.domain h0
+              else exists hh_ h_. stack_lex_witness sb go a b hh_ h_
+                so subchain sb hh0 hh_
+                so if hh0 h_
+                  then maximum sb hh0 h_ so h_ = h0
+                    so lower (subchain go) (fn a) (fn b)
+                  else a.eval h0 = b.eval h0
+                    by equalizer (remove hh_ h_) a.eval b.eval
+                    so remove hh_ h_ h0
+            )
+            so (chain (subchain go) ch by chain s_o hsr /\
+              monotone_on hsr s_o fn (subchain go))
+            so (inhabited ch by ch (fn s0))
+            (* We build the 'limit frame' by completion. *)
+            so let hl = bigunion ch in
+              supremum (subchain go) ch hl
+            so let fl = { (s0.eval h0) with log = hl } in
+              let s_cl = restrict hh0 s0 in
+              let s_rl = padd s_cl h0 fl in
+            (s_cl.domain = hh0 by sext s_cl.domain hh0)
+            so (s_rl.domain = hh0 by sext s_rl.domain hh0)
+            (* Prove that it is a true limit. *)
+            so ("stop_split" not (ch hl so exists a. hsr a /\ fn a = hl
+              so exists b. hsr b /\ stack_lex_witness sb go a b hh0 h0
+              so lower (subchain go) hl (fn b) so ch (fn b)
+              so subchain go (fn b) hl
+            ))
+            (* Prove that the 'limit stack' is
+               the output of the transversal run lemma for ANY
+               element of hsr (this is the place where we need
+               the statement of the lemma to be explicit). *)
+            so ("stop_split" forall s. hsr s ->
+              ("stop_split"
+                s_o s s_rl /\ s <> s_rl /\ is_stack o p q g s_rl)
+              by let f0 = s.eval h0 in
+                let f1 = { f0 with log = hl } in
+                let under = flip sb h0 in
+                let s_c = restrict under s in
+                let s_r = padd s_c h0 f1 in
+                (fl = f1 by s_o s0 s /\ hsr s0 /\ hsr s)
+              so (s_r = s_rl by pext s_r s_rl
+                by (s_r.domain = s_rl.domain
+                  by sext s_c.domain hh0
+                  by subchain sb hh0 s.domain
+                  so (forall u. hh0 u -> under u /\ s.domain u)
+                  so forall u. under u /\ s.domain u -> hh0 u
+                  by u = h0 \/ not sb h0 u by sb u h0)
+                so forall h_. s_r.domain h_ ->
+                  s_r.eval h_ = s_rl.eval h_
+                by if h_ = h0 then true else
+                  s_r.eval h_ = s.eval h_
+                  so s_rl.eval h_ = s0.eval h_
+                  so s.eval h_ = s0.eval h_
+                  by s_o s0 s
+                  so if lo s0 s
+                  then subchain sb s0.domain s.domain
+                    so equalizer s0.domain s0.eval s.eval
+                    so s0.domain h_
+                  else exists hh_ h2. stack_lex_witness sb go s0 s hh_ h2
+                    so subchain sb hh0 hh_
+                    so equalizer (remove hh_ h2) s0.eval s.eval
+                    so remove hh_ h2 h_ by hh0 h_ so hh_ h_
+                    so h_ = h2 -> false by maximum sb hh0 h_
+              )
+              so let target = bigunion (image q h0) in
+                (victory_invariant (game_rec o p q g h0)
+                                     ((=) fl.str) target fl.inv
+                by exists h. ch h so exists a. hsr a /\ fn a = h
+                so fl.inv = (a.eval h0).inv /\ fl.str = (a.eval h0).str
+              )
+              so (f0.inv hl by subset ch fl.inv by forall h. ch h -> fl.inv h
+                by exists a. hsr a /\ fn a = h
+                so (a.eval h0).inv = fl.inv)
+              so not (inhabited (inter hl target) so exists x.
+                hl x /\ target x so exists h. ch h /\ h x
+                so exists a. hsr a /\ fn a = h
+                so not inhabited (inter h target)
+                so inter h target x
+              )
+              so (s.domain h0 by subchain sb hh0 s.domain)
+              so (lower (subchain go) f0.log hl
+                by ch f0.log so hl <> f0.log /\ subchain go f0.log hl
+                so order (subchain go)
+              )
+              so is_stack o p q g s
+              so tr_cond s f0.log hl
+                by forall h x. s.domain h /\ hl x /\ not f0.log x ->
+                upper_bound go (s.eval h).log x
+                by exists hx. ch hx /\ hx x
+                so exists sx. hsr sx /\ fn sx = hx
+                so s_o s sx \/ (false by s_o sx s so subchain go hx (fn s)
+                                so f0.log x)
+                so not (lorder sb s sx so s.domain h0)
+                so exists hh_ h_. stack_lex_witness sb go s sx hh_ h_
+                so subchain sb hh0 hh_
+                so hh_ h0 so (h0 = h_ by not remove hh_ h_ h0)
+            )
+            so ("stop_split" upper_bound s_o hs s_rl by
+              forall s. hs s -> s_o s s_rl
+              by if hsr s then true else hsr s0 so s_o s s0
+                so s_o s0 s_rl so transitive s_o
+            )
+            so (is_stack o p q g s_rl by hsr s0)
+            (* However, the obtained stack is not correlated with xs.
+               We use the 'next' lemma to add it on top and be done.
+               For this, we first need to establish that xs is the (strict)
+               supremum of hl. *)
+            so ("stop_split" supremum go hl xs
+              by transitive go
+              so (forall x. hl x -> go x xs
+                by exists h. ch h /\ h x
+                so exists a. hsr a /\ fn a = h
+                so go x (fs a) /\ (go (fs a) xs by image fs hs (fs a))
+                by upper_bound go h (fs a)
+                by i a (fs a) so exists ht. is_stack_top o go a ht (fs a)
+                so maximum go (a.eval ht).log (fs a)
+                so h0 <> ht -> a.domain h0 so subchain o h0 ht
+                so upper_bound go (fn a) (a.eval ht).str
+                so go (a.eval ht).str (fs a)
+                by minimum go (a.eval ht).log (a.eval ht).str
+              ) /\ forall x. upper_bound go hl x -> go xs x
+                by upper_bound go (image fs hs) x
+                by (forall a. hsr a -> go (fs a) x
+                  by exists b. hsr b /\ stack_lex_witness sb go a b hh0 h0
+                  so lower (subchain go) (fn a) (fn b)
+                  so not sext (fn a) (fn b) so subset (fn a) (fn b)
+                  so exists y. fn b y /\ not fn a y
+                  so i a (fs a) so exists ht. is_stack_top o go a ht (fs a)
+                  so upper_bound go (a.eval ht).log y so (hl y by ch (fn b))
+                  so go (fs a) y /\ go y x
+                ) so (forall a. hs a -> go (fs a) x
+                  by not hsr a -> s_o a s0 /\ hsr s0
+                  so go (fs a) (fs s0) /\ go (fs s0) x
+                )
+            ) so ("stop_split" not (hl xs so exists h. ch h /\ h xs
+              so subchain go h hl so sext h hl by forall x. hl x -> h x
+              by x = xs \/ not go xs x by go x xs
+            ))
+            so ("stop_split" (s_rl.eval h0).inv (add hl xs)
+              by s_rl.eval h0 = fl
+              so victory_invariant (game_rec o p q g h0)
+                                   ((=) fl.str) (bigunion (image q h0)) fl.inv
+              so fl.inv hl
+            )
+            so ("stop_split" ret_cond s_rl xs
+              by forall h. s_rl.domain h ->
+                let lg0 = (s_rl.eval h).log in
+                upper_bound go lg0 xs
+              by if h = h0 then lg0 = hl else
+                subchain o h h0
+              so upper_bound go lg0 (s_rl.eval h0).str
+              so minimum go (s_rl.eval h0).log (s_rl.eval h0).str
+              so transitive go /\ go (s_rl.eval h0).str xs
+            )
+            so s_rl.domain h0
+            so later s_o i s_rl xs
+          else (* corresponds to transfinite stack overflow,
+                  and limp is a perfect candidate for the limit stack.
+                  However, showing that it is indeed an upper bound
+                  is quite tricky due to the order structure.
+                *)
+            ("stop_split"
+              upper_bound s_o hs limp by forall s. hs s -> s_o s limp
+                by transitive sbb /\ transitive lo
+                so (exists p. evp p /\ not paf p s
+                  so exists s2. hs s2 /\ s_o s s2 /\ not lo p s2
+                  so exists s3. hs s3 /\ paf p s3
+                  so lo p s3 so s_o s2 s3 || (false by s_o s3 s2)
+                  so lo p limp so s_o s2 limp
+                  by if lo s2 s3
+                  then lo s2 p by sbb s2.domain p.domain
+                    || (false by sbb p.domain s2.domain
+                    )
+                  else exists h x.
+                      stack_lex_witness (subchain o) go s2 s3 h x
+                    so stack_lex_witness (subchain o) go s2 limp h x
+                    by sbb h p.domain
+                    || (false by sbb p.domain h
+                      so not (p.domain x so sext p.domain h
+                        by forall u. h u -> p.domain u
+                          by (x = u \/ not sb x u) by sb u x)
+                      so sbb p.domain s2.domain
+                      so equalizer p.domain p.eval s2.eval
+                      by forall u. p.domain u ->
+                        s2.eval u = s3.eval u = p.eval u
+                        by remove h x u
+                    )
+                    so h x so p.domain x so lo p limp so sbb h limp.domain
+                    so limp.eval x = p.eval x = s3.eval x
+                    so forall z. remove h x z ->
+                      s2.eval z = s3.eval z = p.eval z = limp.eval z
+                    by p.domain z
+                ) || (false by paf limp s
+                  by forall s2. hs s2 /\ s_o s s2 -> lo limp s2
+                  by upper_bound lo evp s2
+                )
+            )
+            (* Moreover, limp has the nice property of being a stack
+               (is_stack is continuous over lo) *)
+            so ("stop_split" is_stack o p q g limp
+              by ("stop_split" wf_chain sb limp.domain
+                by (forall d. image domain evp d -> wf_chain sb d
+                  by exists p. evp p /\ d = p.domain
+                  so exists s. hs s /\ paf p s
+                  so lo p s so subchain sb p.domain s.domain
+                  so wf_chain sb s.domain)
+                so chain sbb (image domain evp)
+                by monotone lo domain sbb
+              )
+              so ("stop_split" forall h1 h2.
+                limp.domain h2 /\ inhabited h1 /\ subchain o h1 h2 ->
+                limp.domain h1 by exists d. image domain evp d /\ d h2
+                so exists p. evp p /\ p.domain = d
+                so exists s. hs s && (lo p s by paf p s)
+                so d h1 by s.domain h1 so subchain sb d s.domain
+                so h1 = h2 \/ not sb h2 h1
+              )
+              so ("stop_split" forall h1 h2.
+                limp.domain h1 /\ limp.domain h2 /\ subchain o h1 h2 ->
+                h1 <> h2 ->
+                upper_bound go (limp.eval h1).log (limp.eval h2).str
+                by exists d. image domain evp d /\ d h2
+                so exists p. evp p /\ p.domain = d
+                so lo p limp
+                so (d h1 by not sb h2 h1 /\ sbb d limp.domain)
+                so exists s. hs s && (lo p s by paf p s)
+                so limp.eval h1 = p.eval h1 = s.eval h1
+                /\ limp.eval h2 = p.eval h2 = s.eval h2
+                by equalizer d p.eval s.eval
+              )
+              so ("stop_split" forall h. limp.domain h ->
+                let f = limp.eval h in
+                let target = bigunion (image q h) in
+                let lg = game_rec o p q g h in
+                f.inv f.log
+                /\ chain o h
+                /\ inhabited h
+                /\ (maximum o h (sup o h) -> p (sup o h) f.str)
+                /\ minimum g.progress f.log f.str
+                /\ victory_invariant lg ((=) f.str) target f.inv
+                /\ not inhabited (inter f.log target)
+                /\ (forall x. target x /\ upper_bound go f.log x ->
+                    linked o limp h x)
+                by exists d. image domain evp d /\ d h
+                so exists p_. evp p_ /\ p_.domain = d
+                so exists s. hs s && (lo p_ s by paf p_ s)
+                so lo p_ limp
+                so equalizer d p_.eval s.eval
+                so limp.eval h = p_.eval h = s.eval h
+                so is_stack o p q g s
+                so s.domain h
+                so forall x. target x /\ upper_bound go f.log x ->
+                  linked o limp h x by linked o s h x
+                so exists hl. let fl = s.eval hl in
+                  s.domain hl /\ lower sb hl h /\
+                  fl.inv (add fl.log x)
+                so limp.domain hl /\ fl = p_.eval hl = limp.eval hl
+                by d hl by not sb h hl /\ sbb d limp.domain
+              )
+            )
+            so let hf = bigunion limp.domain in
+              let target = bigunion (image q hf) in
+              (* Necessary for both branches: xs completely
+                 dominate the remaining logs. *)
+            ("stop_split" forall h. limp.domain h ->
+                  upper_bound go (limp.eval h).log xs
+              by exists d. image domain evp d /\ d h
+              so exists p. evp p /\ p.domain = d
+              so exists s. hs s && (lo p s by paf p s)
+              so s.domain h
+              so (s.eval h = p.eval h = limp.eval h
+                by equalizer p.domain p.eval s.eval)
+              so i s (fs s)
+              so exists ht. is_stack_top o go s ht (fs s)
+              so s.domain ht /\ maximum go (s.eval ht).log (fs s)
+              so transitive go /\ (go (fs s) xs by image fs hs (fs s))
+              so if h = ht then upper_bound go (s.eval h).log (fs s)
+              else (lower sb h ht by sb h ht)
+                so upper_bound go (s.eval h).log (s.eval ht).str
+                so minimum go (s.eval ht).log (s.eval ht).str
+                so transitive go
+                so go (s.eval ht).str xs
+            )
+            so ("stop_split" forall h x. maximum o h x /\ subchain o h hf ->
+              limp.domain h by exists h'. limp.domain h' /\ h' x
+              so (subchain o h' hf by supremum sb limp.domain hf)
+              so subchain o h h' || (false by subchain o h' h
+               so sext h' h by forall u. h u -> h' u
+               by x = u \/ not o x u by o u x
+            ))
+            (* New case disjonction: if by chance we land on the target,
+               done by return lemma. Otherwise, we need to perform
+               a 'limit' call. *)
+            so if target xs
+            then exists s. image q hf s /\ s xs
+              so exists u. hf u /\ s = q u
+              so exists h. limp.domain h /\ h u
+              so bigunion (image q h) xs
+              so (ret_cond limp xs)
+              so later s_o i limp xs
+              so later_limit s_o i hs xs
+            else (* To perform a call, it only remains
+               to find the correct instance of the limit. *)
+              let fn =
+              fun x -> (limp.eval (inter hf (flip o x))).str in
+              chain sb limp.domain
+              so ("stop_split" chain o hf
+                so forall h. limp.domain h -> chain o h
+              )
+              so ("stop_split" forall x. hf x ->
+                let h = inter hf (flip o x) in
+                maximum o h x && subchain o h hf && limp.domain h)
+              so ("stop_split" rel_mapping hf fn p
+                by forall x. hf x -> p x (fn x)
+                by let h = inter hf (flip o x) in
+                  inhabited h so x = sup o h
+              )
+              so ("stop_split" monotone_on hf o fn go
+                by forall x y. hf x /\ hf y /\ o x y -> go (fn x) (fn y)
+                by x <> y -> let hx = inter hf (flip o x) in
+                  let hy = inter hf (flip o y) in
+                  subchain o hx hy
+                so upper_bound go (limp.eval hx).log (limp.eval hy).str
+                so minimum go (limp.eval hx).log (limp.eval hx).str
+              )
+              so ("stop_split" not (limp.domain hf
+                so exists d. d hf /\ image domain evp d
+                so exists p. evp p /\ p.domain = d
+                so maximum sb limp.domain hf
+                so (subchain sb d limp.domain by lo p limp)
+                so (sext p.domain limp.domain by forall u. limp.domain u ->
+                  p.domain u by hf = u \/ not sb hf u by sb u hf)
+                so pext p limp))
+              so not maximum o hf (sup o hf)
+              so ("stop_split" not (not inhabited hf so
+                (forall h. not (limp.domain h so (h = none by sext h none
+                  by subchain o h hf) so inhabited h))
+                so exists s. hs s so paf limp s
+                by forall s. lo limp s
+              ))
+              (* Establishing the supremum is a tricky,
+                 especially the second part. To establish it,
+                 we must analyse both cases of lexicographic
+                 increase (in fact, first one is impossible,
+                 but it is simpler to prove the goal directly) *)
+              so ("stop_split" supremum go (image fn hf) xs
+                by (forall u. image fn hf u -> go u xs
+                  by exists k. hf k /\ fn k = u
+                  so let hk = inter hf (flip o k) in
+                    upper_bound go (limp.eval hk).log xs
+                  so minimum go (limp.eval hk).log u
+                )
+                /\ (forall u. upper_bound go (image fn hf) u -> go xs u
+                  by upper_bound go fhs u
+                  by forall v. image fs hs v -> go v u
+                  by exists s. hs s /\ fs s = v
+                  so i s (fs s) so exists ht. is_stack_top o go s ht v
+                  so s_o s limp
+                  so transitive go
+                  so (forall h x. limp.domain h /\ (limp.eval h).log x ->
+                    go x u
+                    by limp.domain h so not sext h hf /\ subset h hf
+                    so exists k. hf k /\ not h k
+                    so let hk = inter hf (flip o k) in
+                      maximum o hk k so subchain o hk hf so limp.domain hk
+                    so (subchain o h hf by supremum sb limp.domain hf)
+                    so subchain o hk hf
+                    so subchain o h hk
+                      || (false by subchain o hk h so sext hk h
+                        by forall u. h u -> hk u by u = k \/ not o k u
+                        by o u k)
+                    so h <> hk
+                    so upper_bound go (limp.eval h).log (fn k)
+                    so go x (fn k) so go (fn k) u
+                  )
+                  so if lo s limp
+                  then s.domain ht
+                    so limp.domain ht /\ limp.eval ht = s.eval ht
+                    so go v u
+                  else exists hh h.
+                    stack_lex_witness (subchain o) go s limp hh h
+                    so not sext (limp.eval h).log (s.eval h).log
+                    so subset (s.eval h).log (limp.eval h).log
+                    so exists x. (limp.eval h).log x /\ not (s.eval h).log x
+                    so upper_bound go (s.eval ht).log x
+                    so go v x so go x u
+                )
+              )
+              so let rg = game_rec o p q g hf in
+                let recursive = uquant (upper_bound o hf) (henforce p q) in
+                holds (conj c recursive)
+                      (enforce (supremum go (image fn hf)) target)
+              so (holds (conj c recursive) (enforce ((=) xs) target)
+                by subset ((=) xs) (supremum go (image fn hf)))
+              so have_uniform_winning_strat rg ((=) xs) target
+              so exists iv. victory_invariant rg ((=) xs) target iv
+              so upper_bound (subchain o) limp.domain hf
+              (* Setting up the limit call. Most conditions are already
+                   ok (including no new return links), we only need
+                   to check saturation. *)
+              so ("stop_split" call_cond limp hf xs
+                by (forall h2. inhabited h2 /\ lower (subchain o) h2 hf ->
+                  limp.domain h2
+                  by supremum (subchain o) limp.domain hf
+                  so not upper_bound (subchain o) limp.domain h2
+                  so exists h. limp.domain h /\ not subchain o h h2
+                  so subchain o h hf so subchain o h2 h
+                )
+              )
+              so let s_r = padd limp hf
+                                { str = xs; log = (=) xs; inv = iv } in
+                (("stop_split"
+                  is_stack o p q g s_r /\ s_r <> limp /\ s_o limp s_r
+                 /\ is_stack_top o go s_r hf xs) so i s_r xs)
+              so later s_o i limp xs
+              so later_limit s_o i hs xs
+      )
+    )
+
+  lemma recursion_v2 : forall c go,p q:rel 'b 'a,o:erel 'b,x0.
+    holds c (ordering go) /\ order o /\ is_rec c o go p q ->
+    holds c (enforce (p x0) (q x0))
+    by let c1 = conj c (enforce (q x0) none) in
+      holds c1 (enforce (p x0) (q x0))
+    by subset none (q x0) so holds c1 (enforce (p x0) none)
+    by let q' = q[x0 <- none] in
+      forall g. c1.interp g -> (enforce (p x0) none).interp g
+    by let c2 = glarger g in
+      holds c2 (enforce (p x0) none)
+    by q' x0 = none so is_rec c2 o go p q'
+    by (forall s. let rec1 = uquant s (henforce p q') in
+      let rec2 = uquant s (henforce p q) in
+      holds (conj c2 rec1) rec2 by forall x. s x ->
+      holds (conj c2 rec1) (enforce (p x) (q x))
+      by holds (enforce (p x) (q' x)) (enforce (p x) (q x))
+      by holds (enforce (p x) (q' x)) (enforce (p x) (q' x))
+      so subset (q' x) (q x)
+    )
+    so (forall x. let rec1 = uquant (lower o x) (henforce p q') in
+      holds (conj c2 rec1) (enforce (p x) (q' x))
+      by let rec2 = uquant (lower o x) (henforce p q) in
+        holds (conj c rec2) (enforce (p x) (q x))
+      so holds (conj c2 rec2) (enforce (p x) (q x))
+      so (holds (conj c2 rec2) (enforce (p x) (q' x))
+        by x = x0 -> holds (conj c2 rec2) (enforce (q x) (q' x))
+      )
+    ) /\ (forall h f. chain o h /\ monotone_on h o f go /\ inhabited h /\
+      not maximum o h (sup o h) /\ rel_mapping h f p ->
+      let rec1 = uquant (upper_bound o h) (henforce p q') in
+      let rec2 = uquant (upper_bound o h) (henforce p q) in
+      let tg1 = bigunion (image q' h) in
+      let tg2 = bigunion (image q h) in
+      let src = supremum go (image f h) in
+      holds (conj c2 rec1) (enforce src tg1)
+      by holds (conj c2 rec2) (enforce src tg1)
+      by holds (conj c2 rec2) (enforce src tg2)
+      so holds (conj c2 rec2) (enforce tg2 tg1)
+      by forall y. tg2 y -> holds (conj c2 rec2) (enforce ((=) y) tg1)
+      by exists s. image q h s /\ s y so exists x. h x /\ s = q x
+      so if x = x0 then holds (conj c2 rec2) (enforce s none)
+          so subset ((=) y) s /\ subset none tg1
+        else subset ((=) y) tg1 by image q' h s
+    )
+
+  clone FmlaRules with goal abstraction,
+    goal modus_ponens,
+    goal reflexive,
+    goal conj_left,
+    goal conj_right,
+    goal enforce_monotonic,
+    goal enforce_does_progress,
+    goal enforce_reflexivity,
+    goal sequence,
+    goal kont_intro,
+    goal external_pre,
+    goal trampoline,
+    goal recursion
+
+end
+
+
+

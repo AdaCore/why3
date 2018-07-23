@@ -21,16 +21,16 @@
 
 module OptimalReplay
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
-  (* parameters [N] and [f] are introduced as logic symbols *)
-  constant n: int
-  axiom n_nonneg: 0 < n
+  val constant n: int
+    ensures { 0 < result }
 
-  function f int: int
-  axiom f_prop: forall k: int. 0 < k < n -> 0 <= f k < k
+  val function f (k:int): int
+    requires { 0 < k < n }
+    ensures { 0 <= result < k}
 
   (* path from 0 to i of distance d *)
   inductive path int int =

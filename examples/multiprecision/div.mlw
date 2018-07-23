@@ -1,0 +1,4009 @@
+module Div
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use compare.Compare
+  use util.Util
+  use add.Add
+  use sub.Sub
+  use logical.Logical
+  use int.EuclideanDivision
+
+  (** Based on Niels Möller and Torbjörn Granlund, “Improved
+      division by invariant integers” 2010 *)
+
+  use int.MinMax as MM
+
+  predicate reciprocal (v d:limb) =
+    v = (div (radix*radix - 1) (d)) - radix
+
+  let lemma fact_div (x y z:int)
+    requires { y > 0 }
+    ensures { div (x + y * z) y = (div x y) + z }
+  =
+    assert { x + y * z = y * (div (x + y * z) y) + mod (x + y * z) y
+             so mod (x + y * z) y = mod (y * z + x) y = mod x y
+             so x + y * z = y * (div (x + y * z) y) + mod x y
+             so
+             x = y * div x y + mod x y
+             so x + y * z = y * div x y + mod x y + y * z
+             so y * (div (x + y * z) y) + mod x y
+                = y * div x y + mod x y + y * z
+             so y * (div (x + y * z) y) = y * div x y + y * z
+                                        = y * ((div x y) + z)
+             so y <> 0
+             so div (x + y * z) y = div x y + z
+           }
+
+  let invert_limb (d:limb) : limb
+    requires { d >= div radix 2 }
+    ensures { reciprocal result d }
+  =
+    let v = div2by1 (Limb.of_int max_uint64)
+                    (Limb.(-) (Limb.of_int max_uint64) d)
+                    d in
+    fact_div (radix * radix - 1) (l2i d) (- radix);
+    assert { v = (div (radix*radix - 1) (d)) - radix
+             by
+             radix - 1 + radix * (radix - 1 - d)
+             = radix - 1 + radix * (radix - 1) - radix * d
+             = radix - 1 + radix * radix - radix - radix * d
+             = radix * radix - 1 - radix * d
+             so
+             radix - 1 + radix * (radix - 1 - d)
+             = radix * radix - 1 - radix * d
+             so
+             v
+             = div ((radix - 1) + radix * (radix - 1 - d)) (d)
+             = div (radix * radix - 1 - radix * d) (d)
+             = div (radix * radix - 1) (d) - radix
+           };
+   v
+
+  (** Divide a two-word integer by a one-word integer given the
+  reciprocal of the divisor. *)
+  let div2by1_inv (uh ul d v:limb) : (limb,limb)
+    requires { d >= div radix 2 }
+    requires { uh < d }
+    requires { reciprocal v d }
+    returns { q, r -> l2i q * d + l2i r = ul + radix * uh }
+    returns { _q, r -> 0 <= l2i r < d }
+  =
+    let zero = Limb.of_int 0 in
+    let one = Limb.of_int 1 in
+    let ghost k = radix * radix - (radix + l2i v) * l2i d in
+    let ghost u = l2i ul + radix * l2i uh in
+    assert { 1 <= k <= d };
+    let l,h = mul_double v uh in
+    let sl,c = add_with_carry l ul zero in
+    let (sh,ghost c') = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
+    assert { sl + radix * sh + radix * radix * c'
+             = l + radix * h + ul + radix * uh };
+    assert { c' = 0
+             by
+             uh < d
+             so v * uh <= v * d
+             so k = radix * radix - (radix + v) * d
+                  = radix * radix - radix * d - v * d
+             so v * d = radix * radix - radix * d - k
+                              = radix * (radix - d) - k
+             so k > 0
+             so v * d < radix * (radix - d)
+             so v * uh < radix * (radix - d)
+             so l + radix * h = v * uh
+             so l + radix * h < radix * (radix - d)
+             so uh <= d - 1
+             so radix * uh <= radix * (d - 1) = radix * d - radix
+             so l + radix * h + radix * uh
+                < radix * (radix - d) + radix * uh
+                <= radix * (radix - d) + radix * d - radix
+                <= radix * (radix - d + d) - radix = radix * radix - radix
+             so ul < radix
+             so l + radix * h + ul + radix * uh
+                = l + radix * h + radix * uh + ul
+                < radix * radix - radix + ul
+                < radix * radix - radix + radix = radix * radix
+             so sl + radix * sh + radix * radix * c'
+                = l + radix * h + ul + radix * uh
+                < radix * radix
+             so radix * radix * c' <= sl + radix * sh + radix * radix * c'
+             so radix * radix * c' < radix * radix
+     };
+    assert { sl + radix * sh = l + radix * h + ul + radix * uh
+             = v * uh + ul + radix * uh
+             = ul + (radix + v) * uh };
+    let qh = ref (sh:limb) in
+    let ql = ref sl in
+    let ghost q0 = l2i !ql in
+    let ghost cq = l2i sh + 1 in (*candidate quotient*)
+    let ghost cr = l2i ul - cq * l2i d + radix * l2i uh in (*candidate remainder*)
+    assert { cq * d + cr = u};
+    qh := add_mod !qh one;
+    assert { !qh = mod cq radix };
+    let p = mul_mod !qh d in
+    let r = ref (sub_mod ul p) in
+    let ghost r' = !r in
+    assert { r' = mod cr radix
+             by
+             let a = (- div (!qh * d) radix) in
+             r' = !r
+             = mod (ul - p) radix
+             = mod (ul - mod (!qh * d) radix) radix
+             = mod (radix * a
+                   + ul - mod (!qh * d) radix) radix
+             = mod (ul - mod (!qh * d) radix
+                           - radix * div (!qh * d) radix) radix
+             = mod (ul - !qh * d) radix
+             = mod (ul - mod cq radix * d) radix
+             = mod (radix * (- (div cq radix)) * d + ul - mod cq radix * d) radix
+             = mod (ul - (mod cq radix + radix * div cq radix) * d) radix
+             = mod (ul - cq * d) radix
+             = mod (radix * uh + ul - cq * d) radix
+             = mod (ul - cq * d + radix * uh) radix
+             = mod cr radix };
+    assert { radix * cr = uh * k + ul * (radix - d) + q0 * d - radix * d };
+    prod_compat_strict_r (l2i ul) radix (radix - l2i d);
+    prod_compat_strict_r (l2i d) radix (radix - q0);
+    assert { (* Theorem 2 of Möller&Granlund 2010 *)
+             (MM.max (radix - d) (q0 + 1)) - radix <= cr < MM.max (radix - d) q0
+             by radix * cr = uh * k + ul * (radix - d) + q0 * d - radix * d
+             so (uh * k + ul * (radix - d) >= 0
+                by uh >= 0 /\ k >= 0 /\ ul >= 0 /\ radix - d >= 0)
+             so radix * cr >= q0 * d - radix * d
+             so radix * cr >= - radix * d
+             so cr >= - d
+             so radix * cr >= q0 * d - radix * d = (q0 - radix) * d
+             so radix > d
+             so radix - q0 > 0
+             so d * (radix-q0) < radix * (radix - q0)
+             so (q0 - radix) * d > (q0 - radix) * radix
+             so radix * cr > (q0 - radix) * radix
+             so cr > q0 - radix
+             so (let m = MM.max (radix - d) (q0 +1) in
+                cr >= m - radix
+                by (cr + radix >= - d + radix
+                   /\ (cr + radix > q0 so cr + radix >= q0 + 1))
+                   so cr + radix >= m)
+             so 0 < k <= d so 0 <= uh < d
+             so k * uh < k * d <= d * d
+             so radix * cr < d * d + ul * (radix - d) + q0 * d - radix * d
+             so ul * (radix - d) < radix * (radix - d)
+             so radix * cr < d * d + radix * (radix - d) + q0 * d - radix * d
+             so (radix * cr < (radix - d) * (radix - d) + q0 * d
+                by
+                d * d + radix * (radix - d) + q0 * d - radix * d
+                        = radix * (radix - d) + d * d - radix * d + q0 * d
+                        = radix * (radix - d) + (d - radix) * d +  q0 * d
+                        = radix * (radix - d) - d * (radix - d) + q0 * d
+                        = (radix - d) * (radix - d) + q0 * d)
+             so let m = MM.max (radix - d) q0 in
+                radix - d <= m
+             so (radix - d) * (radix - d) <= m* (radix - d)
+             so (q0 * d <= m * d by 0 <= q0 <= m /\ 0 < d)
+             so radix * cr < (radix - d) * (radix - d) + q0 * d
+                           <= m* (radix - d) + q0 * d
+                           <= m* (radix - d) + m * d
+                           = m * radix
+             so cr < m
+                           };
+    assert { cr >= 0 -> r' = cr };
+    assert { cr < 0 ->
+           ( r' = cr + radix
+             by cr >= MM.max (radix - d) (q0 + 1) - radix
+             so cr >= - d
+             so cr + radix >= radix - d >= 0
+             so 0 <= cr + radix < radix
+             so mod (cr + radix) radix = mod cr radix
+             so r' = mod (cr + radix) radix ) };
+    assert { cr < 0 ->
+                ( !r > !ql
+                by MM.max (radix - d) (q0 + 1) >= q0 + 1 > q0
+                so cr >= (MM.max (radix - d) (q0 +1)) - radix > q0 - radix
+                so r' = cr + radix > q0 - radix + radix = q0 ) };
+    assert { 1 <= cq <= radix };
+    assert { (!qh = cq \/ (!qh = 0 /\ cq = radix)
+              by (1 <= cq < radix -> !qh = mod cq radix = cq)
+              so (cq = radix -> !qh = 0) ) };
+    assert { cq = radix ->
+             (cr < 0
+                by cq * d + cr = u
+                so uh <= d - 1
+                so 1 + uh <= d
+                so ul < radix
+                so u = ul + radix * uh
+                     < radix + radix * uh
+                     = radix * (1 + uh)
+                     <= radix * d
+                so u < radix * d
+                so radix * d + cr = u
+                so radix * d + cr < radix * d
+                so cr < 0) };
+    assert { 1 <= cq < radix -> !qh = cq /\ !qh * d + cr = u };
+    if Limb.(>) !r !ql
+    then
+    begin
+      qh := sub_mod !qh one;
+      r := add_mod !r d;
+      assert { cr >= 0 ->
+                  (!r = cr + d
+                  by r' = cr
+                  so r' < MM.max (radix - d) q0
+                  so r' > q0
+                  so 0 <= r' < radix - d
+                  so d <= r' + d < radix
+                  so !r = mod (r' + d) radix = r' + d) };
+      assert { cr >= 0 ->
+                  ( !r >= d
+                  by r' = cr >= 0
+                  so !r = r' + d >= d ) };
+      assert { cr < 0 ->
+                  ( !r = r' + d - radix
+                  by r' = cr + radix < radix
+                  so cr >= MM.max (radix - d) (q0 + 1) - radix
+                        >= radix - d - radix = - d
+                  so r' = cr + radix >= radix - d
+                  so !r = mod (r' + d) radix
+                  so radix + radix >= r' + d >= radix
+                  so !r = mod (r' + d) radix = r' + d - radix ) };
+      assert { cr < 0 ->
+                  ( 0 <= !r < d
+                  by r' = cr + radix < radix
+                  so !r = mod (r' + d) radix = r' + d - radix
+                  so !r >= 0
+                  so !r = r' + d - radix < d ) };
+      assert { cq = radix ->
+                ( !qh * d + !r = u
+                by cq * d + cr = u
+                so cr < 0
+                so r' = cr + radix
+                so u = radix * d + cr
+                     = (radix - 1) * d + d + cr
+                     = (radix - 1) * d + d + r' - radix
+                so r' = cr + radix >= MM.max (radix - d) (q0 + 1)
+                   >= radix - d
+                so radix + radix >= d + r' >= radix
+                so !r = mod (d + r') radix = d + r' - radix
+                so (radix - 1) * d + !r = u
+                so !qh = mod ((mod cq radix) - 1) radix
+                           = mod (-1) radix
+                           = radix - 1
+                so !qh * d + !r = u
+               ) };
+      assert { !r = cr + d by [@case_split] cr >= 0 \/ cr < 0 };
+      assert { 1 <= cq <= radix ->
+               ( !qh * d + !r = u
+               by cq * d + cr = u
+               so !qh = cq - 1
+               so !qh * d + cr + d = u
+               so !r = cr + d ) };
+    end
+    else
+    begin
+       assert { cr >= 0 };
+       assert { 1 <= cq < radix };
+    end;
+    assert { !qh * d + !r = ul + radix * uh
+            by [@case_split] cq = radix \/ 1 <= cq < radix };
+    if Limb.(>=) !r d
+    then begin
+      assert { cr >= 0 };
+      assert { !qh < radix - 1
+               by
+               !qh * d = ul + radix * uh  - !r
+               so uh <= d - 1
+               so ul + radix * uh - !r
+                  <= ul + radix * (d - 1) - !r
+                  = ul + radix * d - radix - !r
+                  = (ul - radix)  + radix * d - !r
+                  <  radix * d - !r
+                  <= radix * d - d
+                  = (radix - 1) * d
+               so !qh * d < (radix - 1) * d
+               so d > 0
+               so !qh < radix - 1 };
+      qh := Limb.(+) !qh one;
+      r := Limb.(-) !r d;
+      assert { 0 <= !r < d };
+      assert { !qh * d + !r = ul + radix * uh };
+    end;
+    assert { 0 <= !r < d };
+    assert { !qh * d + !r = ul + radix * uh };
+    (!qh,!r)
+
+(** `wmpn_divrem_1 q x y sz` divides `(x, sz)` by `y`, writes the quotient
+    in `(q, sz)` and returns the remainder. Corresponds to
+    `mpn_wmpn_divrem_1`. *)
+(* TODO develop further decimal points (qxn) *)
+let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
+    requires { valid x sz }
+    requires { valid q sz }
+    requires { 0 < sz }
+    requires { 0 < y }
+    ensures { value x sz
+              = value q sz * y + result }
+    ensures { result < y }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let msb = Int32.(-) sz one in
+    let lx = ref limb_zero in
+    let i = ref msb in
+    let r = ref limb_zero in
+    (*normalize divisor*)
+    let clz = count_leading_zeros y in
+    if (Int32.(>) clz zero)
+    then begin
+      let ghost mult = power 2 (p2i clz) in
+      let ry = lsl y (Limb.of_int32 clz) in
+      assert { ry = mult * y };
+      let ghost tlum = power 2 (Limb.length - p2i clz) in
+      assert { tlum * mult = radix };
+      let v = invert_limb ry in
+      while (Int32.(>=) !i zero) do
+        variant   { p2i !i }
+        invariant { -1 <= !i <= msb }
+        invariant { !r < ry }
+        invariant { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * ry
+                      + !r }
+        invariant { !r <= radix - mult }
+        invariant { mod (!r) mult = 0 }
+        assert { !i >= 0 };
+        label StartLoop in
+        lx := C.get_ofs x !i;
+        (*TODO lshift in place would simplify things*)
+        let l,h = lsld_ext !lx (Limb.of_int32 clz) in
+        mod_mult mult (l2i y) 0;
+        assert { !r + h < ry
+                 by
+                 let drm = div (!r) mult in
+                 let dym = div (ry) mult in
+                 mod (!r) mult = 0
+                 so !r = mult * drm
+                 so mod (ry) mult
+                    = mod (mult * (y) + 0) mult
+                    = mod 0 mult
+                    = 0
+                 so ry = mult * dym
+                 so !r < ry
+                 so 0 < ry - !r
+                      = mult * dym - mult * drm
+                      = mult * (dym - drm)
+                 so mult > 0
+                 so dym - drm > 0
+                 so dym >= drm + 1
+                 so h < mult
+                 so !r + h = mult * drm + h
+                    < mult * drm + mult
+                    = mult * (drm + 1)
+                    <= mult * dym = l2i ry };
+        assert { !r + h < radix by
+                 !r + h < ry < radix };
+        let (qu,rem) = div2by1_inv (Limb.(+) !r h) l ry v in
+        mod_mult mult (l2i y * l2i qu) (l2i rem);
+        mod_mult mult (tlum * (l2i !r + l2i h)) (l2i l);
+        assert { mod (rem) mult = 0
+                 by
+                 ry * qu + rem
+                 = (radix * (!r + h) + l)
+                 so
+                 mult * y * qu + rem
+                 = (mult * tlum * (!r + h) + l)
+                 so mod (mult * y * qu + rem) mult
+                    = mod (mult * tlum * (!r + h) + l) mult
+                 so mult > 0
+                 so mod (mult * (y * qu) + rem) mult
+                    = mod (rem) mult
+                 so mod (mult * tlum * (!r + h) + l) mult
+                    = mod (l) mult
+                    = 0
+                 };
+        let ghost mer = div (l2i rem) mult in
+        assert { rem <= radix - mult
+                 by
+                 mod (rem) mult = 0
+                 so mult * mer = l2i rem < radix = mult * tlum
+                 so mult > 0
+                 so 0 < mult * tlum - mult * mer = mult * (tlum - mer)
+                 so tlum - mer > 0
+                 so mer < tlum
+                 so rem = mult * mer <= mult * (tlum - 1) = radix - mult
+                 };
+        r:=rem;
+        assert { qu * ry + !r = l + radix * h + radix * (!r at StartLoop) };
+               (* coerced div2by1 postcondition *)
+        value_sub_update_no_change (pelts q) (q.offset + p2i !i)
+                                   (q.offset + 1 + p2i !i)
+                                   (q.offset + p2i sz) qu;
+        C.set_ofs q !i qu;
+        assert { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * ry
+                      + (!r at StartLoop) }; (* previous invariant is still true *)
+        value_sub_head (pelts x) (x.offset + int32'int !i) (x.offset + p2i sz);
+        value_sub_head (pelts q) (q.offset + int32'int !i) (q.offset + p2i sz);
+        assert { l + radix * h = mult * !lx }; (*lsld_ext postcondition *)
+        assert { mult * value_sub (pelts x) (x.offset + !i)
+                                            (x.offset + sz)
+                 = mult * !lx
+                   + radix * (mult * value_sub (pelts x) (x.offset + !i + 1)
+                                              (x.offset + sz))
+                 by (pelts x)[x.offset + !i] = !lx
+                 so value_sub (pelts x) (x.offset + !i) (x.offset + sz)
+                    = !lx + radix * value_sub (pelts x) (x.offset + !i + 1)
+                                              (x.offset + sz) }; (*nonlinear*)
+        assert { value_sub (pelts q) (q.offset + !i) (q.offset + sz) * ry
+                 = qu * ry
+                   + radix
+                      * (value_sub (pelts q) (q.offset + !i + 1) (q.offset + sz)
+                        * ry)
+                 by (pelts q)[q.offset + !i] = qu
+                 so value_sub (pelts q) (q.offset + !i) (q.offset + sz)
+                    = qu + radix * value_sub (pelts q) (q.offset + !i + 1)
+                                              (q.offset + sz) }; (*nonlinear*)
+        assert { mult * value_sub (pelts x) (x.offset + !i)
+                                            (x.offset + sz)
+                = value_sub (pelts q) (q.offset + !i) (q.offset + sz) * ry
+                  + !r };
+        i := Int32.(-) !i one;
+      done;
+      let ghost res = lsr !r (Limb.of_int32 clz) in
+      assert { value x sz = value q sz * y + res
+               by !r = res * mult
+               so mult * value x sz
+                  = value q sz * ry + !r
+                  = value q sz * y * mult + !r
+                  = value q sz * y * mult + res * mult
+                  = (value q sz * y + res) * mult };
+      lsr !r (Limb.of_int32 clz) end
+    else begin
+      let v = invert_limb y in
+      while (Int32.(>=) !i zero) do
+        variant   { p2i !i }
+        invariant { -1 <= !i <= msb }
+        invariant { !r < y }
+        invariant { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r }
+        assert { !i >= 0 };
+        label StartLoop in
+        let ghost k = p2i !i in
+        lx := C.get_ofs x !i;
+        let (qu, rem) = div2by1_inv !r !lx y v in
+        r := rem;
+        value_sub_update_no_change (pelts q) (q.offset + p2i !i)
+                                   (q.offset + 1 + p2i !i)
+                                   (q.offset + p2i sz) qu;
+        C.set_ofs q !i qu;
+        i := Int32.(-) !i one;
+        value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
+        value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
+        assert { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r
+                 by (pelts q)[q.offset + k] = qu
+                 so (pelts x)[x.offset + k] = !lx
+                 so value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts x) (x.offset + k) (x.offset + sz)
+                    = !lx + radix * value_sub (pelts x) (x.offset + k + 1)
+                                                        (x.offset + sz)
+                    = !lx + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y + (!r at StartLoop))
+                    = !lx + radix * (!r at StartLoop)
+                          + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y)
+                    = qu * y + !r
+                          + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y)
+                    = (qu + radix * value_sub (pelts q) (q.offset + k + 1)
+                                                        (q.offset + sz))
+                      * y
+                      + !r
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r };
+      done;
+      !r
+    end
+
+
+  predicate reciprocal_3by2 (v dh dl:limb) =
+    v = div (radix*radix*radix -1) (dl + radix * dh) - radix
+
+  let div3by2_inv (uh um ul dh dl v: limb) : (limb,limb,limb)
+    requires { dh >= div radix 2 }
+    requires { reciprocal_3by2 v dh dl }
+    requires { um + radix * uh < dl + radix * dh }
+    returns { q, rl, rh -> uint64'int q * dl + radix * q * dh
+                           + uint64'int rl + radix * uint64'int rh
+                  = ul + radix * um + radix * radix * uh }
+    returns { _q, rl, rh -> 0 <= uint64'int rl + radix * uint64'int rh < dl + radix * dh }
+  =
+    let ghost d = l2i dl + radix * l2i dh in
+    let ghost u = l2i ul + radix * (l2i um + radix * l2i uh) in
+    let zero = Limb.of_int 0 in
+    let one = Limb.of_int 1 in
+    let q1 = ref zero in
+    let r0 = ref zero in
+    let r1 = ref zero in
+    let l,h = mul_double v uh in
+    let sl, c = add_with_carry um l zero in
+    let sh, ghost c' = add_with_carry uh h c in
+    assert { sl + radix * sh + radix * radix * c'
+             = um + radix * uh + v * uh };
+    assert { c' = 0
+             by
+             um + radix * uh < d
+             so radix * uh < d
+             so radix * (um + radix * uh + v * uh)
+                < radix * (d + v * uh)
+                = radix * d + v * radix * uh
+                <= radix * d + v * d
+                = (div (radix * radix * radix - 1) d) * d
+                <= radix * radix * radix - 1
+                < radix * radix * radix
+             so um + radix * uh + v * uh < radix * radix
+             so sl + radix * sh + radix * radix * c' < radix * radix
+             so radix * radix * c' < radix * radix
+     };
+    q1 := sh;
+    let ghost q0 = l2i sl in
+    let ghost cq = l2i !q1 + 1 in (*candidate quotient*)
+    q1 := add_mod !q1 one;
+    assert { !q1 = mod cq radix };
+    let p = mul_mod dh sh in
+    r1 := sub_mod um p;
+    label CQuot in
+    let ghost a = div (l2i um - l2i dh * l2i sh) radix in
+    let tl, th = mul_double sh dl in
+    let il, b = sub_with_borrow ul tl zero in
+    let (ih, ghost b') = sub_with_borrow !r1 th b in
+    assert { il + radix * ih - radix * radix * b'
+             = ul + radix * !r1 - sh * dl };
+    let bl,b2 = sub_with_borrow il dl zero in
+    let bh, ghost b2' = sub_with_borrow ih dh b2 in
+    assert { bl + radix * bh - radix * radix * b2'
+             = il + radix * ih - dl - radix * dh };
+    mod_mult (radix * radix) (l2i b')
+             (l2i ul + radix * l2i !r1 - l2i sh * l2i dl - l2i dl
+                - radix * l2i dh);
+    assert { bl + radix * bh
+             = mod (ul + radix * !r1
+                - sh * dl- dl
+                - radix * dh) (radix * radix)
+             by
+             bl + radix * bh
+             = mod (il + radix * ih
+                - dl - radix * dh) (radix * radix)
+             so il + radix * ih
+                = radix * radix * b' + ul + radix * !r1
+                  - sh * dl
+             so mod (il + radix * ih
+                - dl - radix * dh) (radix * radix)
+                = mod (radix * radix * b' + ul + radix * !r1
+                      - sh * dl - dl - radix * dh)
+                  (radix * radix)
+                = mod (ul + radix * !r1
+                - sh * dl - dl
+                - radix * dh) (radix * radix) };
+    r1 := bh;
+    r0 := bl;
+    let ghost r' = l2i !r0 + radix * l2i !r1 in
+    let ghost cr = u - d * cq in
+    assert {  r' = mod cr(radix * radix)
+              by
+              (!r1 at CQuot = mod (um - dh * sh) radix
+                by let a' = div (dh * sh) radix in
+                   dh * sh = p + radix * a'
+                so !r1 at CQuot = mod (um - p) radix
+                   = mod (radix * a' + um - dh * sh) radix
+                   = mod (um - dh * sh) radix )
+              so um - dh * sh = a * radix + !r1 at CQuot
+              so !r0 + radix * !r1
+                 = mod (ul + radix * (!r1 at CQuot)
+                  - sh * dl - dl
+                  - radix * dh) (radix * radix)
+              so ul + radix * (!r1 at CQuot)
+                   - sh * dl - dl - radix * dh
+                 = ul + radix * (um - dh * sh - a * radix)
+                   - sh * dl - dl - radix * dh
+                 = ul + radix * um - radix * dh * sh
+                   - radix * radix * a - sh * dl - dl
+                   - radix * dh
+                 = ul + radix * um - radix * dh * (sh + 1)
+                   - radix * radix * a - sh * dl - dl
+                 = ul + radix * um - radix * dh * (sh + 1)
+                   - radix * radix * a - dl * (sh + 1)
+                 = ul + radix * um
+                   - (dl + radix * dh) * (sh + 1)
+                   - radix * radix * a
+                 = ul + radix * um - d * cq - radix * radix * a
+                 = u - radix * radix * uh - d * cq - radix * radix * a
+                 = cr + radix * radix * (- a - uh)
+              so (*let y = - a - uh in*)
+                 mod (ul + radix * (!r1 at CQuot)
+                  - sh * dl - dl
+                  - radix * dh) (radix * radix)
+                 = mod (radix * radix * (-a - uh) + cr)
+                       (radix * radix)
+                 = mod cr (radix*radix)
+               };
+    let ghost m = MM.max (radix * radix - d) (q0 * radix) in
+    assert { (* Theorem 3 of Moller&Granlund 2010 *)
+             m - radix * radix <= cr < m
+            by
+            let k = radix * radix * radix - (radix + v) * d in
+            reciprocal_3by2 v dh dl
+            so let m3 = radix * radix * radix - 1 in
+               (radix + v) * d = d * div m3 d = m3 - mod m3 d
+            so (k = 1 + mod m3 d
+                by k = radix * radix * radix - (radix + v) * d
+                     = m3 + 1 - (radix + v) * d
+                     = m3 + 1 - m3 + mod m3 d
+                     = 1 + mod m3 d)
+            so 1 <=  k <= d
+            so q0 + radix * sh = (radix + v) * uh + um
+            so cq = sh + 1
+            so radix * cq = radix * sh + radix
+               = (radix + v) * uh + um - q0 + radix
+            so (radix * cr = k * uh + (radix * radix - d) * um
+                 + radix * ul + d * q0 - d * radix
+               by radix * cr = radix * (u - cq * d)
+               = radix * u
+                 - ((radix + v) * uh + um - q0 + radix) * d
+               = radix * u - d * (radix + v) * uh
+                 - d * um + d * q0 - d * radix
+               = radix * u - (radix * radix * radix - k) * uh
+                 - d * um + d * q0 - d * radix
+               = (radix * radix * radix * uh + radix * radix * um
+                 + radix * ul) - (radix * radix * radix - k) * uh
+                 - d * um + d * q0 - d * radix
+               = k * uh + radix * radix * um + radix * ul
+                 - d * um + d * q0 - d * radix
+               = k * uh + (radix * radix - d) * um + radix * ul
+                 + d * q0 - d * radix )
+            so (cr >= m - radix * radix
+               by (
+                  k >= 0 so radix * radix - d >= 0
+               so uh >= 0 so um >= 0 so ul >= 0
+               so  k * uh + (radix * radix - d) * um + radix * ul
+                   >= 0
+               so radix * cr >= d * q0 - d * radix
+               so q0 >= 0 so d >= 0
+               so d * q0 >= 0
+               so radix * cr >= - d * radix
+               so cr >= -d = radix * radix - d - radix * radix
+               so radix * cr >= d * (q0 - radix)
+               so (
+                    (radix - q0) * d < (radix - q0) * radix * radix
+                    by let rq = radix - q0 in let r2 = radix * radix in
+                    rq > 0 /\ d < r2
+                    so rq * d < rq * r2
+                  )
+               so d * (q0 - radix) > radix * radix * (q0 - radix)
+               so radix * cr > radix * radix * (q0 - radix)
+               so cr > radix * (q0 - radix) = radix * q0 - radix * radix
+                  ))
+            so cr < m
+            by (
+                let bbd = radix * radix - d in
+                bbd > 0 /\ bbd <= m /\ q0 * radix <= m
+                so (bbd * bbd <= bbd * m
+                    by [@case_split]
+                    (bbd = m \/ (bbd < m so bbd * bbd < bbd * m)))
+                so (d*(radix * q0) <= d * m
+                    by [@case_split]
+                    (radix * q0 = m \/ (radix * q0 < m so d > 0 so d * (radix * q0) < d * m)))
+                so if uh <= dh - 1
+                then
+                  let dm = dh - 1 in
+                  uh <= dm
+                  so
+                  k * uh <= k * dm
+                  so (k * dm <= d * dm
+                     by k <= d /\ 0 <= dm
+                     so [@case_split] (k = d \/ dm = 0 \/
+                                     (k < d /\ dm > 0 so k * dm < d * dm)))
+                  so k * uh <= d * dm
+                  so
+                  bbd * um <= bbd * (radix - 1)
+                  so
+                  radix * cr
+                  = k * uh + (radix * radix - d) * um
+                    + radix * ul + d * q0 - radix * d
+                  <= d * dm + bbd * um
+                    + radix * ul + d * q0 - radix * d
+                  <= d * dm + bbd * (radix - 1)
+                    + radix * ul + d * q0 - radix * d
+                  < d * dm + bbd * (radix - 1)
+                    + radix * radix + d * q0 - radix * d
+                  so radix * radix * cr
+                  < radix * (d * dm + bbd * (radix - 1)
+                    + radix * radix + d * q0 - radix * d)
+                  = d * radix * (dh - 1) + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * radix * dh - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * (d - dl) - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * dl
+                  so (d * dl >= 0 by d >= 0 /\ dl >= 0)
+                  so radix * radix * cr
+                  < d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * dl
+                  <= d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * (radix * radix - radix)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * radix - (radix * radix - d) * radix
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * radix
+                    + radix * d - radix * radix * radix
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d + bbd * radix * radix - radix * radix * d + radix * d * q0
+                  = bbd * radix * radix - d * (radix * radix - d) + radix * d * q0
+                  = bbd * radix * radix - d * bbd + radix * d * q0
+                  = bbd * bbd + d * (radix * q0)
+                  <= bbd * m + d * (radix * q0)
+                  <= bbd * m + d * m
+                  = radix * radix * m
+                  so cr < m
+                 else
+                  uh = dh
+                  so
+                  (um <= dl - 1
+                  by um + radix * uh < dl + radix * dh)
+                  so (radix * radix - d) * um <= (radix * radix - d) * (dl - 1)
+                  so
+                  ( radix * radix * cr
+                    < radix * radix * m
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                 by radix * cr
+                  = k * dh + (radix * radix - d) * um
+                    + radix * ul + d * q0 - radix * d
+                  <= d * dh + (radix * radix - d) * um
+                    + radix * ul + d * q0 - radix * d
+                  <= d * dh + (radix * radix - d) * (dl - 1)
+                    + radix * ul + d * q0 - radix * d
+                  < d * dh + (radix * radix - d) * (dl - 1)
+                    + radix * radix + d * q0 - radix * d
+                  so radix * radix * cr
+                  < radix * (d * dh + (radix * radix - d) * (dl - 1)
+                    + radix * radix + d * q0 - radix * d)
+                  = d * radix * dh
+                    + (radix * radix - d) * (dl - 1) * radix
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * (d - dl)
+                    + (radix * radix - d) * (radix * dl - radix)
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * d - d * dl + radix * radix * radix * dl
+                    - d * radix * dl + d * radix - radix * radix * radix
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * d - d * dl + radix * radix * radix * dl
+                    - d * radix * dl + d * radix + d * q0 * radix
+                    - radix * radix * d
+                  = d * d - radix * radix * d + d * radix + d * q0 * radix
+                    + dl * (radix * radix * radix - d - d * radix)
+                  = d * (d - radix * radix) + d * radix + d * q0 * radix
+                    + dl * (radix * radix * radix - d - d * radix)
+                  = bbd * (-d) + d * radix + d * q0 * radix
+                    + dl * (radix * radix * radix - d - d * radix)
+                  = bbd * (bbd - radix * radix) + d * radix + d * q0 * radix
+                    + dl * (radix * radix * radix - d - d * radix)
+                  = bbd * bbd + d * q0 * radix
+                    - bbd * radix * radix + d * radix
+                    + dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - (radix * radix - d) * radix * radix + d * radix
+                    + dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix * ((radix * radix - d) * radix - d)
+                    + dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix *  (radix * radix * radix - d * radix - d)
+                    + dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix * (radix * radix * radix - d * (1+ radix))
+                    + dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                  <= bbd * m + d * q0 * radix
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                  <= bbd * m + d * m
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                  = (bbd + d) * m
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                  = radix * radix * m
+                    - (radix - dl) * (radix * radix * radix - d * (1+ radix))
+                  )
+                  so
+                    (cr < m by
+                    if d <= radix * (radix - 1)
+                    then (radix + 1) * d <= radix * (radix - 1) * (radix + 1)
+                         = radix * (radix * radix - 1)
+                         = radix * radix * radix - radix
+                         < radix * radix * radix
+                         so (radix * radix * radix - d * (1+ radix)) > 0
+                         so radix - dl > 0
+                         so (radix - dl) * (radix * radix * radix
+                                               - d * (1+ radix))
+                            > 0
+                         so
+                         radix * radix * cr
+                         < radix * radix * m
+                           - (radix - dl) * (radix * radix * radix
+                           - d * (1+ radix))
+                         < radix * radix * m
+                         so radix * radix * cr < radix * radix * m
+                    else
+                        dl + radix * dh = d > radix * (radix - 1)
+                        so dl < radix
+                        so dl + radix * dh < radix * (1 + dh)
+                        so radix - 1 < 1 + dh
+                        so dh > radix - 2
+                        so dh = radix - 1
+                        so uh = dh
+                        so d >= radix * (radix - 1) +1
+                        so d * (radix + 1)
+                           >= (radix * (radix - 1) + 1) * (radix +1)
+                            = radix * (radix * radix - 1) + radix + 1
+                            = radix * radix * radix - radix + radix + 1
+                            = radix * radix * radix + 1
+                        so
+                        (d * div (radix * radix * radix - 1) d
+                             <= d * (radix + 1)
+                          by d * div (radix * radix * radix - 1) d
+                             <= radix * radix * radix - 1
+                             < radix * radix * radix + 1
+                             <= d * (radix + 1))
+                        so (let a = div (radix * radix * radix - 1) d in
+                            a < radix + 1
+                            by d > 0
+                            so (forall x y z. x * z < y * z /\ z > 0 -> x < y)
+                            so (forall x y. x * d < y * d -> x < y)
+                            so let r = radix + 1 in
+                               a * d < r * d
+                               so a < r)
+                        so v = div (radix * radix * radix - 1) d - radix
+                                 < radix + 1 - radix = 1
+                        so v = 0
+                        so sh = uh = radix - 1
+                        so cq = sh + 1 = radix
+                        so cr = u - cq * d
+                              = u - radix * d
+                              = ul + radix * (um + radix * dh)
+                                       - radix * (dl + radix * dh)
+                              = ul + radix * (um - dl)
+                        so um <= dl - 1
+                        so 1 + um - dl <= 0
+                        so ul < radix
+                        so cr = ul + radix * (um - dl)
+                              < radix + radix * (um - dl)
+                              = radix * (1 + um - dl) <= 0
+                        so cr < 0 <= m
+                   )
+                )
+            };
+    assert { cr >= 0 -> r' = cr };
+    assert { cr < 0 -> r' = radix * radix + cr
+             by
+             m >= radix * radix - d
+             so cr >= m - radix * radix >= -d
+             so cr + radix * radix >= radix * radix - d >= 0
+             so 0 <= cr + radix * radix < radix * radix
+             so mod (radix * radix + cr) (radix*radix) = mod cr (radix*radix)
+             so r' = mod (radix * radix + cr) (radix*radix) };
+    assert { cr < 0 -> !r1 >= sl
+             by m >= radix * q0
+             so cr >= m - radix * radix >= radix * q0 - radix * radix
+             so r' = radix * radix + cr >= radix * q0
+             so r' = radix * !r1 + !r0 >= radix * q0
+             so !r0 < radix
+             so r' < radix * !r1 + radix = radix * (!r1 + 1)
+             so radix * q0 < radix * (!r1 + 1)
+             so sl = q0 < !r1 + 1 };
+    assert { 1 <= cq <= radix };
+    assert { 1 <= cq < radix -> !q1 = cq so !q1 * d + cr = u };
+    assert { cq = radix ->
+             (cr < 0
+                by cq * d + cr = u
+                so um + radix * uh <= d - 1
+                so radix * d + cr = ul
+                                    + radix * (um + radix * uh)
+                                  <= ul + radix * (d - 1)
+                                  = ul - radix + radix * d
+                                  < radix * d
+             )
+           };
+    label PreCorrections in
+    if Limb.(>=) !r1 sl
+    then begin
+      q1 := sub_mod !q1 one;
+      assert { !q1 = cq - 1
+               by
+               if cq = radix
+               then
+                 (!q1 at PreCorrections)
+                 = mod cq radix = mod radix radix= 0
+                 so !q1 = mod (0 - 1) radix = radix - 1 = cq - 1
+               else
+                 0 <= cq - 1 < radix - 1
+                 so (!q1 at PreCorrections) = cq
+                 so !q1 = mod (cq - 1) radix = cq - 1
+                 };
+      let rl, c = add_with_carry !r0 dl zero in
+      let rh, ghost c' = add_with_carry !r1 dh c in
+      assert { rl + radix * rh = mod (r' + d) (radix * radix)
+               by radix * radix * c' + rl + radix * rh
+                  = r' + d
+               so mod (r' + d) (radix * radix)
+                  = mod (radix * radix * c' + rl + radix * rh)
+                      (radix * radix)
+                  = mod (rl + radix * rh) (radix * radix)  };
+      assert { rl + radix * rh = cr + d
+               by
+               if cr >= 0
+               then r' = cr
+                    so rl + radix * rh = mod (cr + d) (radix * radix)
+                    so cr < MM.max (radix * radix - d) (q0*radix)
+                    so (cr >= q0 * radix
+                       by
+                          r' = radix * !r1 + !r0
+                             >= radix * !r1
+                             >= radix * q0)
+                    so cr < radix * radix - d
+                    so cr + d < radix * radix
+                    so (cr + d >= 0  by cr + d >= cr)
+                    so mod (cr + d) (radix * radix) = cr + d
+               else
+                    r' = cr + radix * radix
+                    so cr >= m - radix * radix
+                    so r' >= m >= radix * radix - d
+                    so r' + d >= radix * radix
+                    so r' < radix * radix
+                    so d < radix * radix
+                    so r' + d < radix * radix + radix * radix
+                    so mod (r' + d) (radix * radix)
+                       = r' + d - radix * radix
+                       = cr + d
+             };
+      r1 := rh;
+      r0 := rl;
+      assert { !q1 * d + !r0 + radix * !r1 = u
+               by
+               cq * d + cr = u
+               so !q1 = cq - 1
+               so !r0 + radix * !r1 = cr + d
+               so !q1 * d + !r0 + radix * !r1
+                  = (cq - 1) * d + cr + d
+                  = cq * d - d + cr + d
+                  = cq * d + cr };
+    end
+    else assert { !q1 * d + r' = u
+                  by cr >= 0
+                  so r' = cr
+                  so 1 <= cq < radix
+                  so !q1 * d + cr = u };
+    assert { !q1 * d + !r0 + radix * !r1 = u };
+    label PreRemAdjust in
+    if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
+    then begin
+      let bl, b = sub_with_borrow !r0 dl zero in
+      let bh, ghost b'= sub_with_borrow !r1 dh b in
+      assert { b' = 0 };
+      assert { bl + radix * bh = !r0 + radix * !r1 - d };
+      assert { !q1 < radix - 1
+               by !q1 * d + !r0 + radix * !r1 = u
+               so !r0 + radix * !r1 >= d
+               so um + radix * uh <= d - 1
+               so u = ul + radix * (um + radix * uh)
+                    <= ul + radix * (d - 1)
+                    < radix + radix * (d-1)
+                    = radix * d
+               so (!q1 * d < (radix - 1) * d
+                  by
+                  !q1 * d = u - (!r0 + radix * !r1)
+                              <= u - d
+                              < radix * d - d
+                              = (radix - 1) * d )
+               };
+      q1 := add_mod !q1 one;
+      assert { !q1 = (!q1 at PreRemAdjust) + 1 };
+      r1 := bh;
+      r0 := bl;
+      assert { !q1 * d + !r0 + radix * !r1 = u
+               by
+               !q1 * d + !r0 + radix * !r1
+               = ((!q1 at PreRemAdjust) + 1) * d
+                 + (!r0 + radix * !r1 at PreRemAdjust) - d
+               = (!q1 * d + !r0 + radix * !r1 at PreRemAdjust)
+                };
+    end;
+    assert { 0 <= !r0 + radix * !r1 < d };
+    (!q1,!r0,!r1)
+
+  let lemma bounds_imply_rec3by2 (v dh dl:limb)
+    requires { radix * radix * radix - (dl + radix * dh)
+               <= (radix + v) * (dl + radix * dh)
+               < radix * radix * radix }
+    ensures { reciprocal_3by2 v dh dl }
+  = ()
+
+  let reciprocal_word_3by2 (dh dl:limb) : limb
+    requires { dh >= div radix 2 }
+    ensures { reciprocal_3by2 result dh dl }
+  =
+    let ghost d = l2i dl + radix * l2i dh in
+    let one = Limb.of_int 1 in
+    let v = ref (invert_limb dh) in
+    assert { radix * radix - dh
+             <= (radix + !v) * dh
+             < radix * radix
+             by
+             radix + !v = div (radix * radix - 1) (dh) };
+    let p = ref (mul_mod dh !v) in
+    assert { (radix + !v) * dh
+             = radix * (radix-1)
+               + !p
+             by
+             mod ((radix + !v) * dh) radix
+             = mod (radix * dh + dh * !v) radix
+             = mod (dh * !v) radix = l2i !p
+             so
+             div ((radix + !v) * dh) radix = radix - 1
+             so
+             (radix + !v) * dh
+             = radix * div ((radix + !v) * dh) radix
+               + mod (dh * !v) radix
+             = radix * (radix - 1) + !p
+             };
+    label Estimate in
+    p := add_mod !p dl;
+    if Limb.(<) !p dl (* carry out *)
+    then begin
+      assert { (!p at Estimate) + dl >= radix };
+      assert { (!p at Estimate) + dl = radix + !p };
+      assert { !v >= 1
+               by
+               (!p at Estimate) + dl >= radix
+               so (!p at Estimate) > 0
+             };
+      assert { (radix + !v) * dh + dl
+               = radix * (radix - 1) + radix + !p };
+      label Carry in
+      if Limb.(>=) !p dh
+      then begin
+        v := Limb.(-) !v one;
+        p := Limb.(-) !p dh;
+        assert { (radix + !v) * dh + dl
+                 = radix * (radix - 1) + radix + !p
+               };
+      end;
+      label Borrow in
+      v := Limb.(-) !v one;
+      assert { !p < dh };
+      p := sub_mod !p dh;
+      assert { !p = radix + !p at Borrow - dh };
+    end;
+    assert { (radix + !v) * dh * radix + radix * dl
+               = radix * radix * (radix - 1) + radix * !p
+             by (radix + !v) * dh + dl
+                 = radix * (radix - 1) + !p };
+    assert { radix * radix - dh
+             <= (radix + !v) * dh + dl
+             < radix * radix };
+    let tl, th = mul_double !v dl in
+    label Adjust in
+    p := add_mod !p th;
+    if Limb.(<) !p th (* carry out *)
+    then begin
+      assert { (!p at Adjust) + th >= radix };
+      assert { (!p at Adjust) + th = radix + !p
+               by (!p at Adjust) + th < radix + radix
+               so div ((!p at Adjust) + th) radix = 1
+               so !p = mod ((!p at Adjust) + th) radix
+               so (!p at Adjust) + th
+                  = radix * div ((!p at Adjust) + th) radix
+                    + mod ((!p at Adjust) + th) radix
+                  = radix + !p
+             };
+      assert { !v >= 1
+               by
+               th <> 0
+               so !v <> 0
+             };
+      if Limb.(>) !p dh || (Limb.(=) !p dh && Limb.(>=) tl dl)
+      then begin
+        assert { tl + radix * !p >= d };
+        v := Limb.(-) !v one;
+        assert { (radix + !v) * dh * radix + radix * dl
+                   + !v * dl
+                 = radix * radix * radix
+                   + radix * !p + tl - d
+                 by
+                 (radix + !v) * dh * radix + radix * dl
+                   + !v * dl
+                 = (radix + !v at Adjust - 1) * dh * radix
+                   + radix * dl
+                   + (!v at Adjust - 1) * dl
+                 = (radix + !v at Adjust) * dh * radix
+                   + radix *  dl
+                   + (!v at Adjust) * dl - radix * dh
+                   - dl
+                 = radix * radix * (radix - 1) + radix * (!p at Adjust)
+                   + (!v at Adjust) * dl - radix * dh
+                   - dl
+                 = radix * radix * (radix - 1) + radix * (!p at Adjust)
+                   + radix * th + tl - d
+                 = radix * radix * (radix - 1) + radix * (radix + !p)
+                   + tl - d
+                 = radix * radix * (radix - 1) + radix * radix + radix * !p
+                   + tl - d
+                 = radix * radix * radix + radix * !p + tl - d
+            };
+      end;
+      assert { radix * radix * radix
+               <= (radix + !v) * dh * radix + radix * dl
+                   + !v * dl
+               < radix * radix * radix + d };
+      v := Limb.(-) !v one;
+    end;
+    bounds_imply_rec3by2 !v dh dl;
+    !v
+
+  let sub3 (x y z:limb) : (limb,limb)
+    returns { (r,d) -> x - y - z = l2i r - radix * l2i d
+                     /\ 0 <= d <= 2 }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let u1, b1 = sub_with_borrow x y limb_zero in
+    let u2, b2 = sub_with_borrow u1 z limb_zero in
+    (u2, (Limb.(+) b1 b2))
+
+  (** `submul_limb r x y sz` multiplies `(x, sz)` by `y`, subtracts the `sz`
+      least significant limbs from `(r, sz)` and writes the result in `(r, sz)`.
+      Returns the most significant limb of the product plus the borrow
+      of the subtraction. Corresponds to `mpn_submul_1`.*)
+  let submul_limb (r x:t) (y:limb) (sz:int32):limb
+    requires { valid x sz }
+    requires { valid r sz }
+    ensures { value r sz - (power radix sz) * result
+            = value (old r) sz
+              - value x sz * y }
+    writes { r.data.elts }
+    ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
+              (pelts r)[j] = (pelts (old r))[j] }
+=
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let lr = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { sz - !i }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i - (power radix !i) * !b
+                 = value (old r) !i
+                   - value x !i * y }
+      invariant { forall j. !i <= j < sz ->
+                 (pelts (old r)) [r.offset+j] = (pelts r)[r.offset + j]  }
+      invariant { forall j. j < r.offset \/ r.offset + sz <= j ->
+                 (pelts r)[j] = (pelts (old r))[j] }
+      label StartLoop in
+      let ghost k = p2i !i in
+      lx := get_ofs x !i;
+      lr := get_ofs r !i;
+      assert { !lr = (pelts (old r))[r.offset + !i] };
+      let rl, rh = Limb.mul_double !lx y in
+      let res, borrow = sub3 !lr rl !b in
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_update (pelts r) (r.offset + p2i !i)
+                       r.offset (r.offset + p2i !i +1) res;
+      set_ofs r !i res;
+      assert { forall j. (!i + 1) <= j < sz ->
+               (pelts (old r))[r.offset+j] = (pelts r)[r.offset+j]
+               by
+               (pelts r)[r.offset+j] = ((pelts r) at StartLoop)[r.offset+j]
+                                  = (pelts (old r))[r.offset+j] };
+      assert { value r (!i + 1)
+              = value (r at StartLoop) (!i + 1)
+                + (power radix !i) * (res - !lr)
+               };
+      assert { rl + radix * rh <= (radix-1)*(radix-1)
+               by
+               (!lx * y <= !lx * (radix-1) <= (radix-1)*(radix-1)
+                 by
+                0 <= !lx <= radix - 1 /\ 0 <= y <= radix -1)
+                /\
+                rl + radix * rh = !lx * y
+                };
+      assert { rh < radix - 1
+               by
+               rl + radix * rh  <= (radix -1) * (radix -1)
+               so
+               radix * rh <= (radix -1) * (radix -1)
+               };
+      assert { rh = radix - 2 -> rl <= 1
+               by
+               rl + radix * rh <= (radix-1)*(radix-1) };
+      assert { rh = radix - 2 -> borrow <= 1
+               by rl <= 1 };
+      b := Limb.(+) rh borrow;
+      i := Int32.(+) !i (Int32.of_int 1);
+      assert { value r !i - (power radix !i) * !b
+                 = value (old r) !i
+                   - value x !i * y
+               by
+                (value r !i - (power radix !i) * !b
+                = value (r at StartLoop) !i +
+                   (power radix k) * (res - !lr)
+                   - (power radix !i) * !b
+                = value (r at StartLoop) !i +
+                   (power radix k) * (res - !lr)
+                   - (power radix !i) * (rh + borrow)
+                = value (r at StartLoop) !i +
+                   (power radix k) * (res - !lr)
+                   - (power radix k) * radix * (rh + borrow)
+                = value (r at StartLoop) !i +
+                   (power radix k) * (res - !lr
+                                   - radix * (rh + borrow))
+                = value (r at StartLoop) !i +
+                   (power radix k) * (res - radix * borrow
+                          - !lr - radix * rh)
+                = value (r at StartLoop) !i +
+                   (power radix k) * (!lr - rl - (!b at StartLoop)
+                          - !lr - radix * rh)
+                = value (r at StartLoop) !i -
+                   (power radix k) * (rl + radix * rh + (!b at StartLoop))
+                = value (r at StartLoop) !i -
+                   (power radix k) * (!lx * y + (!b at StartLoop))
+                = value (r at StartLoop) k
+                    + (power radix k) * !lr
+                    - (power radix k) * (!lx * y + (!b at StartLoop))
+                = value (r at StartLoop) k
+                    - (power radix k) * (!b at StartLoop)
+                    + (power radix k) * (!lr - !lx * y)
+                = value (old r) k
+                    - value x k * y
+                    + (power radix k) * (!lr - !lx * y)
+                = value (old r) k
+                    + (power radix k) * !lr
+                    - (value x k + (power radix k)*(!lx)) * y
+                = value (old r) !i
+                    - (value x k + (power radix k)*(!lx)) * y
+                = value (old r) !i
+                    - value x !i * y
+                    by
+                  value (old r) !i = value (old r) k
+                     + (power radix k) * (!lr)
+                     )
+                    };
+    done;
+    !b
+
+  (* `(x, sz)` is normalized if its most significant bit is set. *)
+  predicate normalized (x:t) (sz:int32) =
+    valid x sz
+    /\ (pelts x)[x.offset + sz - 1] >= div radix 2
+
+  let div_sb_qr (q x y:t) (sx sy:int32) : limb
+    requires { 3 <= sy <= sx }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid q (sx - sy) }
+    requires { normalized y sy }
+    ensures { value (old x) sx =
+              (value q (sx - sy)
+              + power radix (sx - sy) * result)
+                * value y sy
+              + value x sy }
+    ensures { value x sy < value y sy }
+    ensures { 0 <= result <= 1 }
+  =
+    let one = Int32.of_int 1 in
+    let two = Int32.of_int 2 in
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let uone = Limb.of_int 1 in
+    let xp = ref (C.incr x (Int32.(-) sx two)) in
+    let qp = ref (C.incr q (Int32.(-) sx sy)) in
+    let dh = C.get_ofs y (Int32.(-) sy one) in
+    assert { dh >= div radix 2 by normalized y sy };
+    let dl = C.get_ofs y (Int32.(-) sy two) in
+    let v = reciprocal_word_3by2 dh dl in
+    let i = ref (Int32.(-) sx sy) in
+    let mdn = Int32.(-) two sy in
+    let ql = ref limb_zero in
+    let xd = C.incr !xp mdn in
+    let ghost vy = value y (p2i sy) in
+    let x1 = ref limb_zero in
+    let x0 = ref limb_zero in
+    let r = wmpn_cmp xd y sy in
+    let qh = (*begin
+               ensures { r >= 0 -> result = 1 }
+               ensures { r < 0 -> result = 0 }*)
+               if (Int32.(>=) r zero)
+               then uone
+               else limb_zero
+             (*end*) in
+    label PreAdjust in
+    begin
+      ensures { value (old x) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1 }
+      ensures { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * !x1
+                 < vy }
+      ensures { dl + radix * dh
+                  >= (pelts x)[(!xp).offset] + radix * !x1 }
+    let ghost ox = pelts x in
+    begin [@vc:sp]
+    if (not (Limb.(=) qh limb_zero))
+    then begin
+         assert { qh = 1 };
+         let ghost b = wmpn_sub_in_place xd y sy sy in
+         begin
+             ensures { value (x at PreAdjust) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x sx }
+             ensures { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy)
+                 < vy }
+           value_sub_upper_bound (pelts x) xd.offset (xd.offset + p2i sy);
+           assert { b = 0 };
+           assert { value (xd at PreAdjust) sy
+                    = value xd sy + vy };
+           value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
+           value_sub_concat ox x.offset xd.offset (xd.offset + p2i sy);
+           value_sub_frame (pelts x) ox x.offset xd.offset;
+           assert { value (x at PreAdjust) sx
+             = value x sx
+             + power radix (sx - sy) * vy
+             by
+             value_sub (pelts (x at PreAdjust)) x.offset xd.offset
+             = value_sub (pelts x) x.offset xd.offset
+             so pelts (xd at PreAdjust) = pelts (x at PreAdjust)
+             so value_sub (pelts (x at PreAdjust)) xd.offset (xd.offset + sy)
+                = value (xd at PreAdjust) sy
+             so value (x at PreAdjust) sx
+             = value_sub (pelts (x at PreAdjust)) x.offset xd.offset
+               + power radix (sx - sy)
+               * value_sub (pelts (x at PreAdjust)) xd.offset (xd.offset + sy)
+             = value_sub (pelts x) x.offset xd.offset
+               + power radix (sx - sy)
+               * value (xd at PreAdjust) sy
+             = value_sub (pelts x) x.offset xd.offset
+               + power radix (sx - sy)
+               * (value xd sy + vy)
+             = value_sub (pelts x) x.offset xd.offset
+               + power radix (sx - sy)
+               * (value_sub (pelts x) (xd.offset) (xd.offset + sy) + vy)
+             = value_sub (pelts x) x.offset xd.offset
+               + power radix (sx - sy)
+               * value_sub (pelts x) (xd.offset) (xd.offset + sy)
+               + power radix (sx - sy) * vy
+             = value x sx
+               + power radix (sx - sy) * vy
+           };
+           value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
+           assert { value (x at PreAdjust) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x sx
+                 by
+                   !i = sx - sy
+                 so power radix (sx - sy - !i) = 1
+                 so value !qp (sx - sy - !i) = 0 };
+           value_sub_lower_bound_tight (pelts y) y.offset (y.offset + p2i sy);
+           assert { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy)
+                 < vy
+                 by
+                 value_sub (pelts x) (!xp.offset + mdn)
+                           (!xp.offset + mdn + sy)
+                 = value xd sy
+                 = value (xd at PreAdjust) sy - vy
+                 so value (xd at PreAdjust) sy
+                    < power radix sy
+                 so vy >= dh * power radix (sy - 1)
+                 so 2 * vy >= 2 * dh * power radix (sy - 1)
+                 so 2 * dh >= radix
+                 so 2 * dh * power radix (sy - 1) >= radix * power radix (sy - 1)
+                 so 2 * vy >= radix * power radix (sy - 1) = power radix sy
+                 so value (xd at PreAdjust) sy < 2 * vy
+                 so value (xd at PreAdjust) sy - vy < vy };
+           end
+         end
+    else begin
+         assert { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy)
+                 < vy
+                 by r < 0 };
+         assert { value (x at PreAdjust) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                   * vy * power radix !i
+                   + value x sx
+                 by qh = 0
+                 so sx - sy - !i = 0
+                 so (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i)) = 0 };
+         end
+    end;
+    let ghost gx1 = (C.get_ofs !xp one) in
+    value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+    value_sub_upper_bound_tight (pelts y) y.offset (y.offset + p2i sy - 1);
+    value_sub_tail (pelts x) (!xp.offset) (!xp.offset + p2i sy - 1);
+    value_sub_lower_bound_tight (pelts x) (!xp.offset) (!xp.offset + p2i sy - 1);
+    assert { dl + radix * dh
+             >= (pelts x)[(!xp).offset] + radix * gx1
+             by value_sub (pelts x) (!xp.offset + mdn)
+                                    (!xp.offset + mdn + sy)
+                < vy
+             so value y (sy - 1) < (dl + 1) * power radix (sy - 1 - 1)
+             so vy = dh * power radix (sy - 1)
+                     + value y (sy - 1)
+                     < dh * power radix (sy - 1)
+                     + (dl + 1) * power radix (sy - 1 - 1)
+                   = power radix (sy - 2) * (dl+1 + radix * dh)
+             so !xp.offset + mdn + sy - 1 = !xp.offset + 1
+             so (pelts x)[!xp.offset + mdn + sy - 1]
+                = (pelts x)[!xp.offset + 1] = gx1
+             so value_sub (pelts x) (!xp.offset + mdn) (!xp.offset + mdn + sy)
+                = gx1 * power radix (sy - 1)
+                     + value_sub (pelts x) (!xp.offset + mdn)
+                                           (!xp.offset + mdn + sy - 1)
+                >= gx1 * power radix (sy - 1)
+                   + (pelts x)[!xp.offset] * power radix (sy - 1 - 1)
+                = power radix (sy - 2)
+                  * ((pelts x) [!xp.offset] + radix * gx1)
+             so power radix (sy - 2) * ((pelts x) [!xp.offset] + radix * gx1)
+                < power radix (sy - 2) * (dl+1 + radix * dh)
+             so (pelts x) [!xp.offset] + radix * gx1
+                < dl + 1 + radix * dh
+             };
+    value_sub_tail (pelts x) (!xp.offset + p2i mdn)
+                   (!xp.offset + p2i mdn + p2i sy - 1);
+    value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
+
+    x1 := (C.get_ofs !xp one);
+    assert { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * !x1
+                 < vy
+             by
+             !xp.offset + mdn + sy - 1 = !xp.offset + 1
+             so value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * !x1
+             = value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * (pelts x)[!xp.offset + 1]
+             = value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1)
+                   * (pelts x)[!xp.offset + mdn + sy - 1]
+             = value_sub (pelts x) (!xp.offset + mdn)
+                         (!xp.offset + mdn + sy)
+             < vy };
+    assert { value (x at PreAdjust) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1
+                by value (x at PreAdjust) sx =
+                   (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                   * vy * power radix !i
+                   + value x sx
+                so sx = sy + !i
+                so x.offset + sy + !i - 1 = !xp.offset + 1
+                so (pelts x)[x.offset + sy + !i - 1] =
+                   (pelts x)[!xp.offset + 1]= !x1
+                so value x sx
+                   = value x (sx - 1)
+                     + power radix (sx -1) * (pelts x)[x.offset + sx - 1]
+                   = value x (sy + !i - 1)
+                     + power radix (sy + !i - 1) * (pelts x)[x.offset + sy + !i - 1]
+                so value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1
+                  = value x sx
+           };
+    end;
+    while (Int32.(>) !i zero) do
+      variant { p2i !i }
+      invariant { 0 <= !i <= sx - sy }
+      invariant { (!qp).offset = q.offset + !i }
+      invariant { (!xp).offset = x.offset + sy + !i - 2 }
+      invariant { plength !qp = plength q }
+      invariant { !qp.min = q.min }
+      invariant { !qp.max = q.max }
+      invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
+      invariant { pelts !qp = pelts q }
+      invariant { pelts !xp = pelts x }
+      invariant { value (old x) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1 }
+      invariant { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * !x1
+                 < vy }
+      invariant { dl + radix * dh
+                  >= (pelts x)[(!xp).offset] + radix * !x1 }
+      label StartLoop in
+      let ghost k = int32'int !i in
+      i := Int32.(-) !i one;
+      let ghost s = int32'int sy + int32'int !i - 1 in
+      xp.contents <- C.incr !xp (-1);
+      let xd = C.incr !xp mdn in
+      let nx0 = C.get_ofs !xp one in
+      if [@ex:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
+      then begin
+        ql := Limb.of_int Limb.max_uint64;
+        value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
+        value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
+        let ghost vlx = value xd (p2i sy - 1) in
+        assert { value xd sy
+                 = vlx + power radix (sy - 1) * dl
+                 by value xd sy
+                    = vlx + power radix (sy - 1)
+                            * (pelts xd)[xd.offset + sy - 1]
+                 so xd.offset + sy - 1 = !xp.offset + mdn + sy - 1
+                                           = !xp.offset + 1
+                 so pelts xd = pelts !xp
+                 so (pelts xd)[xd.offset + sy - 1]
+                    = (pelts !xp)[!xp.offset + 1] = dl
+               };
+        value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+        value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 2);
+        let ghost vly = value y (p2i sy - 2) in
+        assert { vy = vly + power radix (sy - 2) * dl
+                          + power radix (sy - 1) * dh
+                 by (pelts y)[y.offset + sy - 1] = dh
+                 so (pelts y)[y.offset + sy - 2] = dl
+                 so
+                    vy = value y (sy - 1)
+                          + power radix (sy - 1) * dh
+                    = vly + power radix (sy - 2) * dl
+                          + power radix (sy - 1) * dh };
+        begin
+          ensures { value_sub (pelts xd) (xd.offset+1) (xd.offset + p2i sy - 1)
+                        + power radix (sy - 2) * dl
+                        + power radix (sy - 1) * dh
+                     < vy }
+          value_sub_tail (pelts xd) (xd.offset + 1) (xd.offset + p2i sy - 2);
+          assert { value_sub (pelts x) (!xp.offset at StartLoop + mdn)
+                             (!xp.offset at StartLoop + mdn + sy - 1)
+                   = value_sub (pelts xd) (xd.offset+1) (xd.offset + p2i sy - 1)
+                        + power radix (sy - 2) * dl
+                   by
+                   pelts x = pelts xd
+                   so !xp.offset at StartLoop + mdn = xd.offset + 1
+                   so !xp.offset at StartLoop + mdn + sy - 1 = xd.offset + sy
+                   so xd.offset + sy - 1 = !xp.offset + 1
+                   so pelts xd = pelts !xp
+                   so (pelts xd)[xd.offset + sy - 1] = (pelts !xp)[!xp.offset+1] = dl
+                   so value_sub (pelts x) (!xp.offset at StartLoop + mdn)
+                             (!xp.offset at StartLoop + mdn + sy - 1)
+                    = value_sub (pelts xd) (xd.offset+1) (xd.offset + sy)
+                    = value_sub (pelts xd) (xd.offset+1) (xd.offset + p2i sy - 1)
+                      + power radix (sy - 2)
+                        * (pelts xd)[xd.offset + p2i sy - 1]
+                    = value_sub (pelts xd) (xd.offset+1) (xd.offset + p2i sy - 1)
+                      + power radix (sy - 2) * dl
+                 };
+         assert { !x1 = dh };
+        end;
+        label SubMax in
+        let ghost xc = Array.copy (x.data) in
+        value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+        let ghost b = submul_limb xd y !ql sy in
+        begin
+          ensures { value x !i
+                 = value (x at SubMax) !i }
+          assert { forall j. x.offset <= j < x.offset + !i
+                          -> (pelts x)[j] = xc.elts[j]
+                   by
+                   (pelts x)[j] = (pelts x at SubMax)[j]
+                   so
+                   ((pelts x at SubMax)[j] = xc.elts[j]
+                   by
+                   0 <= j /\ j < xc.Array.length
+                   ) };
+          value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+        end;
+        value_sub_upper_bound (pelts xd) xd.offset (xd.offset + p2i sy);
+        value_sub_lower_bound (pelts xd) xd.offset (xd.offset + p2i sy);
+        value_sub_head (pelts xd) xd.offset (xd.offset + p2i sy - 1);
+        assert { vlx < radix * vly
+                 by
+                   vlx = value_sub (pelts xd at SubMax) xd.offset
+                                   (xd.offset + sy - 1)
+                       = (pelts xd at SubMax)[xd.offset]
+                         + radix * value_sub (pelts xd at SubMax)
+                                             (xd.offset + 1)
+                                             (xd.offset + sy - 1)
+                   so value_sub (pelts xd at SubMax) (xd.offset + 1)
+                                           (xd.offset + sy - 1)
+                      + power radix (sy - 2) * dl
+                      + power radix (sy - 1) * dh
+                      < vy
+                      = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh
+                   so value_sub (pelts xd at SubMax) (xd.offset + 1)
+                                           (xd.offset + sy - 1)
+                      < vly
+                   so value_sub (pelts xd at SubMax) (xd.offset + 1)
+                                           (xd.offset + sy - 1)
+                      <= vly - 1
+                   so vlx = (pelts xd at SubMax)[xd.offset]
+                            + radix * value_sub (pelts xd at SubMax)
+                                                (xd.offset + 1)
+                                                (xd.offset + sy - 1)
+                          <= (pelts xd at SubMax)[xd.offset]
+                            + radix * (vly - 1)
+                          < radix + radix * (vly - 1)
+                          = radix * vly
+               };
+        assert { b = dh
+                 by
+                   value xd sy
+                 = value (xd at SubMax) sy
+                   - (!ql) * vy
+                   + power radix sy * b
+                 so !ql = radix - 1
+                 so 0 <= value xd sy < power radix sy
+                 so radix * power radix (sy - 2) = power radix (sy - 1)
+                 so radix * power radix (sy - 1) = power radix sy
+                 so value xd sy
+                    = power radix (sy - 1) * dl + vlx
+                      - (radix - 1) * vy
+                      + power radix sy * b
+                    = power radix (sy - 1) * dl + vlx
+                      - radix * (vly + power radix (sy - 2) * dl
+                                + power radix (sy - 1) * dh)
+                      + vy + power radix sy * b
+                    = power radix (sy - 1) * dl + vlx
+                      - radix * vly - radix * power radix (sy - 2) * dl
+                      - radix * power radix (sy - 1) * dh
+                      + vy + power radix sy * b
+                    = power radix (sy - 1) * dl + vlx
+                      - radix * vly - power radix (sy - 1) * dl
+                      - power radix sy * dh
+                      + vy + power radix sy * b
+                    = power radix sy * (b - dh)
+                      + vlx - radix * vly + vy
+                 so vlx < radix * vly
+                 so (0 <= vlx - radix * vly + vy < power radix sy
+                      by
+                      vy - radix * vly
+                      = vly + power radix (sy - 2) * dl
+                          + power radix (sy - 1) * dh
+                          - radix * vly
+                      = power radix (sy - 2) * (dl + radix * dh)
+                        - vly * (radix - 1)
+                      so let pr2 = power radix (sy - 2) in
+                      0 <= vly < pr2
+                      so 0 <= vly * (radix - 1) < pr2 * (radix - 1)
+                      so vy - radix * vly
+                         >= pr2 * (dl + radix * dh)
+                           - pr2 * (radix - 1)
+                         = pr2 * (dl + radix * dh - (radix - 1))
+                      so dh + radix * dh - (radix - 1) >= 0
+                      so pr2 >= 0
+                      so vy - radix * vly
+                         >= pr2 * (dl + radix * dh - (radix - 1)) >= 0
+                      so vlx - radix * vly < 0
+                      so vlx - radix * vly + vy < vy < power radix sy
+                    )
+                 so - (power radix sy)
+                    < power radix sy * (b - dh)
+                    < power radix sy
+                 so - 1 < b - dh < 1
+               };
+        value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
+        x1 := C.get_ofs !xp one;
+        qp.contents <- C.incr !qp (-1);
+        value_sub_update_no_change (pelts q) (!qp).offset
+                            ((!qp).offset + 1)
+                            ((!qp).offset + p2i sx - p2i sy - p2i !i)
+                            !ql;
+        label QUp in
+        C.set !qp !ql;
+        assert { value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                    = value (!qp at StartLoop)
+                              (sx - sy - k)
+                by value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                   = value_sub (pelts q at QUp) (!qp.offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                   = value (!qp at StartLoop) (sx - sy - k) };
+        value_sub_head (pelts q) (!qp).offset
+          ((!qp).offset + p2i sx - p2i sy - p2i !i);
+        value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
+        assert { value xd (sy - 1)
+                 + power radix (sy - 1) * !x1
+                 = value (xd at SubMax) sy
+                   + power radix sy * (!x1 at StartLoop)
+                   - !ql * vy
+                 by
+                 value xd sy
+                 = value (xd at SubMax) sy
+                   - (!ql) * vy
+                   + power radix sy * b
+                 so b = dh = !x1 at StartLoop
+                 so pelts !xp = pelts x = pelts xd
+                 so ((pelts xd)[xd.offset + sy - 1] = !x1
+                    by
+                    xd.offset = x.offset + !i
+                    so (!xp).offset = x.offset + !i + sy - 2
+                    so (!xp).offset + 1 = xd.offset + sy - 1
+                    so (pelts xd)[xd.offset + sy - 1]
+                       = (pelts !xp)[(!xp).offset + 1]
+                       = !x1
+                    )
+                 so value xd sy
+                    = value xd (sy - 1)
+                      + power radix (sy - 1) * (pelts xd)[xd.offset + sy - 1]
+                    = value xd (sy - 1)
+                      + power radix (sy - 1) * !x1
+               };
+        (* refl *)
+        assert { value (old x) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1
+                 by
+                 pelts !xp = pelts x = pelts xd
+                 so
+                 value xd sy
+                 = value (xd at SubMax) sy
+                   - (!ql) * vy
+                   + power radix sy * b
+                 = value (xd at SubMax) sy
+                   - (!ql) * vy
+                   + power radix sy * dh
+                 so (value x s
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1)
+                    by
+                      xd.offset = x.offset + !i
+                      so x.offset + s = xd.offset + sy - 1
+                      so value_sub (pelts x) (x.offset + !i) (x.offset + s)
+                         = value xd (sy - 1)
+                      so value x s
+                    = value x !i
+                      + power radix !i
+                        * value_sub (pelts x) (x.offset + !i)
+                                              (x.offset + s)
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1))
+                 so (power radix s
+                    = power radix !i * power radix (sy - 1)
+                    by
+                    let n = !i in
+                    let m = sy - 1 in
+                    let x = radix in
+                    power x s = power x (n + m)
+                    so (power x (n + m) = power x n * power x m
+                       by 0 <= n
+                       so 0 <= m
+                       so forall x:int, n:int, m:int.
+                                 0 <= n -> 0 <= m ->
+                                 power x (n + m) = (power x n * power x m)))
+                 so (value x s + power radix s * !x1
+                    = value x !i
+                      + power radix !i * (value xd sy)
+                    by
+                    value x s + power radix s * !x1
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1)
+                      + power radix (!i + sy - 1) * !x1
+                    = value x !i
+                      + power radix !i *
+                        (value xd (sy - 1)
+                         + power radix (sy - 1) * !x1)
+                    = value x !i
+                      + power radix !i * (value xd sy)
+                    )
+                 so (value (x at StartLoop) (sy + k - 1)
+                    = value (x at SubMax) !i
+                      + power radix !i
+                        * value (xd at SubMax) sy
+                    by
+                    pelts xd at SubMax = pelts x at SubMax
+                    so x.offset at SubMax + !i = xd.offset at SubMax
+                    so
+                    value (x at StartLoop) (sy + k - 1)
+                    = value_sub (pelts x at SubMax) (x at SubMax).offset
+                                (xd.offset at SubMax)
+                      + power radix !i
+                        * value_sub (pelts x at SubMax)
+                           (xd.offset at SubMax)
+                           (xd.offset at SubMax + sy)
+                    so value_sub (pelts x at SubMax) (x at SubMax).offset
+                                 (xd at SubMax).offset
+                       = value (x at SubMax) !i
+                    so value_sub (pelts x at SubMax) (xd.offset at SubMax)
+                                                     (xd.offset at SubMax + sy)
+                       = value (xd at SubMax) sy
+                    )
+                 so value x !i
+                    = value (x at SubMax) !i
+                 so value x s + power radix s * !x1
+                    = value (x at StartLoop) (sy + k - 1)
+                      + power radix !i
+                        * (value xd sy
+                           - value (xd at SubMax) sy)
+                    = value (x at StartLoop) (sy + k - 1)
+                      + power radix !i
+                        * (- (!ql) * vy
+                           + power radix sy * b)
+                    = value (x at StartLoop) (sy + k - 1)
+                      + power radix !i
+                        * (- (!ql) * vy
+                           + power radix sy * (!x1 at StartLoop))
+                 so value !qp (sx - sy - !i)
+                    = !ql + radix *
+                          value_sub (pelts q) ((!qp).offset + 1)
+                                    ((!qp).offset + sx - sy - !i)
+                 so (value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                    = value (!qp at StartLoop)
+                              (sx - sy - k)
+                     by value (!qp at StartLoop) (sx - sy - k)
+                      = value_sub (pelts q at StartLoop)
+                                  (!qp.offset + 1) (!qp.offset + sx - sy - !i))
+                 so value !qp (sx - sy - !i)
+                    = !ql + radix * value (!qp at StartLoop)
+                                    (sx - sy - k)
+                 so power radix (sx - sy - !i)
+                    = radix * power radix (sx - sy - k)
+                 so radix * power radix !i = power radix k
+                 so (power radix !i * power radix sy
+                      = power radix (sy + k - 1)
+                      by !i + sy = sy + k - 1
+                      so power radix !i * power radix sy
+                         = power radix (!i + sy))
+                 so (value !qp (sx - sy - !i)
+                      + qh * power radix (sx - sy - !i))
+                      * vy * power radix !i
+                      + value x (sy + !i - 1)
+                      + power radix (sy + !i - 1) * !x1
+                    = (!ql + radix * value (!qp at StartLoop)
+                                    (sx - sy - k)
+                      + qh * power radix (sx - sy - !i))
+                      * vy * power radix !i
+                      + value x (sy + !i - 1)
+                      + power radix (sy + !i - 1) * !x1
+                    = (!ql + radix * value (!qp at StartLoop)
+                                    (sx - sy - k)
+                      + radix * qh * power radix (sx - sy - k))
+                      * vy * power radix !i
+                      + value x (sy + !i - 1)
+                      + power radix (sy + !i - 1) * !x1
+                    = (!ql + radix * value (!qp at StartLoop)
+                                    (sx - sy - k)
+                      + radix * qh * power radix (sx - sy - k))
+                      * vy * power radix !i
+                      + value x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix !i
+                      + radix * (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix !i
+                      + value x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * radix * power radix !i
+                      + value x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value (x at StartLoop) (sy + k - 1)
+                      + power radix !i
+                        * (- (!ql) * vy
+                           + power radix sy * (!x1 at StartLoop))
+                    = (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value (x at StartLoop) (sy + k - 1)
+                      + power radix !i * power radix sy
+                        * (!x1 at StartLoop)
+                    = (value (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value (x at StartLoop) (sy + k - 1)
+                      + power radix (sy + k - 1) * (!x1 at StartLoop)
+                    = value (old x) sx
+                  };
+        assert { value_sub (pelts x) (!xp.offset + mdn)
+                   (!xp.offset + mdn + sy - 1)
+                   + power radix (sy - 1) * !x1
+                   < vy
+                   by
+                     pelts x = pelts xd
+                   so xd.offset = !xp.offset + mdn
+                   so !xp.offset + mdn + sy - 1 = xd.offset + sy - 1
+                   so
+                     value xd (sy - 1)
+                     = value_sub (pelts xd) xd.offset (xd.offset + sy - 1)
+                     = value_sub (pelts x) (!xp.offset + mdn)
+                       (!xp.offset + mdn + sy - 1)
+                   so value_sub (pelts x) (!xp.offset + mdn)
+                                (!xp.offset + mdn + sy - 1)
+                      + power radix (sy - 1) * !x1
+                      = value (xd at SubMax) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy
+                   so value (xd at SubMax) sy =
+                      vlx + power radix (sy - 1) * dl
+                   so vlx < radix * vly
+                   so (value (xd at SubMax) sy
+                        + power radix sy * (!x1 at StartLoop)
+                      < radix * vy
+                      by
+                      !x1 at StartLoop = dh
+                      so power radix sy = radix * power radix (sy - 1)
+                      so power radix (sy - 1) = radix * power radix (sy - 2)
+                      so value (xd at SubMax) sy
+                          + power radix sy * (!x1 at StartLoop)
+                         = vlx + power radix (sy - 1) * dl
+                               + power radix sy * dh
+                         < radix * vly + power radix (sy - 1) * dl
+                                       + power radix sy * dh
+                         = radix * vly + radix * power radix (sy - 2) * dl
+                                       + radix * power radix (sy - 1) * dh
+                         = radix * (vly + power radix (sy - 2) * dl
+                                        + power radix (sy - 1) * dh)
+                         = radix * vy
+                      )
+                   so !ql = radix - 1
+                   so value (xd at SubMax) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy
+                      < radix * vy - (radix - 1) * vy
+                      = vy
+               };
+          value_sub_tail (pelts x) (!xp.offset + p2i mdn) (!xp.offset);
+          value_sub_upper_bound (pelts y) (y.offset) (y.offset + p2i sy - 2);
+          value_sub_lower_bound (pelts x) (!xp.offset + p2i mdn) (!xp.offset);
+          assert { dl + radix * dh
+                   >= (pelts x)[(!xp).offset] + radix * !x1
+                   by
+                   vy = vly + power radix (sy - 2)
+                              * (dl + radix * dh)
+                   so value_sub (pelts x) (!xp.offset + mdn)
+                   (!xp.offset + mdn + sy - 1)
+                   + power radix (sy - 1) * !x1
+                   < vy
+                   so !xp.offset + mdn + sy - 1 = !xp.offset + 1
+                   so power radix (sy - 1) = power radix (sy - 2) * radix
+                   so - mdn = sy - 2
+                   so vy
+                      > value_sub (pelts x) (!xp.offset + mdn)
+                                            (!xp.offset + mdn + sy - 1)
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn)
+                                            (!xp.offset + 1)
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (- mdn) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 2) * radix * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2)
+                          * ((pelts x)[(!xp).offset] + radix * !x1)
+                      >= power radix (sy - 2)
+                          * ((pelts x)[(!xp).offset] + radix * !x1)
+                   so vly < power radix (sy - 2)
+                   so vy < power radix (sy - 2)
+                           + power radix (sy - 2)
+                              * (dl + radix * dh)
+                           = power radix (sy - 2)
+                             * (1 + dl + radix * dh)
+                   so power radix (sy - 2)
+                      * ((pelts x)[(!xp).offset] + radix * !x1)
+                      < power radix (sy - 2) * (1 + dl + radix * dh)
+                   so power radix (sy - 2)
+                      * ((pelts x)[(!xp).offset] + radix * !x1
+                        - (1 + dl + radix * dh))
+                      < 0
+                   so (pelts x)[(!xp).offset] + radix * !x1
+                        - (1 + dl + radix * dh)
+                      < 0
+                 };
+      end
+      else begin
+        assert { dl + radix * dh
+                  > (pelts x)[(!xp).offset + 1] + radix * !x1
+                  by
+                  dl + radix * dh
+                  >= (pelts x)[(!xp).offset + 1] + radix * !x1
+                  so dh >= !x1
+                  so [@case_split] dh <> !x1
+                   \/ (dh = !x1
+                      /\ dl <> (pelts x)[(!xp).offset + 1])
+                  so
+                   [@case_split] dh > !x1 \/
+                   (dh = !x1 /\ dl > (pelts x)[(!xp).offset + 1])
+        };
+        label SmallDiv in
+        let ghost vlx = value xd (p2i sy - 2) in
+        let xp0 = C.get !xp in
+        let xp1 = C.get_ofs !xp one in
+        begin
+          ensures { value xd sy =
+                    vlx
+                    + power radix (sy - 2) * (xp0 + radix * xp1) }
+        value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
+        value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 2);
+        value_sub_upper_bound (pelts xd) xd.offset (xd.offset + p2i sy - 2);
+        assert { value xd sy
+                 = vlx + power radix (sy - 2)
+                         * (xp0 + radix * xp1)
+                 by xd.offset + sy - 2 = !xp.offset
+                 so (pelts xd)[xd.offset + sy - 1] = xp1
+                 so (pelts xd)[xd.offset + sy - 2] = xp0
+                 so pelts xd = pelts !xp
+                 so value xd sy
+                    = value xd (sy - 1)
+                      + power radix (sy - 1)
+                            * (pelts xd)[xd.offset + sy - 1]
+                    = value xd (sy - 2)
+                      + power radix (sy - 2)
+                        * (pelts xd)[xd.offset + sy - 2]
+                      + power radix (sy - 1)
+                        * (pelts xd)[xd.offset + sy - 1]
+                    = vlx
+                      + power radix (sy - 2) * xp0
+                      + power radix (sy - 1) * xp1
+                    = value xd (sy - 2)
+                      + power radix (sy - 2) * xp0
+                      + power radix (sy - 2) * radix * xp1
+                    = vlx + power radix (sy - 2)
+                         * (xp0 + radix * xp1)
+               };
+        end;
+        let qu, rl, rh =
+            div3by2_inv !x1 xp1 xp0 dh dl v in
+        ql := qu;
+        x1 := rh;
+        x0 := rl;
+        label SubProd in
+        value_sub_concat (pelts x) x.offset xd.offset
+                           (x.offset + p2i sy + k - 1);
+        let ghost xc = Array.copy (x.data) in
+        value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+        let cy = submul_limb xd y !ql (Int32.(-) sy two) in
+        label PostSub in
+        begin
+          ensures { value x !i
+                 = value (x at SubProd) !i }
+          assert { forall j. x.offset <= j < x.offset + !i
+                          -> (pelts x)[j] = xc.elts[j]
+                   by
+                   (pelts x)[j] = (pelts x at SubProd)[j]
+                   so
+                   ((pelts x at SubProd)[j] = xc.elts[j]
+                   by
+                   0 <= j /\ j < xc.Array.length
+                   ) };
+          value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+        end;
+        let cy1 = [@vc:sp] if (Limb.(<) !x0 cy) then uone else limb_zero in
+        x0 := sub_mod !x0 cy;
+        let cy2 = [@vc:sp] if (Limb.(<) !x1 cy1) then uone else limb_zero in
+        x1 := sub_mod !x1 cy1;
+        assert { 0 <= cy2 <= 1 };
+        (* assert { cy2 = 1 -> rh = 0 }; (* and cy > rl *)*)
+        value_sub_update (pelts x) (!xp).offset xd.offset
+                                   (xd.offset + p2i sy - 1) !x0;
+        value_sub_update_no_change (pelts x) (!xp).offset
+                                   x.offset (x.offset + p2i !i) !x0;
+        value_sub_update_no_change (pelts x) (!xp).offset
+                                   xd.offset (xd.offset + p2i sy - 2) !x0;
+        C.set !xp !x0;
+        assert { value x !i
+                 = value (x at SubProd) !i
+                 by
+                 value x !i
+                 = value (x at PostSub) !i
+                 = value (x at SubProd) !i };
+        value_sub_tail (pelts x) xd.offset (xd.offset + p2i sy - 1);
+        begin
+          ensures { value xd (sy - 1)
+                   + power radix (sy - 1) * !x1
+                   - power radix sy * cy2
+                 = value (xd at SubProd) sy
+                   + power radix sy * (!x1 at StartLoop)
+                   - !ql * vy }
+          assert { value xd (sy - 2)
+                   = value (xd at PostSub) (sy - 2) };
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 2);
+          let ghost vly = value y (p2i sy - 2) in
+          assert { vy = vly + power radix (sy - 2)
+                              * (dl + radix * dh)
+                   by (pelts y)[y.offset + sy - 1] = dh
+                   so (pelts y)[y.offset + sy - 2] = dl
+                   so
+                      vy = value y (sy - 1)
+                            + power radix (sy - 1) * dh
+                         = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh
+                   so power radix (sy - 1)
+                      = power radix (sy - 2) * radix };
+          assert { value xd (sy - 2)
+                   - power radix (sy - 2) * cy
+                   = vlx - !ql * vly
+                   by
+                   value xd (sy - 2)
+                     - power radix (sy - 2) * cy
+                   = value (xd at PostSub) (sy - 2)
+                     - power radix (sy - 2) * cy
+                   = vlx - !ql * vly
+                 };
+          assert { power radix sy
+                   = power radix (sy - 2) * radix * radix };
+          assert { xp0 + radix * xp1
+                   + radix * radix * !x1 at StartLoop
+                   - !ql * (dl + radix * dh)
+                  = rl + radix * rh };
+          begin ensures { value (xd at SubProd) sy
+                     + power radix sy * (!x1 at StartLoop)
+                     - !ql * vy
+                   = value xd (sy - 2)
+                     - power radix (sy - 2) * cy
+                     + power radix (sy - 2) *
+                       (rl + radix * rh) }
+            assert { value (xd at SubProd) sy
+                     = vlx + power radix (sy - 2) * xp0
+                           + power radix (sy - 1) * xp1 }; (*nonlinear*)
+            assert { !ql * vy = !ql * vly
+                                + power radix (sy - 2)
+                                  * (!ql * (dl + radix * dh)) }; (*nonlinear*)
+           end;
+           begin ensures { value xd (sy - 2)
+                     - power radix (sy - 2) * cy
+                     + power radix (sy - 2) * (rl + radix * rh)
+                    =  value xd (sy - 1)
+                    + power radix (sy - 1) * !x1
+                    - power radix sy * cy2 }
+           value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 2);
+           assert { value xd (sy - 1)
+                    = value xd (sy - 2)
+                      + power radix (sy - 2) * !x0
+                    by (pelts xd)[xd.offset + sy - 2] = !x0
+                    so value xd (sy - 1)
+                       = value_sub (pelts xd) xd.offset (xd.offset + sy - 1)
+                       = value_sub (pelts xd) xd.offset (xd.offset + sy - 2)
+                         + power radix (sy - 2) * !x0
+                       = value xd (sy - 2)
+                         + power radix (sy - 2) * !x0 };
+           assert { rl + radix * rh - cy
+                     = !x0 + radix * !x1 - power radix 2 * cy2
+                     by
+                        (!x0 - radix * cy1 = rl - cy
+                         by
+                         !x0 = mod (rl - cy) radix
+                         so - radix < rl - cy < radix
+                         so (if rl < cy
+                             then cy1 = 1
+                                  /\ (- radix < rl - cy < 0
+                                     so
+                                     div (rl - cy) radix = - 1
+                                     so rl - cy
+                                     = radix * div (rl - cy) radix
+                                       + mod (rl - cy) radix
+                                     = !x0 - radix
+                                     = !x0 - radix * cy1)
+                             else cy1 = 0 /\ rl - cy = l2i !x0)) }
+                    (* nonlinear *)
+           end;
+        end;
+        if [@ex:unlikely] (not (Limb.(=) cy2 limb_zero))
+        then begin
+          label Adjust in
+          assert { cy2 = 1 };
+          begin ensures { !ql > 0 }
+            value_sub_lower_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+            value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+            value_sub_upper_bound (pelts xd) xd.offset (xd.offset + p2i sy - 1);
+            assert { !ql > 0
+                      by
+                        (value xd (sy - 1)
+                         + power radix (sy - 1) * !x1
+                         - power radix sy * cy2
+                         < 0
+                         by
+                         value xd (sy - 1) < power radix (sy - 1)
+                         so !x1 <= radix - 1
+                         so  value xd (sy - 1)
+                             + power radix (sy - 1) * !x1
+                           < power radix (sy - 1)
+                             + power radix (sy - 1) * !x1
+                           = power radix (sy - 1) * (1 + !x1)
+                           <= power radix (sy - 1) * radix
+                           = power radix sy
+                         so  value xd (sy - 1)
+                             + power radix (sy - 1) * !x1
+                             - power radix sy * cy2
+                           < power radix sy - power radix sy * cy2
+                           = 0
+                       )
+                      so value (xd at SubProd) sy
+                         + power radix sy * (!x1 at StartLoop)
+                         - !ql * vy
+                         < 0
+                      so (value (xd at SubProd) sy
+                         + power radix sy * (!x1 at StartLoop) >= 0
+                         by value (xd at SubProd) sy >= 0
+                         so !x1 at StartLoop >= 0
+                         so power radix sy * (!x1 at StartLoop) >= 0
+                         )
+                      so !ql * vy > 0
+                      so vy = value_sub (pelts y)
+                                y.offset (y.offset + sy - 1)
+                              + power radix (sy - 1) * dh
+                      so dh > 0
+                      so vy > 0
+                   };
+          end;
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 2);
+          let ghost vly = value y (p2i sy - 2) in
+          assert { vy = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh
+                   by (pelts y)[y.offset + sy - 1] = dh
+                   so (pelts y)[y.offset + sy - 2] = dl
+                   so
+                      vy = value y (sy - 1)
+                            + power radix (sy - 1) * dh
+                         = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh };
+          begin
+            ensures { value xd (sy - 1)
+                      + power radix (sy - 1) * !x1
+                      >= power radix sy - vy }
+            assert { value xd (sy - 1)
+                      + power radix (sy - 1) * !x1
+                     = power radix sy + value (xd at SubProd) sy
+                       + power radix sy * (!x1 at StartLoop)
+                       - !ql * vy };
+            assert {  value (xd at SubProd) sy
+                       + power radix sy * (!x1 at StartLoop)
+                       - !ql * vy
+                      >= - vy
+                      by
+                         value (xd at SubProd) sy
+                         = vlx + power radix (sy - 2) * (xp0 + radix * xp1)
+                      so xp0 + radix * xp1 + radix * radix * (!x1 at StartLoop)
+                         = !ql * (dl + radix * dh) + rl + radix * rh
+                      so power radix (sy - 1) = power radix (sy - 2) * radix
+                      so vy = vly + power radix (sy - 2) * (dl + radix * dh)
+                      so (!ql * vly < vy
+                           by
+                          vly <= power radix (sy - 2)
+                          so !ql < radix
+                          so !ql * vly <= !ql * power radix (sy - 2)
+                                       < radix * power radix (sy - 2)
+                                       = power radix (sy - 1)
+                          so vy = vly + power radix (sy - 2) * (dl + radix * dh)
+                          so dh >= div radix 2 > 1
+                          so vly >= 0
+                          so dl >= 0
+                          so vy >= power radix (sy - 2) * radix * dh
+                                > power radix (sy - 2) * radix * 1
+                                = power radix (sy - 1)
+                          )
+                      so - !ql * vly > - vy
+                      so vlx >= 0
+                      so power radix sy = power radix (sy - 2) * radix * radix
+                      so value (xd at SubProd) sy
+                       + power radix sy * (!x1 at StartLoop)
+                       - !ql * vy
+                         = vlx + power radix (sy - 2) * (xp0 + radix * xp1)
+                           + power radix sy * (!x1 at StartLoop)
+                           - !ql * vy
+                         = vlx + power radix (sy - 2) * (xp0 + radix * xp1)
+                           + power radix (sy - 2)
+                             * radix * radix * (!x1 at StartLoop)
+                           - !ql * vy
+                         = vlx + power radix (sy - 2)
+                                 * (xp0 + radix * xp1
+                                     + radix * radix * (!x1 at StartLoop))
+                           - !ql * vy
+                         = vlx + power radix (sy - 2) *
+                               (!ql * (dl + radix * dh) + rl + radix * rh)
+                           - !ql * vy
+                         = vlx + power radix (sy - 2) *
+                               (!ql * (dl + radix * dh) + rl + radix * rh)
+                           - !ql * (vly
+                                    + power radix (sy - 2) * (dl + radix * dh))
+                         = vlx + power radix (sy - 2) * (rl + radix * rh)
+                           - !ql * vly
+                         >= power radix (sy - 2) * (rl + radix * rh)
+                            - !ql * vly
+                         >= - !ql * vly > - vy
+                   };
+          end;
+          let ghost xc = Array.copy (x.data) in
+          assert { forall j. x.offset <= j < x.offset + !i
+                          -> (pelts x)[j] = xc.elts[j]
+                   by
+                   0 <= x.offset <= j /\ j < x.offset + !i <= xc.Array.length
+                   so 0 <= j < xc.Array.length
+                 } ;
+          value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+          let c = wmpn_add_in_place xd y (Int32.(-) sy one) (Int32.(-) sy one) in
+          begin
+          ensures { value x !i
+                 = value (x at Adjust) !i }
+          assert { forall j. x.offset <= j < x.offset + !i
+                          -> (pelts x)[j] = xc.elts[j]
+                   by
+                   pelts (xd at Adjust) = pelts (x at Adjust)
+                   so pelts x = pelts xd
+                   so (pelts x)[j] = (pelts x at Adjust)[j]
+                   so
+                   ((pelts x at Adjust)[j] = xc.elts[j]
+                   by
+                   0 <= j /\ j < xc.Array.length
+                   ) } ;
+          value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+          end;
+          label MidAdd in
+          begin
+            ensures { value xd (sy - 1) + power radix (sy - 1) * !x1
+                      = value (xd at Adjust) (sy - 1)
+                      + power radix (sy - 1) * (!x1 at Adjust)
+                      + vy
+                      - power radix sy }
+            assert { 0 <= c <= 1
+                     by
+                     value xd (sy - 1) + c * power radix (sy - 1)
+                     = value (xd at Adjust) (sy - 1)
+                       + value y (sy - 1)
+                     so
+                        value (xd at Adjust) (sy - 1)
+                        < power radix (sy - 1)
+                     so value y (sy - 1) < power radix (sy - 1)
+                     so value xd (sy - 1) >= 0
+                     so c * power radix (sy - 1) < 2 * power radix (sy - 1)
+                     so let p = power radix (sy - 1) in
+                        (c < 2 by c * p < 2 * p so p > 0)
+                   };
+            let ghost c' = div (l2i !x1 + l2i dh + l2i c) radix in
+            x1 := add_mod !x1 (add_mod dh c);
+            assert { !x1 + c' * radix = !x1 at Adjust + dh + c
+                     by
+                        (!x1 = mod (!x1 at Adjust + dh + c) radix
+                        by
+                        !x1 = mod (!x1 at Adjust + (mod (dh + c) radix)) radix
+                        so mod (div (dh + c) radix * radix + !x1 at Adjust
+                                + mod (dh + c) radix) radix
+                           = mod (!x1 at Adjust + (mod (dh + c) radix)) radix
+                        so !x1 = mod (div (dh + c) radix * radix + !x1 at Adjust
+                                + mod (dh + c) radix) radix
+                               = mod (!x1 at Adjust + dh + c) radix
+                        )
+                     so (!x1 at Adjust) + dh + c
+                        = div (!x1 at Adjust + dh + c) radix * radix
+                          + mod (!x1 at Adjust + dh + c) radix
+                        = c' * radix + !x1
+                     };
+            assert { 0 <= c' <= 1 };
+            value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+            assert { value xd (sy - 1) + power radix (sy - 1) * !x1
+                     = value (xd at Adjust) (sy - 1)
+                       + power radix (sy - 1) * (!x1 at Adjust)
+                       + vy
+                       - power radix sy
+                     by
+                     value xd (sy - 1) + power radix (sy - 1) * c
+                     = value (xd at Adjust) (sy - 1)
+                       + value y (sy - 1)
+                     so vy = value y (sy - 1)
+                             + power radix (sy - 1) * dh
+                     so value xd (sy - 1) + power radix (sy - 1) * c
+                         + power radix (sy - 1) * (!x1 at Adjust)
+                         + power radix (sy - 1) * dh
+                        = value (xd at Adjust) (sy - 1)
+                           + value y (sy - 1)
+                           + power radix (sy - 1) * (!x1 at Adjust)
+                           + power radix (sy - 1) * dh
+                        = value (xd at Adjust) (sy - 1)
+                           + power radix (sy - 1) * (!x1 at Adjust)
+                           + vy
+                     so value xd (sy - 1) + power radix (sy - 1) * c
+                         + power radix (sy - 1) * (!x1 at Adjust)
+                         + power radix (sy - 1) * dh
+                        = value xd (sy - 1)
+                          + power radix (sy - 1) * (c + dh + !x1 at Adjust)
+                        = value xd (sy - 1)
+                          + power radix (sy - 1) * (!x1 + radix * c')
+                        = value xd (sy - 1)
+                          + power radix (sy - 1) * !x1
+                          + power radix sy * c'
+                      so  value xd (sy - 1)
+                            + power radix (sy - 1) * !x1
+                            + power radix sy * c'
+                          = value (xd at Adjust) (sy - 1)
+                            + power radix (sy - 1) * (!x1 at Adjust)
+                            + vy
+                      so value (xd at Adjust) (sy - 1)
+                            + power radix (sy - 1) * (!x1 at Adjust)
+                         >= power radix sy - vy
+                      so value xd (sy - 1) < power radix (sy - 1)
+                      so !x1 <= radix - 1
+                      so power radix (sy - 1) * !x1
+                         <= power radix (sy - 1) * (radix - 1)
+                      so value xd (sy - 1)
+                            + power radix (sy - 1) * !x1
+                         <= value xd (sy - 1)
+                            + power radix (sy - 1) * (radix - 1)
+                         < power radix (sy - 1)
+                           + power radix (sy - 1) * (radix - 1)
+                         = power radix sy
+                      so c' <> 0
+                      so c' = 1
+                      };
+          end;
+          ql := Limb.(-) !ql uone;
+          (* todo refl *)
+          assert { value xd (sy - 1) + power radix (sy - 1) * !x1
+                   =  value (xd at SubProd) sy
+                   + power radix sy * (!x1 at StartLoop)
+                   - !ql * vy
+                   by
+                   value xd (sy - 1) + power radix (sy - 1) * !x1
+                   = value (xd at Adjust) (sy - 1)
+                       + power radix (sy - 1) * (!x1 at Adjust)
+                       + vy
+                       - power radix sy
+                   = value (xd at SubProd) sy
+                     + power radix sy * (!x1 at StartLoop)
+                     - (!ql at Adjust) * vy
+                     + vy
+                   = value (xd at SubProd) sy
+                     + power radix sy * (!x1 at StartLoop)
+                     - (!ql + 1) * vy
+                     + vy
+                   = value (xd at SubProd) sy
+                     + power radix sy * (!x1 at StartLoop)
+                     - !ql * vy };
+          qp.contents <- C.incr !qp (-1);
+          value_sub_update_no_change (pelts q) (!qp).offset
+                            ((!qp).offset + 1)
+                            ((!qp).offset + p2i sx - p2i sy - p2i !i)
+                            !ql;
+          C.set !qp !ql;
+          value_sub_head (pelts q) (!qp).offset
+            ((!qp).offset + p2i sx - p2i sy - p2i !i);
+          value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
+          value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
+          (* todo refl *)
+          assert { value (old x) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1
+                 by
+                    value !qp (sx - sy - !i)
+                    = !ql + radix *
+                          value_sub (pelts q) ((!qp).offset + 1)
+                                    ((!qp).offset + sx - sy - !i)
+                 so (value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                    = value (!qp at StartLoop)
+                              (sx - sy - k)
+                     by
+                     (!qp at StartLoop).offset = (!qp).offset + 1
+                     so ((!qp).offset + sx - sy - !i)
+                         - ((!qp).offset + 1)
+                        = sx - sy - k
+                     )
+                 so value !qp (sx - sy - !i)
+                    = !ql + radix * value (!qp at StartLoop)
+                                    (sx - sy - k)
+                 so (value x s
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1)
+                     by
+                        xd.offset = x.offset + !i
+                     so x.offset + s = xd.offset + sy - 1
+                     so pelts x = pelts xd
+                     so x.offset + s - xd.offset = sy - 1
+                     so value_sub (pelts x) xd.offset (x.offset + s)
+                        = value xd (sy - 1)
+                     so value x s
+                        = value_sub (pelts x) x.offset xd.offset
+                          + power radix !i * value_sub (pelts x) xd.offset (x.offset + s)
+                        = value x !i
+                          + power radix !i * value xd (sy - 1)
+                        )
+                 so (power radix s
+                    = power radix !i * power radix (sy - 1)
+                    by
+                    let n = !i in
+                    let m = sy - 1 in
+                    let x = radix in
+                    power x s = power x (n + m)
+                    so (power x (n + m) = power x n * power x m
+                       by 0 <= n
+                       so 0 <= m
+                       so forall x:int, n:int, m:int.
+                                 0 <= n -> 0 <= m -> power x (n + m) = (power x n * power x m)))
+                 so (value x s + power radix s * !x1
+                    = value x !i
+                      + power radix !i *
+                        (value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy)
+                    by  value xd (sy - 1)
+                         + power radix (sy - 1) * !x1
+                       = value (xd at SubProd) sy
+                         + power radix sy * (!x1 at StartLoop)
+                         - !ql * vy
+                    so value x s + power radix s * !x1
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1)
+                      + power radix (!i + sy - 1) * !x1
+                    = value x !i
+                      + power radix !i
+                        * value xd (sy - 1)
+                      + power radix !i
+                        * power radix (sy - 1) * !x1
+                    = value x !i
+                      + power radix !i *
+                        (value xd (sy - 1)
+                         + power radix (sy - 1) * !x1)
+                    = value x !i
+                      + power radix !i *
+                        (value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy)
+                    )
+                 so (value (x at StartLoop) (sy + k - 1)
+                    = value (x at SubProd) !i
+                      + power radix !i
+                        * value (xd at SubProd) sy
+                    by
+                     value (x at StartLoop) (sy + k - 1)
+                     = value_sub (pelts x at SubProd) (x at SubProd).offset
+                                 ((x at SubProd).offset + sy + k - 1)
+                     = value_sub (pelts x at SubProd) (x at SubProd).offset xd.offset
+                       + power radix (xd.offset - (x at SubProd).offset)
+                         * value_sub (pelts x at SubProd) xd.offset
+                           ((x at SubProd).offset + sy + k - 1)
+                     so (x at SubProd).offset = x.offset
+                     so xd.offset = x.offset + !i
+                     so value_sub (pelts x at SubProd) (x at SubProd).offset xd.offset
+                        = value (x at SubProd) !i
+                     so power radix (xd.offset - x.offset) = power radix !i
+                     so x.offset + sy + k - 1 - xd.offset = p2i sy
+                     so value_sub (pelts x at SubProd) xd.offset
+                                  (x.offset + sy + k - 1)
+                        = value (xd at SubProd) sy
+                    )
+                 so (value x !i
+                    = value (x at SubProd) !i
+                    by
+                    value x !i
+                    = value (x at Adjust) !i
+                    = value (x at SubProd) !i
+                    )
+                 so power radix !i * power radix sy = power radix (!i + sy)
+                 so value x s + power radix s * !x1
+                    - value (x at StartLoop) (sy + k - 1)
+                    = value x !i
+                      + power radix !i *
+                        (value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy)
+                      - (value (x at SubProd) !i
+                         + power radix !i
+                         * value (xd at SubProd) sy)
+                    = value x !i
+                      + power radix !i *
+                        (value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy)
+                      - (value x !i
+                         + power radix !i
+                         * value (xd at SubProd) sy)
+                    =  power radix !i
+                       * (power radix sy * (!x1 at StartLoop)
+                          - !ql * vy)
+                    = power radix !i * power radix sy * (!x1 at StartLoop)
+                      - power radix !i * !ql * vy
+                    = power radix (!i + sy) * (!x1 at StartLoop)
+                      - power radix !i * !ql * vy
+                    = power radix (sy + k - 1) * (!x1 at StartLoop)
+                      - power radix !i * !ql * vy
+                 so value x s + power radix s * !x1
+                    = value (x at StartLoop) (sy + k - 1)
+                      + power radix (sy + k - 1) * (!x1 at StartLoop)
+                      - power radix !i * !ql * vy
+                 so power radix (sx - sy - !i)
+                    = radix * power radix (sx - sy - k)
+                 so radix * power radix !i = power radix k
+                 so  (value !qp (sx - sy - !i)
+                       + qh * power radix (sx - sy - !i))
+                       * vy * power radix !i
+                       + value x (sy + !i - 1)
+                       + power radix (sy + !i - 1) * !x1
+                    = (!ql + radix * value (!qp at StartLoop)
+                                                      (sx - sy - k)
+                       + qh * power radix (sx - sy - !i))
+                       * vy * power radix !i
+                       + value x (sy + !i - 1)
+                       + power radix (sy + !i - 1) * !x1
+                    = (!ql + radix * value (!qp at StartLoop)
+                                                      (sx - sy - k)
+                       + qh * radix * power radix (sx - sy - k))
+                       * vy * power radix !i
+                       + value x (sy + !i - 1)
+                       + power radix (sy + !i - 1) * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                                 (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * radix * power radix !i
+                      + value x (sy + !i - 1)
+                      + power radix (sy + !i - 1) * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                                 (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value x (sy + !i - 1)
+                      + power radix (sy + !i - 1) * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                                 (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      + value x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix !i
+                      + (value (!qp at StartLoop)
+                                                 (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      +  value (x at StartLoop) (sy + k - 1)
+                      + power radix (sy + k - 1) * (!x1 at StartLoop)
+                      - power radix !i * !ql * vy
+                    = (value (!qp at StartLoop)
+                                                 (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
+                        * vy * power radix k
+                      +  value (x at StartLoop) (sy + k - 1)
+                      + power radix (sy + k - 1) * (!x1 at StartLoop)
+                    = value (old x) sx
+                };
+        assert { value_sub (pelts x) (!xp.offset + mdn)
+                 (!xp.offset + mdn + sy - 1)
+                 + power radix (sy - 1) * !x1
+                 < vy
+                 by
+                 (value xd (sy - 1) + power radix (sy - 1) * !x1 < vy
+                   by
+                   value xd (sy - 1) + power radix (sy - 1) * !x1
+                   = value (xd at Adjust) (sy - 1)
+                     + power radix (sy - 1) * (!x1 at Adjust)
+                     + vy
+                     - power radix sy
+                   so value (xd at Adjust) (sy - 1)
+                      < power radix (sy - 1)
+                   so 1 + (!x1 at Adjust) <= radix
+                   so value (xd at Adjust) (sy - 1)
+                      + power radix (sy - 1) * (!x1 at Adjust)
+                      + vy
+                      - power radix sy
+                    < power radix (sy - 1)
+                      + power radix (sy - 1) * (!x1 at Adjust)
+                      + vy
+                      - power radix sy
+                    = power radix (sy - 1) * (1 + !x1 at Adjust)
+                      + vy
+                      - power radix sy
+                    <= power radix (sy - 1) * radix
+                      + vy
+                      - power radix sy
+                    = vy
+                 )
+                 so pelts x = pelts xd
+                 so xd.offset = !xp.offset + mdn
+                 so value xd (sy - 1)
+                    = value_sub (pelts x) (!xp.offset + mdn)
+                                          (!xp.offset + mdn + sy - 1)
+               };
+        assert { dl + radix * dh
+                 >= (pelts x)[(!xp).offset] + radix * !x1
+                 by
+                    vy = vly + power radix (sy - 2)
+                             * (dl + radix * dh)
+                 so value_sub (pelts x) (!xp.offset + mdn)
+                              (!xp.offset + mdn + sy - 1)
+                    + power radix (sy - 1) * !x1
+                    < vy
+                 so !xp.offset + mdn + sy - 1 = !xp.offset + 1
+                 so power radix (sy - 1) = power radix (sy - 2) * radix
+                 so - mdn = sy - 2
+                 so vy
+                    > value_sub (pelts x) (!xp.offset + mdn)
+                                          (!xp.offset + mdn + sy - 1)
+                      + power radix (sy - 1) * !x1
+                    = value_sub (pelts x) (!xp.offset + mdn)
+                                          (!xp.offset + 1)
+                      + power radix (sy - 1) * !x1
+                    = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                      + power radix (- mdn) * (pelts x)[(!xp).offset]
+                      + power radix (sy - 1) * !x1
+                    = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                      + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                      + power radix (sy - 1) * !x1
+                    = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                      + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                      + power radix (sy - 2) * radix * !x1
+                    = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                      + power radix (sy - 2)
+                        * ((pelts x)[(!xp).offset] + radix * !x1)
+                    >= power radix (sy - 2)
+                        * ((pelts x)[(!xp).offset] + radix * !x1)
+                 so vly < power radix (sy - 2)
+                 so vy < power radix (sy - 2)
+                         + power radix (sy - 2)
+                           * (dl + radix * dh)
+                         = power radix (sy - 2)
+                           * (1 + dl + radix * dh)
+                 so power radix (sy - 2)
+                    * ((pelts x)[(!xp).offset] + radix * !x1)
+                    < power radix (sy - 2) * (1 + dl + radix * dh)
+                 so power radix (sy - 2)
+                    * ((pelts x)[(!xp).offset] + radix * !x1
+                      - (1 + dl + radix * dh))
+                    < 0
+                 so (pelts x)[(!xp).offset] + radix * !x1
+                      - (1 + dl + radix * dh)
+                    < 0
+               };
+        end
+        else begin
+          qp.contents <- C.incr !qp (-1);
+          value_sub_update_no_change (pelts q) (!qp).offset
+                            ((!qp).offset + 1)
+                            ((!qp).offset + p2i sx - p2i sy - p2i !i)
+                            !ql;
+          C.set !qp !ql;
+          value_sub_head (pelts q) (!qp).offset
+            ((!qp).offset + p2i sx - p2i sy - p2i !i);
+          assert { value !qp (sx - sy - !i) * vy
+                    = !ql * vy + radix *
+                          (value_sub (pelts q) ((!qp).offset + 1)
+                                    ((!qp).offset + sx - sy - !i) * vy) }; (*nonlinear*)
+          assert { value_sub (pelts q) ((!qp).offset + 1)
+                                    ((!qp).offset + sx - sy - !i) * vy
+                   =  (value !qp (sx - sy - !i) * vy at StartLoop) }; (*nonlinear*)
+          value_tail x (sy + !i - 1);
+          value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
+          (* todo refl *)
+          assert { cy2 = 0 };
+          assert { value x !i = value (x at SubProd) !i };
+          assert { value x s = value x !i + power radix !i * value xd (sy-1)
+                     by xd.offset = x.offset + !i
+                     so x.offset + s = xd.offset + sy - 1
+                     so pelts x = pelts xd
+                     so x.offset + s - xd.offset = sy - 1
+                     so value_sub (pelts x) xd.offset (x.offset + s)
+                        = value xd (sy - 1)
+                     so value x s
+                        = value_sub (pelts x) x.offset xd.offset
+                          + power radix !i * value_sub (pelts x) xd.offset (x.offset + s)
+                        = value x !i
+                          + power radix !i * value xd (sy - 1)}; (*lifted from assertion*)
+          assert { (value !qp (sx - sy - !i) + qh * power radix (sx - sy - !i))
+                   * vy
+                   = value !qp (sx - sy - !i) * vy
+                     + qh * vy * power radix (sx - sy - !i)  }; (*nonlinear*)
+          assert { ((value !qp (sx - sy - !i) + qh * power radix (sx - sy - !i))
+                   * vy at StartLoop)
+                   = (value !qp (sx - sy - !i) * vy
+                     + qh * vy * power radix (sx - sy - !i) at StartLoop)  }; (*nonlinear*)
+          assert { value x s = value x (sy + !i - 1) };
+          assert { value (xd at SmallDiv) sy =
+                    vlx + power radix (sy - 2) * xp0
+                    + power radix (sy - 1) * xp1 };  (*nonlinear*)
+          assert { value (x at SubProd) (sy + (!i at StartLoop) - 1)
+                   = value (x at SubProd) !i + power radix !i * value (xd at SubProd) sy };
+          assert { value (old x) sx =
+                  (value !qp (sx - sy - !i)
+                   + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1 };
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 2);
+          let ghost vly = value y (p2i sy - 2) in
+          assert { vy = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh
+                   by (pelts y)[y.offset + sy - 1] = dh
+                   so (pelts y)[y.offset + sy - 2] = dl
+                   so
+                      vy = value y (sy - 1)
+                            + power radix (sy - 1) * dh
+                         = vly + power radix (sy - 2) * dl
+                            + power radix (sy - 1) * dh };
+          assert { value_sub (pelts x) (!xp.offset + mdn)
+                   (!xp.offset + mdn + sy - 1)
+                   + power radix (sy - 1) * !x1
+                   < vy
+                   by
+                     pelts x = pelts xd
+                   so xd.offset = !xp.offset + mdn
+                   so !xp.offset + mdn + sy - 1 = xd.offset + sy - 1
+                   so
+                     value xd (sy - 1)
+                     = value_sub (pelts xd) xd.offset (xd.offset + sy - 1)
+                     = value_sub (pelts x) (!xp.offset + mdn)
+                       (!xp.offset + mdn + sy - 1)
+                   so value xd (sy - 1)
+                      + power radix (sy - 1) * !x1
+                      - power radix sy * cy2
+                      = value (xd at SubProd) sy
+                      + power radix sy * (!x1 at StartLoop)
+                      - !ql * vy
+                   so cy2 = 0
+                   so value xd (sy - 1)
+                      + power radix (sy - 1) * !x1
+                      = value (xd at SubProd) sy
+                      + power radix sy * (!x1 at StartLoop)
+                      - !ql * vy
+                   so !ql * (dl + radix * dh)
+                      + (rl + radix * rh)
+                      = xp0
+                        + radix * xp1
+                        + radix * radix * (!x1 at StartLoop)
+                   so vy = vly + power radix (sy - 2)
+                                 * (dl + radix * dh)
+                   so !ql * vy
+                      = power radix (sy - 2) *
+                          (xp0
+                          + radix * xp1
+                          + radix * radix * (!x1 at StartLoop))
+                        - power radix (sy - 2) * (rl + radix * rh)
+                        + !ql * vly
+                   so value (xd at SubProd) sy
+                       = vlx
+                        + power radix (sy - 2) * (xp0 + radix * xp1)
+                   so power radix sy
+                      = power radix (sy - 2) * radix * radix
+                   so (value (xd at SubProd) sy
+                      + power radix sy * (!x1 at StartLoop)
+                      - !ql * vy
+                      < vy
+                      by
+                      (!ql * vly >= 0
+                       by !ql >= 0 so vly >= 0)
+                      so (power radix (sy - 2) * (rl + radix * rh)
+                         <= power radix (sy - 2)
+                            * (dl + radix * dh)
+                            - power radix (sy - 2)
+                         by
+                         rl + radix * rh <= dl + radix * dh - 1
+                         so power radix (sy - 2) >= 0
+                         so power radix (sy - 2) * (rl + radix * rh)
+                            <= power radix (sy - 2)
+                               * (dl + radix * dh - 1)
+                            = power radix (sy - 2)
+                              * (dl + radix * dh)
+                              - power radix (sy - 2)
+                         )
+                      so vlx < power radix (sy - 2)
+                      so value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy
+                      = vlx
+                        + power radix (sy - 2) * (xp0 + radix * xp1)
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy
+                      = vlx
+                        + power radix (sy - 2) *
+                                (xp0 + radix * xp1
+                                  + radix * radix * (!x1 at StartLoop))
+                        - !ql * vy
+                      = vlx
+                        + power radix (sy - 2) *
+                                (xp0 + radix * xp1
+                                  + radix * radix * (!x1 at StartLoop))
+                        -  (power radix (sy - 2) *
+                           (xp0
+                            + radix * xp1
+                            + radix * radix * (!x1 at StartLoop))
+                          - power radix (sy - 2) * (rl + radix * rh)
+                          + !ql * vly)
+                      = vlx
+                        + power radix (sy - 2) * (rl + radix * rh)
+                        - !ql * vly
+                      <= vlx
+                        + power radix (sy - 2) * (rl + radix * rh)
+                      <= vlx
+                         +  power radix (sy - 2)
+                            * (dl + radix * dh)
+                         - power radix (sy - 2)
+                      <  power radix (sy - 2)
+                         +  power radix (sy - 2)
+                            * (dl + radix * dh)
+                         - power radix (sy - 2)
+                      = power radix (sy - 2) * (dl + radix * dh)
+                      = vy - vly <= vy
+                      )
+                    so value_sub (pelts x) (!xp.offset + mdn)
+                       (!xp.offset + mdn + sy - 1)
+                       + power radix (sy - 1) * !x1
+                       = value xd (sy - 1)
+                         + power radix (sy - 1) * !x1
+                       = value (xd at SubProd) sy
+                        + power radix sy * (!x1 at StartLoop)
+                        - !ql * vy
+                       < vy
+                 };
+          value_sub_tail (pelts x) (!xp.offset + p2i mdn) (!xp.offset);
+          value_sub_upper_bound (pelts y) (y.offset) (y.offset + p2i sy - 2);
+          value_sub_lower_bound (pelts x) (!xp.offset + p2i mdn) (!xp.offset);
+          assert { dl + radix * dh
+                   >= (pelts x)[(!xp).offset] + radix * !x1
+                   by
+                   vy = vly + power radix (sy - 2)
+                              * (dl + radix * dh)
+                   so value_sub (pelts x) (!xp.offset + mdn)
+                   (!xp.offset + mdn + sy - 1)
+                   + power radix (sy - 1) * !x1
+                   < vy
+                   so !xp.offset + mdn + sy - 1 = !xp.offset + 1
+                   so power radix (sy - 1) = power radix (sy - 2) * radix
+                   so - mdn = sy - 2
+                   so vy
+                      > value_sub (pelts x) (!xp.offset + mdn)
+                                            (!xp.offset + mdn + sy - 1)
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn)
+                                            (!xp.offset + 1)
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (- mdn) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 1) * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2) * (pelts x)[(!xp).offset]
+                        + power radix (sy - 2) * radix * !x1
+                      = value_sub (pelts x) (!xp.offset + mdn) (!xp.offset)
+                        + power radix (sy - 2)
+                          * ((pelts x)[(!xp).offset] + radix * !x1)
+                      >= power radix (sy - 2)
+                          * ((pelts x)[(!xp).offset] + radix * !x1)
+                   so vly < power radix (sy - 2)
+                   so vy < power radix (sy - 2)
+                           + power radix (sy - 2)
+                              * (dl + radix * dh)
+                           = power radix (sy - 2)
+                             * (1 + dl + radix * dh)
+                   so power radix (sy - 2)
+                      * ((pelts x)[(!xp).offset] + radix * !x1)
+                      < power radix (sy - 2) * (1 + dl + radix * dh)
+                   so power radix (sy - 2)
+                      * ((pelts x)[(!xp).offset] + radix * !x1
+                        - (1 + dl + radix * dh))
+                      < 0
+                   so (pelts x)[(!xp).offset] + radix * !x1
+                        - (1 + dl + radix * dh)
+                      < 0
+                 };
+        end;
+      end;
+    done;
+    label EndLoop in
+    assert { !i = 0 };
+    assert { !xp.offset = x.offset + sy - 2 };
+    value_sub_update_no_change (pelts x) (!xp.offset + 1)
+                               x.offset (!xp.offset) !x1;
+    C.set_ofs !xp 1 !x1;
+    assert { value x (sy - 1) =
+             value (x at EndLoop) (sy - 1)
+             by pelts x = Map.set (pelts x at EndLoop) (x.offset + sy - 1) !x1 };
+    value_sub_tail (pelts x) x.offset (!xp.offset+1);
+    (* todo refl *)
+    assert { value (old x) sx =
+              (value q (sx - sy)
+              + power radix (sx - sy) * qh)
+                * value y sy
+              + value x sy
+             by
+               value x sy
+                = value x (sy - 1)
+                  + power radix (sy - 1) * !x1
+             so vy = value y sy
+             so value (old x) sx
+                = (value !qp (sx - sy - !i)
+                  + qh * power radix (sx - sy - !i))
+                  * vy * power radix !i
+                  + value x (sy + !i - 1)
+                  + power radix (sy + !i - 1) * !x1
+                = (value !qp (sx - sy)
+                  + qh * power radix (sx - sy))
+                  * vy * 1
+                  + value x (sy - 1)
+                  + power radix (sy - 1) * !x1
+                = (value !qp (sx - sy)
+                  + qh * power radix (sx - sy))
+                  * value y sy
+                  + value x sy };
+    qh
+
+  let wmpn_divrem_2 (q x y:t) (sx:int32) : limb
+    requires { 2 <= sx }
+    requires { valid x sx }
+    requires { valid y 2 }
+    requires { valid q (sx - 2) }
+    requires { (pelts y)[y.offset + 1] >= div radix 2 }
+    ensures { value (old x) sx =
+              (value q (sx - 2)
+               + power radix (sx - 2) * result)
+              * value y 2
+              + value x 2 }
+    ensures { value x 2 < value y 2 }
+    ensures { 0 <= result <= 1 }
+  =
+    let one = Int32.of_int 1 in
+    let zero = Int32.of_int 0 in
+    let two = Int32.of_int 2 in
+    let uzero = Limb.of_int 0 in
+    let uone = Limb.of_int 1 in
+    let xp = ref (C.incr x (Int32.(-) sx two)) in
+    let dh = C.get_ofs y one in
+    let dl = C.get y in
+    let rh = ref (C.get_ofs !xp one) in
+    let rl = ref (C.get !xp) in
+    let qh = ref uzero in
+    let lx = ref uzero in
+    assert { value y 2 = dl + radix * dh };
+    let i = ref (Int32.(-) sx two) in
+    let dinv = reciprocal_word_3by2 dh dl in
+    ([@vc:sp] if (Limb.(>=) !rh dh && ([@vc:sp] Limb.(>) !rh dh || Limb.(>=) !rl dl))
+    then
+      label Adjust in
+      begin
+        ensures { value x sx
+                  = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh) }
+        ensures { !rl + radix * !rh < dl + radix * dh }
+        ensures { !qh = 1 }
+        let (r0, b) = sub_with_borrow !rl dl uzero in
+        let (r1, ghost b') = sub_with_borrow !rh dh b in
+        assert { b' = 0 };
+        assert { r0 + radix * r1 = !rl + radix * !rh - (dl + radix * dh) };
+        value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
+        value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
+        rh := r1;
+        rl := r0;
+        qh := uone;
+        assert { value x sx
+                  = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+                 by
+                 value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2) = 0
+                 so (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+                  = value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+                  = value x !i
+                    + power radix !i * (dl + radix * dh + !rl + radix * !rh)
+                  = value x !i
+                    + power radix !i * (!rl at Adjust + radix * !rh at Adjust)
+                  = value x !i
+                    + power radix !i * !rl at Adjust
+                    + power radix (!i+1) * !rh at Adjust
+                  = value x sx
+               };
+      end
+    else
+      begin
+        ensures { value x sx
+                  = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh) }
+        ensures { !rl + radix * !rh < dl + radix * dh }
+        ensures { !qh = 0 }
+        value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
+        value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
+      end);
+    while (Int32.(>) !i zero) do
+      variant { p2i !i }
+      invariant { 0 <= !i <= sx - 2 }
+      invariant { !xp.offset = x.offset + !i }
+      invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
+      invariant { pelts !xp = pelts x }
+      invariant { value x sx
+                  = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh) }
+      invariant { !rl + radix * !rh < dl + radix * dh }
+      label StartLoop in
+      let ghost k = p2i !i in
+      xp.contents <- C.incr !xp (-1);
+      lx := C.get !xp;
+      label Got in
+      let (qu, r0, r1) = div3by2_inv !rh !rl !lx dh dl dinv in
+      rh := r1;
+      rl := r0;
+      i := Int32.(-) !i one;
+      C.set_ofs q !i qu;
+      assert { qu * (dl + radix * dh) + r0 + radix * r1
+               = !lx + radix * (!rl at StartLoop)
+                     + radix * radix * (!rh at StartLoop)
+               by
+                 radix * ((!rl at StartLoop) + radix * (!rh at StartLoop))
+                 = radix * (!rl at StartLoop) + radix * radix * (!rh at StartLoop)
+               so
+                 qu * (dl + radix * dh) + r0 + radix * r1
+               = !lx + radix * ((!rl at StartLoop) + radix * (!rh at StartLoop))
+               = !lx + radix * (!rl at StartLoop)
+                     + radix * radix * (!rh at StartLoop)
+             };
+      value_sub_head (pelts q) (q.offset + p2i !i) (q.offset + p2i sx - 2);
+      value_sub_tail (pelts x) x.offset (x.offset + p2i !i);
+      assert { value x sx
+                  = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+               by
+                  value x k = value x !i + power radix !i * !lx
+               so value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                 = qu + radix
+                        * value_sub (pelts q) (q.offset + k) (q.offset + sx - 2)
+               so power radix (sx - 2 - !i) = radix * power radix (sx - 2 - k)
+               so
+                 (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                        + !qh * power radix (sx - 2 - !i))
+                 = qu + radix
+                        * (value_sub (pelts q) (q.offset + k) (q.offset + sx - 2)
+                           + !qh * power radix (sx - 2 - k))
+               so power radix !i * radix  = power radix k
+               so ((value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                  = power radix !i * qu * (dl + radix * dh)
+                    + (value_sub (pelts q) (q.offset + k)
+                                                   (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                  by
+                  (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                  = (qu + radix
+                         * (value_sub (pelts q) (q.offset + k)
+                                                (q.offset + sx - 2)
+                             + !qh * power radix (sx - 2 - k)))
+                    * value y 2 * power radix !i
+                  = power radix !i * qu * (dl + radix * dh)
+                    + radix * (value_sub (pelts q) (q.offset + k)
+                                                   (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix !i
+                  = power radix !i * qu * (dl + radix * dh)
+                    + (value_sub (pelts q) (q.offset + k)
+                                                   (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k)
+               so (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2 - !i))
+                    * value y 2 * power radix !i
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+                  = power radix !i * qu * (dl + radix * dh)
+                    + (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x !i
+                    + power radix !i * (!rl + radix * !rh)
+                  = (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x !i
+                    + power radix !i * (qu * (dl + radix * dh)
+                                        + !rl + radix * !rh)
+                  = (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x !i
+                    + power radix !i
+                      * (!lx + radix * (!rl at StartLoop)
+                         + radix * radix * (!rh at StartLoop))
+                  = (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x !i
+                    + power radix !i * !lx
+                    + power radix !i * (radix * (!rl at StartLoop
+                                                 + radix * !rh at StartLoop))
+                  = (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x k
+                    + power radix !i * (radix * (!rl at StartLoop
+                                                 + radix * !rh at StartLoop))
+                  = (value_sub (pelts q) (q.offset + k)
+                                           (q.offset + sx - 2)
+                               + !qh * power radix (sx - 2 - k))
+                      * value y 2 * power radix k
+                    + value x k
+                    + power radix k * (!rl at StartLoop
+                                       + radix * !rh at StartLoop)
+                  = value x sx
+          };
+    done;
+    assert { !i = 0 };
+    assert { value x sx
+             = (value_sub (pelts q) q.offset (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2))
+                    * value y 2
+                    + !rl + radix * !rh
+             by power radix !i = 1 };
+    C.set_ofs x one !rh;
+    C.set x !rl;
+    assert { value x 2 = !rl + radix * !rh
+             by (pelts x)[x.offset] = !rl
+                /\ (pelts x)[x.offset + 1] = !rh};
+    !qh
+
+  (** `div_qr q r x y sx sy` divides `(x, sx)` by `(y, sy)`, writes the quotient
+    in `(q, (sx-sy))` and the remainder in `(r, sy)`. Corresponds to
+    `mpn_tdiv_qr`. *)
+  let div_qr (q r x y nx ny:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid q (sx - sy + 1) }
+    requires { valid r sy }
+    requires { valid nx (sx + 1) }
+    requires { valid ny sy }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value x sx
+              = value q (sx - sy + 1) * value y sy
+                + value r sy }
+    ensures { value r sy < value y sy }
+  =
+    label Start in
+    let one = Int32.of_int 1 in
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let two = Int32.of_int 2 in
+    value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+    value_sub_lower_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+    assert { value y sy >= power radix (sy - 1) };
+    if (Int32.(=) sy one)
+    then
+      let lr = wmpn_divrem_1 q x (C.get y) sx in
+      C.set r lr
+    else
+    if (Int32.(=) sy two)
+    then
+      let clz = clz_ext (C.get_ofs y (Int32.(-) sy one)) in
+      let ghost p = power 2 (p2i clz) in
+      if Int32.(=) clz zero
+      then begin
+        wmpn_copyi nx x sx;
+        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) limb_zero;
+        C.set_ofs nx sx limb_zero;
+        value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+        label Div2_ns in
+        let ghost _qh = wmpn_divrem_2 q nx y (Int32.(+) sx one) in
+        wmpn_copyi r nx sy;
+        assert { value x sx
+                 = value q (sx - sy + 1) * value y sy
+                 + value r sy
+               by value r sy = value nx sy
+               so value (nx at Div2_ns) (sx + 1) < power radix sx
+               so value (nx at Div2_ns) (sx + 1)
+                  = value (nx at Div2_ns) sx
+               so (_qh = 0
+                   by
+                   power radix sx
+                   > value (nx at Div2_ns) (sx + 1)
+                   = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                    * value y 2
+                    + value nx 2
+                   so value nx 2 >= 0
+                   so value y 2 >= radix
+                   so value q (sx - 1) >= 0
+                   so _qh >= 0
+                   so (value q (sx - 1)
+                           + power radix (sx - 1) * _qh) >= 0
+                   so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                      * value y 2
+                      + value nx 2
+                      >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                         * value y 2
+                      >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                         * radix
+                      >= power radix (sx - 1) * _qh * radix
+                      = power radix sx * _qh
+                   so power radix sx > power radix sx * _qh
+                  )
+               so value x sx = value (nx at Div2_ns) sx
+               };
+        ()
+      end
+      else begin
+        let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
+        begin
+          ensures { normalized ny sy }
+          ensures { value ny sy = power 2 clz * value y sy }
+          let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
+          assert { value y sy
+                   = value y (sy - 1) + power radix (sy - 1) * dh };
+          value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
+          assert { normalized ny sy
+                   /\ value ny sy = power 2 clz * value y sy
+                   by
+                   value y sy < (dh + 1) * power radix (sy - 1)
+                   so value ny sy + (power radix sy) * _c
+                      = power 2 clz * value y sy
+                      = power 2 clz
+                        * (value y (sy - 1)
+                           + dh * power radix (sy - 1))
+                   so power 2 clz * dh <= radix - power 2 clz
+                   so value ny sy + (power radix sy) * _c
+                      = power 2 clz * value y (sy - 1)
+                        + power 2 clz * dh * power radix (sy - 1)
+                      < power 2 clz * power radix (sy - 1)
+                        + power 2 clz * dh * power radix (sy - 1)
+                      <= power 2 clz * power radix (sy - 1)
+                        + (radix - power 2 clz) * power radix (sy - 1)
+                       = radix * power radix (sy - 1)
+                       = power radix sy
+                   so _c = 0
+                   so value ny sy
+                      = power 2 clz * value y sy
+                   so value y sy >= dh * power radix (sy - 1)
+                   so value ny sy
+                      >= power 2  clz * dh * power radix (sy - 1)
+                   so value ny sy =
+                      value ny (sy - 1) + power radix (sy - 1) * ndh
+                      < power radix (sy - 1) + power radix (sy - 1) * ndh
+                      = power radix (sy - 1) * (ndh + 1)
+                   so power radix (sy - 1) * (ndh + 1)
+                      > power radix (sy - 1) * (power 2 clz * dh)
+                   so ndh + 1 > power 2 clz * dh
+                   so ndh >= power 2 clz * dh
+                   so 2 * power 2 clz * dh >= radix
+                   so 2 * ndh >= radix
+                   so ndh >= div radix 2
+                 };
+        end;
+        let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
+        C.set_ofs nx sx h;
+        begin
+          ensures { value nx (sx + 1)
+                    = p * value x sx  }
+          value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+          assert { value nx (sx + 1)
+                    = p * value x sx
+                   by
+                   value nx sx + power radix sx * h
+                    = p * value x sx
+                   so value nx (sx + 1)
+                      = value nx sx + power radix sx * h
+                 }
+        end;
+        label Div2_s in
+        (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
+        let ghost _qh = wmpn_divrem_2 q nx ny (Int32.(+) sx one) in
+        let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
+        begin ensures { value nx 2 = p * value r 2 }
+          assert { _l = 0
+                 by
+                   (mod (value nx sy) p = 0
+                    by
+                      value (nx at Div2_s) (sx + 1)
+                   = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                      * value ny sy
+                      + value nx sy
+                   so value (nx at Div2_s) (sx + 1)
+                    = p * value x sx
+                   so value ny sy = p * value y sy
+                   so value nx sy
+                      = value (nx at Div2_s) (sx + 1)
+                        - (value q (sx - 1)
+                          + power radix (sx - 1) * _qh)
+                          * value ny sy
+                      = p * value x sx
+                        - p * (value q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                            * value y sy
+                      = p * (value x sx
+                             - (value q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                               * value y sy)
+                   so let n = (value x sx
+                                - (value q (sx - 1)
+                                   + power radix (sx - 1) * _qh)
+                                   * value y sy)
+                      in
+                      value nx sy = p * n
+                      so value nx sy >= 0
+                      so p > 0
+                      so n >= 0
+                      so mod (value nx sy) p
+                         = mod (p * n) p
+                         = mod ((p*n)+0) p
+                         = mod 0 p
+                         = 0
+                 )
+                 so _l + radix * value r sy
+                    = power 2 (Limb.length - clz) * (value nx sy)
+                 so let a = div (value nx sy) p in
+                    value nx sy = p * a
+                 so power 2 (Limb.length - clz) * p = radix
+                 so power 2 (Limb.length - clz) * (value nx sy)
+                    = power 2 (Limb.length - clz) * (p * a)
+                    = (power 2 (Limb.length - clz) * p) * a
+                    = radix * a
+                 so mod (radix * value r sy + _l) radix
+                    = mod _l radix
+                 so mod (radix * value r sy + _l) radix
+                    = mod (radix * a) radix = 0
+                 so mod _l radix = 0
+                 so 0 <= _l < radix
+               };
+          assert { value nx 2 = p * value r 2
+                   by
+                   radix * value r 2
+                   = power 2 (Limb.length - clz) * value nx 2
+                   so p * power 2 (Limb.length - clz)
+                      = radix
+                   so p * radix * value r 2
+                      = p * power 2 (Limb.length - clz) * value nx 2
+                      = radix * value nx 2
+                   so p * value r 2 = value nx 2
+                 }
+        end;
+        assert { value x sx
+                 = value q (sx - sy + 1) * value y sy
+                 + value r sy
+                by
+                 value (nx at Div2_s) (sx + 1)
+                 = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                   * value ny 2
+                   + value nx 2
+                so value (nx at Div2_s) (sx + 1)
+                    = p * value x sx
+                so value ny 2 = p * value y 2
+                so (_qh = 0
+                    by
+                    value x sx < power radix sx
+                    so value y 2 >= radix
+                    so value ny 2 >= p * radix
+                    so value q (sx - 1) >= 0
+                    so value nx 2 >= 0
+                    so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                        >= 0
+                    so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                         * value ny 2
+                       + value nx 2
+                       >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                          * value ny 2
+                       >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                          * (p * radix)
+                       >= power radix (sx - 1) * _qh * p * radix
+                       = power radix sx * p * _qh
+                    so power radix sx * p
+                       > value (nx at Div2_s) (sx + 1)
+                       >= power radix sx * p * _qh
+                    )
+                so value nx 2 = p * value r 2
+                so p * value x sx
+                   = value q (sx - 1) * p * value y 2
+                     + p * value r 2
+                   = p * (value q (sx - 1) * value y 2
+                          + value r 2)
+               };
+        ()
+      end
+    else
+     (* let qn = ref (Int32.(-) (Int32.(+) sx one) sy) in
+      if (Int32.(>=)  (Int32.(+) !qn !qn) sx)
+      then*) begin
+        let adjust =
+          if Limb.(>=) (get_ofs x (Int32.(-) sx one))
+                       (get_ofs y (Int32.(-) sy one))
+          then one
+          else zero
+        in
+        let clz = clz_ext (C.get_ofs y (Int32.(-) sy one)) in
+        let ghost p = power 2 (p2i clz) in
+        if Int32.(=) clz zero
+        then begin
+          wmpn_copyi nx x sx;
+          value_sub_shift_no_change (pelts x) x.offset
+                                    (p2i sx) (p2i sx) limb_zero;
+          C.set_ofs nx sx limb_zero;
+          value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+          assert { value y sy * (power radix (sx - sy + adjust))
+                   > value nx (sx + adjust)
+                   by
+                   let dh = (pelts y)[y.offset + sy - 1] in
+                   value y sy >= dh * power radix (sy - 1)
+                   so value nx (sx + adjust) = value nx sx = value x sx
+                   so [@case_split]
+                      ((adjust = 1
+                           so value x sx < power radix sx
+                           so value y sy * power radix (sx - sy + adjust)
+                              >= dh * power radix (sy - 1)
+                                    * power radix (sx - sy + adjust)
+                              = dh * power radix ((sy - 1) + (sx - sy + adjust))
+                              = dh * power radix sx
+                           so dh >= div radix 2 > 1
+                           so dh * power radix sx > power radix sx )
+                      \/
+                      (adjust = 0
+                           so let ah = (pelts x)[x.offset + sx - 1] in
+                              value x sx < (ah + 1) * power radix (sx - 1)
+                              so ah + 1 <= dh
+                              so value x sx < dh * power radix (sx - 1)
+                              so value y sy * power radix (sx - sy + adjust)
+                                 = value y sy * power radix (sx - sy)
+                                 >= dh * power radix (sy - 1)
+                                       * power radix (sx - sy)
+                                 = dh * power radix (sy - 1 + sx - sy)
+                                 = dh * power radix (sx - 1))) };
+          label Div_ns in
+          let ghost _qh = div_sb_qr q nx y (Int32.(+) sx adjust) sy in
+          wmpn_copyi r nx sy;
+          assert { value x sx
+                   = value q (sx - sy + adjust) * value y sy
+                   + value r sy
+                 by value r sy = value nx sy
+                 so value (nx at Div_ns) (sx + adjust) = value x sx < power radix sx
+                 so value (nx at Div_ns) (sx + adjust)
+                    = value (nx at Div_ns) sx
+                 so (_qh = 0
+                     by
+                     value (nx at Div_ns) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                        + power radix (sx - sy + adjust) * _qh)
+                      * value y sy
+                      + value nx sy
+                     so value nx sy >= 0
+                     so value q (sx - sy + adjust) >= 0
+                     so _qh >= 0
+                     so (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh) >= 0
+                     so (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value y sy
+                        + value nx sy
+                        >= (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh)
+                           * value y sy
+                        >= power radix (sx - sy + adjust) * _qh * value y sy
+                     so _qh <> 1)
+                 so value x sx = value (nx at Div_ns) sx
+                 };
+           label Ret_ns in
+           begin
+             ensures { value q (sx - sy + 1)
+                       = value (q at Ret_ns) (sx - sy + adjust) }
+             if (Int32.(=) adjust zero)
+             then begin
+               value_sub_shift_no_change (pelts x) x.offset
+                                         (p2i sx) (p2i sx) limb_zero;
+               set_ofs q (Int32.(-) sx sy) limb_zero;
+               value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+               ()
+             end
+           end
+        end
+        else begin
+          let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
+          begin
+            ensures { normalized ny sy }
+            ensures { value ny sy
+                      = power 2 clz * value y sy }
+            let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
+            assert { value y sy
+                     = value y (sy - 1) + power radix (sy - 1) * dh };
+            value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+            value_sub_tail (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+            value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+            let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
+            assert { normalized ny sy
+                     /\ value ny sy
+                        = power 2 clz * value y sy
+                     by
+                     value y sy < (dh + 1) * power radix (sy - 1)
+                     so value ny sy + (power radix sy) * _c
+                        = power 2 clz * value y sy
+                        = power 2 clz
+                          * (value y (sy - 1)
+                             + dh * power radix (sy - 1))
+                     so power 2 clz * dh <= radix - power 2 clz
+                     so (_c = 0
+                        by
+                          value ny sy + (power radix sy) * _c
+                          = power 2 clz * value y (sy - 1)
+                            + power 2 clz * dh * power radix (sy - 1)
+                          < power 2 clz * power radix (sy - 1)
+                            + power 2 clz * dh * power radix (sy - 1)
+                          <= power 2 clz * power radix (sy - 1)
+                            + (radix - power 2 clz) * power radix (sy - 1)
+                           = radix * power radix (sy - 1)
+                           = power radix sy
+                        so value ny sy >= 0
+                        so power radix sy * _c < power radix sy
+                        so power radix sy > 0
+                        so _c >= 0
+                        )
+                     so value ny sy
+                        = power 2 clz * value y sy
+                     so value y sy >= dh * power radix (sy - 1)
+                     so value ny sy
+                        >= power 2  clz * dh * power radix (sy - 1)
+                     so value ny sy =
+                        value ny (sy - 1) + power radix (sy - 1) * ndh
+                        < power radix (sy - 1) + power radix (sy - 1) * ndh
+                        = power radix (sy - 1) * (ndh + 1)
+                     so power radix (sy - 1) * (ndh + 1)
+                        > power radix (sy - 1) * (power 2 clz * dh)
+                     so ndh + 1 > power 2 clz * dh
+                     so ndh >= power 2 clz * dh
+                     so 2 * power 2 clz * dh >= radix
+                     so 2 * ndh >= radix
+                     so ndh >= div radix 2
+                   };
+          end;
+          let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
+          label Shifted in
+          C.set_ofs nx sx h;
+          begin
+            ensures { value nx (sx + adjust)
+                      = p * value x sx  }
+            if (Int32.(=) adjust one)
+            then begin
+              value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+              assert { value nx (sx + 1)
+                        = p * value x sx
+                       by
+                       value nx sx + power radix sx * h
+                        = p * value x sx
+                       so value nx (sx + 1)
+                          = value nx sx + power radix sx * h
+                     } end
+            else begin
+              assert { adjust = 0 };
+              assert { h = 0
+                       by
+                       let dh = (pelts y)[y.offset + sy - 1] in
+                       let ah = (pelts x)[x.offset + sx - 1] in
+                       p * dh < radix
+                       so 0 <= ah <= dh
+                       so p * ah < radix
+                       so (p * ah <= radix - p
+                           by
+                           let q = power 2 (Limb.length - clz) in
+                           radix = p * q
+                           so p * ah < p * q
+                           so ah < q
+                           so ah <= q - 1
+                           so p * ah <= p * (q - 1) = radix - p
+                           )
+                       so p * (ah + 1) <= radix
+                       so let s = power radix (sx - 1) in
+                          value x sx < (ah + 1) * s
+                       so p * value x sx < p * (ah + 1) * s
+                       so (p * (ah + 1) * s
+                           <= radix * s
+                           by
+                           [@case_split]
+                           (p * (ah + 1) = radix
+                           \/ (p * (ah + 1) < radix
+                               so s > 0
+                               so p * (ah + 1) * s
+                                 < radix * s)))
+                       so radix * power radix (sx - 1) = power radix sx
+                       so value (nx at Shifted) sx + power radix sx * h
+                          < power radix sx
+                       so power radix sx * h < power radix sx * 1
+                       so (h < 1 by power radix sx > 0)
+                      }
+            end
+          end;
+          label Div_s in
+          assert { value ny sy * (power radix (sx - sy + adjust))
+                   > value nx (sx + adjust)
+                   by
+                   let dh = (pelts y)[y.offset + sy - 1] in
+                   value ny sy >= p * dh * power radix (sy - 1)
+                   so value nx (sx + adjust) = p * value x sx
+                   so p > 0
+                   so [@case_split]
+                      ((adjust = 1
+                           so value x sx < power radix sx
+                           so p * value x sx < p * power radix sx
+                           so value ny sy * power radix (sx - sy + adjust)
+                              >= p * dh * power radix (sy - 1)
+                                    * power radix (sx - sy + adjust)
+                              = p * dh * power radix ((sy - 1) + (sx - sy + adjust))
+                              = p * dh * power radix sx
+                           so dh >= 1
+                           so p * dh * power radix sx >= p * power radix sx )
+                      \/
+                      (adjust = 0
+                           so let ah = (pelts x)[x.offset + sx - 1] in
+                              value x sx < (ah + 1) * power radix (sx - 1)
+                              so ah + 1 <= dh
+                              so value x sx < dh * power radix (sx - 1)
+                              so p * value x sx < p * dh * power radix (sx - 1)
+                              so value ny sy * power radix (sx - sy + adjust)
+                                 = value ny sy * power radix (sx - sy)
+                                 >= p * dh * power radix (sy - 1)
+                                       * power radix (sx - sy)
+                                 = p * dh * power radix (sy - 1 + sx - sy)
+                                 = p * dh * power radix (sx - 1))) };
+          let ghost _qh = div_sb_qr q nx ny (Int32.(+) sx adjust) sy in
+          let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
+          begin ensures { value nx sy = p * value r sy }
+            assert { _l = 0
+                   by
+                     (mod (value nx sy) p = 0
+                      by
+                        value (nx at Div_s) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value ny sy
+                        + value nx sy
+                     so value (nx at Div_s) (sx + adjust)
+                      = p * value x sx
+                     so value ny sy = p * value y sy
+                     so value nx sy
+                        = value (nx at Div_s) (sx + adjust)
+                          - (value q (sx - sy + adjust)
+                            + power radix (sx - sy + adjust) * _qh)
+                            * value ny sy
+                        = p * value x sx
+                          - p * (value q (sx - sy + adjust)
+                                 + power radix (sx - sy + adjust) * _qh)
+                              * value y sy
+                        = p * (value x sx
+                               - (value q (sx - sy + adjust)
+                                 + power radix (sx - sy + adjust) * _qh)
+                                 * value y sy)
+                     so let n = (value x sx
+                                  - (value q (sx - sy + adjust)
+                                     + power radix (sx - sy + adjust) * _qh)
+                                     * value y sy)
+                        in
+                        value nx sy = p * n
+                        so value nx sy >= 0
+                        so p > 0
+                        so n >= 0
+                        so mod (value nx sy) p
+                           = mod (p * n) p
+                           = mod ((p*n)+0) p
+                           = mod 0 p
+                           = 0
+                   )
+                   so _l + radix * value r sy
+                      = power 2 (Limb.length - clz) * (value nx sy)
+                   so let a = div (value nx sy) p in
+                      value nx sy = p * a
+                   so power 2 (Limb.length - clz) * p = radix
+                   so power 2 (Limb.length - clz) * (value nx sy)
+                      = power 2 (Limb.length - clz) * (p * a)
+                      = (power 2 (Limb.length - clz) * p) * a
+                      = radix * a
+                   so mod (radix * value r sy + _l) radix
+                      = mod _l radix
+                   so mod (radix * value r sy + _l) radix
+                      = mod (radix * a) radix = 0
+                   so mod _l radix = 0
+                   so 0 <= _l < radix
+                 };
+            assert { value nx sy = p * value r sy
+                     by
+                     radix * value r sy
+                     = power 2 (Limb.length - clz) * value nx sy
+                     so p * power 2 (Limb.length - clz)
+                        = radix
+                     so p * radix * value r sy
+                        = p * power 2 (Limb.length - clz) * value nx sy
+                        = radix * value nx sy
+                     so p * value r sy = value nx sy
+                   }
+          end;
+          assert { value x sx
+                   = value q (sx - sy + adjust) * value y sy
+                   + value r sy
+                  by
+                   value (nx at Div_s) (sx + adjust)
+                   = (value q (sx - sy + adjust)
+                       + power radix (sx - sy + adjust) * _qh)
+                     * value ny sy
+                     + value nx sy
+                  so value (nx at Div_s) (sx + adjust)
+                      = p * value x sx
+                  so power radix (sx - sy + 1) * power radix (sy - 1)
+                     = power radix sx
+                  so value ny sy = p * value y sy
+                  so (_qh = 0
+                     by
+                     value (nx at Div_s) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                        + power radix (sx - sy + adjust) * _qh)
+                      * value ny sy
+                      + value nx sy
+                     so value nx sy >= 0
+                     so value q (sx - sy + adjust) >= 0
+                     so _qh >= 0
+                     so (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh) >= 0
+                     so (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value ny sy
+                        + value nx sy
+                        >= (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh)
+                           * value ny sy
+                        >= power radix (sx - sy + adjust) * _qh * value ny sy
+                     so _qh <> 1)
+                  so value nx sy = p * value r sy
+                  so p * value x sx
+                     = value q (sx - sy + adjust) * p * value y sy
+                       + p * value r sy
+                     = p * (value q (sx - sy + adjust)
+                       * value y sy
+                            + value r sy)
+                 };
+          label Ret_s in
+          begin
+            ensures { value q (sx - sy + 1)
+                      = value (q at Ret_s) (sx - sy + adjust) }
+            if (Int32.(=) adjust zero)
+            then begin
+              value_sub_shift_no_change (pelts x) x.offset
+                                        (p2i sx) (p2i sx) limb_zero;
+              set_ofs q (Int32.(-) sx sy) limb_zero;
+              value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+              assert { value q (sx - sy + 1) = value (q at Ret_s) (sx - sy)
+                       by value q (sx - sy + 1)
+                          = value (q at Ret_s) (sx - sy) + power radix (sx - sy) * 0
+                          = value (q at Ret_s) (sx - sy) }
+            end
+          end;
+          ()
+        end
+        end
+
+  let wmpn_tdiv_qr (q r x y:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid q (sx - sy + 1) }
+    requires { valid r sy }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value x sx
+              = value q (sx - sy + 1) * value y sy
+                + value r sy }
+    ensures { value r sy < value y sy }
+    diverges
+  =
+    let uone = UInt32.of_int 1 in
+    let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) uone) in
+    c_assert (is_not_null nx);
+    let ny = malloc (UInt32.of_int32 sy) in
+    c_assert (is_not_null ny);
+    div_qr q r x y nx ny sx sy;
+    free nx;
+    free ny;
+
+end

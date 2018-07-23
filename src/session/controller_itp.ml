@@ -20,16 +20,6 @@ let debug_sched = Debug.register_info_flag "scheduler"
 let debug_call_prover = Debug.lookup_flag "call_prover"
 let default_delay_ms = 100 (* 0.1 seconds *)
 
-
-exception Noprogress
-
-let () = Exn_printer.register
-    (fun fmt e ->
-      match e with
-      | Noprogress ->
-          Format.fprintf fmt "The transformation made no progress.\n"
-      | _ -> raise e)
-
 (** State of a proof *)
 type proof_attempt_status =
   | Undone   (** prover was never called *)
@@ -380,7 +370,7 @@ let fuzzy_proof_time nres ores =
   let told = ores.Call_provers.pr_time in
   let ansnew = nres.Call_provers.pr_answer in
   let tnew = nres.Call_provers.pr_time in
-  if group_answer ansold = group_answer ansnew &&
+  if ansnew <> Call_provers.Timeout && group_answer ansold = group_answer ansnew &&
        tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1
   then { nres with Call_provers.pr_time = told }
   else nres
@@ -733,9 +723,9 @@ let schedule_transformation c id name args ~callback ~notification =
         let tid = graft_transf c.controller_session id name args subtasks in
         callback (TSdone tid)
       with
-      | Exit ->
+      | NoProgress ->
          (* if result is same as input task, consider it as a failure *)
-         callback (TSfailed (id, Noprogress))
+         callback (TSfailed (id, NoProgress))
       | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)

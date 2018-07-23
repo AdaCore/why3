@@ -19,58 +19,56 @@ Require list.Length.
 Require list.Mem.
 
 (* Why3 goal *)
-Lemma infix_plpl_def : forall {a:Type} {a_WT:WhyType a},
+Lemma infix_plpl_def {a:Type} {a_WT:WhyType a} :
   forall (l1:(list a)) (l2:(list a)),
-   ((Init.Datatypes.app l1 l2) = match l1 with
-                                 | Init.Datatypes.nil => l2
-                                 | (Init.Datatypes.cons x1 r1) =>
-                                     (Init.Datatypes.cons x1 (Init.Datatypes.app r1 l2))
-                                 end).
+  ((Init.Datatypes.app l1 l2) =
+   match l1 with
+   | Init.Datatypes.nil => l2
+   | (Init.Datatypes.cons x1 r1) =>
+       (Init.Datatypes.cons x1 (Init.Datatypes.app r1 l2))
+   end).
 Proof.
-now intros a a_WT [|h1 q1] l2.
+now intros [|h1 q1] l2.
 Qed.
 
 Require Import Lists.List.
 
 (* Why3 goal *)
-Lemma Append_assoc :
-forall {a:Type} {a_WT:WhyType a},
-forall (l1:(list a)) (l2:(list a)) (l3:(list a)),
- ((Init.Datatypes.app l1 (Init.Datatypes.app l2 l3)) = (Init.Datatypes.app (Init.Datatypes.app l1 l2) l3)).
+Lemma Append_assoc {a:Type} {a_WT:WhyType a} :
+  forall (l1:(list a)) (l2:(list a)) (l3:(list a)),
+  ((Init.Datatypes.app l1 (Init.Datatypes.app l2 l3)) =
+   (Init.Datatypes.app (Init.Datatypes.app l1 l2) l3)).
 Proof.
-intros a a_WT l1 l2 l3.
+intros l1 l2 l3.
 apply app_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Append_l_nil :
-forall {a:Type} {a_WT:WhyType a},
-forall (l:(list a)), ((Init.Datatypes.app l Init.Datatypes.nil) = l).
+Lemma Append_l_nil {a:Type} {a_WT:WhyType a} :
+  forall (l:(list a)), ((Init.Datatypes.app l Init.Datatypes.nil) = l).
 Proof.
-intros a a_WT l.
+intros l.
 apply app_nil_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Append_length :
-forall {a:Type} {a_WT:WhyType a},
-forall (l1:(list a)) (l2:(list a)),
- ((list.Length.length (Init.Datatypes.app l1 l2)) = ((list.Length.length l1) + 
- (list.Length.length l2))%Z).
+Lemma Append_length {a:Type} {a_WT:WhyType a} :
+  forall (l1:(list a)) (l2:(list a)),
+  ((list.Length.length (Init.Datatypes.app l1 l2)) =
+   ((list.Length.length l1) + (list.Length.length l2))%Z).
 Proof.
-intros a a_WT l1 l2.
+intros l1 l2.
 rewrite 3!Length.length_std.
 now rewrite app_length, inj_plus.
 Qed.
 
 (* Why3 goal *)
-Lemma mem_append :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l1:(list a)) (l2:(list a)),
- (list.Mem.mem x (Init.Datatypes.app l1 l2)) <->
- ((list.Mem.mem x l1) \/ (list.Mem.mem x l2)).
+Lemma mem_append {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (l1:(list a)) (l2:(list a)),
+  (list.Mem.mem x (Init.Datatypes.app l1 l2)) <->
+  ((list.Mem.mem x l1) \/ (list.Mem.mem x l2)).
 Proof.
-intros a a_WT x l1 l2.
+intros x l1 l2.
 split.
 intros H.
 apply Mem.mem_std in H.
@@ -91,15 +89,12 @@ now apply Mem.mem_std.
 Qed.
 
 (* Why3 goal *)
-Lemma mem_decomp :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l:(list a)),
- (list.Mem.mem x l) ->
- exists l1:(list a),
-  exists l2:(list a),
-   (l = (Init.Datatypes.app l1 (Init.Datatypes.cons x l2))).
+Lemma mem_decomp {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (l:(list a)), (list.Mem.mem x l) ->
+  exists l1:(list a), exists l2:(list a),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons x l2))).
 Proof.
-intros a a_WT x l h1.
+intros x l h1.
 apply in_split.
 now apply Mem.mem_std.
 Qed.

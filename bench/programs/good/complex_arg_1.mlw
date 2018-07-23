@@ -1,4 +1,3 @@
-module M
 
 exception Exception
 
@@ -10,10 +9,3 @@ let f ()
   raises { Exception -> true }
   = f0 (f1 ())
 
-end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/complex_arg_1"
-End:
-*)

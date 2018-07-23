@@ -1,11 +1,11 @@
 
 theory T
 
-  use import bool.Bool
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Nth
+  use bool.Bool
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Nth
 
 
   goal G : forall l: list 'a. length l >= 3 -> exists i j:int, x:'a. i <> j /\ nth i l = Some x /\ nth j l = Some x

@@ -146,9 +146,7 @@ module Task =
       |  _ -> []
 
     let task_to_string t =
-      ignore (flush_str_formatter ());
-      Driver.print_task alt_ergo_driver str_formatter t;
-      flush_str_formatter ()
+      Format.asprintf "%a" (Driver.print_task alt_ergo_driver) t
 
     let gen_id =
       let c = ref 0 in
@@ -189,7 +187,7 @@ module Task =
       Hashtbl.add task_table th_id  { task = `Theory(th);
 				      parent_id = "theory-list";
 				      status = `New;
-				      subtasks = task_ids;
+				      subtasks = List.rev task_ids;
 				      loc = [];
 				      expl = th_name;
                                       pretty = "";
@@ -318,57 +316,17 @@ let why3_parse_theories theories =
      List.iter (fun i -> why3_prove i) subs
     ) theories
 
-let execute_symbol m fmt ps =
-  match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
-  | None ->
-     fprintf fmt "function '%s' has no definition"
-	     ps.Mlw_expr.ps_name.Ident.id_string
-  | Some d ->
-    let lam = d.Mlw_expr.fun_lambda in
-    match lam.Mlw_expr.l_args with
-    | [pvs] when
-        Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
-      begin
-        let spec = lam.Mlw_expr.l_spec in
-        let eff = spec.Mlw_ty.c_effect in
-        let writes = eff.Mlw_ty.eff_writes in
-        let body = lam.Mlw_expr.l_expr in
-        try
-          let res, _final_env =
-            Mlw_interp.eval_global_expr env m.Mlw_module.mod_known
-              m.Mlw_module.mod_theory.Theory.th_known writes body
-          in
-          match res with
-          | Mlw_interp.Normal v -> Mlw_interp.print_value fmt v
-          | Mlw_interp.Excep(x,v) ->
-            fprintf fmt "exception %s(%a)"
-              x.Mlw_ty.xs_name.Ident.id_string Mlw_interp.print_value v
-          | Mlw_interp.Irred e ->
-            fprintf fmt "cannot execute expression@ @[%a@]"
-              Mlw_pretty.print_expr e
-          | Mlw_interp.Fun _ ->
-            fprintf fmt "result is a function"
-        with e ->
-          fprintf fmt
-            "failure during execution of function: %a (%s)"
-            Exn_printer.exn_printer e
-            (Printexc.to_string e)
-    end
-  | _ ->
-    fprintf fmt "Only functions with one unit argument can be executed"
-
-let why3_execute (modules,_theories) =
+let why3_execute modules =
   let result =
     let mods =
       Wstdlib.Mstr.fold
 	(fun _k m acc ->
-         let th = m.Mlw_module.mod_theory in
+         let th = m.Pmodule.mod_theory in
          let modname = th.Theory.th_name.Ident.id_string in
          try
-           let ps =
-             Mlw_module.ns_find_ps m.Mlw_module.mod_export ["main"]
+           let rs = Pmodule.ns_find_rs m.Pmodule.mod_export ["main"]
            in
-           let result = Pp.sprintf "%a" (execute_symbol m) ps in
+           let result = Pp.sprintf "%a" (Pinterp.eval_global_symbol env m) rs in
            let loc =
              Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
            in
@@ -390,7 +348,7 @@ let why3_execute (modules,_theories) =
   W.send result
 
 
-let () = Sys_js.register_file ~name:temp_file_name ~content:""
+let () = Sys_js.create_file ~name:temp_file_name ~content:""
 
 let why3_run f lang code =
   try
@@ -430,7 +388,7 @@ let () =
        | ExecuteBuffer code ->
           Task.clear_warnings ();
 	  Task.clear_table ();
-	  why3_run why3_execute Mlw_module.mlw_language code
+	  why3_run why3_execute Pmodule.mlw_language code
        | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
      in
      W.send Idle

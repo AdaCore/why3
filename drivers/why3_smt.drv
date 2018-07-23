@@ -27,26 +27,30 @@ theory BuiltIn
   syntax type  int  "int"
   syntax type  real "real"
   syntax predicate (=)  "(%1 = %2)"
-  meta "encoding:ignore_polymorphism_ls" predicate (=)
 
-  meta "encoding : kept" type int
-  meta "encoding : kept" type real
+  meta "encoding:kept" type int
+  meta "encoding:kept" type real
+  meta "encoding:ignore_polymorphism_ls" predicate (=)
+end
+
+theory bool.Ite
+  meta "encoding:lskept" function ite
+  meta "encoding:ignore_polymorphism_ls" function ite
+end
+
+theory HighOrd
+  meta "encoding:lskept" function (@)
+  meta "encoding:ignore_polymorphism_ts" type (->)
+  meta "encoding:ignore_polymorphism_ls" function (@)
 end
 
 theory map.Map
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
-
-  meta "encoding:ignore_polymorphism_ts" type map
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
   meta "encoding:ignore_polymorphism_ls" function get
   meta "encoding:ignore_polymorphism_ls" function ([])
   meta "encoding:ignore_polymorphism_ls" function set
   meta "encoding:ignore_polymorphism_ls" function ([<-])
-  meta "encoding:ignore_polymorphism_pr" prop Select_eq
-  meta "encoding:ignore_polymorphism_pr" prop Select_neq
-
-  remove prop Select_eq
-  remove prop Select_neq
 end
 
 import "discrimination.gen"

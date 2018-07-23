@@ -2,9 +2,9 @@
 
 (** {1 Removing duplicate elements in an array}
 
-    Given an array [a] of size [n], removes its duplicate elements,
-    in-place, as follows: return [r] such that [a[0..r-1]] contains the same
-    elements as [a[0..n-1]] and no duplicate
+    Given an array `a` of size `n`, removes its duplicate elements,
+    in-place, as follows: return `r` such that `a[0..r-1]` contains the same
+    elements as `a[0..n-1]` and no duplicate
 
 *)
 
@@ -16,11 +16,11 @@ module Spec
   use export int.Int
   use export array.Array
 
-  (** v appears in [a[0..s-1]] *)
+  (** `v` appears in `a[0..s-1]` *)
   predicate appears (v: 'a) (a: array 'a) (s: int) =
     exists i: int. 0 <= i < s /\ a[i] = v
 
-  (** [a[0..s-1]] contains no duplicate element *)
+  (** `a[0..s-1]` contains no duplicate element *)
   predicate nodup (a: array 'a) (s: int) =
     forall i: int. 0 <= i < s -> not (appears a[i] a i)
 
@@ -30,34 +30,37 @@ end
 
 module RemoveDuplicateQuadratic
 
-  use import Spec
-  use import ref.Refint
+  use Spec
+  use ref.Refint
 
-  let rec test_appears (ghost w: ref int) (v: 'a) (a: array 'a) (s: int) : bool
+  type t
+  val predicate eq (x y: t)
+    ensures { result <-> x = y }
+
+  let rec test_appears (ghost w: ref int) (v: t) (a: array t) (s: int) : bool
     requires { 0 <= s <= length a }
-    ensures  { result=true <-> appears v a s }
-    ensures  { result=true -> 0 <= !w < s && a[!w] = v }
+    ensures  { result <-> appears v a s }
+    ensures  { result -> 0 <= !w < s && a[!w] = v }
     variant  { s }
   = s > 0 &&
-    if a[s-1] = v then begin w := s - 1; true end else test_appears w v a (s-1)
+    if eq a[s-1] v then begin w := s - 1; true end else test_appears w v a (s-1)
 
-  let remove_duplicate (a: array 'a) : int
+  let remove_duplicate (a: array t): int
     ensures { 0 <= result <= length a }
     ensures { nodup a result }
-    ensures { forall v:'a. appears v (old a) (length a) <-> appears v a result }
+    ensures { forall v. appears v (old a) (length a) <-> appears v a result }
   = let n = length a in
     let r = ref 0 in
     let ghost from = make n 0 in
     let ghost to_  = make n 0 in
-    'L:
     for i = 0 to n - 1 do
       invariant { 0 <= !r <= i }
       invariant { nodup a !r }
       invariant { forall j: int. 0 <= j < !r ->
-                  0 <= to_[j] < i /\ a[j] = (at a 'L)[to_[j]] }
+                  0 <= to_[j] < i /\ a[j] = (old a)[to_[j]] }
       invariant { forall j: int. 0 <= j < i ->
-                  0 <= from[j] < !r /\ (at a 'L)[j] = a[from[j]] }
-      invariant { forall j: int. i <= j < n -> a[j] = (at a 'L)[j] }
+                  0 <= from[j] < !r /\ (old a)[j] = a[from[j]] }
+      invariant { forall j: int. i <= j < n -> a[j] = (old a)[j] }
       let ghost w = ref 0 in
       if not (test_appears w a[i] a !r) then begin
         a[!r] <- a[i];

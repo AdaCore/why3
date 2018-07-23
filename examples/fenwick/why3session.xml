@@ -2,94 +2,23 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../fenwick.mlw">
-<theory name="Fenwick">
- <goal name="WP_parameter make" expl="VC for make">
- <proof prover="1"><result status="valid" time="0.03" steps="29"/></proof>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../fenwick.mlw" proved="true">
+<theory name="Fenwick" proved="true">
+ <goal name="VC make" expl="VC for make" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="39"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add">
- <proof prover="1"><result status="valid" time="0.42" steps="353"/></proof>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <proof prover="1"><result status="valid" time="0.66" steps="721"/></proof>
  </goal>
- <goal name="WP_parameter sum_dec" expl="VC for sum_dec">
- <proof prover="1"><result status="valid" time="0.06" steps="67"/></proof>
+ <goal name="VC sum_dec" expl="VC for sum_dec" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="37"/></proof>
  </goal>
- <goal name="WP_parameter fen_compact" expl="VC for fen_compact">
- <proof prover="0"><result status="valid" time="1.36"/></proof>
+ <goal name="VC fen_compact" expl="VC for fen_compact" proved="true">
+ <proof prover="1"><result status="valid" time="0.82" steps="850"/></proof>
  </goal>
- <goal name="WP_parameter query" expl="VC for query">
- <transf name="split_goal_right">
-  <goal name="WP_parameter query.1" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter query.2" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter query.3" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.19" steps="154"/></proof>
-  </goal>
-  <goal name="WP_parameter query.4" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter query.5" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter query.6" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.13" steps="95"/></proof>
-  </goal>
-  <goal name="WP_parameter query.7" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter query.8" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.78" steps="434"/></proof>
-  </goal>
-  <goal name="WP_parameter query.9" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.11" steps="74"/></proof>
-  </goal>
-  <goal name="WP_parameter query.10" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.08" steps="69"/></proof>
-  </goal>
-  <goal name="WP_parameter query.11" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter query.12" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.97" steps="646"/></proof>
-  </goal>
-  <goal name="WP_parameter query.13" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter query.14" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter query.15" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.14" steps="97"/></proof>
-  </goal>
-  <goal name="WP_parameter query.16" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter query.17" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.74" steps="895"/></proof>
-  </goal>
-  <goal name="WP_parameter query.18" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.14" steps="70"/></proof>
-  </goal>
-  <goal name="WP_parameter query.19" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.09" steps="73"/></proof>
-  </goal>
-  <goal name="WP_parameter query.20" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter query.21" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.00" steps="546"/></proof>
-  </goal>
-  <goal name="WP_parameter query.22" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.05" steps="55"/></proof>
-  </goal>
-  <goal name="WP_parameter query.23" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
- </transf>
+ <goal name="VC query" expl="VC for query" proved="true">
+ <proof prover="1"><result status="valid" time="2.57" steps="2527"/></proof>
  </goal>
 </theory>
 </file>

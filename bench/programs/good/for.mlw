@@ -1,7 +1,7 @@
 module M
 
-use import int.Int
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 (* for loop with invariant *)
 let test1 () =
@@ -15,7 +15,7 @@ let test1 () =
 (* we don't even enter *)
 let test2 () =
   let x = ref 0 in
-  for i = 2 to 1 do
+  for i = 2 to 1 do invariant { !x = 0 }
     x := 1
   done;
   assert { !x = 0 }
@@ -55,7 +55,7 @@ let test1d () =
 
 let test2d () =
   let x = ref 0 in
-  for i = 1 downto 2 do
+  for i = 1 downto 2 do invariant { !x = 0 }
     x := 1
   done;
   assert { !x = 0 }
@@ -79,9 +79,3 @@ let test4d x
   end
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/for"
-End:
-*)

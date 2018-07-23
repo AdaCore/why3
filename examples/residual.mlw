@@ -7,6 +7,9 @@ module Residuals
 
   type char
 
+  val predicate eq (x y : char)
+    ensures { result <-> x = y }
+
   clone export regexp.Regexp with type char = char
 
   let rec accepts_epsilon (r:regexp) : bool
@@ -31,14 +34,14 @@ module Residuals
     forall c w r. mem (Cons c w) (Star r) ->
        exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 (Star r)
 
-  (** [residual r c] denotes the set of words [w] such that [mem c.w r] *)
+  (** `residual r c` denotes the set of words `w` such that `mem c.w r` *)
   let rec residual (r:regexp) (c:char) : regexp
     variant { r }
     ensures { forall w. mem w result <-> mem (Cons c w) r }
   = match r with
     | Empty -> Empty
     | Epsilon -> Empty
-    | Char c' -> if c = c' then Epsilon else Empty
+    | Char c' -> if eq c c' then Epsilon else Empty
     | Alt r1 r2 -> Alt (residual r1 c) (residual r2 c)
     | Concat r1 r2 ->
        if accepts_epsilon r1 then
@@ -64,13 +67,13 @@ module Test
 
   type char = int
 
-  clone import Residuals with type char = char
+  clone Residuals with type char = char
 
-  constant a : char = 65
+  let constant a : char = 65
 
-  constant aa : word = Cons a (Cons a Nil)
+  let constant aa : word = Cons a (Cons a Nil)
 
-  constant astar : regexp = Star (Char a)
+  let constant astar : regexp = Star (Char a)
 
   let test_astar () = decide_mem aa astar
 
@@ -81,10 +84,10 @@ end
 module DFA
 
   type char
-  use import list.List
+  use list.List
   type word = list char
 
-  use import map.Map
+  use map.Map
 
   (** automaton where states = 0..size-1, init state = 0 *)
 
@@ -99,7 +102,7 @@ module DFA
   function exec (a:t) (q:state) (w:word) : state =
     match w with
     | Nil -> q
-    | Cons c r -> let q' = a.transition[(q,c)] in exec a q' r
+    | Cons c r -> let q' = a.transition[q,c] in exec a q' r
     end
 
   function accepts (a:t) (w:word) : bool =

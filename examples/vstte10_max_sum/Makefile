@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-OBJ=vstte10_max_sum__MaxAndSum2 vstte10_max_sum__TestCase
+OBJ=vstte10_max_sum
 
 ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
@@ -45,7 +45,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../vstte10_max_sum.mlw
-	$(WHY3) extract -D ocaml32 ../vstte10_max_sum.mlw -o .
+	$(WHY3) extract -D ocaml64 -o $@ $^
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
@@ -59,6 +59,3 @@ $(ML): ../vstte10_max_sum.mlw
 clean::
 	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
 	rm -f why3__*.ml* vstte10_max_sum__*.ml* int__*.ml*
-
-
-

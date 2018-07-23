@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sorted_list.mlw">
-<theory name="FindInSortedList">
- <goal name="Sorted_not_mem" expl="">
- <proof prover="1"><result status="valid" time="0.03" steps="70"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../sorted_list.mlw" proved="true">
+<theory name="FindInSortedList" proved="true">
+ <goal name="Sorted_not_mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="44"/></proof>
  </goal>
- <goal name="WP_parameter find" expl="VC for find">
- <proof prover="1"><result status="valid" time="0.02" steps="118"/></proof>
+ <goal name="VC find" expl="VC for find" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="149"/></proof>
  </goal>
 </theory>
 </file>

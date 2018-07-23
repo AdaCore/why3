@@ -4,41 +4,37 @@
 
 module BinarySearch
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
 
   (* the code and its specification *)
 
-  exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
   let binary_search (a : array int) (v : int) : int
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
-  = try
-      let l = ref 0 in
-      let u = ref (length a - 1) in
-      while !l <= !u do
-        invariant { 0 <= !l /\ !u < length a }
-        invariant {
-          forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
-        variant { !u - !l }
-        let m = !l + div (!u - !l) 2 in
-        assert { !l <= m <= !u };
-        if a[m] < v then
-          l := m + 1
-        else if a[m] > v then
-          u := m - 1
-        else
-          raise (Break m)
-      done;
-      raise Not_found
-    with Break i ->
-      i
-    end
+  =
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < length a }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+      variant { !u - !l }
+      let m = !l + div (!u - !l) 2 in
+      assert { !l <= m <= !u };
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
 
 end
 
@@ -47,11 +43,10 @@ end
 
 module BinarySearchAnyMidPoint
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
-  exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
   val midpoint (l:int) (u:int) : int
@@ -61,26 +56,60 @@ module BinarySearchAnyMidPoint
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
-  = try
-      let l = ref 0 in
-      let u = ref (length a - 1) in
-      while !l <= !u do
-        invariant { 0 <= !l /\ !u < length a }
-        invariant {
-          forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
-        variant { !u - !l }
-        let m = midpoint !l !u in
-        if a[m] < v then
-          l := m + 1
-        else if a[m] > v then
-          u := m - 1
-        else
-          raise (Break m)
-      done;
-      raise Not_found
-    with Break i ->
-      i
-    end
+  =
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < length a }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+      variant { !u - !l }
+      let m = midpoint !l !u in
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
+
+end
+
+(* The following version of binary search is faster in practice, by being
+   friendlier with the branch predictor of most processors. It also happens
+   to be stable, since it always return the highest index. *)
+
+module BinarySearchBranchless
+
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
+
+  exception Not_found (* raised to signal a search failure *)
+
+  let binary_search (a : array int) (v : int) : int
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    ensures  { forall i : int. result < i < length a -> a[i] <> v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  =
+    let l = ref 0 in
+    let s = ref (length a) in
+    if !s = 0 then raise Not_found;
+    while !s > 1 do
+      invariant { 0 <= !l /\ !l + !s <= length a /\ !s >= 1 }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> a[!l] <= v /\ i < !l + !s }
+      variant { !s }
+      let h = div !s 2 in
+      let m = !l + h in
+      l := if a[m] > v then !l else m;
+      s := !s - h;
+    done;
+    if a[!l] = v then !l
+    else raise Not_found
 
 end
 
@@ -88,42 +117,37 @@ end
 
 module BinarySearchInt32
 
-  use import mach.int.Int32
-  use import ref.Ref
-  use import mach.array.Array32
+  use int.Int
+  use mach.int.Int32
+  use ref.Ref
+  use mach.array.Array32
 
-  (* the code and its specification *)
-
-  exception Break int32 (* raised to exit the loop *)
   exception Not_found   (* raised to signal a search failure *)
 
   let binary_search (a : array int32) (v : int32) : int32
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < to_int a.length ->
-               to_int a[i1] <= to_int a[i2] }
-    ensures  { 0 <= to_int result < to_int a.length /\ a[to_int result] = v }
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < a.length ->
+               a[i1] <= a[i2] }
+    ensures  { 0 <= result < a.length /\ a[result] = v }
     raises   { Not_found ->
-                 forall i:int. 0 <= i < to_int a.length -> a[i] <> v }
-  = try
-      let l = ref (of_int 0) in
-      let u = ref (length a - of_int 1) in
-      while !l <= !u do
-        invariant { 0 <= to_int !l /\ to_int !u < to_int a.length }
-        invariant { forall i : int. 0 <= i < to_int a.length ->
-                    a[i] = v -> to_int !l <= i <= to_int !u }
-        variant   { to_int !u - to_int !l }
-        let m = !l + (!u - !l) / of_int 2 in
-        assert { to_int !l <= to_int m <= to_int !u };
-        if a[m] < v then
-          l := m + of_int 1
-        else if a[m] > v then
-          u := m - of_int 1
-        else
-          raise (Break m)
-      done;
-      raise Not_found
-    with Break i ->
-      i
-    end
+                 forall i:int. 0 <= i < a.length -> a[i] <> v }
+  =
+    let l = ref 0 in
+    let u = ref (length a - 1) in
+    while !l <= !u do
+      invariant { 0 <= !l /\ !u < a.length }
+      invariant { forall i : int. 0 <= i < a.length ->
+                  a[i] = v -> !l <= i <= !u }
+      variant   { !u - !l }
+      let m = !l + (!u - !l) / 2 in
+      assert { !l <= m <= !u };
+      if a[m] < v then
+        l := m + 1
+      else if a[m] > v then
+        u := m - 1
+      else
+        return m
+    done;
+    raise Not_found
 
 end
 
@@ -132,10 +156,10 @@ end
 
 module BinarySearchBoolean
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
 
   let binary_search (a: array int) : int
     requires { 0 < a.length }

@@ -90,10 +90,10 @@ val add_tdecls : tdecl list -> task trans
 (** {2 Dependent Transformations} *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans
-val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
-
 val on_meta_excl : meta -> (meta_arg list option -> 'a trans) -> 'a trans
+
 val on_used_theory : theory -> (bool -> 'a trans) -> 'a trans
+val on_cloned_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
 
 (** [on_tagged_* m f] allow to do a transformation having all the tagged declarations
     in a set as argument of f.
@@ -171,6 +171,7 @@ val named : string -> 'a trans -> 'a trans
 type naming_table = {
     namespace : namespace;
     known_map : known_map;
+    coercion : Coercion.t;
     printer : Ident.ident_printer;
     aprinter : Ident.ident_printer;
  }

@@ -13,255 +13,265 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
+Require map.Map.
+Require map.Const.
 
 Require Import ClassicalEpsilon.
 
 Lemma predicate_extensionality:
-  forall A (P Q : A -> Prop),
-    (forall x, P x <-> Q x) -> P = Q.
+  forall A (P Q : A -> bool),
+    (forall x, P x = Q x) -> P = Q.
 Admitted.
-(* "it is folklore that the two together are consistent" *)
 
-(* Why3 goal *)
-Definition set : forall (a:Type), Type.
-intros.
-exact (a -> Prop).
-Defined.
+(* Why3 assumption *)
+Definition set (a:Type) := a -> bool.
 
 Global Instance set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Proof.
 intros.
 split.
-exact (fun _ => False).
+exact (fun _ => false).
 intros x y.
 apply excluded_middle_informative.
 Qed.
 
-(* Why3 goal *)
-Definition mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
-intros a a_WT x s.
-exact (s x).
-Defined.
+(* Why3 assumption *)
+Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:a -> bool) : Prop :=
+  ((s x) = true).
 
 Hint Unfold mem.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a))
-  (s2:(set a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> bool)
+    (s2:a -> bool) : Prop :=
+  forall (x:a), (mem x s1) <-> (mem x s2).
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
 (* Why3 goal *)
-Lemma extensionality :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
+Lemma extensionality {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool), (infix_eqeq s1 s2) -> (s1 = s2).
 Proof.
-intros a a_WT s1 s2 h1.
-now apply predicate_extensionality.
+intros s1 s2 h1.
+apply predicate_extensionality.
+intros x.
+generalize (h1 x).
+unfold mem.
+intros [h2 h3].
+destruct (s1 x).
+now rewrite h2.
+destruct (s2 x).
+now apply h3.
+easy.
 Qed.
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a))
-  (s2:(set a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
+Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> bool) (s2:a -> bool) :
+    Prop :=
+  forall (x:a), (mem x s1) -> mem x s2.
 
 (* Why3 goal *)
-Lemma subset_refl :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(set a)), (subset s s).
+Lemma subset_refl {a:Type} {a_WT:WhyType a} :
+  forall (s:a -> bool), subset s s.
 Proof.
-now intros a a_WT s x.
+now intros s x.
 Qed.
 
 (* Why3 goal *)
-Lemma subset_trans :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)) (s3:(set a)),
- (subset s1 s2) -> ((subset s2 s3) -> (subset s1 s3)).
+Lemma subset_trans {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool) (s3:a -> bool), (subset s1 s2) ->
+  (subset s2 s3) -> subset s1 s3.
 Proof.
-intros a a_WT s1 s2 s3 h1 h2 x H.
+intros s1 s2 s3 h1 h2 x H.
 now apply h2, h1.
 Qed.
 
-(* Why3 goal *)
-Definition empty: forall {a:Type} {a_WT:WhyType a}, (set a).
-intros.
-exact (fun _ => False).
-Defined.
-
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:a -> bool) : Prop :=
   forall (x:a), ~ (mem x s).
 
 (* Why3 goal *)
-Lemma empty_def1 :
-forall {a:Type} {a_WT:WhyType a}, (is_empty
-(empty : (set a))).
+Lemma mem_empty {a:Type} {a_WT:WhyType a} :
+  is_empty (map.Const.const false : a -> bool).
 Proof.
-now intros a a_WT x.
+now intros x.
 Qed.
 
 (* Why3 goal *)
-Lemma mem_empty :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a), ~ (mem x (empty : (set a))).
+Lemma add_spec {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (s:a -> bool), forall (y:a),
+  (mem y (map.Map.set s x true)) <-> ((y = x) \/ (mem y s)).
 Proof.
-now intros a a_WT x.
+intros x y s.
+unfold Map.set, mem.
+destruct why_decidable_eq ; intuition.
 Qed.
 
 (* Why3 goal *)
-Definition add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
-intros a a_WT x s.
-exact (fun y => x = y \/ s y).
-Defined.
-
-(* Why3 goal *)
-Lemma add_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (y:a),
- forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
+Lemma remove_spec {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (s:a -> bool), forall (y:a),
+  (mem y (map.Map.set s x false)) <-> (~ (y = x) /\ (mem y s)).
 Proof.
-intros a a_WT x y s.
-unfold add, mem; intuition.
+intros x s y.
+unfold Map.set, mem.
+destruct why_decidable_eq ; intuition.
 Qed.
 
 (* Why3 goal *)
-Definition remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
-intros a a_WT x s.
-exact (fun y => x <> y /\ s y).
-Defined.
-
-(* Why3 goal *)
-Lemma remove_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (y:a) (s:(set a)),
- (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+Lemma add_remove {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (s:a -> bool), (mem x s) ->
+  ((map.Map.set (map.Map.set s x false) x true) = s).
 Proof.
-intros a a_WT x y s.
-unfold remove, mem; intuition.
-Qed.
-
-(* Why3 goal *)
-Lemma add_remove :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (s:(set a)), (mem x s) -> ((add x (remove x s)) = s).
-Proof.
-intros a a_WT x s h1.
+intros x s h1.
 apply extensionality; intro y.
-rewrite add_def1.
-rewrite remove_def1.
+rewrite add_spec.
+rewrite remove_spec.
 destruct (why_decidable_eq y x) as [->|H] ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma remove_add :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (s:(set a)), ((remove x (add x s)) = (remove x s)).
+Lemma remove_add {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (s:a -> bool),
+  ((map.Map.set (map.Map.set s x true) x false) = (map.Map.set s x false)).
 Proof.
-intros a a_WT x s.
+intros x s.
 apply extensionality; intro y.
-rewrite remove_def1.
-rewrite remove_def1.
-rewrite add_def1.
+rewrite remove_spec.
+rewrite remove_spec.
+rewrite add_spec.
 destruct (why_decidable_eq y x) as [->|H] ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma subset_remove :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (s:(set a)), (subset (remove x s) s).
+Lemma subset_remove {a:Type} {a_WT:WhyType a} :
+  forall (x:a) (s:a -> bool), subset (map.Map.set s x false) s.
 Proof.
-intros a a_WT x s y.
-rewrite remove_def1.
+intros x s y.
+rewrite remove_spec.
 now intros [_ H].
 Qed.
 
 (* Why3 goal *)
-Definition union: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
-  (set a).
-intros a a_WT s1 s2.
-exact (fun x => s1 x \/ s2 x).
+Definition union {a:Type} {a_WT:WhyType a} :
+  (a -> bool) -> (a -> bool) -> a -> bool.
+Proof.
+intros s1 s2.
+exact (fun x => orb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma union_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)) (x:a),
- (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
+Lemma union_def {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool) (x:a),
+  (((union s1 s2) x) = true) <-> (((s1 x) = true) \/ ((s2 x) = true)).
 Proof.
-now intros a a_WT s1 s2 x.
+intros s1 s2 x.
+apply Bool.orb_true_iff.
 Qed.
 
 (* Why3 goal *)
-Definition inter: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
-  (set a).
-intros a a_WT s1 s2.
-exact (fun x => s1 x /\ s2 x).
+Lemma union_spec {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
+  (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
+Proof.
+exact union_def.
+Qed.
+
+(* Why3 goal *)
+Definition inter {a:Type} {a_WT:WhyType a} :
+  (a -> bool) -> (a -> bool) -> a -> bool.
+Proof.
+intros s1 s2.
+exact (fun x => andb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma inter_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)) (x:a),
- (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
+Lemma inter_def {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool) (x:a),
+  (((inter s1 s2) x) = true) <-> (((s1 x) = true) /\ ((s2 x) = true)).
 Proof.
-now intros a a_WT s1 s2 x.
+intros s1 s2 x.
+apply Bool.andb_true_iff.
 Qed.
 
 (* Why3 goal *)
-Definition diff: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
-  (set a).
-intros a a_WT s1 s2.
-exact (fun x => s1 x /\ ~(s2 x)).
+Lemma inter_spec {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
+  (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
+Proof.
+exact inter_def.
+Qed.
+
+(* Why3 goal *)
+Definition diff {a:Type} {a_WT:WhyType a} :
+  (a -> bool) -> (a -> bool) -> a -> bool.
+Proof.
+intros s1 s2.
+exact (fun x => andb (s1 x) (negb (s2 x))).
 Defined.
 
 (* Why3 goal *)
-Lemma diff_def1 :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)) (x:a),
- (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
+Lemma diff_def {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool) (x:a),
+  (((diff s1 s2) x) = true) <-> (((s1 x) = true) /\ ~ ((s2 x) = true)).
 Proof.
-now intros a a_WT s1 s2 x.
+intros s1 s2 x.
+unfold mem, diff.
+rewrite Bool.not_true_iff_false.
+rewrite <- Bool.negb_true_iff.
+apply Bool.andb_true_iff.
 Qed.
 
 (* Why3 goal *)
-Lemma subset_diff :
-forall {a:Type} {a_WT:WhyType a},
-forall (s1:(set a)) (s2:(set a)), (subset (diff s1 s2) s1).
+Lemma diff_spec {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
+  (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
 Proof.
-intros a a_WT s1 s2 x.
-rewrite diff_def1.
+exact diff_def.
+Qed.
+
+(* Why3 goal *)
+Lemma subset_diff {a:Type} {a_WT:WhyType a} :
+  forall (s1:a -> bool) (s2:a -> bool), subset (diff s1 s2) s1.
+Proof.
+intros s1 s2 x.
+rewrite diff_spec.
 now intros [H _].
 Qed.
 
 (* Why3 goal *)
-Definition choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
-intros a a_WT s.
+Definition complement {a:Type} {a_WT:WhyType a} : (a -> bool) -> a -> bool.
+Proof.
+intros s.
+exact (fun x => negb (s x)).
+Defined.
+
+(* Why3 goal *)
+Lemma complement_def {a:Type} {a_WT:WhyType a} :
+  forall (s:a -> bool) (x:a),
+  (((complement s) x) = true) <-> ~ ((s x) = true).
+Proof.
+intros s x.
+unfold complement.
+rewrite Bool.not_true_iff_false.
+apply Bool.negb_true_iff.
+Qed.
+
+(* Why3 goal *)
+Definition choose {a:Type} {a_WT:WhyType a} : (a -> bool) -> a.
+Proof.
+intros s.
 assert (i: inhabited a) by (apply inhabits, why_inhabitant).
 exact (epsilon i (fun x => mem x s)).
 Defined.
 
 (* Why3 goal *)
-Lemma choose_def :
-forall {a:Type} {a_WT:WhyType a},
-forall (s:(set a)), (~ (is_empty s)) -> (mem (choose s) s).
+Lemma choose_spec {a:Type} {a_WT:WhyType a} :
+  forall (s:a -> bool), ~ (is_empty s) -> mem (choose s) s.
 Proof.
-intros a a_WT s h.
+intros s h1.
 unfold choose.
 apply epsilon_spec.
 now apply not_all_not_ex.
-Qed.
-
-(* Why3 goal *)
-Definition all: forall {a:Type} {a_WT:WhyType a}, (set a).
-intros a a_WT.
-exact (fun x => True).
-Defined.
-
-(* Why3 goal *)
-Lemma all_def :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a), (mem x (all : (set a))).
-Proof.
-now intros a a_WT x.
 Qed.
 

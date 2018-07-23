@@ -1,53 +1,42 @@
-diff --git a/src/sat/sat_solvers.ml b/src/sat/sat_solvers.ml
-index 97e384e..5213df7 100644
---- a/src/sat/sat_solvers.ml
-+++ b/src/sat/sat_solvers.ml
-@@ -23,6 +23,8 @@
+diff -r -u alt-ergo-2.0.0/lib/reasoners/fun_sat.ml alt-ergo/lib/reasoners/fun_sat.ml
+--- alt-ergo-2.0.0/lib/reasoners/fun_sat.ml	2017-11-14 18:01:38.000000000 +0100
++++ alt-ergo/lib/reasoners/fun_sat.ml	2018-05-24 16:10:10.418194590 +0200
+@@ -29,6 +29,7 @@
  open Options
  open Format
  
 +exception StepsLimitReached
+ 
+ module Th = Theory.Main
+ open Sig
+@@ -691,8 +692,7 @@
+     if steps_bound () <> -1
+       && Int64.compare !steps (Int64.of_int (steps_bound ())) > 0 then
+       begin
+-	printf "Steps limit reached: %Ld@." !steps;
+-	exit 1
++        raise StepsLimitReached
+       end;
+     { env with tbox = tbox; unit_tbox = utbox; inst = inst }
+ 
+diff -r -u alt-ergo-2.0.0/lib/reasoners/fun_sat.mli alt-ergo/lib/reasoners/fun_sat.mli
+--- alt-ergo-2.0.0/lib/reasoners/fun_sat.mli	2017-11-14 18:01:38.000000000 +0100
++++ alt-ergo/lib/reasoners/fun_sat.mli	2018-05-24 16:10:45.622082786 +0200
+@@ -27,3 +27,5 @@
+ (******************************************************************************)
+ 
+ include Sat_solver_sig.S
 +
- module type S = sig
-   type t
- 
-@@ -580,8 +582,11 @@ module Dfs_sat : S = struct
-       if steps_bound () <> -1
-         && Int64.compare !steps (Int64.of_int (steps_bound ())) > 0 then
-         begin
-+          raise StepsLimitReached;
-+(*
- 	  printf "Steps limit reached: %Ld@." !steps;
- 	  exit 1
-+ *)
-         end;
-       { env with tbox = tbox; unit_tbox = utbox; inst = inst }
- 
-diff --git a/src/sat/sat_solvers.mli b/src/sat/sat_solvers.mli
-index f4f9f60..4da53d1 100644
---- a/src/sat/sat_solvers.mli
-+++ b/src/sat/sat_solvers.mli
-@@ -22,6 +22,8 @@
- 
- open Options
- 
 +exception StepsLimitReached
-+
- module type S = sig
-   type t
- 
-diff --git a/src/util/numbers.ml b/src/util/numbers.ml
-index ebf8f95..f172a03 100644
---- a/src/util/numbers.ml
-+++ b/src/util/numbers.ml
-@@ -20,8 +20,8 @@
- (*   This file is distributed under the terms of the CeCILL-C licence         *)
+diff -r -u alt-ergo-2.0.0/lib/util/numbers.ml alt-ergo/lib/util/numbers.ml
+--- alt-ergo-2.0.0/lib/util/numbers.ml	2017-11-14 18:01:38.000000000 +0100
++++ alt-ergo/lib/util/numbers.ml	2018-05-24 16:12:31.849745671 +0200
+@@ -26,7 +26,7 @@
+ (*                                                                            *)
  (******************************************************************************)
  
 -module MyZarith = ZarithNumbers
--module MyNums = NumsNumbers
-+module MyZarith = (*ZarithNumbers
-+module MyNums =*) NumsNumbers
++module MyZarith = NumsNumbers
+ module MyNums = NumsNumbers
  
  module Z = MyZarith.Z
- 

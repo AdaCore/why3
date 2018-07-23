@@ -10,12 +10,12 @@
 
 module RandomAccessList
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
+  use int.Int
+  use int.ComputerDivision
+  use list.List
+  use list.Length
+  use list.Nth
+  use option.Option
 
   type ral 'a =
   | Empty
@@ -142,15 +142,15 @@ end
 
 module RAL
 
-  use import int.Int
-  use import RandomAccessList as R
-  use import list.List
-  use import list.Length
-  use import option.Option
-  use import list.Nth
+  use int.Int
+  use list.List
+  use list.Length
+  use option.Option
+  use list.Nth
+  use RandomAccessList
 
   type t 'a = { r: ral 'a; ghost l: list 'a }
-    invariant { self.l = elements self.r }
+    invariant { l = elements r }
 
   let empty () : t 'a
     ensures { result.l = Nil }
@@ -179,9 +179,9 @@ end
 
 module RandomAccessListWithSeq
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import seq.Seq
+  use int.Int
+  use int.ComputerDivision
+  use seq.Seq
 
   type ral 'a =
   | Empty
@@ -190,8 +190,16 @@ module RandomAccessListWithSeq
 
   function flatten (s: seq ('a, 'a)) : seq 'a =
     create (2 * length s)
-           (\ i: int. let (x0, x1) = s[div i 2] in
-                      if mod i 2 = 0 then x0 else x1)
+           (fun i -> let (x0, x1) = s[div i 2] in
+                     if mod i 2 = 0 then x0 else x1)
+
+  lemma cons_flatten : forall x y :'a,s:seq ('a,'a).
+    let a = flatten (cons (x,y) s) in
+    let b = cons x (cons y (flatten s)) in
+    a = b by a == b by forall i. 0 <= i < a.length -> a[i] = b[i]
+    by (i <= 1 so (cons (x,y) s)[div i 2] = (x,y))
+       \/ (i >= 2 so (cons (x,y) s)[div i 2] = s[div (i-2) 2]
+       )
 
   function elements (l: ral 'a) : seq 'a =
     match l with
@@ -232,15 +240,18 @@ module RandomAccessListWithSeq
                   if mod i 2 = 0 then x0 else x1
     end
 
-  let rec tail (l: ral 'a) : ral 'a
+   let rec tail (l: ral 'a) : ral 'a
     requires { 0 < length (elements l) }
     variant  { l }
-    ensures  { elements result == (elements l)[1 .. ] }
+    ensures  { elements result == (elements l)[1..] }
     =
     match l with
     | Empty    -> absurd
     | One _ l1 -> Zero l1
-    | Zero  l1 -> let (_, x1) = lookup 0 l1 in One x1 (tail l1)
+    | Zero  l1 -> let (_, x1) as p = lookup 0 l1 in
+      let tl = tail l1 in
+      assert { elements l1 == cons p (elements tl) };
+      One x1 tl
     end
 
   (** update in O(log n)
@@ -250,22 +261,30 @@ module RandomAccessListWithSeq
   function setf (s: seq 'a) (i: int) (f: 'a -> 'a) : seq 'a =
     set s i (f s[i])
 
-  function aux (i: int) (f: 'a -> 'a) : ('a, 'a) -> ('a, 'a) =
-    \ z. let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
+  let function aux (i: int) (f: 'a -> 'a) : ('a, 'a) -> ('a, 'a) =
+    fun z -> let (x,y) = z in if mod i 2 = 0 then (f x, y) else (x, f y)
 
   let rec fupdate (f: 'a -> 'a) (i: int) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }
-    variant  { i, l}
-    ensures  { elements result == setf (elements l) i f}
+    variant  { i, l }
+    ensures  { elements result == setf (elements l) i f }
     =
     match l with
     | Empty    -> absurd
     | One x l1 -> if i = 0 then One (f x) l1 else
                   cons x (fupdate f (i-1) (Zero l1))
-    | Zero l1  -> Zero (fupdate (aux i f) (div i 2) l1)
+    | Zero l1  ->
+      let ul1 = fupdate (aux i f) (div i 2) l1 in
+      let res = Zero ul1 in
+      assert { forall j. 0 <= j < length (elements res) ->
+        (elements res)[j] = (setf (elements l) i f)[j]
+        by div j 2 <> div i 2 ->
+          (elements ul1)[div j 2] = (elements l1)[div j 2]
+      };
+      res
     end
 
-  function f (y: 'a) : 'a -> 'a = \ _. y
+  let function f (y: 'a) : 'a -> 'a = fun _ -> y
 
   let update (i: int) (y: 'a) (l: ral 'a) : ral 'a
     requires { 0 <= i < length (elements l) }

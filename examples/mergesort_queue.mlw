@@ -5,31 +5,31 @@
 
 module MergesortQueue
 
-  use import int.Int
-  use import list.List
-  use import list.Mem
-  use import list.Length
-  use import list.Append
-  use import list.Permut
-  use import queue.Queue
+  use int.Int
+  use list.List
+  use list.Mem
+  use list.Length
+  use list.Append
+  use list.Permut
+  use queue.Queue
 
   type elt
-  predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
-  clone export list.Sorted      with type t = elt, predicate le  = le,
-  goal Transitive.Trans
+  val predicate le elt elt
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+  clone export list.Sorted with
+    type t = elt, predicate le  = le, goal Transitive.Trans
 
   let merge (q1: t elt) (q2: t elt) (q: t elt)
     requires { q.elts = Nil /\ sorted q1.elts /\ sorted q2.elts }
     ensures  { sorted q.elts }
     ensures  { permut q.elts (old q1.elts ++ old q2.elts) }
-  = 'L:
-    while length q1 > 0 || length q2 > 0 do
+  = while length q1 > 0 || length q2 > 0 do
       invariant { sorted q1.elts /\ sorted q2.elts /\ sorted q.elts }
       invariant { forall x y: elt. mem x q.elts -> mem y q1.elts -> le x y }
       invariant { forall x y: elt. mem x q.elts -> mem y q2.elts -> le x y }
       invariant { permut (q.elts ++ q1.elts ++ q2.elts)
-                         (at q1.elts 'L ++ at q2.elts 'L) }
+                         (old (q1.elts ++ q2.elts)) }
       variant { length q1 + length q2 }
       if length q1 = 0 then
         push (safe_pop q2) q
@@ -47,12 +47,11 @@ module MergesortQueue
   let rec mergesort (q: t elt) : unit
     ensures { sorted q.elts /\ permut q.elts (old q.elts) }
     variant { length q }
-  = 'L:
-    if length q > 1 then begin
+  = if length q > 1 then begin
       let q1 = create () : t elt in
       let q2 = create () : t elt in
       while not (is_empty q) do
-        invariant { permut (q1.elts ++ q2.elts ++ q.elts) (at q.elts 'L) }
+        invariant { permut (q1.elts ++ q2.elts ++ q.elts) (old q.elts) }
         invariant { length q1 = length q2 \/
                     length q = 0 /\ length q1 = length q2 +1 }
         variant   { length q }
@@ -60,7 +59,7 @@ module MergesortQueue
         if not (is_empty q) then let x = safe_pop q in push x q2
       done;
       assert { q.elts = Nil };
-      assert { permut (q1.elts ++ q2.elts) (at q.elts 'L) };
+      assert { permut (q1.elts ++ q2.elts) (old q.elts) };
       mergesort q1;
       mergesort q2;
       merge q1 q2 q

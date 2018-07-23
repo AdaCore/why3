@@ -2,92 +2,122 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../register_allocation.mlw" proved="true">
 <theory name="Spec" proved="true">
- <goal name="WP_parameter exec_append" expl="VC for exec_append" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+ <goal name="VC exec_append" expl="VC for exec_append" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="42"/></proof>
  </goal>
 </theory>
 <theory name="DWP" proved="true">
- <goal name="WP_parameter prefix $" expl="VC for prefix $" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+ <goal name="VC prefix $" expl="VC for prefix $" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="WP_parameter wrap" expl="VC for wrap" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="VC wrap" expl="VC for wrap" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter infix --" expl="VC for infix --" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="VC infix --" expl="VC for infix --" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
- <goal name="WP_parameter cons" expl="VC for cons" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter cons.0" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.1" expl="postcondition" proved="true">
-  <transf name="inline_goal" proved="true" >
-   <goal name="WP_parameter cons.1.0" expl="postcondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter cons.1.0.0" expl="postcondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter cons.1.0.0.0" expl="postcondition" proved="true">
-     <transf name="introduce_premises" proved="true" >
-      <goal name="WP_parameter cons.1.0.0.0.0" expl="postcondition" proved="true">
-      <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <goal name="VC cons" expl="VC for cons" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="123"/></proof>
  </goal>
- <goal name="WP_parameter nil" expl="VC for nil" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter nil.0" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter nil.1" expl="postcondition" proved="true">
-  <transf name="inline_goal" proved="true" >
-   <goal name="WP_parameter nil.1.0" expl="postcondition" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="WP_parameter nil.1.0.0" expl="postcondition" proved="true">
-    <transf name="compute_specified" proved="true" >
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <goal name="VC nil" expl="VC for nil" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="InfinityOfRegisters" proved="true">
- <goal name="WP_parameter compile" expl="VC for compile" proved="true">
+ <goal name="VC compile" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter compile.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="VC compile.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter compile.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC compile.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter compile.2" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.2.0" expl="precondition" proved="true">
+  <goal name="VC compile.2" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+  <goal name="VC compile.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC compile.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC compile.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC compile.6" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="VC compile.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC compile.8" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="VC compile.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="VC compile.10" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC compile.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC compile.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+  <goal name="VC compile.13" expl="precondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC compile.13.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.2.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.2.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.2.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.2.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+    <goal name="VC compile.13.0.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.13.0.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.13.0.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.13.0.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.13.1" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.13.1.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.13.1.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.13.1.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.13.1.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.13.2" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.13.2.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.13.2.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.13.2.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.13.2.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="41"/></proof>
        </goal>
       </transf>
       </goal>
@@ -99,136 +129,174 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
+  <goal name="VC compile.14" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter compile.4" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.5" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.6" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.7" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.8" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.10" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.10.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.10.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.10.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.10.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.10.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.11" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.12" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.13" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.14" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.15" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.16" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.17" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.18" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.19" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.20" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.21" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.21.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.21.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.21.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.21.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.21.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.03" steps="42"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.22" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.23" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
+  <goal name="VC compile.15" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter recover" expl="VC for recover" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+ <goal name="VC recover" expl="VC for recover" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
 </theory>
 <theory name="FiniteNumberOfRegisters" proved="true">
- <goal name="WP_parameter compile" expl="VC for compile" proved="true">
+ <goal name="VC k" expl="VC for k" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="VC compile" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter compile.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC compile.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter compile.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC compile.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter compile.2" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.2.0" expl="precondition" proved="true">
+  <goal name="VC compile.2" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="VC compile.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC compile.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC compile.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
+  </goal>
+  <goal name="VC compile.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC compile.7" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="VC compile.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC compile.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="VC compile.10" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
+  </goal>
+  <goal name="VC compile.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC compile.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC compile.13" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="VC compile.14" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC compile.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC compile.16" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+  <goal name="VC compile.17" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="48"/></proof>
+  </goal>
+  <goal name="VC compile.18" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="VC compile.19" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC compile.20" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="52"/></proof>
+  </goal>
+  <goal name="VC compile.21" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="VC compile.22" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="VC compile.23" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="VC compile.24" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="VC compile.25" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="VC compile.26" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="VC compile.27" expl="precondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC compile.27.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.2.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.2.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.2.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.2.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+    <goal name="VC compile.27.0.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.27.0.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.27.0.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.27.0.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.27.1" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.27.1.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.27.1.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.27.1.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.27.1.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.27.2" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.27.2.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.27.2.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.27.2.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.27.2.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.05" steps="45"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.27.3" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.27.3.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.27.3.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.27.3.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.27.3.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.02" steps="135"/></proof>
        </goal>
       </transf>
       </goal>
@@ -240,280 +308,209 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC compile.28" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter compile.4" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.5" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.6" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.7" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.8" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.10" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.11" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.11.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.11.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.11.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.11.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.11.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.12" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.13" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.14" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.15" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.16" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.17" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.18" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.19" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.20" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.21" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.22" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.23" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.24" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.24.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.24.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.24.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.24.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.24.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.03" steps="48"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.25" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.26" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.27" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.28" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.29" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.30" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.31" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.32" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.33" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.34" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.35" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.36" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.37" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.38" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.39" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.39.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.39.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification" proved="true" >
-     <goal name="WP_parameter compile.39.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.39.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.39.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="2"><result status="valid" time="0.06" steps="85"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.40" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.41" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
+  <goal name="VC compile.29" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="OptimalNumberOfRegisters" proved="true">
+ <goal name="VC k" expl="VC for k" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="VC n" expl="VC for n" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="60"/></proof>
+ </goal>
  <goal name="measure_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="measure_nonneg.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter compile" expl="VC for compile" proved="true">
+ <goal name="VC compile" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter compile.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC compile.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter compile.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="VC compile.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter compile.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.00"/></proof>
+  <goal name="VC compile.2" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compile.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC compile.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter compile.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC compile.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter compile.5" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+  <goal name="VC compile.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compile.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12"/></proof>
+  <goal name="VC compile.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter compile.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="VC compile.7" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter compile.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC compile.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter compile.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="VC compile.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compile.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  <goal name="VC compile.10" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter compile.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.74"/></proof>
+  <goal name="VC compile.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter compile.12" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  <goal name="VC compile.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter compile.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  <goal name="VC compile.13" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter compile.14" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="VC compile.14" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter compile.15" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+  <goal name="VC compile.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter compile.16" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC compile.16" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter compile.17" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
+  <goal name="VC compile.17" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter compile.18" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="VC compile.18" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compile.19" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  <goal name="VC compile.19" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter compile.20" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  <goal name="VC compile.20" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter compile.21" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC compile.21" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter compile.22" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="VC compile.22" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter compile.23" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  <goal name="VC compile.23" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter compile.24" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.24.0" expl="precondition" proved="true">
+  <goal name="VC compile.24" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC compile.25" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
+  </goal>
+  <goal name="VC compile.26" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="VC compile.27" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC compile.28" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC compile.29" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="VC compile.30" expl="precondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC compile.30.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.24.0.0" expl="precondition" proved="true">
+    <goal name="VC compile.30.0.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="WP_parameter compile.24.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.24.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.24.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="1"><result status="valid" time="0.08"/></proof>
+     <goal name="VC compile.30.0.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.30.0.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.30.0.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.03" steps="16"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.30.1" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.30.1.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.30.1.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.30.1.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.30.1.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.30.2" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.30.2.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.30.2.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.30.2.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.30.2.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.01" steps="67"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.30.3" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.30.3.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.30.3.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.30.3.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.30.3.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.02" steps="186"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC compile.30.4" expl="precondition" proved="true">
+   <transf name="compute_specified" proved="true" >
+    <goal name="VC compile.30.4.0" expl="precondition" proved="true">
+    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
+     <goal name="VC compile.30.4.0.0" expl="precondition" proved="true">
+     <transf name="introduce_premises" proved="true" >
+      <goal name="VC compile.30.4.0.0.0" expl="precondition" proved="true">
+      <transf name="compute_specified" proved="true" >
+       <goal name="VC compile.30.4.0.0.0.0" expl="precondition" proved="true">
+       <proof prover="1"><result status="valid" time="0.06" steps="27"/></proof>
        </goal>
       </transf>
       </goal>
@@ -525,97 +522,11 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile.25" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
+  <goal name="VC compile.31" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter compile.26" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.27" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.28" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.29" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.30" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.31" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.32" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.33" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.34" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.35" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="24"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.36" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="26"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.37" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.38" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.39" expl="precondition" proved="true">
-  <transf name="prop_curry" proved="true" >
-   <goal name="WP_parameter compile.39.0" expl="precondition" proved="true">
-   <transf name="compute_specified" proved="true" >
-    <goal name="WP_parameter compile.39.0.0" expl="precondition" proved="true">
-    <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="WP_parameter compile.39.0.0.0" expl="VC for compile" proved="true">
-     <transf name="compute_specified" proved="true" >
-      <goal name="WP_parameter compile.39.0.0.0.0" expl="VC for compile" proved="true">
-      <transf name="introduce_premises" proved="true" >
-       <goal name="WP_parameter compile.39.0.0.0.0.0" expl="VC for compile" proved="true">
-       <proof prover="0"><result status="valid" time="0.10" steps="99"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter compile.40" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.41" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.42" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.43" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.44" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.45" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.46" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.47" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
-  </goal>
-  <goal name="WP_parameter compile.48" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="VC compile.32" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>

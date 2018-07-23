@@ -47,13 +47,9 @@ module Sexpr = Set.Make(ExprNode)
 
 (** prints the given expression, transforming spaces into _ *)
 let string_of_expr_node node =
-  let print_in_buf printer x =
-    Format.fprintf Format.str_formatter "@[%a@]" printer x;
-    Format.flush_str_formatter()
-  in
   let white_space = Str.regexp "[ ()]" in
   let translate x = Str.global_replace white_space "_" x in
-  let repr = print_in_buf Pretty.print_term node in
+  let repr = Format.asprintf "@[%a@]" Pretty.print_term node in
   translate repr
 
 (* for debugging (graph printing) purposes *)
@@ -107,7 +103,7 @@ module NF = struct (* add memoization, one day ? *)
   (* TODO ! *)
   (** all quantifiers in prenex form, currently just identity *)
   let prenex_fmla fmla =
-    Format.eprintf "prenex_fmla : @[%a@]@." Pretty.print_term fmla;
+    Format.eprintf "prenex_fmla: @[%a@]@." Pretty.print_term fmla;
     fmla
 
   (** creates a fresh non-quantified formula, representing a quantified formula *)
@@ -122,14 +118,14 @@ module NF = struct (* add memoization, one day ? *)
       A clause is a list of formulae, so this function returns a list
       of list of formulae. *)
   let rec transform fmlaTable fmla =
-    Format.eprintf "transform : @[%a@]@." Pretty.print_term fmla;
+    Format.eprintf "transform: @[%a@]@." Pretty.print_term fmla;
     match fmla.t_node with
     | Tquant (_,f_bound) ->
         let var,_,f =  t_open_quant f_bound in
         traverse fmlaTable fmla var f
     | Tbinop (_,_,_) ->
         let clauses = split fmla in
-        Format.eprintf "split : @[%a@]@." Util.print_clause clauses;
+        Format.eprintf "split: @[%a@]@." Util.print_clause clauses;
         begin match clauses with
           | [f] -> begin match f.t_node with
               | Tbinop (Tor,f1,f2) ->
@@ -217,7 +213,7 @@ module GraphConstant = struct
   with Not_found ->
     let new_v = GC.V.create fmla in
     Hterm.add fTbl fmla new_v;
-    (* Format.eprintf "generating new vertex : %a@."
+    (* Format.eprintf "generating new vertex: %a@."
       Pretty.print_term fmla; *)
     new_v
   and findT tTbl term = try
@@ -225,7 +221,7 @@ module GraphConstant = struct
   with Not_found ->
     let new_v = GC.V.create term in
     Hterm.add tTbl term new_v;
-    (* Format.eprintf "generating new vertex : %a@."
+    (* Format.eprintf "generating new vertex: %a@."
       Pretty.print_term fmla; *)
     new_v
   and find fTbl tTbl expr = TermTF.t_select (findT tTbl) (findF fTbl) expr
@@ -300,7 +296,7 @@ module GraphPredicate = struct
       | { t_node = Tapp(p,_) } -> raise (Exit p)
       | f -> TermTF.t_map (fun t->t) search f in
     try ignore (search fmla);
-      Format.eprintf "invalid formula : ";
+      Format.eprintf "invalid formula: ";
       Pretty.print_term Format.err_formatter fmla; assert false
     with Exit p -> p
 
@@ -309,7 +305,7 @@ module GraphPredicate = struct
   with Not_found ->
     let new_v = GP.V.create x in
     Hls.add symbTbl x new_v;
-    (* Format.eprintf "generating new vertex : %a@." Pretty.print_ls x; *)
+    (* Format.eprintf "generating new vertex: %a@." Pretty.print_ls x; *)
     new_v
 
   (** analyse a single clause, and creates an edge between every positive
@@ -410,17 +406,17 @@ module Select = struct
       | _ -> failwith "bad literal in the goal clause" in
     let l0 = List.fold_left add_literal Sexpr.empty goal_clause in
 
-    (** explore one more step *)
+    (* explore one more step *)
     let rec one_step cur =
       let step = Sexpr.fold explore cur [cur;cur] in
       Format.eprintf "one step made !@.";
       step
 
-    (** explores the neighbours of [vertex] *)
+    (* explores the neighbours of [vertex] *)
     and explore vertex l = match l with [_next_cur;cur] ->
 
-      (** [changed] indicates whether a vertex has been added;
-          [v] is a vertex *)
+      (* [changed] indicates whether a vertex has been added;
+         [v] is a vertex *)
       let find_odd v ((acc,_changed) as old) =
         if Sexpr.mem v acc then old else
           let count = GC.fold_pred
@@ -442,13 +438,13 @@ module Select = struct
 
       | _ -> assert false (*only not to have warnings on non-exhaustive match*)
 
-    (** iterates [one_step] until an exception is raised *)
+    (* iterates [one_step] until an exception is raised *)
     and control cur acc =
       let next_acc = try
         let next_step = one_step cur in
         next_step @ acc (* next step contains *2* steps *)
       with FixPoint ->
-        Format.eprintf "[control] : fixpoint reached !";
+        Format.eprintf "[control]: fixpoint reached";
         raise (Exit acc) in
       control (List.hd next_acc) next_acc in
     try
@@ -516,7 +512,7 @@ module Select = struct
     match decl.d_node with
       | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> [decl]
       | Dprop (Paxiom,_,fmla) -> (* filter only axioms *)
-          Format.eprintf "filter : @[%a@]@." Pretty.print_term fmla;
+          Format.eprintf "filter: @[%a@]@." Pretty.print_term fmla;
           let goal_exprs = goal_clauses in
           let return_value =
             if is_pertinent_predicate symTbl goal_clauses gp fmla &&

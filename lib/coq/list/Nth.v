@@ -18,24 +18,21 @@ Require list.List.
 Require option.Option.
 
 (* Why3 goal *)
-Definition nth: forall {a:Type} {a_WT:WhyType a}, Z -> (list a) ->
-  (option a).
-intros a a_WT.
+Definition nth {a:Type} {a_WT:WhyType a} : Z -> (list a) -> (option a).
 exact (fix nth n l := match l with nil => None | cons h t => if Zeq_bool n Z0 then Some h else nth (n - 1)%Z t end).
 Defined.
 
 (* Why3 goal *)
-Lemma nth_def :
-forall {a:Type} {a_WT:WhyType a},
-forall (n:Z) (l:(list a)),
- match l with
- | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)
- | (Init.Datatypes.cons x r) =>
-     ((n = 0%Z) -> ((nth n l) = (Init.Datatypes.Some x)))
-     /\ ((~ (n = 0%Z)) -> ((nth n l) = (nth (n - 1%Z)%Z r)))
- end.
+Lemma nth_def {a:Type} {a_WT:WhyType a} :
+  forall (n:Z) (l:(list a)),
+  match l with
+  | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)
+  | (Init.Datatypes.cons x r) =>
+      ((n = 0%Z) -> ((nth n l) = (Init.Datatypes.Some x))) /\
+      (~ (n = 0%Z) -> ((nth n l) = (nth (n - 1%Z)%Z r)))
+  end.
 Proof.
-intros a a_WT n l.
+intros n l.
 revert n.
 induction l.
 easy.

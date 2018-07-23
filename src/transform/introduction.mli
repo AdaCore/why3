@@ -27,8 +27,11 @@
 
 *)
 
-val intros :  Decl.prsymbol -> Term.term -> Decl.decl list
- (** [intros G f] returns the declarations after introducing
+val intro_attr : Ident.attribute
+
+val intros :
+  ?known_map:Decl.known_map -> Decl.prsymbol -> Term.term -> Decl.decl list
+ (** [intros ?known_map G f] returns the declarations after introducing
      premises of [goal G : f] *)
 
 val introduce_premises : Task.task Trans.trans

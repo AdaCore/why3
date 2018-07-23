@@ -1,0 +1,371 @@
+
+(** {1 Set theories} *)
+
+(** {2 Potentially infinite sets} *)
+
+module Set
+
+  use map.Map
+  use map.Const
+
+  type set 'a = map 'a bool
+
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
+  meta "material_type_arg" type set, 0
+
+  (** membership *)
+  predicate mem (x: 'a) (s: set 'a) = s[x]
+
+  (** equality *)
+  predicate (==) (s1 s2: set 'a) = forall x: 'a. mem x s1 <-> mem x s2
+
+  lemma extensionality:
+    forall s1 s2: set 'a. s1 == s2 -> s1 = s2
+
+  (** inclusion *)
+  predicate subset (s1 s2: set 'a) = forall x : 'a. mem x s1 -> mem x s2
+
+  lemma subset_refl:
+    forall s: set 'a. subset s s
+
+  lemma subset_trans:
+    forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
+
+  (** empty set *)
+  predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
+
+  let constant empty: set 'a = const false
+
+  lemma mem_empty: is_empty (empty: set 'a)
+
+
+  (** whole set *)
+  let constant all: set 'a = const true
+
+  (** addition *)
+  let ghost function add (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y = x \/ mem y s }
+  = s[x <- true]
+
+  let ghost function singleton (x: 'a): set 'a = add x empty
+
+  (** removal *)
+  let ghost function remove (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y <> x /\ mem y s }
+  = s[x <- false]
+
+  lemma add_remove:
+    forall x: 'a, s: set 'a. mem x s -> add x (remove x s) = s
+
+  lemma remove_add:
+    forall x: 'a, s: set 'a. remove x (add x s) = remove x s
+
+  lemma subset_remove:
+    forall x: 'a, s: set 'a. subset (remove x s) s
+
+  (** union *)
+  let ghost function union (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 \/ mem x s2 }
+  = fun x -> s1[x] || s2[x]
+
+  (** intersection *)
+  let ghost function inter (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ mem x s2 }
+  = fun x -> s1[x] && s2[x]
+
+  (** difference *)
+  let ghost function diff (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ not (mem x s2) }
+  = fun x -> s1[x] && not s2[x]
+
+  lemma subset_diff:
+    forall s1 s2: set 'a. subset (diff s1 s2) s1
+
+  (** complement *)
+  let ghost function complement (s: set 'a): set 'a
+  = fun x -> not s[x]
+
+  (** arbitrary element *)
+  val ghost function choose(s: set 'a): 'a
+    ensures { not (is_empty s) -> mem result s }
+
+end
+
+(** {2 Set Comprehension} *)
+
+module SetMap
+
+  use export Set
+
+  (** `{ f x | x in U }` *)
+  function map (f: 'a  -> 'b) (u: set 'a) : set 'b =
+    fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x
+
+  lemma map_def:
+    forall f: 'a -> 'b, u: set 'a.
+    forall x: 'a. mem x u -> mem (f x) (map f u)
+
+end
+
+(** {2 Finite sets} *)
+
+module Fset
+
+  use int.Int
+
+  (* TODO: monomorphize to fix issue with equality *)
+
+  type set 'a
+
+  (** if `'a` is an infinite type, then `set 'a` is infinite *)
+  meta "material_type_arg" type set, 0
+
+  (** membership *)
+  val predicate mem 'a (set 'a)
+
+  (** equality *)
+  val predicate (==) (s1 s2: set 'a)
+    ensures { result <-> (forall x: 'a. mem x s1 <-> mem x s2) }
+
+  axiom extensionality:
+    forall s1 s2: set 'a. s1 == s2 -> s1 = s2
+
+  (** inclusion *)
+  val predicate subset (s1 s2: set 'a)
+    ensures { result <-> (forall x : 'a. mem x s1 -> mem x s2) }
+
+  lemma subset_refl:
+    forall s: set 'a. subset s s
+
+  lemma subset_trans:
+    forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
+
+  (** empty set *)
+  val predicate is_empty (s: set 'a)
+    ensures { result <-> forall x: 'a. not (mem x s) }
+
+  val constant empty: set 'a
+    ensures { is_empty result }
+
+  (** addition *)
+  val function add (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y = x \/ mem y s }
+
+  let function singleton (x: 'a): set 'a = add x empty
+
+  (** removal *)
+  val function remove (x: 'a) (s: set 'a): set 'a
+    ensures { forall y: 'a. mem y result <-> y <> x /\ mem y s }
+
+  lemma add_remove:
+    forall x: 'a, s: set 'a. mem x s -> add x (remove x s) = s
+
+  lemma remove_add:
+    forall x: 'a, s: set 'a. remove x (add x s) = remove x s
+
+  lemma subset_remove:
+    forall x: 'a, s: set 'a. subset (remove x s) s
+
+  (** union *)
+  val function union (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 \/ mem x s2 }
+
+  (** intersection *)
+  val function inter (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ mem x s2 }
+
+  (** difference *)
+  val function diff (s1 s2: set 'a): set 'a
+    ensures { forall x: 'a. mem x result <-> mem x s1 /\ not (mem x s2) }
+
+  lemma subset_diff:
+    forall s1 s2: set 'a. subset (diff s1 s2) s1
+
+  (** arbitrary element *)
+  val function choose (s: set 'a): 'a
+    ensures { not (is_empty s) -> mem result s }
+
+  (** cardinal *)
+  val function cardinal (set 'a): int
+
+  axiom cardinal_nonneg: forall s: set 'a. cardinal s >= 0
+
+  axiom cardinal_empty:
+    forall s: set 'a. cardinal s = 0 <-> is_empty s
+
+  axiom cardinal_add:
+    forall x: 'a. forall s: set 'a.
+    not (mem x s) -> cardinal (add x s) = 1 + cardinal s
+
+  axiom cardinal_remove:
+    forall x: 'a. forall s: set 'a.
+    mem x s -> cardinal s = 1 + cardinal (remove x s)
+
+  axiom cardinal_subset:
+    forall s1 s2: set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
+
+  lemma subset_eq:
+    forall s1 s2: set 'a.
+    subset s1 s2 -> cardinal s1 = cardinal s2 -> s1 == s2
+
+  lemma cardinal1:
+    forall s: set 'a. cardinal s = 1 ->
+    forall x: 'a. mem x s -> x = choose s
+
+end
+
+(** {2 Finite Set Comprehension} *)
+
+module FsetComprehension
+
+  use export Fset
+  use int.Int
+
+  (** { x | x in U and p(x) } *)
+  function filter (p: 'a -> bool) (u: set 'a) : set 'a
+
+  axiom filter_def:
+    forall p: 'a -> bool, u: set 'a.
+    forall x: 'a. mem x (filter p u) <-> (p x /\ mem x u)
+
+  lemma filter_cardinal:
+    forall p: 'a -> bool, u: set 'a. cardinal (filter p u) <= cardinal u
+
+  (** { f x | x in U } *)
+  function map (f: 'a -> 'b) (u: set 'a) : set 'b
+
+  axiom map_def1:
+    forall f: 'a -> 'b, u: set 'a.
+    forall y: 'b. mem y (map f u) <-> (exists x: 'a. mem x u /\ y = f x)
+
+  lemma map_def2:
+    forall f: 'a -> 'b, u: set 'a.
+    forall x: 'a. mem x u -> mem (f x) (map f u)
+
+  lemma map_cardinal:
+    forall f: 'a -> 'b, u: set 'a. cardinal (map f u) <= cardinal u
+
+end
+
+(** {2 N-th element of a finite set} *)
+
+module FsetNth
+
+  use int.Int
+  use Fset
+
+  function nth (i: int) (s: set 'a) : 'a
+
+  axiom nth_injective:
+    forall s: set 'a, i j: int.
+    0 <= i < cardinal s -> 0 <= j < cardinal s -> nth i s = nth j s -> i = j
+
+  axiom nth_surjective:
+    forall s: set 'a, x: 'a. mem x s ->
+    exists i: int. 0 <= i < cardinal s /\ x = nth i s
+
+end
+
+(** {2 Induction principle on finite sets} *)
+
+module FsetInduction
+
+  use Fset
+
+  type t
+
+  predicate p (set t)
+
+  lemma Induction :
+    (forall s: set t. is_empty s -> p s) ->
+    (forall s: set t. p s -> forall t: t.
+      not (mem t s) -> p (add t s)) ->
+    forall s: set t. p s
+
+end
+
+(** {2 Finite sets of integers} *)
+
+module Fsetint
+
+  use export int.Int
+  use export Fset
+
+  val function min_elt (s: set int): int
+    requires { not (is_empty s) }
+    ensures { mem result s }
+    ensures { forall x: int. mem x s -> result <= x }
+
+  val function max_elt (s: set int): int
+    requires { not (is_empty s) }
+    ensures { mem result s }
+    ensures { forall x: int. mem x s -> x <= result }
+
+  val function interval (l r: int): set int
+    ensures { forall x: int. mem x result <-> l <= x < r }
+
+  lemma cardinal_interval:
+    forall l r: int. cardinal (interval l r) = if l <= r then r - l else 0
+
+end
+
+(** {2 Finite set iterators} *)
+
+module Min
+
+  use Fset
+  use int.Int
+
+  type param
+
+  type elt
+
+  function cost param elt : int
+
+  function min param (set elt) : int
+
+  axiom min_is_a_lower_bound:
+    forall p:param, s:set elt, x:elt. mem x s -> cost p x >= min p s
+
+  axiom min_appears_in_set:
+    forall p:param, s:set elt. not (is_empty s) ->
+      exists x:elt. mem x s /\ cost p x = min p s
+
+end
+
+(** {2 Sum of a function over a finite set} *)
+
+module FsetSum
+
+  use int.Int
+  use import Fset as S
+
+  function sum (set 'a) ('a -> int) : int
+  (** `sum s f` is the sum `\sum_{S.mem x s} f x` *)
+
+  axiom Sum_def_empty :
+    forall f. sum (S.empty: set 'a) f = 0
+
+  axiom Sum_add:
+    forall s: set 'a. forall f x.
+    not (mem x s) -> sum (S.add x s) f = sum s f + f x
+
+  lemma Sum_remove:
+    forall s: set 'a. forall f x.
+    mem x s -> sum (S.remove x s) f = sum s f - f x
+
+  lemma Sum_def_choose:
+    forall s: set 'a. forall f.
+     not (S.is_empty s) ->
+     let x = S.choose s in
+     sum s f = f x + sum (S.remove x s) f
+
+  lemma Sum_transitivity:
+    forall s1 s2: set 'a. forall f.
+     sum (S.union s1 s2) f = sum s1 f + sum s2 f - sum (S.inter s1 s2) f
+
+  lemma Sum_eq:
+    forall s: set 'a. forall f g.
+    (forall x. S.mem x s -> f x = g x) -> sum s f = sum s g
+
+end

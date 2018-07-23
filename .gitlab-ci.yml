@@ -18,9 +18,9 @@ build-4.03.0:
     COMPILER: 4.03.0
   <<: *build_definition
 
-build-4.04.0:
+build-4.04.2:
   variables:
-    COMPILER: 4.04.0
+    COMPILER: 4.04.2
   <<: *build_definition
 
 build-4.05.0:
@@ -28,9 +28,14 @@ build-4.05.0:
     COMPILER: 4.05.0
   <<: *build_definition
 
-build-4.06.0:
+build-4.06.1:
   variables:
-    COMPILER: 4.06.0
+    COMPILER: 4.06.1
+  <<: *build_definition
+
+build-4.07.0:
+  variables:
+    COMPILER: 4.07.0
   <<: *build_definition
 
 bench:
@@ -38,12 +43,12 @@ bench:
   variables:
     COMPILER: system
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
 
 .bench_template: &bench_definition
   stage: test
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench
+    - misc/ci-docker.sh misc/ci-local.sh bench ide
   only:
     - tags
     - schedules
@@ -53,9 +58,9 @@ bench-4.03.0:
     COMPILER: 4.03.0
   <<: *bench_definition
 
-bench-4.04.0:
+bench-4.04.2:
   variables:
-    COMPILER: 4.04.0
+    COMPILER: 4.04.2
   <<: *bench_definition
 
 bench-4.05.0:
@@ -63,10 +68,31 @@ bench-4.05.0:
     COMPILER: 4.05.0
   <<: *bench_definition
 
-bench-4.06.0:
+bench-4.06.1:
   variables:
-    COMPILER: 4.06.0
+    COMPILER: 4.06.1
   <<: *bench_definition
+
+bench-4.07.0:
+  variables:
+    COMPILER: 4.07.0
+  <<: *bench_definition
+
+full:
+  stage: test
+  variables:
+    COMPILER: system
+    DEBIAN_PACKAGES: hevea rubber texlive-latex-extra
+    OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx
+  script:
+    - misc/ci-docker.sh misc/ci-local.sh bench ide doc
+
+opam:
+  stage: build
+  variables:
+    COMPILER: system
+  script:
+    - misc/ci-docker.sh misc/ci-opam.sh
 
 deploy:
   stage: deploy

@@ -1,8 +1,8 @@
 
 theory TwoPlayerGame
 
-  use import int.Int
-  use import list.List
+  use int.Int
+  use list.List
 
 
   (** type describing a position in the game. It must include every
@@ -17,12 +17,12 @@ theory TwoPlayerGame
   constant initial_position : position
 
   (** gives the list of legal moves in the given position *)
-  function legal_moves position : list move
+  val function legal_moves position : list move
 
   (** [do_move p m] returns the position obtained by doing the move [m]
      on position [p].
   *)
-  function do_move position move : position
+  val function do_move position move : position
 
   (** [position_value p] returns an evaluation of position [p], an
      integer [v] between [-infinity] and [+infinity] which is supposed
@@ -34,8 +34,8 @@ theory TwoPlayerGame
      [-winning_value].
   *)
   constant winning_value : int
-  constant infinity : int
-  function position_value position : int
+  val constant infinity : int
+  val function position_value position : int
 
   axiom position_value_bound :
     forall p:position. - infinity < position_value p < infinity
@@ -46,7 +46,7 @@ theory TwoPlayerGame
     As for [position_value], the value is for the player who has the turn.
 
   *)
-  function minmax position int : int
+  val function minmax position int : int
 
   axiom minmax_depth_0 :
     forall p:position. minmax p 0 = position_value p
@@ -98,11 +98,11 @@ end
 
 module AlphaBeta
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   use TwoPlayerGame as G
-  use import list.List
+  use list.List
   use list.Elements
   use set.Fset
 
@@ -114,6 +114,7 @@ module AlphaBeta
       if - beta < m < - alpha then result = - m
       else if m <= - beta then result >= beta
       else result <= alpha }
+    variant { depth, 0 }
     let pos' = G.do_move pos move in
     let s = negabeta (-beta) (-alpha) pos' (depth-1)
     in -s
@@ -124,6 +125,7 @@ module AlphaBeta
       if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
       if G.minmax pos depth <= alpha then result <= alpha else
       result >= beta }
+    variant { depth, 1 }
     if depth = 0 then G.position_value pos else
     let l = G.legal_moves pos in
     match l with
@@ -145,6 +147,7 @@ module AlphaBeta
       if alpha < m < beta then result = m
       else if m <= alpha then result <= alpha else
       result >= beta }
+    variant { depth, 1, l }
     match l with
       |	Nil -> best
       | Cons c l ->

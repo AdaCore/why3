@@ -1,0 +1,35 @@
+
+(** {1 A possibly null, yet safe, value}
+
+    The OCaml driver does optimize this into the identity.
+
+    To permit the implementation of eq_null, null is implemented as a
+    heap-allocated value in OCaml, e.g., Obj.magic [|0|]
+*)
+
+module Null
+
+  type null = int
+
+  type t_model 'a = Null null | Value 'a
+
+  type t 'a = abstract { v: t_model 'a }
+
+  let ghost predicate is_null (t: t 'a) =
+    match t.v with Null _ -> true | Value _ -> false end
+
+  val create_null () : t 'a
+    ensures { is_null result }
+
+  val eq_null (n x: t 'a) : bool
+    requires { is_null n }
+    ensures  { result <-> x.v = n.v }
+
+  val create (x: 'a) : t 'a
+    ensures { result.v = Value x }
+
+  val get (t: t 'a) : 'a
+    requires { not (is_null t) }
+    ensures  { t.v = Value result }
+
+end

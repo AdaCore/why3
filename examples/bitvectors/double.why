@@ -1,10 +1,10 @@
 theory BV_double
 
-  use import int.Int
-  use import real.RealInfix
-  use import real.FromInt
-  use import power2.Pow2real
-  use import bitvector.BV64
+  use int.Int
+  use real.RealInfix
+  use real.FromInt
+  use power2.Pow2real
+  use bitvector.BV64
 
   function double_of_bv64 (b:bv) : real
 
@@ -64,9 +64,9 @@ end
 
 theory TestDouble
 
-  use import int.Int
-  use import bitvector.BV64
-  use import BV_double
+  use int.Int
+  use bitvector.BV64
+  use BV_double
 
   function one:bv = from_int 4607182418800017408 (* 1.0 *)
 

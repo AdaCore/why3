@@ -1,0 +1,120 @@
+
+(** {1 Multisets (aka bags)} *)
+
+module Bag
+
+  use int.Int
+
+  type bag 'a
+
+  (** whatever `'a`, the type `bag 'a` is always infinite *)
+  meta "infinite_type" type bag
+
+  (** the most basic operation is the number of occurrences *)
+
+  function nb_occ (x: 'a) (b: bag 'a): int
+
+  axiom occ_non_negative: forall b: bag 'a, x: 'a. nb_occ x b >= 0
+
+  predicate mem (x: 'a) (b: bag 'a) = nb_occ x b > 0
+
+  (** equality of bags *)
+
+  predicate eq_bag (a b: bag 'a) =
+    forall x:'a. nb_occ x a = nb_occ x b
+
+  axiom bag_extensionality: forall a b: bag 'a. eq_bag a b -> a = b
+
+  (** basic constructors of bags *)
+
+  function empty_bag: bag 'a
+
+  axiom occ_empty: forall x: 'a. nb_occ x empty_bag = 0
+
+  lemma is_empty: forall b: bag 'a.
+    (forall x: 'a. nb_occ x b = 0) -> b = empty_bag
+
+  function singleton (x: 'a) : bag 'a
+
+  axiom occ_singleton: forall x y: 'a.
+    (x = y /\ (nb_occ y (singleton x)) = 1) \/
+    (x <> y /\ (nb_occ y (singleton x)) = 0)
+    (* FIXME? nb_occ y (singleton x) = if x = y then 1 else 0 *)
+
+  lemma occ_singleton_eq:
+    forall x y: 'a. x = y -> nb_occ y (singleton x) = 1
+  lemma occ_singleton_neq:
+    forall x y: 'a. x <> y -> nb_occ y (singleton x) = 0
+
+  function union (bag 'a) (bag 'a) : bag 'a
+
+  axiom occ_union:
+    forall x: 'a, a b: bag 'a.
+    nb_occ x (union a b) = nb_occ x a + nb_occ x b
+
+  (** `union` is commutative, associative with identity `empty_bag` *)
+
+  lemma Union_comm: forall a b: bag 'a. union a b = union b a
+
+  lemma Union_identity: forall a: bag 'a. union a empty_bag = a
+
+  lemma Union_assoc:
+    forall a b c: bag 'a. union a (union b c) = union (union a b) c
+
+  lemma bag_simpl_right:
+    forall a b c: bag 'a. union a b = union c b -> a = c
+
+  lemma bag_simpl_left:
+    forall a b c: bag 'a. union a b = union a c -> b = c
+
+  (** add operation *)
+
+  function add (x: 'a) (b: bag 'a) : bag 'a = union (singleton x) b
+
+  lemma occ_add_eq:
+    forall b: bag 'a, x y: 'a.
+    x = y -> nb_occ y (add x b) = nb_occ y b + 1
+
+  lemma occ_add_neq: forall b: bag 'a, x y: 'a.
+    x <> y -> nb_occ y (add x b) = nb_occ y b
+
+  (** cardinality of bags *)
+
+  function card (bag 'a): int
+
+  axiom Card_nonneg: forall x: bag 'a. card x >= 0
+  axiom Card_empty: card (empty_bag: bag 'a) = 0
+  axiom Card_zero_empty: forall x: bag 'a. card x = 0 -> x = empty_bag
+
+  axiom Card_singleton: forall x:'a. card (singleton x) = 1
+  axiom Card_union: forall x y: bag 'a. card (union x y) = card x + card y
+  lemma Card_add: forall x: 'a, b: bag 'a. card (add x b) = 1 + card b
+
+  (** bag difference *)
+
+  use int.MinMax
+
+  function diff (bag 'a) (bag 'a) : bag 'a
+
+  axiom Diff_occ: forall b1 b2: bag 'a, x:'a.
+    nb_occ x (diff b1 b2) = max 0 (nb_occ x b1 - nb_occ x b2)
+
+  lemma Diff_empty_right: forall b: bag 'a. diff b empty_bag = b
+  lemma Diff_empty_left: forall b: bag 'a. diff empty_bag b = empty_bag
+
+  lemma Diff_add: forall b: bag 'a, x:'a. diff (add x b) (singleton x) = b
+
+  lemma Diff_comm:
+    forall b b1 b2: bag 'a. diff (diff b b1) b2 = diff (diff b b2) b1
+
+  lemma Add_diff: forall b: bag 'a, x:'a.
+    mem x b -> add x (diff b (singleton x)) = b
+
+  (** arbitrary element *)
+
+  function choose (b: bag 'a) : 'a
+
+  axiom choose_mem: forall b: bag 'a.
+    empty_bag <> b -> mem (choose b) b
+
+end

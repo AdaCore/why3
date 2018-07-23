@@ -2,234 +2,241 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.3" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="15" steplimit="0" memlimit="1000"/>
-<file name="../random_access_list.mlw">
-<theory name="RandomAccessList">
- <goal name="WP_parameter length_flatten" expl="VC for length_flatten">
- <transf name="split_goal_right">
-  <goal name="WP_parameter length_flatten.1" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../random_access_list.mlw" proved="true">
+<theory name="RandomAccessList" proved="true">
+ <goal name="VC length_flatten" expl="VC for length_flatten" proved="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="132"/></proof>
+ </goal>
+ <goal name="VC cons" expl="VC for cons" proved="true">
+ <proof prover="4"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="VC nth_flatten" expl="VC for nth_flatten" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC nth_flatten.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter length_flatten.2" expl="postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="VC nth_flatten.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter length_flatten.3" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  <goal name="VC nth_flatten.2" expl="postcondition" proved="true">
+  <proof prover="4" timelimit="5"><result status="valid" time="3.54"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter size" expl="VC for size">
- <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="68"/></proof>
+ <goal name="VC lookup" expl="VC for lookup" proved="true">
+ <proof prover="3"><result status="valid" time="0.34" steps="670"/></proof>
  </goal>
- <goal name="WP_parameter cons" expl="VC for cons">
- <proof prover="0"><result status="valid" time="0.03" steps="70"/></proof>
+ <goal name="VC tail" expl="VC for tail" proved="true">
+ <proof prover="4"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter nth_flatten" expl="VC for nth_flatten">
- <transf name="split_goal_right">
-  <goal name="WP_parameter nth_flatten.1" expl="postcondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="11"/></proof>
+ <goal name="VC update" expl="VC for update" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC update.0" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter nth_flatten.2" expl="variant decrease">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="21"/></proof>
+  <goal name="VC update.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter nth_flatten.3" expl="precondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="VC update.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
-  <goal name="WP_parameter nth_flatten.4" expl="postcondition">
-  <proof prover="6"><result status="valid" time="0.24"/></proof>
+  <goal name="VC update.3" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter nth_flatten.5" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <goal name="VC update.4" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter lookup" expl="VC for lookup">
- <proof prover="0"><result status="valid" time="0.47" steps="406"/></proof>
- </goal>
- <goal name="WP_parameter tail" expl="VC for tail">
- <transf name="split_goal_right">
-  <goal name="WP_parameter tail.1" expl="unreachable point">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
+  <goal name="VC update.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter tail.2" expl="postcondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="34"/></proof>
+  <goal name="VC update.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter tail.3" expl="precondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC update.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter tail.4" expl="variant decrease">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC update.8" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter tail.5" expl="precondition">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="7"/></proof>
+  <goal name="VC update.9" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="100"/></proof>
   </goal>
-  <goal name="WP_parameter tail.6" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <goal name="VC update.10" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="108"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter update" expl="VC for update">
- <transf name="split_goal_right">
-  <goal name="WP_parameter update.1" expl="unreachable point">
-  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter update.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter update.3" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
-  </goal>
-  <goal name="WP_parameter update.4" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
-  </goal>
-  <goal name="WP_parameter update.5" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter update.6" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter update.7" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter update.8" expl="unreachable point">
-  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter update.9" expl="unreachable point">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter update.10" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
-  </goal>
-  <goal name="WP_parameter update.11" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="87"/></proof>
-  </goal>
-  <goal name="WP_parameter update.12" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="58"/></proof>
-  </goal>
-  <goal name="WP_parameter update.13" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
-  </goal>
-  <goal name="WP_parameter update.14" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.11" steps="69"/></proof>
-  </goal>
-  <goal name="WP_parameter update.15" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
-  </goal>
-  <goal name="WP_parameter update.16" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter update.17" expl="assertion">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter update.17.1" expl="assertion">
-   <proof prover="0"><result status="valid" time="1.21" steps="370"/></proof>
+  <goal name="VC update.11" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC update.11.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.05" steps="59"/></proof>
    </goal>
-   <goal name="WP_parameter update.17.2" expl="assertion">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <goal name="VC update.11.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.31" steps="576"/></proof>
    </goal>
-   <goal name="WP_parameter update.17.3" expl="assertion">
-   <proof prover="4"><result status="valid" time="0.40"/></proof>
+   <goal name="VC update.11.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.90" steps="2184"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter update.18" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.58" steps="484"/></proof>
+  <goal name="VC update.12" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.28" steps="708"/></proof>
   </goal>
-  <goal name="WP_parameter update.19" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  <goal name="VC update.13" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="342"/></proof>
   </goal>
-  <goal name="WP_parameter update.20" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.12" steps="136"/></proof>
+  <goal name="VC update.14" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="137"/></proof>
   </goal>
-  <goal name="WP_parameter update.21" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="32"/></proof>
+  <goal name="VC update.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="197"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="RAL">
- <goal name="WP_parameter empty" expl="VC for empty">
- <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="4"/></proof>
+<theory name="RAL" proved="true">
+ <goal name="VC t" expl="VC for t" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter size" expl="VC for size">
- <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="1"/></proof>
+ <goal name="VC empty" expl="VC for empty" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter cons" expl="VC for cons">
- <proof prover="0" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter lookup" expl="VC for lookup">
- <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+ <goal name="VC cons" expl="VC for cons" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC lookup" expl="VC for lookup" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="RandomAccessListWithSeq">
- <goal name="WP_parameter size" expl="VC for size">
- <transf name="split_goal_right">
-  <goal name="WP_parameter size.1" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.01" steps="5"/></proof>
+<theory name="RandomAccessListWithSeq" proved="true">
+ <goal name="cons_flatten" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="cons_flatten.0" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter size.2" expl="variant decrease">
-  <proof prover="8"><result status="valid" time="0.02" steps="17"/></proof>
+  <goal name="cons_flatten.1" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter size.3" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="8"/></proof>
+  <goal name="cons_flatten.2" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="69"/></proof>
   </goal>
-  <goal name="WP_parameter size.4" expl="variant decrease">
-  <proof prover="8"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="cons_flatten.3" proved="true">
+  <proof prover="3"><result status="valid" time="0.46" steps="492"/></proof>
   </goal>
-  <goal name="WP_parameter size.5" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="15"/></proof>
+  <goal name="cons_flatten.4" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="WP_parameter cons" expl="VC for cons">
- <transf name="split_goal_right">
-  <goal name="WP_parameter cons.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.3" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter cons.4" expl="postcondition">
-  <proof prover="0"><result status="valid" time="1.27" steps="280"/></proof>
+  <goal name="cons_flatten.5" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter lookup" expl="VC for lookup">
- <proof prover="0"><result status="valid" time="0.44" steps="402"/></proof>
+ <goal name="VC size" expl="VC for size" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="91"/></proof>
  </goal>
- <goal name="WP_parameter tail" expl="VC for tail">
- <transf name="split_goal_right">
-  <goal name="WP_parameter tail.1" expl="unreachable point">
-  <proof prover="8"><result status="valid" time="0.03" steps="4"/></proof>
+ <goal name="VC cons" expl="VC for cons" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="171"/></proof>
+ </goal>
+ <goal name="VC lookup" expl="VC for lookup" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC lookup.0" expl="unreachable point" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter tail.2" expl="postcondition">
-  <proof prover="8"><result status="valid" time="0.04" steps="68"/></proof>
+  <goal name="VC lookup.1" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter tail.3" expl="precondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="16"/></proof>
+  <goal name="VC lookup.2" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter tail.4" expl="variant decrease">
-  <proof prover="8"><result status="valid" time="0.03" steps="25"/></proof>
+  <goal name="VC lookup.3" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter tail.5" expl="precondition">
-  <proof prover="8"><result status="valid" time="0.02" steps="5"/></proof>
+  <goal name="VC lookup.4" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter tail.6" expl="postcondition">
-  <proof prover="8"><result status="valid" time="5.55" steps="526"/></proof>
+  <goal name="VC lookup.5" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="38"/></proof>
+  </goal>
+  <goal name="VC lookup.6" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC lookup.7" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC lookup.7.0" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="11"/></proof>
+   </goal>
+   <goal name="VC lookup.7.1" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="27"/></proof>
+   </goal>
+   <goal name="VC lookup.7.2" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="96"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter fupdate" expl="VC for fupdate">
- <proof prover="0"><result status="valid" time="3.27" steps="1188"/></proof>
+ <goal name="VC tail" expl="VC for tail" proved="true">
+ <proof prover="3"><result status="valid" time="0.30" steps="724"/></proof>
  </goal>
- <goal name="WP_parameter update" expl="VC for update">
- <proof prover="8" timelimit="5"><result status="valid" time="0.02" steps="16"/></proof>
+ <goal name="VC aux" expl="VC for aux" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+ <goal name="VC fupdate" expl="VC for fupdate" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC fupdate.0" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="VC fupdate.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC fupdate.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="VC fupdate.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC fupdate.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="42"/></proof>
+  </goal>
+  <goal name="VC fupdate.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="VC fupdate.6" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC fupdate.6.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.30" steps="267"/></proof>
+   </goal>
+   <goal name="VC fupdate.6.1" expl="VC for fupdate" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="1.93" steps="1536"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC fupdate.7" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC fupdate.7.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.03" steps="115"/></proof>
+   </goal>
+   <goal name="VC fupdate.7.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.06" steps="207"/></proof>
+   </goal>
+   <goal name="VC fupdate.7.2" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.09" steps="266"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC f" expl="VC for f" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC update" expl="VC for update" proved="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
 </file>

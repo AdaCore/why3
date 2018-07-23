@@ -1,0 +1,12 @@
+use int.Int
+use ref.Ref
+
+let rec test (m n: ref int) : unit
+  variant   { !m }
+  requires  { !m >= 0 }
+  ensures   { !m = 0 /\ !n = !(old m) + !(old n) }
+= if !m > 0 then begin
+    m := !m - 1;
+    test m n;
+    n := !n + 1
+  end

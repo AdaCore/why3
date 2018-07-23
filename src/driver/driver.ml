@@ -30,6 +30,7 @@ type driver = {
   drv_transform   : string list;
   drv_prelude     : prelude;
   drv_thprelude   : prelude_map;
+  drv_thuse       : (theory * theory) Mid.t;
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_res_parser  : prover_result_parser;
@@ -118,6 +119,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   let thprelude     = ref Mid.empty in
   let meta          = ref Mid.empty in
   let qualid        = ref [] in
+  let thuse         = ref Mid.empty in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
@@ -138,34 +140,43 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     let s = try snd (Mid.find th.th_name !m) with Not_found -> Stdecl.empty in
     m := Mid.add th.th_name (th, Stdecl.add td s) !m
   in
-  let add_local th = function
+  (* th_uc is the theory built with the uses forced by the driver *)
+  let add_local th th_uc = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
-        thprelude := Mid.add th.th_name (s::l) !thprelude
+        thprelude := Mid.add th.th_name (s::l) !thprelude;
+        th_uc
     | Rsyntaxts (q,s,b) ->
         let td = syntax_type (find_ts th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rsyntaxfs (q,s,b) ->
         let td = syntax_logic (find_fs th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rsyntaxps (q,s,b) ->
         let td = syntax_logic (find_ps th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rremoveall ->
       let it key _ = match (Mid.find key th.th_known).d_node with
         | Dprop (_,symb,_) -> add_meta th (remove_prop symb) meta
         | _ -> ()
       in
-      Mid.iter it th.th_local
+      Mid.iter it th.th_local;
+      th_uc
     | Rconverter (q,s,b) ->
         let cs = syntax_converter (find_ls th q) s b in
-        add_meta th cs meta
+        add_meta th cs meta;
+        th_uc
     | Rliteral (q,s,b) ->
         let cs = syntax_literal (find_ts th q) s b in
-        add_meta th cs meta
+        add_meta th cs meta;
+        th_uc
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
@@ -190,14 +201,22 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
         in
         let m = lookup_meta s in
         let td = create_meta m (List.map convert al) in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
+    | Ruse (loc,q) ->
+      let file, th = Lists.chop_last q in
+      let th = Loc.try3 ~loc Env.read_theory env file th in
+      Theory.use_export th_uc th
   in
-  let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
+  let add_local th th_uc (loc,rule) = Loc.try2 ~loc add_local th th_uc rule in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
-    let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
+    let f,id = Lists.chop_last q in
     let th = Loc.try3 ~loc Env.read_theory env f id in
+    let th_uc = Theory.create_theory (Ident.id_fresh ~loc ("driver export for "^th.th_name.id_string)) in
     qualid := q;
-    List.iter (add_local th) trl
+    let th_uc' = List.fold_left (add_local th) th_uc trl in
+    if th_uc != th_uc' then
+      thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
   List.iter (fun f -> List.iter add_theory (load_file f).f_rules) extra_files;
@@ -220,6 +239,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
       prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
     drv_tag         = !driver_tag;
+    drv_thuse       = !thuse;
   }
 
 let syntax_map drv =
@@ -275,15 +295,35 @@ let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
 exception NoPrinter
 
 let update_task = let ht = Hint.create 5 in fun drv ->
-  let update task0 =
-    Mid.fold (fun _ (th,s) task ->
-      Task.on_theory th (fun task sm ->
-        Stdecl.fold (fun tdm task ->
-          add_tdecl task (clone_meta tdm sm)
-        ) s task
-      ) task task0
-    ) drv.drv_meta task0
-  in
+    let update task0 =
+      (** add requested theorie *)
+      let task0 = Mid.fold (fun _ (th,th') task ->
+          let tdcs = (Task.find_clone_tds task0 th).tds_set in
+          Stdecl.fold (fun tdc task -> match tdc.td_node with
+              | Use _ -> Task.use_export task th'
+              | Clone (_,_) ->
+                  (** We do nothing in case of clone *)
+                  task
+              | _ -> assert false
+            ) tdcs task
+        ) drv.drv_thuse task0
+      in
+      (** apply metas *)
+      let task0 = Mid.fold (fun _ (th,tdms) task ->
+          let tdcs = (Task.find_clone_tds task0 th).tds_set in
+          Stdecl.fold (fun tdc task ->
+              Stdecl.fold (fun tdm task -> match tdc.td_node with
+                  | Use _ -> add_tdecl task tdm
+                  | Clone (_,sm) ->
+                      let tdm = Theory.clone_meta tdm th sm in
+                      Opt.fold add_tdecl task tdm
+                  | _ -> assert false
+                ) tdms task
+            ) tdcs task
+        ) drv.drv_meta task0
+      in
+      task0
+    in
   function
   | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as goal;
           task_prev = task} ->
@@ -293,7 +333,7 @@ let update_task = let ht = Hint.create 5 in fun drv ->
         Hint.add ht drv.drv_tag upd; upd in
       let task = Trans.apply update task in
       add_tdecl task goal
-  | task -> update task
+    | task -> update task
 
 let prepare_task drv task =
   let lookup_transform t =

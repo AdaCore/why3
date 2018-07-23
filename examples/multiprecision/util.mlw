@@ -1,0 +1,98 @@
+module Util
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+
+  let wmpn_copyi (r x:t) (sz:int32) : unit
+    requires { valid x sz }
+    requires { valid r sz }
+    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+  =
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let i = ref zero in
+    let xp = ref (C.incr x zero) in
+    let rp = ref (C.incr r zero) in
+    while (Int32.(<) !i sz) do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= !i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset !i }
+      invariant { pelts !xp = pelts x }
+      invariant { pelts !rp = pelts r }
+      invariant { !xp.min = min x }
+      invariant { !xp.max = x.max }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { !xp.offset = x.offset + !i }
+      invariant { !rp.offset = r.offset + !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+                  (pelts r)[j] = old (pelts r)[j] }
+      C.set !rp (C.get !xp);
+      rp.contents <- C.incr !rp one;
+      xp.contents <- C.incr !xp one;
+      i := Int32.(+) !i one;
+    done
+
+   (* `wmpn_zero_p` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)
+   let wmpn_zero_p (x:t) (sz:int32) : int32
+     requires { valid x sz }
+     ensures { 0 <= Int32.to_int result <= 1 }
+     ensures { Int32.to_int result = 1 <-> value x sz = 0 }
+   =
+     let i = ref sz in
+     let uzero = Limb.of_int 0 in
+     let lx = ref uzero in
+     try
+       while Int32.(>=) !i (Int32.of_int 1) do
+         variant { p2i !i }
+         invariant { 0 <= !i <= sz }
+         invariant { value_sub (pelts x) (x.offset + !i) (x.offset + sz)=0 }
+         let ghost k = p2i !i in
+         i := Int32.(-) !i (Int32.of_int 1);
+         assert { 0 <= !i < sz };
+         lx := get_ofs x !i;
+         if not (Limb.(=) !lx uzero)
+         then begin
+           value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
+           value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
+           value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
+           raise Return32 (Int32.of_int 0);
+         end
+         else begin
+           assert { 1+2=3 };
+         end
+       done;
+       Int32.of_int 1
+     with Return32 r -> r
+     end
+
+  (** `wmpn_zero r sz` sets `(r,sz)` to zero. Corresponds to `mpn_zero`. *)
+  let wmpn_zero (r:t) (sz:int32) : unit
+    requires { valid r sz }
+    ensures { value r sz = 0 }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+  =
+    let i = ref (Int32.of_int 0) in
+    let lzero = Limb.of_int 0 in
+    while Int32.(<) !i sz do
+      invariant { 0 <= !i <= sz }
+      variant { sz - !i }
+      invariant { value r !i = 0 }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      set_ofs r !i lzero;
+      value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
+      i := Int32.(+) !i (Int32.of_int 1);
+    done
+
+end

@@ -1,8 +1,8 @@
 
 module LocalFunctions
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (* local function (f) accessing a local reference (x) *)
   let test1 () =
@@ -17,9 +17,3 @@ module LocalFunctions
   let rec test2 () ensures { !r = 0 } = r := 0
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../../.. bench/programs/good/scopes"
-End:
-*)

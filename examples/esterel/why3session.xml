@@ -2,67 +2,73 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="4" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="7" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../esterel.mlw" proved="true">
 <theory name="Esterel" proved="true">
- <goal name="WP_parameter union" expl="VC for union" proved="true">
- <proof prover="1"><result status="valid" time="0.16" steps="220"/></proof>
+ <goal name="VC s" expl="VC for s" proved="true">
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter intersection" expl="VC for intersection" proved="true">
- <proof prover="1"><result status="valid" time="0.18" steps="198"/></proof>
+ <goal name="VC union" expl="VC for union" proved="true">
+ <proof prover="6"><result status="valid" time="0.16" steps="221"/></proof>
  </goal>
- <goal name="WP_parameter aboveMin" expl="VC for aboveMin" proved="true">
+ <goal name="VC intersection" expl="VC for intersection" proved="true">
+ <proof prover="6"><result status="valid" time="0.18" steps="189"/></proof>
+ </goal>
+ <goal name="VC aboveMin" expl="VC for aboveMin" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter aboveMin.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.15" steps="225"/></proof>
+  <goal name="VC aboveMin.0" expl="precondition" proved="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.22"/></proof>
-  <proof prover="3"><result status="valid" time="0.72"/></proof>
+  <goal name="VC aboveMin.1" expl="assertion" proved="true">
+  <proof prover="6"><result status="valid" time="0.15" steps="307"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.2" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.42"/></proof>
+  <goal name="VC aboveMin.2" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.31"/></proof>
+  <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.3" expl="type invariant" proved="true">
-  <proof prover="1"><result status="valid" time="0.30" steps="336"/></proof>
+  <goal name="VC aboveMin.3" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.19"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <goal name="VC aboveMin.4" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.59" steps="1099"/></proof>
+  </goal>
+  <goal name="VC aboveMin.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="77"/></proof>
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter maxUnion" expl="VC for maxUnion" proved="true">
+ <goal name="VC maxUnion" expl="VC for maxUnion" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="WP_parameter maxUnion.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.01" steps="72"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <goal name="VC maxUnion.0" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="72"/></proof>
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="73"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="VC maxUnion.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="73"/></proof>
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.2" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.13"/></proof>
-  <proof prover="3"><result status="valid" time="0.33"/></proof>
+  <goal name="VC maxUnion.2" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.40"/></proof>
+  <proof prover="7"><result status="valid" time="0.25"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.14"/></proof>
-  <proof prover="1"><result status="valid" time="1.27" steps="1464"/></proof>
+  <goal name="VC maxUnion.3" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.42" steps="1044"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.4" expl="postcondition" proved="true">
+  <goal name="VC maxUnion.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="WP_parameter maxUnion.4.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   <goal name="VC maxUnion.4.0" expl="postcondition" proved="true">
+   <proof prover="7"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter maxUnion.4.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.16"/></proof>
-   <proof prover="1"><result status="valid" time="0.23" steps="388"/></proof>
+   <goal name="VC maxUnion.4.1" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.28" steps="607"/></proof>
+   <proof prover="7"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>

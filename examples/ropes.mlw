@@ -16,7 +16,7 @@
 
 module String
 
-  use import int.Int
+  use int.Int
 
   type char
   constant dummy_char: char
@@ -24,19 +24,15 @@ module String
   type string
 
   (* axiomatized function length *)
-  function length string: int
-  axiom length_nonnegative: forall s: string. length s >= 0
-
-  function ([]) string int: char (* access to i-th char *)
+  val function length string: int
+    ensures { 0 <= result }
 
   (* string access routine *)
-  val ([]) (s: string) (i:int) : char
+  val function ([]) (s: string) (i:int) : char
     requires { 0 <= i < s.length }
-    ensures  { result = s[i] }
 
-  constant empty: string
-  axiom empty_def: length empty = 0
-
+  val constant empty: string
+    ensures { length result = 0 }
 
   (* extensional equality for strings *)
   predicate (==) (s1 s2: string) =
@@ -88,7 +84,7 @@ end
 
 module Sig
 
-  use import int.Int
+  use int.Int
   use import String as S
 
   type rope
@@ -130,7 +126,7 @@ end
 
 module Rope (* : Sig *)
 
-  use import int.Int
+  use int.Int
   use import String as S
 
   (* ***** Logical description of rope type **** *)
@@ -139,11 +135,12 @@ module Rope (* : Sig *)
     | Str string int  int  (* Str s ofs len is s[ofs..ofs+len[ *)
     | App rope   rope int  (* concatenation and total length   *)
 
-  function length (r: rope) : int = match r with
+  let function length (r: rope) : int =
+    match r with
     | Emp         -> 0
     | Str _ _ len -> len
     | App _ _ len -> len
-  end
+    end
 
   (* invariant predicate for ropes *)
   predicate inv (r: rope) = match r with
@@ -181,7 +178,7 @@ module Rope (* : Sig *)
   let is_empty (r: rope) : bool
     requires { inv r }
     ensures  { result <-> string r == empty }
-  = r = Emp
+  = match r with Emp -> true | _ -> false end
 
   (* string conversion into a rope *)
   let of_string (s: string) : rope
@@ -239,46 +236,47 @@ end
 
 module Balance
 
-  use import String
+  use String
   use import Rope as R
-  use import int.Int
-  use import int.Fibonacci
-  use import int.MinMax
-  use import array.Array
-  use import ref.Ref
+  use int.Int
+  use int.Fibonacci
+  use int.MinMax
+  use array.Array
+  use ref.Ref
 
   (** we assume that any rope length is smaller than fib (max+1) *)
-  constant max : int (* e.g. = 100 *)
-  axiom max_at_least_2: 2 <= max
+  val constant max : int (* e.g. = 100 *)
+    ensures { 2 <= result }
 
-  function string_of_array (q: Array.array rope) (l u: int) : string
-    (** q[u-1] + q[u-2] + ... + q[l] *)
+  function string_of_array (q: array rope) (l u: int) : string
+    (** `q[u-1] + q[u-2] + ... + q[l]` *)
 
   axiom string_of_array_empty:
-    forall q: Array.array rope, l: int.
+    forall q: array rope, l: int.
     0 <= l <= length q -> string_of_array q l l == S.empty
+
   axiom string_of_array_concat_left:
-    forall q: Array.array rope, l u: int. 0 <= l < u <= Array.length q ->
+    forall q: array rope, l u: int. 0 <= l < u <= Array.length q ->
     string_of_array q l u ==
       S.app (string_of_array q (l+1) u) (string q[l])
 
 
   let rec lemma string_of_array_concat
-    (q: Array.array rope) (l mid u: int) : unit
+    (q: array rope) (l mid u: int) : unit
     requires { 0 <= l <= mid <= u <= Array.length q }
     ensures  { string_of_array q l u ==
       S.app (string_of_array q mid u) (string_of_array q l mid) }
     = variant { mid - l } if l < mid then string_of_array_concat q (l+1) mid u
 
   let rec lemma string_of_array_concat_right
-    (q: Array.array rope) (l u: int)
+    (q: array rope) (l u: int)
     requires { 0 <= l < u <= Array.length q }
     ensures { string_of_array q l u ==
                 S.app (string q[u-1]) (string_of_array q l (u-1)) }
     = variant { u -l } if l < u-1 then string_of_array_concat_right q (l+1) u
 
   let lemma string_of_array_length
-    (q: Array.array rope) (l u i: int)
+    (q: array rope) (l u i: int)
     requires { 0 <= l <= i < u <= Array.length q }
     requires { forall j: int. l <= j < u -> inv q[j] }
     ensures  { S.length (string_of_array q l u) >= S.length (string q[i]) }
@@ -288,28 +286,28 @@ module Balance
                S.app (string_of_array q (i+1) u) (string_of_array q l (i+1)) }
 
   let rec lemma string_of_array_eq
-    (q1 q2: Array.array rope) (l u: int)
+    (q1 q2: array rope) (l u: int)
     requires { 0 <= l <= u <= Array.length q1 = Array.length q2 }
     requires { forall j: int. l <= j < u -> q1[j] = q2[j] }
     ensures  { string_of_array q1 l u == string_of_array q2 l u }
     = variant { u - l } if l < u then string_of_array_eq q1 q2 (l+1) u
 
   lemma string_of_array_frame:
-    forall q: Array.array rope, l u: int. 0 <= l <= u <= Array.length q ->
+    forall q: array rope, l u: int. 0 <= l <= u <= Array.length q ->
     forall i: int, r: rope. (0 <= i < l \/ u <= i < Array.length q) ->
     string_of_array q l u == string_of_array q[i <- r] l u
 
   let rec lemma string_of_array_concat_empty
-    (q: Array.array rope) (l u: int)
+    (q: array rope) (l u: int)
     requires { 0 <= l <= u <= Array.length q }
     requires { forall j: int. l <= j < u -> q[j] = Emp }
     ensures  { string_of_array q l u == S.empty }
     = variant { u - l } if l < u then string_of_array_concat_empty q (l+1) u
 
-  function string_of_queue (q: Array.array rope) : string =
+  function string_of_queue (q: array rope) : string =
     string_of_array q 2 (Array.length q)
 
-  let rec insert (q: Array.array rope) (i: int) (r: rope) : unit
+  let rec insert (q: array rope) (i: int) (r: rope) : unit
     requires { 2 <= i < length q = max+1 }
     requires { inv r }
     requires { forall j: int. 2 <= j <= max -> inv q[j] }
@@ -320,18 +318,17 @@ module Balance
     ensures  { string_of_array q i (max+1) ==
                  S.app (string_of_array (old q) i (max+1)) (string r) }
     variant  { max - i }
-  = 'L:
-    let r' = concat q[i] r in
+  = let r' = concat q[i] r in
     if R.length r' < fib (i+1) then begin
       q[i] <- r';
-      assert {    string_of_array q         (i+1) (max+1)
-               == string_of_array (at q 'L) (i+1) (max+1) }
+      assert {    string_of_array q       (i+1) (max+1)
+               == string_of_array (old q) (i+1) (max+1) }
     end else begin
       q[i] <- Emp;
-      assert {    string_of_array q         i     (max+1)
-               == string_of_array (at q 'L) (i+1) (max+1) };
-      assert {   S.app (string_of_array q         i (max+1)) (string r')
-              == S.app (string_of_array (at q 'L) i (max+1)) (string r) };
+      assert {    string_of_array q       i     (max+1)
+               == string_of_array (old q) (i+1) (max+1) };
+      assert {   S.app (string_of_array q       i (max+1)) (string r')
+              == S.app (string_of_array (old q) i (max+1)) (string r) };
       insert q (i+1) r';
       assert { string_of_array q i (max+1) == string_of_array q (i+1) (max+1) }
     end

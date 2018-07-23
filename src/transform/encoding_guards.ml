@@ -63,20 +63,20 @@ let rec expl_term info svs sign t = match t.t_node with
       let tl = List.map (expl_term info svs sign) tl in
       let add _ ty tl = term_of_ty info.varm ty :: tl in
       let tl = Mtv.fold add tv_to_ty tl in
-      t_label_copy t (t_app (ls_extend ls) tl t.t_ty)
+      t_attr_copy t (t_app (ls_extend ls) tl t.t_ty)
   | Tapp (ls,[t1;t2])
     when (not info.polar || sign) && ls_equal ls ps_equ ->
       svs := collect (collect !svs t1) t2;
       let t1 = expl_term info svs sign t1 in
       let t2 = expl_term info svs sign t2 in
-      t_label_copy t (t_equ t1 t2)
+      t_attr_copy t (t_equ t1 t2)
   | Tlet (t1, b) ->
       let s = collect Svs.empty t1 in
       let u,t2,close = t_open_bound_cb b in
       let t1 = expl_term info svs sign t1 in
       let t2 = expl_term info svs sign t2 in
       if Svs.mem u !svs then svs := Svs.union s (Svs.remove u !svs);
-      t_label_copy t (t_let t1 (close u t2))
+      t_attr_copy t (t_let t1 (close u t2))
   | Tquant (q, b) ->
       let vl,tl,f1,close = t_open_quant_cb b in
       let tl = tr_map (expl_term info svs sign) tl in
@@ -91,12 +91,12 @@ let rec expl_term info svs sign t = match t.t_node with
         let g = expl_term info svs sign g in
         (if q = Tforall then t_implies else t_and) g f in
       let f1 = List.fold_right guard vl f1 in
-      t_label_copy t (t_quant q (close vl tl f1))
+      t_attr_copy t (t_quant q (close vl tl f1))
   | Tif (f1,t1,t2) when t.t_ty <> None ->
       let f1 = expl_term { info with polar = false } svs sign f1 in
       let t1 = expl_term info svs sign t1 in
       let t2 = expl_term info svs sign t2 in
-      t_label_copy t (t_if f1 t1 t2)
+      t_attr_copy t (t_if f1 t1 t2)
   | _ ->
       t_map_sign (expl_term info svs) sign t
 

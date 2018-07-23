@@ -3,25 +3,36 @@
 \label{sec:install}
 %HEVEA\cutname{install.html}
 
-In short, installation proceeds as follows.
-\begin{flushleft}\ttfamily
-  ./configure\\
-  make\\
-  make install \mbox{\rmfamily (as super-user)}
-\end{flushleft}
+\section{Installing Why3}
 
-\section{Installation Instructions from Source Distribution}
+\subsection{Installation via \opam}
+
+The simplest way to install Why3 is via \opam, the OCaml
+package manager. It is as simple as
+\begin{verbatim}
+> opam install why3
+\end{verbatim}
+Then jump to Section~\ref{provers} to install external provers.
+
+\subsection{Installation Instructions from Source Distribution}
+
+In short, installation from sources proceeds as follows.
+\begin{flushleft}\ttfamily
+  > ./configure\\
+  > make\\
+  > make install \mbox{\rmfamily (as super-user)}
+\end{flushleft}
 
 After unpacking the distribution, go to the newly created directory
 \texttt{why3-\whyversion}. Compilation must start with a
-configuration phase which is run as 
+configuration phase which is run as
 \begin{verbatim}
-./configure
+> ./configure
 \end{verbatim}
 This analyzes your current configuration and checks if requirements hold.
 Compilation requires:
 \begin{itemize}
-\item The Objective Caml compiler, version 3.11.2 or higher. It is
+\item The Objective Caml compiler. It is
   available as a binary package for most Unix distributions. For
   Debian-based Linux distributions, you can install the packages
 \begin{verbatim}
@@ -44,23 +55,23 @@ liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 It is also installable from sources, available from the site
 \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item For \texttt{why3 bench}, the OCaml bindings of the sqlite3 library
-are needed.
-For Debian-based Linux distributions, you can install the package
-\begin{verbatim}
-libsqlite3-ocaml-dev
-\end{verbatim}
-It is also installable from sources, available from the site
-\url{http://ocaml.info/home/ocaml_sources.html#ocaml-sqlite3}
+% \item For \texttt{why3 bench}, the OCaml bindings of the sqlite3 library
+% are needed.
+% For Debian-based Linux distributions, you can install the package
+% \begin{verbatim}
+% libsqlite3-ocaml-dev
+% \end{verbatim}
+% It is also installable from sources, available from the site
+% \url{http://ocaml.info/home/ocaml_sources.html#ocaml-sqlite3}
 \end{itemize}
 
 
-If you want to use the specific Coq features, \ie the Coq tactic
-(Section~\ref{sec:coqtactic}) and Coq realizations
+If you want to use the Coq realizations
 (Section~\ref{sec:realizations}), then Coq has to be installed before
 \why. Look at the summary printed at the end of the configuration
-script to check if Coq has been detected properly. Similarly, for
-using PVS (Section~\ref{sec:pvs}) or Isabelle (Section~\ref{sec:isabelle}) to discharge proofs, PVS and Isabelle must be
+script to check if Coq has been detected properly. Similarly, in order to
+use PVS (Section~\ref{sec:pvs}) or Isabelle (Section~\ref{sec:isabelle})
+to discharge proofs, PVS and Isabelle must be
 installed before \why. You should check that those proof assistants
 are correctly detected by the configure script.
 
@@ -74,26 +85,21 @@ make install
 \end{verbatim}
 Installation can be tested as follows:
 \begin{enumerate}
-\item install some external provers (see~Section~\ref{provers} below)
+\item install some external provers (see Section~\ref{provers} below)
 \item run \verb|why3 config --detect|
 \item run some examples from the distribution, \eg you should
-obtain the following:
+obtain the following (provided the required provers are installed on
+your machine):
 \begin{verbatim}
 $ cd examples
 $ why3 replay logic/scottish-private-club
-Opening session... done
-Progress: 4/4
- 1/1
-Everything OK.
-$ why3 replay programs/same_fringe
-Opening session... done
-Progress: 12/12
- 3/3
-Everything OK.
+ 1/1 (replay OK)
+$ why3 replay same_fringe
+ 18/18 (replay OK)
 \end{verbatim}
 \end{enumerate}
 
-\section{Local Use, Without Installation}
+\subsubsection{Local Use, Without Installation}
 
 It is not mandatory to install \why into system directories.
 \why can be configured and compiled for local use as follows:
@@ -104,7 +110,7 @@ make
 The \why executables are then available in the subdirectory
 \texttt{bin/}. This directory can be added in your \texttt{PATH}.
 
-\section{Installation of the \why API}
+\subsubsection{Installation of the \why API}
 \label{sec:installlib}\index{API}
 
 By default, the \why API is not installed. It can be installed using
@@ -113,76 +119,77 @@ make byte opt \\
 make install-lib \mbox{\rmfamily (as super-user)}
 \end{flushleft}
 
-\section{Installation of External Provers}
+\section{Installing External Provers}
 \label{provers}
 
 \why can use a wide range of external theorem provers. These need to
 be installed separately, and then \why needs to be configured to use
 them. There is no need to install automatic provers, \eg SMT solvers,
 before compiling and installing \why.
-
 For installation of external provers, please refer to the specific
-section about provers on the Web page \url{http://why3.lri.fr/}.
+section about provers from \url{http://why3.lri.fr/}.
+(If you have installed \why via \opam, note that you can install the
+SMT solver Alt-Ergo via \opam as well.)
 
-For configuring \why to use the provers, follow instructions given in
-Section~\ref{sec:why3config}.
+Once you have installed a prover, or a new version of a prover, you
+have to run the following command:
+\begin{verbatim}
+> why3 config --detect
+\end{verbatim}
+It scans your \texttt{PATH} for provers and updates your configuration
+file (see Section~\ref{sec:why3config}) accordingly.
 
-\section{Multiple Versions of the Same Prover}
+\subsection{Multiple Versions of the Same Prover}
 
 \why is able to use several versions of the same
-prover, \eg it can use both CVC3 2.2 and CVC3 2.4.1 at the same time.
+prover, \eg it can use both CVC4 1.4 and CVC4 1.5 at the same time.
 The automatic detection of provers looks for typical names for their
-executable command, \eg \texttt{cvc3} for CVC3. However, if you
-install several version of the same prover it is likely that you would
-use specialized executable names, such as \texttt{cvc3-2.2} or
-\texttt{cvc3-2.4.1}. To allow the \why detection process to recognize
-these, you can use the option \verb|--add-prover| with the
-\texttt{config} command, \eg
+executable command, \eg \texttt{cvc4} for CVC3. However, if you
+install several versions of the same prover it is likely that you would
+use specialized executable names, such as \texttt{cvc4-1.4} or
+\texttt{cvc4-1.5}. If needed, option \verb|--add-prover| can be
+added to the \texttt{config} command to specify names of prover executables, \eg
 \index{add-prover@\verb+--add-prover+}
 \begin{verbatim}
-why3 config --detect --add-prover cvc3-2.4 /usr/local/bin/cvc3-2.4.1
+why3 config --add-prover cvc4 /usr/local/bin/cvc4-dev
 \end{verbatim}
-the first argument (here \verb|cvc3-2.4|) must be one of the class of
+the first argument (here \verb|cvc4|) must be one of the class of
 provers known in the file \verb|provers-detection-data.conf| typically
 located in \verb|/usr/local/share/why3| after installation. See
 Appendix~\ref{sec:proverdetecttiondata} for details.
 
 
-\section{Session Update after Prover Upgrade}
+\subsection{Session Update after Prover Upgrade}
 \label{sec:uninstalledprovers}
 
-If you happen to upgrade a prover, \eg installing CVC3 2.4.1 in place
-of CVC3 2.2, then the proof sessions formerly recorded will still
+If you happen to upgrade a prover, \eg installing CVC4 1.5 in place
+of CVC4 1.4, then the proof sessions formerly recorded will still
 refer to the old version of the prover. If you open one such a session
-with the GUI, and replay the proofs, you will be asked to choose
-between 3 options:
+with the GUI, and replay the proofs, a popup window will show up for asking you to choose
+between three options:
 \begin{itemize}
-\item Keep the former proofs as they are. They will be marked as
-  ``archived''.
-\item Upgrade the former proofs to an installed prover (typically a
+\item Keep the former proof attempts as they are, with the old prover version. They will not be replayed.
+\item Upgrade the former proof attempts to an installed prover (typically a
   upgraded version). The corresponding proof attempts will become
   attached to this new prover, and marked as obsolete,
-  to make their replay mandatory.
+  to make their replay mandatory. Note that you need to invoke again the replay command to replay those proof attempts.
 \item Copy the former proofs to an installed prover. This is a
   combination of the actions above: each proof attempt is duplicated,
-  one with the former prover marked as archived, and one for the new
-  prover marked as obsolete.
+  one with the former prover version, and one for the new
+  version marked as obsolete.
 \end{itemize}
 
 Notice that if the prover under consideration is an interactive one, then
 the copy option will duplicate also the edited proof scripts, whereas
-the upgrade-without-archive option will just reuse the former proof scripts.
+the upgrade-without-copy option will just reuse the former proof scripts.
 
 Your choice between the three options above will be recorded, one for
 each prover, in the \why configuration file. Within the GUI, you can
-discard these choices via the \textsf{Preferences} dialog.
+discard these choices via the \textsf{Preferences} dialog: just click on one choice to remove it.
 
 Outside the GUI, the prover upgrades are handled as follows. The
-\texttt{replay} command will just ignore proof attempts marked as
-archived\index{archived}.
-Conversely, a non-archived proof attempt with a non-existent
-prover will be reported as a replay failure. The
-\texttt{session} command performs move or copy operations on
+\texttt{replay} command will take into account any prover upgrade policy stored in the configuration.
+The \texttt{session} command performs move or copy operations on
 proof attempts in a fine-grained way, using filters, as detailed in
 Section~\ref{sec:why3session}.
 

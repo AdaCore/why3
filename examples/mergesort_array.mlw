@@ -13,11 +13,13 @@ module Elt
 
   type elt
 
-  predicate le elt elt
+  val predicate le elt elt
 
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
 
-  clone export array.Sorted with type elt = elt, predicate le = le
+  clone export array.Sorted with type
+    elt = elt, predicate le = le, axiom .
 
 end
 
@@ -30,10 +32,10 @@ end
 
 module Merge
 
-  clone export Elt
+  clone export Elt with axiom .
   use export ref.Refint
   use export array.Array
-  use import map.Occ
+  use map.Occ
   use export array.ArrayPermut
 
   (* merges tmp[l..m[ and tmp[m..r[ into a[l..r[ *)
@@ -45,8 +47,7 @@ module Merge
     ensures  { permut tmp a l r }
     ensures  { forall i: int.
                (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
-  = 'L:
-    let i = ref l in
+  = let i = ref l in
     let j = ref m in
     for k = l to r-1 do
       invariant { l <= !i <= m <= !j <= r }
@@ -57,7 +58,7 @@ module Merge
       invariant { forall v: elt.
                   occ v tmp.elts l !i + occ v tmp.elts m !j = occ v a.elts l k }
       invariant { forall i: int.
-                  (0 <= i < l \/ r <= i < length a) -> a[i] = (at a 'L)[i] }
+                  (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
       if !i < m && (!j = r || le tmp[!i] tmp[!j]) then begin
         a[k] <- tmp[!i];
         incr i
@@ -81,10 +82,10 @@ module Merge
         assert { forall i1 i2: int. l <= i1 < m -> m <= i2 < r ->
                  le a[i1] a[m-1] && le a[m] a[i2] }
       else begin
-        'N:
+        label N in
         blit a l tmp l (r - l);
         merge tmp a l m r;
-        assert { permut_sub (at a 'N) a l r }
+        assert { permut_sub (a at N) a l r }
       end
 
 end
@@ -95,25 +96,23 @@ end
 
 module TopDownMergesort
 
-  clone import Merge
-  use import mach.int.Int
+  clone Merge with axiom .
+  use mach.int.Int
 
   let rec mergesort_rec (a tmp: array elt) (l r: int) : unit
     requires { 0 <= l <= r <= length a = length tmp }
     ensures { sorted_sub a l r }
     ensures { permut_sub (old a) a l r }
     variant { r - l }
-  = 'L:
-    if l < r-1 then begin
-      let m = l + (r - l) / 2 in
-      assert { l <= m < r };
-      mergesort_rec a tmp l m;
-      assert { permut_sub (at a 'L) a l r };
-      'M:
-      mergesort_rec a tmp m r;
-      assert { permut_sub (at a 'M) a l r };
-      merge_using tmp a l m r;
-    end
+  = if l >= r-1 then return;
+    let m = l + (r - l) / 2 in
+    assert { l <= m < r };
+    mergesort_rec a tmp l m;
+    assert { permut_sub (old a) a l r };
+    label M in
+    mergesort_rec a tmp m r;
+    assert { permut_sub (a at M) a l r };
+    merge_using tmp a l m r
 
   let mergesort (a: array elt) : unit
     ensures { sorted a }
@@ -134,29 +133,28 @@ end
 
 module BottomUpMergesort
 
-  clone import Merge
-  use import mach.int.Int
-  use import int.MinMax
+  clone Merge with axiom .
+  use mach.int.Int
+  use int.MinMax
 
   let bottom_up_mergesort (a: array elt) : unit
     ensures { sorted a }
     ensures { permut_all (old a) a }
-  = 'I:
-    let n = length a in
+  = let n = length a in
     let tmp = Array.copy a in
     let len = ref 1 in
     while !len < n do
       invariant { 1 <= !len }
-      invariant { permut_all (at a 'I) a }
+      invariant { permut_all (old a) a }
       invariant { forall k: int. let l = k * !len in
                   0 <= l < n -> sorted_sub a l (min n (l + !len)) }
       variant   { 2 * n - !len }
-      'L:
+      label L in
       let lo = ref 0 in
       let ghost i = ref 0 in
       while !lo < n - !len do
         invariant { 0 <= !lo /\ !lo = 2 * !i * !len }
-        invariant { permut_all (at a 'L) a }
+        invariant { permut_all (a at L) a }
         invariant { forall k: int. let l = k * !len in
                     !lo <= l < n -> sorted_sub a l (min n (l + !len)) }
         invariant { forall k: int. let l = k * (2 * !len) in
@@ -167,24 +165,24 @@ module BottomUpMergesort
         assert { sorted_sub a !lo (min n (!lo + !len)) };
         let hi = min n (mid + !len) in
         assert { sorted_sub a mid (min n (mid + !len)) };
-        'M:
+        label M in
         merge_using tmp a !lo mid hi;
-        assert { permut_sub (at a 'M) a !lo hi };
-        assert { permut_all (at a 'M) a };
+        assert { permut_sub (a at M) a !lo hi };
+        assert { permut_all (a at M) a };
         assert { hi = min n (!lo + 2 * !len) };
         assert { sorted_sub a !lo (min n (!lo + 2 * !len)) };
         assert { forall k: int. let l = k * !len in mid + !len <= l < n ->
-                   sorted_sub (at a 'M) l (min n (l + !len)) &&
-                   sorted_sub a         l (min n (l + !len)) };
+                   sorted_sub (a at M) l (min n (l + !len)) &&
+                   sorted_sub a        l (min n (l + !len)) };
         assert { forall k: int. let l = k * (2 * !len) in 0 <= l < mid + !len ->
                    k <= !i &&
                    (k < !i ->
                      min n (l + 2 * !len) <= !lo &&
-                     sorted_sub (at a 'M) l (min n (l + 2 * !len)) &&
-                     sorted_sub a         l (min n (l + 2 * !len)) )
+                     sorted_sub (a at M) l (min n (l + 2 * !len)) &&
+                     sorted_sub a        l (min n (l + 2 * !len)) )
                    &&
                    (k = !i ->
-                     l = !lo /\ sorted_sub a         l (min n (l + 2 * !len)))
+                     l = !lo /\ sorted_sub a l (min n (l + 2 * !len)))
                };
         lo := mid + !len;
         ghost incr i
@@ -211,9 +209,9 @@ end
 
 module NaturalMergesort
 
-  clone import Merge
-  use import mach.int.Int
-  use import int.MinMax
+  clone Merge with axiom .
+  use mach.int.Int
+  use int.MinMax
 
   (* returns the maximal hi such that a[lo..hi[ is sorted *)
   let find_run (a: array elt) (lo: int) : int
@@ -231,45 +229,37 @@ module NaturalMergesort
     done;
     !i
 
-  exception Break
-  exception Return
-
   let natural_mergesort (a: array elt) : unit
     ensures { sorted a }
     ensures { permut_all (old a) a }
-  = 'I:
-    let n = length a in
-    if n >= 2 then
+  = let n = length a in
+    if n <= 1 then return;
     let tmp = Array.copy a in
     let ghost first_run = ref 0 in
-    try
     while true do
       invariant { 0 <= !first_run <= n && sorted_sub a 0 !first_run }
-      invariant { permut_all (at a 'I) a }
+      invariant { permut_all (old a) a }
       variant   { n - !first_run }
-      'L:
+      label L in
       let lo = ref 0 in
-      try
       while !lo < n - 1 do
         invariant { 0 <= !lo <= n }
-        invariant { at !first_run 'L <= !first_run <= n }
+        invariant { !first_run at L <= !first_run <= n }
         invariant { sorted_sub a 0 !first_run }
-        invariant { !lo = 0 \/ !lo >= !first_run > at !first_run 'L }
-        invariant { permut_all (at a 'L) a }
+        invariant { !lo = 0 \/ !lo >= !first_run > !first_run at L }
+        invariant { permut_all (a at L) a }
         variant   { n - !lo }
         let mid = find_run a !lo in
-        if mid = n then begin if !lo = 0 then raise Return; raise Break end;
+        if mid = n then begin if !lo = 0 then return; break end;
         let hi = find_run a mid in
-        'M:
+        label M in
         merge_using tmp a !lo mid hi;
-        assert { permut_sub (at a 'M) a !lo hi };
-        assert { permut_all (at a 'M) a };
+        assert { permut_sub (a at M) a !lo hi };
+        assert { permut_all (a at M) a };
         ghost if !lo = 0 then first_run := hi;
         lo := hi;
       done
-      with Break -> () end
     done
-    with Return -> () end
 
 
   (** an alternative implementation suggested by Martin Clochard,
@@ -286,28 +276,25 @@ module NaturalMergesort
     ensures  { permut_sub (old a) a lo (length a) }
     ensures  { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
     variant  { k }
-  = 'I:
-    let n = length a in
-    if lo >= n-1 then n else
-    try
-      let mid = ref (find_run a lo) in
-      if !mid = n then raise Break;
-      for i = 0 to k-1 do
-        invariant { lo + i < !mid < n }
-        invariant { sorted_sub a lo !mid }
-        invariant { permut_sub (at a 'I) a lo (length a) }
-        invariant { forall j: int. 0 <= j < lo -> a[j] = (at a 'I)[j] }
-        let hi = naturalrec tmp a !mid i in
-        assert { permut_sub (at a 'I) a lo (length a) };
-        'M:
-        merge_using tmp a lo !mid hi;
-        assert { permut_sub (at a 'M) a lo hi };
-        assert { permut_sub (at a 'M) a lo (length a) };
-        mid := hi;
-        if !mid = n then raise Break
-      done;
-      !mid
-    with Break -> n end
+  = let n = length a in
+    if lo >= n-1 then return n;
+    let mid = ref (find_run a lo) in
+    if !mid = n then return n;
+    for i = 0 to k-1 do
+      invariant { lo + i < !mid < n }
+      invariant { sorted_sub a lo !mid }
+      invariant { permut_sub (old a) a lo (length a) }
+      invariant { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
+      let hi = naturalrec tmp a !mid i in
+      assert { permut_sub (old a) a lo (length a) };
+      label M in
+      merge_using tmp a lo !mid hi;
+      assert { permut_sub (a at M) a lo hi };
+      assert { permut_sub (a at M) a lo (length a) };
+      mid := hi;
+      if !mid = n then return n
+    done;
+    !mid
 
   let natural_mergesort2 (a: array elt) : unit
     ensures { sorted a }

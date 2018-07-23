@@ -2,8 +2,9 @@
    OPT: -journal-disable -jessie3
 */
 
-/* selection sort
- */
+// ISSUE: predicate with labels not implemented
+
+/* selection sort */
 
 
 
@@ -94,6 +95,6 @@ void min_sort(int t[], int n) {
 
 /*
 Local Variables:
-compile-command: "frama-c -add-path ../.. -jessie3 selection_sort.c"
+compile-command: "frama-c -load-module ../../Jessie3.cmxs -jessie3 selection_sort.c"
 End:
 */

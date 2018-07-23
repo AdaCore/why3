@@ -2,49 +2,46 @@
 
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (*  Parameters.
-      Without loss of generality, we can take [x1=0] and [y1=0].
-      Thus the line to draw joins [(0,0)] to [(x2,y2)]
-      and we have [deltax = x2] and [deltay = y2].
+      Without loss of generality, we can take `x1=0` and `y1=0`.
+      Thus the line to draw joins `(0,0)` to `(x2,y2)`
+      and we have `deltax = x2` and `deltay = y2`.
       Moreover we assume being in the first octant, i.e.
-      [0 <= y2 <= x2]. The seven other cases can be easily
+      `0 <= y2 <= x2`. The seven other cases can be easily
       deduced by symmetry. *)
 
-  constant x2: int
-  constant y2: int
-  axiom first_octant: 0 <= y2 <= x2
-
-  (* [best x y] expresses that the point [(x,y)] is the best
+  (* `best x y` expresses that the point `(x,y)` is the best
      possible point i.e. the closest to the real line
-     i.e. for all y', we have |y - x*y2/x2| <= |y' - x*y2/x2|
-     We stay in type [int] by multiplying everything by [x2]. *)
+     i.e. for all `y'`, we have `|y - x*y2/x2| <= |y' - x*y2/x2|`
+     We stay in type `int` by multiplying everything by `x2`. *)
 
-  use import int.Abs
+  use int.Abs
 
-  predicate best (x y: int) =
+  predicate best (x2 y2 x y: int) =
     forall y': int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
 
-  (** Key lemma for Bresenham's proof: if [b] is at distance less or equal
-   than [1/2] from the rational [c/a], then it is the closest such integer.
-   We express this property using integers by multiplying everything by [2a]. *)
+  (** Key lemma for Bresenham's proof: if `b` is at distance less or equal
+   than `1/2` from the rational `c/a`, then it is the closest such integer.
+   We express this property using integers by multiplying everything by `2a`. *)
 
   lemma closest :
     forall a b c: int.
     abs (2 * a * b - 2 * c) <= a ->
     forall b': int. abs (a * b - c) <= abs (a * b' - c)
 
-  let bresenham () =
-    let y = ref 0 in
+  let bresenham (x2 y2:int)
+    requires { 0 <= y2 <= x2 }
+  = let y = ref 0 in
     let e = ref (2 * y2 - x2) in
     for x = 0 to x2 do
       invariant { !e = 2 * (x + 1) * y2 - (2 * !y + 1) * x2 }
       invariant { 2 * (y2 - x2) <= !e <= 2 * y2 }
       (* here we would plot (x, y),
          so we assert this is the best possible row y for column x *)
-      assert { best x !y };
+      assert { best x2 y2 x !y };
       if !e < 0 then
         e := !e + 2 * y2
       else begin

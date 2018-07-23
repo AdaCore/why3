@@ -2,48 +2,48 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="veriT" version="201410" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../agatha.why">
-<theory name="Agatha">
- <goal name="Diff1">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+<file name="../agatha.why" proved="true">
+<theory name="Agatha" proved="true">
+ <goal name="Diff1" proved="true">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
- <proof prover="7"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="9"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Diff2">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <goal name="Diff2" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="9"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Diff3">
- <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <goal name="Diff3" proved="true">
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="7"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="9"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="Enigma">
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <goal name="Enigma" proved="true">
+ <proof prover="1"><result status="valid" time="0.06"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

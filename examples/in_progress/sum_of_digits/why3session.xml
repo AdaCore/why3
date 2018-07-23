@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../sum_of_digits.mlw" expanded="true">
+<theory name="Euler290" sum="fea5102aaf2c7bdd7ee94a69b0aadcb3" expanded="true">
+ <goal name="Base">
+ <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+ <proof prover="4" timelimit="10"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="Empty">
+ <proof prover="2"><result status="valid" time="0.02" steps="58"/></proof>
+ <proof prover="4" timelimit="10"><result status="valid" time="0.07" steps="68"/></proof>
+ </goal>
+ <goal name="Induc" expanded="true">
+ </goal>
+ <goal name="VC sd" expl="VC for sd">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="25"/></proof>
+ <proof prover="5"><result status="valid" time="0.90"/></proof>
+ </goal>
+ <goal name="VC f" expl="VC for f">
+ <transf name="split_goal_right">
+  <goal name="VC f.1" expl="1. assertion">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC f.2" expl="2. assertion">
+  <proof prover="1"><result status="valid" time="2.70"/></proof>
+  <proof prover="2"><result status="valid" time="2.17" steps="304"/></proof>
+  </goal>
+  <goal name="VC f.3" expl="3. precondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC f.4" expl="4. postcondition">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="VC f.5" expl="5. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="6"/></proof>
+  </goal>
+  <goal name="VC f.6" expl="6. precondition">
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC f.7" expl="7. precondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="VC f.8" expl="8. variant decrease">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
+  </goal>
+  <goal name="VC f.9" expl="9. precondition">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="VC f.10" expl="10. assertion">
+  <transf name="split_goal_right">
+   <goal name="VC f.10.1" expl="1. VC for f">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
+   </goal>
+   <goal name="VC f.10.2" expl="2. VC for f">
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+   <proof prover="4"><result status="valid" time="0.07" steps="11"/></proof>
+   </goal>
+   <goal name="VC f.10.3" expl="3. VC for f">
+   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC f.11" expl="11. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="VC f.12" expl="12. postcondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC f.13" expl="13. postcondition">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

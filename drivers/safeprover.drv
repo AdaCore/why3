@@ -1,8 +1,5 @@
 (* Why3 driver for safe prover *)
 
-printer "tptp-fof"
-filename "%f-%t-%g.p"
-
 valid   "Unsat"
 (*
 invalid "Completion found"
@@ -13,3 +10,6 @@ unknown "No Proof Found" ""
 fail    "Failure.*"                   "\"\\0\""
 *)
 time "why3cpulimit time : %s s"
+
+import "tptp.gen"
+import "discrimination.gen"

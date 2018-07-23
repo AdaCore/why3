@@ -2,188 +2,172 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Spass" version="3.7" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2015_parallel_gcd.mlw">
-<theory name="ParallelGCD">
- <goal name="gcd_sub" expl="">
+<prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../verifythis_2015_parallel_gcd.mlw" proved="true">
+<theory name="ParallelGCD" proved="true">
+ <goal name="gcd_sub" proved="true">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter parallel_gcd" expl="VC for parallel_gcd">
- <transf name="split_goal_right">
-  <goal name="WP_parameter parallel_gcd.1" expl="loop invariant init">
-  <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="VC parallel_gcd" expl="VC for parallel_gcd" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC parallel_gcd.0" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.2" expl="loop invariant preservation">
-  <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC parallel_gcd.1" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.3" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.12"/></proof>
-  <proof prover="5" timelimit="6"><result status="valid" time="0.03" steps="37"/></proof>
+  <goal name="VC parallel_gcd.2" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.4" expl="loop invariant preservation">
-  <proof prover="5" timelimit="6"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC parallel_gcd.3" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.5" expl="loop invariant preservation">
-  <proof prover="5" timelimit="6"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="VC parallel_gcd.4" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.6" expl="loop invariant preservation">
-  <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC parallel_gcd.5" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.7" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" timelimit="30"><result status="valid" time="0.09"/></proof>
-  <proof prover="4" timelimit="30"><result status="valid" time="0.09"/></proof>
-  <proof prover="5" timelimit="6"><result status="valid" time="0.02" steps="13"/></proof>
+  <goal name="VC parallel_gcd.6" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.8" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="5" timelimit="6"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC parallel_gcd.7" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.9" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="5" timelimit="6"><result status="valid" time="0.00" steps="10"/></proof>
+  <goal name="VC parallel_gcd.8" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.10" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <goal name="VC parallel_gcd.9" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="VC parallel_gcd.10" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.26" steps="100"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Interleaving">
- <goal name="gcd_sub" expl="">
- <proof prover="7"><result status="valid" time="0.04"/></proof>
+<theory name="Interleaving" proved="true">
+ <goal name="gcd_sub" proved="true">
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter step" expl="VC for step">
- <transf name="split_goal_right">
-  <goal name="WP_parameter step.1" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+ <goal name="VC step" expl="VC for step" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC step.0" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter step.2" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC step.1" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter step.3" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+  <goal name="VC step.2" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter step.4" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.74" steps="180"/></proof>
+  <goal name="VC step.3" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter step.5" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="VC step.4" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter step.6" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+  <goal name="VC step.5" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter step.7" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="VC step.6" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter step.8" expl="postcondition">
-  <proof prover="5"><result status="valid" time="1.45" steps="281"/></proof>
+  <goal name="VC step.7" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.24" steps="104"/></proof>
   </goal>
-  <goal name="WP_parameter step.9" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
+  <goal name="VC step.8" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter step.10" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+  <goal name="VC step.9" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter step.11" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
+  <goal name="VC step.10" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter step.12" expl="postcondition">
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  <goal name="VC step.11" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter step.13" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.69" steps="41"/></proof>
+  <goal name="VC step.12" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter step.14" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="VC step.13" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter step.15" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="VC step.14" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter step.16" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="13"/></proof>
+  <goal name="VC step.15" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter step.17" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="VC step.16" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter step.18" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
+  <goal name="VC step.17" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter step.19" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC step.18" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter step.20" expl="postcondition">
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  <goal name="VC step.19" expl="postcondition" proved="true">
+  <proof prover="9" timelimit="1"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter step.21" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="2"/></proof>
+  <goal name="VC step.20" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter step.22" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="VC step.21" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter step.23" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="2"/></proof>
+  <goal name="VC step.22" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter step.24" expl="postcondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="VC step.23" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter parallel_gcd" expl="VC for parallel_gcd">
- <transf name="split_goal_right">
-  <goal name="WP_parameter parallel_gcd.1" expl="loop invariant init">
-  <proof prover="5"><result status="valid" time="0.04" steps="16"/></proof>
+ <goal name="VC can_progress" expl="VC for can_progress" proved="true">
+ <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
+ </goal>
+ <goal name="VC parallel_gcd" expl="VC for parallel_gcd" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC parallel_gcd.0" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.2" expl="precondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC parallel_gcd.1" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.3" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.19" steps="98"/></proof>
-  </goal>
-  <goal name="WP_parameter parallel_gcd.4" expl="loop variant decrease">
-  <transf name="inline_goal">
-   <goal name="WP_parameter parallel_gcd.4.1" expl="loop variant decrease">
-   <transf name="inline_goal">
-    <goal name="WP_parameter parallel_gcd.4.1.1" expl="loop variant decrease">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.78"/></proof>
-    </goal>
-   </transf>
+  <goal name="VC parallel_gcd.2" expl="loop variant decrease" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="VC parallel_gcd.2.0" expl="loop variant decrease" proved="true">
+   <proof prover="9"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter parallel_gcd.5" expl="precondition">
-  <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
+  <goal name="VC parallel_gcd.3" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.6" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.05" steps="59"/></proof>
+  <goal name="VC parallel_gcd.4" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter parallel_gcd.7" expl="loop variant decrease">
-  <transf name="inline_goal">
-   <goal name="WP_parameter parallel_gcd.7.1" expl="loop variant decrease">
-   <transf name="inline_goal">
-    <goal name="WP_parameter parallel_gcd.7.1.1" expl="loop variant decrease">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.79"/></proof>
-    </goal>
-   </transf>
+  <goal name="VC parallel_gcd.5" expl="loop variant decrease" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="VC parallel_gcd.5.0" expl="loop variant decrease" proved="true">
+   <proof prover="9"><result status="valid" time="0.20"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter parallel_gcd.8" expl="postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="2" timelimit="5"><result status="valid" time="1.34"/></proof>
-  <proof prover="6"><result status="valid" time="0.06"/></proof>
-  <proof prover="7"><result status="valid" time="0.07"/></proof>
+  <goal name="VC parallel_gcd.6" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="VC parallel_gcd.7" expl="postcondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.56" steps="195"/></proof>
   </goal>
  </transf>
  </goal>

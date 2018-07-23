@@ -1,7 +1,7 @@
 
 theory FibonacciTest
 
-  use import int.Fibonacci
+  use int.Fibonacci
 
   lemma isfib_2_1 : fib 2 = 1
   lemma isfib_6_8 : fib 6 = 8
@@ -12,9 +12,9 @@ end
 
 module FibonacciLinear
 
-  use import int.Fibonacci
-  use import int.Int
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use ref.Ref
 
   let fib (n:int) : int
     requires { n >= 0 }
@@ -31,10 +31,12 @@ module FibonacciLinear
 
 end
 
-module FibRecGhost "recursive version, using ghost code"
+(** {2 Recursive version, using ghost code} *)
 
-  use import int.Fibonacci
-  use import int.Int
+module FibRecGhost
+
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
     requires { k >= 0 }
@@ -52,15 +54,17 @@ module FibRecGhost "recursive version, using ghost code"
 
   exception BenchFailure
 
-  let bench () raises { BenchFailure -> true } =
+  let bench () raises { BenchFailure } =
     if test42 () <> 267914296 then raise BenchFailure
 
 end
 
-module FibRecNoGhost "recursive version, without ghost code"
+(** {2 Recursive version, without ghost code} *)
 
-  use import int.Fibonacci
-  use import int.Int
+module FibRecNoGhost
+
+  use int.Fibonacci
+  use int.Int
 
   let rec fib_aux (a b k: int) : int
     requires { k >= 0 }
@@ -79,10 +83,10 @@ end
 
 module SmallestFibAbove
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
 
   let smallest_fib_above (x: int) : int
     requires { 0 <= x }
@@ -113,12 +117,12 @@ Cf https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem
 
 module Zeckendorf
 
-  use import int.Fibonacci
-  use import int.Int
-  use import int.MinMax
-  use import ref.Ref
-  use import list.List
-  use import SmallestFibAbove
+  use int.Fibonacci
+  use int.Int
+  use int.MinMax
+  use ref.Ref
+  use list.List
+  use SmallestFibAbove
 
   function sum (l: list int) : int = match l with
   | Nil -> 0
@@ -145,7 +149,7 @@ module Zeckendorf
 
   let greatest_fib (x: int) : (int, int)
     requires { 0 < x }
-    ensures  { let (k, fk) = result in
+    ensures  { let k, fk = result in
                2 <= k /\ 1 <= fk = fib k <= x < fib (k + 1) }
   =
     let a = ref 1 in
@@ -160,7 +164,7 @@ module Zeckendorf
       b := f;
       k := !k + 1
    done;
-   (!k, !a)
+   !k, !a
 
   let zeckendorf (n: int) : list int
     requires { 0 <= n }
@@ -175,7 +179,7 @@ module Zeckendorf
       invariant { !x + sum !l = n }
       invariant { match !l with Nil -> true | Cons k _ -> !x < fib (k-1) end }
       variant   { !x }
-      let (k, fk) = greatest_fib !x in
+      let k, fk = greatest_fib !x in
       x := !x - fk;
       l := Cons k !l
     done;
@@ -235,31 +239,33 @@ module Zeckendorf
     requires { sum l1 = sum l2 }
     ensures { l1 = l2 }
     variant { sum l1 }
-  = let rec decomp (k acc:int) (lc lb:list int) : (int,list int)
+  = let rec decomp (k acc:int) (lc lb:list int) : (x: int, p: list int)
       requires { wf k lc }
       requires { k >= 2 /\ lc <> Nil }
       requires { 0 <= acc = sum lb - sum lc < fib (k-1) }
-      returns { (x,p) -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
-      returns { (x,p) -> wf k p /\ x >= k /\ lc = snoc p x }
+      ensures { fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
+      ensures { wf k p /\ x >= k /\ lc = snoc p x }
       variant { lc }
     = match lc with
       | Nil -> absurd
-      | Cons x Nil -> (x,Nil)
-      | Cons x q -> let (y,p) = decomp (x+2) (acc+fib x) q lb in (y,Cons x p)
+      | Cons x Nil -> x,Nil
+      | Cons x q -> let y,p = decomp (x+2) (acc+fib x) q lb in y,Cons x p
       end in
     match l1 , l2 with
     | Nil , Nil -> ()
     | Nil , l | l , Nil -> let _ = decomp 2 0 l l in absurd
-    | _ , _ -> let (_,q1) = decomp 2 0 l1 l1 in
-      let (_,q2) = decomp 2 0 l2 l2 in
+    | _ , _ -> let _,q1 = decomp 2 0 l1 l1 in
+      let _,q2 = decomp 2 0 l2 l2 in
       zeckendorf_unique q1 q2
     end
 
 end
 
-theory Mat22 "2x2 integer matrices"
+(** {2 2x2 integer matrices} *)
 
-  use import int.Int
+theory Mat22
+
+  use int.Int
 
   type t = { a11: int; a12: int; a21: int; a22: int }
 
@@ -272,39 +278,49 @@ theory Mat22 "2x2 integer matrices"
     }
 
   clone export
-    int.Exponentiation with type t = t, function one = id, function (*) = mult,
-    goal Monoid.Assoc, goal Monoid.Unit_def_l, goal Monoid.Unit_def_r
+    int.Exponentiation with
+      type t = t, function one = id, function (*) = mult,
+      goal Assoc, goal Unit_def_l, goal Unit_def_r,
+      axiom . (* FIXME: replace with "goal" and prove *)
 
 end
 
 module FibonacciLogarithmic
 
-  use import int.Int
-  use import int.Fibonacci
-  use import int.EuclideanDivision
-  use import Mat22
+  use int.Int
+  use int.Fibonacci
+  use int.ComputerDivision
+  use Mat22
 
-  constant m1110 : t = { a11 = 1; a12 = 1;
-                         a21 = 1; a22 = 0 }
+  val constant m1110 : t
+    ensures { result = { a11 = 1; a12 = 1;
+                         a21 = 1; a22 = 0 } }
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
 
      since it is a matrix of the shape ((a+b b) (b a)),
      we only return the pair (a, b) *)
 
-  let rec logfib n variant { n }
+  let rec logfib (n:int) variant { n }
     requires { n >= 0 }
     ensures  { let a, b = result in
       power m1110 n = { a11 = a+b; a12 = b; a21 = b; a22 = a } }
   = if n = 0 then
-      (1, 0)
+      1, 0
     else begin
+      assert { 0 <= div n 2 };
       let a, b = logfib (div n 2) in
       let c = a + b in
       if mod n 2 = 0 then
-        (a*a + b*b, b*(a + c))
+        begin
+        assert { 2 * (div n 2) = (div n 2) + (div n 2) };
+        a*a+ b*b, b*(a + c)
+        end
       else
-        (b*(a + c), c*c + b*b)
+        begin
+        assert { 2 * (div n 2) + 1 = (div n 2) + (div n 2) + 1 };
+        b*(a + c), c*c + b*b
+        end
     end
 
   (* by induction, we easily prove that
@@ -315,9 +331,11 @@ module FibonacciLogarithmic
     thus, we can compute F(n) in O(log(n)) using funtion logfib above
   *)
 
-  lemma fib_m :
-    forall n: int. n >= 0 ->
-    let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21
+  let rec lemma fib_m (n: int)
+    requires { n >= 0 }
+    variant { n }
+    ensures { let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21 }
+  = if n = 0 then () else fib_m (n-1)
 
   let fibo n requires { n >= 0 } ensures { result = fib n } =
     let _, b = logfib n in b
@@ -331,7 +349,7 @@ module FibonacciLogarithmic
 
   exception BenchFailure
 
-  let bench () raises { BenchFailure -> true } =
+  let bench () raises { BenchFailure } =
     if test42 () <> 267914296 then raise BenchFailure;
     if test2014 () <> 3561413997540486142674781564382874188700994538849211456995042891654110985470076818421080236961243875711537543388676277339875963824466334432403730750376906026741819889036464401788232213002522934897299928844192803507157647764542466327613134605502785287441134627457615461304177503249289874066244145666889138852687147544158443155204157950294129177785119464446668374163746700969372438526182906768143740891051274219441912520127
     then raise BenchFailure

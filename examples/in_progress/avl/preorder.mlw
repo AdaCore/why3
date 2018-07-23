@@ -44,8 +44,8 @@ end
 (* Total preorder + corresponding program types and computable comparison. *)
 module ComputableParam
   
-  use import int.Int
-  use import program_type.TypeParams
+  use int.Int
+  use program_type.TypeParams
   clone program_type.Type1 as T
   clone program_type.Type1 as O
   clone export TotalFullParam with type t = T.m, type order = O.m

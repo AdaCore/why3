@@ -13,10 +13,10 @@ Pages: 321 - 322
 
 module Algo63
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Refint
+  use array.Array
+  use array.ArrayPermut
 
   (* we pass m and n (as ghost arguments) to ensure [permut_sub];
      this will help solvers in the proof of partition *)
@@ -26,18 +26,19 @@ module Algo63
     ensures  { permut_sub (old a) a m (n+1) }
     let v = a[i] in
     a[i] <- a[j];
-    a[j] <- v
+    a[j] <- v;
+    assert { exchange (old a) a i j }
 
   val random (m n: int) : int ensures { m <= result <= n }
 
-  let partition_ (a: array int) (m n: int) (i j: ref int) (ghost ghx: ref int) =
+  let partition_ (a: array int) (m n: int) (i j: ref int) (ghost ghx: ref int)
     requires { 0 <= m < n < length a }
     ensures  { m <= !j < !i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
     ensures  { forall r:int. m <= r <= !j -> a[r] <= !ghx }
     ensures  { forall r:int. !j < r < !i -> a[r] = !ghx }
     ensures  { forall r:int. !i <= r <= n -> a[r] >= !ghx }
-'Init:
+  =
     let f = random m n in
     let x = a[f] in
     ghx := x;
@@ -45,12 +46,12 @@ module Algo63
     j := n;
     let rec up_down () variant { 1 + !j - !i } =
       requires { m <= !j <= n /\ m <= !i <= n }
-      requires { permut_sub (at a 'Init) a m (n+1) }
+      requires { permut_sub (old a) a m (n+1) }
       requires { forall r:int. m <= r < !i -> a[r] <= x }
       requires { forall r:int. !j < r <= n -> a[r] >= x }
       requires { a[f] = x }
       ensures  { m <= !j <= !i <= n }
-      ensures  { permut_sub (at a 'Init) a m (n+1) }
+      ensures  { permut_sub (old a) a m (n+1) }
       ensures  { !i = n \/ a[!i] > x }
       ensures  { !j = m \/ a[!j] < x }
       ensures  { a[f] = x }

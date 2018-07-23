@@ -7,12 +7,10 @@
 <prover id="3" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="8" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="9" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="4000"/>
 <file name="../f_puzzle.why" proved="true">
-<theory name="Puzzle" proved="true">
-</theory>
 <theory name="Step1" proved="true">
  <goal name="I1.base" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
@@ -20,54 +18,53 @@
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.01" steps="3"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
+ <proof prover="8" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="9" memlimit="1000"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
  <goal name="I1.induction_step" proved="true">
- <proof prover="4"><result status="valid" time="0.37"/></proof>
- <proof prover="5"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.86"/></proof>
+ <proof prover="5"><result status="valid" time="0.20"/></proof>
  </goal>
 </theory>
 <theory name="Solution" proved="true">
  <goal name="L3" proved="true">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
- <proof prover="8" memlimit="4000"><result status="valid" time="0.00"/></proof>
+ <proof prover="8"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="L4" proved="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="4" memlimit="4000"><result status="valid" time="3.22"/></proof>
- <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
- <proof prover="8"><result status="valid" time="0.33"/></proof>
+ <proof prover="4" memlimit="4000"><result status="valid" time="0.07"/></proof>
+ <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="I2.base" proved="true">
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="8"><result status="valid" time="0.01"/></proof>
+ <proof prover="8" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="9" memlimit="1000"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="I2.induction_step" proved="true">
- <proof prover="6" memlimit="1000"><result status="valid" time="0.84" steps="59"/></proof>
+ <proof prover="9" timelimit="10" memlimit="1000"><result status="valid" time="1.10" steps="97"/></proof>
  </goal>
  <goal name="L5" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
- <proof prover="8" memlimit="4000"><result status="valid" time="0.05"/></proof>
+ <proof prover="8"><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="L6" proved="true">
- <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
+ <proof prover="9"><result status="valid" time="0.01" steps="16"/></proof>
  </goal>
  <goal name="G" proved="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.35"/></proof>
+ <proof prover="4"><result status="valid" time="0.17"/></proof>
  <proof prover="5" memlimit="4000"><result status="valid" time="0.14"/></proof>
- <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
+ <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
 </file>

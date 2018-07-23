@@ -37,7 +37,7 @@ theory BuiltIn
   syntax type real  "Reals"
   syntax predicate (=)  "(%1 == %2)"
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 (* int *)
@@ -59,20 +59,20 @@ theory int.Int
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -83,7 +83,7 @@ theory int.Int
   remove prop CompatOrderMult
   remove prop ZeroLessOne
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory int.Abs
@@ -103,7 +103,7 @@ theory int.EuclideanDivision
   remove prop Mod_1
   remove prop Div_1
 
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 (* real *)
@@ -127,20 +127,20 @@ theory real.Real
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 > %2)"
 
-  meta "inline : no" predicate (<=)
-  meta "inline : no" predicate (>=)
-  meta "inline : no" predicate (>)
+  meta "inline:no" predicate (<=)
+  meta "inline:no" predicate (>=)
+  meta "inline:no" predicate (>)
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop Refl
@@ -159,7 +159,7 @@ theory real.Real
   remove prop assoc_div_div
   remove prop CompatOrderMult
 
-  (*meta "encoding : kept" type real*)
+  (*meta "encoding:kept" type real*)
 end
 
 theory real.Abs
@@ -246,24 +246,17 @@ end
 
 
 theory Bool
-   syntax type     bool  "Bool"
-   syntax function True  "True"
-   syntax function False "False"
-   meta "encoding : kept" type bool
+  syntax type     bool  "Bool"
+  syntax function True  "True"
+  syntax function False "False"
+
+  meta "encoding:kept" type bool
 end
 
 theory bool.Bool
-   syntax function andb  "(%1 && %2)"
-   syntax function orb   "(%1 || %2)"
-   syntax function xorb  "Xor[%1, %2]"
-   syntax function notb  "(! %1)"
-   syntax function implb "Implies[%1, %2]"
+  syntax function andb  "(%1 && %2)"
+  syntax function orb   "(%1 || %2)"
+  syntax function xorb  "Xor[%1, %2]"
+  syntax function notb  "(! %1)"
+  syntax function implb "Implies[%1, %2]"
 end
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)

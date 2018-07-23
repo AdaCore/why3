@@ -38,7 +38,7 @@ end
 
 module Enum
 
-  use import Tree
+  use Tree
 
   type enum =
     | Done
@@ -62,8 +62,8 @@ end
 
 module Iterator
 
-  use import Tree
-  use import Enum
+  use Tree
+  use Enum
 
   type iterator = { mutable it: enum }
 
@@ -77,7 +77,7 @@ module Iterator
 
   let hasNext (i: iterator)
     ensures { result = True <-> hasNext i }
-  = i.it <> Done
+  = match i.it with Done -> False | _ -> True end
 
   let next (i: iterator)
     requires { hasNext i }
@@ -142,7 +142,7 @@ module ITree
   use export BSTree
   use export Iterator
 
-  type itree = { mutable tree: tree } invariant { bst self.tree }
+  type itree = { mutable tree: tree } invariant { bst tree }
 
   let create () = { tree = Empty }
 
@@ -165,7 +165,7 @@ end
 
 module Harness
 
-  use import ITree
+  use ITree
 
   let test () =
      let t = create () in

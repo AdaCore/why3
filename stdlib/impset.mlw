@@ -1,0 +1,46 @@
+
+(** {1 Imperative sets} *)
+
+module Impset
+
+  use set.Fset
+
+  type elt
+
+  type t = abstract { mutable contents: set elt }
+
+  val empty (): t
+    ensures { is_empty result.contents }
+
+  val clear (s: t): unit
+    writes  { s }
+    ensures { is_empty s.contents }
+
+  val predicate is_empty (s: t)
+    ensures { result <-> is_empty s.contents }
+
+  val predicate mem (x: elt) (s: t)
+    ensures { result <-> mem x s.contents }
+
+  val add (x: elt) (s: t): unit
+    writes  { s }
+    ensures { s.contents = add x (old s.contents) }
+
+  val choose (s: t): elt
+    requires { not (is_empty s) }
+    ensures  { mem result s }
+
+  val remove (x: elt) (s: t): unit
+    writes   { s }
+    ensures  { s.contents = remove x (old s.contents) }
+
+  val choose_and_remove (s: t): elt
+    writes   { s }
+    requires { not (is_empty s) }
+    ensures  { mem result (old s) }
+    ensures  { s.contents = remove result (old s.contents) }
+
+  val function cardinal (s: t): int
+    ensures { result = cardinal s.contents }
+
+end

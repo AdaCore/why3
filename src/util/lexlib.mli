@@ -11,13 +11,13 @@
 
 (** common functions to be used in lexers/parsers *)
 
-val newline : Lexing.lexbuf -> unit
-
 val comment : Lexing.lexbuf -> unit
 
 val string : Lexing.lexbuf -> string
 
 val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
+
+val backjump : Lexing.lexbuf -> int -> unit
 
 val remove_leading_plus : string -> string
 

@@ -1,4 +1,3 @@
-
 (* Two Way Sort
 
    The following program sorts an array of Boolean values, with False<True.
@@ -18,17 +17,16 @@
 
       You can refer to the contents of array a at the beginning of the
       function with notation (at a 'Init).
-
 *)
 
 module TwoWaySort
 
-  use import int.Int
-  use import bool.Bool
-  use import ref.Refint
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use bool.Bool
+  use ref.Refint
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
 
   predicate (<<) (x y: bool) = x = False \/ y = True
 
@@ -38,7 +36,7 @@ module TwoWaySort
   let two_way_sort (a: array bool) : unit
     ensures { true }
   =
-    'Init:
+    label Init in
     let i = ref 0 in
     let j = ref (length a - 1) in
     while !i < !j do

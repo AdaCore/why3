@@ -15,11 +15,11 @@
 
 module CoincidenceCount
 
-  use import list.List
-  use import set.Fset
-  use import list.Elements
+  use list.List
+  use set.Fset
+  use list.Elements
   use list.Mem as L
-  use import int.Int
+  use int.Int
 
   clone export list.Sorted
      with type t = int, predicate le = (<), goal Transitive.Trans
@@ -48,13 +48,19 @@ end
 
 module CoincidenceCountAnyType
 
-  use import list.List
-  use import set.Fset
-  use import list.Elements
+  use list.List
+  use set.Fset
+  use list.Elements
   use list.Mem as L
-  use import int.Int
+  use int.Int
 
-  clone import relations.TotalStrictOrder
+  type t
+
+  val predicate eq (x y : t)
+    ensures { result <-> x = y }
+  val predicate rel (x y : t)
+
+  clone relations.TotalStrictOrder with type t, predicate rel, axiom .
 
   clone export list.Sorted
      with type t = t, predicate le = rel, goal Transitive.Trans
@@ -67,7 +73,7 @@ module CoincidenceCountAnyType
   =
     match a, b with
     | Cons ha ta, Cons hb tb ->
-       if ha = hb then
+       if eq ha hb then
          add ha (coincidence_count ta tb)
        else if rel ha hb then
          coincidence_count ta b
@@ -83,9 +89,9 @@ end
 
 module CoincidenceCountList
 
-  use import list.List
-  use import list.Mem
-  use import int.Int
+  use list.List
+  use list.Mem
+  use int.Int
 
   clone export list.Sorted
      with type t = int, predicate le = (<), goal Transitive.Trans

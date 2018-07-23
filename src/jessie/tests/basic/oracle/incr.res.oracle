@@ -6,8 +6,11 @@
 [kernel] Parsing tests/basic/incr.c (with preprocessing)
 [jessie3] Loading prover drivers...
 [jessie3] Translating to Why3...
+[jessie3] Starting translation
 [jessie3] processing function f
 [jessie3] created program function f (67)
+[jessie3] global var g done
+[jessie3] denv contains [g; f]
 [jessie3] processing function h
 [jessie3] created program function h (73)
 [jessie3] found 0 logic decl(s)
@@ -22,42 +25,51 @@
             
             (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude.Prelude *)
-            
             (* use int.Int *)
+            
+            (* use int.ComputerDivision *)
             
             (* use real.Real *)
             
-            (* use map.Map *)
+            (* use array.Array *)
             
             (* use ref.Ref *)
             
             (* use mach.bv.BVCheck32 *)
             
-            goal WP_parameter_f :
+            (* use mach.int.Int64 *)
+            
+            goal VC_f :
               forall x:t.
                to_uint x <= 1000000 ->
-                (0 <= 0 /\ 0 < two_power_size) &&
-                 (to_uint (of_int 0) = 0 ->
-                   (0 <= 1 /\ 1 < two_power_size) && (let o = of_int 1 in
-                    to_uint o = 1 ->
-                     (0 <= (to_uint x + to_uint o) /\
-                       (to_uint x + to_uint o) < two_power_size) &&
-                      (let o1 = add x o in
-                      to_uint o1 = (to_uint x + to_uint o) ->
-                       (forall us_retres:t.
-                         us_retres = o1 -> to_uint us_retres = (to_uint x + 1)))))
+                (0 <= 0 /\ 0 < two_power_size) /\
+                 (forall o:t.
+                   to_uint o = 0 /\ o = of_int 0 ->
+                    (0 <= 1 /\ 1 < two_power_size) /\
+                     (forall o1:t.
+                       to_uint o1 = 1 /\ o1 = of_int 1 ->
+                        (0 <= (to_uint x + to_uint o1) /\
+                          (to_uint x + to_uint o1) < two_power_size) /\
+                         (forall o2:t.
+                           to_uint o2 = (to_uint x + to_uint o1) /\ o2 = add x o1 ->
+                            (forall us_retres:t.
+                              us_retres = o2 -> to_uint us_retres = (to_uint x + 1)))))
             
-            goal WP_parameter_h :
-              forall x:t.
-               forall g:t.
+            goal VC_h :
+              forall g:t.
+               forall x:t.
                 (0 <= to_uint x /\ to_uint x <= 1000000) /\
                  0 <= to_uint g /\ to_uint g <= 1000000 ->
                  (0 <= (to_uint g + to_uint x) /\
-                   (to_uint g + to_uint x) < two_power_size) && (let o = add g x in
-                  to_uint o = (to_uint g + to_uint x) ->
-                   (forall g1:t. g1 = o -> to_uint g1 = (to_uint g + to_uint x)))
+                   (to_uint g + to_uint x) < two_power_size) /\
+                  (forall o:t.
+                    to_uint o = (to_uint g + to_uint x) /\ o = add g x ->
+                     (forall g1:t. g1 = o -> to_uint g1 = (to_uint g + to_uint x)))
             end
-[jessie3] Provers: Alt-Ergo 0.99.1, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.2
-[jessie3] Task 1 (WP_parameter f): Valid, Timeout, Valid, Timeout, Timeout
-[jessie3] Task 2 (WP_parameter h): Valid, Timeout, Valid, Timeout, Valid
+[jessie3] Provers: Alt-Ergo 1.01, CVC4 1.4, Z3 4.4.1
+[jessie3] Task 1 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 2 (VC f) (precondition): Valid, Valid, Valid
+[jessie3] Task 3 (VC f) (precondition): Valid, Timeout, Timeout
+[jessie3] Task 4 (VC f) (postcondition): Valid, Valid, Valid
+[jessie3] Task 5 (VC h) (precondition): Valid, Unknown, Valid
+[jessie3] Task 6 (VC h) (postcondition): Valid, Valid, Valid

@@ -1,0 +1,186 @@
+module Univ
+  type iType
+end
+
+module Ghost
+  type gh 'a
+
+  constant gh : gh 'a
+end
+
+module Int
+  use export int.Int
+end
+
+module IntTrunc
+  function floor (x : int) : int = x
+  function ceiling (x : int) : int = x
+  function truncate (x : int) : int = x
+  function round (x : int) : int = x
+
+  function to_int (x : int) : int = x
+
+  predicate is_int int = true
+  predicate is_rat int = true
+end
+
+module IntDivE
+  use export int.EuclideanDivision
+end
+
+module IntDivT
+  (* TODO: divide and truncate *)
+  function div_t (x y : int) : int
+  function mod_t (x y : int) : int
+end
+
+module IntDivF
+  (* TODO: divide and floor *)
+  function div_f (x y : int) : int
+  function mod_f (x y : int) : int
+end
+
+module Rat
+  use int.Int as Int
+
+  type rat
+
+  predicate (< ) (x y : rat)
+  predicate (> ) (x y : rat) = y < x
+  predicate (<=) (x y : rat) = x < y \/ x = y
+  predicate (>=) (x y : rat) = y <= x
+
+  clone export algebra.OrderedField
+    with type t = rat, predicate (<=) = (<=)
+
+  function frac (n d : int) : rat
+
+  function numerator rat : int
+  function denominator rat : int
+
+  axiom inversion : forall r : rat. r = frac (numerator r) (denominator r)
+  axiom dpositive : forall r : rat. Int.(>) (denominator r) 0
+
+  axiom frac_zero : forall d : int. d <> 0 -> frac 0 d = zero
+  axiom frac_unit : forall d : int. d <> 0 -> frac d d = one
+
+  axiom nume_zero : numerator zero = 0
+  axiom deno_zero : denominator zero = 1
+
+  axiom nume_unit : numerator one = 1
+  axiom deno_unit : denominator one = 1
+
+  axiom proportion : forall n1 n2 d1 d2 : int. d1 <> 0 -> d2 <> 0 ->
+    (frac n1 d1 = frac n2 d2 <-> Int.(*) n1 d2 = Int.(*) n2 d1)
+
+  function to_rat (x : rat) : rat = x
+
+  predicate is_int (r : rat) = denominator r = 1
+  predicate is_rat rat = true
+end
+
+module RatTrunc
+  use Rat
+
+  (* TODO: axiomatize *)
+  function floor (x : rat) : rat
+  function ceiling (x : rat) : rat
+  function truncate (x : rat) : rat
+  function round (x : rat) : rat
+
+  function to_int (x : rat) : int = numerator (floor x)
+end
+
+module RatDivE
+  use Rat
+
+  (* TODO: euclidean division *)
+  function div (x y : rat) : rat
+  function mod (x y : rat) : rat
+end
+
+module RatDivT
+  use Rat
+
+  (* TODO: divide and truncate *)
+  function div_t (x y : rat) : rat
+  function mod_t (x y : rat) : rat
+end
+
+module RatDivF
+  use Rat
+
+  (* TODO: divide and floor *)
+  function div_f (x y : rat) : rat
+  function mod_f (x y : rat) : rat
+end
+
+module Real
+  use export real.Real
+  function to_real (x : real) : real = x
+end
+
+module RealTrunc
+  use Real
+  use real.FromInt as FromInt
+  use real.Truncate as Truncate
+
+  function floor (x : real) : real = FromInt.from_int (Truncate.floor x)
+  function ceiling (x : real) : real = FromInt.from_int (Truncate.ceil x)
+  function truncate (x : real) : real = FromInt.from_int (Truncate.truncate x)
+
+  (* TODO : axiomatize *)
+  function round (x : real) : real
+
+  function to_int (x : real) : int = Truncate.floor x
+
+  predicate is_int (r : real) = r = FromInt.from_int (Truncate.truncate r)
+  predicate is_rat (r : real) =
+    exists n d : int. d <> 0 /\ r * FromInt.from_int d = FromInt.from_int n
+end
+
+module RealDivE
+  (* TODO: euclidean division *)
+  function div (x y : real) : real
+  function mod (x y : real) : real
+end
+
+module RealDivT
+  (* TODO: divide and truncate *)
+  function div_t (x y : real) : real
+  function mod_t (x y : real) : real
+end
+
+module RealDivF
+  (* TODO: divide and floor *)
+  function div_f (x y : real) : real
+  function mod_f (x y : real) : real
+end
+
+module IntToRat
+  use Rat
+
+  function to_rat (x : int) : rat = frac x 1
+end
+
+module IntToReal
+  use real.FromInt as FromInt
+
+  function to_real (x : int) : real = FromInt.from_int x
+end
+
+module RealToRat
+  use Rat
+
+  (* TODO: axiomatize *)
+  function to_rat (x : real) : rat
+end
+
+module RatToReal
+  use Rat
+  use real.Real
+  use real.FromInt as FromInt
+
+  function to_real (x : rat) : real =
+    FromInt.from_int (numerator x) / FromInt.from_int (denominator x)
+end

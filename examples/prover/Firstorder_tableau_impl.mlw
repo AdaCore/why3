@@ -1,27 +1,27 @@
 module Types
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
   type nl_tableau 'b0 'b1 =
     | NL_Root
     | NL_Node (nl_tableau 'b0 'b1) (nl_fo_formula 'b0 'b1)
@@ -42,30 +42,30 @@ module Types
 end
 
 module Logic
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
-  use import Types
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
+  use Types
   function nat_nlsize_tableau (t:nl_tableau 'b0 'b1) : nat =
     match t with | NL_Root -> let s = one_nat in s
       | NL_Node v0 v1 v2 ->
@@ -93,9 +93,9 @@ module Logic
           nlsize_positive_lemma_fo_formula_list v2 ; ()
     end
 
-  function nlmodel_tableau (t:nl_tableau 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
-    (bnd0:func int (symbol 'c0)) (fr1:func 'b1 (fo_term 'c0 'c1))
-    (bnd1:func int (fo_term 'c0 'c1)) : tableau 'c0 'c1 =
+  function nlmodel_tableau (t:nl_tableau 'b0 'b1) (fr0:'b0 -> (symbol 'c0))
+    (bnd0: int -> (symbol 'c0)) (fr1:'b1 -> (fo_term 'c0 'c1))
+    (bnd1: int -> (fo_term 'c0 'c1)) : tableau 'c0 'c1 =
     match t with | NL_Root -> Root
       | NL_Node v0 v1 v2 ->
         Node
@@ -114,10 +114,10 @@ module Logic
     end
 
   let rec lemma nlmodel_subst_commutation_lemma_tableau
-    (t:nl_tableau 'b0 'b1) (fr0:func 'b0 (symbol 'c0))
-    (bnd0:func int (symbol 'c0)) (s0:func 'c0 (symbol 'd0))
-    (fr1:func 'b1 (fo_term 'c0 'c1)) (bnd1:func int (fo_term 'c0 'c1))
-    (s1:func 'c1 (fo_term 'd0 'd1)) : unit
+    (t:nl_tableau 'b0 'b1) (fr0:'b0 -> (symbol 'c0))
+    (bnd0: int -> (symbol 'c0)) (s0:'c0 -> (symbol 'd0))
+    (fr1:'b1 -> (fo_term 'c0 'c1)) (bnd1: int -> (fo_term 'c0 'c1))
+    (s1:'c1 -> (fo_term 'd0 'd1)) : unit
     ensures {
       nlmodel_tableau t (subst_compose_symbol fr0 s0)
         (subst_compose_symbol bnd0 s0) (subst_compose_fo_term fr1 s0 s1)
@@ -232,9 +232,9 @@ module Logic
     end
 
   let lemma nlmodel_rename_commutation_lemma_tableau (t:nl_tableau 'b0 'b1)
-    (fr0:func 'b0 (symbol 'c0)) (bnd0:func int (symbol 'c0))
-    (s0:func 'c0 'd0) (fr1:func 'b1 (fo_term 'c0 'c1))
-    (bnd1:func int (fo_term 'c0 'c1)) (s1:func 'c1 'd1) : unit
+    (fr0:'b0 -> (symbol 'c0)) (bnd0: int -> (symbol 'c0)) (s0:'c0 -> 'd0)
+    (fr1:'b1 -> (fo_term 'c0 'c1)) (bnd1: int -> (fo_term 'c0 'c1))
+    (s1:'c1 -> 'd1) : unit
     ensures {
       nlmodel_tableau t (rename_subst_symbol fr0 s0)
         (rename_subst_symbol bnd0 s0) (rename_subst_fo_term fr1 s0 s1)
@@ -294,10 +294,10 @@ module Logic
     end
 
   let rec lemma model_equal_tableau (t:nl_tableau 'b0 'b1)
-    (fr10:func 'b0 (symbol 'c0)) (fr20:func 'b0 (symbol 'c0))
-    (bnd10:func int (symbol 'c0)) (bnd20:func int (symbol 'c0))
-    (fr11:func 'b1 (fo_term 'c0 'c1)) (fr21:func 'b1 (fo_term 'c0 'c1))
-    (bnd11:func int (fo_term 'c0 'c1)) (bnd21:func int (fo_term 'c0 'c1)) :
+    (fr10: 'b0 -> (symbol 'c0)) (fr20: 'b0 -> (symbol 'c0))
+    (bnd10: int -> (symbol 'c0)) (bnd20: int -> (symbol 'c0))
+    (fr11: 'b1 -> (fo_term 'c0 'c1)) (fr21: 'b1 -> (fo_term 'c0 'c1))
+    (bnd11: int -> (fo_term 'c0 'c1)) (bnd21: int -> (fo_term 'c0 'c1)) :
     unit
     requires {
       forall i:int. 0 <= i < bound_depth_of_symbol_in_tableau t ->  bnd10 i =
@@ -392,35 +392,35 @@ module Logic
 end
 
 module Impl
-  use import option.Option
-  use import int.Int
-  use import Nat.Nat
-  use import Functions.Func
-  use import OptionFuncs.Funcs
-  use import Sum.Sum
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Firstorder_formula_spec.Spec
-  use import Firstorder_formula_impl.Types
-  use import Firstorder_formula_impl.Logic
-  use import Firstorder_formula_impl.Impl
-  use import Firstorder_formula_list_spec.Spec
-  use import Firstorder_formula_list_impl.Types
-  use import Firstorder_formula_list_impl.Logic
-  use import Firstorder_formula_list_impl.Impl
-  use import Firstorder_tableau_spec.Spec
-  use import Types
-  use import Logic
+  use option.Option
+  use int.Int
+  use Nat.Nat
+  use Functions.Func
+  use OptionFuncs.Funcs
+  use Sum.Sum
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Firstorder_formula_spec.Spec
+  use Firstorder_formula_impl.Types
+  use Firstorder_formula_impl.Logic
+  use Firstorder_formula_impl.Impl
+  use Firstorder_formula_list_spec.Spec
+  use Firstorder_formula_list_impl.Types
+  use Firstorder_formula_list_impl.Logic
+  use Firstorder_formula_list_impl.Impl
+  use Firstorder_tableau_spec.Spec
+  use Types
+  use Logic
   let rec bind_var_symbol_in_tableau (t:nl_tableau int int) (x:int) (i:int)
-    (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    (ghost fr0: int -> (symbol 'b0)) (ghost bnd0: int -> (symbol 'b0))
+    (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd1: int -> (fo_term 'b0 'b1)) : nl_tableau int int
     requires { correct_indexes_tableau t }
     requires { bound_depth_of_symbol_in_tableau t <= i }
     variant { nlsize_tableau t }
@@ -488,9 +488,9 @@ module Impl
     end
 
   with bind_var_fo_term_in_tableau (t:nl_tableau int int) (x:int) (i:int)
-    (ghost fr0:func int (symbol 'b0)) (ghost bnd0:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd1:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    (ghost fr0: int -> (symbol 'b0)) (ghost bnd0: int -> (symbol 'b0))
+    (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd1: int -> (fo_term 'b0 'b1)) : nl_tableau int int
     requires { correct_indexes_tableau t }
     requires { bound_depth_of_fo_term_in_tableau t <= i }
     variant { nlsize_tableau t }
@@ -567,11 +567,10 @@ module Impl
     end
 
   let rec unbind_var_symbol_in_tableau (t:nl_tableau int int) (i:int)
-    (x:nl_symbol int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0)) : nl_tableau int int
+    (x:nl_symbol int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0)) : nl_tableau int int
     requires { i >= 0 } requires { correct_indexes_tableau t }
     requires { bound_depth_of_symbol_in_tableau t <= i + 1 }
     requires { correct_indexes_symbol x }
@@ -667,12 +666,11 @@ module Impl
     end
 
   with unbind_var_fo_term_in_tableau (t:nl_tableau int int) (i:int)
-    (x:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0))
-    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    (x:nl_fo_term int int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0))
+    (ghost bnd21: int -> (fo_term 'b0 'b1)) : nl_tableau int int
     requires { i >= 0 } requires { correct_indexes_tableau t }
     requires { bound_depth_of_fo_term_in_tableau t <= i + 1 }
     requires { correct_indexes_fo_term x }
@@ -802,17 +800,16 @@ module Impl
     end
 
   let rec subst_base_symbol_in_tableau (t:nl_tableau int int) (x:int)
-    (u:nl_symbol int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0)) : nl_tableau int int
+    (u:nl_symbol int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0)) : nl_tableau int int
     requires { correct_indexes_tableau t }
     requires { correct_indexes_symbol u }
     requires { bound_depth_of_symbol_in_symbol u = 0 }
     variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
-    ensures { bound_depth_of_symbol_in_tableau result =
+     ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
     ensures { bound_depth_of_fo_term_in_tableau result =
       bound_depth_of_fo_term_in_tableau t }
@@ -902,19 +899,18 @@ module Impl
     end
 
   with subst_base_fo_term_in_tableau (t:nl_tableau int int) (x:int)
-    (u:nl_fo_term int int) (ghost fr0:func int (symbol 'b0))
-    (ghost bnd10:func int (symbol 'b0))
-    (ghost fr1:func int (fo_term 'b0 'b1))
-    (ghost bnd11:func int (fo_term 'b0 'b1))
-    (ghost bnd20:func int (symbol 'b0))
-    (ghost bnd21:func int (fo_term 'b0 'b1)) : nl_tableau int int
+    (u:nl_fo_term int int) (ghost fr0: int -> (symbol 'b0))
+    (ghost bnd10: int -> (symbol 'b0)) (ghost fr1: int -> (fo_term 'b0 'b1))
+    (ghost bnd11: int -> (fo_term 'b0 'b1))
+    (ghost bnd20: int -> (symbol 'b0))
+    (ghost bnd21: int -> (fo_term 'b0 'b1)) : nl_tableau int int
     requires { correct_indexes_tableau t }
     requires { correct_indexes_fo_term u }
     requires { bound_depth_of_symbol_in_fo_term u = 0 }
     requires { bound_depth_of_fo_term_in_fo_term u = 0 }
     variant { nlsize_tableau t }
     ensures { correct_indexes_tableau result }
-    ensures { bound_depth_of_symbol_in_tableau result =
+     ensures { bound_depth_of_symbol_in_tableau result =
        bound_depth_of_symbol_in_tableau t }
     ensures { bound_depth_of_fo_term_in_tableau result =
       bound_depth_of_fo_term_in_tableau t }
@@ -1227,23 +1223,23 @@ module Impl
           } ;
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_tableau v0.nlrepr_tableau_field
@@ -1258,35 +1254,35 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula v1.nlrepr_fo_formula_field
@@ -1301,35 +1297,35 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         assert {
           extensionalEqual (rename_subst_symbol subst_id_symbol identity)
-            ((rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+            ((rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
                 identity))
           } ;
         assert { rename_subst_symbol subst_id_symbol identity =
-          (rename_subst_symbol (subst_id_symbol:func (int) (symbol (int)))
+          (rename_subst_symbol (subst_id_symbol:(int)->(symbol (int)))
              identity)
           } ;
         assert {
           extensionalEqual
             (rename_subst_fo_term subst_id_fo_term identity identity)
             ((rename_subst_fo_term
-                (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+                (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
                 identity))
           } ;
         assert { rename_subst_fo_term subst_id_fo_term identity identity =
           (rename_subst_fo_term
-             (subst_id_fo_term:func (int) (fo_term (int) (int))) identity
+             (subst_id_fo_term:(int)->(fo_term (int) (int))) identity
              identity)
           } ;
         model_equal_fo_formula_list v2.nlrepr_fo_formula_list_field
@@ -1344,16 +1340,16 @@ module Impl
           (rename_subst_fo_term (const (Var_fo_term (-1))) identity identity) ;
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         (*assert {
             extensionalEqual (rcompose (identity) (identity))
-              ((identity : func (int) (int)))
+              ((identity : (int) -> (int)))
             } ;
-        assert { rcompose (identity) (identity) =
-          (identity : func (int) (int)) } ;*)
+        assert { rcompose (identity) (identity) = (identity : (int) -> (int))
+          } ;*)
         res
     end
 
@@ -1377,26 +1373,26 @@ module Impl
             (nlmodel_tableau v0
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             (nlmodel_fo_formula v1
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             (nlmodel_fo_formula_list v2
                (rename_subst_symbol subst_id_symbol identity)
                (rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity)
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity)
                (rename_subst_fo_term subst_id_fo_term identity identity)
                (rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
           } ;
           let (mv0 , mv1 , mv2) =
@@ -1408,30 +1404,30 @@ module Impl
             nlmodel_tableau v0
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { mv1 =
             nlmodel_fo_formula v1
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { mv2 =
             nlmodel_fo_formula_list v2
               ((rename_subst_symbol subst_id_symbol identity))
               ((rename_subst_symbol
-                 (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                 (const (Var_symbol (-1)) : int -> (symbol int)) identity))
               ((rename_subst_fo_term subst_id_fo_term identity identity))
               ((rename_subst_fo_term
-                 (const (Var_fo_term (-1)) : func int (fo_term int int))
+                 (const (Var_fo_term (-1)) : int -> (fo_term int int))
                  identity identity))
             } ;
           assert { bound_depth_of_symbol_in_tableau v0 <= 0 } ;
@@ -1473,60 +1469,60 @@ module Impl
           model_equal_tableau v0 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           model_equal_fo_formula v1 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
           model_equal_fo_formula_list v2 subst_id_symbol
             (rename_subst_symbol
                ((rename_subst_symbol subst_id_symbol identity)) (identity)) ((
-            const (Var_symbol (-1)) : func int (symbol int)))
+            const (Var_symbol (-1)) : int -> (symbol int)))
             (rename_subst_symbol
                ((rename_subst_symbol
-                  (const (Var_symbol (-1)) : func int (symbol int)) identity))
+                  (const (Var_symbol (-1)) : int -> (symbol int)) identity))
                (identity))
             subst_id_fo_term
             (rename_subst_fo_term
                ((rename_subst_fo_term subst_id_fo_term identity identity))
                (identity) (identity)) ((const (Var_fo_term (-1)) :
-                                          func int (fo_term int int)))
+                                          int -> (fo_term int int)))
             (rename_subst_fo_term
                ((rename_subst_fo_term
-                  (const (Var_fo_term (-1)) : func int (fo_term int int))
+                  (const (Var_fo_term (-1)) : int -> (fo_term int int))
                   identity identity))
                (identity) (identity)) ;
-          let mrv0 = rename_tableau mv0 identity identity in
-          let mrv1 = rename_fo_formula mv1 identity identity in
-          let mrv2 = rename_fo_formula_list mv2 identity identity in
+          let ghost mrv0 = rename_tableau mv0 identity identity in
+          let ghost mrv1 = rename_fo_formula mv1 identity identity in
+          let ghost mrv2 = rename_fo_formula_list mv2 identity identity in
           let resv0 =
             { nlrepr_tableau_field = v0 ;
               nlfree_var_symbol_set_abstraction_tableau_field = fv0 ;
@@ -1626,30 +1622,30 @@ module Impl
     requires { nlimpl_symbol_ok u } ensures { nlimpl_tableau_ok result }
     ensures { result.model_tableau_field =
       subst_tableau t.model_tableau_field
-        (update (subst_id_symbol: func (int) (symbol (int))) x
+        (update (subst_id_symbol: (int) -> (symbol (int))) x
            u.model_symbol_field)
-        (subst_id_fo_term: func (int) (fo_term (int) (int)))
+        (subst_id_fo_term: (int) -> (fo_term (int) (int)))
       }
     =
     model_equal_tableau t.nlrepr_tableau_field
       (subst_compose_symbol subst_id_symbol
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field)))
-      ((update (subst_id_symbol: func (int) (symbol (int))) x
+      ((update (subst_id_symbol: (int) -> (symbol (int))) x
           u.model_symbol_field))
       (subst_compose_symbol (const (Var_symbol (-1)))
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field)))
       ((const (Var_symbol (-1))))
       (subst_compose_fo_term subst_id_fo_term
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field))
-         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
-      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+         ((subst_id_fo_term: (int) -> (fo_term (int) (int)))))
+      ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
       (subst_compose_fo_term (const (Var_fo_term (-1)))
-         ((update (subst_id_symbol: func (int) (symbol (int))) x
+         ((update (subst_id_symbol: (int) -> (symbol (int))) x
              u.model_symbol_field))
-         ((subst_id_fo_term: func (int) (fo_term (int) (int)))))
+         ((subst_id_fo_term: (int) -> (fo_term (int) (int)))))
       ((const (Var_fo_term (-1))));
     let res =
       {
@@ -1668,9 +1664,9 @@ module Impl
           t.nlfree_var_fo_term_set_abstraction_tableau_field ;
         model_tableau_field = ghost
           subst_tableau t.model_tableau_field
-            (update (subst_id_symbol: func (int) (symbol (int))) x
+            (update (subst_id_symbol: (int) -> (symbol (int))) x
                u.model_symbol_field)
-            (subst_id_fo_term: func (int) (fo_term (int) (int))) ;
+            (subst_id_fo_term: (int) -> (fo_term (int) (int))) ;
       }
     in
     assert {
@@ -1681,7 +1677,7 @@ module Impl
               (is_symbol_free_var_in_tableau y t.model_tableau_field /\
                  is_symbol_free_var_in_symbol x2
                    (eval
-                      ((update (subst_id_symbol: func (int) (symbol (int))) x
+                      ((update (subst_id_symbol: (int) -> (symbol (int))) x
                           u.model_symbol_field))
                       y))
               ->
@@ -1696,8 +1692,7 @@ module Impl
            (forall y:int.
               (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
                  is_symbol_free_var_in_fo_term x2
-                   (eval
-                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                   (eval ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
                       y))
               -> false))
         && (x2) < (res.nlfree_var_symbol_set_abstraction_tableau_field)
@@ -1709,8 +1704,7 @@ module Impl
            (forall y:int.
               (is_fo_term_free_var_in_tableau y t.model_tableau_field /\
                  is_fo_term_free_var_in_fo_term x2
-                   (eval
-                      ((subst_id_fo_term: func (int) (fo_term (int) (int))))
+                   (eval ((subst_id_fo_term: (int) -> (fo_term (int) (int))))
                       y))
               -> x2 = y && (x2) <
               (res.nlfree_var_fo_term_set_abstraction_tableau_field)))
@@ -1723,27 +1717,27 @@ module Impl
     requires { nlimpl_fo_term_ok u } ensures { nlimpl_tableau_ok result }
     ensures { result.model_tableau_field =
       subst_tableau t.model_tableau_field
-        (subst_id_symbol: func (int) (symbol (int)))
-        (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+        (subst_id_symbol: (int) -> (symbol (int)))
+        (update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
            u.model_fo_term_field)
       }
     =
     model_equal_tableau t.nlrepr_tableau_field
       (subst_compose_symbol subst_id_symbol
-         ((subst_id_symbol: func (int) (symbol (int)))))
-      ((subst_id_symbol: func (int) (symbol (int))))
+         ((subst_id_symbol: (int) -> (symbol (int)))))
+      ((subst_id_symbol: (int) -> (symbol (int))))
       (subst_compose_symbol (const (Var_symbol (-1)))
-         ((subst_id_symbol: func (int) (symbol (int)))))
+         ((subst_id_symbol: (int) -> (symbol (int)))))
       ((const (Var_symbol (-1))))
       (subst_compose_fo_term subst_id_fo_term
-         ((subst_id_symbol: func (int) (symbol (int))))
-         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+         ((subst_id_symbol: (int) -> (symbol (int))))
+         ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
              u.model_fo_term_field)))
-      ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+      ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
           u.model_fo_term_field))
       (subst_compose_fo_term (const (Var_fo_term (-1)))
-         ((subst_id_symbol: func (int) (symbol (int))))
-         ((update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+         ((subst_id_symbol: (int) -> (symbol (int))))
+         ((update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
              u.model_fo_term_field)))
       ((const (Var_fo_term (-1))));
     let res =
@@ -1768,8 +1762,8 @@ module Impl
                (u.nlfree_var_fo_term_set_abstraction_fo_term_field)) ;
         model_tableau_field = ghost
           subst_tableau t.model_tableau_field
-            (subst_id_symbol: func (int) (symbol (int)))
-            (update (subst_id_fo_term: func (int) (fo_term (int) (int))) x
+            (subst_id_symbol: (int) -> (symbol (int)))
+            (update (subst_id_fo_term: (int) -> (fo_term (int) (int))) x
                u.model_fo_term_field) ;
       }
     in
@@ -1780,7 +1774,7 @@ module Impl
            (forall y:int.
               (is_symbol_free_var_in_tableau y t.model_tableau_field /\
                  is_symbol_free_var_in_symbol x2
-                   (eval ((subst_id_symbol: func (int) (symbol (int)))) y))
+                   (eval ((subst_id_symbol: (int) -> (symbol (int)))) y))
               -> x2 = y && (x2) <
               (res.nlfree_var_symbol_set_abstraction_tableau_field))
            /\
@@ -1789,7 +1783,7 @@ module Impl
                  is_symbol_free_var_in_fo_term x2
                    (eval
                       ((update
-                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          (subst_id_fo_term: (int) -> (fo_term (int) (int)))
                           x u.model_fo_term_field))
                       y))
               ->
@@ -1808,7 +1802,7 @@ module Impl
                  is_fo_term_free_var_in_fo_term x2
                    (eval
                       ((update
-                          (subst_id_fo_term: func (int) (fo_term (int) (int)))
+                          (subst_id_fo_term: (int) -> (fo_term (int) (int)))
                           x u.model_fo_term_field))
                       y))
               ->

@@ -1,12 +1,12 @@
 module TestHashtbl
 
-  use import int.Int
-  use import list.List
-  use import hashtbl.Hashtbl
+  use int.Int
+  use list.List
+  use hashtbl.Hashtbl
 
-  function k1: key
-  function k2: key
-  function k3: key
+  val constant k1: key
+  val constant k2: key
+  val constant k3: key
   axiom kdiff : k1 <> k2 /\ k1 <> k3 /\ k2 <> k3
 
   let test1 () =

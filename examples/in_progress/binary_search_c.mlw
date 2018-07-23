@@ -19,13 +19,13 @@ int binary_search(int* t, int n, int v) {
 
 module M1
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
 
   type pointer
   type memory
-  function get memory pointer int : int
+  val function get memory pointer int : int
 
   val mem : ref memory
 
@@ -66,9 +66,9 @@ end
 
 module M2
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
 
   type pointer
   type memory
@@ -114,12 +114,12 @@ end
 
 module M3
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
 
   type int32
-  function to_int int32 : int
+  val function to_int int32 : int
 
   axiom int32_domain : forall x:int32. -2147483648 <= to_int x <= 2147483647
 

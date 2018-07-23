@@ -1,0 +1,64 @@
+(* From simulation, define a notion of subgame. *)
+module SubGameDef
+
+  use ho_set.Set
+  use game.Game
+  use game_simulation.SimDef
+
+  predicate direct_subgame (g1 g2:game 'a) =
+    g1.progress = g2.progress /\
+    forall x. subset (g1.transition x) (g2.transition x)
+  predicate subgame (g1 g2:game 'a) =
+    g1.progress = g2.progress /\ simulate g1 (=) g2
+
+end
+
+module SubGame "W:non_conservative_extension:N" (* => SubGameProof *)
+
+  use game.Game
+  use ho_rel.Rel
+  use export SubGameDef
+
+  axiom trivial_subgame_subgame : forall g1 g2:game 'a.
+    direct_subgame g1 g2 -> subgame g1 g2
+
+  axiom subgame_other : forall g1 g2:game 'a.
+    subgame g1 g2 <-> g1.progress = g2.progress /\ forall p q.
+      have_uniform_winning_strat g1 p q -> have_uniform_winning_strat g2 p q
+
+  axiom subgame_preorder : preorder (subgame:erel (game 'a))
+
+end
+
+module SubGameProof
+
+  use SubGameDef
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.RelSet
+  use ho_rel.Prod
+  use order.Chain
+  use order.Product
+  use order.ProductChain
+  use game.Game
+  use game.BasicStrats
+  use game_simulation.Sim
+
+  lemma L0 : forall s:set 'a. related (=) s = s
+    by sext (related (=) s) s
+
+  lemma L1 : forall g1 g2:game 'a. direct_subgame g1 g2 ->
+    subgame g1 g2 by step_simulate g1 (=) g2
+    by (forall x y s. g1.transition x s /\ x = y ->
+      have_winning_strat g2 y (related (=) s)
+      by g2.transition y (related (=) s))
+    /\ forall ch:set 'a,f. rel_mapping ch f (=) ->
+      image f ch = ch by sext (image f ch) ch
+
+  clone SubGame with
+    goal trivial_subgame_subgame,
+    goal subgame_other,
+    goal subgame_preorder
+
+end

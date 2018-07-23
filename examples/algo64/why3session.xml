@@ -2,64 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../algo64.mlw">
-<theory name="Algo64">
- <goal name="WP_parameter quicksort" expl="VC for quicksort">
- <transf name="split_goal_right">
-  <goal name="WP_parameter quicksort.1" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.2" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.3" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.4" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.14" steps="131"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.5" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.6" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.7" expl="assertion">
-  <proof prover="1"><result status="valid" time="1.43" steps="657"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.8" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.19" steps="315"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.9" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.16" steps="95"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.10" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter quicksort.11" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
-  </goal>
- </transf>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file name="../algo64.mlw" proved="true">
+<theory name="Algo64" proved="true">
+ <goal name="VC quicksort" expl="VC for quicksort" proved="true">
+ <proof prover="1"><result status="valid" time="0.67" steps="1799"/></proof>
  </goal>
- <goal name="WP_parameter qs" expl="VC for qs">
- <transf name="split_goal_right">
-  <goal name="WP_parameter qs.1" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
-  </goal>
-  <goal name="WP_parameter qs.2" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter qs.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
-  </goal>
-  <goal name="WP_parameter qs.4" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter qs.5" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
- </transf>
+ <goal name="VC qs" expl="VC for qs" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="57"/></proof>
  </goal>
 </theory>
 </file>

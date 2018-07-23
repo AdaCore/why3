@@ -14,16 +14,16 @@
 
 module CoincidenceCount
 
-  use import array.Array
-  use import ref.Refint
-  use import set.Fsetint
-  use import set.FsetComprehension
+  use array.Array
+  use ref.Refint
+  use set.Fsetint
+  use set.FsetComprehension
 
   function setof (a: array 'a) : set 'a =
-    map (get a) (interval 0 (length a))
+    map (fun x -> a[x]) (interval 0 (length a))
 
   function drop (a: array 'a) (n: int) : set 'a =
-    map (get a) (interval n (length a))
+    map (fun x -> a[x]) (interval n (length a))
 
   lemma drop_left:
     forall a: array 'a, n: int. 0 <= n < length a ->

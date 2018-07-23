@@ -9,7 +9,7 @@ k = 0
 while k <= n:
     #@ invariant k <= n+1
     #@ invariant s == (k - 1) * k // 2
-    #@ variant   n-k
+    #@ variant n - k
     s = s + k
     k = k + 1
 

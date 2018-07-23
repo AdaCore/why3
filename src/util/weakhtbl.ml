@@ -169,7 +169,7 @@ module Make (S : Weakey) = struct
 
   let tbl_final t =
     tbl_final_aux t;
-    (** We don't need anymore the weak hashset, we can release it *)
+    (* We don't need anymore the weak hashset, we can release it *)
     Hashtbl.remove gen_table t.tbl_tag
 
   (** All the hashweak that can be collected. When a hashweak is

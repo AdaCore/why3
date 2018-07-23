@@ -9,9 +9,9 @@
 
 module Grid
 
-  use import int.Int
-  use import map.Map
-  use import mach.int.Int31
+  use int.Int
+  use map.Map
+  use mach.int.Int31
   function t (n:int31) : int = to_int n
 
   (** A grid is a map from integers to integers *)
@@ -48,7 +48,7 @@ module Grid
 
   *)
 
-  use import mach.array.Array31
+  use mach.array.Array31
 
   type sudoku_chunks =
     { column_start : array int31;
@@ -145,13 +145,13 @@ end
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
 module TheClassicalSudokuGrid
 
-  use import Grid
-  use import map.Map
-  use import int.Int
+  use Grid
+  use map.Map
+  use int.Int
 
-  use import mach.int.Int31
+  use mach.int.Int31
 
-  use import mach.array.Array31
+  use mach.array.Array31
 
   let classical_sudoku () : sudoku_chunks
     ensures { well_formed_sudoku result }
@@ -337,12 +337,12 @@ end
 
 module Solver
 
-  use import Grid
-  use import array.Array
+  use Grid
+  use array.Array
 
-  use import mach.int.Int31
-  use import int.Int
-  use import mach.array.Array31
+  use mach.int.Int31
+  use int.Int
+  use mach.array.Array31
 
   (** predicate for the loop invariant of next function *)
   predicate valid_chunk_up_to (g:grid) (i:int)
@@ -357,7 +357,7 @@ module Solver
 
   exception Invalid
 
-  use import ref.Ref
+  use ref.Ref
 
   (** [check_valid_chunk g i start offsets] checks the validity
       of the chunk that includes [i] *)
@@ -391,7 +391,7 @@ module Solver
       let v = g[Int31.(+) s offsets[!off]] in
       if Int31.(<=) n1 v && Int31.(<=) v n9 then
          begin
-           if b[v] = True then
+           if b[v] then
               begin
                 assert { exists o:int.
            0 <= o < t !off /\ t (Map.get g.elts (t s + t offsets[o])) = t v };
@@ -562,7 +562,7 @@ this is true but with 2 different possible reasons:
     let n1 = of_int 1 in
     let n9 = of_int 9 in
     let n81 = of_int 81 in
-    if Int31.eq i n81 then raise SolutionFound;
+    if i = n81 then raise SolutionFound;
     (* assert { is_index i }; *)
     if g[i] <> n0 then
       try
@@ -575,15 +575,15 @@ this is true but with 2 different possible reasons:
       end
     else
       begin
-      'L:
+      label L in
       let k = ref n1 in
       while Int31.(<=) !k n9 do
         invariant { 1 <= t !k <= 10 }
-        invariant { grid_eq (at g 'L).elts (Map.set g.elts (t i) n0) }
+        invariant { grid_eq (g at L).elts (Map.set g.elts (t i) n0) }
         invariant { full_up_to g.elts (t i) }
         invariant { (* for completeness *)
           forall k'. 1 <= t k' < t !k ->
-          let g' = Map.set (at g 'L).elts (t i) k' in
+          let g' = Map.set (g at L).elts (t i) k' in
           forall h : grid. included g' h /\ full h -> not (valid s h) }
         variant { 9 - t !k }
         g[i] <- !k;
@@ -592,7 +592,7 @@ this is true but with 2 different possible reasons:
           check_valid_chunk g i s.row_start s.row_offsets;
           check_valid_chunk g i s.square_start s.square_offsets;
             (* the hard part: see lemma valid_up_to_change *)
-          assert { let grid' = Map.set (at g 'L).elts (t i) !k in
+          assert { let grid' = Map.set (g at L).elts (t i) !k in
             grid_eq grid' g.elts &&
             valid_chunk grid' (t i) s.column_start s.column_offsets &&
             valid_chunk grid' (t i) s.row_start s.row_offsets &&
@@ -602,22 +602,22 @@ this is true but with 2 different possible reasons:
           solve_aux s g (Int31.(+) i n1)
         with Invalid ->
           assert {
-            grid_eq g.elts (Map.set (at g 'L).elts (t i) !k) };
+            grid_eq g.elts (Map.set (g at L).elts (t i) !k) };
           assert { (* for completeness *)
             not (valid s g.elts) };
           assert { (* for completeness *)
-            not (valid s (Map.set (at g 'L).elts (t i) !k)) };
+            not (valid s (Map.set (g at L).elts (t i) !k)) };
           assert { (* for completeness *)
-            let g' = Map.set (at g 'L).elts (t i) !k in
+            let g' = Map.set (g at L).elts (t i) !k in
             forall h : grid. included g' h /\ full h -> not (valid s h) }
         end;
         k := Int31.(+) !k n1;
       done;
       g[i] <- n0;
       assert { (* for completeness *)
-        forall h:grid. included (at g 'L).elts h /\ full h ->
+        forall h:grid. included (g at L).elts h /\ full h ->
           let k' = Map.get h (t i) in
-          let g' = Map.set (at g 'L).elts (t i) k' in
+          let g' = Map.set (g at L).elts (t i) k' in
           included g' h }
       end
 
@@ -658,13 +658,13 @@ end
 
 module Test
 
-  use import Grid
-  use import TheClassicalSudokuGrid
+  use Grid
+  use TheClassicalSudokuGrid
 
-  use import Solver
+  use Solver
   use mach.array.Array31
-  use import map.Map
-  use import mach.int.Int31
+  use map.Map
+  use mach.int.Int31
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()

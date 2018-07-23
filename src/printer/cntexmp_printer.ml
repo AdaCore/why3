@@ -45,7 +45,7 @@ module TermCmp = struct
 	    else false
 
   let compare a b =
-    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
+    if (a.t_loc = b.t_loc) && (a.t_attrs = b.t_attrs)
     then 0 else
       (* Order the terms accoridng to their source code locations  *)
       if before a.t_loc b.t_loc then 1
@@ -56,8 +56,8 @@ end
 module S = Set.Make(TermCmp)
 
 let add_model_element (el: term) info_model =
-(** Add element el (term) to info_model.
-    If an element with the same hash (the same set of labels + the same
+ (* Add element el (term) to info_model.
+    If an element with the same hash (the same set of attributes + the same
     location) as the element el already exists in info_model, replace it with el.
 
     The reason is that  we do not want to display two model elements with the same
@@ -83,13 +83,13 @@ let check_enter_vc_term t in_goal vc_term_info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
+  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc
   end
 
 let check_exit_vc_term t in_goal info =
   (* Check whether the term triggering VC is exited. *)
-  if in_goal && Slab.mem Ident.model_vc_label t.t_label then begin
+  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
     info.vc_inside <- false;
   end

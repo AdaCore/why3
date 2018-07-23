@@ -2,49 +2,48 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../induction.mlw">
-<theory name="Hyps">
-</theory>
-<theory name="Induction1">
- <goal name="SimpleInduction.base" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
+<prover id="2" name="Z3" version="4.6.0" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="36" steplimit="0" memlimit="1000"/>
+<file name="../induction.mlw" proved="true">
+<theory name="Induction1" proved="true">
+ <goal name="SimpleInduction.base" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="SimpleInduction.induction_step" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="SimpleInduction.induction_step" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
  </goal>
- <goal name="G" expl="">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
- </goal>
-</theory>
-<theory name="Induction2">
- <goal name="G" expl="">
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction1">
- <goal name="WP_parameter ind" expl="VC for ind">
- <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
- </goal>
- <goal name="G" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+<theory name="Induction2" proved="true">
+ <goal name="G" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction2">
- <goal name="WP_parameter ind" expl="VC for ind">
- <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+<theory name="LemmaFunction1" proved="true">
+ <goal name="VC ind" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="G" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction3">
- <goal name="WP_parameter ind" expl="VC for ind">
- <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
+<theory name="LemmaFunction2" proved="true">
+ <goal name="VC ind" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="G" expl="">
- <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+</theory>
+<theory name="LemmaFunction3" proved="true">
+ <goal name="VC ind" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="55"/></proof>
+ </goal>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
 </file>

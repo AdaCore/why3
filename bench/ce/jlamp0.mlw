@@ -1,16 +1,17 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   val a : ref int
 
   let p1 (b : ref int)
     requires { 0 <= !a <= 10 /\ 3 <= !b <= 17 }
     ensures  { 17 <= !a <= 42 }
-  = a := !a + !b;
-    assert { 5 <= !a <= 15 };
-    if !a >= 10 then a := !a - 1
+  =
+    a.contents <- !a + !b;
+    (*assert { 5 <= !a <= 15 };*)
+    (*if !a >= 10 then a.contents <- !a - 1*) ()
 
   val c : ref int
 

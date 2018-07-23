@@ -45,6 +45,8 @@ type rs_kind =
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
 
+val rs_kind : rsymbol -> rs_kind
+
 val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
 (** If [?kind] is supplied and is not [RKnone], then [cty]
     must have no effects except for resets which are ignored.
@@ -65,25 +67,37 @@ val restore_rs : lsymbol -> rsymbol
 
 val rs_ghost : rsymbol -> bool
 
+val ls_of_rs : rsymbol -> lsymbol
+(** raises [Invalid_argument] is [rs_logic] is not an [RLls] *)
+
+val fd_of_rs : rsymbol -> pvsymbol
+(** raises [Invalid_argument] is [rs_field] is [None] *)
+
 (** {2 Program patterns} *)
 
+type pat_ghost =
+  | PGfail  (* refutable ghost subpattern before "|" *)
+  | PGlast  (* refutable ghost subpattern otherwise  *)
+  | PGnone  (* every ghost subpattern is irrefutable *)
+
 type prog_pattern = private {
-  pp_pat   : pattern;
-  pp_ity   : ity;
-  pp_ghost : bool;
+  pp_pat  : pattern;    (* pure pattern *)
+  pp_ity  : ity;        (* type of the matched value *)
+  pp_mask : mask;       (* mask of the matched value *)
+  pp_fail : pat_ghost;  (* refutable ghost subpattern *)
 }
 
 type pre_pattern =
   | PPwild
-  | PPvar of preid
+  | PPvar of preid * bool
   | PPapp of rsymbol * pre_pattern list
+  | PPas  of pre_pattern * preid * bool
   | PPor  of pre_pattern * pre_pattern
-  | PPas  of pre_pattern * preid
 
 exception ConstructorExpected of rsymbol
 
 val create_prog_pattern :
-  pre_pattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * prog_pattern
+  pre_pattern -> ity -> mask -> pvsymbol Mstr.t * prog_pattern
 
 (** {2 Program expressions} *)
 
@@ -102,34 +116,41 @@ type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 type expr = private {
   e_node   : expr_node;
   e_ity    : ity;
+  e_mask   : mask;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
 }
 
-and expr_node = private
+and expr_node =
   | Evar    of pvsymbol
   | Econst  of Number.constant
-  | Eexec   of cexp
+  | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * (prog_pattern * expr) list
+  | Ematch  of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
-  | Efor    of pvsymbol * for_bounds * invariant list * expr
-  | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
   | Eraise  of xsymbol * expr
+  | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
+  | Eghost  of expr
   | Epure   of term
   | Eabsurd
+
+and reg_branch = prog_pattern * expr
+
+and exn_branch = pvsymbol list * expr
 
 and cexp = private {
   c_node : cexp_node;
   c_cty  : cty;
 }
 
-and cexp_node = private
+and cexp_node =
   | Capp of rsymbol * pvsymbol list
+  | Cpur of lsymbol * pvsymbol list
   | Cfun of expr
   | Cany
 
@@ -141,21 +162,16 @@ and let_defn = private
 and rec_defn = private {
   rec_sym  : rsymbol; (* exported symbol *)
   rec_rsym : rsymbol; (* internal symbol *)
-  rec_fun  : cexp;    (* Cfun *)
+  rec_fun  : cexp;    (* necessary a Cfun *)
   rec_varl : variant list;
 }
 
 (** {2 Expressions} *)
 
-val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
-val e_label_add : label -> expr -> expr
-val e_label_copy : expr -> expr -> expr
-
-val e_ghost : expr -> bool
-val c_ghost : cexp -> bool
-
-val e_ghostify : bool -> expr -> expr
-val c_ghostify : bool -> cexp -> cexp
+val e_attr_set : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_push : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_add : attribute -> expr -> expr
+val e_attr_copy : expr -> expr -> expr
 
 (** {2 Definitions} *)
 
@@ -168,35 +184,31 @@ val let_sym :
 val let_rec :
   (rsymbol * cexp * variant list * rs_kind) list -> let_defn * rec_defn list
 
-val ls_decr_of_let_defn : let_defn -> lsymbol option
+val ls_decr_of_rec_defn : rec_defn -> lsymbol option
 (* returns the dummy predicate symbol used in the precondition of
    the rec_rsym rsymbol to store the instantiated variant list *)
 
 (** {2 Callable expressions} *)
 
 val c_app : rsymbol -> pvsymbol list -> ity list -> ity -> cexp
+val c_pur : lsymbol -> pvsymbol list -> ity list -> ity -> cexp
 
-val c_fun : pvsymbol list ->
-  pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t -> expr -> cexp
+val c_fun : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t -> expr -> cexp
 
 val c_any : cty -> cexp
-
-type ext_cexp = let_defn list * cexp
-
-val ext_c_sym : rsymbol -> ext_cexp
-
-val ext_c_app : ext_cexp -> expr list -> ity list -> ity -> ext_cexp
 
 (** {2 Expression constructors} *)
 
 val e_var : pvsymbol -> expr
 
-val e_const : Number.constant -> expr
+val e_const : Number.constant -> ity -> expr
 val e_nat_const : int -> expr
 
 val e_exec : cexp -> expr
 
 val e_app : rsymbol -> expr list -> ity list -> ity -> expr
+val e_pur : lsymbol -> expr list -> ity list -> ity -> expr
 
 val e_let : let_defn -> expr -> expr
 
@@ -216,20 +228,24 @@ val e_false : expr
 val is_e_true  : expr -> bool
 val is_e_false : expr -> bool
 
+exception ExceptionLeak of xsymbol
+
+val e_exn : xsymbol -> expr -> expr
+
 val e_raise : xsymbol -> expr -> ity -> expr
 
-val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
-
-val e_case : expr -> (prog_pattern * expr) list -> expr
+val e_match : expr -> reg_branch list -> exn_branch Mxs.t -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 
-val e_for : pvsymbol ->
-  expr -> for_direction -> expr -> invariant list -> expr -> expr
-
-val e_pure : term -> expr
+val e_for : pvsymbol -> expr -> for_direction -> expr ->
+              pvsymbol -> invariant list -> expr -> expr
 
 val e_assert : assertion_kind -> term -> expr
+
+val e_ghostify : bool -> expr -> expr
+
+val e_pure : term -> expr
 
 val e_absurd : ity -> expr
 
@@ -242,7 +258,18 @@ val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
 (** [e_locate_effect pr e] looks for a minimal sub-expression of
     [e] whose effect satisfies [pr] and returns its location *)
 
-val proxy_label : label
+val proxy_attr : attribute
+
+val e_rs_subst : rsymbol Mrs.t -> expr -> expr
+val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp
+
+val term_of_post : prop:bool -> vsymbol -> term -> (term * term) option
+
+val term_of_expr : prop:bool -> expr -> term option
+val post_of_expr : term -> expr -> term option
+
+val e_ghost : expr -> bool
+val c_ghost : cexp -> bool
 
 (** {2 Built-in symbols} *)
 
@@ -253,7 +280,9 @@ val rs_tuple : int -> rsymbol
 val e_tuple : expr list -> expr
 
 val rs_void : rsymbol
+val fs_void : lsymbol
 val e_void : expr
+val t_void : term
 
 val is_e_void : expr -> bool
 val is_rs_tuple : rsymbol -> bool
@@ -266,9 +295,6 @@ val e_func_app_l : expr -> expr list -> expr
 (** {2 Pretty-printing} *)
 
 val forget_rs  : rsymbol -> unit (* flush id_unique for a program symbol *)
-
 val print_rs   : Format.formatter -> rsymbol -> unit  (* program symbol *)
-
 val print_expr : Format.formatter -> expr -> unit     (* expression *)
-
 val print_let_defn : Format.formatter -> let_defn -> unit

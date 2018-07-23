@@ -435,8 +435,8 @@ void handle_child_events() {
     is_timeout = false;
     if (WIFSIGNALED(status)) {
       is_timeout = true;
-    }
-    if (WIFEXITED(status)) {
+      exit_code = WTERMSIG(status);
+    } else if (WIFEXITED(status)) {
       exit_code = WEXITSTATUS(status);
     }
     child = (pproc) list_lookup(processes, pid);

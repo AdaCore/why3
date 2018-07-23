@@ -1,21 +1,21 @@
 
 module Types
 
-  use import Functions.Func
+  use Functions.Func
   (*use import Assoc.Types as AS
   use import Assoc.Logic as AS
   use import Assoc.Impl as AS*)
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
 
   type sdata = PConflict nlimpl_fo_term_list nlimpl_fo_term_list
     | Assign nlimpl_fo_term
@@ -24,41 +24,41 @@ module Types
   type timesubst = BA.timestamp sdata
 
   type unifier_subst = {
-    ghost unifier_base_model : func int (fo_term int int) ;
-    ghost unifier : func int (fo_term int int) ;
+    ghost unifier_base_model : int -> (fo_term int int) ;
+    ghost unifier : int -> (fo_term int int) ;
   }
 
   type unification_return = {
     ghost final_unifier : unifier_subst ;
-    ghost unifier_factor : func int (fo_term int int) ;
+    ghost unifier_factor : int -> (fo_term int int) ;
   }
 
   (*type unify_return = {
-    ghost factor : func int (fo_term int int);
+    ghost factor : int -> (fo_term int int);
   }*)
 
 end
 
 module Logic
 
-  use import int.Int
-  use import Functions.Func
-  use import option.Option
+  use int.Int
+  use Functions.Func
+  use option.Option
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import list.List
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Types
+  use list.List
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Types
 
-  constant sdata_inv : pred sdata
+  constant sdata_inv : sdata -> bool
   axiom sdata_inv_def : forall x:sdata.
     sdata_inv x <-> match x with
       | PConflict l1 l2 -> nlimpl_fo_term_list_ok l1 /\
@@ -72,7 +72,7 @@ module Logic
           l.model_fo_term_field -> x >= 0)
     end
 
-  function smodel (l:timesubst) : func int (fo_term int int)
+  function smodel (l:timesubst) : int -> (fo_term int int)
   axiom smodel_def : forall l:timesubst,x:int.
     smodel l x = match table l x with
       | Nil -> Var_fo_term x
@@ -91,40 +91,40 @@ module Logic
   =
     assert { extensionalEqual (smodel l1) (smodel l2) }
 
-  function sc (s1:func 'b (fo_term 'ls 'b)) (s2:func 'b (fo_term 'ls 'b)) :
-    func 'b (fo_term 'ls 'b) =
+  function sc (s1:'b -> (fo_term 'ls 'b)) (s2:'b -> (fo_term 'ls 'b)) :
+    'b -> (fo_term 'ls 'b) =
     subst_compose_fo_term s1 subst_id_symbol s2
 
-  function st (t:fo_term 'ls 'b) (s:func 'b (fo_term 'ls 'b)) : fo_term 'ls 'b =
+  function st (t:fo_term 'ls 'b) (s:'b -> (fo_term 'ls 'b)) : fo_term 'ls 'b =
     subst_fo_term t subst_id_symbol s
 
   function stl (t:fo_term_list 'ls 'b)
-    (s:func 'b (fo_term 'ls 'b)) : fo_term_list 'ls 'b =
+    (s:'b -> (fo_term 'ls 'b)) : fo_term_list 'ls 'b =
     subst_fo_term_list t subst_id_symbol s
 
   (*
   (* power relation. *)
 
-  inductive power_rel (s:func 'b (fo_term 'ls 'b)) (n:int)
-    (sr:func 'b (fo_term 'ls 'b)) =
-    | Power0 : forall s:func 'b (fo_term 'ls 'b).
+  inductive power_rel (s:'b -> (fo_term 'ls 'b)) (n:int)
+    (sr:'b -> (fo_term 'ls 'b)) =
+    | Power0 : forall s:'b -> (fo_term 'ls 'b).
       power_rel s 0 subst_id_fo_term
-    | Powern : forall s:func 'b (fo_term 'ls 'b),n:int,
-      sr:func 'b (fo_term 'ls 'b).
+    | Powern : forall s:'b -> (fo_term 'ls 'b),n:int,
+      sr:'b -> (fo_term 'ls 'b).
       n >= 0 /\ power_rel s n sr ->
       power_rel s (n+1) (sc s sr)
 
-  let rec lemma power_rel_det (s:func 'b (fo_term 'ls 'b)) (n:int) : unit
-    ensures { forall sr1 sr2:func 'b (fo_term 'ls 'b).
+  let rec lemma power_rel_det (s:'b -> (fo_term 'ls 'b)) (n:int) : unit
+    ensures { forall sr1 sr2:'b -> (fo_term 'ls 'b).
       power_rel s n sr1 /\ power_rel s n sr2 -> sr1 = sr2 }
     variant { n }
   =
     if n > 0
     then power_rel_det s (n-1)
 
-  let rec lemma power_rel_additive (s:func 'b (fo_term 'ls 'b)) (n m:int)
-    (srm:func 'b (fo_term 'ls 'b)) : unit
-    ensures { forall srn:func 'b (fo_term 'ls 'b).
+  let rec lemma power_rel_additive (s:'b -> (fo_term 'ls 'b)) (n m:int)
+    (srm:'b -> (fo_term 'ls 'b)) : unit
+    ensures { forall srn:'b -> (fo_term 'ls 'b).
       power_rel s n srn /\ power_rel s m srm ->
       power_rel s (n+m) (sc srn srm) }
     variant { n }
@@ -132,8 +132,8 @@ module Logic
     if n > 0
     then power_rel_additive s (n-1) m srm
 
-  let rec ghost power (s:func 'b (fo_term 'ls 'b)) (n:int) :
-    func 'b (fo_term 'ls 'b)
+  let rec ghost power (s:'b -> (fo_term 'ls 'b)) (n:int) :
+    'b -> (fo_term 'ls 'b)
     requires { n >= 0 }
     ensures { power_rel s n result }
     variant { n }
@@ -142,10 +142,10 @@ module Logic
     then subst_id_fo_term
     else sc s (power s (n-1))
 
-  let rec lemma power_fixed_point (s:func 'b (fo_term 'ls 'b)) (n:int)
+  let rec lemma power_fixed_point (s:'b -> (fo_term 'ls 'b)) (n:int)
     (x:'b) : unit
     requires { s x = Var_fo_term x }
-    ensures { forall srn:func 'b (fo_term 'ls 'b).
+    ensures { forall srn:'b -> (fo_term 'ls 'b).
       power_rel s n srn -> srn x = Var_fo_term x }
     variant { n }
   =
@@ -172,7 +172,7 @@ module Logic
     rho.inv = sdata_inv
 
   (*let rec lemma size_term_increase (t:fo_term int int) (x:int)
-    (s:func int (fo_term int int)) : unit
+    (s:int -> (fo_term int int)) : unit
     ensures { is_fo_term_free_var_in_fo_term x t ->
       size_fo_term (subst_fo_term t subst_id_symbol s)
       >= size_fo_term t + size_fo_term (s x) -
@@ -187,7 +187,7 @@ module Logic
     end
 
   with lemma size_list_increase (t:fo_term_list int int) (x:int)
-    (s:func int (fo_term int int)) : unit
+    (s:int -> (fo_term int int)) : unit
     ensures { is_fo_term_free_var_in_fo_term_list x t ->
       size_fo_term_list (subst_fo_term_list t subst_id_symbol s)
       >= size_fo_term_list t + size_fo_term (s x) -
@@ -206,25 +206,25 @@ end
 
 module Impl
 
-  use import int.Int
-  use import Functions.Func
-  use import option.Option
+  use int.Int
+  use Functions.Func
+  use option.Option
   use import BacktrackArray.Types as BA
   use import BacktrackArray.Logic as BA
   use import BacktrackArray.Impl as BA
-  use import list.List
-  use import Firstorder_symbol_spec.Spec
-  use import Firstorder_symbol_impl.Types
-  use import Firstorder_symbol_impl.Logic
-  use import Firstorder_symbol_impl.Impl
-  use import Firstorder_term_spec.Spec
-  use import Firstorder_term_impl.Types
-  use import Firstorder_term_impl.Logic
-  use import Firstorder_term_impl.Impl
-  use import Types
-  use import Logic
-  use import ref.Ref
-  use import list.Mem
+  use list.List
+  use Firstorder_symbol_spec.Spec
+  use Firstorder_symbol_impl.Types
+  use Firstorder_symbol_impl.Logic
+  use Firstorder_symbol_impl.Impl
+  use Firstorder_term_spec.Spec
+  use Firstorder_term_impl.Types
+  use Firstorder_term_impl.Logic
+  use Firstorder_term_impl.Impl
+  use Types
+  use Logic
+  use ref.Ref
+  use list.Mem
 
   exception UnificationFailure
 
@@ -232,7 +232,7 @@ module Impl
      allow to decrease variant. *)
   (*let ghost checkit (rhob:subst) (rho:unifier_subst) (x:int) (*(it:int)*) : unit
     (*requires { it >= 0 }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       let tm = Var_fo_term x in
       power_rel rho.unifier_base_model it sp ->
       st tm sp = st tm rho.unifier }*)
@@ -242,7 +242,7 @@ module Impl
         | _ -> false
       end }
     (*ensures { it >= 1 }*)
-    ensures { forall sp:func int (fo_term int int).
+    ensures { forall sp:int -> (fo_term int int).
       let tm = eval rho.unifier_base_model x in
       power_rel rho.unifier_base_model (it-1) sp ->
       st tm sp = st tm rho.unifier }
@@ -257,7 +257,7 @@ module Impl
         | Cons (Assign _) _ -> false
         | _ -> true
       end) && it <> 0 } ;
-    assert { forall sp:func int (fo_term int int).
+    assert { forall sp:int -> (fo_term int int).
       let rho0 = rho.unifier_base_model in
       let rhoi = rho.unifier in
       let tm = rho0 x in
@@ -284,7 +284,7 @@ module Impl
     requires { unifier_subst_ok rhob rho }
     requires { nlimpl_fo_term_ok t }
     (* Variant requirement. *)
-    (*requires { forall sp:func int (fo_term int int).
+    (*requires { forall sp:int -> (fo_term int int).
       let tm = t.model_fo_term_field in
       power_rel rho.unifier_base_model it sp ->
       st tm sp = st tm rho.unifier }*)
@@ -324,7 +324,7 @@ module Impl
       | NLC_App f l -> let fm = f.model_symbol_field in
         let lm = l.model_fo_term_list_field in
         assert { tm = App fm lm } ;
-        assert { forall s:func int (fo_term int int).
+        assert { forall s:int -> (fo_term int int).
           st tm s = App fm (stl lm s) } ;
         check_unified_free_var_list x l rhob rho (*it*)
     end
@@ -334,7 +334,7 @@ module Impl
     requires { nlimpl_fo_term_list_ok t }
     requires { unifier_subst_ok rhob rho }
     (* Variant requirement. *)
-    (*requires { forall sp:func int (fo_term int int).
+    (*requires { forall sp:int -> (fo_term int int).
       let tm = t.model_fo_term_list_field in
       power_rel rho.unifier_base_model it sp ->
       stl tm sp = stl tm rho.unifier }*)
@@ -356,7 +356,7 @@ module Impl
       | NLC_FOCons u q -> let um = u.model_fo_term_field in
         let qm = q.model_fo_term_list_field in
         assert { tm = FOCons um qm } ;
-        assert { forall s:func int (fo_term int int).
+        assert { forall s:int -> (fo_term int int).
           stl tm s = FOCons (st um s) (stl qm s) } ;
         check_unified_free_var x u rhob rho (*it*) ;
         check_unified_free_var_list x q rhob rho (*it*)
@@ -373,7 +373,7 @@ module Impl
   (* Unification core routine : set a variable to some equation. *)
 
   let assign (z:int) (t:nlimpl_fo_term) (lv:ref (list int)) (rhob:subst)
-    (ghost rho:unifier_subst) (ghost lp:pred int)
+    (ghost rho:unifier_subst) (ghost lp:int -> bool)
     (*(ghost fv s:S.set int)*) : unification_return
 
     (* Invariant requirements. *)
@@ -405,7 +405,7 @@ module Impl
     (* Unifier properties. *)
     ensures { sc rho.unifier result.unifier_factor =
       result.final_unifier.unifier }
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       s' z = st t.model_fo_term_field s' ->
       s' = sc result.final_unifier.unifier s }
@@ -431,23 +431,24 @@ module Impl
         -> mem y fv }*)
     raises { UnificationFailure -> precede (old rhob) rhob /\
       correct rhob
-    (*-> forall s:func int (fo_term int int).
+    (*-> forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       s' z <> st t.model_fo_term_field s'*) }
   =
-    'Init:
-    assert { forall s1 s2 s3:func int (fo_term int int).
+    label Init in
+    assert { forall s1 s2 s3:int -> (fo_term int int).
       sc s1 (sc s2 s3) = sc (sc s1 s2) s3 } ;
-    assert { forall t0:fo_term int int,s1 s2:func int (fo_term int int).
+    assert { forall t0:fo_term int int,s1 s2:int -> (fo_term int int).
       st (st t0 s1) s2 = st t0 (sc s1 s2) } ;
     let tm = t.model_fo_term_field in
     let rho0 = rho.unifier_base_model in
     let rhoi = rho.unifier in
-    let stm = st tm rhoi in
+    let ghost stm = st tm rhoi in
     (*let n0 = rho.iteration in*)
+    bottomvar rhob rho z;
     assert { rho0 z = Var_fo_term z } ;
     assert { rhoi z = Var_fo_term z } ;
-    (*assert { forall s:func int (fo_term int int).
+    (*assert { forall s:int -> (fo_term int int).
       is_fo_term_free_var_in_fo_term z stm ->
       match stm with
         | Var_fo_term _ -> false
@@ -455,13 +456,13 @@ module Impl
       size_fo_term (st tm (sc rhoi s)) > size_fo_term (s z) &&
       s z = sc rhoi s z && st tm (sc rhoi s) <> sc rhoi s z } ;*)
     check_unified_free_var z t rhob rho (*rho.iteration*) ;
-    let uf = subst_id_fo_term[z <- stm] in
-    let rhoi' = sc rhoi uf in
-    let rho0' = rho0[z <- tm] in
+    let ghost uf = subst_id_fo_term[z <- stm] in
+    let ghost rhoi' = sc rhoi uf in
+    let ghost rho0' = rho0[z <- tm] in
     BA.add z (Assign t) rhob ;
     lv := Cons z !lv;
     (*let n1 = 2 * n0 + 1 in*)
-    assert { let rho' = current_timestamp (at rhob 'Init) in
+    assert { let rho' = current_timestamp (rhob at Init) in
       let rho'' = current_timestamp rhob in
       (forall x:int.
       (x <> z -> table rho'' x = table rho' x &&
@@ -469,7 +470,7 @@ module Impl
       (x = z -> (smodel rho'' x = t.model_fo_term_field = rho0' x))) &&
       extensionalEqual (smodel rho'') rho0' &&
       smodel rho'' = rho0' } ;
-    let rho0'' = rho0[z <- stm] in
+    let ghost rho0'' = rho0[z <- stm] in
     assert { (forall x:int.
       (x <> z -> uf x = Var_fo_term x && rho0'' x = rho0 x = sc uf rho0 x) /\
       (x = z -> rho0'' x = stm = st stm rho0 = sc uf rho0 x)) &&
@@ -481,10 +482,10 @@ module Impl
         rho0'' x = rho0 x = rho0' x = sc uf rho0' x) /\
       (x = z -> rho0'' x = stm = st stm rho0 = st stm rho0' = sc uf rho0 x)) &&
       extensionalEqual rho0'' (sc uf rho0') && rho0'' = sc uf rho0' } ;
-    (*assert { forall r:func int (fo_term int int).
+    (*assert { forall r:int -> (fo_term int int).
         power_rel r 0 subst_id_fo_term /\ sc r subst_id_fo_term = r &&
         power_rel r 1 r } ;*)
-    (*let rec ghost aux0 (m:int) (sp1 sp2:func int (fo_term int int)) : unit
+    (*let rec ghost aux0 (m:int) (sp1 sp2:int -> (fo_term int int)) : unit
       requires { m >= 0 }
       requires { power_rel rho0 m sp1 /\ power_rel rho0'' m sp2 }
       variant { m }
@@ -518,7 +519,7 @@ module Impl
       else assert { sp1 = subst_id_fo_term }
     in*)
     (*
-    let rec ghost aux1 (m:int) (sp1 sp2:func int (fo_term int int)) : unit
+    let rec ghost aux1 (m:int) (sp1 sp2:int -> (fo_term int int)) : unit
       requires { m >= 0 }
       requires { power_rel rho0 m sp1 }
       requires { power_rel rho0' m sp2 }
@@ -547,7 +548,7 @@ module Impl
       )
       else assert { sp1 = subst_id_fo_term = sp2 }
     in*)(*
-    let rec ghost aux2 (m:int) (sp1 sp2 sp3:func int (fo_term int int)) : unit
+    let rec ghost aux2 (m:int) (sp1 sp2 sp3:int -> (fo_term int int)) : unit
       requires { m >= 0 }
       requires { power_rel rho0 m sp2 /\
         power_rel rho0' n0 sp3 /\
@@ -618,7 +619,7 @@ module Impl
     assert { rhoi_ = sc rhoi_ rho0' } ;
     assert { rhoi_ = sc (sc rhoi' rho0) sp3
       = sc (sc rhoi' rho0') sp3 = sc rhoi' (sc rho0' sp3) } ;*)
-    (*let rec ghost aux3 (m:int) (sp:func int (fo_term int int)) : unit
+    (*let rec ghost aux3 (m:int) (sp:int -> (fo_term int int)) : unit
       requires { m >= 0 }
       requires { power_rel rho0' m sp }
       variant { m }
@@ -656,7 +657,7 @@ module Impl
     (*assert { rhoi_ = rhoi' } ;
     aux3 n1 rhoi_ ;*)
     (*assert { sc rhoi' rhoi' = rhoi' } ;*)
-    (*let rec ghost aux4 (m:int) (sp:func int (fo_term int int)) : unit
+    (*let rec ghost aux4 (m:int) (sp:int -> (fo_term int int)) : unit
       requires { m >= 0 }
       requires { power_rel rho0 m sp }
       variant { m }
@@ -701,7 +702,7 @@ module Impl
       AS.model rho'' x = None ->
       x <> z && AS.model rho'' x = AS.model rho.unifier_base x &&
       mem x s && mem x (remove z s) } ;*)
-    assert { forall s0:func int (fo_term int int).
+    assert { forall s0:int -> (fo_term int int).
       let s0' = sc rhoi s0 in
       s0' z = st tm s0' ->
       st stm s0 = s0' z = st (rhoi z) s0 = s0 z &&
@@ -727,7 +728,7 @@ module Impl
       ) &&
       extensionalEqual (sc rhoi rho0'') rhoi' &&
       sc rhoi' rho0 = rhoi' = sc rhoi' rho0' } ;
-    let rhoi'' = rhoi[z <- stm] in
+    let ghost rhoi'' = rhoi[z <- stm] in
     assert { ((forall x:int. x <> z ->
       uf x = Var_fo_term x &&
       rhoi'' x = rhoi x = sc uf rhoi x) /\
@@ -754,7 +755,7 @@ module Impl
       rhoi x = Var_fo_term x &&
       rhoi' x = uf x = Var_fo_term x) /\
       (table (current_timestamp rhob) x =
-       table (current_timestamp (at rhob 'Init)) x &&
+       table (current_timestamp (rhob at Init)) x &&
        unassigned (current_timestamp rhob) x)))
        && (rho0' x = Var_fo_term x -> rhoi' x = Var_fo_term x)
        && (rho0' x = Var_fo_term x ->
@@ -782,12 +783,12 @@ module Impl
   *)
 
   (* Forced because of the model fields. *)
-  val ghost unassigned_vars (rhob:subst) : pred int
+  val ghost unassigned_vars (rhob:subst) : int -> bool
     ensures { forall x:int.
       result x <-> unassigned (current_timestamp rhob) x }
 
   let rec unification_term (t1 t2:nlimpl_fo_term) (lv:ref (list int))
-    (rhob:subst) (ghost rho:unifier_subst) (ghost lp:pred int)
+    (rhob:subst) (ghost rho:unifier_subst) (ghost lp:int -> bool)
     (*(ghost fv s:S.set int) (ghost it1 it2:int)*) : unification_return
 
     (* Invariant requirements. *)
@@ -810,12 +811,12 @@ module Impl
         -> mem y fv }
     requires { forall x:int.
       mem x fv /\ AS.model rho.unifier_base x = None -> mem x s }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       let tm = t1.model_fo_term_field in
       power_rel rho.unifier_base_model it1 sp ->
       st tm sp = st tm rho.unifier }
     requires { it1 >= 0 }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       let tm = t2.model_fo_term_field in
       power_rel rho.unifier_base_model it2 sp ->
       st tm sp = st tm rho.unifier }
@@ -840,7 +841,7 @@ module Impl
     (* Any possible unifier obtained in such a way can be
        factorised with the final unifier as factor. In fact,
        the factorisation is trivial, so we can avoid existentials. *)
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' = st t2.model_fo_term_field s' ->
       s' = sc result.final_unifier.unifier s }
@@ -869,7 +870,7 @@ module Impl
         eval result.final_unifier.unifier_base_model x)
         -> mem y fv }*)
     raises { UnificationFailure -> precede (old rhob) rhob /\ correct rhob
-    (*-> forall s:func int (fo_term int int).
+    (*-> forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' <> st t2.model_fo_term_field s'*) }
     diverges (* variant { 0 } *)
@@ -895,7 +896,7 @@ module Impl
               let rhoi = rho.unifier in
               assert { bxm = rhobm x (*/\ mem x fv*) } ;
               assert { st bxm rhoi = sc rhobm rhoi x = rhoi x = st t1m rhoi
-                && forall s:func int (fo_term int int).
+                && forall s:int -> (fo_term int int).
                   st bxm (sc rhoi s) = st t1m (sc rhoi s) } ;
               let res = unification_term bx t2 lv rhob rho lp (*
                 fv s (it1-1) it2*) in
@@ -912,7 +913,7 @@ module Impl
                   assert { sdata_inv (Assign by') } ;
                   assert { bym = rhobm y (*/\ mem y fv*) } ;
                   assert { st bym rhoi = sc rhobm rhoi y = rhoi y = st t2m rhoi
-                    && forall s:func int (fo_term int int).
+                    && forall s:int -> (fo_term int int).
                       st bym (sc rhoi s) = st t2m (sc rhoi s) } ;
                   let res = unification_term t1 by' lv rhob rho lp (*fv s it1 (it2-1)*) in
                   let rhoi' = res.final_unifier.unifier in
@@ -937,7 +938,7 @@ module Impl
           | NLCVar_symbol f1 , NLCVar_symbol f2 -> if f1 = f2
             then (
               assert { forall l1 l2:fo_term_list int int,
-                s1 s2:func int (fo_term int int).
+                s1 s2:int -> (fo_term int int).
                 st (App f1m l1) s1 = st (App f2m l2) s2 <->
                 stl l1 s1 = stl l2 s2 } ;
                 unification_term_list l1 l2 lv rhob rho lp (*fv s it1 it2*)
@@ -958,7 +959,7 @@ module Impl
             let rhoi = rho.unifier in
             assert { bxm = rhobm x } ;
             assert { st bxm rhoi = sc rhobm rhoi x = rhoi x = st t1m rhoi
-              && forall s:func int (fo_term int int).
+              && forall s:int -> (fo_term int int).
                 st bxm (sc rhoi s) = st t1m (sc rhoi s) } ;
             let res = unification_term bx t2 lv rhob rho lp (*
               fv s (it1-1) it2*) in
@@ -981,7 +982,7 @@ module Impl
             let rhoi = rho.unifier in
             assert { bxm = rhobm x } ;
             assert { st bxm rhoi = sc rhobm rhoi x = rhoi x = st t2m rhoi
-              && forall s:func int (fo_term int int).
+              && forall s:int -> (fo_term int int).
                 st bxm (sc rhoi s) = st t2m (sc rhoi s) } ;
             let res = unification_term t1 bx lv rhob rho lp
               (*fv s it1 (it2-1)*) in
@@ -994,7 +995,7 @@ module Impl
     end
 
   with unification_term_list (t1 t2:nlimpl_fo_term_list) (lv:ref (list int))
-    (rhob:subst) (ghost rho:unifier_subst) (ghost lp:pred int)
+    (rhob:subst) (ghost rho:unifier_subst) (ghost lp:int -> bool)
     (*(ghost fv s:S.set int) (ghost it1 it2:int)*) :
     unification_return
     (* Invariant requirements. *)
@@ -1019,12 +1020,12 @@ module Impl
         mem y fv }
     requires { forall x:int.
       mem x fv /\ AS.model rho.unifier_base x = None -> mem x s }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       let tm = t1.model_fo_term_list_field in
       power_rel rho.unifier_base_model it1 sp ->
       stl tm sp = stl tm rho.unifier }
     requires { it1 >= 0 }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       let tm = t2.model_fo_term_list_field in
       power_rel rho.unifier_base_model it2 sp ->
       stl tm sp = stl tm rho.unifier }
@@ -1044,7 +1045,7 @@ module Impl
     (* Unifier properties. *)
     ensures { sc rho.unifier result.unifier_factor =
       result.final_unifier.unifier }
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' = stl t2.model_fo_term_list_field s' ->
       s' = sc result.final_unifier.unifier s }
@@ -1073,7 +1074,7 @@ module Impl
         eval result.final_unifier.unifier_base_model x)
         -> mem y fv }*)
     raises { UnificationFailure -> precede (old rhob) rhob /\ correct rhob
-    (*-> forall s:func int (fo_term int int).
+    (*-> forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' <>
         stl t2.model_fo_term_list_field s'*) }
@@ -1095,14 +1096,14 @@ module Impl
         let q2m = q2.model_fo_term_list_field in
         assert { t1m = FOCons u1m q1m /\ t2m = FOCons u2m q2m } ;
         assert { forall a c:fo_term int int,b d:fo_term_list int int,
-          s1 s2:func int (fo_term int int).
+          s1 s2:int -> (fo_term int int).
           stl (FOCons a b) s1 = stl (FOCons c d) s2 <->
           st a s1 = st c s2 /\ stl b s1 = stl d s2 } ;
         let rho0 = rho.unifier in
         let rho2 = unification_term_list q1 q2 lv rhob rho lp (*fv s it1 it2*) in
         let rho2f = rho2.final_unifier in
         let rho20 = rho2f.unifier in
-        assert { forall s:func int (fo_term int int).
+        assert { forall s:int -> (fo_term int int).
           stl t1m (sc rho0 s) = stl t2m (sc rho0 s) ->
             stl q1m (sc rho0 s) = stl q2m (sc rho0 s) &&
             sc rho0 s = sc rho20 s &&
@@ -1111,24 +1112,24 @@ module Impl
         (*let ghost aux_ (u_:unit) : (int,int)
           returns { (it'1,it'2) ->
             (rho2.unassigned_set = s -> it1=it'1 /\ it2 = it'2) /\
-            (forall sp:func int (fo_term int int).
+            (forall sp:int -> (fo_term int int).
               power_rel rho2f.unifier_base_model it'1 sp ->
               stl t1m sp = stl t1m rho20) /\
-            (forall sp:func int (fo_term int int).
+            (forall sp:int -> (fo_term int int).
               power_rel rho2f.unifier_base_model it'2 sp ->
               stl t2m sp = stl t2m rho20) /\
               it'1 >= 0 /\
               it'2 >= 0 }
         = if rho2.unassigned_set = s
           then (it1,it2)
-          else ( assert { forall sp:func int (fo_term int int).
+          else ( assert { forall sp:int -> (fo_term int int).
             power_rel rho2f.unifier_base_model u sp ->
             sp = rho2f.unifier } ; (u,u) ) in
         let (it1,it2) = aux_ () in*)
         let rho3 = unification_term u1 u2 lv rhob rho2f lp
           (*fv rho2.unassigned_set it1 it2*) in
         let rho30 = rho3.final_unifier.unifier in
-        assert { forall s:func int (fo_term int int).
+        assert { forall s:int -> (fo_term int int).
           stl t1m (sc rho0 s) = stl t2m (sc rho0 s) ->
             sc rho0 s = sc rho20 s &&
             st u1m (sc rho20 s) = st u2m (sc rho20 s) &&
@@ -1140,14 +1141,14 @@ module Impl
           unifier_factor = ghost sc rho2.unifier_factor rho3.unifier_factor (*;
           unassigned_set = rho3.unassigned_set*) }
       | NLC_FONil , NLC_FOCons u q ->
-        (*assert { forall s:func int (fo_term int int).
+        (*assert { forall s:int -> (fo_term int int).
           subst_fo_term_list t1m subst_id_symbol s = FONil /\
           let um = u.model_fo_term_field in
           let qm = q.model_fo_term_list_field in
           stl t2m s = FOCons (st um s) (stl qm s) } ;*)
         raise UnificationFailure
       | NLC_FOCons u q , NLC_FONil ->
-        (*assert { forall s:func int (fo_term int int).
+        (*assert { forall s:int -> (fo_term int int).
           subst_fo_term_list t2m subst_id_symbol s = FONil /\
           let um = u.model_fo_term_field in
           let qm = q.model_fo_term_list_field in
@@ -1169,19 +1170,19 @@ module Impl
       (current_timestamp (old rhob).table }*)
     raises { UnificationFailure -> precede (old rhob) rhob /\ correct rhob }
   =
-    'Init:
+    label Init in
     let l = ref Nil in
     let t = stamp rhob in
     let lp = unassigned_vars rhob in
     let u = try Some (unification_term_list t1 t2 l rhob rho lp)
     with UnificationFailure -> None end in
-    'Mid0:
+    label Mid0 in
     match u with
       | Some _ -> match !l with
           | Nil -> raise UnificationFailure
           | Cons v _ -> backtrack t rhob ;
-            assert { backtrack_to (at rhob 'Init) (at rhob 'Mid0) rhob } ;
-            'Middle:
+            assert { backtrack_to (rhob at Init) (rhob at Mid0) rhob } ;
+            label Middle in
             add v (PConflict t1 t2) rhob ;
             assert { (forall t:timesubst,x:int. unassigned t x ->
               let u = smodel t x in match table t x with
@@ -1191,32 +1192,32 @@ module Impl
               u = Var_fo_term x) &&
               (forall x:int.
               x <> v -> smodel (current_timestamp rhob) x =
-                smodel (current_timestamp (at rhob 'Middle)) x) &&
+                smodel (current_timestamp (rhob at Middle)) x) &&
               lp v &&
-              unassigned (current_timestamp (at rhob 'Middle)) v &&
+              unassigned (current_timestamp (rhob at Middle)) v &&
               unassigned (current_timestamp rhob) v &&
               (let u = current_timestamp rhob in
-               let u' = current_timestamp (at rhob 'Middle) in
+               let u' = current_timestamp (rhob at Middle) in
                let ut = u.time in
                let utb = u.table in
                let us = u.size in
                u = { time = u.time ; table = u.table ; size = u.size } /\
                u' = { time = u'.time ; table = u'.table ; size = u'.size }) &&
               smodel (current_timestamp rhob) v = Var_fo_term v =
-              smodel (current_timestamp (at rhob 'Middle)) v &&
+              smodel (current_timestamp (rhob at Middle)) v &&
               extensionalEqual (smodel (current_timestamp rhob))
-                (smodel (current_timestamp (at rhob 'Middle))) &&
-              smodel (current_timestamp rhob) = smodel (current_timestamp (at rhob 'Middle)) } ;
+                (smodel (current_timestamp (rhob at Middle))) &&
+              smodel (current_timestamp rhob) = smodel (current_timestamp (rhob at Middle)) } ;
             assert { (forall x:int.
-              x <> v -> unassigned (current_timestamp (at rhob 'Middle)) x ->
+              x <> v -> unassigned (current_timestamp (rhob at Middle)) x ->
               unassigned (current_timestamp rhob) x) &&
               (forall x:int.
                 unifier_base_model rho x = Var_fo_term x ->
-                unassigned (current_timestamp (at rhob 'Middle)) x &&
+                unassigned (current_timestamp (rhob at Middle)) x &&
                 unassigned (current_timestamp rhob) x) }
         end
       | None -> backtrack t rhob ;
-        assert { backtrack_to (at rhob 'Init) (at rhob 'Mid0) rhob }
+        assert { backtrack_to (rhob at Init) (rhob at Mid0) rhob }
     end
 
   let rec conflicts (lv:list sdata) (rhob:subst) (ghost rho:unifier_subst) : unit
@@ -1262,7 +1263,7 @@ module Impl
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { result.final_unifier.unifier = sc rho.unifier result.unifier_factor }
     ensures { precede (old rhob) rhob }
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' = stl t2.model_fo_term_list_field s' ->
       s' = sc result.final_unifier.unifier s }
@@ -1287,7 +1288,7 @@ module Impl
     (rho:unifier_subst) : set int
     requires { unifier_subst_ok rho }
     requires { it >= 0 }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       power_rel rho.unifier_base_model it sp ->
       st t sp = st t rho.unifier }
     ensures { forall x:int. is_fo_term_free_var_in_fo_term x t ->
@@ -1308,13 +1309,13 @@ module Impl
           add x empty)
         else
           let t2 = eval rho0 x in
-          (assert { forall sp:func int (fo_term int int).
+          (assert { forall sp:int -> (fo_term int int).
             power_rel rho0 (it-1) sp ->
             power_rel rho0 it (sc rho0 sp) &&
             st t2 sp = st t (sc rho0 sp) = st t rhoi =
             st t (sc rho0 rhoi) = st t2 rhoi && st t2 sp = st t2 rhoi } ;
             add x (term_free_var_set t2 (it-1) rho))
-      | App _ l -> assert { forall s s2:func int (fo_term int int).
+      | App _ l -> assert { forall s s2:int -> (fo_term int int).
         st t s = st t s2 <-> stl l s = stl l s2 } ;
         term_list_free_var_set l it rho
     end
@@ -1323,7 +1324,7 @@ module Impl
     (rho:unifier_subst) : set int
     requires { unifier_subst_ok rho }
     requires { it >= 0 }
-    requires { forall sp:func int (fo_term int int).
+    requires { forall sp:int -> (fo_term int int).
       power_rel rho.unifier_base_model it sp ->
       stl t sp = stl t rho.unifier }
     ensures { forall x:int. is_fo_term_free_var_in_fo_term_list x t ->
@@ -1335,7 +1336,7 @@ module Impl
   =
     match t with
       | FONil -> empty
-      | FOCons x q -> assert { forall s s2:func int (fo_term int int).
+      | FOCons x q -> assert { forall s s2:int -> (fo_term int int).
         stl t s = stl t s2 <->
         st x s = st x s2 /\ stl q s = stl q s2 } ;
         union (term_free_var_set x it rho)
@@ -1359,7 +1360,7 @@ module Impl
       result.usubst.unifier }
     (* All possible unifier factorisable using rho
        can be factorised using the generated one. *)
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' = st t2.model_fo_term_field s' ->
       s' = sc result.usubst.unifier s }
@@ -1369,7 +1370,7 @@ module Impl
         st t2.model_fo_term_field s0 }
     ensures { unifier_subst_ok result.usubst }
     (* There is no unifier factorisable by rho. *)
-    raises { UnificationFailure -> forall s:func int (fo_term int int).
+    raises { UnificationFailure -> forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' <>
         st t2.model_fo_term_field s' }
@@ -1387,7 +1388,7 @@ module Impl
     requires { unifier_subst_ok rho }
     ensures { sc rho.unifier result.factor =
       result.usubst.unifier }
-    ensures { forall s:func int (fo_term int int).
+    ensures { forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' = stl t2.model_fo_term_list_field s' ->
       s' = sc result.usubst.unifier s }
@@ -1395,7 +1396,7 @@ module Impl
       stl t1.model_fo_term_list_field s0 =
         stl t2.model_fo_term_list_field s0 }
     ensures { unifier_subst_ok result.usubst }
-    raises { UnificationFailure -> forall s:func int (fo_term int int).
+    raises { UnificationFailure -> forall s:int -> (fo_term int int).
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' <>
         stl t2.model_fo_term_list_field s' }

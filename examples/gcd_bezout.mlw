@@ -3,10 +3,10 @@
 
 module GcdBezout
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import number.Gcd
-  use import ref.Ref
+  use int.Int
+  use int.ComputerDivision
+  use number.Gcd
+  use ref.Ref
 
   let gcd (x:int) (y:int)
     requires { x >= 0 /\ y >= 0 }
@@ -14,14 +14,14 @@ module GcdBezout
     ensures  { exists a b:int. a*x+b*y = result }
     =
     let x = ref x in let y = ref y in
-'Pre:
+    label Pre in
     let ghost a = ref 1 in let ghost b = ref 0 in
     let ghost c = ref 0 in let ghost d = ref 1 in
     while (!y > 0) do
        invariant { !x >= 0 /\ !y >= 0 }
-       invariant { gcd !x !y = gcd (at !x 'Pre) (at !y 'Pre) }
-       invariant { !a * (at !x 'Pre) + !b * (at !y 'Pre) = !x }
-       invariant { !c * (at !x 'Pre) + !d * (at !y 'Pre) = !y }
+       invariant { gcd !x !y = gcd (!x at Pre) (!y at Pre) }
+       invariant { !a * (!x at Pre) + !b * (!y at Pre) = !x }
+       invariant { !c * (!x at Pre) + !d * (!y at Pre) = !y }
        variant { !y }
        let r = mod !x !y in let ghost q = div !x !y in
        assert { r = !x - q * !y };

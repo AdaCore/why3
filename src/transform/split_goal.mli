@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val stop_split : Ident.label
-
 val split_pos_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
@@ -33,21 +31,21 @@ val split_proof_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_proof_full f] returns a list of formulas whose conjunction implies f.
     The reverse implication also holds when f does not contain the by/so
     connectives. In this case, [split_proof_full] works as [split_pos_full]
-    but stops at the [stop_split] label and removes it. *)
+    but stops at the [stop_split] attribute and removes it. *)
 
 val split_proof_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_proof_right f] returns a list of formulas whose conjunction
     implies f. The reverse implication also holds when f does not contain
     the by/so connectives. In this case, [split_proof_right] works as
-    [split_pos_right] but stops at the [stop_split] label and removes it. *)
+    [split_pos_right] but stops at the [stop_split] attribute and removes it. *)
 
 val split_intro_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_intro_full] works as [split_pos_full] but does not respect
-    the [asym_split] label, stops at the [stop_split] label and removes it *)
+(** [split_intro_full] works as [split_pos_full] but does not respect the
+    [asym_split] attribute, stops at the [stop_split] attribute and removes it *)
 
 val split_intro_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
-(** [split_intro_right] works as [split_pos_right] but does not respect
-    the [asym_split] label, stops at the [stop_split] label and removes it *)
+(** [split_intro_right] works as [split_pos_right] but does not respect the
+    [asym_split] attribute, stops at the [stop_split] attribute and removes it *)
 
 val split_goal_full : Task.task Trans.tlist
 val split_all_full : Task.task Trans.tlist

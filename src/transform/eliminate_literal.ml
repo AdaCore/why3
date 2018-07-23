@@ -72,7 +72,9 @@ let elim le_int le_real neg_real type_kept kn
       in
       let f = t_forall_close [v] [] f in
       let ax_decl = create_prop_decl Paxiom pr f in
-      (known_lit, List.fold_left Task.add_decl task [ty_decl; ls_decl; ax_decl])
+      let add_decl t d = try Task.add_decl t d
+                         with UnknownIdent _ -> t in (*FIXME*)
+      (known_lit, List.fold_left add_decl task [ty_decl; ls_decl; ax_decl])
   | Dtype ts when Mts.exists (fun ts' _ -> ts_equal ts ts') float_metas
                && not (Sts.mem ts type_kept) ->
       let to_real,is_finite = Mts.find ts float_metas in
@@ -94,10 +96,8 @@ let elim le_int le_real neg_real type_kept kn
       let emax = BigInt.pow_int_pos_bigint 2 (BigInt.pred eb) in
       let m = BigInt.pred (BigInt.pow_int_pos_bigint 2 sb) in
       let e = BigInt.sub emax sb in
-      Number.print_in_base 16 None Format.str_formatter m;
-      let m_string = Format.flush_str_formatter () in
-      Number.print_in_base 10 None Format.str_formatter e;
-      let e_string = Format.flush_str_formatter () in
+      let m_string = Format.asprintf "%a" (Number.print_in_base 16 None) m in
+      let e_string = Format.asprintf "%a" (Number.print_in_base 10 None) e in
       let e_val = Number.real_const_hex m_string "" (Some e_string) in
       let max_term = t_const
           Number.(ConstReal { rc_negative = false ; rc_abs = e_val })
@@ -136,10 +136,10 @@ let eliminate le_int le_real neg_real type_kept
 let eliminate_literal env =
   (* FIXME: int.Int.le_sym should be imported in the task *)
   let th = Env.read_theory env ["int"] "Int" in
-  let le_int = ns_find_ls th.th_export ["infix <="] in
+  let le_int = ns_find_ls th.th_export [op_infix "<="] in
   let th = Env.read_theory env ["real"] "Real" in
-  let le_real = ns_find_ls th.th_export ["infix <="] in
-  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  let le_real = ns_find_ls th.th_export [op_infix "<="] in
+  let neg_real = ns_find_ls th.th_export [op_prefix "-"] in
   Trans.on_meta meta_range (fun range_metas ->
       Trans.on_meta meta_float (fun float_metas ->
           let range_metas = List.fold_left (fun acc meta_arg ->
@@ -188,9 +188,9 @@ let rec replace_negative_constants neg_int neg_real t =
 let eliminate_negative_constants env =
   (* FIXME: int.Int should be imported in the task *)
   let th = Env.read_theory env ["int"] "Int" in
-  let neg_int = ns_find_ls th.th_export ["prefix -"] in
+  let neg_int = ns_find_ls th.th_export [op_prefix "-"] in
   let th = Env.read_theory env ["real"] "Real" in
-  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  let neg_real = ns_find_ls th.th_export [op_prefix "-"] in
   Trans.rewrite (replace_negative_constants neg_int neg_real) None
 
 let () =

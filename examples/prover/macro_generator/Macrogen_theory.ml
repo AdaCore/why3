@@ -7,10 +7,10 @@ open Macrogen_decls
 open Format
 
 module Printer = functor (P:PrintParameters) -> struct
-  
+
   open P.P
   open P.H
-  
+
   let type_defs_printer fmt =
     List.iter (fun scc ->
       let tp = rec_type_printer () in
@@ -34,7 +34,7 @@ module Printer = functor (P:PrintParameters) -> struct
             fprintf fmt "@]@\n@\n"
       ) scc
     ) dm.sccg
-  
+
   let size_defs_printer fmt =
     let pr = rec_fun_printer () in
     let print_decl is_nat tn _ _ =
@@ -59,7 +59,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << tyn << match_printer tn vcase cons_case (string_printer "t") in
     make_for_defs << print_decl true ;
     make_for_defs << print_decl false
-  
+
   let size_lemma_printer fmt =
     let pr = rec_val_printer () in
     let print_decl tn _ _ =
@@ -76,7 +76,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << indent << nat_size_name tn
         << match_printer tn vcase cons_case (string_printer "t") in
     make_for_defs print_decl
-  
+
   let subst_defs_printer sub fmt =
     let pr = rec_fun_printer () in
     let fn = if sub then subst_name else rename_name in
@@ -105,7 +105,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << type_app_printer c tn
         << match_printer tn vcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let composition_lemma_printer sub1 sub2 fmt =
     let fn = match sub1,sub2 with
       | false,false -> renaming_composition_lemma_name
@@ -153,7 +153,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << size_name tn
         << match_printer tn vcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let identity_lemma_printer sub fmt =
     let pr = rec_val_printer () in
     let fp = if sub then subst_name else rename_name in
@@ -176,7 +176,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << size_name tn
         << match_printer tn vcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let subst_composition_def_printer sub fmt =
     let fn = if sub then subst_compose_name else rename_subst_name in
     let fp = if sub then subst_name else rename_name in
@@ -207,7 +207,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << tindex_printer tn << indent << fn tn << print_args
         << print_right in
     make_for_vdefs print_decl
-  
+
   let associativity_lemma_printer (sub1,sub2,sub3) fmt =
     let fn = associativity_lemma_name (sub1,sub2,sub3) in
     let print_decl tn _ v =
@@ -235,7 +235,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << print_targs sub2 c d "2" << print_targs sub3 d e "3"
         << indent << p1 << p2 << indent << indent << p1 << p2 in
     make_for_vdefs print_decl
-  
+
   let right_identity_lemma_printer sub fmt =
     let fn = if sub then right_subst_by_identity_lemma_name
       else right_rename_by_identity_lemma_name in
@@ -251,7 +251,7 @@ module Printer = functor (P:PrintParameters) -> struct
         indent << fn tn << subst_type_printer true b c tn
         << indent << p1 << p2 << indent << indent << p1 << p2
     in make_for_vdefs print_decl
-  
+
   let left_identity_lemma_printer sub fmt =
     let fn = if sub then left_subst_identity_lemma_name
       else left_rename_identity_lemma_name in
@@ -271,7 +271,7 @@ module Printer = functor (P:PrintParameters) -> struct
              << subst_type_printer sub b c tn) v
         << indent << p1 << p2 << indent << indent << p1 << p2 in
     make_for_vdefs print_decl
-  
+
   let subst_identity_printer fmt =
     let b = string_printer "b" in
     let c = string_printer "c" in
@@ -298,7 +298,7 @@ module Printer = functor (P:PrintParameters) -> struct
         fprintf fmt "(%t%t@ %t@])" indent << slift_name tn
           << typed_identity_printer true b tn in
       let p2 = subst_identity_name tn in
-      fprintf fmt "%tlet lemma@ %t@ (u:unit) :@ unit@ \
+      fprintf fmt "%tlet lemma@ %t@ (_:'b%t) :@ unit@ \
         %tensures {@ %t@ =@ %t@ }@]@ =@ \
         %tassert {@ %tforall x:option 'b%t.@ \
           %tmatch x with@ \
@@ -306,14 +306,15 @@ module Printer = functor (P:PrintParameters) -> struct
             %t| Some y ->@ %teval@ (%t)@ x@]@ =@ %teval@ (%t)@ x@]@]@]@ \
           end@]@ }@] ;@ \
         %tassert {@ extensionalEqual@ (%t)@ (%t)@ }@]@]@\n@\n"
-        indent << slift_identity_lemma_name tn << indent << p1 << p2
+        indent << slift_identity_lemma_name tn << tindex_printer tn
+        << indent << p1 << p2
         << indent << indent << tindex_printer tn
         << indent << indent << indent << p1 << indent << p2
         << indent << indent << p1 << indent << p2
         << indent << p1 << p2
       in
     make_for_vdefs print_decl
-  
+
   let subst_lifting_printer fmt =
     let b,c = string_printer "b",string_printer "c" in
     let print_decl tn _ v =
@@ -329,7 +330,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << variable_name tn
     in
     make_for_vdefs print_decl
-  
+
   let lifting_composition_lemma_printer (sub1,sub2) fmt =
     let b,c,d = string_printer "b",string_printer "c",string_printer "d" in
     let li s = if s then slift_name else fun _ fmt -> fprintf fmt "olift" in
@@ -392,7 +393,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << indent << p1 << indent << pint2 << pint << indent << p2
         << indent << indent << p1 << p2 in
     make_for_vdefs print_decl
-  
+
   let free_var_def_printer fmt =
     let pr = make_first_case_printer
       << string_printer "predicate"
@@ -423,7 +424,7 @@ module Printer = functor (P:PrintParameters) -> struct
         << match_printer tn vcase ccase (string_printer "t") in
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv -> print_decl tnv tn c v) v)
-  
+
   let subst_free_var_inversion_printer sub fmt =
     let pr = rec_val_printer () in
     let b,c,x = string_printer "b",string_printer "c",string_printer "x" in
@@ -451,7 +452,7 @@ module Printer = functor (P:PrintParameters) -> struct
           %t| None ->@ absurd@]@ \
           %t| Some sumx ->@ %t@]@] end" indent indent
           indent << rule_nones_out p (n-1) in
-    
+
     let print_decl tnv tn _ v =
       let v0 = List.filter (fun tn2 ->
         List.mem tnv (binder_vars dm tn2)) v in
@@ -539,7 +540,7 @@ module Printer = functor (P:PrintParameters) -> struct
           << (if sub then subst_name tn else rename_name tn)
           << list_printer (fun tn fmt ->
             fprintf fmt "@ s%t" << tindex_printer tn) v in
-      
+
       fprintf fmt "%t%tensures {@ %t@ }@]@ \
         %tvariant {@ %t%t@ t@]@ }@]@ =@ \
         %t@]@\n@\n"
@@ -589,11 +590,11 @@ module Printer = functor (P:PrintParameters) -> struct
                 fprintf fmt "()") v0
           else fun fmt -> fprintf fmt "()"
     in
-    
+
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let rename_free_var_propagation_lemma_printer fmt =
     let pr = rec_val_printer () in
     let b,c = string_printer "b",string_printer "c" in
@@ -630,7 +631,7 @@ module Printer = functor (P:PrintParameters) -> struct
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let subst_free_var_propagation_lemma_printer fmt =
     let pr = rec_val_printer () in
     let b,c = string_printer "b",string_printer "c" in
@@ -684,7 +685,7 @@ module Printer = functor (P:PrintParameters) -> struct
           print_decl tni tnv tn c v
         ) (binder_vars dm tni)
       ) v)
-  
+
   let free_var_equivalence_lemma_prelude sub inv pr tn c v fmt =
     let b,c = string_printer "b",string_printer "c" in
     let sn = if sub then subst_name tn else rename_name tn in
@@ -712,7 +713,7 @@ module Printer = functor (P:PrintParameters) -> struct
         ) v
       << indent << ens << indent << sn << args "1"
       << indent << sn << args "2" << variant
-  
+
   let free_var_equivalence_lemma_printer sub fmt =
     if sub
     then let pr = rec_val_printer () in
@@ -760,7 +761,7 @@ module Printer = functor (P:PrintParameters) -> struct
                 indent sor << tindex_printer tn
                 << indent << sor << tindex_printer tn) v in
       make_for_bdefs print_decl
-  
+
   let free_var_derive_equivalence_lemma_printer sub fmt =
     if sub
     then let pr = rec_val_printer () in
@@ -850,9 +851,9 @@ module Printer = functor (P:PrintParameters) -> struct
               << type_app_printer c tn
               << tindex_printer tn << tindex_printer tn) v in
       make_for_bdefs print_decl
-  
+
   (* TODO : remove ? do not seem that useful in fact. *)
-  
+
   let open_close_defs_printer fmt =
     let b = string_printer "b" in
     let print_decl tnv tn c v =
@@ -886,7 +887,7 @@ module Printer = functor (P:PrintParameters) -> struct
     make_for_bdefs (fun tn c v ->
       List.iter (fun tnv ->
         print_decl tnv tn c v) v)
-  
+
   let size_preservation_lemma_printer fmt =
     let b,c = string_printer "b",string_printer "c" in
     let pr = rec_val_printer () in
@@ -913,18 +914,18 @@ module Printer = functor (P:PrintParameters) -> struct
         << indent << indent << size_name tn
         << match_printer tn vcase ccase (string_printer "t") in
     make_for_bdefs print_decl
-  
+
   let required_imports fmt =
     fprintf fmt "use import option.Option@\n\
       use import int.Int@\nuse import Nat.Nat@\n\
       use import Functions.Func@\nuse import OptionFuncs.Funcs@\n\
       use import Sum.Sum@\n"
-  
+
   let base_defs_printer fmt =
     type_defs_printer fmt ;
     size_defs_printer fmt ;
     size_lemma_printer fmt
-  
+
   let subst_lemmae_defs_printer fmt =
     subst_defs_printer false fmt ;
     composition_lemma_printer false false fmt ;
@@ -952,7 +953,7 @@ module Printer = functor (P:PrintParameters) -> struct
     left_identity_lemma_printer true fmt ;
     right_identity_lemma_printer true fmt ;
     size_preservation_lemma_printer fmt
-  
+
   let free_var_lemmae_defs_printer fmt =
     free_var_def_printer fmt ;
     subst_free_var_inversion_printer false fmt ;
@@ -963,9 +964,7 @@ module Printer = functor (P:PrintParameters) -> struct
     free_var_equivalence_lemma_printer false fmt ;
     free_var_derive_equivalence_lemma_printer true fmt ;
     free_var_derive_equivalence_lemma_printer false fmt
-  
-  
-  
+
+
+
 end
-
-

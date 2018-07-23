@@ -133,6 +133,7 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
+  | Unfocus_req
   | Save_req
   | Reload_req
   | Exit_req

@@ -62,10 +62,10 @@ let scanf s =
 let read_channel env path filename cin =
   (* Find the int theory and the needed operation *)
   let th_int = Env.read_theory env ["int"] "Int" in
-  let leq = ns_find_ls th_int.th_export ["infix <"] in
-  let plus_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix +"] in
-  let neg_symbol = Theory.ns_find_ls th_int.Theory.th_export ["prefix -"] in
-  let mult_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix *"] in
+  let leq = ns_find_ls th_int.th_export [op_infix "<"] in
+  let plus_symbol = ns_find_ls th_int.th_export [op_infix "+"] in
+  let neg_symbol = ns_find_ls th_int.th_export [op_prefix "-"] in
+  let mult_symbol = ns_find_ls th_int.th_export [op_infix "*"] in
 
   let zero = t_nat_const 0 in
   let t_int_const n =

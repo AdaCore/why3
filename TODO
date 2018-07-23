@@ -1,3 +1,40 @@
+
+library/gallery migration
+-------------------------
+
+  - check that examples/tests/cvc4-models.mlw can use arrays
+    instead of ref map (commit dfc90d)
+
+  - remove the temporary --type-only from bench/bench (commit 02be08f)
+
+  - DISCUSS: why3 prove theories/int.why fails because of a "variant"
+    clause in one of let functions: this clause requires int.Int
+    for the order relation, which is not loaded automatically
+    (program modules are expected to do "use import int.Int")
+    and, of course, cannot be used explicitly inside int.why.
+
+  - expression { e with f2 = e2 } is syntactic sugar for
+    { f1 = e.f1; f2 = e2; f3 = e.f3 }
+    We would get better error messages if we would produce instead
+    { f2 = e2; f1 = e.f1; f3 = e.f3 }
+    that is, with user-given fields first, then fields from e
+    See for instance bench/programs/bad-typing/with1.mlw
+
+  - the error message for
+      val foo (_x : int) : int
+      val f (x:int) : unit writes { foo.contents }
+    is "unbound symbol 'foo'", which is not correct
+    (is should rather be that "foo" has the wrong type)
+
+  - bench/programs/bad-to-keep/{at1.mlw,old2.mlw}
+    should at least produce a warning (meaningless 'old')
+
+  - no warning on lemma functions
+    cf examples/tests/lemma_functions.mlw
+
+  - "old" and "at" in program code gives a syntax error
+    (bench/programs/bad-to-keep/old3.mlw), we can do better
+
 docs
 ----
 

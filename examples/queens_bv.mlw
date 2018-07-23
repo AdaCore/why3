@@ -6,8 +6,8 @@
 Verification of the following 2-lines C program solving the N-queens problem:
 
 {h <pre>
-   t(a,b,c){int d=0,e=a&~b&~c,f=1;if(a)for(f=0;d=(e-=d)&-e;f+=t(a-d,(b+d)*2,(
-   c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
+   t(a,b,c){int d=0,e=a&amp;~b&amp;~c,f=1;if(a)for(f=0;d=(e-=d)&amp;-e;f+=t(a-d,(b+d)*2,(
+   c+d)/2));return f;}main(q){scanf("%d",&amp;q);printf("%d\n",t(~(~0&lt;&lt;q),0,0));}
 </pre>}
 
 *)
@@ -38,7 +38,7 @@ end
 
 theory Solution
 
-  use import int.Int
+  use int.Int
   use export map.Map
 
   (** the number of queens *)
@@ -46,13 +46,13 @@ theory Solution
 
   type solution = map int int
 
-  (** solutions [t] and [u] have the same prefix [[0..i[] *)
+  (** solutions `t` and `u` have the same prefix `[0..i[` *)
   predicate eq_prefix (t u: map int 'a) (i: int) =
     forall k: int. 0 <= k < i -> t[k] = u[k]
 
   predicate eq_sol (t u: solution) = eq_prefix t u n
 
-  (** [s] stores a partial solution, for the rows [0..k-1] *)
+  (** `s` stores a partial solution, for the rows `0..k-1` *)
   predicate partial_solution (k: int) (s: solution) =
     forall i: int. 0 <= i < k ->
       0 <= s[i] < n /\
@@ -71,7 +71,7 @@ theory Solution
 
   type solutions = map int solution
 
-  (** [s[a..b[] is sorted for [lt_sol] *)
+  (** `s[a..b[` is sorted for `lt_sol` *)
   predicate sorted (s: solutions) (a b: int) =
     forall i j: int. a <= i < j < b -> lt_sol s[i] s[j]
 
@@ -86,14 +86,14 @@ end
 
 module BitsSpec
 
-  use import S
+  use S
 
   constant size : int = 32
 
-  type t = {
+  type t = private {
     ghost mdl: set int;
   }
-  invariant { forall i. mem i self.mdl -> 0 <= i < size }
+  invariant { forall i. mem i mdl -> 0 <= i < size }
 
   val empty () : t
     ensures { is_empty result.mdl }
@@ -121,23 +121,25 @@ module BitsSpec
   val diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
 
-  use import ref.Ref
+  use ref.Ref
   val rightmost_bit_trick (a: t) (ghost min : ref int) : t
     requires { not (is_empty a.mdl) }
     writes   { min }
     ensures  { !min = min_elt a.mdl }
     ensures  { result.mdl = singleton !min }
 
-  use bv.BV32
+  use bv.BV32 as BV32
   val below (n: BV32.t) : t
     requires { BV32.ule n (32:BV32.t) }
     ensures  { result.mdl = interval 0 (BV32.t'int n) }
 end
 
-module Bits "the 1-bits of an integer, as a set of integers"
+(** {2 The 1-bits of an integer, as a set of integers} *)
 
-  use import S
-  use import bv.BV32
+module Bits
+
+  use S
+  use bv.BV32
 
   constant size : int = 32
 
@@ -146,19 +148,17 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ghost mdl: set int;
   }
   invariant {
-    forall i: int. (0 <= i < size /\ nth self.bv i) <-> mem i self.mdl
+    forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl
   }
 
   let empty () : t
     ensures { is_empty result.mdl }
-  =
-    { bv = zeros; mdl = empty }
+  = { bv = zeros; mdl = empty }
 
   let is_empty (x:t) : bool
     ensures { result  <-> is_empty x.mdl }
-  =
-    assert {is_empty x.mdl -> BV32.eq x.bv zeros};
-    x.bv = zeros
+  = assert {is_empty x.mdl -> x.bv = zeros by x.bv == zeros};
+    BV32.eq x.bv zeros
 
   let remove_singleton (a b: t) : t
     requires { b.mdl = singleton (min_elt b.mdl) }
@@ -166,7 +166,7 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = remove (min_elt b.mdl) a.mdl }
   =
     { bv = bw_and a.bv (bw_not b.bv);
-      mdl = remove (min_elt b.mdl) a.mdl }
+      mdl = ghost remove (min_elt b.mdl) a.mdl }
     (* { bv = sub a.bv b.bv; mdl = remove (min_elt b.mdl) a.mdl } *)
 
   let add_singleton (a b: t) : t
@@ -176,24 +176,26 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = S.add (min_elt b.mdl) a.mdl }
   =
     { bv = bw_or a.bv b.bv;
-      mdl = S.add (min_elt b.mdl) a.mdl }
+      mdl = ghost S.add (min_elt b.mdl) a.mdl }
     (* { bv = add a.bv b.bv; mdl = add (min_elt b.mdl) a.mdl } *)
 
   let mul2 (a: t) : t
     ensures { result.mdl = remove size (succ a.mdl) }
   =
-    { bv = lsl_bv a.bv (1:BV32.t); mdl = remove size (succ a.mdl) }
+    { bv = lsl_bv a.bv (1:BV32.t);
+      mdl = ghost remove size (succ a.mdl) }
 
   let div2 (a: t) : t
     ensures { result.mdl = pred a.mdl }
   =
-    { bv = lsr_bv a.bv (1:BV32.t); mdl = pred a.mdl }
+    { bv = lsr_bv a.bv (1:BV32.t);
+      mdl = ghost pred a.mdl }
 
   let diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
   =
     { bv = bw_and a.bv (bw_not b.bv);
-      mdl = diff a.mdl b.mdl }
+      mdl = ghost diff a.mdl b.mdl }
 
   predicate bits_interval_is_zeros_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
     eq_sub_bv a zeros i n
@@ -228,19 +230,19 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures  { result.mdl = interval 0 (t'int n) }
   =
     { bv = bw_not (lsl_bv ones n);
-      mdl = interval 0 (t'int n) }
+      mdl = ghost interval 0 (t'int n) }
 
 end
 
 module NQueensBits
 
-  use import BitsSpec
-  use import ref.Ref
-  use import Solution
-  use import int.Int
+  use BitsSpec
+  use ref.Ref
+  use Solution
+  use int.Int
 
   val ghost col: ref solution  (* solution under construction *)
-  (* val ghost k  : ref int       (\* current row in the current solution *\) *)
+  (* val ghost k  : ref int       (* current row in the current solution *) *)
 
   val ghost sol: ref solutions (* all solutions *)
   val ghost s  : ref int       (* next slot for a solution =
@@ -277,32 +279,32 @@ module NQueensBits
     assert { forall u:solution. solution u /\ eq_prefix !col u k -> S.mem u[k] !e.mdl };
     let f = ref 0 in
     let ghost min = ref (-1) in
-     'L:
+    label L in
     while not (is_empty !e) do
       variant { S.cardinal !e.mdl }
       invariant { not (S.is_empty !e.mdl) -> !min < S.min_elt !e.mdl }
-      invariant { !f = !s - at !s 'L >= 0 }
+      invariant { !f = !s - (!s at L) >= 0 }
       invariant { S.subset !e.mdl (S.diff (S.diff a.mdl b.mdl) c.mdl) }
       invariant { partial_solution k !col }
-      invariant { sorted !sol (at !s 'L) !s }
-      invariant { forall i: int. S.mem i (at !e.mdl 'L) /\ not (S.mem i !e.mdl) -> i <= !min }
-      invariant { forall i:int. at !s 'L <= i < !s -> solution !sol[i] /\ eq_prefix !col !sol[i] k /\ 0 <= !sol[i][k] <= !min }
+      invariant { sorted !sol (!s at L) !s }
+      invariant { forall i: int. S.mem i (!e.mdl at L) /\ not (S.mem i !e.mdl) -> i <= !min }
+      invariant { forall i:int. (!s at L) <= i < !s -> solution !sol[i] /\ eq_prefix !col !sol[i] k /\ 0 <= !sol[i][k] <= !min }
       invariant { forall u: solution.
         (solution u /\ eq_prefix !col u k /\ 0 <= u[k] <= !min)
         ->
-        S.mem u[k] (at !e.mdl 'L) && not (S.mem u[k] !e.mdl) &&
-        exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i] }
+        S.mem u[k] (!e.mdl at L) && not (S.mem u[k] !e.mdl) &&
+        exists i: int. (!s at L) <= i < !s /\ eq_sol u !sol[i] }
       (* assigns *)
-      invariant { eq_prefix (at !col 'L) !col k }
-      invariant { eq_prefix (at !sol 'L) !sol (at !s 'L) }
-      'N:
+      invariant { eq_prefix (!col at L) !col k }
+      invariant { eq_prefix (!sol at L) !sol (!s at L) }
+      label N in
       let d = rightmost_bit_trick !e min in
       ghost col := !col[k <- !min];
       assert { 0 <= !col[k] < size };
       assert { not (S.mem !col[k] b.mdl) };
       assert { not (S.mem !col[k] c.mdl) };
 
-      assert { eq_prefix (at !col 'L) !col k };
+      assert { eq_prefix (!col at L) !col k };
       assert { forall i: int. S.mem i a.mdl -> (forall j: int. 0 <= j < k ->  !col[j] <> i) };
       assert { forall i: int. S.mem i (S.remove (S.min_elt d.mdl) a.mdl) <-> (0 <= i < n /\ (forall j: int. 0 <= j < k + 1 ->  !col[j] <> i)) };
 
@@ -314,15 +316,15 @@ module NQueensBits
       assert { forall i: int.  0 <= i < size ->
         S.mem i c'.mdl -> (i = !min - 1 \/ (i + 1 < size /\ S.mem (i + 1) c.mdl)) && not (forall j:int. 0 <= j < k + 1 -> i - !col[j] <> j - k - 1) };
 
-      'M:
+      label M in
       f := !f + t (remove_singleton a d)
                   (mul2 (add_singleton b d)) (div2 (add_singleton c d)) (k + 1);
 
-      assert { forall i j. (at !s 'L) <= i < at !s 'M <= j < !s -> (eq_prefix !sol[i] !sol[j] k /\ !sol[i][k] <= at !min 'N < !min = !sol[j][k]) && lt_sol !sol[i] !sol[j]};
+      assert { forall i j. (!s at L) <= i < (!s at M) <= j < !s -> (eq_prefix !sol[i] !sol[j] k /\ !sol[i][k] <= (!min at N) < !min = !sol[j][k]) && lt_sol !sol[i] !sol[j]};
 
       e := remove_singleton !e d
     done;
-    assert { forall u:solution. solution u /\ eq_prefix !col u k -> S.mem u[k] (at !e.mdl 'L) && 0 <= u[k] <= !min  };
+    assert { forall u:solution. solution u /\ eq_prefix !col u k -> S.mem u[k] (!e.mdl at L) && 0 <= u[k] <= !min  };
     !f
     end else begin
       ghost sol := !sol[!s <- !col];

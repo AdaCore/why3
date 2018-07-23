@@ -1,0 +1,9 @@
+
+module S
+  type t = private { a: int }
+end
+
+module M
+  type t = { b: int } (* no field a *)
+  clone S with type t = t
+end

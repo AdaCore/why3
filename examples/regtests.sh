@@ -65,38 +65,48 @@ run_dir () {
     shapes="$shapes $1/*/why3shapes.*"
 }
 
+echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
+echo ""
+run_dir .
+run_dir double_wp "-L double_wp"
+run_dir avl "-L avl"
+run_dir foveoos11-cm
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
+run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"
+run_dir WP_revisited
+run_dir prover "-L prover --debug ignore_unused_vars"
+run_dir multiprecision "-L multiprecision"
+echo ""
+
+echo "Score on ported programs : $success/$total"
+echo ""
+
 echo "=== Standard Library ==="
+echo ""
 run_dir stdlib
 echo ""
 
 echo "=== Tests ==="
+echo ""
 # there's no session there...
 # run_dir tests
 run_dir tests-provers
 echo ""
 
 echo "=== Check Builtin translation ==="
+echo ""
 run_dir check-builtin
 echo ""
 
 echo "=== BTS ==="
+echo ""
 run_dir bts
 echo ""
 
 echo "=== Logic ==="
+echo ""
 run_dir logic
 run_dir bitvectors "-L bitvectors"
-echo ""
-
-echo "=== Programs ==="
-run_dir .
-run_dir foveoos11-cm
-run_dir WP_revisited
-run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
-run_dir avl "-L avl"
-run_dir double_wp "-L double_wp"
-run_dir prover "-L prover --debug ignore_unused_vars"
-run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"
 echo ""
 
 echo "Summary       : $success/$total"

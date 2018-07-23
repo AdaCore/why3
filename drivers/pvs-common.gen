@@ -27,23 +27,17 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-theory map.Map
-  syntax type  map "[%1 -> %2]"
+theory HighOrd
+  syntax type (->) "[%1 -> %2]"
+  syntax function (@) "%1(%2)"
+end
 
-  syntax function get "%1(%2)"
+theory map.Map
+  syntax function get  "%1(%2)"
   syntax function ([]) "%1(%2)"
 
   syntax function set    "(%1 WITH [(%2) |-> %3])"
   syntax function ([<-]) "(%1 WITH [(%2) |-> %3])"
-
-  remove prop Select_eq
-  remove prop Select_neq
-
-end
-
-theory map.Const
-  syntax function const "(LAMBDA (x:%v0): %1)"
-  remove prop Const
 end
 
 theory Bool
@@ -78,16 +72,16 @@ theory int.Int
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 >  %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Refl
   remove prop Trans
@@ -131,16 +125,16 @@ theory real.Real
   syntax predicate (>=) "(%1 >= %2)"
   syntax predicate (>)  "(%1 >  %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
+  remove prop MulComm.Comm
+  remove prop MulAssoc.Assoc
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Inv_def_l
+  remove prop Inv_def_r
+  remove prop Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
-  remove prop Comm.Comm
+  remove prop Comm
   remove prop Unitary
   remove prop Inverse
   remove prop NonTrivialRing
@@ -301,30 +295,29 @@ theory set.Set
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def1
+  remove prop      mem_empty
 
   syntax function add "add(%1, %2)"
-  remove prop     add_def1
+  remove prop     add_spec
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_def1
+  remove prop     remove_spec
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_def1
+  remove prop     union_spec
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_def1
+  remove prop     inter_spec
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_def1
+  remove prop     diff_spec
   remove prop     subset_diff
 
   (* TODO: choose *)
 
   syntax function all "fullset"
-  remove prop     all_def
 end
 
 theory set.Fset
@@ -338,24 +331,24 @@ theory set.Fset
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def1
+  remove prop      empty_def
 
   syntax function add "add(%1, %2)"
-  remove prop     add_def1
+  remove prop     add_spec
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_def1
+  remove prop     remove_spec
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_def1
+  remove prop     union_spec
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_def1
+  remove prop     inter_spec
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_def1
+  remove prop     diff_spec
   remove prop     subset_diff
 
   (* TODO: choose *)

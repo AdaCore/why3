@@ -414,7 +414,6 @@ let print_prop_decl info fmt (k, pr, f) =
     | Paxiom -> "axiom"
     | Plemma -> "lemma"
     | Pgoal -> "lemma"
-    | Pskip -> assert false (* impossible *)
   in
   print_statement stt (print_pr info) pr info fmt f
 
@@ -456,12 +455,12 @@ let print_task printer_args realize fmt task =
         Mid.add th.Theory.th_name (th, s1) mid
       | _ -> assert false
     ) Mid.empty task in
-  (* two cases: task is clone T with [] or task is a real goal *)
+  (* two cases: task is use T or task is a real goal *)
   let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
         string_of_id pr.pr_name, realized_theories
-    | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+    | Some { Task.task_decl = { Theory.td_node = Theory.Use th }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
         let id = th.Theory.th_name in
         String.concat "." (th.Theory.th_path @ [string_of_id id]),

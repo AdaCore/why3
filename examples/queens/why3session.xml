@@ -2,125 +2,126 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="25" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="3" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="8" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Z3" version="4.3.2" timelimit="25" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Alt-Ergo" version="0.99.1" timelimit="25" steplimit="0" memlimit="1000"/>
-<file name="../queens.mlw">
-<theory name="S">
-</theory>
-<theory name="NQueensSetsTermination">
- <goal name="WP_parameter t" expl="VC for t">
- <transf name="split_goal_right">
-  <goal name="WP_parameter t.1" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.00"/></proof>
-  <proof prover="11"><result status="valid" time="0.01" steps="3"/></proof>
+<prover id="0" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
+<prover id="7" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="10" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../queens.mlw" proved="true">
+<theory name="NQueensSetsTermination" proved="true">
+ <goal name="VC t" expl="VC for t" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC t.0" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter t.2" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.06" steps="73"/></proof>
+  <goal name="VC t.1" expl="precondition" proved="true">
+  <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter t.3" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="9"><result status="valid" time="0.00"/></proof>
-  <proof prover="11"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC t.2" expl="variant decrease" proved="true">
+  <proof prover="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter t.4" expl="loop variant decrease">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="VC t.3" expl="loop variant decrease" proved="true">
+  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC t.4" expl="loop invariant preservation" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Solution">
- <goal name="partial_solution_eq_prefix" expl="">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="9"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.02" steps="44"/></proof>
+<theory name="Solution" proved="true">
+ <goal name="partial_solution_eq_prefix" proved="true">
+ <proof prover="10"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="no_duplicate" expl="">
- <proof prover="2" timelimit="25" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <goal name="no_duplicate" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="NQueensSets">
- <goal name="WP_parameter t3" expl="VC for t3">
- <transf name="split_goal_right">
-  <goal name="WP_parameter t3.1" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.21"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="9"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.04" steps="43"/></proof>
+<theory name="NQueensSets" proved="true">
+ <goal name="VC t3" expl="VC for t3" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC t3.0" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="203"/></proof>
   </goal>
-  <goal name="WP_parameter t3.2" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.11" steps="140"/></proof>
+  <goal name="VC t3.1" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter t3.3" expl="precondition">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter t3.3.1" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC t3.2" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC t3.3" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC t3.4" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC t3.5" expl="loop invariant init" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC t3.6" expl="precondition" proved="true">
+  <proof prover="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC t3.7" expl="variant decrease" proved="true">
+  <proof prover="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC t3.8" expl="precondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC t3.8.0" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.2" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="11"><result status="valid" time="0.11" steps="138"/></proof>
+   <goal name="VC t3.8.1" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.3" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="17"/></proof>
+   <goal name="VC t3.8.2" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.4" expl="VC for t3">
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.11" steps="64"/></proof>
+   <goal name="VC t3.8.3" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.08"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.5" expl="VC for t3">
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.12" steps="65"/></proof>
+   <goal name="VC t3.8.4" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.08"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.6" expl="VC for t3">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.49"/></proof>
-   <proof prover="11" timelimit="5"><result status="valid" time="0.27" steps="290"/></proof>
+   <goal name="VC t3.8.5" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.07" steps="205"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.7" expl="VC for t3">
-   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"><result status="valid" time="0.85"/></proof>
-   <proof prover="11"><result status="valid" time="0.29" steps="290"/></proof>
+   <goal name="VC t3.8.6" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.13" steps="350"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.8" expl="VC for t3">
-   <proof prover="11"><result status="valid" time="0.47" steps="383"/></proof>
+   <goal name="VC t3.8.7" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.28" steps="615"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.9" expl="VC for t3">
-   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"><result status="valid" time="1.38"/></proof>
+   <goal name="VC t3.8.8" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.11" steps="360"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.10" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.42"/></proof>
-   <proof prover="11"><result status="valid" time="0.16" steps="172"/></proof>
+   <goal name="VC t3.8.9" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.16" steps="470"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.11" expl="VC for t3">
-   <proof prover="3" memlimit="1000" edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"><result status="valid" time="1.35"/></proof>
+   <goal name="VC t3.8.10" expl="VC for t3" proved="true">
+   <proof prover="3"><result status="valid" time="0.16" steps="209"/></proof>
    </goal>
-   <goal name="WP_parameter t3.3.12" expl="VC for t3">
-   <transf name="inline_goal">
-    <goal name="WP_parameter t3.3.12.1" expl="VC for t3">
-    <transf name="split_goal_right">
-     <goal name="WP_parameter t3.3.12.1.1" expl="VC for t3">
-     <proof prover="11"><result status="valid" time="0.14" steps="184"/></proof>
-     </goal>
-     <goal name="WP_parameter t3.3.12.1.2" expl="VC for t3">
-     <proof prover="11"><result status="valid" time="0.13" steps="155"/></proof>
-     </goal>
-     <goal name="WP_parameter t3.3.12.1.3" expl="VC for t3">
-     <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.26" steps="196"/></proof>
-     </goal>
-     <goal name="WP_parameter t3.3.12.1.4" expl="VC for t3">
-     <proof prover="11" timelimit="5"><result status="valid" time="0.32" steps="193"/></proof>
-     </goal>
-     <goal name="WP_parameter t3.3.12.1.5" expl="VC for t3">
-     <proof prover="11"><result status="valid" time="0.38" steps="275"/></proof>
+   <goal name="VC t3.8.11" expl="VC for t3" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC t3.8.11.0" expl="VC for t3" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="VC t3.8.11.0.0" expl="VC for t3" proved="true">
+     <transf name="split_goal_right" proved="true" >
+      <goal name="VC t3.8.11.0.0.0" expl="VC for t3" proved="true">
+      <proof prover="3"><result status="valid" time="0.05" steps="170"/></proof>
+      </goal>
+      <goal name="VC t3.8.11.0.0.1" expl="VC for t3" proved="true">
+      <proof prover="3"><result status="valid" time="0.06" steps="170"/></proof>
+      </goal>
+      <goal name="VC t3.8.11.0.0.2" expl="VC for t3" proved="true">
+      <proof prover="3"><result status="valid" time="0.14" steps="352"/></proof>
+      </goal>
+      <goal name="VC t3.8.11.0.0.3" expl="VC for t3" proved="true">
+      <proof prover="3"><result status="valid" time="0.61" steps="963"/></proof>
+      </goal>
+      <goal name="VC t3.8.11.0.0.4" expl="VC for t3" proved="true">
+      <proof prover="3"><result status="valid" time="0.37" steps="628"/></proof>
+      </goal>
+     </transf>
      </goal>
     </transf>
     </goal>
@@ -128,170 +129,130 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t3.4" expl="loop invariant preservation">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter t3.4.1" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="9"><result status="valid" time="0.44"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="29"/></proof>
+  <goal name="VC t3.9" expl="loop variant decrease" proved="true">
+  <proof prover="10"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC t3.10" expl="loop invariant preservation" proved="true">
+  <transf name="split_all_right" proved="true" >
+   <goal name="VC t3.10.0" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.2" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="29"/></proof>
+   <goal name="VC t3.10.1" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.3" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="29"/></proof>
+   <goal name="VC t3.10.2" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.4" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="37"/></proof>
+   <goal name="VC t3.10.3" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.5" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.08"/></proof>
-   <proof prover="2"><result status="valid" time="0.19"/></proof>
+   <goal name="VC t3.10.4" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.34"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.6" expl="VC for t3">
-   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"><result status="valid" time="1.24"/></proof>
+   <goal name="VC t3.10.5" expl="VC for t3" proved="true">
+   <proof prover="4" edited="queens_NQueensSets_VC_t3_2.v"><result status="valid" time="1.28"/></proof>
    </goal>
-   <goal name="WP_parameter t3.4.7" expl="VC for t3">
-   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"><result status="valid" time="0.75"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.8" expl="VC for t3">
-   <proof prover="2" timelimit="55"><result status="valid" time="18.50"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.9" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.08"/></proof>
-   <proof prover="2"><result status="valid" time="3.73"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.10" expl="VC for t3">
-   <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="1.32"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.11" expl="VC for t3">
-   <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="0.53"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.12" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="36"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.4.13" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="36"/></proof>
+   <goal name="VC t3.10.6" expl="VC for t3" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC t3.10.6.0" expl="VC for t3" proved="true">
+    <proof prover="2"><result status="valid" time="0.06"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t3.5" expl="loop variant decrease">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.07" steps="49"/></proof>
-  </goal>
-  <goal name="WP_parameter t3.6" expl="postcondition">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter t3.6.1" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.00"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.2" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.01"/></proof>
-   <proof prover="9"><result status="valid" time="0.00"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.3" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.00"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.4" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.5" expl="VC for t3">
-   <proof prover="3" timelimit="10" edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"><result status="valid" time="1.08"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.6" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.7" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="37"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.8" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.01"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="15"/></proof>
-   </goal>
-   <goal name="WP_parameter t3.6.9" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC t3.11" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC t3.11.0" expl="loop invariant preservation" proved="true">
+   <proof prover="3"><result status="valid" time="0.80" steps="1957"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t3.7" expl="postcondition">
-  <transf name="split_goal_right">
-   <goal name="WP_parameter t3.7.1" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.00"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="VC t3.12" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.53" steps="1245"/></proof>
+  </goal>
+  <goal name="VC t3.13" expl="loop invariant preservation" proved="true">
+  <proof prover="10"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="VC t3.14" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC t3.14.0" expl="loop invariant preservation" proved="true">
+   <proof prover="10"><result status="valid" time="0.27"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.2" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.01"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="8"/></proof>
+  </transf>
+  </goal>
+  <goal name="VC t3.15" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC t3.15.0" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.3" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.01"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="12"/></proof>
+   <goal name="VC t3.15.1" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.4" expl="VC for t3">
-   <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="9"><result status="valid" time="0.01"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="18"/></proof>
+   <goal name="VC t3.15.2" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.5" expl="VC for t3">
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.08" steps="66"/></proof>
+   <goal name="VC t3.15.3" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.6" expl="VC for t3">
-   <proof prover="9"><result status="valid" time="0.02"/></proof>
-   <proof prover="11"><result status="valid" time="0.02" steps="18"/></proof>
+   <goal name="VC t3.15.4" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.13"/></proof>
    </goal>
-   <goal name="WP_parameter t3.7.7" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.00"/></proof>
-   <proof prover="11"><result status="valid" time="0.00" steps="9"/></proof>
+   <goal name="VC t3.15.5" expl="VC for t3" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC t3.15.5.0" expl="VC for t3" proved="true">
+    <proof prover="3"><result status="valid" time="0.06" steps="260"/></proof>
+    </goal>
+   </transf>
    </goal>
-   <goal name="WP_parameter t3.7.8" expl="VC for t3">
-   <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="9"><result status="valid" time="0.01"/></proof>
-   <proof prover="11"><result status="valid" time="0.01" steps="11"/></proof>
+   <goal name="VC t3.15.6" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC t3.15.7" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC t3.15.8" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC t3.16" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC t3.16.0" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC t3.16.1" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC t3.16.2" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC t3.16.3" expl="VC for t3" proved="true">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC t3.16.4" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC t3.16.5" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC t3.16.6" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC t3.16.7" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter queens3" expl="VC for queens3">
- <transf name="split_goal_right">
-  <goal name="WP_parameter queens3.1" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.22"/></proof>
-  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.02" steps="61"/></proof>
+ <goal name="VC queens3" expl="VC for queens3" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC queens3.0" expl="precondition" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter queens3.2" expl="postcondition">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.02" steps="56"/></proof>
+  <goal name="VC queens3.1" expl="postcondition" proved="true">
+  <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>

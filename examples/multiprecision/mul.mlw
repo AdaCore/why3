@@ -1,0 +1,390 @@
+module Mul
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use util.Util
+  use add.Add
+
+
+    (** `wmpn_mul_1 r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
+    writes the n least significant limbs in `r`, and returns the most
+    significant limb. It corresponds to `mpn_mul_1`. *)
+  let wmpn_mul_1 (r x:t) (y:limb) (sz:int32) : limb
+    requires { valid x sz }
+    requires { valid r sz }
+    ensures { value r sz + (power radix sz) * result
+                = value x sz * y }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    writes { r.data.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let c = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { sz - !i }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i + (power radix !i) * !c =
+                  value x !i * y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      label StartLoop in
+      lx := get_ofs x !i;
+      let rl, rh = Limb.mul_double !lx y in
+      let res, carry = Limb.add_with_carry rl !c limb_zero in
+      label BeforeWrite in
+      value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) res;
+      set_ofs r !i res;
+      assert { value r !i + (power radix !i) * !c =
+                  value x !i * y };
+      assert { rh < radix - 1
+               by
+               (!lx * y <= !lx * (radix-1) <= (radix-1)*(radix-1)
+                 by
+                0 <= !lx <= radix - 1 /\ 0 <= y <= radix -1)
+                 /\
+               (radix * rh <= !lx * y
+                 by
+               rl + radix * rh = !lx * y)
+               so
+               radix * rh <= (radix -1) * (radix -1)
+               };
+      c := Limb.(+) rh carry;
+      value_tail r !i;
+      value_tail x !i;
+      assert { value x (!i+1) * y
+               = value x !i * y + power radix !i * (!lx * y) };
+               (*nonlinear, needed for reflection*)
+      assert { value r (!i+1) + (power radix (!i+1)) * !c =
+               value x (!i+1) * y };
+      i := Int32.(+) !i (Int32.of_int 1);
+    done;
+    !c
+
+  (** `wmpn_addmul_1 r x y sz` multiplies `(x, sz)` by `y`, adds the `sz`
+      least significant limbs to `(r, sz)` and writes the result in `(r, sz)`.
+      Returns the most significant limb of the product plus the carry
+      of the addition. Corresponds to `mpn_addmul_1`.*)
+  let wmpn_addmul_1 (r x:t) (y:limb) (sz:int32):limb
+    requires { valid x sz }
+    requires { valid r sz }
+    ensures { value r sz + (power radix sz) * result
+            = value (old r) sz
+              + value x sz * y }
+    writes { r.data.elts }
+    ensures { forall j. (j < r.offset \/ r.offset + sz <= j) ->
+              (pelts r)[j] = (pelts (old r))[j] }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let lr = ref limb_zero in
+    let c = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { sz - !i }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i + (power radix !i) * !c
+                 = value (old r) !i
+                   + value x !i * y }
+      invariant { forall j. !i <= j < sz ->
+                 (pelts (old r)) [r.offset+j] = (pelts r)[r.offset + j]  }
+      invariant { forall j. j < r.offset \/ r.offset + sz <= j ->
+                 (pelts r)[j] = (pelts (old r))[j] }
+      label StartLoop in
+      lx := get_ofs x !i;
+      lr := get_ofs r !i;
+      assert { !lr = (pelts (old r))[r.offset + !i] };
+      let rl, rh = Limb.mul_double !lx y in
+      let res, carry = Limb.add3 !lr rl !c in
+      value_tail r !i;
+      value_tail x !i;
+      assert { value (old r) (!i+1) = value (old r) !i + power radix !i * !lr };
+      (* value_tail (old r) !i... *)
+      value_sub_update (pelts r) (r.offset + p2i !i)
+                       r.offset (r.offset + p2i !i +1) res;
+      set_ofs r !i res;
+      assert { forall j. (!i + 1) <= j < sz ->
+               (pelts (old r))[r.offset+j] = (pelts r)[r.offset+j]
+               by
+               (pelts r)[r.offset+j] = ((pelts r) at StartLoop)[r.offset+j]
+                                  = (pelts (old r))[r.offset+j] };
+      assert { value r (!i + 1)
+              = value (r at StartLoop) (!i + 1)
+                + (power radix !i) * (res - !lr) };
+      assert { rl + radix * rh <= (radix-1)*(radix-1)
+               by
+               (!lx * y <= !lx * (radix-1) <= (radix-1)*(radix-1)
+                 by
+                0 <= !lx <= radix - 1 /\ 0 <= y <= radix -1)
+                /\
+                rl + radix * rh = !lx * y };
+      assert { rh < radix - 1
+               by
+               rl + radix * rh  <= (radix -1) * (radix -1)
+               so
+               radix * rh <= (radix -1) * (radix -1) };
+      assert { rh = radix - 2 -> rl <= 1
+               by
+               rl + radix * rh <= (radix-1)*(radix-1) };
+      assert { rh = radix - 2 -> carry <= 1
+               by rl <= 1 };
+      c := Limb.(+) rh carry;
+      assert { value x (!i + 1) * y
+               = value x !i * y + (power radix !i) * (!lx * y) };
+               (* nonlinear part *)
+      assert { value r (!i+1) + (power radix (!i+1)) * !c
+                 = value (old r) (!i+1)
+                   + value x (!i+1) * y };
+      i := Int32.(+) !i (Int32.of_int 1);
+    done;
+    !c
+
+  (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  writes the result to `(r, 2*sz)`. `r` must not overlap with either
+  `x` or `y`. Corresponds to `mpn_mul_n`.  *)
+  let wmpn_mul_n (r x y:t) (sz:int32) : unit
+    requires { sz > 0 }
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r (sz + sz) }
+    writes { r.data.elts }
+    ensures { value r (sz + sz)
+              = value x sz * value y sz }
+    ensures { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+  =
+    wmpn_zero r sz;
+    let limb_zero = Limb.of_int 0 in
+    let one = Int32.of_int 1 in
+    let rp = ref (C.incr r (Int32.of_int 0)) in
+    let ly = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      invariant { 0 <= !i <= sz }
+      invariant { value r (!i + sz) = value x sz * value y !i }
+      invariant { (!rp).offset = r.offset + !i }
+      invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { pelts !rp = pelts r }
+      invariant { forall j. (j < offset r \/ offset r + (sz + sz) <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { sz - !i }
+      label StartLoop in
+      value_concat r !i (!i + sz);
+      assert { value !rp sz
+               = value_sub (pelts r) (offset r + !i) (offset r + (!i + sz)) };
+      ly := get_ofs y !i;
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
+      assert { value !rp sz + power radix sz * c'
+              = value (!rp at StartLoop) sz + value x sz * !ly };
+      assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
+                r.offset (!rp).offset
+                by (!rp).offset = r.offset + !i
+                so forall j. r.offset <= j < (!rp).offset
+                   ->
+                   (j < (!rp).offset
+                    so (pelts !rp)[j] = (pelts !rp at StartLoop)[j]
+                         = (pelts r at StartLoop)[j]) };
+      label BeforeCarry in
+      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
+                        r.offset (r.offset + p2i !i) c';
+      set_ofs !rp sz c';
+      assert { (pelts !rp)[offset !rp + sz] = c'
+                = (pelts r)[offset r + (!i + sz)] };
+      assert { value r !i = value (r at BeforeCarry) !i
+             = value (r at StartLoop) !i};
+      value_tail r (!i + sz);
+      assert { value r (!i + sz + 1) = value r (!i + sz)
+                     + power radix (!i + sz) * (pelts r)[offset r + (!i + sz)] };
+      value_tail y !i;
+      value_concat r !i (!i + sz);
+      assert { value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz))
+               = value !rp sz };
+      assert { value !rp sz = value (!rp at BeforeCarry) sz };
+      assert { value !rp sz + power radix sz * c'
+                 = value (!rp at StartLoop) sz + value x sz * !ly };
+      assert { value (r at StartLoop) !i
+                 + (power radix !i) * value_sub (pelts r at StartLoop)
+                                   (r.offset + !i) (r.offset + (!i + sz))
+                 = value (r at StartLoop) (!i + sz) };
+      assert { value x sz * value y (!i + 1)
+               = value x sz * value y !i + (power radix !i) * (value x sz * !ly) };
+             (* nonlinear *)
+      assert { value r (!i + sz + 1) = value x sz * value y (!i+1) };
+      i := Int32.(+) !i one;
+      rp.contents <- C.incr !rp one;
+    done
+
+ let wmpn_addmul_n (r x y:t) (sz:int32) : limb
+    requires { sz > 0 }
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r (sz +  sz) }
+    writes { r.data.elts }
+    ensures { value r (sz + sz)
+                + power radix (sz + sz) * result
+              = value (old r) (sz + sz)
+                + value x sz * value y sz }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let one = Int32.of_int 1 in
+    let rp = ref (C.incr r (Int32.of_int 0)) in
+    let ly = ref limb_zero in
+    let lr = ref limb_zero in
+    let c = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      invariant { 0 <= !i <= sz }
+      invariant { value r (!i + sz)
+                    + (power radix (!i + sz)) * !c
+                  = value (old r) (!i + sz)
+                    + value x sz * value y !i }
+      invariant { (!rp).offset = r.offset + !i }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { r.data = (!rp).data }
+      invariant { 0 <= !c <= 1 }
+      invariant { forall j. (!rp).offset + sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j] }
+      variant { sz - !i }
+      label StartLoop in
+      value_concat r !i (!i+sz);
+      assert { value !rp sz
+               = value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz)) };
+      ly := get_ofs y !i;
+      let c' =  wmpn_addmul_1 !rp x !ly sz in
+      assert { forall j. (!rp).offset + sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j]
+                 by (pelts r)[j]
+                 = (pelts !rp)[j]
+                 = (pelts !rp)[j] at StartLoop
+                 = (pelts (old r))[j]};
+      assert { value !rp sz + power radix sz * c'
+              = value (!rp at StartLoop) sz + value x sz * !ly };
+      assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
+                r.offset (!rp).offset
+                by (!rp).offset = r.offset + !i
+                so forall j. r.offset <= j < (!rp).offset
+                   ->
+                   (j < (!rp).offset
+                    so (pelts !rp)[j] = (pelts !rp at StartLoop)[j]
+                         = (pelts r at StartLoop)[j]) };
+      lr := get_ofs !rp sz;
+      assert { !lr = (pelts (old r))[(old r).offset + (!i + sz)] };
+      let (res, carry) = add_with_carry c' !lr !c in
+      label BeforeCarry in
+      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
+                        r.offset  (r.offset + p2i !i) res;
+      set_ofs !rp sz res;
+      assert { value !rp sz = value (!rp at BeforeCarry) sz };
+      c:= carry;
+      assert { value r !i = value (r at BeforeCarry) !i
+               = value (r at StartLoop) !i};
+      value_tail r (!i+sz);
+      value_tail y !i;
+      assert { value (old r) ((!i+sz)+1)
+               = value (old r) (!i+sz) + power radix (!i+sz) * !lr };
+      assert { (pelts r)[r.offset + (!i + sz)] = res };
+      value_concat r !i (!i+sz);
+      assert { value_sub (pelts r) (r.offset + !i) (r.offset+(!i+sz))
+               = value !rp sz };
+      assert { value x sz * value y (!i+1)
+               = value x sz * value y !i + power radix !i * (value x sz * !ly) };
+             (* nonlinear *)
+      assert { value r (!i + sz + 1)
+                    + (power radix (!i + sz + 1)) * !c
+                  = value (old r) (!i + sz + 1)
+                    + value x sz * value y (!i + 1) };
+      i := Int32.(+) !i one;
+      rp.contents <- C.incr !rp one;
+      assert { forall j. (!rp).offset + sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j] };
+    done;
+    !c
+
+  (** `wmpn_mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  the result in `(r, sx+sy)`. `sx` must be greater than or equal to
+  `sy`. Corresponds to `mpn_mul`. *)
+  let wmpn_mul (r x y:t) (sx sy:int32) : unit
+    requires { 0 < sy <= sx }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid r (sy + sx) }
+    writes   { r.data.elts }
+    ensures  { value r (sy + sx) = value x sx * value y sy }
+    ensures { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    (*ensures  { result = (pelts r)[r.offset + sx + sy - 1] }*)
+  =
+    let ly = ref (C.get y) in
+    let c = wmpn_mul_1 r x !ly sx in
+    value_sub_update_no_change (pelts r) (r.offset + p2i sx)
+                               r.offset (r.offset + p2i sx - 1) c;
+    set_ofs r sx c;
+    value_sub_tail (pelts r) r.offset (r.offset + p2i sx);
+    assert { value r (sx + 1) = value x sx * value y 1
+             by value y 1 = !ly
+             so value r sx + power radix sx * c = value x sx * value y 1 };
+    let one = Int32.of_int 1 in
+    let rp = ref (C.incr r (Int32.of_int 1)) in
+    let i = ref (Int32.of_int 1) in
+    while Int32.(<) !i sy do
+      invariant { 1 <= !i <= sy }
+      invariant { value r (!i + sx) = value x sx * value y !i }
+      invariant { (!rp).offset = r.offset + !i }
+      invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { pelts !rp = pelts r }
+      invariant { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { sy - !i }
+      label StartLoop in
+      value_concat r !i (!i + sx);
+      assert { value !rp sx =
+               value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sx)) };
+      ly := get_ofs y !i;
+      let res =  wmpn_addmul_1 !rp x !ly sx in
+      assert { value !rp sx + power radix sx * res
+              = value (!rp at StartLoop) sx + value x sx * !ly };
+      assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
+                r.offset (!rp).offset
+                by (!rp).offset = r.offset + !i
+                so forall j. r.offset <= j < (!rp).offset
+                   ->
+                   (j < (!rp).offset
+                    so (pelts !rp)[j] = (pelts !rp at StartLoop)[j]
+                         = (pelts r at StartLoop)[j]) };
+      label BeforeCarry in
+      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sx)
+                        r.offset  (r.offset + p2i !i) res;
+      set_ofs !rp sx res;
+      assert { value !rp sx = value (!rp at BeforeCarry) sx };
+      assert { value r !i = value (r at BeforeCarry) !i
+             = value (r at StartLoop) !i };
+      value_tail r (!i + sx);
+      value_tail y !i;
+      value_concat r !i (!i+sx);
+      assert { value_sub (pelts r) (r.offset + !i) (r.offset+(!i+sx))
+               = value !rp sx };
+      assert { (pelts r)[r.offset + (!i+sx)] = res };
+      assert { value x sx * value y (!i+1)
+               = value x sx * value y !i
+                 + power radix !i * (value x sx * !ly) };
+             (*nonlinear*)
+      assert { value r (!i + sx + 1) = value x sx * value y (!i+1) };
+      i := Int32.(+) !i one;
+      rp.contents <- C.incr !rp one;
+    done;
+
+end

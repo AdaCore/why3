@@ -11,65 +11,139 @@
 
 open Wstdlib
 
-(** Labels *)
+(** Attributes *)
 
-type label = {
-  lab_string : string;
-  lab_tag    : int;
+type attribute = {
+  attr_string : string;
+  attr_tag    : int;
 }
 
-module Lab = MakeMSH (struct
-  type t = label
-  let tag lab = lab.lab_tag
+module Attr = MakeMSH (struct
+  type t = attribute
+  let tag a = a.attr_tag
 end)
 
-module Slab = Lab.S
-module Mlab = Lab.M
+module Sattr = Attr.S
+module Mattr = Attr.M
 
-module Hslab = Hashcons.Make (struct
-  type t = label
-  let equal lab1 lab2 = lab1.lab_string = lab2.lab_string
-  let hash lab = Hashtbl.hash lab.lab_string
-  let tag n lab = { lab with lab_tag = n }
+module Hsattr = Hashcons.Make (struct
+  type t = attribute
+  let equal a1 a2 = a1.attr_string = a2.attr_string
+  let hash a = Hashtbl.hash a.attr_string
+  let tag n a = { a with attr_tag = n }
 end)
 
-let create_label s = Hslab.hashcons {
-  lab_string = s;
-  lab_tag    = -1
+let create_attribute s = Hsattr.hashcons {
+  attr_string = s;
+  attr_tag    = -1
 }
 
-let list_label () =
+let list_attributes () =
   let acc = ref [] in
-  Hslab.iter (fun label -> acc := label.lab_string :: !acc);
+  Hsattr.iter (fun a -> acc := a.attr_string :: !acc);
   !acc
 
-let lab_equal : label -> label -> bool = (==)
-let lab_hash lab = lab.lab_tag
-let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
+let attr_equal : attribute -> attribute -> bool = (==)
+let attr_hash a = a.attr_tag
+let attr_compare a1 a2 = Pervasives.compare a1.attr_tag a2.attr_tag
 
 (** Naming convention *)
 
-let infix  s = "infix "  ^ s
-let prefix s = "prefix " ^ s
-let mixfix s = "mixfix " ^ s
+type notation =
+  | SNword   of string  (* plus *)
+  | SNinfix  of string  (* + *)
+  | SNtight  of string  (* ! *)
+  | SNprefix of string  (* -_ *)
+  | SNget    of string  (* [] *)
+  | SNset    of string  (* []<- *)
+  | SNupdate of string  (* [<-] *)
+  | SNcut    of string  (* [..] *)
+  | SNlcut   of string  (* [.._] *)
+  | SNrcut   of string  (* [_..] *)
 
-let kind_of_fix s =
+(* current encoding *)
+
+let op_infix  s = "infix " ^ s
+let op_prefix s = "prefix " ^ s
+let op_get    s = "mixfix []" ^ s
+let op_set    s = "mixfix []<-" ^ s
+let op_update s = "mixfix [<-]" ^ s
+let op_cut    s = "mixfix [..]" ^ s
+let op_lcut   s = "mixfix [.._]" ^ s
+let op_rcut   s = "mixfix [_..]" ^ s
+
+let op_equ   = op_infix "="
+let op_neq   = op_infix "<>"
+let op_tight = op_prefix
+
+let print_sn fmt w =
+  let lspace p = if p.[0] = '*' then " " else "" in
+  let rspace p = if p.[String.length p - 1] = '*' then " " else "" in
+  match w with (* infix/prefix never empty, mixfix cannot have stars *)
+  | SNinfix  p -> Format.fprintf fmt "(%s%s%s)" (lspace p) p (rspace p)
+  | SNtight  p -> Format.fprintf fmt "(%s%s)" p (rspace p)
+  | SNprefix p -> Format.fprintf fmt "(%s%s_)" (lspace p) p
+  | SNget    p -> Format.fprintf fmt "([]%s)" p
+  | SNset    p -> Format.fprintf fmt "([]%s<-)" p
+  | SNupdate p -> Format.fprintf fmt "([<-]%s)" p
+  | SNcut    p -> Format.fprintf fmt "([..]%s)" p
+  | SNlcut   p -> Format.fprintf fmt "([.._]%s)" p
+  | SNrcut   p -> Format.fprintf fmt "([_..]%s)" p
+  | SNword   p -> Format.pp_print_string fmt p
+
+(* The function below recognizes the following strings as notations:
+      "infix " (opchar+ [']* as p) (['_] [^'_] .* as q)
+      "prefix " (opchar+ [']* as p) (['_] [^'_] .* as q)
+      "mixfix " .* "]" opchar* ([']* as p) (['_] [^'_] .* as q)
+   It will fail if you add a mixfix that contains a non-opchar after
+   the closing square bracket, or a mixfix that does not use brackets.
+   Be careful when working with this code, it may eat your brain. *)
+
+let sn_decode s =
   let len = String.length s in
-  if len < 7 then `None else
-  let inf = String.sub s 0 6 in
-  if inf = "infix "  then `Infix (String.sub s 6 (len - 6)) else
-  let prf = String.sub s 0 7 in
-  if prf = "prefix " then `Prefix (String.sub s 7 (len - 7)) else
-  let prf = String.sub s 0 7 in
-  if prf = "mixfix " then `Mixfix (String.sub s 7 (len - 7)) else
-  `None
+  if len <= 6 then SNword s else
+  if s.[5] <> ' ' && s.[6] <> ' ' then SNword s else
+  let k = match String.sub s 0 6 with
+    | "infix " -> 6
+    | "prefix" -> 7
+    | "mixfix" -> (try succ (String.index_from s 7 ']') with Not_found -> 0)
+    | _ -> 0 in
+  if k = 0 then SNword s else
+  let rec skip_opchar i =
+    if i = len then i else match s.[i] with
+      | '@' | '!' | '^' | '$' | '=' | '%' | '>' | '#'
+      | '.' | '<' | '-' | '&' | '/' | '+' | '?' | ':'
+      | '*' | '~' | '|' | '\\' -> skip_opchar (succ i)
+      | _ -> i in
+  let l = skip_opchar k in
+  let rec skip_quote i =
+    if i = len then i else
+    if s.[i] = '\'' then skip_quote (succ i) else
+    if i = l || s.[i] = '_' then i else pred i in
+  let m = skip_quote l in
+  if l = k && k < 8 then SNword s (* null infix/prefix *) else
+  let w = if k = 6 then SNinfix (String.sub s 6 (m - 6)) else
+          if k = 7 then let op = String.sub s 7 (m - 7) in
+                        if s.[7] = '!' || s.[7] = '?' then
+                          SNtight op else SNprefix op else
+          let p = if l < m then String.sub s l (m - l) else "" in
+          match String.sub s 8 (l - 8) with
+          | "]"   -> SNget p | "]<-"  -> SNset p  | "<-]"  -> SNupdate p
+          | "..]" -> SNcut p | ".._]" -> SNlcut p | "_..]" -> SNrcut p
+          | _ -> SNword (if m = len then s else String.sub s 0 m) in
+  if m = len then w (* no appended suffix *) else
+  if s.[m] <> '\'' && s.[m] <> '_' then SNword s else
+  let p = print_sn Format.str_formatter w;
+          Format.flush_str_formatter () in
+  SNword (p ^ String.sub s m (len - m))
 
+let print_decoded fmt s = print_sn fmt (sn_decode s)
 
 (** Identifiers *)
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : Slab.t;               (* identifier labels *)
+  id_attrs  : Sattr.t;              (* identifier attributes *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
@@ -86,7 +160,7 @@ module Wid = Id.W
 
 type preid = {
   pre_name  : string;
-  pre_label : Slab.t;
+  pre_attrs : Sattr.t;
   pre_loc   : Loc.position option;
 }
 
@@ -98,33 +172,33 @@ let id_compare id1 id2 = Pervasives.compare (id_hash id1) (id_hash id2)
 
 let id_register = let r = ref 0 in fun id -> {
   id_string = id.pre_name;
-  id_label  = id.pre_label;
+  id_attrs  = id.pre_attrs;
   id_loc    = id.pre_loc;
   id_tag    = (incr r; Weakhtbl.create_tag !r);
 }
 
-let create_ident name labels loc = {
+let create_ident name attrs loc = {
   pre_name  = name;
-  pre_label = labels;
+  pre_attrs = attrs;
   pre_loc   = loc;
 }
 
-let id_fresh ?(label = Slab.empty) ?loc nm =
-  create_ident nm label loc
+let id_fresh ?(attrs = Sattr.empty) ?loc nm =
+  create_ident nm attrs loc
 
-let id_user ?(label = Slab.empty) nm loc =
-  create_ident nm label (Some loc)
+let id_user ?(attrs = Sattr.empty) nm loc =
+  create_ident nm attrs (Some loc)
 
-let id_lab label id =
-  create_ident id.id_string label id.id_loc
+let id_attr id attrs =
+  create_ident id.id_string attrs id.id_loc
 
-let id_clone ?(label = Slab.empty) id =
-  let ll = Slab.union label id.id_label in
-  create_ident id.id_string ll id.id_loc
+let id_clone ?(attrs = Sattr.empty) id =
+  let aa = Sattr.union attrs id.id_attrs in
+  create_ident id.id_string aa id.id_loc
 
-let id_derive ?(label = Slab.empty) nm id =
-  let ll = Slab.union label id.id_label in
-  create_ident nm ll id.id_loc
+let id_derive ?(attrs = Sattr.empty) nm id =
+  let aa = Sattr.union attrs id.id_attrs in
+  create_ident nm aa id.id_loc
 
 let preid_name id = id.pre_name
 
@@ -140,23 +214,14 @@ type ident_printer = {
 (* name is already sanitized *)
 let find_unique indices name =
   let specname ind =
-    let rec repeat n s =
-      if n <= 0 then s else repeat (n-1) (s ^ "^")
-    in
-    (* In the case, the symbol is infix/prefix *and* the name has not been
-       sanitized for provers (the space " " is still there), we don't want to
-       disambiguate with a number but with a symbol: "+" becomes "+." "+.." etc.
-       It allows to parse the ident again (for transformations).
-    *)
-    if Strings.has_prefix "infix " name ||
-       Strings.has_prefix "prefix " name then
-      (repeat ind name)
-    else
-      if ind < 0 then
-        name
-      else
-        name ^ string_of_int ind
-  in
+    (* If the symbol is infix/prefix *and* the name has not been
+       sanitized for provers, we don't want to disambiguate with
+       a number but with a quote symbol: "+" becomes "+'" "+''" etc.
+       This allows to parse the ident again (for transformations). *)
+    if ind <= 0 then name else
+    match sn_decode name with
+    | SNword _ -> name ^ string_of_int ind
+    | _        -> name ^ String.make ind '\'' in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in
@@ -231,7 +296,7 @@ let char_to_alpha c = match c with
   | '0' -> "zr" | '1'  -> "un" | '2' -> "du"
   | '3' -> "tr" | '4'  -> "qr" | '5' -> "qn"
   | '6' -> "sx" | '7'  -> "st" | '8' -> "oc"
-  | '9' -> "nn" | '\n' -> "br" |  _  -> "zz"
+  | '9' -> "nn" | '\n' -> "nl" |  _  -> "zz"
 
 let char_to_lalpha c = Strings.uncapitalize (char_to_alpha c)
 let char_to_ualpha c = Strings.capitalize (char_to_alpha c)
@@ -250,65 +315,64 @@ let char_to_lalnumus c =
 
 let sanitizer' head rest last n =
   let lst = ref [] in
+  let n = if n = "" then "zilch" else n in
+  let len = String.length n in
   let code i c = lst :=
     (if i = 0 then head
-     else if i = String.length n - 1 then last
+     else if i = len - 1 then last
      else rest) c :: !lst in
-  let n = if n = "" then "zilch" else n in
   String.iteri code n;
   String.concat "" (List.rev !lst)
 
 let sanitizer head rest n = sanitizer' head rest rest n
 
+(** {2 functions for working with counterexample attributes} *)
 
+let model_projected_attr = create_attribute "model_projected"
+let model_vc_attr = create_attribute "model_vc"
+let model_vc_post_attr = create_attribute "model_vc_post"
+let model_vc_havoc_attr = create_attribute "model_vc_havoc"
 
-(** {2 functions for working with counterexample model labels} *)
+let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 
-let model_projected_label = create_label "model_projected"
-let model_vc_label = create_label "model_vc"
-let model_vc_post_label = create_label "model_vc_post"
+let is_model_trace_attr a =
+  Strings.has_prefix "model_trace:" a.attr_string
 
-let create_model_trace_label s = create_label ("model_trace:" ^ s)
+let is_counterexample_attr a =
+  is_model_trace_attr a || a = model_projected_attr
 
-let is_model_trace_label label =
-  Strings.has_prefix "model_trace:" label.lab_string
+let has_a_model_attr id =
+  Sattr.exists is_counterexample_attr id.id_attrs
 
-let is_counterexample_label l =
-  is_model_trace_label l || l = model_projected_label
+let remove_model_attrs ~attrs =
+  Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
 
-let has_a_model_label id =
-  Slab.exists is_counterexample_label id.id_label
+let get_model_trace_attr ~attrs =
+  Sattr.choose (Sattr.filter is_model_trace_attr attrs)
 
-let remove_model_labels ~labels =
-  Slab.filter (fun l -> not (is_counterexample_label l)) labels
-
-let get_model_trace_label ~labels =
-  Slab.choose (Slab.filter is_model_trace_label labels)
-
-let transform_model_trace_label labels trans_fun =
+let transform_model_trace_attr attrs trans_fun =
   try
-    let trace_label = get_model_trace_label ~labels in
-    let labels_without_trace = Slab.remove trace_label labels in
-    let new_trace_label = create_label (trans_fun trace_label.lab_string) in
-    Slab.add new_trace_label labels_without_trace
-  with Not_found -> labels
+    let trace_attr = get_model_trace_attr ~attrs in
+    let attrs_without_trace = Sattr.remove trace_attr attrs in
+    let new_trace_attr = create_attribute (trans_fun trace_attr.attr_string) in
+    Sattr.add new_trace_attr attrs_without_trace
+  with Not_found -> attrs
 
-let append_to_model_element_name ~labels ~to_append =
-  let trans lab_str =
-    let splitted = Strings.bounded_split '@' lab_str 2 in
+let append_to_model_element_name ~attrs ~to_append =
+  let trans attr_str =
+    let splitted = Strings.bounded_split '@' attr_str 2 in
     match splitted with
     | [before; after] -> before ^ to_append ^ "@" ^ after
-    | _ -> lab_str^to_append
-  in
-  transform_model_trace_label labels trans
+    | _ -> attr_str^to_append in
+  transform_model_trace_attr attrs trans
 
-let append_to_model_trace_label ~labels ~to_append =
-    let trans lab_str = lab_str ^ to_append in
-    transform_model_trace_label labels trans
+let append_to_model_trace_attr ~attrs ~to_append =
+    let trans attr_str = attr_str ^ to_append in
+    transform_model_trace_attr attrs trans
 
-let get_model_element_name ~labels =
-  let trace_label = get_model_trace_label ~labels in
-  let splitted1 = Strings.bounded_split ':' trace_label.lab_string 2 in
+let get_model_element_name ~attrs =
+  let trace_attr = get_model_trace_attr ~attrs in
+  let splitted1 = Strings.bounded_split ':' trace_attr.attr_string 2 in
   match splitted1 with
   | [_; content] ->
     begin
@@ -321,41 +385,41 @@ let get_model_element_name ~labels =
   | [_] -> ""
   | _ -> assert false
 
-let get_model_trace_string ~labels =
-  let tl = get_model_trace_label ~labels in
-  let splitted = Strings.bounded_split ':' tl.lab_string 2 in
+let get_model_trace_string ~attrs =
+  let tl = get_model_trace_attr ~attrs in
+  let splitted = Strings.bounded_split ':' tl.attr_string 2 in
   match splitted with
   | [_; t_str] -> t_str
   | _ -> ""
 
 
-(* Functions for working with ITP labels *)
+(* Functions for working with ITP attributes *)
 
-let is_name_label label =
-  Strings.has_prefix "name:" label.lab_string
+let is_name_attr a =
+  Strings.has_prefix "name:" a.attr_string
 
-let get_name_label ~labels =
-  try Some (Slab.choose (Slab.filter is_name_label labels))
+let get_name_attr ~attrs =
+  try Some (Sattr.choose (Sattr.filter is_name_attr attrs))
   with Not_found -> None
 
-let get_element_name ~labels =
-  match get_name_label ~labels with
+let get_element_name ~attrs =
+  match get_name_attr ~attrs with
   | None -> None
-  | Some name_label ->
-    let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+  | Some name_attr ->
+    let splitted1 = Strings.bounded_split ':' name_attr.attr_string 2 in
     let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
     match splitted1 with
     | ["name"; content] when Str.string_match correct_word content 0 ->
         Some content
     | _ -> None
 
-let id_unique_label printer ?(sanitizer = same) id =
+let id_unique_attr printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id
   with Not_found ->
-    let labels = id.id_label in
+    let attrs = id.id_attrs in
     let name =
-      match (get_element_name ~labels) with
+      match (get_element_name ~attrs) with
       | Some x -> x
       | None -> printer.sanitizer id.id_string
     in

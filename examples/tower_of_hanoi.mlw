@@ -1,15 +1,15 @@
 module Hanoi
   (* a simple version where the disks are natural numbers from 1 to n *)
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.SortedInt
+  use int.Int
+  use list.List
+  use list.Length
+  use list.SortedInt
 
   type tower = {
     mutable rod : list int;
   } invariant {
-    sorted self.rod
+    sorted rod
   }
 
   function prepend (n: int) (s: list int) : list int
@@ -61,18 +61,18 @@ end
 module Tower_of_Hanoi
   (* a generalized version where the disks are arbitrary integers *)
 
-  use import int.Int
-  use import list.List
-  use import list.Length
+  use int.Int
+  use list.List
+  use list.Length
 
-  use import list.RevAppend
-  clone import list.RevSorted with type t = int, predicate le = (<),
+  use list.RevAppend
+  clone list.RevSorted with type t = int, predicate le = (<),
   goal Transitive.Trans
 
   type tower = {
     mutable rod : list int;
   } invariant {
-    Incr.sorted self.rod
+    Incr.sorted rod
   }
 
   let move (a b: tower) (ghost x: int) (ghost s: list int)
@@ -98,7 +98,7 @@ module Tower_of_Hanoi
     ensures  { c.rod = old c.rod }
   = if n > 0 then begin
       let ghost t = c.rod in
-      let x,r = match p with Cons x r -> (x,r) | Nil -> absurd end in
+      let x,r = match p with Cons x r -> x,r | Nil -> absurd end in
       hanoi_rec a c b (n-1) r (Cons x s);
       move a b x s;
       hanoi_rec c b a (n-1) r t

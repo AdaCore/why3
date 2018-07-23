@@ -7,10 +7,13 @@
 
 theory Graph
 
-  use import int.Int
+  use int.Int
   use export set.Fset
 
   type vertex
+
+  val predicate eq (x y: vertex)
+    ensures { result <-> x = y }
 
   function succ vertex : set vertex
 
@@ -48,10 +51,10 @@ end
 
 module BFS
 
-  use import int.Int
-  use import Graph
-  use impset.Impset as B
-  use import ref.Refint
+  use int.Int
+  use Graph
+  clone impset.Impset as B with type elt = vertex
+  use ref.Refint
 
   exception Found int
 
@@ -78,27 +81,32 @@ module BFS
     mem x visited -> not (mem x current) -> not (mem x next) ->
     forall y: vertex. mem y (succ x) -> mem y visited
 
+  function (!!) (s: B.t) : set vertex = B.contents s
+
+  val pick_succ (v: vertex) : B.t
+    ensures { !!result = succ v }
+
   (* function fill_next fills set next with the unvisited successors of v *)
-  let fill_next (s t v: vertex) (visited current next: B.t vertex) (d:ref int)
-    requires { inv s t !visited !current !next !d /\
+  let fill_next (s t v: vertex) (visited current next: B.t) (d:ref int)
+    requires { inv s t !!visited !!current !!next !d /\
       shortest_path s v !d /\
-      (forall x: vertex. x<> v -> closure !visited !current !next x) }
-    ensures { inv s t !visited !current !next !d /\
-      subset (succ v) !visited  /\
-      (forall x: vertex. closure !visited !current !next x) }
-  = let acc = ref (succ v) in
+      (forall x: vertex. x<> v -> closure !!visited !!current !!next x) }
+    ensures { inv s t !!visited !!current !!next !d /\
+      subset (succ v) !!visited  /\
+      (forall x: vertex. closure !!visited !!current !!next x) }
+  = let acc = pick_succ v in
     while not (B.is_empty acc) do
       invariant {
-        inv s t !visited !current !next !d /\
-        subset !acc (succ v) /\
-        subset (diff (succ v) !acc) !visited /\
-        (forall x: vertex. x<> v -> closure !visited !current !next x)
+        inv s t !!visited !!current !!next !d /\
+        subset !!acc (succ v) /\
+        subset (diff (succ v) !!acc) !!visited /\
+        (forall x: vertex. x <> v -> closure !!visited !!current !!next x)
       }
-      variant { cardinal !acc }
-      let w = B.pop acc in
-      if not (mem w !visited) then begin
-        B.push w visited;
-        B.push w next
+      variant { cardinal !!acc }
+      let w = B.choose_and_remove acc in
+      if not (B.mem w visited) then begin
+        B.add w visited;
+        B.add w next
       end
     done
 
@@ -106,26 +114,27 @@ module BFS
     ensures { forall d: int. not (path s t d) }
     raises { Found r -> shortest_path s t r }
     diverges (* the set of reachable nodes may be infinite *)
-  = let visited = ref (singleton s) in
-    let current = ref (singleton s) in
-    let next    = ref empty in
+  = let visited = B.empty () in
+    let current = ref (B.empty ()) in
+    let next    = ref (B.empty ()) in
+    B.add s visited;
+    B.add s !current;
     let d = ref 0 in
-    while not (B.is_empty current) do
+    while not (B.is_empty !current) do
       invariant {
-        inv s t !visited !current !next !d /\
-        (is_empty !current -> is_empty !next) /\
-        (forall x: vertex. closure !visited !current !next x) /\
+        inv s t !!visited !! !current !! !next !d /\
+        (is_empty !! !current -> is_empty !! !next) /\
+        (forall x: vertex. closure !!visited !! !current !! !next x) /\
         0 <= !d
       }
-      let v = B.pop current in
-      if v = t then raise (Found !d);
-      fill_next s t v visited current next d;
-      if B.is_empty current then begin
-        current := !next;
-        next    := empty;
+      let v = B.choose_and_remove !current in
+      if eq v t then raise (Found !d);
+      fill_next s t v visited !current !next d;
+      if B.is_empty !current then begin
+        (current.contents, next.contents) <- (!next, B.empty ());
         incr d
       end
     done;
-    assert { not (mem t !visited) }
+    assert { not (mem t !!visited) }
 
 end

@@ -276,7 +276,7 @@ let print_binop fmt = function
 
 (* TODO: labels are lost, but we could print them as "% label \n",
    it would result in an ugly output, though *)
-let print_label _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
+let print_attr _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -287,10 +287,10 @@ and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
 and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
-and print_lrterm opl opr info fmt t = match t.t_label with
+and print_lrterm opl opr info fmt t = match t.t_attrs with
   | _ -> print_tnode opl opr info fmt t
 
-and print_lrfmla opl opr info fmt f = match f.t_label with
+and print_lrfmla opl opr info fmt f = match f.t_attrs with
   | _ -> print_fnode opl opr info fmt f
 
 and print_tnode opl opr info fmt t = match t.t_node with
@@ -769,8 +769,7 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Paxiom when info.realization -> "LEMMA" (* axiom_or_lemma prev *)
     | Paxiom -> "AXIOM"
     | Plemma -> "LEMMA"
-    | Pgoal -> "THEOREM"
-    | Pskip -> assert false (* impossible *) in
+    | Pgoal -> "THEOREM" in
   print_name fmt pr.pr_name;
   fprintf fmt "@[<hov 2>%a%a: %s %a@]@\n@\n"
     print_pr pr print_params params kind (print_fmla info) f;
@@ -836,12 +835,12 @@ let print_task printer_args realize ?old fmt task =
           (th, (f, if s2 = "" then String.concat "." f else s2)) mid
       | _ -> assert false
     ) Mid.empty task in
-  (* two cases: task is clone T with [] or task is a real goal *)
+  (* two cases: task is use T or task is a real goal *)
     let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
         get_th_name pr.pr_name, [], realized_theories
-    | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+    | Some { Task.task_decl = { Theory.td_node = Theory.Use th }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
        let id = th.Theory.th_name in
        get_th_name id,

@@ -247,7 +247,6 @@ val why3_regexp_of_string : string -> Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 
-(** Access to the Rc.t *)
 val get_section : config -> string -> Rc.section option
 (** [get_section config name] Same as {!Rc.get_section} except name
     must not be "main" *)

@@ -2,149 +2,110 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="12" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../euler002.mlw">
-<theory name="FibSumEven">
-</theory>
-<theory name="FibOnlyEven">
- <goal name="WP_parameter fib_even_3n" expl="VC for fib_even_3n">
- <transf name="split_goal_right">
-  <goal name="WP_parameter fib_even_3n.1" expl="variant decrease">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.01" steps="4"/></proof>
+<prover id="3" name="Yices" version="1.0.38" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.5" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../euler002.mlw" proved="true">
+<theory name="FibOnlyEven" proved="true">
+ <goal name="VC fib_even_3n" expl="VC for fib_even_3n" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC fib_even_3n.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fib_even_3n.2" expl="precondition">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="VC fib_even_3n.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fib_even_3n.3" expl="postcondition">
-  <proof prover="1" memlimit="4000"><result status="valid" time="0.19"/></proof>
-  </goal>
-  <goal name="WP_parameter fib_even_3n.4" expl="postcondition">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.20" steps="41"/></proof>
+  <goal name="VC fib_even_3n.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.21"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="fib_even0" expl="">
- <proof prover="10" timelimit="6"><result status="valid" time="0.02" steps="3"/></proof>
+ <goal name="fib_even0" proved="true">
+ <proof prover="6" timelimit="6"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="fib_even1" expl="">
- <proof prover="1" timelimit="6"><result status="valid" time="0.03"/></proof>
+ <goal name="fib_even1" proved="true">
+ <proof prover="7"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="fib_evenn" expl="">
- <proof prover="1" timelimit="6"><result status="valid" time="0.06"/></proof>
+ <goal name="fib_evenn" proved="true">
+ <proof prover="7"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="Solve">
- <goal name="WP_parameter f" expl="VC for f">
- <transf name="split_goal_right">
-  <goal name="WP_parameter f.1" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="12"><result status="valid" time="0.00"/></proof>
+<theory name="Solve" proved="true">
+ <goal name="VC f" expl="VC for f" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC f.0" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter f.2" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="12"><result status="valid" time="0.00"/></proof>
+  <goal name="VC f.1" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter f.3" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="12"><result status="valid" time="0.03"/></proof>
+  <goal name="VC f.2" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter f.4" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.00" steps="5"/></proof>
-  <proof prover="12"><result status="valid" time="0.00"/></proof>
+  <goal name="VC f.3" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter f.5" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.00" steps="5"/></proof>
-  <proof prover="12"><result status="valid" time="0.00"/></proof>
+  <goal name="VC f.4" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter f.6" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="6"/></proof>
-  <proof prover="12"><result status="valid" time="0.00"/></proof>
+  <goal name="VC f.5" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter f.7" expl="loop invariant init">
-  <proof prover="7"><result status="valid" time="0.03"/></proof>
-  <proof prover="10"><result status="valid" time="0.11" steps="6"/></proof>
+  <goal name="VC f.6" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter f.8" expl="loop invariant init">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="VC f.7" expl="loop invariant init" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter f.9" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="12"><result status="valid" time="0.02"/></proof>
+  <goal name="VC f.8" expl="loop variant decrease" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter f.10" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="12"><result status="valid" time="0.02"/></proof>
+  <goal name="VC f.9" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter f.11" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="10"><result status="valid" time="0.00" steps="20"/></proof>
+  <goal name="VC f.10" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter f.12" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.00" steps="20"/></proof>
-  <proof prover="12"><result status="valid" time="0.02"/></proof>
+  <goal name="VC f.11" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter f.13" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC f.12" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter f.14" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.30"/></proof>
-  <proof prover="7"><result status="valid" time="0.04"/></proof>
-  <proof prover="12"><result status="valid" time="0.04"/></proof>
+  <goal name="VC f.13" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter f.15" expl="loop invariant preservation">
-  <proof prover="2"><result status="valid" time="2.26"/></proof>
+  <goal name="VC f.14" expl="loop invariant preservation" proved="true">
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter f.16" expl="loop invariant preservation">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.02" steps="20"/></proof>
+  <goal name="VC f.15" expl="loop invariant preservation" proved="true">
+  <proof prover="2" timelimit="60"><result status="valid" time="10.04"/></proof>
   </goal>
-  <goal name="WP_parameter f.17" expl="loop variant decrease">
-  <proof prover="10" memlimit="4000"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC f.16" expl="loop invariant preservation" proved="true">
+  <proof prover="6"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter f.18" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.01"/></proof>
-  <proof prover="10"><result status="valid" time="0.01" steps="19"/></proof>
-  <proof prover="12"><result status="valid" time="0.04"/></proof>
+  <goal name="VC f.17" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter run" expl="VC for run">
- <proof prover="10"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="VC run" expl="VC for run" proved="true">
+ <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="10" memlimit="4000"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="VC bench" expl="VC for bench" proved="true">
+ <proof prover="6"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
 </file>

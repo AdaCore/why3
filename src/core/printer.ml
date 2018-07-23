@@ -62,6 +62,8 @@ let print_comments fmt start_tok ?end_tok:(end_tok="") term =
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type interface = string list
+type interface_map = interface Mid.t
 type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
@@ -207,7 +209,7 @@ exception BadSyntaxArity of int * int
 let int_of_string s =
   try int_of_string s
   with _ ->
-    Format.eprintf "bad argument for int_of_string : %s@." s;
+    Format.eprintf "bad argument for int_of_string: %s@." s;
     assert false
 
 let check_syntax s len =
@@ -358,6 +360,8 @@ let print_prelude fmt pl =
   let println fmt s = fprintf fmt "%s@\n" s in
   print_list nothing println fmt pl
 
+let print_interface = print_prelude
+
 let print_prelude_of_theories th_used fmt pm =
   let ht = Hid.create 5 in
   List.iter (fun { th_name = id } ->
@@ -367,7 +371,7 @@ let print_prelude_of_theories th_used fmt pm =
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,_) } -> th::acc
+    | { td_node = Use th | Clone (th,_) } -> th::acc
     | _ -> acc) [] task
   in
   print_prelude_of_theories th_used fmt pm
@@ -619,7 +623,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
   | Unsupported s ->
-      fprintf fmt "@[<hov 3> Uncatched exception 'Unsupported %s'@]" s
+      fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
       fprintf fmt "@[@[<hov 3> This type isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_ty e s

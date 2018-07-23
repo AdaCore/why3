@@ -1,0 +1,205 @@
+(* Reasoning on bitvectors with precondition enforcing absence of overflow *)
+module BVCheck_Gen
+  use int.Int
+
+  type t
+
+  constant size : int
+
+  constant two_power_size : int
+  constant zeros           : t
+
+  function to_uint t   : int
+  function of_int  int : t
+
+  function add  t t : t
+  function sub  t t : t
+  function mul  t t : t
+  function udiv t t : t
+  function urem t t : t
+
+  function lsl    t int : t
+  function lsl_bv t t   : t
+  function lsr    t int : t
+  function lsr_bv t t   : t
+  function asr    t int : t
+  function asr_bv t t   : t
+
+  predicate ule t t
+  predicate ult t t
+  predicate uge t t
+  predicate ugt t t
+
+  val add_check (a b:t) : t
+    requires { 0 <= to_uint a + to_uint b < two_power_size }
+    ensures  { to_uint result = to_uint a + to_uint b }
+    ensures  { result = add a b }
+
+  val sub_check (a b:t) : t
+    requires { 0 <= to_uint a - to_uint b < two_power_size }
+    ensures  { result = sub a b }
+    ensures  { to_uint result = to_uint a - to_uint b }
+
+  val mul_check (a b:t) : t
+    requires { 0 <= to_uint a * to_uint b < two_power_size }
+    ensures  { result = mul a b }
+    ensures  { to_uint result = to_uint a * to_uint b }
+
+  val lsl_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = lsl_bv a b }
+    ensures  { result = lsl a (to_uint b) }
+
+  val lsr_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = lsr_bv a b }
+    ensures  { result = lsr a (to_uint b) }
+
+  val asr_check (a b:t) : t
+    requires { 0 <= to_uint b < size }
+    ensures  { result = asr_bv a b }
+    ensures  { result = asr a (to_uint b) }
+
+  use int.EuclideanDivision
+
+  val udiv_check (a b:t) : t
+    requires {b <> zeros}
+    ensures  { to_uint result = div (to_uint a) (to_uint b) }
+    ensures  { result = udiv a b }
+
+  val urem_check (a b:t) : t
+    requires {b <> zeros}
+    ensures  { to_uint result = mod (to_uint a) (to_uint b) }
+    ensures  { result = urem a b }
+
+  val eq_check (a b:t) : bool
+    ensures { result <-> a = b }
+
+  val ne_check (a b:t) : bool
+    ensures { result <-> a <> b }
+
+  val le_check (a b:t) : bool
+    ensures { result <-> to_uint a <= to_uint b }
+    ensures { result <-> ule a b }
+
+  val lt_check (a b:t) : bool
+    ensures { result <-> to_uint a < to_uint b }
+    ensures { result <-> ult a b }
+
+  val ge_check (a b:t) : bool
+    ensures { result <-> to_uint a >= to_uint b }
+    ensures { result <-> uge a b }
+
+  val gt_check (a b:t) : bool
+    ensures { result <-> to_uint a > to_uint b }
+    ensures { result <-> ugt a b }
+
+end
+
+module BVCheck8
+  use export bv.BV8
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    function two_power_size = two_power_size,
+    function zeros = zeros,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
+end
+
+module BVCheck16
+  use export bv.BV16
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    function two_power_size = two_power_size,
+    function zeros = zeros,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
+end
+
+module BVCheck32
+  use export bv.BV32
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    function two_power_size = two_power_size,
+    function zeros = zeros,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
+end
+
+module BVCheck64
+  use export bv.BV64
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    function two_power_size = two_power_size,
+    function zeros = zeros,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function udiv = udiv,
+    function urem = urem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt
+end

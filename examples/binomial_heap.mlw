@@ -9,23 +9,23 @@
 
 module BinomialHeap
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Reverse
-  use import list.Append
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Reverse
+  use list.Append
 
   (** The type of elements, together with a total pre-order *)
 
   type elt
 
-  predicate le elt elt
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  val predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (** Trees.
 
       These are arbitrary trees, not yet constrained
-      to be binomial trees. Field [rank] is used later to store the rank
+      to be binomial trees. Field `rank` is used later to store the rank
       of the binomial tree, for access in constant time. *)
 
   type tree = {
@@ -50,7 +50,7 @@ module BinomialHeap
 
   (** Heaps. *)
 
-  (* [e] is no greater than the roots of the trees in [l] *)
+  (* `e` is no greater than the roots of the trees in `l` *)
   predicate le_roots (e: elt) (l: list tree) =
     match l with
     | Nil      -> true
@@ -67,7 +67,7 @@ module BinomialHeap
     end
 
   lemma heaps_append:
-    forall h1 "induction" h2. heaps h1 -> heaps h2 -> heaps (h1 ++ h2)
+    forall h1 [@induction] h2. heaps h1 -> heaps h2 -> heaps (h1 ++ h2)
   lemma heaps_reverse:
     forall h. heaps h -> heaps (reverse h)
 
@@ -89,7 +89,7 @@ module BinomialHeap
     end
 
   lemma occ_append:
-    forall l1 "induction" l2 x. occ x (l1 ++ l2) = occ x l1 + occ x l2
+    forall l1 [@induction] l2 x. occ x (l1 ++ l2) = occ x l1 + occ x l2
 
   lemma occ_reverse:
     forall x l. occ x l = occ x (reverse l)
@@ -106,7 +106,7 @@ module BinomialHeap
     | Cons { children = c } r -> heaps_mem c; heaps_mem r
     end
 
-  (** Binomial tree of rank [k]. *)
+  (** Binomial tree of rank `k`. *)
 
   predicate has_order (k: int) (l: list tree) =
     match l with
@@ -127,8 +127,8 @@ module BinomialHeap
 
   type heap = list tree
 
-  (** A heap [h] is a list of binomial trees in strict increasing order of
-      ranks, those ranks being no smaller than [m]. *)
+  (** A heap `h` is a list of binomial trees in strict increasing order of
+      ranks, those ranks being no smaller than `m`. *)
 
   predicate inv (m: int) (h: heap) =
     match h with
@@ -168,8 +168,7 @@ module BinomialHeap
 
   let is_empty (h: heap) : bool
     ensures { result <-> h = Nil }
-    =
-    h = Nil
+  = match h with Nil -> true | _ -> false end
 
   let get_min (h: heap) : elt
     requires { heaps h }
@@ -193,7 +192,7 @@ module BinomialHeap
           aux t.elem l
     end
 
-  function link (t1 t2: tree) : tree =
+  let function link (t1 t2: tree) : tree =
     if le t1.elem t2.elem then
       { elem = t1.elem; rank = t1.rank + 1; children = Cons t2 t1.children }
     else
@@ -258,7 +257,7 @@ module BinomialHeap
     requires { inv k h }
     requires { h <> Nil }
     variant  { h }
-    ensures  { let (t, h') = result in
+    ensures  { let t, h' = result in
                heaps (Cons t Nil) && heaps h' && inv k h' &&
                le_roots t.elem h && binomial_tree t &&
                forall x. occ x h = occ x (Cons t Nil) + occ x h' }
@@ -267,10 +266,10 @@ module BinomialHeap
     | Nil ->
         absurd
     | Cons t Nil ->
-        (t, Nil)
+        t, Nil
     | Cons t tl ->
-        let (t', tl') = extract_min_tree (rank t + 1) tl in
-        if le t.elem t'.elem then (t, tl) else (t', Cons t tl')
+        let t', tl' = extract_min_tree (rank t + 1) tl in
+        if le t.elem t'.elem then t, tl else t', Cons t tl'
     end
 
   let rec extract_min (h: heap) : (elt, heap)
@@ -278,17 +277,17 @@ module BinomialHeap
     requires { inv 0 h }
     requires { h <> Nil }
     variant  { h }
-    ensures  { let (e, h') = result in
+    ensures  { let e, h' = result in
                heaps h' && inv 0 h' &&
                occ e h' = occ e h - 1 &&
                forall x. x <> e -> occ x h' = occ x h }
     =
-    let (t, h') = extract_min_tree 0 h in
-    (t.elem, merge 0 (reverse t.children) h')
+    let t, h' = extract_min_tree 0 h in
+    t.elem, merge 0 (reverse t.children) h'
 
   (** Complexity analysis. *)
 
-  use import int.Power
+  use int.Power
 
   let rec lemma has_order_size (k: int) (l: list tree)
     requires { has_order k l }

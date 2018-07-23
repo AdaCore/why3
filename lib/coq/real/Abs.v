@@ -23,9 +23,9 @@ Import Rbasic_fun.
 
 (* Why3 goal *)
 Lemma abs_def :
-forall (x:R),
- ((0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = x))
- /\ ((~ (0%R <= x)%R) -> ((Reals.Rbasic_fun.Rabs x) = (-x)%R)).
+  forall (x:R),
+  ((0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = x)) /\
+  (~ (0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = (-x)%R)).
 split ; intros H.
 apply Rabs_right.
 now apply Rle_ge.
@@ -35,8 +35,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Abs_le :
-forall (x:R) (y:R),
- ((Reals.Rbasic_fun.Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\ (x <= y)%R).
+  forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\ (x <= y)%R).
 intros x y.
 unfold Rabs.
 case Rcase_abs ; intros H ; (split ; [intros H0;split | intros (H0,H1)]).
@@ -61,29 +61,31 @@ exact H1.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_pos :
-forall (x:R), (0%R <= (Reals.Rbasic_fun.Rabs x))%R.
+Lemma Abs_pos : forall (x:R), (0%R <= (Reals.Rbasic_fun.Rabs x))%R.
 exact Rabs_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Abs_sum :
-forall (x:R) (y:R),
- ((Reals.Rbasic_fun.Rabs (x + y)%R) <= ((Reals.Rbasic_fun.Rabs x) + (Reals.Rbasic_fun.Rabs y))%R)%R.
+  forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rabs (x + y)%R) <=
+   ((Reals.Rbasic_fun.Rabs x) + (Reals.Rbasic_fun.Rabs y))%R)%R.
 exact Rabs_triang.
 Qed.
 
 (* Why3 goal *)
 Lemma Abs_prod :
-forall (x:R) (y:R),
- ((Reals.Rbasic_fun.Rabs (x * y)%R) = ((Reals.Rbasic_fun.Rabs x) * (Reals.Rbasic_fun.Rabs y))%R).
+  forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rabs (x * y)%R) =
+   ((Reals.Rbasic_fun.Rabs x) * (Reals.Rbasic_fun.Rabs y))%R).
 exact Rabs_mult.
 Qed.
 
 (* Why3 goal *)
 Lemma triangular_inequality :
-forall (x:R) (y:R) (z:R),
- ((Reals.Rbasic_fun.Rabs (x - z)%R) <= ((Reals.Rbasic_fun.Rabs (x - y)%R) + (Reals.Rbasic_fun.Rabs (y - z)%R))%R)%R.
+  forall (x:R) (y:R) (z:R),
+  ((Reals.Rbasic_fun.Rabs (x - z)%R) <=
+   ((Reals.Rbasic_fun.Rabs (x - y)%R) + (Reals.Rbasic_fun.Rabs (y - z)%R))%R)%R.
 intros x y z.
 replace (x - z)%R with ((x - y) + (y - z))%R by ring.
 apply Rabs_triang.

@@ -503,13 +503,13 @@ let update_status st id =
     let span_msg = getElement AsHtml.span (id ^ "_msg") in
     let cls =
       match st with
-      | `Scheduled -> "fa fa-fw fa-cog why3-task-pending"
-      | `Running -> "fa fa-fw fa-cog fa-spin why3-task-pending"
+      | `Scheduled -> "fas fa-fw fa-cog why3-task-pending"
+      | `Running -> "fas fa-fw fa-cog fa-spin why3-task-pending"
       | `Valid -> span_msg ##. innerHTML := Js.string "";
-	  "fa-check-circle why3-task-valid"
-      | `Unknown -> "fa-question-circle why3-task-unknown"
-      | `Timeout -> "fa-clock-o why3-task-unknown"
-      | `Failure -> "fa-bomb why3-task-unknown"
+	  "fas fa-check-circle why3-task-valid"
+      | `Unknown -> "fas fa-question-circle why3-task-unknown"
+      | `Timeout -> "fas fa-clock-o why3-task-unknown"
+      | `Failure -> "fas fa-bomb why3-task-unknown"
     in
     span_icon ##. className := Js.string cls
   with

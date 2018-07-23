@@ -28,6 +28,11 @@ let map_fold_right f l acc =
     (fun e (l, acc) -> let e, acc = f e acc in e :: l, acc)
     l ([], acc)
 
+let map_filter f l =
+  List.fold_right
+    (fun e l -> match f e with Some e -> e :: l | None -> l)
+    l []
+
 let equal pr l1 l2 =
   try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
 

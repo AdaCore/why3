@@ -1,0 +1,72 @@
+
+(** {1 Imperative maps with finite domain} *)
+
+module Impmap
+
+  use option.Option
+  use map.Map
+  use map.Const
+  use map.MapExt
+  use export exn.Exn
+
+  type key
+
+  type t 'a = abstract {
+    mutable contents: map key (option 'a)
+  }
+
+  val empty () : t 'a
+    ensures { result.contents = const None }
+
+  val is_empty (m: t 'a) : bool
+    ensures { result <-> m.contents == const None }
+
+  val mem (k: key) (m: t 'a) : bool
+    ensures { result <-> m.contents[k] <> None }
+
+  val get (k: key) (m: t 'a) : 'a
+    requires { m.contents[k] <> None }
+    ensures  { m.contents[k] = Some result }
+
+  val get_opt (k: key) (m: t 'a) : option 'a
+    ensures { result = m.contents[k] }
+
+  val get_def (k: key) (d: 'a) (m: t 'a) : 'a
+    ensures { result = match m.contents[k] with None -> d | Some v -> v end }
+
+  val find (k: key) (m: t 'a) : 'a
+    ensures  { m.contents[k] = Some result }
+    raises   { Not_found -> m.contents[k] = None }
+
+  val add (k: key) (v: 'a) (m: t 'a) : unit
+    writes  { m }
+    ensures { m.contents = old m.contents[k <- Some v] }
+
+  val remove (k: key) (m: t 'a) : unit
+    writes   { m }
+    ensures  { m.contents = old m.contents[k <- None] }
+end
+
+module ImpmapNoDom
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val ghost function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+  val ([]<-) (m: t 'a) (k: key) (v: 'a): unit
+    writes { m }
+    ensures { m = (old m)[k <- v] }
+
+end

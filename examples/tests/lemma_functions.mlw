@@ -1,7 +1,7 @@
 module LemmaFunction1
 
-  use import int.Int
-  use import ref.Refint
+  use int.Int
+  use ref.Refint
 
   function fact int : int
   axiom fact0 : fact 0 = 1
@@ -19,9 +19,9 @@ end
 
 module LemmaFunction2
 
-  use import int.Int
-  use import array.Array
-  use import array.ArraySum
+  use int.Int
+  use array.Array
+  use array.ArraySum
 
   let rec lemma sum_nonneg (a: array int) (l u: int) : unit
     requires { 0 <= l <= u <= length a }
@@ -43,14 +43,14 @@ end
 
 module M
 
-  use import int.Int
+  use int.Int
 
   type list 'a = Nil | Cons 'a (list 'a)
 
   function length (l:list 'a) : int =
     match l with
     | Nil -> 0
-    | Cons x r -> 1 + length r
+    | Cons _ r -> 1 + length r
     end
 
 
@@ -60,7 +60,7 @@ module M
   =
     match l with
     | Nil -> ()
-    | Cons x r -> lemma_length_non_neg r
+    | Cons _ r -> lemma_length_non_neg r
     end
 
 

@@ -1,0 +1,64 @@
+
+(** {1 Hash tables}
+
+  This module provides Hash tables à la OCaml.
+  Each key is mapped to a {h <b>stack</b>} of values,
+  with [add h k v] pushing a new value [v] for key [k],
+  and [remove h k] popping a value for key [k].
+
+*)
+
+module Hashtbl
+
+  use list.List
+  use map.Map
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key (list 'a) }
+
+  function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
+
+  val create (n:int) : t 'a ensures { forall k: key. result[k] = Nil }
+
+  val clear (h: t 'a) : unit writes {h} ensures { forall k: key. h[k] = Nil }
+
+  val add (h: t 'a) (k: key) (v: 'a) : unit writes {h}
+    ensures { h[k] = Cons v (old h)[k] }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+
+  val mem (h: t 'a) (k: key) : bool
+    ensures { result=True <-> h[k] <> Nil }
+
+  val find (h: t 'a) (k: key) : 'a
+    requires { h[k] <> Nil }
+    ensures  { match h[k] with Nil -> false | Cons v _ -> result = v end }
+
+  val find_all (h: t 'a) (k: key) : list 'a
+    ensures { result = h[k] }
+
+  exception NotFound
+
+  val defensive_find (h: t 'a) (k: key) : 'a
+    ensures { match h[k] with Nil -> false | Cons v _ -> result = v end }
+    raises  { NotFound -> h[k] = Nil }
+
+  val copy (h: t 'a) : t 'a
+    ensures { forall k: key. result[k] = h[k] }
+
+  val remove (h: t 'a) (k: key) : unit writes {h}
+    ensures { h[k] = match (old h)[k] with Nil -> Nil | Cons _ l -> l end }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+
+  val replace (h: t 'a) (k: key) (v: 'a) : unit writes {h}
+    ensures {
+      h[k] = Cons v (match (old h)[k] with Nil -> Nil | Cons _ l -> l end) }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+
+  (*** TODO
+     - val length: t 'a -> int (the number of distinct key)
+     - val iter : ('a -> 'b -> unit) -> ('a, 'b) t -> unit
+     - val fold : ('a -> 'b -> 'c -> 'c) -> ('a, 'b) t -> 'c -> 'c
+  *)
+
+end

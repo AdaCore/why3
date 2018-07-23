@@ -1,0 +1,593 @@
+
+(** {1 Sequences}
+
+    This file provides a basic theory of sequences.
+*)
+
+(** {2 Sequences and basic operations} *)
+
+module Seq
+
+  use int.Int
+
+  (** the polymorphic type of sequences *)
+  type seq 'a
+
+  (** `seq 'a` is an infinite type *)
+  meta "infinite_type" type seq
+
+  val function length (seq 'a) : int
+
+  axiom length_nonnegative:
+    forall s: seq 'a. 0 <= length s
+
+  val function get (seq 'a) int : 'a
+  (** `get s i` is the `i+1`-th element of sequence `s`
+      (the first element has index 0) *)
+
+  let function ([]) (s: seq 'a) (i: int) : 'a =
+    get s i
+
+  (** equality is extensional *)
+  val predicate (==) (s1 s2: seq 'a)
+    ensures { result <-> length s1 = length s2 &&
+              forall i: int. 0 <= i < length s1 -> s1[i] = s2[i] }
+    ensures { result -> s1 = s2 }
+
+  (** sequence comprehension *)
+  val function create (len: int) (f: int -> 'a) : seq 'a
+    requires { 0 <= len }
+    ensures { length result = len }
+    ensures { forall i. 0 <= i < len -> result[i] = f i }
+
+  (*** FIXME: could be defined, but let constant does
+     not accept spec. *)
+  (*** let constant empty : seq 'a
+    ensures { length result = 0 }
+  = while false do variant { 0 } () done;
+    create 0 (fun _ requires { false } -> absurd)
+   *)
+
+  (** empty sequence *)
+  val constant empty : seq 'a
+    ensures { length result = 0 }
+
+  (** `set s i v` is a new sequence `u` such that
+      `u[i] = v` and `u[j] = s[j]` otherwise *)
+  let function set (s:seq 'a) (i:int) (v:'a) : seq 'a
+    requires { 0 <= i < length s }
+    ensures { length result = length s }
+    ensures { result[i] = v }
+    ensures { forall j. 0 <= j < length s /\ j <> i -> result[j] = s[j] }
+  = while false do variant { 0 } () done;
+    create s.length (fun j -> if j = i then v else s[j])
+
+  (* FIXME: not a real alias because of spec, but should be. *)
+  let function ([<-]) (s: seq 'a) (i: int) (v: 'a) : seq 'a
+    requires { 0 <= i < length s }
+   = set s i v
+
+  (** singleton sequence *)
+  let function singleton (v:'a) : seq 'a
+    ensures { length result = 1 }
+    ensures { result[0] = v }
+  = while false do variant { 0 } () done;
+    create 1 (fun _ -> v)
+
+  (** insertion of elements on both sides *)
+  let function cons (x:'a) (s:seq 'a) : seq 'a
+    ensures { length result = 1 + length s }
+    ensures { result[0] = x }
+    ensures { forall i. 0 < i <= length s -> result[i] = s[i-1] }
+  = while false do variant { 0 } () done;
+    create (1 + length s) (fun i -> if i = 0 then x else s[i-1])
+
+  let function snoc (s:seq 'a) (x:'a) : seq 'a
+    ensures { length result = 1 + length s }
+    ensures { result[length s] = x }
+    ensures { forall i. 0 <= i < length s -> result[i] = s[i] }
+  = while false do variant { 0 } () done;
+    create (1 + length s) (fun i -> if i = length s then x else s[i])
+
+  (** `s[i..j]` is the sub-sequence of `s` from element `i` included
+      to element `j` excluded *)
+  let function ([..]) (s:seq 'a) (i:int) (j:int) : seq 'a
+    requires { 0 <= i <= j <= length s }
+    ensures { length result = j - i }
+    ensures { forall k. 0 <= k < j - i -> result[k] = s[i + k] }
+  = while false do variant { 0 } () done;
+    create (j-i) (fun k -> s[i+k])
+
+  (* FIXME: spec/alias *)
+  let function ([_..]) (s: seq 'a) (i: int) : seq 'a
+    requires { 0 <= i <= length s }
+  = s[i .. length s]
+
+  (* FIXME: spec/alias *)
+  let function ([.._]) (s: seq 'a) (j: int) : seq 'a
+    requires { 0 <= j <= length s }
+  = s[0 .. j]
+
+  (** concatenation *)
+  let function (++) (s1:seq 'a) (s2:seq 'a) : seq 'a
+    ensures { length result = length s1 + length s2 }
+    ensures { forall i. 0 <= i < length s1 -> result[i] = s1[i] }
+    ensures { forall i. length s1 <= i < length result ->
+      result[i] = s2[i - length s1] }
+  = while false do variant { 0 } () done;
+    let l = length s1 in
+    create (l + length s2)
+           (fun i -> if i < l then s1[i] else s2[i-l])
+
+end
+
+(** {2 Lemma library about algebraic interactions between
+       `empty`/`singleton`/`cons`/`snoc`/`++`/`[ .. ]`} *)
+
+module FreeMonoid
+
+  use int.Int
+  use Seq
+
+  (* Monoidal properties/simplification. *)
+
+  let lemma associative (s1 s2 s3:seq 'a)
+    ensures { s1 ++ (s2 ++ s3) = (s1 ++ s2) ++ s3 }
+  = if not (s1 ++ s2) ++ s3 == s1 ++ (s2 ++ s3) then absurd
+  meta rewrite axiom associative
+
+  let lemma left_neutral (s:seq 'a)
+    ensures { empty ++ s = s }
+  = if not empty ++ s == s then absurd
+  meta rewrite axiom left_neutral
+
+  let lemma right_neutral (s:seq 'a)
+    ensures { s ++ empty = s }
+  = if not s ++ empty == s then absurd
+  meta rewrite axiom right_neutral
+
+  let lemma cons_def (x:'a) (s:seq 'a)
+    ensures { cons x s = singleton x ++ s }
+  = if not cons x s == singleton x ++ s then absurd
+  meta rewrite axiom cons_def
+
+  let lemma snoc_def (s:seq 'a) (x:'a)
+    ensures { snoc s x = s ++ singleton x }
+  = if not snoc s x == s ++ singleton x then absurd
+  meta rewrite axiom snoc_def
+
+  let lemma double_sub_sequence (s:seq 'a) (i j k l:int)
+    requires { 0 <= i <= j <= length s }
+    requires { 0 <= k <= l <= j - i }
+    ensures { s[i .. j][k .. l] = s[k+i .. l+i] }
+  = if not s[i .. j][k .. l] == s[k+i .. l+i] then absurd
+
+  (* Inverting cons/snoc/catenation *)
+
+  let lemma cons_back (x:'a) (s:seq 'a)
+    ensures { (cons x s)[1 ..] = s }
+  = if not (cons x s)[1 ..] == s then absurd
+
+  let lemma snoc_back (s:seq 'a) (x:'a)
+    ensures { (snoc s x)[.. length s] = s }
+  = if not (snoc s x)[.. length s] == s then absurd
+
+  let lemma cat_back (s1 s2:seq 'a)
+    ensures { (s1 ++ s2)[.. length s1] = s1 }
+    ensures { (s1 ++ s2)[length s1 ..] = s2 }
+  = let c = s1 ++ s2 in let l = length s1 in
+    if not (c[.. l] == s1 || c[l ..] == s2) then absurd
+
+  (* Decomposing sequences as cons/snoc/catenation/empty/singleton *)
+
+  let lemma cons_dec (s:seq 'a)
+    requires { length s >= 1 }
+    ensures  { s = cons s[0] s[1 ..] }
+  = if not s == cons s[0] s[1 ..] then absurd
+
+  let lemma snoc_dec (s:seq 'a)
+    requires { length s >= 1 }
+    ensures  { s = snoc s[.. length s - 1] s[length s - 1] }
+  = if not s == snoc s[.. length s - 1] s[length s - 1] then absurd
+
+  let lemma cat_dec (s:seq 'a) (i:int)
+    requires { 0 <= i <= length s }
+    ensures  { s = s[.. i] ++ s[i ..] }
+  = if not s == s[.. i] ++ s[i ..] then absurd
+
+  let lemma empty_dec (s:seq 'a)
+    requires { length s = 0 }
+    ensures  { s = empty }
+  = if not s == empty then absurd
+
+  let lemma singleton_dec (s:seq 'a)
+    requires { length s = 1 }
+    ensures  { s = singleton s[0] }
+  = if not s == singleton s[0] then absurd
+
+end
+
+module ToList
+  use int.Int
+  use Seq
+  use list.List
+
+  val function to_list (a: seq 'a) : list 'a
+
+  axiom to_list_empty:
+    to_list (empty: seq 'a) = (Nil: list 'a)
+
+  axiom to_list_cons:
+    forall s: seq 'a. 0 < length s ->
+    to_list s = Cons s[0] (to_list s[1 ..])
+
+  use list.Length as ListLength
+
+  lemma to_list_length:
+    forall s: seq 'a. ListLength.length (to_list s) = length s
+
+  use list.Nth as ListNth
+  use option.Option
+
+  lemma to_list_nth:
+    forall s: seq 'a, i: int. 0 <= i < length s ->
+    ListNth.nth i (to_list s) = Some s[i]
+
+  let rec lemma to_list_def_cons (s: seq 'a) (x: 'a)
+    variant { length s }
+    ensures { to_list (cons x s) = Cons x (to_list s) }
+  = assert { (cons x s)[1 ..] == s }
+
+end
+
+module OfList
+  use int.Int
+  use option.Option
+  use list.List
+  use list.Length as L
+  use list.Nth
+  use Seq
+  use list.Append
+
+  let rec function of_list (l: list 'a) : seq 'a = match l with
+    | Nil -> empty
+    | Cons x r -> cons x (of_list r)
+    end
+
+  lemma length_of_list:
+    forall l: list 'a. length (of_list l) = L.length l
+
+  predicate point_wise (s: seq 'a) (l: list 'a) =
+    forall i. 0 <= i < L.length l -> Some (get s i) = nth i l
+
+  lemma elts_seq_of_list: forall l: list 'a.
+    point_wise (of_list l) l
+
+  lemma is_of_list: forall l: list 'a, s: seq 'a.
+    L.length l = length s -> point_wise s l -> s == of_list l
+
+  let rec lemma of_list_app (l1 l2: list 'a)
+    ensures { of_list (l1 ++ l2) == Seq.(++) (of_list l1) (of_list l2) }
+    variant { l1 }
+  = match l1 with
+    | Nil -> ()
+    | Cons _ r -> of_list_app r l2
+    end
+
+  lemma of_list_app_length: forall l1 [@induction] l2: list 'a.
+    length (of_list (l1 ++ l2)) = L.length l1 + L.length l2
+
+  let rec lemma of_list_snoc (l: list 'a) (x: 'a)
+    variant { l }
+    ensures { of_list (l ++ Cons x Nil) == snoc (of_list l) x }
+  = match l with
+    | Nil -> assert { snoc empty x = cons x empty }
+    | Cons _ r -> of_list_snoc r x;
+    end
+
+  meta coercion function of_list
+
+  use ToList
+
+  lemma convolution_to_of_list: forall l: list 'a.
+    to_list (of_list l) = l
+
+end
+
+module Mem
+
+  use int.Int
+  use Seq
+
+  predicate mem (x: 'a) (s: seq 'a) =
+    exists i: int. 0 <= i < length s && s[i] = x
+
+  lemma mem_append : forall x: 'a, s1 s2.
+    mem x (s1 ++ s2) <-> mem x s1 \/ mem x s2
+
+  lemma mem_tail: forall x: 'a, s.
+    length s > 0 ->
+    mem x s <-> (x = s[0] \/ mem x s[1 .. ])
+
+end
+
+module Distinct
+  use int.Int
+  use Seq
+
+  predicate distinct (s : seq 'a) =
+    forall i j. 0 <= i < length s -> 0 <= j < length s ->
+    i <> j -> s[i] <> s[j]
+
+end
+
+module Reverse
+
+  use int.Int
+  use Seq
+
+  let function reverse (s: seq 'a) : seq 'a =
+    create (length s) (fun i -> s[length s - 1 - i])
+
+end
+
+module ToFset
+  use int.Int
+  use set.Fset
+  use Mem
+  use Seq
+
+  val function to_set (s: seq 'a) : set 'a
+
+  axiom to_set_empty: to_set (empty: seq 'a) = (Fset.empty: set 'a)
+
+  axiom to_set_add: forall s: seq 'a. length s > 0 ->
+    to_set s = add s[0] (to_set s[1 ..])
+
+  lemma to_set_cardinal: forall s: seq 'a.
+    cardinal (to_set s) <= length s
+
+  lemma to_set_mem: forall s: seq 'a, e: 'a.
+    mem e s <-> Fset.mem e (to_set s)
+
+  lemma to_set_snoc: forall s: seq 'a, x: 'a.
+    to_set (snoc s x) = add x (to_set s)
+
+  use Distinct
+
+  lemma to_set_cardinal_distinct: forall s: seq 'a. distinct s ->
+    cardinal (to_set s) = length s
+
+end
+
+(** {2 Sorted Sequences} *)
+
+module Sorted
+
+  use int.Int
+  use Seq
+
+  type t
+  predicate le t t
+  clone relations.TotalOrder as TO with
+    type t = t, predicate rel = le, axiom .
+
+  predicate sorted_sub (s: seq t) (l u: int) =
+    forall i1 i2. l <= i1 <= i2 < u -> le s[i1] s[i2]
+  (** `sorted_sub s l u` is true whenever the sub-sequence `s[l .. u-1]` is
+      sorted  w.r.t. order relation `le` *)
+
+  predicate sorted (s: seq t) =
+    sorted_sub s 0 (length s)
+  (** `sorted s` is true whenever the sequence `s` is sorted w.r.t `le`  *)
+
+  lemma sorted_cons:
+    forall x: t, s: seq t.
+      (forall i: int. 0 <= i < length s -> le x s[i]) /\ sorted s <->
+    sorted (cons x s)
+
+  lemma sorted_append:
+    forall s1 s2: seq t.
+    (sorted s1 /\ sorted s2 /\
+      (forall i j: int. 0 <= i < length s1 /\ 0 <= j < length s2 ->
+      le s1[i] s2[i])) <-> sorted (s1 ++ s2)
+
+  lemma sorted_snoc:
+    forall x: t, s: seq t.
+      (forall i: int. 0 <= i < length s -> le s[i] x) /\ sorted s <->
+    sorted (snoc s x)
+
+end
+
+module SortedInt (** sorted sequences of integers *)
+
+  use int.Int
+  clone export Sorted with type t = int, predicate le = (<=), goal .
+
+end
+
+(** {2 Number of occurences in a sequence} *)
+
+module Occ
+
+  use int.Int
+  use int.NumOf as N
+  use Seq
+
+  function iseq (x: 'a) (s: seq 'a) : int->bool = fun i -> s[i] = x
+
+  function occ (x: 'a) (s: seq 'a) (l u: int) : int = N.numof (iseq x s) l u
+
+  (* TODO: lemmas for cons, snoc, etc. *)
+
+  lemma append_num_occ:
+    forall x: 'a, s1 s2: seq 'a.
+    let s = s1 ++ s2 in
+      occ x s 0 (length s) =
+      occ x s1 0 (length s1) + occ x s2 0 (length s2)
+
+end
+
+(** {2 Sequences Equality} *)
+
+module SeqEq
+
+  use int.Int
+  use Seq
+
+  predicate seq_eq_sub (s1 s2: seq 'a) (l u: int) =
+    forall i. l <= i < u -> s1[i] = s2[i]
+
+end
+
+module Exchange
+
+  use int.Int
+  use Seq
+
+  predicate exchange (s1 s2: seq 'a) (i j: int) =
+    length s1 = length s2 /\
+    0 <= i < length s1 /\ 0 <= j < length s1 /\
+    s1[i] = s2[j] /\ s1[j] = s2[i] /\
+    (forall k:int. 0 <= k < length s1 -> k <> i -> k <> j -> s1[k] = s2[k])
+
+  lemma exchange_set :
+    forall s: seq 'a, i j: int.
+    0 <= i < length s -> 0 <= j < length s ->
+    exchange s s[i <- s[j]][j <- s[i]] i j
+
+end
+
+(** {2 Permutation of sequences} *)
+
+module Permut
+
+  use int.Int
+  use Seq
+  use Occ
+  use SeqEq
+  use export Exchange
+
+  predicate permut (s1 s2: seq 'a) (l u: int) =
+    length s1 = length s2 /\
+    0 <= l <= length s1 /\ 0 <= u <= length s1 /\
+    forall v: 'a. occ v s1 l u = occ v s2 l u
+  (** `permut s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]`. Values outside this range are
+  ignored. *)
+
+  predicate permut_sub (s1 s2: seq 'a) (l u: int) =
+    seq_eq_sub s1 s2 0 l /\
+    permut s1 s2 l u /\
+    seq_eq_sub s1 s2 u (length s1)
+  (** `permut_sub s1 s2 l u` is true when the segment `s1[l..u-1]` is a
+  permutation of the segment `s2[l..u-1]` and values outside this range
+  are equal. *)
+
+  predicate permut_all (s1 s2: seq 'a) =
+    length s1 = length s2 /\ permut s1 s2 0 (length s1)
+  (** `permut_all s1 s2` is true when sequence `s1` is a permutation of
+  sequence `s2` *)
+
+  lemma exchange_permut_sub:
+    forall s1 s2: seq 'a, i j l u: int.
+    exchange s1 s2 i j -> l <= i < u -> l <= j < u ->
+    0 <= l -> u <= length s1 -> permut_sub s1 s2 l u
+
+  (** enlarge the interval *)
+  lemma Permut_sub_weakening:
+    forall s1 s2: seq 'a, l1 u1 l2 u2: int.
+    permut_sub s1 s2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length s1 ->
+    permut_sub s1 s2 l2 u2
+
+  (** {3 Lemmas about permut} *)
+
+  lemma permut_refl: forall s: seq 'a, l u: int.
+    0 <= l <= length s -> 0 <= u <= length s ->
+    permut s s l u
+
+  lemma permut_sym: forall s1 s2: seq 'a, l u: int.
+    permut s1 s2 l u -> permut s2 s1 l u
+
+  lemma permut_trans:
+    forall s1 s2 s3: seq 'a, l u: int.
+    permut s1 s2 l u -> permut s2 s3 l u -> permut s1 s3 l u
+
+  lemma permut_exists:
+    forall s1 s2: seq 'a, l u i: int.
+    permut s1 s2 l u -> l <= i < u ->
+    exists j: int. l <= j < u /\ s1[j] = s2[i]
+
+  (** {3 Lemmas about permut_all} *)
+
+  use Mem
+
+  lemma permut_all_mem: forall s1 s2: seq 'a. permut_all s1 s2 ->
+    forall x. mem x s1 <-> mem x s2
+
+  lemma exchange_permut_all:
+    forall s1 s2: seq 'a, i j: int.
+    exchange s1 s2 i j -> permut_all s1 s2
+
+end
+
+module FoldLeft
+
+  use Seq
+  use int.Int
+
+  (** `fold_left f a [b1; ...; bn]` is `f (... (f (f a b1) b2) ...) bn` *)
+  let rec function fold_left (f: 'a -> 'b -> 'a) (acc: 'a) (s: seq 'b) : 'a
+    variant { length s }
+  = if length s = 0 then acc else fold_left f (f acc s[0]) s[1 ..]
+
+  lemma fold_left_ext: forall f: 'b -> 'a -> 'b, acc: 'b, s1 s2: seq 'a.
+    s1 == s2 -> fold_left f acc s1 = fold_left f acc s2
+
+  lemma fold_left_cons: forall s: seq 'a, x: 'a, f: 'b -> 'a -> 'b, acc: 'b.
+    fold_left f acc (cons x s) = fold_left f (f acc x) s
+
+  let rec lemma fold_left_app (s1 s2: seq 'a) (f: 'b -> 'a -> 'b) (acc: 'b)
+    ensures { fold_left f acc (s1 ++ s2) = fold_left f (fold_left f acc s1) s2 }
+    variant { Seq.length s1 }
+  = if Seq.length s1 > 0 then fold_left_app s1[1 ..] s2 f (f acc (Seq.get s1 0))
+
+end
+
+module FoldRight
+
+  use Seq
+  use int.Int
+
+  (** `fold_right f [a1; ...; an] b` is `f a1 (f a2 (... (f an b) ...))` *)
+  let rec function fold_right (f: 'b -> 'a -> 'a) (s: seq 'b) (acc: 'a) : 'a
+    variant { length s }
+  = if length s = 0 then acc
+    else let acc = f s[length s - 1] acc in fold_right f s[.. length s - 1] acc
+
+  lemma fold_right_ext: forall f: 'a -> 'b -> 'b, acc: 'b, s1 s2: seq 'a.
+    s1 == s2 -> fold_right f s1 acc = fold_right f s2 acc
+
+  lemma fold_right_snoc: forall s: seq 'a, x: 'a, f: 'a -> 'b -> 'b, acc: 'b.
+    fold_right f (snoc s x) acc = fold_right f s (f x acc)
+
+end
+
+(*** TODO / TO DISCUSS
+
+  - what about s[i..j] when i..j is not a valid range?
+    left undefined? empty sequence?
+
+  - what about negative index e.g. s[-3..] for the last three elements?
+
+  - a syntax for cons and snoc?
+
+  - create: better name? move to a separate theory?
+
+  - UNPLEASANT: we cannot write s[1..] because 1. is recognized as a float
+    so we have to write s[1 ..]
+
+  - UNPLEASANT: when using both arrays and sequences, the lack of overloading
+    is a pain; see for instance vstte12_ring_buffer.mlw
+
+*)

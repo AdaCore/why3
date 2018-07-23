@@ -2,20 +2,22 @@
 module HeapSort
 
 (**** logic declarations *****)
-use import int.Int
-use import elements.Elements
-use import bag.Bag
-use import bag_of_integers.Bag_integers
+use int.Int
+use elements.Elements
+use bag.Bag
+use bag_of_integers.Bag_integers
 
-use import ref.Ref
-use import array.Array
-use import array.IntArraySorted
-use import abstract_heap.AbstractHeap
+use ref.Ref
+use array.Array
+use array.IntArraySorted
+use abstract_heap.AbstractHeap
 
-lemma Min_of_sorted:
-  forall a:M.map int int, i n :int.
-    0 <= i < n -> (M.sorted_sub a 0 n) ->
-      min_bag (elements a i n) = M.get a i
+let rec lemma min_of_sorted (a: int -> int) (i n: int)
+   requires { 0 <= i < n }
+   requires { M.sorted_sub a 0 n }
+   variant  { n }
+   ensures  { min_bag (elements a i n) = a i }
+ = if n > 0 && i < n - 1 then min_of_sorted a i (n-1)
 
 (* heap sort *)
 
@@ -24,8 +26,7 @@ let heapSort (a : array int)
   ensures  { sorted a /\
     elements a.elts 0 (length a) =
       elements (old a.elts) 0 (length a) }
-= 'Init:
-  let len = length a in
+= let len = length a in
   let h = create len in
 
    for i = 0 to len-1 do
@@ -40,7 +41,7 @@ let heapSort (a : array int)
    invariant
      { 0 <= i <= len /\
        card (model !h) = len - i /\
-       elements (at a.elts 'Init) 0 len =
+       elements (old a.elts) 0 len =
          union (model !h) (elements a.elts 0 i) /\
        sorted_sub a 0 i /\
        forall j:int. 0 <= j < i -> a[j] <= min_bag (model !h)

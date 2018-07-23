@@ -1,0 +1,9 @@
+
+module S
+  type t = private { a: int }
+end
+
+module M
+  type t = { a: bool } (* bad type for a *)
+  clone S with type t = t
+end

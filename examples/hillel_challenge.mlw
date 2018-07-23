@@ -1,0 +1,271 @@
+
+(** {1 Hillel challenge}
+
+  See https://www.hillelwayne.com/post/theorem-prover-showdown/
+
+  The challenge proposed by Hillel Wayne was to provide purely functional
+  implementations and proofs for three imperative programs he proved using
+  Dafny (as an attempt to understand whether the proof of FP code is easier
+  than the proof of imperative programs).
+
+  Below are imperative implementations and proofs for the three Hillel
+  challenges. Thus it is not really a response to the challenge, but rather
+  an alternative to the Dafny proofs.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(** {2 Challenge 1: Lefpad}
+
+  Takes a padding character, a string, and a total length, returns the
+  string padded to that length with that character. If length is less
+  than the length of the string, does nothing.
+*)
+
+module Leftpad
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+
+  type char (* whatever it is *)
+  type string = array char
+
+  let leftpad (pad: char) (n: int) (s: string) : string
+    ensures { length result = max n (length s) }
+    ensures { forall i. 0 <= i < length result - length s -> result[i] = pad }
+    ensures { forall i. 0 <= i < length s ->
+              result[length result - 1 - i] = s[length s - 1 - i] }
+  = let len = max n (length s) in
+    let res = Array.make len pad in
+    Array.blit s 0 res (len - length s) (length s);
+    res
+
+end
+
+(** {2 Challenge 2: Unique}
+
+  Takes a sequence of integers, returns the unique elements of that
+  list. There is no requirement on the ordering of the returned
+  values.
+
+*)
+
+module Unique
+
+  use int.Int
+  use ref.Refint
+  clone hashtbl.Hashtbl as H with type key = int
+  use array.Array
+
+  predicate mem (x: int) (a: array int) (i: int) =
+    exists j. 0 <= j < i /\ a[j] = x
+
+  predicate hmem (x: int) (h: H.t unit) =
+    H.contents h x <> H.List.Nil
+
+  let unique (a: array int) : array int
+    ensures { forall x. mem x result (length result) <-> mem x a (length a) }
+    ensures { forall i j. 0 <= i < j < length result -> result[i] <> result[j] }
+  = let n = length a in
+    let h = H.create n in
+    let res = Array.make n 0 in
+    let len = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { 0 <= !len <= i }
+      invariant { forall x. mem x a i <-> hmem x h }
+      invariant { forall x. mem x a i <-> mem x res !len }
+      invariant { forall i j. 0 <= i < j < !len -> res[i]<>res[j] }
+      if not (H.mem h a[i]) then begin
+        H.add h a[i] ();
+        res[!len] <- a[i];
+        incr len
+      end
+    done;
+    Array.sub res 0 !len
+
+end
+
+(** {2 Challenge 3: Fulcrum}
+
+  Given a sequence of integers, returns the index `i` that minimizes
+  `|sum(seq[..i]) - sum(seq[i..])|`. Does this in O(n) time and O(n)
+  memory.
+
+  We do it in O(n) time and O(1) space. A first loop computes the sum
+  of the array. A second scans the array from left to right, while
+  maintaining the left and right sums in two variables. Updating these
+  variables is simply of matter of adding `a[i]` to `left` and subtracting
+  `a[i]` to `right`.
+
+*)
+
+module Fulcrum
+
+  use int.Int
+  use int.Abs
+  use ref.Refint
+  use array.Array
+  use array.ArraySum
+
+  function diff (a: array int) (i: int) : int =
+    abs (sum a 0 i - sum a i (length a))
+
+  let fulcrum (a: array int) : int
+    ensures { 0 <= result <= length a }
+    ensures { forall i. 0 <= i <= length a -> diff a result <= diff a i }
+  = let n = length a in
+    let right = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { !right = sum a 0 i }
+      right += a[i]
+     done;
+    let left = ref 0 in
+    let besti = ref 0 in
+    let bestd = ref (abs !right) in
+    for i = 0 to n - 1 do
+      invariant { !left = sum a 0 i }
+      invariant { !right = sum a i n }
+      invariant { 0 <= !besti <= i }
+      invariant { !bestd = diff a !besti }
+      invariant { forall j. 0 <= j <= i -> !bestd <= diff a j }
+      left += a[i];
+      right -= a[i];
+      let d = abs (!left - !right) in
+      if d < !bestd then begin bestd := d; besti := i+1 end
+    done;
+    !besti
+
+end
+
+(** Now, let's try to do the same with machine integers and avoiding
+  overflows. Obviously, computing the sum of the array elements may
+  overflow. We could limit the size of the array and the maximal value
+  of the elements. Instead, we choose here to compute the various sums
+  using "small big integers" implemented with pairs of machine
+  integers (basically, the sum of all the array elements cannot exceed
+  `max_int^2` so two digits are enough).
+
+  For the purpose of illustration, we choose here 32-bit integers.
+*)
+
+module FulcrumNoOverflow
+
+  use int.Int
+  use int.Sum as Sum
+  use int.Abs
+  use ref.Ref
+  use mach.int.Int32
+  use mach.array.Array32
+
+  constant m : int = max_int32 + 1 (* thus 2^31 *)
+
+  (* small big integers, within the range -m^2 .. m^2-1 *)
+  type big = {
+    mutable       q: int32;
+    mutable       r: int32;
+    mutable ghost v: int;
+  } invariant { -m <= q <= m - 1 /\ 0 <= r <= m - 1 /\ v = q * m + r }
+  by { q = 0:int32; r = 0:int32; v = 0 }
+
+  meta coercion function v
+
+  predicate biginv (b: big) = 89>55 (* used to enforce the type invariant *)
+
+  constant min_big : int = -m*m
+  constant max_big : int =  m*m - 1
+
+  let constant big_zero () : big =
+    { q = 0:int32; r = 0:int32; v = 0 }
+
+  let constant min_int32: int32 = -0x8000_0000
+  let constant max_int32: int32 =  0x7fff_ffff
+
+  let add_big (b: big) (x: int32) : unit
+    requires { min_big <= b.v + x <= max_big }
+    ensures  { b.v = old b.v + x }
+  = if x < 0 then begin
+      let r' = b.r + x in
+      if r' < 0 then begin b.q <- b.q - 1; b.r <- (r'+1) + max_int32 end
+      else b.r <- r'
+    end else begin
+      let r' = b.r + (min_int32 + x) in
+      if r' < 0 then begin b.r <- (r'+1) + max_int32 end
+      else begin b.q <- b.q + 1;  b.r <- r' end
+    end;
+    b.v <- b.v + to_int x
+
+  let sub_big (b: big) (x: int32) : unit
+    requires { min_big <= b.v - x <= max_big }
+    ensures  { b.v = old b.v - x }
+  = if x = min_int32 then begin b.q <- b.q + 1; b.v <- b.v - to_int x end
+    else add_big b (-x)
+
+  let delta (x y: big) : big
+    requires { min_big <= abs (x.v - y.v) <= max_big }
+    ensures  { result.v = abs (x.v - y.v) }
+  = let r = y.r - x.r in
+    let ghost v = abs (x.v - y.v) in
+    if y.q < x.q then (* -qM-r *)
+      if r > 0 then { q = (x.q - 1) - y.q; r = (-r + 1) + max_int32; v = v }
+      else { q = x.q - y.q; r = -r; v = v }
+    else if y.q = x.q then (* abs r *)
+      if r < 0 then { q = 0; r = -r; v = v } else { q = 0; r = r; v = v }
+    else (* qM+r *)
+      if r < 0 then { q = (y.q - 1) - x.q; r = (r+1) + max_int32; v = v }
+      else { q = y.q - x.q; r = r; v = v }
+
+  let big_lt (x y: big) : bool
+    requires { x.v >= 0 /\ y.v >= 0 }
+    ensures  { result <-> x.v < y.v }
+  = x.q < y.q || x.q = y.q && x.r < y.r
+
+  function sum (a: array int32) (l u: int) : int =
+    Sum.sum (fun i -> to_int a[i]) l u
+
+  let lemma sum_bounds (a: array int32) (l u: int)
+    requires { 0 <= l <= u <= length a }
+    ensures  { (u-l) * min_int32 <= sum a l u <= (u-l) * max_int32 }
+  = let s = ref 0 in
+    for i = l to u - 1 do
+      invariant { !s = sum a l i }
+      invariant { (i-l) * min_int32 <= !s <= (i-l) * max_int32 }
+      s := !s + to_int (a.elts i)
+    done
+
+  function diff (a: array int32) (i: int) : int =
+    abs (sum a 0 i - sum a i (length a))
+
+  let fulcrum (a: array int32) : int32
+    requires { length a < max_int32 } (* the only (and small) compromise *)
+    ensures  { 0 <= result <= length a }
+    ensures  { forall i. 0 <= i <= length a -> diff a result <= diff a i }
+  = let n = length a in
+    let right = big_zero () in
+    for i = 0 to n - 1 do
+      invariant { biginv right }
+      invariant { right = sum a 0 i }
+      add_big right a[i]
+     done;
+    let left = big_zero () in
+    let besti = ref (0: int32) in
+    let bestd = delta left right in
+    for i = 0 to n - 1 do
+      invariant { biginv right /\ biginv left /\ biginv bestd }
+      invariant { left = sum a 0 i }
+      invariant { right = sum a i n }
+      invariant { 0 <= !besti <= i }
+      invariant { bestd = diff a !besti }
+      invariant { forall j. 0 <= j <= i -> bestd <= diff a j }
+      add_big left  a[i];
+      sub_big right a[i];
+      let d = delta left right in
+      if big_lt d bestd then begin
+        (* bestd <- d *) bestd.q <- d.q; bestd.r <- d.r; bestd.v <- d.v;
+        besti := i + 1
+      end
+    done;
+    !besti
+
+end
+

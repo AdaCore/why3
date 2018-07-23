@@ -1,0 +1,153 @@
+
+(** {1 Polymorphic binary trees with elements at nodes} *)
+
+module Tree
+
+  type tree 'a = Empty | Node (tree 'a) 'a (tree 'a)
+
+  let predicate is_empty (t:tree 'a)
+    ensures { result <-> t = Empty }
+  = match t with Empty -> true | Node _ _ _ -> false end
+
+end
+
+(** {2 Number of nodes} *)
+
+module Size
+
+  use Tree
+  use int.Int
+
+  let rec function size (t: tree 'a) : int = match t with
+    | Empty -> 0
+    | Node l _ r -> 1 + size l + size r
+  end
+
+  lemma size_nonneg: forall t: tree 'a. 0 <= size t
+
+  lemma size_empty: forall t: tree 'a. 0 = size t <-> t = Empty
+
+end
+
+(** {2 Occurrences in a binary tree} *)
+
+module Occ
+
+  use Tree
+  use int.Int
+
+  function occ (x: 'a) (t: tree 'a) : int = match t with
+    | Empty      -> 0
+    | Node l y r -> (if y = x then 1 else 0) + occ x l + occ x r
+  end
+
+  lemma occ_nonneg:
+    forall x: 'a, t: tree 'a. 0 <= occ x t
+
+  predicate mem (x: 'a) (t: tree 'a) =
+    0 < occ x t
+
+end
+
+(** {2 Height of a tree} *)
+
+module Height
+
+  use Tree
+  use int.Int
+  use int.MinMax
+
+  let rec function height (t: tree 'a) : int = match t with
+    | Empty      -> 0
+    | Node l _ r -> 1 + max (height l) (height r)
+  end
+
+  lemma height_nonneg:
+    forall t: tree 'a. 0 <= height t
+
+end
+
+(** {2 In-order traversal} *)
+
+module Inorder
+
+  use Tree
+  use list.List
+  use list.Append
+
+  let rec function inorder (t: tree 'a) : list 'a = match t with
+    | Empty -> Nil
+    | Node l x r -> inorder l ++ Cons x (inorder r)
+  end
+
+end
+
+(** {2 Pre-order traversal} *)
+
+module Preorder
+
+  use Tree
+  use list.List
+  use list.Append
+
+  let rec function preorder (t: tree 'a) : list 'a = match t with
+    | Empty -> Nil
+    | Node l x r -> Cons x (preorder l ++ preorder r)
+  end
+
+end
+
+module InorderLength
+
+  use Tree
+  use Size
+  use Inorder
+  use list.List
+  use list.Length
+
+  lemma inorder_length: forall t: tree 'a. length (inorder t) = size t
+
+end
+
+(** {2 Huet's zipper} *)
+
+module Zipper
+
+  use Tree
+
+  type zipper 'a =
+    | Top
+    | Left  (zipper 'a) 'a (tree 'a)
+    | Right (tree 'a)   'a (zipper 'a)
+
+  let rec function zip (t: tree 'a) (z: zipper 'a) : tree 'a =
+    match z with
+    | Top -> t
+    | Left z x r -> zip (Node t x r) z
+    | Right l x z -> zip (Node l x t) z
+    end
+
+  (* navigating in a tree using a zipper *)
+
+  type pointed 'a = (tree 'a, zipper 'a)
+
+  let function start (t: tree 'a) : pointed 'a = (t, Top)
+
+  let function up (p: pointed 'a) : pointed 'a = match p with
+    | _, Top -> p (* do nothing *)
+    | l, Left z x r | r, Right l x z -> (Node l x r, z)
+  end
+
+  let function top (p: pointed 'a) : tree 'a = let t, z = p in zip t z
+
+  let function down_left (p: pointed 'a) : pointed 'a = match p with
+    | Empty, _ -> p (* do nothing *)
+    | Node l x r, z -> (l, Left z x r)
+  end
+
+  let function down_right (p: pointed 'a) : pointed 'a = match p with
+    | Empty, _ -> p (* do nothing *)
+    | Node l x r, z -> (r, Right l x z)
+  end
+
+end

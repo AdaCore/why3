@@ -107,8 +107,8 @@ Theorem permut_sub_weakening : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l1:Z) (u1:Z) (l2:Z)
   (u2:Z), (permut_sub a1 a2 l1 u1) -> (((0%Z <= l2)%Z /\ (l2 <= l1)%Z) ->
   (((u1 <= u2)%Z /\ (u2 <= (length a1))%Z) -> (permut_sub a1 a2 l2 u2))).
-(* Why3 intros a a_WT a1 a2 l1 u1 l2 u2 h1 (h2,h3) (h4,h5). *)
-intros a a_WT a1 a2 l1 u1 l2 u2 h1 (h2,h3) (h4,h5).
+(* Why3 intros a1 a2 l1 u1 l2 u2 h1 (h2,h3) (h4,h5). *)
+intros a1 a2 l1 u1 l2 u2 h1 (h2,h3) (h4,h5).
 unfold permut_sub in *.
 destruct h1 as (eql,(h1,eqr)).
 unfold map_eq_sub in *.

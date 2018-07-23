@@ -52,7 +52,7 @@ type 'a format_parser = env -> pathname -> filename -> in_channel -> 'a
 
 type format_info = fformat * extension list * Pp.formatted
 
-module Hpath = Hashtbl.Make(struct
+module Hpath = Exthtbl.Make(struct
   type t = pathname
   let hash = Hashtbl.hash
   let equal = (=)
@@ -229,21 +229,20 @@ let read_theory env path s =
 open Ident
 open Theory
 
-let base_builtin path =
+let base_language_builtin =
   let builtin s =
     if s = builtin_theory.th_name.id_string then builtin_theory else
     if s = highord_theory.th_name.id_string then highord_theory else
     if s = bool_theory.th_name.id_string then bool_theory else
-    if s = unit_theory.th_name.id_string then unit_theory else
     match tuple_theory_name s with
     | Some n -> tuple_theory n
     | None -> raise Not_found
   in
-  match path with
-  | [s] -> Mstr.singleton s (builtin s)
-  | _   -> raise Not_found
+  Hpath.memo 7 (function
+    | [s] -> Mstr.singleton s (builtin s)
+    | _   -> raise Not_found)
 
-let () = add_builtin base_language base_builtin
+let () = add_builtin base_language base_language_builtin
 
 (* Exception reporting *)
 

@@ -1,0 +1,769 @@
+
+(** {1 Formalization of Floating-Point Arithmetic}
+
+This formalization follows the {h <a
+href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754
+standard</a>}.
+
+*)
+
+(** {2 Definition of IEEE-754 rounding modes} *)
+
+module Rounding
+
+  type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
+  (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
+
+end
+
+(** {2 Handling of IEEE-754 special values}
+
+Special values are +infinity, -infinity, NaN, +0, -0.  These are
+handled as described in {h <a
+href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, Marché, IJCAR,
+2010]</a>}.
+
+*)
+
+module SpecialValues
+
+  type class = Finite | Infinite | NaN
+
+  type sign = Neg | Pos
+
+  use real.Real
+
+  inductive same_sign_real sign real =
+    | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
+    | Pos_case: forall x:real. x > 0.0 -> same_sign_real Pos x
+
+(*** useful ???
+
+lemma sign_not_pos_neg : forall x:t.
+      sign(x) <> Pos -> sign(x) = Neg
+lemma sign_not_neg_pos : forall x:t.
+      sign(x) <> Neg -> sign(x) = Pos
+
+lemma sign_not_pos_neg : forall x:double.
+      sign(x) <> Pos -> sign(x) = Neg
+lemma sign_not_neg_pos : forall x:double.
+      sign(x) <> Neg -> sign(x) = Pos
+*)
+
+lemma same_sign_real_zero1 :
+  forall b:sign. not same_sign_real b 0.0
+
+lemma same_sign_real_zero2 :
+  forall x:real.
+    same_sign_real Neg x /\ same_sign_real Pos x -> false
+
+lemma same_sign_real_zero3 :
+  forall b:sign, x:real. same_sign_real b x -> x <> 0.0
+
+lemma same_sign_real_correct2 :
+  forall b:sign, x:real.
+    same_sign_real b x -> (x < 0.0 <-> b = Neg)
+
+lemma same_sign_real_correct3 :
+  forall b:sign, x:real.
+    same_sign_real b x -> (x > 0.0 <-> b = Pos)
+
+
+end
+
+(** {2 Generic theory of floats}
+
+The theory is parametrized by the real constant `max` which denotes
+the maximal representable number, the real constant `min` which denotes
+the minimal number whose rounding is not null, and the integer constant
+`max_representable_integer` which is the maximal integer `n` such that
+every integer between `0` and `n` are representable.
+
+*)
+
+module GenFloat
+
+  use Rounding
+  use real.Real
+  use real.Abs
+  use real.FromInt
+  use int.Int as Int
+
+  type t
+
+  function round mode real : real
+
+  function value t : real
+  function exact t : real
+  function model t : real
+
+  function round_error (x : t) : real = abs (value x - exact x)
+  function total_error (x : t) : real = abs (value x - model x)
+
+  constant max : real
+
+  predicate no_overflow (m:mode) (x:real) = abs (round m x) <= max
+
+  axiom Bounded_real_no_overflow :
+    forall m:mode, x:real. abs x <= max -> no_overflow m x
+
+  axiom Round_monotonic :
+    forall m:mode, x y:real. x <= y -> round m x <= round m y
+
+  axiom Round_idempotent :
+    forall m1 m2:mode, x:real. round m1 (round m2 x) = round m2 x
+
+  axiom Round_value :
+    forall m:mode, x:t. round m (value x) = value x
+
+  axiom Bounded_value :
+    forall x:t. abs (value x) <= max
+
+  constant max_representable_integer : int
+
+  axiom Exact_rounding_for_integers:
+    forall m:mode,i:int.
+      Int.(<=) (Int.(-_) max_representable_integer) i /\
+      Int.(<=) i max_representable_integer ->
+        round m (from_int i) = from_int i
+
+  (** rounding up and down *)
+
+  axiom Round_down_le:
+    forall x:real. round Down x <= x
+  axiom Round_up_ge:
+    forall x:real. round Up x >= x
+  axiom Round_down_neg:
+    forall x:real. round Down (-x) = - round Up x
+  axiom Round_up_neg:
+    forall x:real. round Up (-x) = - round Down x
+
+  (** rounding into a float instead of a real *)
+
+  function round_logic mode real : t
+  axiom Round_logic_def:
+    forall m:mode, x:real.
+      no_overflow m x ->
+      value (round_logic m x) = round m x
+
+end
+
+
+(** {2 Format of Single precision floats}
+
+A.k.a. binary32 numbers.
+
+*)
+
+module SingleFormat
+
+  type single
+
+  constant max_single : real = 0x1.FFFFFEp127
+  constant max_int : int = 16777216 (* 2^24 *)
+
+(*
+  clone export GenFloatSpecStrict with
+    type t = single,
+    constant max = max_single,
+    constant max_representable_integer = max_int
+*)
+
+end
+
+(** {2 Format of Double precision floats}
+
+A.k.a. binary64 numbers.
+
+*)
+
+module DoubleFormat
+
+  type double
+
+  constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
+  constant max_int : int = 9007199254740992 (* 2^53 *)
+
+(*
+  clone export GenFloatSpecStrict with
+    type t = double,
+    constant max = max_double,
+    constant max_representable_integer = max_int
+*)
+
+end
+
+module GenFloatSpecStrict
+
+  use Rounding
+  use real.Real
+  clone export GenFloat with axiom .
+
+
+  predicate of_real_post (m:mode) (x:real) (res:t) =
+    value res = round m x /\ exact res = x /\ model res = x
+
+  (** {3 binary operations} *)
+
+  predicate add_post (m:mode) (x y res:t) =
+    value res = round m (value x + value y) /\
+    exact res = exact x + exact y /\
+    model res = model x + model y
+
+  predicate sub_post (m:mode) (x y res:t) =
+    value res = round m (value x - value y) /\
+    exact res = exact x - exact y /\
+    model res = model x - model y
+
+  predicate mul_post (m:mode) (x y res:t) =
+    value res = round m (value x * value y) /\
+    exact res = exact x * exact y /\
+    model res = model x * model y
+
+  predicate div_post (m:mode) (x y res:t) =
+    value res = round m (value x / value y) /\
+    exact res = exact x / exact y /\
+    model res = model x / model y
+
+  predicate neg_post (x res:t) =
+    value res = - value x /\
+    exact res = - exact x /\
+    model res = - model x
+
+  (** {3 Comparisons} *)
+
+  predicate lt (x:t) (y:t) = value x < value y
+
+  predicate gt (x:t) (y:t) = value x > value y
+
+
+end
+
+
+module Single
+
+  use export SingleFormat
+
+  clone export GenFloatSpecStrict with
+    type t = single,
+    constant max = max_single,
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+end
+
+
+module Double
+
+  use export DoubleFormat
+
+  clone export GenFloatSpecStrict with
+    type t = double,
+    constant max = max_double,
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+end
+
+
+
+(** {2 Generic Full theory of floats}
+
+This theory extends the generic theory above by adding the special values.
+
+*)
+
+module GenFloatFull
+
+  use SpecialValues
+  use Rounding
+  use real.Real
+
+  clone export GenFloat with axiom .
+
+  (** {3 special values} *)
+
+  function class t : class
+
+  predicate is_finite (x:t) = class x = Finite
+  predicate is_infinite (x:t) = class x = Infinite
+  predicate is_NaN (x:t) = class x = NaN
+  predicate is_not_NaN (x:t) = is_finite x \/ is_infinite x
+
+  lemma is_not_NaN: forall x:t. is_not_NaN x <-> not (is_NaN x)
+
+  function sign t  : sign
+
+  predicate same_sign_real (x:t) (y:real) =
+    SpecialValues.same_sign_real (sign x) y
+  predicate same_sign (x:t) (y:t)  = sign x = sign y
+  predicate diff_sign (x:t) (y:t)  = sign x <> sign y
+
+  predicate sign_zero_result (m:mode) (x:t) =
+    value x = 0.0 ->
+    match m with
+    | Down -> sign x = Neg
+    | _ -> sign x = Pos
+    end
+
+  predicate is_minus_infinity (x:t) = is_infinite x /\ sign x = Neg
+  predicate is_plus_infinity (x:t) = is_infinite x /\ sign x = Pos
+  predicate is_gen_zero (x:t) = is_finite x /\ value x = 0.0
+  predicate is_gen_zero_plus (x:t) = is_gen_zero x /\ sign x = Pos
+  predicate is_gen_zero_minus (x:t) = is_gen_zero x /\ sign x = Neg
+
+  (** {3 Useful lemmas on sign} *)
+
+  (* non-zero finite gen_float has the same sign as its float_value *)
+  lemma finite_sign :
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 -> same_sign_real x (value x)
+
+  lemma finite_sign_pos1:
+    forall x:t.
+      class x = Finite /\ value x > 0.0 -> sign x = Pos
+
+  lemma finite_sign_pos2:
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 /\ sign x = Pos -> value x > 0.0
+
+  lemma finite_sign_neg1:
+    forall x:t. class x = Finite /\ value x < 0.0 -> sign x = Neg
+
+  lemma finite_sign_neg2:
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 /\ sign x = Neg -> value x < 0.0
+
+  lemma diff_sign_trans:
+    forall x y z:t. diff_sign x y /\ diff_sign y z -> same_sign x z
+
+  lemma diff_sign_product:
+    forall x y:t.
+      class x = Finite /\ class y = Finite /\ value x * value y < 0.0
+      -> diff_sign x y
+
+  lemma same_sign_product:
+    forall x y:t.
+      class x = Finite /\ class y = Finite /\ same_sign x y
+      -> value x * value y >= 0.0
+
+  (** {3 overflow} *)
+
+  (** This predicate tells what is the result of a rounding in case
+      of overflow *)
+  predicate overflow_value (m:mode) (x:t) =
+    match m, sign x with
+    | Down, Neg -> is_infinite x
+    | Down, Pos -> is_finite x /\ value x = max
+    | Up, Neg -> is_finite x /\ value x = - max
+    | Up, Pos -> is_infinite x
+    | ToZero, Neg -> is_finite x /\ value x = - max
+    | ToZero, Pos -> is_finite x /\ value x = max
+    | (NearestTiesToAway | NearestTiesToEven), _ -> is_infinite x
+    end
+
+
+  (** rounding in logic *)
+  lemma round1 :
+    forall m:mode, x:real.
+      no_overflow m x ->
+        is_finite (round_logic m x) /\ value(round_logic m x) = round m x
+
+  lemma round2 :
+    forall m:mode, x:real.
+      not no_overflow m x ->
+        same_sign_real (round_logic m x) x /\
+        overflow_value m (round_logic m x)
+
+  lemma round3 : forall m:mode, x:real. exact (round_logic m x) = x
+
+  lemma round4 : forall m:mode, x:real. model (round_logic m x) = x
+
+  (** rounding of zero *)
+
+  lemma round_of_zero : forall m:mode. is_gen_zero (round_logic m 0.0)
+
+  use real.Abs
+
+  lemma round_logic_le : forall m:mode, x:real.
+    is_finite (round_logic m x) -> abs (value (round_logic m x)) <= max
+
+  lemma round_no_overflow : forall m:mode, x:real.
+    abs x <= max ->
+    is_finite (round_logic m x) /\ value (round_logic m x) = round m x
+
+  constant min : real
+
+  lemma positive_constant : forall m:mode, x:real.
+    min <= x <= max ->
+    is_finite (round_logic m x) /\ value (round_logic m x) > 0.0 /\
+    sign (round_logic m x) = Pos
+
+  lemma negative_constant : forall m:mode, x:real.
+    - max <= x <= - min ->
+    is_finite (round_logic m x) /\ value (round_logic m x) < 0.0 /\
+    sign (round_logic m x) = Neg
+
+  (** lemmas on `gen_zero` *)
+
+  lemma is_gen_zero_comp1 : forall x y:t.
+    is_gen_zero x /\ value x = value y /\ is_finite y -> is_gen_zero y
+
+  lemma is_gen_zero_comp2 : forall x y:t.
+    is_finite x /\ not (is_gen_zero x) /\ value x = value y
+    -> not (is_gen_zero y)
+
+end
+
+module GenFloatSpecFull
+
+  use real.Real
+  use real.Square
+  use Rounding
+  use SpecialValues
+  clone export GenFloatFull with axiom .
+
+  (** {3 binary operations} *)
+
+  predicate add_post (m:mode) (x:t) (y:t) (r:t) =
+    (is_NaN x \/ is_NaN y -> is_NaN r)
+    /\
+    (is_finite x /\ is_infinite y -> is_infinite r /\ same_sign r y)
+    /\
+    (is_infinite x /\ is_finite y -> is_infinite r /\ same_sign r x)
+    /\
+    (is_infinite x /\ is_infinite y ->
+     if same_sign x y then is_infinite r /\ same_sign r x
+     else is_NaN r)
+    /\
+    (is_finite x /\ is_finite y /\ no_overflow m (value x + value y)
+      -> is_finite r /\
+        value r = round m (value x + value y) /\
+        (if same_sign x y then same_sign r x
+         else sign_zero_result m r))
+    /\
+    (is_finite x /\ is_finite y /\ not no_overflow m (value x + value y)
+      -> SpecialValues.same_sign_real (sign r) (value x + value y)
+         /\ overflow_value m r)
+    /\ exact r = exact x + exact y
+    /\ model r = model x + model y
+
+  predicate sub_post (m:mode) (x:t) (y:t) (r:t) =
+    (is_NaN x \/ is_NaN y -> is_NaN r)
+    /\
+    (is_finite x /\ is_infinite y -> is_infinite r /\ diff_sign r y)
+    /\
+    (is_infinite x /\ is_finite y -> is_infinite r /\ same_sign r x)
+    /\
+    (is_infinite x /\ is_infinite y ->
+     if diff_sign x y then is_infinite r /\ same_sign r x
+     else is_NaN r)
+    /\
+    (is_finite x /\ is_finite y /\ no_overflow m (value x - value y)
+      -> is_finite r /\
+        value r = round m (value x - value y) /\
+        (if diff_sign x y then same_sign r x
+         else sign_zero_result m r))
+    /\
+    (is_finite x /\ is_finite y /\ not no_overflow m (value x - value y)
+      -> SpecialValues.same_sign_real (sign r) (value x - value y)
+         /\ overflow_value m r)
+    /\ exact r = exact x - exact y
+    /\ model r = model x - model y
+
+  predicate product_sign (z x y: t) =
+    (same_sign x y -> sign z = Pos) /\ (diff_sign x y -> sign z = Neg)
+
+  predicate mul_post (m:mode) (x:t) (y:t) (r:t) =
+    (is_NaN x \/ is_NaN y -> is_NaN r)
+    /\ (is_gen_zero x /\ is_infinite y -> is_NaN r)
+    /\ (is_finite x /\ is_infinite y /\ value x <> 0.0
+         -> is_infinite r)
+    /\ (is_infinite x /\ is_gen_zero y -> is_NaN r)
+    /\ (is_infinite x /\ is_finite y /\ value y <> 0.0
+         -> is_infinite r)
+    /\ (is_infinite x /\ is_infinite y -> is_infinite r)
+    /\ (is_finite x /\ is_finite y /\ no_overflow m (value x * value y)
+         -> is_finite r /\ value r = round m (value x * value y))
+    /\ (is_finite x /\ is_finite y /\ not no_overflow m (value x * value y)
+         -> overflow_value m r)
+    /\ (not is_NaN r -> product_sign r x y)
+    /\ exact r = exact x * exact y
+    /\ model r = model x * model y
+
+  predicate neg_post (x:t) (r:t) =
+    (is_NaN x -> is_NaN r)
+    /\ (is_infinite x -> is_infinite r)
+    /\ (is_finite x -> is_finite r /\ value r = - value x)
+    /\ (not is_NaN r -> diff_sign r x)
+    /\ exact r = - exact x
+    /\ model r = - model x
+
+  predicate div_post (m:mode) (x:t) (y:t) (r:t) =
+    (is_NaN x \/ is_NaN y -> is_NaN r)
+    /\ (is_finite x /\ is_infinite y -> is_gen_zero r)
+    /\ (is_infinite x /\ is_finite y -> is_infinite r)
+    /\ (is_infinite x /\ is_infinite y -> is_NaN r)
+    /\ (is_finite x /\ is_finite y /\ value y <> 0.0 /\
+        no_overflow m (value x / value y)
+        -> is_finite r /\ value r = round m (value x / value y))
+    /\ (is_finite x /\ is_finite y /\ value y <> 0.0 /\
+        not no_overflow m (value x / value y)
+        -> overflow_value m r)
+    /\ (is_finite x /\ is_gen_zero y /\ value x <> 0.0
+        -> is_infinite r)
+    /\ (is_gen_zero x /\ is_gen_zero y -> is_NaN r)
+    /\ (not is_NaN r -> product_sign r x y)
+    /\ exact r = exact x / exact y
+    /\ model r = model x / model y
+
+  predicate fma_post (m:mode) (x y z:t) (r:t) =
+    (is_NaN x \/ is_NaN y \/ is_NaN z -> is_NaN r)
+    /\ (is_gen_zero x /\ is_infinite y -> is_NaN r)
+    /\ (is_infinite x /\ is_gen_zero y -> is_NaN r)
+    /\ (is_finite x /\ value x <> 0.0 /\ is_infinite y /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_finite x /\ value x <> 0.0 /\ is_infinite y /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_infinite x /\ is_finite y /\ value y <> 0.0 /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_infinite x /\ is_finite y /\ value y <> 0.0 /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_infinite x /\ is_infinite y /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_finite x /\ is_finite y /\ is_infinite z
+        -> is_infinite r /\ same_sign r z)
+    /\ (is_infinite x /\ is_infinite y /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_finite x /\ is_finite y /\ is_finite z /\
+        no_overflow m (value x * value y + value z)
+        -> is_finite r /\
+        value r = round m (value x * value y + value z) /\
+        (if product_sign z x y then same_sign r z
+         else (value x * value y + value z = 0.0 ->
+               if m = Down then sign r = Neg else sign r = Pos)))
+    /\ (is_finite x /\ is_finite y /\ is_finite z /\
+        not no_overflow m (value x * value y + value z)
+        -> SpecialValues.same_sign_real (sign r) (value x * value y + value z)
+        /\ overflow_value m r)
+    /\ exact r = exact x * exact y + exact z
+    /\ model r = model x * model y + model z
+
+  predicate sqrt_post (m:mode) (x:t) (r:t) =
+    (is_NaN x -> is_NaN r)
+    /\ (is_plus_infinity x -> is_plus_infinity r)
+    /\ (is_minus_infinity x -> is_NaN r)
+    /\ (is_finite x /\ value x < 0.0 -> is_NaN r)
+    /\ (is_finite x /\ value x = 0.0
+        -> is_finite r /\ value r = 0.0 /\ same_sign r x)
+    /\ (is_finite x /\ value x > 0.0
+        -> is_finite r /\ value r = round m (sqrt (value x)) /\ sign r = Pos)
+    /\ exact r = sqrt (exact x)
+    /\ model r = sqrt (model x)
+
+  predicate of_real_exact_post (x:real) (r:t) =
+    is_finite r /\ value r = x /\ exact r = x /\ model r = x
+
+  (** {3 Comparisons} *)
+
+  predicate le (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x <= value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y)
+    \/ (is_not_NaN x /\ is_plus_infinity y)
+
+  predicate lt (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x < value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y /\ not (is_minus_infinity y))
+    \/ (is_not_NaN x /\ not (is_plus_infinity x) /\ is_plus_infinity y)
+
+  predicate ge (x:t) (y:t) = le y x
+
+  predicate gt (x:t) (y:t) = lt y x
+
+  predicate eq (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x = value y) \/
+    (is_infinite x /\ is_infinite y /\ same_sign x y)
+
+  predicate ne (x:t) (y:t) = not (eq x y)
+
+  lemma le_lt_trans:
+    forall x y z:t. le x y /\ lt y z -> lt x z
+
+  lemma lt_le_trans:
+    forall x y z:t. lt x y /\ le y z -> lt x z
+
+  lemma le_ge_asym:
+    forall x y:t. le x y /\ ge x y -> eq x y
+
+  lemma not_lt_ge: forall x y:t.
+    not (lt x y) /\ is_not_NaN x /\ is_not_NaN y -> ge x y
+
+  lemma not_gt_le: forall x y:t.
+    not (gt x y) /\ is_not_NaN x /\ is_not_NaN y -> le x y
+
+end
+
+
+(** {2 Full theory of single precision floats} *)
+
+module SingleFull
+
+  use export SingleFormat
+
+  constant min_single : real = 0x1p-149
+
+  clone export GenFloatSpecFull with
+    type t = single,
+    constant min = min_single,
+    constant max = max_single,
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+end
+
+(** {2 Full theory of double precision floats} *)
+
+module DoubleFull
+
+  use export DoubleFormat
+
+  constant min_double : real = 0x1p-1074
+
+  clone export GenFloatSpecFull with
+    type t = double,
+    constant min = min_double,
+    constant max = max_double,
+    constant max_representable_integer = max_int,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+end
+
+
+
+module GenFloatSpecMultiRounding
+
+  use Rounding
+  use real.Real
+  use real.Abs
+  clone export GenFloat with axiom .
+
+  (** {3 binary operations} *)
+
+  constant min_normalized : real
+  constant eps_normalized : real
+  constant eta_normalized : real
+
+  predicate add_post (m:mode) (x y res:t) =
+    ((* CASE 1 : normalized numbers *)
+     (abs(value x + value y) >= min_normalized ->
+      abs(value res - (value x + value y)) <= eps_normalized * abs(value x + value y))
+     /\
+     (*CASE 2: denormalized numbers *)
+     (abs(value x + value y) <= min_normalized ->
+      abs(value res - (value x + value y)) <= eta_normalized))
+   /\
+    exact res = exact x + exact y
+   /\
+    model res = model x + model y
+
+
+  predicate sub_post (m:mode) (x y res:t) =
+    ((* CASE 1 : normalized numbers *)
+     (abs(value x - value y) >= min_normalized ->
+      abs(value res - (value x - value y)) <= eps_normalized * abs(value x - value y))
+     /\
+     (*CASE 2: denormalized numbers *)
+     (abs(value x - value y) <= min_normalized ->
+      abs(value res - (value x - value y)) <= eta_normalized))
+   /\
+    exact res = exact x - exact y
+   /\
+    model res = model x - model y
+
+
+  predicate mul_post (m:mode) (x y res:t) =
+    ((* CASE 1 : normalized numbers *)
+     (abs(value x * value y) >= min_normalized ->
+      abs(value res - (value x * value y)) <= eps_normalized * abs(value x * value y))
+     /\
+     (*CASE 2: denormalized numbers *)
+     (abs(value x * value y) <= min_normalized ->
+      abs(value res - (value x * value y)) <= eta_normalized))
+   /\ exact res = exact x * exact y
+   /\ model res = model x * model y
+
+
+  predicate neg_post (m:mode) (x res:t) =
+   ((abs(value x) >= min_normalized ->
+     abs(value res - (- value x)) <= eps_normalized * abs(- value x))
+    /\
+    (abs(value x) <= min_normalized ->
+     abs(value res - (- value x)) <= eta_normalized))
+   /\ exact res = - exact x
+   /\ model res = - model x
+
+  predicate of_real_post (m:mode) (x:real) (res:t) =
+    value res = round m x /\ exact res = x /\ model res = x
+
+  predicate of_real_exact_post (x:real) (r:t) =
+    value r = x /\ exact r = x /\ model r = x
+
+  (** {3 Comparisons} *)
+
+  predicate lt (x:t) (y:t) = value x < value y
+
+  predicate gt (x:t) (y:t) = value x > value y
+
+end
+
+
+(*** TODO: find constants for type single *)
+
+(***
+module SingleMultiRounding
+
+  constant min_normalized_single : real =
+  constant eps_normalized_single : real =
+  constant eta_normalized_single : real =
+
+  clone export GenFloatSpecMultiRounding with
+    type t = single,
+    constant max = max_single,
+    constant max_representable_integer = max_int,
+    constant min_normalized = min_normalized_single,
+    constant eps_normalized = eps_normalized_single,
+    constant eta_normalized = eta_normalized_single,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+
+end
+
+*)
+
+module DoubleMultiRounding
+
+  use export DoubleFormat
+
+  constant min_normalized_double : real = 0x1p-1022
+  constant eps_normalized_double : real = 0x1.004p-53
+  constant eta_normalized_double : real = 0x1.002p-1075
+
+  clone export GenFloatSpecMultiRounding with
+    type t = double,
+    constant max = max_double,
+    constant max_representable_integer = max_int,
+    constant min_normalized = min_normalized_double,
+    constant eps_normalized = eps_normalized_double,
+    constant eta_normalized = eta_normalized_double,
+    lemma Bounded_real_no_overflow,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+end

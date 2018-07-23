@@ -1,12 +1,12 @@
 (* Symbolic computation on matrix expressions. *)
 module Symb
 
-  use import int.Int
-  use import list.List
-  use import matrices.Matrix
-  use import matrices.MatrixArithmetic
+  use int.Int
+  use list.List
+  use matrices.Matrix
+  use matrices.MatrixArithmetic
 
-  namespace LOCAL
+  scope LOCAL
 
     type mono = {
       m_prod : list int;
@@ -237,7 +237,7 @@ module Symb
       requires { l_vld f r k m1.m_prod /\ l_vld f k c m2.m_prod }
       ensures { result = m_mul m1 m2 /\ l_vld f r c result.m_prod }
       ensures { m_mdl f result = mul (m_mdl f m1) (m_mdl f m2) }
-    = { m_pos = (m1.m_pos = m2.m_pos);
+    = { m_pos = (if m1.m_pos then m2.m_pos else not m2.m_pos);
         m_prod = cat_ok f r k c m1.m_prod m2.m_prod }
 
     function m_distribute (m:mono) (l:list mono) : list mono = match l with
@@ -309,14 +309,8 @@ module Symb
     e_cols : int;
   }
 
-  predicate (-->) (x y:'a) = "rewrite" x = y
+  predicate (-->) (x y:'a) = [@rewrite] x = y
   meta rewrite_def predicate (-->)
-
-  predicate (--->) (x y:expr) =
-    x.e_body --> y.e_body /\
-    x.e_rows --> y.e_rows /\
-    x.e_cols --> y.e_cols
-  meta rewrite_def predicate (--->)
 
   predicate e_vld (env:env) (e:expr) =
     e.e_rows >= 0 /\ e.e_cols >= 0 /\
@@ -327,10 +321,10 @@ module Symb
   meta rewrite_def function e_mdl
 
   function extends (f:int -> mat int) (c:int) (v:mat int) : int -> mat int =
-    \n. if n <> c then f n else v
+    fun n -> if n <> c then f n else v
   lemma extends_rw : forall f c v n.
     extends f c v n = if n <> c then f n else v
-  meta rewrite prop extends_rw
+  meta rewrite lemma extends_rw
 
   let ghost symb_env () : env
     ensures { result.ev_c --> 0 }
@@ -344,7 +338,7 @@ module Symb
     writes { env }
     ensures { env.ev_c --> old env.ev_c + 1 }
     ensures { env.ev_f --> extends (old env.ev_f) (old env.ev_c) m }
-    ensures { result ---> symb_mat m (old env.ev_c) }
+    ensures { result --> symb_mat m (old env.ev_c) }
     ensures { e_vld env result }
   = let id = env.ev_c in
     env.ev_f <- extends env.ev_f id m; env.ev_c <- id + 1;
@@ -357,7 +351,7 @@ module Symb
   let ghost symb_opp (env:env) (e:expr) : expr
     requires { e_vld env e }
     ensures { e_vld env result }
-    ensures { result ---> symb_opp e }
+    ensures { result --> symb_opp e }
     ensures { e_mdl env result = opp (e_mdl env e) }
   = let (r,c) = (e.e_rows,e.e_cols) in
     LOCAL.lm_mdl_same env.ev_f r c e.e_body;
@@ -375,7 +369,7 @@ module Symb
     requires { e_vld env e1 /\ e_vld env e2 }
     requires { e1.e_rows = e2.e_rows /\ e1.e_cols = e2.e_cols }
     ensures { e_vld env result }
-    ensures { result ---> symb_add e1 e2 }
+    ensures { result --> symb_add e1 e2 }
     ensures { e_mdl env result = add (e_mdl env e1) (e_mdl env e2) }
   = let (r,c) = (e1.e_rows, e1.e_cols) in
     LOCAL.lm_mdl_same env.ev_f r c e1.e_body;
@@ -393,7 +387,7 @@ module Symb
     requires { e_vld env e1 /\ e_vld env e2 }
     requires { e1.e_rows = e2.e_rows /\ e1.e_cols = e2.e_cols }
     ensures { e_vld env result }
-    ensures { result ---> symb_sub e1 e2 }
+    ensures { result --> symb_sub e1 e2 }
     ensures { e_mdl env result = sub (e_mdl env e1) (e_mdl env e2) }
   = symb_add env e1 (symb_opp env e2)
 
@@ -406,7 +400,7 @@ module Symb
     requires { e_vld env e1 /\ e_vld env e2 }
     requires { e1.e_cols = e2.e_rows }
     ensures { e_vld env result }
-    ensures { result ---> symb_mul e1 e2 }
+    ensures { result --> symb_mul e1 e2 }
     ensures { e_mdl env result = mul (e_mdl env e1) (e_mdl env e2) }
   = let (r,k,c) = (e1.e_rows,e1.e_cols,e2.e_cols) in
     LOCAL.lm_mdl_same env.ev_f r k e1.e_body;

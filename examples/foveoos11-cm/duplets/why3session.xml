@@ -2,21 +2,68 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="0"/>
-<file name="../duplets.mlw">
-<theory name="Option">
-</theory>
-<theory name="Duplets">
- <goal name="WP_parameter duplet" expl="VC for duplet">
- <proof prover="1"><result status="valid" time="0.06"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../duplets.mlw" proved="true">
+<theory name="Duplets" proved="true">
+ <goal name="VC eq_opt" expl="VC for eq_opt" proved="true">
+ <transf name="split_goal_right" proved="true" >
+ </transf>
  </goal>
- <goal name="WP_parameter duplets" expl="VC for duplets">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.02" steps="84"/></proof>
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <goal name="VC duplet" expl="VC for duplet" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC duplet.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC duplet.1" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="VC duplet.2" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="36"/></proof>
+  </goal>
+  <goal name="VC duplet.3" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC duplet.4" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="VC duplet.5" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="VC duplet.6" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="VC duplet.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="42"/></proof>
+  </goal>
+  <goal name="VC duplet.8" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC duplet.9" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  </goal>
+  <goal name="VC duplet.10" expl="unreachable point" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC duplet.11" expl="out of loop bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC duplets" expl="VC for duplets" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC duplets.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="29"/></proof>
+  </goal>
+  <goal name="VC duplets.1" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="19"/></proof>
+  </goal>
+  <goal name="VC duplets.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="46"/></proof>
+  </goal>
+  <goal name="VC duplets.3" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="82"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

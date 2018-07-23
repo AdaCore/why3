@@ -9,6 +9,15 @@ module Combinators
 
   type term = S | K | App term term
 
+  let rec predicate eq (x y : term)
+    ensures { result <-> x = y }
+  = match x, y with
+    | S, S -> True
+    | K, K -> True
+    | App x1 x2, App y1 y2 -> eq x1 y1 && eq x2 y2
+    | _, _ -> False
+    end
+
   (* specification of the CBV reduction *)
 
   predicate is_value (t: term) = match t with
@@ -48,67 +57,95 @@ module Combinators
        subst c (App (App (App S v1) v2) v3) -->
        subst c (App (App v1 v3) (App v2 v3))
 
-  lemma red_left:
-    forall t1 t2 t: term. t1 --> t2 -> App t1 t --> App t2 t
-
-  lemma red_right:
-    forall v t1 t2: term. is_value v -> t1 --> t2 -> App v t1 --> App v t2
-
-  clone import relations.ReflTransClosure
+  clone relations.ReflTransClosure
     with type t = term, predicate rel = (-->)
   predicate (-->*) (t1 t2: term) = relTR t1 t2
 
-  lemma red_star_left:
-    forall t1 t2 t: term. t1 -->* t2 -> App t1 t -->* App t2 t
+  type zipper = ZHole | ZLeft context term | ZRight term context
 
-  lemma red_star_right:
-    forall v t1 t2: term. is_value v -> t1 -->* t2 -> App v t1 -->* App v t2
+  let rec function subst_c (c ct:context) : context
+    ensures { is_context c /\ is_context ct -> is_context result }
+  = match c with
+    | Hole -> ct
+    | Left c1 t2 -> Left (subst_c c1 ct) t2
+    | Right v1 c2 -> Right v1 (subst_c c2 ct)
+    end
+
+  lemma subst_c_commute : forall c [@induction] ct t.
+    subst c (subst ct t) = subst (subst_c c ct) t
 
   (* task 1: implement CBV reduction *)
 
-  let rec reduction (t: term) : term
+  let rec reduction (ghost c:context) (t: term) : term
     diverges (* there are non-normalizable terms... *)
-    ensures { t -->* result /\ is_value result }
+    requires { is_context c }
+    ensures { subst c t -->* subst c result }
+    ensures { is_value result }
   = match t with
     | S -> S
     | K -> K
-    | App t1 t2 -> match reduction t1 with
-      | K -> App K (reduction t2)
-      | S -> App S (reduction t2)
-      | App K v1 -> let _ = reduction t2 in v1
-      | App S v1 -> App (App S v1) (reduction t2)
-      | App (App S v1) v2 ->
-          let v3 = reduction t2 in reduction (App (App v1 v3) (App v2 v3))
+    | App t1 t2 ->
+      let v1 = reduction (subst_c c (Left Hole t2)) t1 in
+      let v2 = reduction (subst_c c (Right v1 Hole)) t2 in
+      match v1 with
+      | K | S | App S _ -> App v1 v2
+      | App K v3 -> v3
+      | App (App S v3) v4 -> reduction c (App (App v3 v2) (App v4 v2))
       | _ -> absurd
       end
     end
 
   exception BenchFailure
 
-  constant i : term = App (App S K) K
+  let constant i = App (App S K) K
 
   let test_SKK ()
     diverges (* would be hard to prove terminating *)
     raises { BenchFailure -> true }
-  = let t1 = reduction (App i i) in
-    if t1 <> i then raise BenchFailure;
-    let t2 = reduction (App (App (App (App K K) K) K) K) in
-    if t2 <> K then raise BenchFailure;
-    (t1, t2)
+  = let t1 = reduction Hole (App i i) in
+    if not (eq t1 i) then raise BenchFailure;
+    let t2 = reduction Hole (App (App (App (App K K) K) K) K) in
+    if not (eq t2 K) then raise BenchFailure;
+    t1, t2
 
   (* an irreducible term is a value *)
-
-  lemma reducible_or_value:
-    forall t: term. (exists t': term. t-->t') \/ is_value t
-
   predicate irreducible (t: term) = forall t': term. not (t-->t')
 
-  lemma irreducible_is_value:
-    forall t: term. irreducible t <-> is_value t
+  exception Fail
+  let rec ghost reduce_step (c:context) (t:term) : term
+    requires { is_context c }
+    ensures  { subst c t --> subst c result }
+    raises   { Fail -> is_value t }
+    variant  { t }
+  = match t with
+    | App t1 t2 ->
+      try App (reduce_step (subst_c c (Left Hole t2)) t1) t2 with Fail ->
+      try App t1 (reduce_step (subst_c c (Right t1 Hole)) t2) with Fail ->
+      match t1 with
+      | App K v -> v
+      | App (App S v1) v2 -> App (App v1 t2) (App v2 t2)
+      | _ -> raise Fail
+      end end end
+    | _ -> raise Fail
+    end
+
+  let rec lemma value_in_context (c:context) (t:term) : unit
+    requires { is_value (subst c t) }
+    ensures  { is_value t }
+    variant  { c }
+  = match c with
+    | Hole -> ()
+    | Left cl _ -> value_in_context cl t
+    | Right _ cr -> value_in_context cr t
+    end
+
+  let lemma irreducible_is_value (t:term) : unit
+    ensures { irreducible t <-> is_value t }
+  = try let _ = reduce_step Hole t in () with Fail -> () end
 
   (* task 2 *)
 
-  use import int.Int
+  use int.Int
 
   inductive only_K (t: term) =
     | only_K_K:
@@ -116,78 +153,60 @@ module Combinators
     | only_K_App:
         forall t1 t2: term. only_K t1 -> only_K t2 -> only_K (App t1 t2)
 
-  lemma only_K_reduces:
-    forall t: term. only_K t ->
-    exists v: term. t -->* v /\ is_value v /\ only_K v
-
-  function size (t: term) : int = match t with
-    | K | S -> 0
-    | App t1 t2 -> 1 + size t1 + size t2
-  end
-
-  lemma size_nonneg: forall t: term. size t >= 0
-
-  let rec reduction2 (t: term) : term variant { t }
-    requires { only_K t }
+  let rec reduction2 (ghost c:context) (t: term) : term
+    requires { only_K t /\ is_context c }
     ensures { only_K result /\ is_value result }
+    ensures { subst c t -->* subst c result }
+    variant { t }
   = match t with
-    | S -> S
     | K -> K
-    | App t1 t2 -> match reduction2 t1 with
-      | K -> App K (reduction2 t2)
-      | S -> App S (reduction2 t2)
-      | App K v1 -> let _ = reduction2 t2 in v1
-      | App S v1 -> App (App S v1) (reduction2 t2)
-      | App (App S v1) v2 ->
-          let v3 = reduction2 t2 in reduction2 (App (App v1 v3) (App v2 v3))
+    | App t1 t2 ->
+      let v1 = reduction2 (subst_c c (Left Hole t2)) t1 in
+      let v2 = reduction2 (subst_c c (Right v1 Hole)) t2 in
+      match v1 with
+      | K -> App v1 v2
+      | App K v3 -> v3
       | _ -> absurd
       end
+    | _ -> absurd
     end
 
   (* task 3 *)
 
-  function ks (n: int) : term
+  let rec function ks (n: int) : term
+    requires { n >= 0 }
+    ensures  { only_K result }
+    variant { n }
+  = if n = 0 then K else App (ks (n-1)) K
 
-  axiom ksO: ks 0 = K
-  axiom ksS: forall n: int. n >= 0 -> ks (n+1) = App (ks n) K
+  use number.Parity
 
-  lemma ks1: ks 1 = App K K
-
-  lemma only_K_ks: forall n: int. n >= 0 -> only_K (ks n)
-
-  lemma ks_inversion: forall n: int. n >= 0 ->
-    n = 0 \/ n > 0 /\ ks n = App (ks (n-1)) K
-
-  lemma ks_injective:
-    forall n1 n2: int. n1 >= 0 -> n2 >= 0 -> ks n1 = ks n2 -> n1 = n2
-
-  use import int.Div2
-
-  let rec reduction3 (t: term) : term
-    requires { exists n: int. n >= 0 /\ t = ks n }
-    diverges (* TODO: prove termination ... *)
-    ensures { is_value result /\
-      forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
-                            /\ (t = ks (2*n+1) -> result = App K K) }
+  let rec reduction3 (ghost c:context) (ghost n:int) (t: term) : term
+    requires { n >= 0 /\ t = ks n /\ is_context c }
+    variant { n }
+    ensures { subst c t -->* subst c result }
+    ensures { is_value result }
+    ensures { even n -> result = K }
+    ensures { odd n -> result = App K K }
   = match t with
-    | S -> S
     | K -> K
-    | App t1 t2 -> match reduction3 t1 with
-      | K -> App K (reduction3 t2)
-      | S -> App S (reduction3 t2)
-      | App K v1 -> let _ = reduction3 t2 in v1
-      | App S v1 -> App (App S v1) (reduction3 t2)
-      | App (App S v1) v2 ->
-          let v3 = reduction3 t2 in reduction3 (App (App v1 v3) (App v2 v3))
+    | App t1 t2 ->
+      let v1 = reduction3 (subst_c c (Left Hole t2)) (n-1) t1 in
+      let v2 = reduction3 (subst_c c (Right v1 Hole)) 0 t2 in
+      match v1 with
+      | K -> App v1 v2
+      | App K v3 -> v3
       | _ -> absurd
       end
+    | _ -> absurd
     end
 
-   lemma ks_value:
-     forall n: int. 0 <= n -> is_value (ks n) -> 0 <= n <= 1
-
-   lemma ks_even_odd:
-    forall n: int. 0 <= n -> ks (2*n)   -->* K
-                          /\ ks (2*n+1) -->* App K K
+  let lemma ks_even_odd (n:int) : unit
+    requires { n >= 0 }
+    ensures  { ks (2*n) -->* K }
+    ensures  { ks (2*n+1) -->* App K K }
+  = let _ = reduction3 Hole (2*n) (ks (2*n)) in
+    let _ = reduction3 Hole (2*n+1) (ks (2*n+1)) in
+    ()
 
 end

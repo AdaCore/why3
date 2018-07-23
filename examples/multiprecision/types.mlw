@@ -1,0 +1,14 @@
+module Types
+
+  use mach.c.C
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+
+  type limb = uint64
+  type t = ptr limb
+
+  exception Break
+  exception Return32 int32
+  exception ReturnLimb limb
+
+end

@@ -3,7 +3,7 @@ theory TreeForest
   type tree 'a = Leaf 'a | Node (tree 'a) (forest 'a)
   with forest 'a = list (tree 'a)
 
-  use import int.Int
+  use int.Int
 
   function count_forest (f : forest int) : int =
     match f, 10 with

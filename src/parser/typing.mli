@@ -9,66 +9,34 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Typing environments *)
-
-open Wstdlib
-open Term
-open Theory
-
 val debug_parse_only : Debug.flag
+
 val debug_type_only : Debug.flag
 
-(** incremental parsing *)
+val open_file : Env.env -> Env.pathname -> unit
 
-val add_range_decl :
-  'a ->
-  ('a -> Decl.decl -> 'a) ->
-  ('a -> Theory.meta -> Theory.meta_arg list -> 'a) ->
-  Ty.tysymbol -> Number.int_range -> 'a
+val close_file : unit -> Pmodule.pmodule Wstdlib.Mstr.t
 
-val add_float_decl:
-  'a ->
-  ('a -> Decl.decl -> 'a) ->
-  ('a -> Theory.meta -> Theory.meta_arg list -> 'a) ->
-  Ty.tysymbol -> Number.float_format -> 'a
+val open_module : Ptree.ident -> unit
 
-val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
+val close_module : Loc.position -> unit
 
-val add_use_clone :
-  Env.env -> theory Mstr.t -> theory_uc ->
-    Loc.position -> Ptree.use_clone -> theory_uc
+val open_scope : Loc.position -> Ptree.ident -> unit
 
-val close_namespace : Loc.position -> bool -> theory_uc -> theory_uc
+val close_scope : Loc.position -> import:bool -> unit
 
-val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
+val import_scope : Loc.position -> Ptree.qualid -> unit
 
-val open_file : Env.env -> Env.pathname -> Ptree.incremental
+val add_decl : Loc.position -> Ptree.decl -> unit
 
-val close_file : unit -> theory Mstr.t
 
-(***************************************************************************)
-(** The following is exported for program typing (src/whyml/mlw_typing.ml) *)
-(***************************************************************************)
 
-val create_user_id : Ptree.ident -> Ident.preid
-
-val qloc : Ptree.qualid -> Loc.position
 val string_list_of_qualid : Ptree.qualid -> string list
+
 val print_qualid : Format.formatter -> Ptree.qualid -> unit
 
-exception UnboundSymbol of Ptree.qualid
+val type_term_in_namespace :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Ptree.term -> Term.term
 
-val find_qualid :
-  ('a -> Ident.ident) -> ('b -> string list -> 'a) -> 'b -> Ptree.qualid -> 'a
-
-type global_vs = Ptree.qualid -> vsymbol option
-
-val type_term_in_namespace : namespace -> Decl.known_map -> global_vs -> Ptree.term -> term
-
-val type_term : theory_uc -> global_vs -> Ptree.term -> term
-
-val type_fmla_in_namespace : namespace -> Decl.known_map -> global_vs -> Ptree.term -> term
-
-val type_fmla : theory_uc -> global_vs -> Ptree.term -> term
-
-val type_inst : theory_uc -> theory -> Ptree.clone_subst list -> th_inst
+val type_fmla_in_namespace :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Ptree.term -> Term.term
