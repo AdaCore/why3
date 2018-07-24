@@ -37,8 +37,11 @@ type float_type =
   | Float_hexa of string * float
 
 
-let interp_float b eb sb =
+let interp_float ?(interp=true) b eb sb =
     try
+      (* We don't interpret when this is disable *)
+      if not interp then
+        raise Exit;
       let is_neg = match b with
         | "#b0" -> false
         | "#b1" -> true
