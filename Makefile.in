@@ -986,8 +986,9 @@ COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
 COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
+COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
@@ -1035,8 +1036,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory ieee_float.'"$$f"' meta "realized_theory" "ieee_float.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
-	for f in $(COQLIBS_FOR_DRIVER_FILES); do \
-	echo 'theory for_driver.'"$$f"' meta "realized_theory" "for_driver.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_FOR_DRIVERS_FILES); do \
+	echo 'theory for_drivers.'"$$f"' meta "realized_theory" "for_drivers.'"$$f"'", "" end'; done; \
 	) > $@
 
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float update-coq-for-drivers
@@ -1110,6 +1111,8 @@ ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
+	$(MKDIR_P) $(LIBDIR)/why3/coq/for_drivers
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FOR_DRIVERS)) $(LIBDIR)/why3/coq/for_drivers/
 	$(MKDIR_P) $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
