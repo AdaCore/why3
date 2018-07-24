@@ -674,7 +674,7 @@ let proof_dir = !opt_proof_dir
 (* when not doing proof, stop after typing to avoid cost of the WP *)
 let () =
   if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only;
-  Debug.set_flag (Debug.lookup_flag "fast_wp");
+(*  Debug.set_flag (Debug.lookup_flag "fast_wp");*)
   let curdir = Sys.getcwd () in
   Unix.putenv "TEMP" curdir;
   Unix.putenv "TEMPDIR" curdir

@@ -736,12 +736,10 @@ install_spark2014_dev: install_spark2014
 install_spark2014:
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3
-	mkdir -p $(DATADIR)/why3/theories
+	mkdir -p $(DATADIR)/why3/stdlib
 	mkdir -p $(DATADIR)/why3/drivers
-	mkdir -p $(DATADIR)/why3/modules
 	mkdir -p $(DATADIR)/why3/libs
-	cp -f theories/*.why $(DATADIR)/why3/theories
-	cp -f modules/*.mlw $(DATADIR)/why3/modules
+	cp -f stdlib/*.mlw $(DATADIR)/why3/theories
 	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
 	# also copy the fixed coq-realizations.aux file that we use for SPARK;
 	# This will possibly overwrite the one that was copied on the line
