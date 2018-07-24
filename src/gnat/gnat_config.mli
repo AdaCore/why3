@@ -88,7 +88,7 @@ val unit_name : string
 val limit_line : limit_mode option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
-val limit_subp : Ident.label option
+val limit_subp : Ident.attribute option
 (* set if option --limit-subp was given; we only prove VCs from that subprogram
    *)
 

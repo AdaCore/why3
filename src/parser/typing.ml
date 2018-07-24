@@ -343,7 +343,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       let id = create_user_id x in
       let dty = dty_of_ty (ty_of_pty ns ty) in
       let denv = denv_add_quant denv [(Some id, dty, None)] in
-      let e1 = dterm ns km gvars denv e1 in
+      let e1 = dterm ns km crcmap gvars at denv e1 in
       DTeps (id, dty, e1)
   | Ptree.Trecord fl ->
       let get_val _cs pj = function
@@ -710,7 +710,7 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
   | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
   | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
-  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
+  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ | Ptree.Teps _ ->
       Loc.errorm ~loc "unsupported effect expression")
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =

@@ -24,10 +24,10 @@ open Task
 let comment_regex = Str.regexp "comment:\\(.*\\)"
 let line_delim = Str.regexp "[\n\r]+"
 
-let check_comment lab acc =
-  if Str.string_match comment_regex lab.lab_string 0 then
-    let comment = String.sub lab.lab_string 8
-                             ((String.length lab.lab_string) - 8) in
+let check_comment attr acc =
+  if Str.string_match comment_regex attr.attr_string 0 then
+    let comment = String.sub attr.attr_string 8
+                             ((String.length attr.attr_string) - 8) in
     comment :: acc
   else
     acc
@@ -54,7 +54,7 @@ let print_comment fmt start_tok ?end_tok:(end_tok="") comment =
   fprintf fmt "@]"
 
 let print_comments fmt start_tok ?end_tok:(end_tok="") term =
-  let comments = Slab.fold check_comment term.t_label [] in
+  let comments = Sattr.fold check_comment term.t_attrs [] in
   List.iter (print_comment fmt start_tok ~end_tok) comments
 
 

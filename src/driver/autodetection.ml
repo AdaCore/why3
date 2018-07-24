@@ -474,7 +474,11 @@ let detect_exec env data exec_name =
       in_place = data.prover_in_place;
       interactive = (match data.kind with ITP -> true | ATP -> false);
       extra_options = [];
-      extra_drivers = [] } in
+      extra_drivers = [];
+      configure_build = "";
+      build_commands = []
+    }
+  in
   (* if unknown, temporarily put the prover away *)
   if not (good || old) then begin
     let priority = next_priority () in

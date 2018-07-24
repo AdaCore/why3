@@ -96,14 +96,6 @@ module Hprid = Exthtbl.Make (struct
   let hash p = Exthtbl.hash p
 end)
 
-let same_line_loc loc1 loc2 =
-  match loc1, loc2 with
-  | Some loc1, Some loc2 ->
-      let (f1, l1, _, _) = Loc.get loc1 in
-      let (f2, l2, _, _) = Loc.get loc2 in
-      f1 = f2 && l1 = l2
-  | _ -> false
-
 (*  Used to generate duplicate vc_constant and axioms for counterex generation.
     This function is always called when the term is in negative position or
     under a positive term that is not introducible. This means it never change the

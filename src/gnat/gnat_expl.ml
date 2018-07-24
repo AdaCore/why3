@@ -354,9 +354,9 @@ let read_vc_labels s =
              shape          = None;
              already_proved = false;
            } in
-   Ident.Slab.iter
+   Ident.Sattr.iter
      (fun x ->
-        let s = x.Ident.lab_string in
+        let s = x.Ident.attr_string in
         match read_label s with
         | Some Gp_Reason reason ->
             b.check_reason <- Some reason
@@ -379,8 +379,8 @@ let read_vc_labels s =
      (* We potentially need to rectify in the case of loop invariants: We need
         to check whether the VC is for initialization or preservation *)
      if b.check_reason = Some VC_Loop_Invariant then begin
-        Ident.Slab.iter (fun x ->
-           let s = x.Ident.lab_string in
+        Ident.Sattr.iter (fun x ->
+           let s = x.Ident.attr_string in
            if Strings.has_prefix "expl:" s then
               if s = "expl:loop invariant init" then
                  b.check_reason <- Some VC_Loop_Invariant_Init
@@ -411,7 +411,7 @@ let rec extract_msg t =
          let _,_,t = t_open_quant tq in
          extract_msg t
    | _ ->
-         read_vc_labels t.t_label
+         read_vc_labels t.t_attrs
 
 let get_extra_info task =
   let f = Task.task_goal_fmla task in
@@ -430,7 +430,7 @@ let search_labels =
     match extract_check l with
     | None -> []
     | Some x -> [x] in
-  let search = Termcode.search_labels extract_wrap in
+  let search = Termcode.search_attrs extract_wrap in
   fun f ->
     try
     begin match search f with

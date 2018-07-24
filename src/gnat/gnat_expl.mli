@@ -121,10 +121,10 @@ val mk_check : ?shape:string -> reason -> id -> Gnat_loc.loc -> bool -> check
 module MCheck : Extmap.S with type key = check
 module HCheck : Hashtbl.S with type key = check
 
-val extract_check : Ident.Slab.t -> check option
+val extract_check : Ident.Sattr.t -> check option
 (* from a label set, extract the check info, if any *)
 
-val extract_sloc : Ident.Slab.t -> Gnat_loc.loc option
+val extract_sloc : Ident.Sattr.t -> Gnat_loc.loc option
 (* from a label set, extract the sloc info it contains, if any *)
 
 val get_extra_info : Task.task -> int option

@@ -124,12 +124,12 @@ let rec lift_f el bv acc t0 =
               t_map_fold (lift_f el bv) acc t0
             else
               let f = t_let_close_simp vs t2 f in
-              lift_f el acc (t_attr_copy t0 f)
+              lift_f el bv acc (t_attr_copy t0 f)
         | _ ->
             t_map_fold (lift_f el bv) acc t0
       else
         let f = t_let_close_simp vs t1 f in
-        lift_f el acc (t_attr_copy t0 f)
+        lift_f el bv acc (t_attr_copy t0 f)
   in
   match t0.t_node with
     (* cannot merge the 2 patterns because of warning 57 *)
@@ -188,7 +188,7 @@ let rec lift_f el bv acc t0 =
       acc, t_attr_copy t0 t
   | _ ->
       let acc, t = t_map_fold (lift_f el bv) acc t0 in
-      acc, t_label_copy t0 t
+      acc, t_attr_copy t0 t
 
 let rec lift_q el pol acc t0 =
   let binop = if pol then Tand else Timplies in
@@ -214,7 +214,7 @@ let rec lift_q el pol acc t0 =
     let t = List.fold_left (fun t (_, ax) -> t_binary binop ax t) t axml in
       (abst, []), t
   in
-  acc, t_label_copy t0 t
+  acc, t_attr_copy t0 t
 
 let lift_l el (acc,dl) (ls,ld) =
   let vl, t, close = open_ls_defn_cb ld in

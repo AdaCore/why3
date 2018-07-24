@@ -655,7 +655,7 @@ let limit_line = !opt_limit_line
 let limit_subp =
    match !opt_limit_subp with
    | None -> None
-   | Some s -> Some (Ident.create_label ("GP_Subp:" ^ s))
+   | Some s -> Some (Ident.create_attribute ("GP_Subp:" ^ s))
 
 let parallel = !opt_parallel
 

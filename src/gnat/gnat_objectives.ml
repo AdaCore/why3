@@ -600,13 +600,13 @@ exception Found_loc of Gnat_loc.loc
 let extract_sloc (s: Session_itp.session) (main_goal: goal_id) =
    let task = Session_itp.get_task s main_goal in
    let goal_ident = (Task.task_goal task).Decl.pr_name in
-   let label_set = goal_ident.Ident.id_label in
+   let attr_set = goal_ident.Ident.id_attrs in
    try
-      Ident.Slab.iter (fun lab ->
-        match Gnat_expl.read_label lab.Ident.lab_string with
+      Ident.Sattr.iter (fun attr ->
+        match Gnat_expl.read_label attr.Ident.attr_string with
         | Some Gnat_expl.Gp_Subp loc -> raise (Found_loc loc)
         | _ -> ()
-      ) label_set;
+      ) attr_set;
       Gnat_util.abort_with_message ~internal:true
         (Pp.sprintf "could not find source location for subprogram %s"
         goal_ident.Ident.id_string)
@@ -636,11 +636,11 @@ let iter_subps c f =
 let matches_subp_filter s subp =
    match Gnat_config.limit_subp with
    | None -> true
-   | Some lab ->
+   | Some attr ->
          let task = Session_itp.get_task s subp.subp_goal in
          let goal_ident = (Task.task_goal task).Decl.pr_name in
-         let label_set = goal_ident.Ident.id_label in
-         Ident.Slab.mem lab label_set
+         let attr_set = goal_ident.Ident.id_attrs in
+         Ident.Sattr.mem attr attr_set
 
 module Save_VCs = struct
 
@@ -755,7 +755,7 @@ let add_to_stat prover pr stat =
    let compute_trace s =
      let rec compute_trace acc f =
        let acc = Term.t_fold compute_trace acc f in
-       match Gnat_expl.extract_sloc f.Term.t_label with
+       match Gnat_expl.extract_sloc f.Term.t_attrs with
        (* it should be enough to look at the "sloc"s here, and not take into
           account the explanations. *)
        | Some loc -> Gnat_loc.S.add loc acc

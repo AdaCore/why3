@@ -691,7 +691,7 @@ quant_vars:
 | binder_var+ cast? { List.map (fun (l,i) -> l, i, false, $2) $1 }
 
 eps_var:
-| labels(lident) cast { ($1, $2) }
+| attrs(lident) cast { ($1, $2) }
 
 triggers:
 | (* epsilon *)                                                         { [] }

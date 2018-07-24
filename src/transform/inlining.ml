@@ -82,7 +82,7 @@ let fold in_goal notdeft notdeff notls task_hd (env, task) =
 
 (* transformations *)
 
-let inline_label = Ident.create_attr "inline"
+let inline_label = Ident.create_attribute "inline"
 
 let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
@@ -130,7 +130,7 @@ let trivial = t ~use_meta:true ~in_goal:false
 let tagged =
    let notdef _ = false in
    let notls symbol =
-      not (Ident.Slab.mem inline_label symbol.ls_name.Ident.id_label) in
+      not (Ident.Sattr.mem inline_label symbol.ls_name.Ident.id_attrs) in
    t ~use_meta:true ~in_goal:false
      ~notdeft:notdef ~notdeff:notdef ~notls:notls
 

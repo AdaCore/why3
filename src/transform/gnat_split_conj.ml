@@ -11,27 +11,27 @@ let rec split acc f =
   | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
       f :: acc
   | Tbinop (Tand, f1, f2) ->
-      split (split acc (t_label_copy f f2)) (t_label_copy f f1)
+      split (split acc (t_attr_copy f f2)) (t_attr_copy f f1)
   | Tbinop (Timplies, f1, f2) ->
-      let fn f2 = t_label_copy f (t_implies f1 f2) in
+      let fn f2 = t_attr_copy f (t_implies f1 f2) in
       apply_append fn acc (split [] f2)
   | Tbinop (Tiff,f1,f2) ->
-      let f12 = t_label_copy f (t_implies f1 (t_label_copy f f2)) in
-      let f21 = t_label_copy f (t_implies f2 (t_label_copy f f1)) in
+      let f12 = t_attr_copy f (t_implies f1 (t_attr_copy f f2)) in
+      let f21 = t_attr_copy f (t_implies f2 (t_attr_copy f f1)) in
       split (split acc f21) f12
   | Tif (fif,fthen,felse) ->
-      let fit = t_label_copy f (t_implies fif fthen) in
-      let fie = t_label_copy f (t_implies (t_not fif) felse) in
+      let fit = t_attr_copy f (t_implies fif fthen) in
+      let fie = t_attr_copy f (t_implies (t_not fif) felse) in
       split (split acc fie) fit
   | Tlet (t,fb) ->
       let vs,f1,close = t_open_bound_cb fb in
-      let fn f1 = t_label_copy f (t_let t (close vs f1)) in
+      let fn f1 = t_attr_copy f (t_let t (close vs f1)) in
       apply_append fn acc (split [] f1)
   | Tcase (tl,bl) ->
       split_case f t_true acc tl bl
   | Tquant (Tforall,fq) ->
       let vsl,trl,f1,close = t_open_quant_cb fq in
-      let fn f1 = t_label_copy f (t_forall (close vsl trl f1)) in
+      let fn f1 = t_attr_copy f (t_forall (close vsl trl f1)) in
       apply_append fn acc (split [] f1)
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
@@ -44,7 +44,7 @@ and split_case forig c acc tl bl =
     let bll = apply_append (fun f -> close pl f :: el) bll spf in
     bll, brc::el) ([],[]) bl
   in
-  let fn bl = t_label_copy forig (t_case tl bl) in
+  let fn bl = t_attr_copy forig (t_case tl bl) in
   apply_append fn acc bll
 
 let split_goal pr f =

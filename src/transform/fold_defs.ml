@@ -127,7 +127,7 @@ let wrap =
       with Decl.UnknownIdent id ->
         if Debug.test_flag debug then
           Format.printf "[fold_defs]@ gave@ up@ because@ of@ %a@."
-            Pretty.print_id_labels id;
+            Pretty.print_id_attrs id;
         task)
 
 let () =
