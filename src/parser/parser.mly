@@ -151,6 +151,7 @@
 %token <string> QUOTE_LIDENT
 %token <string> RIGHTSQ_QUOTE (* ]'' *)
 %token <string> RIGHTPAR_QUOTE (* )'spec *)
+%token <string> RIGHTPAR_USCORE (* )_spec *)
 
 (* keywords *)
 
@@ -1263,12 +1264,16 @@ lident_rich:
 lident_op:
 | LEFTPAR lident_op_str RIGHTPAR
     { mk_id $2 $startpos($2) $endpos($2) }
+| LEFTPAR lident_op_str RIGHTPAR_USCORE
+    { mk_id ($2^$3) $startpos $endpos }
 | LEFTPAR lident_op_str RIGHTPAR_QUOTE
     { mk_id ($2^$3) $startpos $endpos }
 
 lident_op_nq:
 | LEFTPAR lident_op_str RIGHTPAR
     { mk_id $2 $startpos($2) $endpos($2) }
+| LEFTPAR lident_op_str RIGHTPAR_USCORE
+    { mk_id ($2^$3) $startpos $endpos }
 | LEFTPAR lident_op_str RIGHTPAR_QUOTE
     { let loc = floc $startpos $endpos in
       Loc.errorm ~loc "Symbol (%s)%s cannot be user-defined" $2 $3 }
