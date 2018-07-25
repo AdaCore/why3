@@ -1861,8 +1861,8 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/manual.pdf doc/html/index.html
 
-BNF = ident qualid attribute constant operator type formula term1 term2 term3 \
-	theory theory2 \
+BNF = ident qualid attribute constant operator type \
+	formula term1 term2 term3 theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
 

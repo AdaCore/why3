@@ -4,7 +4,8 @@
 
 In this chapter, we describe the syntax and semantics of \whyml.
 
-This chapter is not yet fully updated to the new syntax of \why 1.00, so it not distributed for the moment.
+This chapter is not yet fully updated to the new syntax of
+\why 1.00, so it not distributed for the moment.
 
 \endinput
 
@@ -41,7 +42,7 @@ Notice that the exponent in hexadecimal real constants is written in base 10.
 
 %\subsection{Identifiers}
 Identifiers are composed of letters, digits, the underscore character,
-and the quote character. %, as shown in Figure~\ref{fig:bnf:ident}.
+and the quotation mark. %, as shown in Figure~\ref{fig:bnf:ident}.
 The syntax distinguishes identifiers that start with a lowercase letter
 or an underscore (\nonterm{lident}{}\spacefalse) and identifiers that
 start with an uppercase letter (\nonterm{uident}{}\spacefalse):
@@ -50,41 +51,52 @@ start with an uppercase letter (\nonterm{uident}{}\spacefalse):
 %\caption{Syntax for identifiers.}
 %\label{fig:bnf:ident}
 %\end{figure}
-Identifiers that contain a quote followed by a letter,
+Identifiers that contain a quotation mark followed by a letter,
 such as \texttt{int32'max}, are reserved for symbols
-introduced by \why transformations and cannot be used
-for user-defined symbols.
+introduced by \why and cannot be used for user-defined symbols.
+
+In order to refer to symbols introduced in different namespaces
+(\textit{scopes}), we can put a dot-separated ``qualifier prefix''
+in front of an identifier (e.g.~\texttt{Map.S.get}).
+This allows us to use the symbol \texttt{get}
+from the scope \texttt{Map.S} without importing
+it in the current scope:
+%\begin{figure}[ht]
+\begin{center}\input{./generated/qualid_bnf.tex}\end{center}
+%\caption{Syntax for qualified identifiers.}
+%\label{fig:bnf:qualid}
+%\end{figure}
 
 %\subsection{Operators}
 Prefix and infix operators are built from characters organized in four
-precedence groups (\textsl{op-char-1} to \textsl{op-char-4}):
+precedence groups (\textsl{op-char-1} to \textsl{op-char-4}), with
+optional quotation marks at the end:
 %as shown in Figure~\ref{fig:bnf:operator}.
 %\begin{figure}[ht]
 \begin{center}\input{./generated/operator_bnf.tex}\end{center}
 %\caption{Syntax for operators.}
 %\label{fig:bnf:operator}
 %\end{figure}
-The infix operators from a high-numbered group bind stronger
-than the infix operators from a low-numbered group,
-and prefix operators bind stronger than infix operators.
-For example, the infix operator \texttt{.*.} (from \textsl{infix-op-3})
-would have a higher precedence than the infix operator \texttt{->-}
-(from \textsl{infix-op-1}).
-The so-called ``bang operators'' are prefix operators that have even
+Infix operators from a high-numbered group bind stronger
+than the infix operators from a low-numbered group.
+For example, infix operator \texttt{.*.} from group 3
+would have a higher precedence than infix operator
+\texttt{->-} from group 1.
+Prefix operators always bind stronger than infix operators.
+The so-called ``tight operators'' are prefix operators that have even
 higher precedence than the juxtaposition (application) operator,
-allowing us to write expressions like \texttt{inv !x}.
-An operator from \textsl{infix-op-4} or \textsl{prefix-op}
-cannot start with \texttt{!} or \texttt{?}: such operators
-are always recognized as bang operators.
+allowing us to write expressions like \texttt{inv !x}
+without parentheses.
+%An operator from \textsl{infix-op-4} or \textsl{prefix-op}
+%cannot start with \texttt{!} or \texttt{?}: such operators
+%are always recognized as tight operators.
 %Infix operators from groups 2-4 are left-associative.
 %Infix operators from group 1 are non-associative and
 %may instead be chained, as explained in Section~\ref{sec:terms}.
 
 %An operator inside parenthesis can act as a lowercase identifier.
-%Qualified identifiers are prefixed with a sequence of uppercase
-%identifiers, e.g., \texttt{App.S.get}:
 %\begin{figure}[ht]
-%\begin{center}\input{./generated/qualid_bnf.tex}\end{center}
+%\begin{center}\input{./generated/ident_op_bnf.tex}\end{center}
 %\caption{Syntax for qualified identifiers.}
 %\label{fig:bnf:qualid}
 %\end{figure}
@@ -170,7 +182,7 @@ Figures~\ref{fig:bnf:term1}-\ref{fig:bnf:term3}.
 The constructions are listed in the order of
 decreasing precedence.
 For example, as was mentioned above,
-bang operators have the highest precedence of all operators,
+tight operators have the highest precedence of all operators,
 so that \texttt{-p.x} denotes the negation of the
 record field \texttt{p.x}, whereas \texttt{!p.x}
 denotes the field \texttt{x} of a record stored
@@ -182,7 +194,7 @@ To distinguish between prefix and infix operators, an
 underscore symbol is appended at the end: for example,
 \texttt{(-)} refers to the binary subtraction and
 \texttt{(-\_)} to the unary negation.
-Bang operators cannot be used as infix operators,
+Tight operators cannot be used as infix operators,
 and thus do not require disambiguation.
 
 In addition to prefix and infix operators, \whyml
@@ -191,11 +203,27 @@ manipulate various collection types: dictionaries,
 arrays, sequences, etc. Bracket operators do not have
 any predefined meaning and may be used to denote access
 and update operations for various user-defined collection types.
-Notice that the in-place update operator (\texttt{a[i] <- v})
+We can introduce multiple bracket operations in the same scope
+by disambiguating them with quotation marks after the closing
+bracket: for example, \texttt{a[i]} may denote array access
+and \texttt{s[i]'} sequence access.
+Notice that the in-place update operator \texttt{a[i] <- v}
 cannot be used inside logical terms: all effectful operations
 are restricted to program expressions. To represent the result
 of a collection update, we should use a pure logical update
-operator (\texttt{a[i <- v]}) instead.
+operator \texttt{a[i <- v]} instead.
+%Overloading of bracket operations, which would allow to use
+%the same bracket operator for different collections,
+%is currently not supported in \whyml.
+
+\whyml supports ``associated'' names for operators, obtained
+by adding a suffix after the parenthesised operator name.
+For example, an axiom that represents the specification of an
+infix \texttt{(+)} operator may be called \texttt{(+)'spec}
+or \texttt{(+)\_spec}. As with normal identifiers, names
+with a letter after a quotation mark, such as \texttt{(+)'spec},
+can only be introduced by \why, and not by the user in a \whyml
+source.
 
 The \texttt{at} and \texttt{old} operators are used inside
 postconditions and assertions to refer to the value of
@@ -211,15 +239,11 @@ can be chained. For example, the term \texttt{0 <= i < j < length a}
 is parsed as the conjunction of three inequalities \texttt{0 <= i},
 \texttt{i < j}, and \texttt{j < length a}.
 
-In order to refer to symbols introduced in different namespaces
-(\textit{scopes}), we can put a dot-separated
-``qualifier prefix'' in front of an identifier
-(e.g.~\texttt{Map.S.get m i}) or in front of a term in parentheses
+Just as with normal identifiers,
+we can put a qualifier prefix in front of a parenthesised operator
+(e.g.~\texttt{Map.S.([]) m i}) or in front of a term in parentheses
 (e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
-if the term is a record or a record update). This notation allows
-us to use the symbol \texttt{get} or the collection access operator
-\texttt{([])} from the scope \texttt{Map.S} without importing
-them in the current namespace.
+if the term is a record or a record update).
 
 The propositional connectives in \whyml formulas are listed in
 Figure~\ref{fig:bnf:term2}. The non-standard connectives ---

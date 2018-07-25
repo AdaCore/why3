@@ -1,5 +1,7 @@
 \begin{syntax}
-  suffix ::= "a" - "z" | "A" - "Z" | "0" - "9" | "'" | "_"
+  alpha  ::= "a" - "z" | "A" - "Z"
+  \
+  suffix ::= alpha | digit | "'" | "_"
   \
   lident ::= ("a" - "z") suffix* | "_" suffix+
   \
