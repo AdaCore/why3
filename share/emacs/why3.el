@@ -1,4 +1,3 @@
-
 ;; why3.el - GNU Emacs mode for Why3
 
 (defvar why3-mode-hook nil)
@@ -15,7 +14,7 @@
 
 (setq auto-mode-alist
       (append
-       '(("\\.\\(why\\|mlw\\)" . why3-mode))
+       '(("\\.\\(why\\|mlw\\)\\'" . why3-mode))
        auto-mode-alist))
 
 ;; font-lock
