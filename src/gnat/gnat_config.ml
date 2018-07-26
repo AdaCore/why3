@@ -183,9 +183,9 @@ let options = Arg.align [
    "--version", Arg.Unit print_version_info,
           " Print version information and exit";
    "-t", Arg.Int set_timeout,
-          " Set the timeout in seconds (default is 1 second)";
+          " Set the timeout in seconds";
    "--timeout", Arg.Int set_timeout,
-          " Set the timeout in seconds (default is 1 second)";
+          " Set the timeout in seconds";
    "--ce-timeout", Arg.Int set_ce_timeout,
           " Set the timeout for counter examples in seconds";
    "--warn-timeout", Arg.Int set_warn_timeout,
