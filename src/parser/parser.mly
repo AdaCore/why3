@@ -1007,7 +1007,7 @@ expr_block:
 
 expr_pure:
 | LEFTBRC qualid RIGHTBRC                           { Eidpur $2 }
-| uqualid DOT LEFTBRC ident_rich RIGHTBRC           { Eidpur (Qdot ($1, $4)) }
+| uqualid DOT LEFTBRC ident RIGHTBRC                { Eidpur (Qdot ($1, $4)) }
 
 expr_sub:
 | expr_block                                        { $1 }
@@ -1209,15 +1209,49 @@ let_pat_uni_:
                                         { Pas ($1,add_model_trace_attr $4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
 
+(* Qualified idents *)
+
+qualid:
+| ident                   { Qident $1 }
+| uqualid DOT ident       { Qdot ($1, $3) }
+
+uqualid:
+| uident                  { Qident $1 }
+| uqualid DOT uident      { Qdot ($1, $3) }
+
+lqualid:
+| lident                  { Qident $1 }
+| uqualid DOT lident      { Qdot ($1, $3) }
+
+lqualid_rich:
+| lident                  { Qident $1 }
+| lident_op               { Qident $1 }
+| uqualid DOT lident      { Qdot ($1, $3) }
+| uqualid DOT lident_op   { Qdot ($1, $3) }
+
+tqualid:
+| uident                  { Qident $1 }
+| squalid DOT uident      { Qdot ($1, $3) }
+
+squalid:
+| sident                  { Qident $1 }
+| squalid DOT sident      { Qdot ($1, $3) }
+
 (* Idents *)
 
 ident:
-| uident { $1 }
-| lident { $1 }
+| uident          { $1 }
+| lident          { $1 }
+| lident_op       { $1 }
 
 ident_nq:
-| uident_nq { $1 }
-| lident_nq { $1 }
+| uident_nq       { $1 }
+| lident_nq       { $1 }
+| lident_op_nq    { $1 }
+
+lident_rich:
+| lident_nq       { $1 }
+| lident_op_nq    { $1 }
 
 uident:
 | UIDENT          { mk_id $1 $startpos $endpos }
@@ -1243,23 +1277,15 @@ lident_keyword:
 | RANGE           { "range" }
 | FLOAT           { "float" }
 
+sident:
+| lident          { $1 }
+| uident          { $1 }
+| STRING          { mk_id $1 $startpos $endpos }
+
 quote_lident:
 | QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
 
-rightsq:
-| RIGHTSQ         { "" }
-| RIGHTSQ_QUOTE   { $1 }
-
-(* Idents + symbolic operation names *)
-
-ident_rich:
-| uident        { $1 }
-| lident        { $1 }
-| lident_op     { $1 }
-
-lident_rich:
-| lident_nq     { $1 }
-| lident_op_nq  { $1 }
+(* Symbolic operation names *)
 
 lident_op:
 | LEFTPAR lident_op_str RIGHTPAR
@@ -1292,6 +1318,10 @@ lident_op_str:
 | LEFTSQ UNDERSCORE DOTDOT rightsq  { Ident.op_rcut $4 }
 | LEFTSQ DOTDOT UNDERSCORE rightsq  { Ident.op_lcut $4 }
 
+rightsq:
+| RIGHTSQ         { "" }
+| RIGHTSQ_QUOTE   { $1 }
+
 op_symbol:
 | OP1 { $1 }
 | OP2 { $1 }
@@ -1319,40 +1349,6 @@ prefix_op:
 | o = OP3   { mk_id (Ident.op_infix o)    $startpos $endpos }
 | o = OP4   { mk_id (Ident.op_infix o)    $startpos $endpos }
 | MINUS     { mk_id (Ident.op_infix "-")  $startpos $endpos }
-
-(* Qualified idents *)
-
-qualid:
-| ident_rich              { Qident $1 }
-| uqualid DOT ident_rich  { Qdot ($1, $3) }
-
-lqualid_rich:
-| lident                  { Qident $1 }
-| lident_op               { Qident $1 }
-| uqualid DOT lident      { Qdot ($1, $3) }
-| uqualid DOT lident_op   { Qdot ($1, $3) }
-
-lqualid:
-| lident                  { Qident $1 }
-| uqualid DOT lident      { Qdot ($1, $3) }
-
-uqualid:
-| uident                  { Qident $1 }
-| uqualid DOT uident      { Qdot ($1, $3) }
-
-(* Theory/Module names *)
-
-tqualid:
-| uident                  { Qident $1 }
-| any_qualid DOT uident   { Qdot ($1, $3) }
-
-any_qualid:
-| sident                  { Qident $1 }
-| any_qualid DOT sident   { Qdot ($1, $3) }
-
-sident:
-| ident   { $1 }
-| STRING  { mk_id $1 $startpos $endpos }
 
 (* Attributes and position markers *)
 
