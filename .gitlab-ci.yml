@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - nightly
   - deploy
 
 .build_template: &build_definition
@@ -41,7 +42,8 @@ build-4.07.0:
 bench:
   stage: test
   variables:
-    COMPILER: system
+    COMPILER: 4.04.0
+    OPAM_PACKAGES: alt-ergo.2.0.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh bench ide
 
@@ -81,11 +83,20 @@ bench-4.07.0:
 full:
   stage: test
   variables:
-    COMPILER: system
-    DEBIAN_PACKAGES: hevea rubber texlive-latex-extra
-    OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx
+    COMPILER: 4.04.0
+    DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
+    OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx alt-ergo.2.0.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh bench ide doc
+
+nightly-bench:
+  stage: nightly
+  variables:
+    COMPILER: 4.04.0
+    DEBIAN_PACKAGES: cvc3 spass
+    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.1 coq-flocq.2.6.1
+  script:
+    - misc/ci-docker.sh misc/ci-local.sh nightly-bench-reduced
 
 opam:
   stage: build

@@ -8,6 +8,20 @@ ARG debian_packages
 RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove && apt-get install -yq --no-install-recommends $debian_packages
 RUN apt-get clean
 
+# install provers
+## CVC4 1.5
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.5-x86_64-linux-opt
+RUN chmod a+x cvc4-1.5-x86_64-linux-opt
+RUN cp cvc4-1.5-x86_64-linux-opt /usr/local/bin/cvc4-1.5
+## CVC4 1.4
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.4-x86_64-linux-opt
+RUN chmod a+x cvc4-1.4-x86_64-linux-opt
+RUN cp cvc4-1.4-x86_64-linux-opt /usr/local/bin/cvc4-1.4
+## Z3
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.6.0-x64-debian-8.10.zip
+RUN unzip z3-4.6.0-x64-debian-8.10.zip
+RUN cp z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0
+
 # create user
 RUN sudo adduser --disabled-password --gecos '' why3
 USER why3
