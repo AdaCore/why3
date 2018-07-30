@@ -1,10 +1,11 @@
-FROM ocaml/ocaml:debian-stable
+ARG debian_version=stable
+FROM ocaml/ocaml:debian-$debian_version
 
 # install dependencies
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove && apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb unzip build-essential autoconf automake
 ARG debian_packages
-RUN apt-get update
-RUN apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb
-RUN apt-get install -y $debian_packages
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove && apt-get install -yq --no-install-recommends $debian_packages
 RUN apt-get clean
 
 # create user
@@ -16,7 +17,11 @@ WORKDIR /home/why3
 ARG compiler=system
 RUN opam init -a -y -j1 --compiler=$compiler
 RUN opam repository add coq-released https://coq.inria.fr/opam/released
+RUN opam install -y depext
 
 ARG opam_packages
+RUN opam depext --dry-run menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo
 RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo
+
+RUN test -z "$opam_packages" || opam depext --dry-run $opam_packages
 RUN test -z "$opam_packages" || opam install -y $opam_packages

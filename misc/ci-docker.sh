@@ -2,13 +2,22 @@
 
 set -e
 
-autoconf && (automake --add-missing 2> /dev/null || true)
-if test -n "$DEBIAN_PACKAGES" -o -n "$OPAM_PACKAGES"; then
-  IMAGE=bench-image-$COMPILER--$(echo $DEBIAN_PACKAGES | sed -e 's/ /--/g')--$(echo $OPAM_PACKAGES | sed -e 's/ /--/g')
-else
-  IMAGE=bench-image-$COMPILER
+if test -z "$DEBIAN_VERSION"; then
+    DEBIAN_VERSION="stable"
 fi
-docker build -t $IMAGE --force-rm -f misc/Dockerfile.init --build-arg compiler=$COMPILER --build-arg debian_packages="$DEBIAN_PACKAGES" --build-arg opam_packages="$OPAM_PACKAGES" .
+
+autoconf && (automake --add-missing 2> /dev/null || true)
+IMAGE=bench-image-$COMPILER-$DEBIAN_VERSION
+
+if test -n "$DEBIAN_PACKAGES"; then
+ IMAGE=$IMAGE--$(echo $DEBIAN_PACKAGES | sed -e 's/ /--/g')
+fi
+
+if test -n "$OPAM_PACKAGES"; then
+ IMAGE=$IMAGE--$(echo $OPAM_PACKAGES   | sed -e 's/ /--/g')
+fi
+
+docker build -t $IMAGE --force-rm -f misc/Dockerfile.init --build-arg debian_version="$DEBIAN_VERSION" --build-arg compiler=$COMPILER --build-arg debian_packages="$DEBIAN_PACKAGES" --build-arg opam_packages="$OPAM_PACKAGES" .
 CID=$(docker create --rm -i -w /home/why3/why3 $IMAGE /bin/sh)
 docker start $CID
 docker cp . $CID:/home/why3/why3
