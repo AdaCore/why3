@@ -14,15 +14,17 @@ esac
 GITBRANCH=`git rev-parse --abbrev-ref HEAD`
 REPORTDIR=$PWD/../why3-reports-$GITBRANCH
 
-if ! test -e "$REPORTDIR"; then
-    echo "directory '$REPORTDIR' for reports does not exist, aborting."
-    exit 2
-fi
-
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
+
+if ! test -e "$REPORTDIR"; then
+    echo "directory '$REPORTDIR' for reports does not exist, creating."
+    mkdir "$REPORTDIR"
+    touch "$PREVIOUS"
+fi
+
 DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 [$GITBRANCH] bench : "
 
@@ -84,45 +86,7 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 COQVER=$(bin/why3 --list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
 echo "Coq version detected: $COQVER" >> $REPORT
 if test "$COQVER" != "" ; then
-cat >> why3.conf <<EOF
-
-[uninstalled_prover coq85]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.5"
-
-[uninstalled_prover coq86]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.6"
-
-[uninstalled_prover coq861]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.6.1"
-
-[uninstalled_prover coq872]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.7.2"
-
-EOF
+sed bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g"  >> why3.conf
 fi
 
 # run the bench

@@ -26,6 +26,7 @@ type proof_attempt_status =
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
   | UpgradeProver of Whyconf.prover (** prover is upgraded *)
+  | Removed of Whyconf.prover (** prover has been removed or upgraded *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 

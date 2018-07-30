@@ -173,6 +173,7 @@ type prover_upgrade_policy =
   | CPU_keep
   | CPU_upgrade of prover
   | CPU_duplicate of prover
+  | CPU_remove
 
 val print_prover_upgrade_policy : Format.formatter -> prover_upgrade_policy -> unit
 

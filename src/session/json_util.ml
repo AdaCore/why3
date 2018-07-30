@@ -106,6 +106,9 @@ let convert_proof_attempt (pas: proof_attempt_status) =
   | Uninstalled p ->
       convert_record ["proof_attempt", String "Uninstalled";
                       "prover", convert_prover_to_json "prover_" p]
+  | Removed p ->
+      convert_record ["proof_attempt", String "Removed";
+                      "prover", convert_prover_to_json "prover_" p]
   | UpgradeProver p ->
       convert_record ["proof_attempt", String "UpgradeProver";
                       "prover", convert_prover_to_json "prover_" p])
@@ -175,6 +178,7 @@ open Whyconf
 
 let convert_policy u =
   match u with
+  | CPU_remove -> ["policy", String "remove"]
   | CPU_keep -> ["policy", String "keep"]
   | CPU_upgrade p ->
      ["policy", String "upgrade"] @ convert_prover "target_" p

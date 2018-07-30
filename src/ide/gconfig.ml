@@ -1026,6 +1026,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   let iter p policy =
     let label =
       match policy with
+        | CPU_remove -> Pp.sprintf_wnl "proofs with %a removed" print_prover p
         | CPU_keep -> Pp.sprintf_wnl "proofs with %a kept as they are" print_prover p
         | CPU_upgrade t ->
           Pp.sprintf_wnl "proofs with %a moved to %a" print_prover p print_prover t
