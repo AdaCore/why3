@@ -83,10 +83,19 @@ val interp:
   Controller_itp.controller ->
   Session_itp.any option -> string -> command
 
-
+(* Find the first unproven goal around the node given.
+   @param always_send: if true then always returns something
+   @param proved     : oracle for proved node
+   @param children   : returns the list children of a node
+   @param get_parent : returns the parent of a node
+   @param is_goal    : answer true iff a given node is a goal
+   @param is_pa      : answer true iff a given node is a proof attempt
+   @param node       : node_id
+*)
 val get_first_unproven_goal_around:
-    proved:('a -> bool) ->
-      children:('a -> 'a list) ->
-        get_parent:('a -> 'a option) ->
-          is_goal:('a -> bool) ->
-            is_pa:('a -> bool) -> 'a -> 'a option
+    always_send:bool ->
+      proved:('a -> bool) ->
+        children:('a -> 'a list) ->
+          get_parent:('a -> 'a option) ->
+            is_goal:('a -> bool) ->
+              is_pa:('a -> bool) -> 'a -> 'a option

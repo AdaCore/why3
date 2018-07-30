@@ -1312,6 +1312,7 @@ end
     | Some any ->
       let unproven_any =
         get_first_unproven_goal_around
+          ~always_send:true
           ~proved:(Session_itp.any_proved s)
           ~children:(get_undetached_children_no_pa s)
           ~get_parent:(get_any_parent s)
