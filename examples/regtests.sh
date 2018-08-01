@@ -95,29 +95,29 @@ echo ""
 
 echo "=== Standard Library ==="
 echo ""
-run_dir stdlib
+run_dir stdlib ""
 echo ""
 
 echo "=== Tests ==="
 echo ""
 # there's no session there...
 # run_dir tests
-run_dir tests-provers
+run_dir tests-provers ""
 echo ""
 
 echo "=== Check Builtin translation ==="
 echo ""
-run_dir check-builtin
+run_dir check-builtin ""
 echo ""
 
 echo "=== BTS ==="
 echo ""
-run_dir bts
+run_dir bts ""
 echo ""
 
 echo "=== Logic ==="
 echo ""
-run_dir logic
+run_dir logic ""
 run_dir bitvectors "-L bitvectors"
 echo ""
 
