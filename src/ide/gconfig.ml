@@ -240,7 +240,10 @@ let save_config t =
   let time = Whyconf.timelimit new_main in
   let mem = Whyconf.memlimit new_main in
   let nb = Whyconf.running_provers_max new_main in
-  let config = set_main config (set_limits (get_main config) time mem nb) in
+  let main = get_main config in
+  let main = set_limits main time mem nb in
+  let main = set_default_editor main (Whyconf.default_editor new_main) in
+  let config = set_main config main in
   (* copy also provers section since it may have changed (the editor
      can be set via the preferences dialog) *)
   let config = set_provers config (get_provers t.config) in

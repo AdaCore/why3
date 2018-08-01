@@ -1,5 +1,9 @@
 :x: marks a potential source of incompatibility
 
+Provers
+  * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
+  * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
+
 Version 1.0.0, June 25, 2018
 ----------------------------
 

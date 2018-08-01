@@ -7,7 +7,8 @@
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-import "smt-libv2.drv"
+import "smt-libv2.gen"
+printer "smtv2"
 import "no-bv.gen"
 import "discrimination.gen"
 
@@ -79,7 +80,7 @@ end
 
 (* REMOVED: we do not use BV theory from Z3 in 4.3.2 but starting from 4.4.0
 
-(* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
+(* bitvector modules, is not in smt-libv2.gen since cvc4 and z3 don't
    have the same name for the function to_uint *)
 theory bv.BV64
   syntax converter of_int "((_ int2bv 64) %1)"

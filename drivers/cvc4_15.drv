@@ -1,4 +1,4 @@
-(** Why3 driver for CVC4 >= 1.5 *)
+(** Why3 driver for CVC4 1.5 *)
 
 prelude ";; produced by cvc4_15.drv ;;"
 prelude "(set-logic AUFBVDTNIRA)"
@@ -10,10 +10,8 @@ prelude "(set-logic AUFBVDTNIRA)"
     NIRA : NonLinear Integer+Real Arithmetic
 *)
 
-(* Counterexamples: set model parser *)
-model_parser "smtv2"
-
-import "smt-libv2.drv"
+import "smt-libv2.gen"
+printer "smtv2"
 import "smt-libv2-bv.gen"
 import "cvc4_bv.gen"
 import "discrimination.gen"
@@ -26,14 +24,12 @@ transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_literal"
 transformation "eliminate_epsilon"
-
 transformation "simplify_formula"
-(*transformation "simplify_trivial_quantification"*)
 
-(* Prepare for counter-example query: get rid of some quantifiers (makes it
-possible to query model values of the variables in premises) and introduce
-counter-example projections.
-Note: does nothing if meta get_counterexmp is not set *)
+(* Prepare for counter-example query: get rid of some quantifiers
+   (makes it possible to query model values of the variables in
+   premises) and introduce counter-example projections.  Note: does
+   nothing if meta get_counterexmp is not set *)
 transformation "prepare_for_counterexmp"
 
 transformation "discriminate_if_poly"
