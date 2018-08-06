@@ -85,14 +85,17 @@ let merge_ps chk x vo vn =
     (* once again, no way to export notation *)
     | _, OO _ -> assert false
     (* but we can merge two compatible symbols *)
-    | RS r1, RS r2 when not (rs_equal r1 r2) ->
+    | RS r1, RS r2 ->
+        if rs_equal r1 r2 then vo else
         if not (same_overload r1 r2) then vn else
         if ity_equal (fsty r1) (fsty r2) then vn else
         OO (Srs.add r2 (Srs.singleton r1))
     (* or add a compatible symbol to notation *)
     | OO s1, RS r2 ->
-        let r1 = Srs.choose s1 and ty = fsty r2 in
+        if Srs.mem r2 s1 then vo else
+        let r1 = Srs.choose s1 in
         if not (same_overload r1 r2) then vn else
+        let ty = fsty r2 in
         let confl r = not (ity_equal (fsty r) ty) in
         let s1 = Srs.filter confl s1 in
         if Srs.is_empty s1 then vn else
