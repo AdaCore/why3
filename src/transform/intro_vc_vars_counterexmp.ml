@@ -22,9 +22,6 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_trace_prefix = "model_trace:"
-  (* The term tagged with "model_trace:name" will be in counterexample with name "name" *)
-
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
   vc_inside : bool;
@@ -34,10 +31,6 @@ type vc_term_info = {
   vc_pre_or_post : bool;
   (* true if VC was generated for precondition or postcondition *)
 }
-
-let get_attr attrs prefix =
-  let check l = Strings.has_prefix prefix l.attr_string in
-  Sattr.choose (Sattr.filter check attrs)
 
 let is_model_vc_attr l =
   attr_equal l model_vc_attr || attr_equal l model_vc_post_attr
@@ -76,18 +69,18 @@ let model_trace_for_postcondition ~attrs =
      Returns attrs with model_trace attribute modified if there
      exist model_trace attribute in attrs, attrs otherwise.
   *)
-  try
-    let trace_attr = get_attr attrs model_trace_prefix in
-    let attr_str = add_old trace_attr.attr_string in
-    if attr_str = trace_attr.attr_string then
+  match get_model_trace_attr ~attrs with
+  | trace_attr ->
+      let attr_str = add_old trace_attr.attr_string in
+      if attr_str = trace_attr.attr_string then
+        attrs
+      else
+        let other_attrs = Sattr.remove trace_attr attrs in
+        Sattr.add
+          (Ident.create_attribute attr_str)
+          other_attrs
+  | exception Not_found ->
       attrs
-    else
-      let other_attrs = Sattr.remove trace_attr attrs in
-      Sattr.add
-        (Ident.create_attribute attr_str)
-        other_attrs
-  with Not_found ->
-    attrs
 
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct

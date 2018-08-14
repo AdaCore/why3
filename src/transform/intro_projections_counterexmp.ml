@@ -15,32 +15,10 @@ open Decl
 open Theory
 open Ty
 
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term with attribute "model_trace:name" will be
-     in the counterexample with name "name" *)
-
-let attr_starts_with regexp a =
-  try
-    ignore(Str.search_forward regexp a.attr_string 0);
-    true
-  with Not_found -> false
-
-let string_starts_with regexp s =
-  try
-    ignore(Str.search_forward regexp s 0);
-    true
-  with Not_found -> false
-
-let get_attr attrs regexp =
-  Sattr.choose (Sattr.filter (attr_starts_with regexp) attrs)
-
 let is_proj_for_array_attr proj_name =
-  let b =
-    try
-      string_starts_with (Str.regexp "'First\\|'Last\\|\\.") proj_name
-    with Not_found -> false in
-  b
-
+  match Str.search_forward (Str.regexp "'First\\|'Last\\|\\.") proj_name 0 with
+  | _ -> true
+  | exception Not_found -> false
 
 (*
 (* Debugging functions *)
@@ -229,15 +207,8 @@ let build_projections_map projs =
   in
   Sls.fold build_map projs Ty.Mty.empty
 
-(* TODO we want to be able to write this. It seems not possible with Trans and
-   more efficient than the version we have below.
-let meta_transform2 f : Task.task -> Task.task = fun task ->
-  Trans.apply (Trans.fold (fun d t ->
-    Trans.apply (Trans.add_decls (f d)) t) task) task
-*)
-
-(* [meta_transform2 f t] Generate new declarations by applying f to each declaration of t
-   and then append these declarations to t *)
+(* [meta_transform2 f t] Generate new declarations by applying f to each
+   declaration of t and then append these declarations to t *)
 let meta_transform2 f : Task.task Trans.trans =
   let list_decl = Trans.fold (fun d l -> l @ (f d)) [] in
   Trans.bind list_decl (fun x -> Trans.add_decls x)
