@@ -569,6 +569,7 @@ module UInt64GMP
   use int.EuclideanDivision
   use int.Power
   use Int32
+  use Int64
   use export UInt64Gen
 
   clone export UnsignedGMP with
@@ -621,5 +622,13 @@ module UInt64GMP
   val of_int32(x:int32) : uint64
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
+
+  val to_int64(x:uint64) : int64
+    requires { x <= max_int64 }
+    ensures  { Int64.to_int result = x }
+
+  val of_int64(x:int64) : uint64
+    requires { 0 <= x }
+    ensures  { to_int result = x }
 
 end
