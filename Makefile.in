@@ -1787,6 +1787,20 @@ test-api-transform.opt: examples/use_api/transform.ml lib/why3/why3.cmxa
 	|| (rm -f test-api-transform.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-transform.opt
 
+test-api-clone.opt: examples/use_api/clone.ml lib/why3/why3.cmxa
+	$(SHOW) 'Ocamlopt $<'
+	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-api-clone.opt > /dev/null) \
+	|| (rm -f test-api-clone.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-clone.opt
+
+test-api-clone.byte: examples/use_api/clone.ml lib/why3/why3.cma
+	$(SHOW) 'Ocamlc $<'
+	($(OCAMLC) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	&& ./test-api-clone.byte > /dev/null) \
+	|| (rm -f test-api-clone.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-clone.byte
+
 test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
 	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
