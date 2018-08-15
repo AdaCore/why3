@@ -1426,6 +1426,41 @@ clean::
 	rm -f drivers/isabelle-realizations.aux
 
 #######################
+# Isabelle client
+#######################
+
+ISABELLEC_FILES := isabelle_client_main
+
+ISABELLECMODULES := $(addprefix src/isabelle-client/, $(ISABELLEC_FILES))
+ISABELLECDEP = $(addsuffix .dep, $(ISABELLECMODULES))
+ISABELLECCMO = $(addsuffix .cmo, $(ISABELLECMODULES))
+ISABELLECCMX = $(addsuffix .cmx, $(ISABELLECMODULES))
+$(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
+$(ISABELLECDEP): DEPFLAGS += -I src/isabelle-client
+
+depend: $(ISABELLECDEP)
+CLEANDIRS += src/isabelle-client
+
+# build targets
+
+byte: bin/isabelle_client.byte
+opt:  bin/isabelle_client.opt
+
+bin/isabelle_client.opt: lib/why3/why3.cmxa $(ISABELLECCMX)
+
+bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
+
+install_no_local::
+	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(ISABELLECDEP)
+endif
+
+clean::
+	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
+
+#######################
 # Ocaml realizations
 #######################
 

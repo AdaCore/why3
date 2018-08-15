@@ -83,7 +83,11 @@ else
 fi
 
 if [ "$BATCH" = true ]; then
-  "$ISABELLE_TOOL" process "${SESSION_DIR[@]}" -l "$SESSION" -T "$NAME"
+  if [ "$ISABELLE_ADDRESS" ]; then
+    isabelle_client -t "$NAME"
+  else
+    "$ISABELLE_TOOL" process "${SESSION_DIR[@]}" -l "$SESSION" -T "$NAME"
+  fi
 elif [ "$INTERACTIVE" = true ]; then
   make_theory "$NAME"
   if [ -f "$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER" ]; then

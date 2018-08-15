@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: Use Isabelle server when executing command
+
+
+## diagnostics
+
+PRG="$(basename "$0")"
+
+function usage()
+{
+  echo
+  echo "Usage: isabelle $PRG [OPTIONS] COMMAND"
+  echo
+  echo "  Options are:"
+  echo "    -d           include session directory"
+  echo "    -i           include session"
+  echo "    -s           name of session (default Why3)"
+  echo
+  echo "Use Isabelle server when executing COMMAND."
+  exit 1
+}
+
+function fail()
+{
+  echo "$1" >&2
+  exit 2
+}
+
+
+## main
+
+SESSION_DIRS=()
+INCLUDE_SESSIONS=()
+SESSION=Why3
+
+while getopts "d:i:s:" OPT
+do
+  case "$OPT" in
+    s)
+      SESSION="$OPTARG"
+      ;;
+    d)
+      SESSION_DIRS+=("-d" "$OPTARG")
+      ;;
+    i)
+      INCLUDE_SESSIONS+=("-i" "$OPTARG")
+      ;;
+    \?)
+      usage
+      ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+SERVER=$("$ISABELLE_TOOL" server -s)
+
+if [ $? -ne 0 ]
+then
+  exit 2
+fi
+
+TMP1=${SERVER##[^=]*= }
+ISABELLE_ADDRESS=${TMP1%%:[^:]*}
+TMP2=${TMP1##[^:]*:}
+ISABELLE_PORT=${TMP2%% [^ ]*}
+TMP3=${TMP2##[^ ]* (password \"}
+ISABELLE_PASSWORD=${TMP3%%\"[^\"]*}
+
+export ISABELLE_ADDRESS
+export ISABELLE_PORT
+export ISABELLE_PASSWORD
+
+ISABELLE_SESSION_ID=$(isabelle_client "${SESSION_DIRS[@]}" "${INCLUDE_SESSIONS[@]}" -s "${SESSION}")
+
+if [ $? -ne 0 ]
+then
+  fail "$ISABELLE_SESSION_ID"
+fi
+
+export ISABELLE_SESSION_ID
+
+"$@"
+
+RET1=$?
+
+isabelle_client -x
+
+RET2=$?
+
+if [ $RET1 -ne 0 ]
+then
+  exit $RET1
+else
+  exit $RET2
+fi
