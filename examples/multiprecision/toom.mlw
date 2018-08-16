@@ -857,9 +857,9 @@ with toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                        -> (pelts scratch)[j] = old (pelts scratch)[j] }
   variant { k + k }
 =
-  let n  = 1 + (if 2 * sx >= 3 * sy
-                then Int32.(/) (sx - 1) 3
-                else Int32.(/) (sy - 1) 2) in
+  let n = 1 + (if 2 * sx >= 3 * sy
+               then Int32.(/) (sx - 1) 3
+               else Int32.(/) (sy - 1) 2) in
   let s = sx - 2 * n in
   let t = sy - n in
   assert { 0 < s <= n };

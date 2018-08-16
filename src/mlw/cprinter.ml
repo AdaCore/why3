@@ -327,9 +327,12 @@ module C = struct
     | Sexpr _ -> true
     | _ -> false
 
-  let simplify_expr (d,s) : expr =
+  let rec simplify_expr (d,s) : expr =
     match (d,s) with
+    | [], Sblock([],s) -> simplify_expr ([],s)
     | [], Sexpr e -> e
+    | [], Sif(c,t,e) ->
+       Equestion (c, simplify_expr([],t), simplify_expr([],e))
     | _ -> raise (Invalid_argument "simplify_expr")
 
   let rec simplify_cond (cd, cs) =
@@ -459,6 +462,9 @@ module Print = struct
     | Ecast(ty, e) ->
       fprintf fmt (protect_on paren "(%a)%a")
         (print_ty ~paren:false) ty (print_expr ~paren:true) e
+    | Ecall (Esyntax (s, _, _, [], _), l) -> (* function defined in the prelude *)
+       fprintf fmt (protect_on paren "%s(%a)")
+         s (print_list comma (print_expr ~paren:false)) l
     | Ecall (e,l) -> fprintf fmt (protect_on paren "%a(%a)")
       (print_expr ~paren:true) e (print_list comma (print_expr ~paren:false)) l
     | Econst c -> print_const fmt c
@@ -754,6 +760,7 @@ module MLToC = struct
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
     | Eapp (rs, el) ->
+       Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
        if is_rs_tuple rs && env.computes_return_value
        then begin
 	 let args =
@@ -1063,53 +1070,55 @@ module MLToC = struct
 
   let translate_decl (info:info) (d:decl) : C.definition list
     =
+    let translate_fun rs vl e =
+      Debug.dprintf debug_c_extraction "print %s@." rs.rs_name.id_string;
+      if rs_ghost rs
+      then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
+      else
+        let params =
+          List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
+            (List.filter (fun (_,_, gh) -> not gh) vl) in
+        let params = List.filter (fun (ty, _) -> ty <> C.Tvoid) params in
+	let env = { computes_return_value = true;
+		    in_unguarded_loop = false;
+                    current_function = rs;
+		    returns = Sid.empty;
+		    breaks = Sid.empty; } in
+	let rity = rs.rs_cty.cty_result in
+	let is_simple_tuple ity =
+	  let arity_zero = function
+	    | Ityapp(_,a,r) -> a = [] && r = []
+	    | Ityreg { reg_args = a; reg_regs = r } ->
+               a = [] && r = []
+	    | Ityvar _ -> true
+	  in
+	  (match ity.ity_node with
+	   | Ityapp ({its_ts = s},_,_)
+             | Ityreg { reg_its = {its_ts = s}; }
+	     -> is_ts_tuple s
+	   | _ -> false)
+	  && (ity_fold
+                (fun acc ity ->
+                  acc && arity_zero ity.ity_node) true ity)
+	in
+	(* FIXME is it necessary to have arity 0 in regions ?*)
+	let rtype = ty_of_ty info (ty_of_ity rity) in
+        let rtype,sdecls =
+          if rtype=C.Tnosyntax && is_simple_tuple rity
+          then
+            let st = struct_of_rs info rs in
+            C.Tstruct st, [C.Dstruct st]
+          else rtype, [] in
+	let d,s = expr info env e in
+        (*TODO check if we want this flatten*)
+	let d,s = C.flatten_defs d s in
+        let d = C.group_defs_by_type d in
+	let s = C.elim_nop s in
+	let s = C.elim_empty_blocks s in
+	sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
-      | Dlet (Lsym(rs, _, vl, e)) ->
-         if rs_ghost rs
-         then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
-         else
-           let params =
-             List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
-               (List.filter (fun (_,_, gh) -> not gh) vl) in
-           let params = List.filter (fun (ty, _) -> ty <> C.Tvoid) params in
-	   let env = { computes_return_value = true;
-		       in_unguarded_loop = false;
-                       current_function = rs;
-		       returns = Sid.empty;
-		       breaks = Sid.empty; } in
-	   let rity = rs.rs_cty.cty_result in
-	   let is_simple_tuple ity =
-	     let arity_zero = function
-	       | Ityapp(_,a,r) -> a = [] && r = []
-	       | Ityreg { reg_args = a; reg_regs = r } ->
-                  a = [] && r = []
-	       | Ityvar _ -> true
-	     in
-	     (match ity.ity_node with
-	      | Ityapp ({its_ts = s},_,_)
-                | Ityreg { reg_its = {its_ts = s}; }
-		-> is_ts_tuple s
-	      | _ -> false)
-	     && (ity_fold
-                   (fun acc ity ->
-                     acc && arity_zero ity.ity_node) true ity)
-	   in
-	   (* FIXME is it necessary to have arity 0 in regions ?*)
-	   let rtype = ty_of_ty info (ty_of_ity rity) in
-           let rtype,sdecls =
-             if rtype=C.Tnosyntax && is_simple_tuple rity
-             then
-               let st = struct_of_rs info rs in
-               C.Tstruct st, [C.Dstruct st]
-             else rtype, [] in
-	   let d,s = expr info env e in
-           (*TODO check if we want this flatten*)
-	   let d,s = C.flatten_defs d s in
-           let d = C.group_defs_by_type d in
-	   let s = C.elim_nop s in
-	   let s = C.elim_empty_blocks s in
-	   sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))]
+      | Dlet (Lsym(rs, _, vl, e)) -> translate_fun rs vl e
       | Dtype [{its_name=id; its_def=idef}] ->
          Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
          begin
@@ -1125,7 +1134,15 @@ module MLToC = struct
                            ^id.id_string))
               end
          end
-
+      | Dlet (Lrec rl) ->
+         let translate_rdef rd =
+           translate_fun rd.rec_sym rd.rec_args rd.rec_exp in
+         let defs = List.flatten (List.map translate_rdef rl) in
+         let proto_of_fun = function
+           | C.Dfun (id, pr, _) -> [C.Dproto (id, pr)]
+           | _ -> [] in
+         let protos = List.flatten (List.map proto_of_fun defs) in
+       protos@defs
       | _ -> [] (*TODO exn ? *) end
     with Unsupported s ->
       Debug.dprintf debug_c_extraction "Unsupported : %s@." s; []
@@ -1133,16 +1150,9 @@ module MLToC = struct
   let translate_decl (info:info) (d:Mltree.decl) : C.definition list
     =
     let decide_print id = query_syntax info.syntax id = None in
-    match Mltree.get_decl_name d with
-    | [id] when decide_print id ->
-       Debug.dprintf debug_c_extraction "print %s@." id.id_string;
-       translate_decl info d
-    | [_] | [] -> []
-    | l -> Debug.dprintf debug_c_extraction "%d defs: %a@."
-             (List.length l)
-             (Pp.print_list Pp.space Pretty.print_id_attrs) l;
-           []
-
+    match List.filter decide_print (Mltree.get_decl_name d) with
+    | [] -> []
+    | _ -> translate_decl info d
 
 end
 

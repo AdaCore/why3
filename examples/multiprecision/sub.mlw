@@ -380,9 +380,9 @@ module Sub
     writes   { x.data.elts }
   =
     let ghost ox = { x } in
-    let ghost b : ref limb = ref 1 in
-    let lx : ref limb = ref 0 in
-    let i : ref int32 = ref 0 in
+    let ghost b = ref (Limb.of_int 1) in
+    let lx = ref (Limb.of_int 0) in
+    let i = ref (Int32.of_int 0) in
     while (Limb.(=) !lx 0) do
       invariant { 0 <= !i <= sz }
       invariant { !i = sz -> !lx <> 0 }
