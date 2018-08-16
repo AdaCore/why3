@@ -744,7 +744,7 @@ fi
 
 # Default version used for generation of realization in the case Isabelle is not
 # detected or Why3 is compiled with disable-isabelle.
-ISABELLEVERSION=2017
+ISABELLEVERSION=2018
 
 if test "$enable_isabelle_libs" = no; then
     enable_isabelle_support=no
@@ -760,9 +760,9 @@ else
         ISABELLEDETECTEDVERSION=[`$ISABELLE version | sed -n -e 's|Isabelle\([^:]*\).*$|\1|p'`]
 
         case $ISABELLEDETECTEDVERSION in
-          2016-1*)
+          2018*)
 	        enable_isabelle_support=yes
-                ISABELLEVERSION=2016-1
+                ISABELLEVERSION=2018
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           2017*)
@@ -773,8 +773,8 @@ else
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2016-1 or later; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2016-1)"
+	        AC_MSG_WARN(You need Isabelle 2017 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2017)"
                 ;;
         esac
     fi

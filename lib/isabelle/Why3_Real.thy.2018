@@ -1,5 +1,8 @@
 theory Why3_Real
-imports Complex_Main "~~/src/HOL/Decision_Procs/Approximation" Why3_Setup
+imports
+  Why3_Setup
+  Complex_Main
+  "HOL-Decision_Procs.Approximation"
 begin
 
 section {* Real numbers and the basic unary and binary operators *}
@@ -22,7 +25,7 @@ why3_vc Comm by simp
 
 why3_vc Assoc1 by simp
 
-why3_vc Mul_distr_l by (simp add: Fields.linordered_field_class.sign_simps)
+why3_vc Mul_distr_l by (simp add: algebra_simps)
 
 why3_vc Mul_distr_r by (simp add: Rings.comm_semiring_class.distrib)
 

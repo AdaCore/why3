@@ -713,8 +713,8 @@ fun add_axioms s [t] =
       fold_map Specification.axiom
         (map_index (fn (i, t) =>
            ((fact_binding (s ^ "_" ^ string_of_int (i + 1)), []), t)) ts) #>
-      apfst (pair (fact_binding s)) #>
-      uncurry Global_Theory.store_thms #> snd;
+      apfst (pair (fact_binding s) #> rpair [] #> single) #>
+      uncurry Global_Theory.add_thmss #> snd;
 
 fun dest_record thy [((s, _), args, [((cname, _), cargs)])] =
       let val tyname = Sign.full_name thy (Binding.name s)
@@ -977,7 +977,7 @@ fun close incomplete thy =
       {theories, env = SOME {thyname, vcs, ...}} =>
         let
           val (proved, unproved) = partition_vcs vcs;
-          val _ = Thm.join_proofs (maps (#1 o snd) proved)
+          val _ = Thm.consolidate (maps (#1 o snd) proved)
         in
           (if null unproved
            then writeln ("Finished Why3 theory " ^ thyname)
