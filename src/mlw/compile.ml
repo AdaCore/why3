@@ -49,6 +49,8 @@ module Translate = struct
 
   module ML = Mltree
 
+  let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
+
   let debug_compile =
     Debug.register_info_flag ~desc:"Compilation" "compile"
 
@@ -188,6 +190,7 @@ module Translate = struct
 
   let mk_eta_expansion rs pvl ({cty_args = ca; cty_effect = ce} as c) =
     (* FIXME : effects and types of the expression in this situation *)
+    let rs = Hrs.find_def ht_rs rs rs in
     let mv = MaskVisible in
     let args_f =
       let def pv =
@@ -298,6 +301,7 @@ module Translate = struct
         let cmk = cty.cty_mask in
         let ceff = cty.cty_effect in
         let pvl = app pvl rs_app.rs_cty.cty_args (fun x -> x) in
+        let rs_app = Hrs.find_def ht_rs rs_app rs_app in
         let eapp = ML.e_app rs_app pvl (ML.C cty) cmk ceff Sattr.empty in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let ld = ML.sym_defn rsf res (params cty.cty_args) eapp in
@@ -305,9 +309,11 @@ module Translate = struct
         ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
     | Elet (LDrec rdefl, ein) ->
         let rdefl = filter_out_ghost_rdef rdefl in
+        List.iter
+          (fun { rec_sym = rs1; rec_rsym = rs2; } ->
+            Hrs.replace ht_rs rs2 rs1) rdefl;
         let def = function
-          | { rec_sym = rs1; rec_rsym = rs2;
-              rec_fun = {c_node = Cfun ef; c_cty = cty} } ->
+          | { rec_sym = rs1; rec_fun = {c_node = Cfun ef; c_cty = cty} } ->
               let res = mlty_of_ity rs1.rs_cty.cty_mask rs1.rs_cty.cty_result in
               let args = params cty.cty_args in
               let new_svar =
@@ -316,9 +322,8 @@ module Translate = struct
                 add_tvar svar res in
               let new_svar = Stv.diff svar new_svar in
               let ef = expr info (Stv.union svar new_svar) ef.e_mask ef in
-              { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-                ML.rec_args = args; ML.rec_exp  = ef;
-                ML.rec_res  = res;  ML.rec_svar = new_svar; }
+              { ML.rec_sym  = rs1; ML.rec_args = args; ML.rec_exp  = ef;
+                ML.rec_res  = res; ML.rec_svar = new_svar; }
           | _ -> assert false in
         let rdefl = List.map def rdefl in
         if rdefl <> [] then
@@ -343,6 +348,7 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling total application of %s@."
           rs.rs_name.id_string;
         Debug.dprintf debug_compile "cty_args: %d@." (List.length cty.cty_args);
+        let rs = Hrs.find_def ht_rs rs rs in
         let add_unit = function [] -> [ML.e_unit] | args -> args in
         let id_f = fun x -> x in
         let f_zero = match rs.rs_logic with RLnone ->
@@ -542,7 +548,9 @@ module Translate = struct
         [ML.Dlet (ML.Lsym (rs, res, args, e))]
     | PDlet (LDrec rl) ->
         let rl = filter_out_ghost_rdef rl in
-        let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
+        List.iter (fun {rec_sym = rs1; rec_rsym = rs2} ->
+            Hrs.replace ht_rs rs2 rs1) rl;
+        let def {rec_fun = e; rec_sym = rs1} =
           let e = match e.c_node with Cfun e -> e | _ -> assert false in
           let args = params rs1.rs_cty.cty_args in
           let res  = mlty_of_ity rs1.rs_cty.cty_mask rs1.rs_cty.cty_result in
@@ -551,9 +559,8 @@ module Translate = struct
             let svar  = List.fold_left add_tvar Stv.empty args' in
             add_tvar svar res in
           let e = expr info svar rs1.rs_cty.cty_mask e in
-          { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-            ML.rec_args = args; ML.rec_exp  = e;
-            ML.rec_res  = res;  ML.rec_svar = svar; } in
+          { ML.rec_sym  = rs1; ML.rec_args = args; ML.rec_exp  = e;
+            ML.rec_res  = res; ML.rec_svar = svar; } in
         if rl = [] then [] else [ML.Dlet (ML.Lrec (List.map def rl))]
     | PDlet (LDsym _) | PDpure ->
         []

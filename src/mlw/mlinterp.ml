@@ -41,7 +41,6 @@ type info = {
     env : Env.env;
     mm  : Pmodule.pmodule Mstr.t;
     vars: value Mid.t;
-    recs: rsymbol Mrs.t;
     funs: decl Mrs.t;
     get_decl: rsymbol -> Mltree.decl;
     cur_rs: rsymbol; (* current function *)
@@ -632,7 +631,6 @@ let rec interp_expr info (e:Mltree.expr) : value =
           v end in
       Debug.dprintf debug_interp "eval call@.";
       let res = try begin
-        let rs = if Mrs.mem rs info.recs then Mrs.find rs info.recs else rs in
         if Hrs.mem builtin_progs rs
         then
           (Debug.dprintf debug_interp "%a is builtin@." Expr.print_rs rs;
@@ -646,8 +644,8 @@ let rec interp_expr info (e:Mltree.expr) : value =
           | Dlet (Lsym (rs, _ty, vl, e)) ->
              eval_call info vl e rs
           | Dlet(Lrec([{rec_args = vl; rec_exp = e;
-                        rec_sym = rs; rec_rsym = rrs; rec_res=_ty}])) ->
-             eval_call { info with recs = Mrs.add rrs rs info.recs } vl e rs
+                        rec_sym = rs; rec_res=_ty}])) ->
+             eval_call info vl e rs
           | Dlet (Lrec _) ->
              Debug.dprintf
                debug_interp "unhandled mutually recursive functions@.";
@@ -863,7 +861,6 @@ let init_info env mm rs vars =
   { env = env;
     mm = mm;
     funs = Mrs.empty;
-    recs = Mrs.empty;
     vars = vars;
     get_decl = get_decl env mm;
     cur_rs = rs;

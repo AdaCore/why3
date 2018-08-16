@@ -264,8 +264,6 @@ module Print = struct
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
-  let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
-
   (* FIXME put these in Compile*)
   let is_true e = match e.e_node with
     | Eapp (s, []) -> rs_equal s rs_true
@@ -411,9 +409,7 @@ module Print = struct
                 (print_fun_type_args info) (args, s, res, e);
               forget_vars args
         in
-        List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
         print_list_next newline print_one fmt rdef;
-        List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
     | Lany (rs, res, []) when functor_arg ->
         fprintf fmt "@[<hov 2>val %a : %a@]"
           (print_lident info) rs.rs_name
@@ -456,14 +452,14 @@ module Print = struct
     | Eapp (rs, []) when rs_equal rs rs_false ->
         fprintf fmt "false"
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
+        fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
         begin match query_syntax info.info_convert rs.rs_name, pvl with
           | Some s, [{e_node = Econst _}] ->
               syntax_arguments s print_constant fmt pvl
           | _ ->
               fprintf fmt (protect_on paren "%a")
-                (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+                (print_apply info rs) pvl end
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2

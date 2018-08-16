@@ -79,7 +79,7 @@ and let_def =
 
 and rdef = {
   rec_sym  : rsymbol; (* exported *)
-  rec_rsym : rsymbol; (* internal *)
+  (* rec_rsym : rsymbol;*) (* internal *)
   rec_args : var list;
   rec_exp  : expr;
   rec_res  : ty;
