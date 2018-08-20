@@ -335,9 +335,10 @@ module Print = struct
         syntax_arguments s print_constant fmt pvl
     | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
+    | _, None, [t] when is_rs_tuple rs ->
+        fprintf fmt "@[%a@]" (print_expr info) t
     | _, None, tl when is_rs_tuple rs ->
-        fprintf fmt "@[(%a)@]"
-          (print_list comma (print_expr info)) tl
+        fprintf fmt "@[(%a)@]" (print_list comma (print_expr info)) tl
     | _, None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
     | _, None, tl when isconstructor () ->
