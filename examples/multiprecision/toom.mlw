@@ -1600,28 +1600,6 @@ with toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
                  + vvy0
               = vvy0 + hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * vvy2
                 - m * m * (hvx0 - lvx3) };
-(*  label Join4 in
-  let ghost or1n = { r1n } in
-  let ghost or4n = { r4n } in
-  join r1n r4n;
-  value_sub_frame (pelts r1n) (pelts or1n) (offset r1n)
-                              (offset r1n + 3 * int32'int n);
-  value_sub_frame (pelts r1n) (pelts or4n)
-                  (offset r1n + 3 * int32'int n)
-                  (offset r1n + 2 * int32'int n + int32'int s + int32'int t);
-  value_concat r1n (3*n) (2*n + s + t);
-  assert { value r1n (2 * n + s + t) + m * m * m * !h
-           = vy + hvx0 - lvx3 - m * vx0 + m * m * vx3
-           by offset or4n = offset r1n + 3*n
-           so offset or4n + s + t - n = offset r1n + 2*n + s + t
-           so value_sub (pelts r1n) (offset r1n + 3*n) (offset r1n + 2*n+s+t)
-              = value or4n (s+t-n)
-           so value r1n (2*n + s + t)
-              = value r1n (3*n) + power radix (3*n) * value or4n (s+t-n)
-           so value r1n (2 * n + s + t) + m * m * m * !h
-              = (value r1n (3*n) + m * m * m * !h at Join4)
-                + (power radix (3*n)) * value or4n (s+t-n)
-           so value or4n (s+t-n) = hvx3 };*)
   label Join1 in
   let ghost or = { r } in
   let ghost or1n = { r1n } in
@@ -1641,8 +1619,6 @@ with toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
            by m * m = power radix (2*n) };
   assert { value r (4*n) + m * m * m * m * !h
            = vx0 + m * vy - m * lvx3 - m * m * vx0 + m * m * m * lvx3 };
-(*assert { value r (3*n + s + t) + m * m * m * m * !h
-           = vx0 + m * vy - m * lvx3 - m * m * vx0 + m * m * m * vx3 };*)
   let rs = Int32.(-) (Int32.(+) s t) n in
   begin ensures { value r (4*n) + m * m * m * m * value r4n rs
                   = (value x sx) * (value y sy) }

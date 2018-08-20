@@ -10,19 +10,21 @@
 #define TEST_WHY3
 #define TEST_ADD
 #define TEST_MUL
+#define TEST_TOOM
 #define TEST_DIV
 #endif
 
 #ifdef TEST_MINIGMP
 #include "mini-gmp.c"
-#endif
-#ifdef TEST_GMP
+#else
 #include <gmp.h>
 #endif
+
 #ifdef TEST_WHY3
 #include "build/add.h"
 #include "build/mul.h"
 #include "build/div.h"
+#include "build/toom.h"
 #endif
 
 #include "mt19937-64.c"
@@ -54,7 +56,7 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
 
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
-  mp_size_t max_n, an, bn, rn;
+  mp_size_t max_n, max_add, max_mul, max_toom, max_div, an, bn, rn;
 #ifdef BENCH
   struct timeval begin, end;
   double elapsed;
@@ -72,8 +74,11 @@ int main () {
   /* Re-interpret reps argument as a size argument.  */
 
   init_genrand64((unsigned long long)time(NULL));
-  max_n = 20;
-
+  max_n = 200;
+  max_add = 50;
+  max_mul = 20;
+  max_toom = 95;
+  max_div = 20;
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
   /* nap = TMP_ALLOC_LIMBS (max_n + 1); */
@@ -89,17 +94,17 @@ int main () {
 #ifdef BENCH
   printf ("#an bn t(s)\n");
 #endif
-  for (an = 2; an <= max_n; an += 1)
+  for (an = 2; an <= max_add; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
 	{
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 10000; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 1000; ++i)
+            for (int i = 0; i != 100; ++i)
               {
 #endif
 
@@ -154,17 +159,17 @@ int main () {
 #ifdef BENCH
   printf ("#an bn t(s)\n");
 #endif
-  for (an = 2; an <= max_n; an += 1)
+  for (an = 2; an <= max_mul; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
 	{
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 5000; ++iter) {
+          for (int iter = 0; iter != 500; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 1000; ++i)
+            for (int i = 0; i != 100; ++i)
               {
 #endif
 #if defined(TEST_GMP) || defined(TEST_MINIGMP)
@@ -204,11 +209,67 @@ int main () {
   printf ("multiplication ok\n");
 #endif
 #endif
+
+#ifdef TEST_TOOM
+#ifdef BENCH
+  printf ("#an bn t(s)\n");
+#endif
+
+  for (bn = 35; bn <= max_toom; bn += 5)
+    {
+      mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      an = (bn * 3) / 2;
+      init_valid (ap, bp, an, bn);
+#ifdef BENCH
+      elapsed = 0;
+      for (int iter = 0; iter != 500; ++iter) {
+        init_valid (ap, bp, an, bn);
+        gettimeofday(&begin, NULL);
+        for (int i = 0; i != 100; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            toom32_mul (rp, ap, bp, ws, an, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec)
+          + ((end.tv_usec - begin.tv_usec)/1000000.0);
+      }
+      printf ("%d %d %f\n", an, bn, elapsed);
+      if (an==bn)
+        printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
+#endif
+    }
+#ifdef COMPARE
+  printf ("toom ok\n");
+#endif
+#endif
+
 #ifdef TEST_DIV
 #ifdef BENCH
   printf ("#an bn t(s)\n");
 #endif
-  for (an = 2; an <= max_n; an += 1)
+  for (an = 2; an <= max_div; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
 	{
@@ -219,13 +280,13 @@ int main () {
 
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 10000; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
 #ifdef TEST_MINIGMP
             mpn_copyi(refr, ap, an);
 #endif
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 1000; ++i)
+            for (int i = 0; i != 100; ++i)
               {
 #endif
 #ifdef TEST_GMP
