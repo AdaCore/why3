@@ -603,20 +603,15 @@ single_term_:
     { Tif ($2, $4, $6) }
 | LET pattern EQUAL term IN term
     { let re_pat pat d = { pat with pat_desc = d } in
-      let rec deparen pat = match pat.pat_desc with
-        | Pparen p -> deparen p
-        | Pcast (p,ty) -> re_pat pat (Pcast (deparen p, ty))
-        | _ -> pat in
-      let pat = deparen $2 in
-      let cast ty = { $4 with term_desc = Tcast ($4, ty) } in
-      let pat, def = match pat.pat_desc with
-        | Ptuple [] -> re_pat pat Pwild, cast (PTtuple [])
-        | Pcast ({pat_desc = (Pvar _|Pwild)} as p, ty) -> p, cast ty
-        | _ -> pat, $4 in
-      match pat.pat_desc with
-      | Pvar id -> Tlet (id, def, $6)
-      | Pwild -> Tlet (id_anonymous pat.pat_loc, def, $6)
-      | _ -> Tcase (def, [pat, $6]) }
+      let cast t ty = { t with term_desc = Tcast (t,ty) } in
+      let rec unfold d p = match p.pat_desc with
+        | Pparen p -> unfold d p
+        | Pcast (p,ty) -> unfold (cast d ty) p
+        | Ptuple [] -> unfold (cast d (PTtuple [])) (re_pat p Pwild)
+        | Pvar id -> Tlet (id, d, $6)
+        | Pwild -> Tlet (id_anonymous p.pat_loc, d, $6)
+        | _ -> Tcase (d, [$2, $6]) in
+      unfold $4 $2 }
 | LET attrs(lident_op_nq) EQUAL term IN term
     { Tlet ($2, $4, $6) }
 | LET attrs(lident_nq) mk_term(lam_defn) IN term
@@ -848,34 +843,25 @@ single_expr_:
     { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
     { let re_pat pat d = { pat with pat_desc = d } in
-      let rec deparen gh pat = match pat.pat_desc with
-        | Ptuple (p::pl) -> re_pat pat (Ptuple (deparen gh p :: pl))
-        | Pas (p,id,g) -> re_pat pat (Pas (deparen gh p, id, g))
-        | Por (p,q) -> re_pat pat (Por (deparen gh p, q))
-        | Pcast (p,ty) -> re_pat pat (Pcast (deparen gh p, ty))
-        | _ when gh -> re_pat pat (Pghost (deparen false pat))
-        | Pghost p -> re_pat pat (Pghost (deparen false p))
-        | Pparen p -> deparen false p (* gh == false *)
-        | _ -> pat in
-      let pat = deparen $2 $4 in
-      let kind = match pat.pat_desc with
-        | _ when $3 = Expr.RKnone -> $3
-        | Pvar _ | Pcast ({pat_desc = Pvar _},_) -> $3
+      let cast e ty = { e with expr_desc = Ecast (e,ty) } in
+      let rec push pat = re_pat pat (match pat.pat_desc with
+        | Ptuple (p::pl) -> Ptuple (push p :: pl)
+        | Pcast (p,ty) -> Pcast (push p, ty)
+        | Pas (p,v,g) -> Pas (push p, v, g)
+        | Por (p,q) -> Por (push p, q)
+        | _ -> Pghost pat) in
+      let pat = if $2 then push $4 else $4 in
+      let rec unfold gh d p = match p.pat_desc with
+        | Pparen p -> unfold gh d p
+        | Pghost p -> unfold true d p
+        | Pcast (p,ty) -> unfold gh (cast d ty) p
+        | Ptuple [] -> unfold gh (cast d (PTtuple [])) (re_pat p Pwild)
+        | Pvar id -> Elet (add_model_trace_attr id, gh, $3, d, $8)
+        | Pwild -> Elet (id_anonymous p.pat_loc, gh, $3, d, $8)
+        | _ when $3 = Expr.RKnone -> Ematch (d, [pat, $8], [])
         | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
             "illegal kind qualifier" in
-      let cast ty = { $6 with expr_desc = Ecast ($6, ty) } in
-      let pat, def = match pat.pat_desc with
-        | Ptuple [] -> re_pat pat Pwild, cast (PTtuple [])
-        | Pcast ({pat_desc = (Pvar _|Pwild)} as p, ty) -> p, cast ty
-        | _ -> pat, $6 in
-      match pat.pat_desc with
-      | Pvar id -> Elet (add_model_trace_attr id, false, kind, def, $8)
-      | Pwild -> Elet (id_anonymous pat.pat_loc, false, kind, def, $8)
-      | Pghost {pat_desc = Pvar id} ->
-                    Elet (add_model_trace_attr id, true, kind, def, $8)
-      | Pghost {pat_desc = Pwild} ->
-                  Elet (id_anonymous pat.pat_loc, true, kind, def, $8)
-      | _ -> Ematch (def, [pat, $8], []) }
+      unfold false $6 pat }
 | LET ghost kind attrs(lident_op_nq) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
