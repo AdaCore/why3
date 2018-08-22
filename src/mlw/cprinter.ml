@@ -1032,7 +1032,7 @@ module MLToC = struct
        [], C.(Sexpr(Ebinop(Bassign, t, C.Evar v.pv_vs.vs_name)))
     | Eassign _ -> raise (Unsupported "assign")
     | Ehole | Eany _ -> assert false
-    | Eexn _ -> raise (Unsupported "exception")
+    | Eexn (_,_,e) -> expr info env e
     | Eignore e ->
        [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
               if env.computes_return_value

@@ -42,8 +42,6 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
   printf("\n");
 }
 
-
-
 void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
   for (int i = 0; i <= an; i++)
     ap[i] = genrand64_int64();
@@ -215,7 +213,7 @@ int main () {
   printf ("#an bn t(s)\n");
 #endif
 
-  for (bn = 35; bn <= max_toom; bn += 5)
+  for (bn = 35; bn <= max_toom; bn += 2)
     {
       mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
       an = (bn * 3) / 2;

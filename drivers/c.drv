@@ -30,7 +30,7 @@ module mach.int.Int32
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
   syntax val (-_)    "-(%1)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"
@@ -56,7 +56,7 @@ module mach.int.UInt32
 
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"
@@ -187,7 +187,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"
@@ -230,7 +230,7 @@ module mach.int.Int64
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
   syntax val (-_)    "-(%1)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"
@@ -256,7 +256,7 @@ module mach.int.UInt64
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
   syntax val (-_)    "-(%1)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"
@@ -396,67 +396,121 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 #include \"longlong.h\"
 
 #undef invert_limb
-
 struct __add64_with_carry_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __add64_with_carry_result
-add64_with_carry(uint64_t x, uint64_t y, uint64_t c);
+static struct __add64_with_carry_result
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
+{
+  struct __add64_with_carry_result result;
+  uint64_t r = x + y + c;
+  result.__field_0 = r;
+  if (r == x) result.__field_1 = c;
+  else result.__field_1 = (r < x);
+  return result;
+}
 
 struct __add64_double_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __add64_double_result
-add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0);
+static struct __add64_double_result
+add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
+{
+  struct __add64_double_result result;
+  add_ssaaaa(result.__field_0, result.__field_1, a1, a0, b1, b0);
+  return result;
+}
 
 struct __sub64_with_borrow_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __sub64_with_borrow_result
-sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b);
+static struct __sub64_with_borrow_result
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
+{
+  struct __sub64_with_borrow_result result;
+  uint64_t r = x - y - b;
+  result.__field_0 = r;
+  if (r > x) result.__field_1 = 1;
+  else if (r == x) result.__field_1 = b;
+  else result.__field_1 = 0;
+  return result;
+}
 
 struct __sub64_double_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __sub64_double_result
-sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0);
+static struct __sub64_double_result
+sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
+{
+  struct __sub64_double_result result;
+  sub_ddmmss(result.__field_0, result.__field_1, a1, a0, b1, b0);
+  return result;
+}
 
 struct __mul64_double_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __mul64_double_result mul64_double(uint64_t x, uint64_t y);
+static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+{
+  struct __mul64_double_result result;
+  umul_ppmm(result.__field_1,result.__field_0,x,y);
+  return result;
+}
 
-uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d);
+static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  uint64_t q;
+  uint64_t _dummy __attribute__((unused));
+  udiv_qrnnd(q,_dummy,uh,ul,d);
+  return q;
+}
 
 struct __add64_3_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z);
+static struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
+{
+  struct __add64_3_result result;
+  uint64_t r, c1, c2;
+  r = x + y;
+  c1 = r < y;
+  r += z;
+  c2 = r < z;
+  result.__field_1 = c1 + c2;
+  result.__field_0 = r;
+  return result;
+}
 
 struct __lsld64_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-struct __lsld64_result lsld64(uint64_t x, uint64_t cnt);
+static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
+{
+  struct __lsld64_result result;
+  result.__field_1 = x >> (64 - cnt);
+  result.__field_0 = x << cnt;
+  return result;
+}
 "
   syntax converter of_int "%1ULL"
 
   syntax val (+)     "(%1) + (%2)"
   syntax val (-)     "(%1) - (%2)"
-  syntax val (*)     "(%1) * (%2)"
+  syntax val ( * )   "(%1) * (%2)"
   syntax val (/)     "(%1) / (%2)"
   syntax val (%)     "(%1) % (%2)"
   syntax val (=)     "(%1) == (%2)"

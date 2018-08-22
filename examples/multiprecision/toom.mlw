@@ -19,7 +19,7 @@ module Toom
   use mul.Mul
   use logical.Logical
 
-let constant toom22_threshold : int32 = 20
+let constant toom22_threshold : int32 = 30
 
 let lemma no_borrow (x y r b m:int)
   requires { 0 <= y <= x }
@@ -41,7 +41,7 @@ let rec toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : unit
   requires { valid x sx }
   requires { valid y sy }
   requires { valid r (sx + sy) }
-  requires { toom22_threshold < sx }
+  requires { toom22_threshold < sy }
   requires { 0 < k }
   requires { sx <= toom22_threshold * power 2 k }
   requires { valid scratch (2 * (sx + k)) }
@@ -782,7 +782,7 @@ with toom22_mul_rec (r x y scratch: ptr limb) (sx sy: int32) (ghost k: int)
   requires { valid x sx }
   requires { valid y sy }
   requires { valid r (sx + sy) }
-  requires { 0 < sy <= sx }
+  requires { 0 < sy <= sx <= sy + sy }
   requires { 8 * sx < max_int32 }
   requires { 0 <= k }
   requires { sx <= toom22_threshold * power 2 k }
@@ -805,7 +805,7 @@ with toom22_mul_rec (r x y scratch: ptr limb) (sx sy: int32) (ghost k: int)
   else
     if Int32.(<) (Int32.( *) 4 sx) (Int32.( *) 5 sy) (* ? *)
     then toom22_mul r x y scratch sx sy k
-    else wmpn_mul r x y sx sy (* TODO toom33_mul *)
+    else toom32_mul r x y scratch sx sy k
 
 with toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
   requires { valid x sz }
