@@ -1217,7 +1217,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
-    if not (ugh || env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
+    if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
       "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
     apply c_pur false true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
