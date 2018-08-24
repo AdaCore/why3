@@ -282,6 +282,16 @@ let simplify_intros =
   Trans.compose Simplify_formula.simplify_trivial_wp_quantification
                 introduce_premises
 
+(*
+let subst_filter ls =
+  Sattr.mem intro_attr ls.ls_name.id_attrs &&
+  not (Ident.has_a_model_attr ls.ls_name)
+
+let simplify_intros =
+  Trans.compose introduce_premises
+                (Subst.subst_filtered subst_filter)
+*)
+
 let split_vc =
   Trans.compose_l
     (Trans.compose generalize_intro Split_goal.split_goal_right)
