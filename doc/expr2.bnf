@@ -1,12 +1,22 @@
 \begin{syntax}
-  rec-defn ::=  fun-defn ("with" fun-defn)* ;
+  expr ::= ...                ; see Fig.~\ref{fig:bnf:expr1}
+    | "if" expr "then" expr ("else" expr)?  ; conditional
+    | "match" expr "with" expr-case+ "end"  ; pattern matching
+    | expr ";" expr                         ; sequence
+    | "let" pattern "=" expr "in" expr      ; let-binding
+    | "let" fun-defn "in" expr              ; function definition
+    | "let" "rec" rec-defn "in" expr        ; recursive definition
+    | "fun" binder+ spec* "->" spec* expr   ; unnamed function
   \
-  fun-defn ::= "ghost"? lident label* fun-body ;
+  prototype ::= lident-ext attribute* binder+
   \
-  fun-body ::= binder+ (":" type)? spec* "=" spec* expr ;
+  expr-case ::= "|" pattern "->" expr
   \
-  binder ::= "ghost"? lident label*
-                  |  param
+  rec-defn ::= fun-defn ("with" fun-defn)* ;
   \
-  param ::= "(" ("ghost"? lident label*)+ ":" type ")"   
+  fun-defn ::= "ghost"? kind? lident-ext attribute* fun-body ;
+  \
+  kind ::= "function" | "predicate" | "lemma" ;
+  \
+  fun-body ::= binder+ (":" ret-type)? spec* "=" spec* expr %
 \end{syntax}

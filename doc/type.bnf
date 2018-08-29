@@ -1,9 +1,12 @@
 \begin{syntax}
-  type ::= lqualid type*     ; type symbol
-       | "'" lident          ; type variable
-       | type "->" type      ; mapping type
+  type ::= lqualid type-arg+ ; polymorphic type symbol
+       | type "->" type      ; mapping type (right-associative)
+       | type-arg
+  \
+  type-arg ::= lqualid       ; monomorphic type symbol (sort)
+       | qident              ; type variable
        | "()"		     ; unit type
        | "(" type ("," type)+ ")" ; tuple type
        | "{" type "}"        ; snapshot type
-       | "(" type ")"        ; parentheses %
+       | "(" type ")"
 \end{syntax}

@@ -4,10 +4,10 @@
 
 In this chapter, we describe the syntax and semantics of \whyml.
 
-This chapter is not yet fully updated to the new syntax of
-\why 1.00, so it not distributed for the moment.
-
-\endinput
+%This chapter is not yet fully updated to the new syntax of
+%\why 1.00, so it not distributed for the moment.
+%
+%\endinput
 
 \section{Lexical Conventions}
 \label{sec:lexer}
@@ -44,8 +44,10 @@ Notice that the exponent in hexadecimal real constants is written in base 10.
 Identifiers are composed of letters, digits, the underscore character,
 and the quotation mark. %, as shown in Figure~\ref{fig:bnf:ident}.
 The syntax distinguishes identifiers that start with a lowercase letter
-or an underscore (\nonterm{lident}{}\spacefalse) and identifiers that
-start with an uppercase letter (\nonterm{uident}{}\spacefalse):
+or an underscore (\nonterm{lident}{}\spacefalse), identifiers that
+start with an uppercase letter (\nonterm{uident}{}\spacefalse),
+and identifiers that start with a quotation mark
+(\nonterm{qident}{}\spacefalse, used exclusively for type variables):
 %\begin{figure}[ht]
 \begin{center}\input{./generated/ident_bnf.tex}\end{center}
 %\caption{Syntax for identifiers.}
@@ -119,7 +121,7 @@ The syntax for type expressions is the following:
 \begin{center}\input{./generated/type_bnf.tex}\end{center}
 Built-in types are \texttt{int} (arbitrary precision integers),
 \texttt{real} (real numbers), \texttt{bool}, the arrow type
-(also called the \textit{mapping type}, right-associative),
+(also called the \textit{mapping type}),
 and the tuple types.
 The empty tuple type is also called the \textit{unit type}
 and can be written as \texttt{unit}.
@@ -163,18 +165,6 @@ behind the scenes.
 \begin{center}\input{./generated/term1_bnf.tex}\end{center}
 \caption{\whyml terms (part I).}
 \label{fig:bnf:term1}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}\input{./generated/term2_bnf.tex}\end{center}
-\caption{\whyml terms (part II).}
-\label{fig:bnf:term2}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}\input{./generated/term3_bnf.tex}\end{center}
-\caption{\whyml terms (part III).}
-\label{fig:bnf:term3}
 \end{figure}
 
 The syntax of \whyml terms is given in
@@ -240,10 +230,16 @@ is parsed as the conjunction of three inequalities \texttt{0 <= i},
 \texttt{i < j}, and \texttt{j < length a}.
 
 Just as with normal identifiers,
-we can put a qualifier prefix in front of a parenthesised operator
-(e.g.~\texttt{Map.S.([]) m i}) or in front of a term in parentheses
-(e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
-if the term is a record or a record update).
+we can put a qualifier prefix in front of a parenthesised operator,
+e.g.~\texttt{Map.S.([]) m i}, or in front of a parenthesised term,
+e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
+if the term is a record or a record update.
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/term2_bnf.tex}\end{center}
+\caption{\whyml terms (part II).}
+\label{fig:bnf:term2}
+\end{figure}
 
 The propositional connectives in \whyml formulas are listed in
 Figure~\ref{fig:bnf:term2}. The non-standard connectives ---
@@ -255,8 +251,8 @@ transformations of \why and provide integrated proofs for
 The semantics of these connectives
 follows the rules below:
 \begin{itemize}
-\item A proof of \texttt{A \&\& B} is split into
-separate proofs of \texttt{A} and \texttt{A -> B}.
+\item A proof task for \texttt{A \&\& B} is split into
+separate tasks for \texttt{A} and \texttt{A -> B}.
 If \texttt{A \&\& B} occurs as a premise, it behaves
 as a normal conjunction.
 \item A case analysis over \texttt{A || B} is split into
@@ -264,16 +260,16 @@ disjoint cases \texttt{A} and \texttt{not A {/\char92} B}.
 If \texttt{A || B} occurs as a goal, it behaves
 as a normal disjunction.
 \item An occurrence of \texttt{A by B} generates a side condition
-\texttt{B -> A} (the proof justifies the conclusion).
+\texttt{B -> A} (the proof justifies the affirmation).
 When \texttt{A by B} occurs as a premise,
 it is reduced to \texttt{A} (the proof is discarded).
 When \texttt{A by B} occurs as a goal,
 it is reduced to \texttt{B} (the proof is verified).
 \item An occurrence of \texttt{A so B} generates a side condition
-\texttt{A -> B} (the premise justifies the consequence).
+\texttt{A -> B} (the premise justifies the conclusion).
 When \texttt{A so B} occurs as a premise,
-it behaves as a conjunction \texttt{A {/\char92} B}
-(we use both the premise and the consequence).
+it is reduced to the conjunction \mbox{\texttt{A {/\char92} B}}
+(we use both the premise and the conclusion).
 When \texttt{A so B} occurs as a goal,
 it is reduced to \texttt{A} (the premise is verified).
 \end{itemize}
@@ -281,8 +277,8 @@ For example, full splitting of the goal
 \texttt{(A by (exists x. B so C)) \&\& D}
 produces four subgoals:
 \texttt{exists x. B} (the premise is verified),
-\texttt{forall x. B -> C} (the premise justifies the consequence),
-\texttt{(exists x. B {/\char92} C) -> A} (the proof justifies the conclusion),
+\texttt{forall x. B -> C} (the premise justifies the conclusion),
+\texttt{(exists x. B {/\char92} C) -> A} (the proof justifies the affirmation),
 and finally, \texttt{A -> D} (the proof of \texttt{A} is discarded
 and \texttt{A} is used to prove \texttt{D}).
 
@@ -330,6 +326,101 @@ of \texttt{A <-> B} and \texttt{B <-> C}.
 To reduce ambiguity, \whyml forbids to place
 a non-parenthesised implication at the right-hand side
 of an equivalence: \texttt{A <-> B -> C} is rejected.
+
+In Figure~\ref{fig:bnf:term3}, we find the more advanced
+term constructions: conditionals, let-bindings, pattern
+matching, and local function definitions,
+either via the \texttt{let-in} construction or the
+\texttt{fun} keyword. The pure logical functions
+defined in this way are called \emph{mappings};
+they are first-class values of ``arrow'' type
+\texttt{$\tau_1$ -> $\tau_2$}.
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/term3_bnf.tex}\end{center}
+\caption{\whyml terms (part III).}
+\label{fig:bnf:term3}
+\end{figure}
+
+The patterns are similar to those of OCaml, though the \texttt{when}
+clauses and numerical constants are not supported. Unlike OCaml,
+\texttt{as} has a higher precedence than the comma: in the pattern
+\texttt{($p_1$,$p_2$ as x)}, variable \texttt{x} is bound to
+the value matched by pattern $p_2$. Also notice the closing
+\texttt{end} after the \texttt{match-with} term.
+A \texttt{let-in} construction with a non-trivial pattern is
+translated as a \texttt{match-with} term with a single branch.
+
+Inside logical terms, pattern matching must be exhaustive:
+\whyml rejects a term like \texttt{let Some x = o in $\dots$},
+where \texttt{o} is a variable of an option type.
+In program expressions, non-exhaustive pattern matching
+is accepted and a proof obligation is generated to show
+that the values not covered cannot occur in execution.
+
+The syntax of parameters (non-terminal
+\nonterm{param}{} in Figure~\ref{fig:bnf:term3})
+in user-defined symbols---%
+first-class mappings,
+top-level logical functions and predicates,
+or executable program functions---%
+is rather flexible in \whyml.
+Like in OCaml, the user can specify the name of a parameter
+without its type and let the type be inferred from the
+definition. Unlike in OCaml, the user can also specify
+the type of the parameter without giving its name.
+This is used when the symbol declaration does not
+contain the actual definition or specification of
+the symbol, and thus only the type signature is of
+relevance.
+For example, one can declare an abstract binary function
+simply by writing
+\texttt{function mem int int : int}.
+
+
+
+Ghost patterns, ghost variables after \texttt{as},
+and ghost binders in function definitions are only used
+in program code, and not allowed in logical terms.
+
+\section{Program expressions}
+\label{sec:exprs}
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/expr1_bnf.tex}\end{center}
+\caption{\whyml program expressions (part I).}
+\label{fig:bnf:expr1}
+\end{figure}
+
+The syntax of program expressions is given in
+Figures~\ref{fig:bnf:expr1}-\ref{fig:bnf:expr3}.
+As before, the constructions are listed in the order of decreasing
+precedence. The rules for tight, prefix, infix, and bracket operators
+are the same as for logical terms. In particular, the infix operators
+from group~1 can be chained. Notice that binary operators \texttt{\&\&}
+and \texttt{||} denote here the usual lazy conjunction and disjunction,
+respectively.
+
+Two new operators make appearance in Figure~\ref{fig:bnf:expr1}.
+One is \texttt{ghost} that marks the subordinate expression as
+ghost code added for verification purposes. Ghost code will be
+removed from the final code intended for execution, and therefore
+cannot influence the computation of the program results nor the
+content of the observable memory.
+
+The other new operation is assignment which can be used to update
+in place a mutable field of a record or an element of a collection.
+The first form can be executed simultaneously
+on a tuple of values: \texttt{x.f, y.g <- a, b}. The second
+form, \texttt{a[i] <- v}, amounts to a call of the ternary
+bracket operator \texttt{([]<-)} and cannot be used in a
+multiple assignment.
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/expr2_bnf.tex}\end{center}
+\caption{\whyml program expressions (part II).}
+\label{fig:bnf:expr2}
+\end{figure}
 
 \newpage
 

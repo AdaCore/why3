@@ -10,7 +10,7 @@
     | term "->" term          ; implication
     | term "<->" term         ; equivalence
     | term ":" type           ; type cast
-    | attribute term          ; attribute
+    | attribute+ term         ; attributes
     | term ("," term)+        ; tuple
     | quantifier quant-vars triggers? "." term ; quantifier
     | ...                     ; continued in Fig.~\ref{fig:bnf:term3}
@@ -19,7 +19,9 @@
   \
   quant-vars ::= quant-cast ("," quant-cast)*
   \
-  quant-cast ::= lident+ (":" type)?
+  quant-cast ::= bound-var+ (":" type)?
+  \
+  bound-var ::= lident attribute*
   \
   triggers ::= "[" trigger ("|" trigger)* "]" ;
   \

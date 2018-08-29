@@ -4,8 +4,8 @@
     | "true" | "false"        ; Boolean constant
     | "()"                    ; empty tuple
     | qualid                  ; qualified identifier
-    | qualifier "(" term ")"        ; qualified term
-    | qualifier "begin" term "end"  ; \textit{idem}
+    | qualifier? "(" term ")"        ; qualified term
+    | qualifier? "begin" term "end"  ; \textit{idem}
     | tight-op term           ; tight operator
     | "{" term-field+ "}"     ; record
     | "{" term "with" term-field+ "}"
@@ -28,7 +28,7 @@
   \
   term-field ::= lqualid "=" term ";" ; field \texttt{=} value
   \
-  qualid ::= qualifier (lident-ext | uident)  ; qualified identifier
+  qualid ::= qualifier? (lident-ext | uident)  ; qualified identifier
   \
   lident-ext ::= lident                   ; lowercase identifier
                | "(" ident-op ")"         ; operator identifier
