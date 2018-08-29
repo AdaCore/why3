@@ -32,6 +32,7 @@ type pty =
   | PTtyapp of qualid * pty list
   | PTtuple of pty list
   | PTarrow of pty * pty
+  | PTscope of qualid * pty
   | PTparen of pty
   | PTpure  of pty
 
@@ -53,8 +54,9 @@ and pat_desc =
   | Pas of pattern * ident * ghost
   | Por of pattern * pattern
   | Pcast of pattern * pty
-  | Pghost of pattern
+  | Pscope of qualid * pattern
   | Pparen of pattern
+  | Pghost of pattern
 
 (*s Logical terms and formulas *)
 

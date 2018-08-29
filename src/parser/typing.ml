@@ -105,23 +105,23 @@ let find_prog_symbol_ns ns p =
 
 (** Parsing types *)
 
-let ty_of_pty ns pty =
-  let rec get_ty = function
-    | PTtyvar {id_str = x} ->
-        ty_var (tv_of_string x)
-    | PTtyapp (q, tyl) ->
-        let ts = find_tysymbol_ns ns q in
-        let tyl = List.map get_ty tyl in
-        Loc.try2 ~loc:(qloc q) ty_app ts tyl
-    | PTtuple tyl ->
-        let s = its_tuple (List.length tyl) in
-        ty_app s.its_ts (List.map get_ty tyl)
-    | PTarrow (ty1, ty2) ->
-        ty_func (get_ty ty1) (get_ty ty2)
-    | PTpure ty | PTparen ty ->
-        get_ty ty
-  in
-  get_ty pty
+let rec ty_of_pty ns = function
+  | PTtyvar {id_str = x} ->
+      ty_var (tv_of_string x)
+  | PTtyapp (q, tyl) ->
+      let ts = find_tysymbol_ns ns q in
+      let tyl = List.map (ty_of_pty ns) tyl in
+      Loc.try2 ~loc:(qloc q) ty_app ts tyl
+  | PTtuple tyl ->
+      let s = its_tuple (List.length tyl) in
+      ty_app s.its_ts (List.map (ty_of_pty ns) tyl)
+  | PTarrow (ty1, ty2) ->
+      ty_func (ty_of_pty ns ty1) (ty_of_pty ns ty2)
+  | PTscope (q, ty) ->
+      let ns = import_namespace ns (string_list_of_qualid q) in
+      ty_of_pty ns ty
+  | PTpure ty | PTparen ty ->
+      ty_of_pty ns ty
 
 let dty_of_pty ns pty =
   Dterm.dty_of_ty (ty_of_pty ns pty)
@@ -156,10 +156,14 @@ let parse_record ~loc ns km get_val fl =
 let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
   match desc with
     | Ptree.Pparen p -> dpattern ns km p
+    | Ptree.Pscope (q,p) ->
+        let ns = import_namespace ns (string_list_of_qualid q) in
+        dpattern ns km p
     | _ -> (* creative indentation ahead *)
   Dterm.dpattern ~loc (match desc with
+    | Ptree.Pparen _
+    | Ptree.Pscope _ -> assert false (* never *)
     | Ptree.Pwild -> DPwild
-    | Ptree.Pparen _ -> assert false (* never *)
     | Ptree.Pvar x -> DPvar (create_user_id x)
     | Ptree.Papp (q,pl) ->
         let pl = List.map (dpattern ns km) pl in
@@ -422,25 +426,25 @@ let find_special muc test nm q =
       end
   | _ ->      Loc.errorm ~loc:(qloc q) "Not a %s: %a" nm print_qualid q
 
-let ity_of_pty muc pty =
-  let rec get_ity = function
-    | PTtyvar {id_str = x} ->
-        ity_var (tv_of_string x)
-    | PTtyapp (q, tyl) ->
-        let s = find_itysymbol_ns (get_namespace muc) q in
-        let tyl = List.map get_ity tyl in
-        Loc.try3 ~loc:(qloc q) ity_app s tyl []
-    | PTtuple tyl ->
-        ity_tuple (List.map get_ity tyl)
-    | PTarrow (ty1, ty2) ->
-        ity_func (get_ity ty1) (get_ity ty2)
-    | PTpure ty ->
-        ity_purify (get_ity ty)
-    | PTparen ty ->
-        get_ity ty
-  in
-  get_ity pty
-
+let rec ity_of_pty muc = function
+  | PTtyvar {id_str = x} ->
+      ity_var (tv_of_string x)
+  | PTtyapp (q, tyl) ->
+      let s = find_itysymbol muc q in
+      let tyl = List.map (ity_of_pty muc) tyl in
+      Loc.try3 ~loc:(qloc q) ity_app s tyl []
+  | PTtuple tyl ->
+      ity_tuple (List.map (ity_of_pty muc) tyl)
+  | PTarrow (ty1, ty2) ->
+      ity_func (ity_of_pty muc ty1) (ity_of_pty muc ty2)
+  | PTpure ty ->
+      ity_purify (ity_of_pty muc ty)
+  | PTscope (q, ty) ->
+      let muc = open_scope muc "dummy" in
+      let muc = import_scope muc (string_list_of_qualid q) in
+      ity_of_pty muc ty
+  | PTparen ty ->
+      ity_of_pty muc ty
 
 let dity_of_pty muc pty =
   Dexpr.dity_of_ity (ity_of_pty muc pty)
@@ -499,10 +503,15 @@ let rec dpattern muc gh { pat_desc = desc; pat_loc = loc } =
   match desc with
     | Ptree.Pparen p -> dpattern muc gh p
     | Ptree.Pghost p -> dpattern muc true p
+    | Ptree.Pscope (q,p) ->
+        let muc = open_scope muc "dummy" in
+        let muc = import_scope muc (string_list_of_qualid q) in
+        dpattern muc gh p
     | _ -> (* creative indentation ahead *)
   Dexpr.dpattern ~loc (match desc with
+    | Ptree.Pparen _ | Ptree.Pscope _
+    | Ptree.Pghost _ -> assert false (* never *)
     | Ptree.Pwild -> DPwild
-    | Ptree.Pparen _ | Ptree.Pghost _ -> assert false
     | Ptree.Pvar x -> DPvar (create_user_id x, gh)
     | Ptree.Papp (q,pl) ->
         DPapp (find_constructor muc q, List.map (dpattern muc gh) pl)
@@ -557,23 +566,34 @@ let dpre muc pl lvm old =
   List.map dpre pl
 
 let dpost muc ql lvm old ity =
-  let rec dpost (loc,pfl) = match pfl with
-    | [{ pat_desc = Ptree.Pparen p; pat_loc = loc}, f] ->
-        dpost (loc, [p,f])
-    | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
-        let v = create_pvsymbol (id_fresh "result") ity in
-        v, Loc.try3 ~loc type_fmla muc lvm old f
-    | [{ pat_desc = Ptree.Pvar id }, f] ->
-        let v = create_pvsymbol (create_user_id id) ity in
-        let lvm = Mstr.add id.id_str v lvm in
-        v, Loc.try3 ~loc type_fmla muc lvm old f
-    | _ ->
-        let v = create_pvsymbol (id_fresh "result") ity in
-        let i = { id_str = "(null)"; id_loc = loc; id_ats = [] } in
-        let t = { term_desc = Tident (Qident i); term_loc = loc } in
-        let f = { term_desc = Ptree.Tcase (t, pfl); term_loc = loc } in
-        let lvm = Mstr.add "(null)" v lvm in
-        v, Loc.try3 ~loc type_fmla muc lvm old f in
+  let mk_case loc pfl =
+    let v = create_pvsymbol (id_fresh "result") ity in
+    let i = { id_str = "(null)"; id_loc = loc; id_ats = [] } in
+    let t = { term_desc = Tident (Qident i); term_loc = loc } in
+    let f = { term_desc = Ptree.Tcase (t, pfl); term_loc = loc } in
+    let lvm = Mstr.add "(null)" v lvm in
+    v, Loc.try3 ~loc type_fmla muc lvm old f in
+  let dpost (loc,pfl) = match pfl with
+    | [pat, f] ->
+        let rec unfold p = match p.pat_desc with
+          | Ptree.Pparen p | Ptree.Pscope (_,p) -> unfold p
+          | Ptree.Pcast (p,pty) ->
+              let ty = ty_of_ity (ity_of_pty muc pty) in
+              Loc.try2 ~loc:p.pat_loc ty_equal_check (ty_of_ity ity) ty;
+              unfold p
+          | Ptree.Ptuple [] ->
+              Loc.try2 ~loc:p.pat_loc ity_equal_check ity ity_unit;
+              unfold { p with pat_desc = Ptree.Pwild }
+          | Ptree.Pwild ->
+              let v = create_pvsymbol (id_fresh "result") ity in
+              v, Loc.try3 ~loc type_fmla muc lvm old f
+          | Ptree.Pvar id ->
+              let v = create_pvsymbol (create_user_id id) ity in
+              let lvm = Mstr.add id.id_str v lvm in
+              v, Loc.try3 ~loc type_fmla muc lvm old f
+          | _ -> mk_case loc pfl in
+        unfold pat
+    | _ -> mk_case loc pfl in
   List.map dpost ql
 
 let dxpost muc ql lvm xsm old =
@@ -1107,7 +1127,7 @@ let add_types muc tdl =
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
 
   and parse ~loc ~alias ~alg pty =
-    let rec down = function
+    let rec down muc = function
       | PTtyvar id ->
           ity_var (tv_of_string id.id_str)
       | PTtyapp (q,tyl) ->
@@ -1127,12 +1147,16 @@ let add_types muc tdl =
                 Hstr.find hts x
             | _ ->
                 find_itysymbol muc q in
-          Loc.try3 ~loc:(qloc q) ity_app s (List.map down tyl) []
-      | PTtuple tyl -> ity_tuple (List.map down tyl)
-      | PTarrow (ty1,ty2) -> ity_func (down ty1) (down ty2)
-      | PTpure ty -> ity_purify (down ty)
-      | PTparen ty -> down ty in
-    down pty in
+          Loc.try3 ~loc:(qloc q) ity_app s (List.map (down muc) tyl) []
+      | PTtuple tyl -> ity_tuple (List.map (down muc) tyl)
+      | PTarrow (ty1,ty2) -> ity_func (down muc ty1) (down muc ty2)
+      | PTpure ty -> ity_purify (down muc ty)
+      | PTscope (q,ty) ->
+          let muc = open_scope muc "dummy" in
+          let muc = import_scope muc (string_list_of_qualid q) in
+          down muc ty
+      | PTparen ty -> down muc ty in
+    down muc pty in
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in

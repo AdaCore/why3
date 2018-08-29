@@ -112,13 +112,25 @@
     if ql = [] then [] else
     let ri loc = { id_str = "result"; id_loc = loc; id_ats = [] } in
     let rt loc = { term_desc = Tident (Qident (ri loc)); term_loc = loc } in
-    let rec case (loc, pfl) = match pfl with
-      | [{ pat_desc = Ptree.Pparen p; pat_loc = loc}, f] -> case (loc, [p,f])
-      | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] -> f
-      | [{ pat_desc = Ptree.Pvar { id_str = "result" } }, f] -> f
-      | [{ pat_desc = Ptree.Pvar id }, f] ->
-              { term_desc = Tlet (id, rt loc, f); term_loc = loc }
-      | _ ->  { term_desc = Tcase (rt loc, pfl); term_loc = loc } in
+    let cast t ty = { t with term_desc = Tcast (t,ty) } in
+    let case (loc, pfl) =
+      let mk_t d = { term_desc = d; term_loc = loc } in
+      match pfl with
+      | [pat, f] ->
+          let rec unfold d p = match p.pat_desc with
+            | Pparen p | Pscope (_,p) -> unfold d p
+            | Pcast (p,ty) -> unfold (cast d ty) p
+            | Ptuple [] -> unfold (cast d (PTtuple []))
+                                  { p with pat_desc = Pwild }
+            | Pvar { id_str = "result" } | Pwild ->
+              begin match d.term_desc with
+                | Tident (Qident _) -> f (* no type casts on d *)
+                | _ -> mk_t (Tlet (id_anonymous p.pat_loc, d, f))
+              end
+            | Pvar id -> mk_t (Tlet (id, d, f))
+            | _ -> mk_t (Tcase (d, pfl)) in
+          unfold (rt loc) pat
+      | _ -> mk_t (Tcase (rt loc, pfl)) in
     let mk_t desc = { term_desc = desc; term_loc = any_loc } in
     let rec join ql = match ql with
       | [] -> assert false (* never *)
@@ -457,6 +469,10 @@ ty:
 ty_arg:
 | lqualid                           { PTtyapp ($1, []) }
 | quote_lident                      { PTtyvar $1 }
+| uqualid DOT ty_block              { PTscope ($1, $3) }
+| ty_block                          { $1 }
+
+ty_block:
 | LEFTPAR comma_list2(ty) RIGHTPAR  { PTtuple $2 }
 | LEFTPAR RIGHTPAR                  { PTtuple [] }
 | LEFTPAR ty RIGHTPAR               { PTparen $2 }
@@ -605,7 +621,7 @@ single_term_:
     { let re_pat pat d = { pat with pat_desc = d } in
       let cast t ty = { t with term_desc = Tcast (t,ty) } in
       let rec unfold d p = match p.pat_desc with
-        | Pparen p -> unfold d p
+        | Pparen p | Pscope (_,p) -> unfold d p
         | Pcast (p,ty) -> unfold (cast d ty) p
         | Ptuple [] -> unfold (cast d (PTtuple [])) (re_pat p Pwild)
         | Pvar id -> Tlet (id, d, $6)
@@ -651,7 +667,7 @@ term_dot_:
 | o = oppref ; a = term_dot { Tidapp (Qident o, [a]) }
 | term_sub_                 { $1 }
 
-term_block:
+term_block_:
 | BEGIN term END                                    { $2.term_desc }
 | LEFTPAR term RIGHTPAR                             { $2.term_desc }
 | BEGIN END                                         { Ttuple [] }
@@ -660,8 +676,8 @@ term_block:
 | LEFTBRC term_arg WITH field_list1(term) RIGHTBRC  { Tupdate ($2,$4) }
 
 term_sub_:
-| term_block                                        { $1 }
-| uqualid DOT mk_term(term_block)                   { Tscope ($1, $3) }
+| term_block_                                       { $1 }
+| uqualid DOT mk_term(term_block_)                  { Tscope ($1, $3) }
 | term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
 | term_arg LEFTSQ term rightsq
     { Tidapp (get_op $4 $startpos($2) $endpos($2), [$1;$3]) }
@@ -852,7 +868,7 @@ single_expr_:
         | _ -> Pghost pat) in
       let pat = if $2 then push $4 else $4 in
       let rec unfold gh d p = match p.pat_desc with
-        | Pparen p -> unfold gh d p
+        | Pparen p | Pscope (_,p) -> unfold gh d p
         | Pghost p -> unfold true d p
         | Pcast (p,ty) -> unfold gh (cast d ty) p
         | Ptuple [] -> unfold gh (cast d (PTtuple [])) (re_pat p Pwild)
@@ -971,14 +987,14 @@ expr_arg_:
 | TRUE                      { Etrue }
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
-| expr_sub                  { $1 }
+| expr_sub_                 { $1 }
 
 expr_dot_:
 | lqualid                   { Eident $1 }
 | o = oppref ; a = expr_dot { Eidapp (Qident o, [a]) }
-| expr_sub                  { $1 }
+| expr_sub_                 { $1 }
 
-expr_block:
+expr_block_:
 | BEGIN single_spec spec seq_expr END
     { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
 | BEGIN single_spec spec END
@@ -991,15 +1007,15 @@ expr_block:
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
 
-expr_pure:
+expr_pure_:
 | LEFTBRC qualid RIGHTBRC                           { Eidpur $2 }
 | uqualid DOT LEFTBRC ident RIGHTBRC                { Eidpur (Qdot ($1, $4)) }
 
-expr_sub:
-| expr_block                                        { $1 }
-| expr_pure                                         { $1 }
-| uqualid DOT mk_expr(expr_block)                   { Escope ($1, $3) }
-| expr_dot DOT mk_expr(expr_pure)                   { Eapply ($3, $1) }
+expr_sub_:
+| expr_block_                                       { $1 }
+| expr_pure_                                        { $1 }
+| uqualid DOT mk_expr(expr_block_)                  { Escope ($1, $3) }
+| expr_dot DOT mk_expr(expr_pure_)                  { Eapply ($3, $1) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_arg LEFTSQ expr rightsq
@@ -1171,6 +1187,10 @@ pat_arg_:
 | UNDERSCORE                            { Pwild }
 | attrs(lident_nq)                      { Pvar (add_model_trace_attr $1) }
 | uqualid                               { Papp ($1,[]) }
+| uqualid DOT mk_pat(pat_block_)        { Pscope ($1,$3) }
+| pat_block_                            { $1 }
+
+pat_block_:
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern RIGHTPAR              { Pparen $2 }
 | LEFTBRC field_list1(pattern) RIGHTBRC { Prec $2 }
