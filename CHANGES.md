@@ -40,6 +40,8 @@ Language
   * `use T` and `clone T` now import the generated namespace T;
     use `use T as T` and `clone T as T` to prevent this :x:
   * `pure { <term> }` produces a ghost value in program code
+  * `a <-> b <-> c` is now parsed as `(a <-> b) /\ (b <-> c)`;
+    `a <-> b -> c` is now rejected :x:
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
