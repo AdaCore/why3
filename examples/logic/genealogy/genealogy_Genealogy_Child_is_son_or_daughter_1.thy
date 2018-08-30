@@ -1,5 +1,5 @@
 theory genealogy_Genealogy_Child_is_son_or_daughter_1
-imports Why3
+imports Why3.Why3
 begin
 
 why3_open "genealogy_Genealogy_Child_is_son_or_daughter_1.xml"

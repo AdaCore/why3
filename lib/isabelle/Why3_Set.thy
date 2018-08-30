@@ -1,11 +1,11 @@
 theory Why3_Set
-imports Why3_Setup Why3_Map "~~/src/HOL/Library/FSet"
+imports
+  Why3_Setup
+  Why3_Map
+  "HOL-Library.FSet"
 begin
 
 section {* Potentially infinite sets *}
-
-definition choose_elt :: "('a \<Rightarrow> bool) \<Rightarrow> 'a" where
-  "choose_elt S = (\<some>x. S x)"
 
 definition complement :: "('a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> bool" where
   "complement S v = Not (S v)"
@@ -19,7 +19,7 @@ why3_open "set/Set.xml"
     inter = inf
     diff = minus
     complement = complement
-    choose = choose_elt
+    choose = Eps
     all = top
 
 why3_vc add_spec by (auto simp add: mem_def)
@@ -46,7 +46,8 @@ why3_vc union_spec
   by (simp add: mem_def)
 
 why3_vc choose_spec
-  by (metis assms choose_elt_def mem_def set.Set.is_empty_def tfl_some)
+  using assms
+  by (auto simp add: mem_def is_empty_def intro: someI_ex)
 
 why3_vc remove_spec
   by (simp add: mem_def)
@@ -58,7 +59,8 @@ why3_vc subset_refl
   by (simp add: subset_def)
 
 why3_vc subset_trans
-  by (meson H1 H2 subset_def)
+  using assms
+  by (simp add: subset_def)
 
 why3_vc subset_remove
   by (simp add: remove_spec subset_def)
@@ -81,9 +83,6 @@ definition fremove :: "'a \<Rightarrow> 'a fset \<Rightarrow> 'a fset" where
 definition fchoose :: "'a fset \<Rightarrow> 'a" where
   "fchoose S = (\<some>x. x |\<in>| S)"
 
-definition ext_eq :: "'a fset \<Rightarrow> 'a fset \<Rightarrow> bool" where
-  "ext_eq S1 S2 = (S1 = S2)"
-
 definition is_empty :: "'a fset \<Rightarrow> bool" where
   "is_empty S = (S = fempty)"
 
@@ -98,7 +97,7 @@ why3_open "set/Fset.xml"
     diff = minus
     choose = fchoose
     all = top
-    infix_eqeq = ext_eq
+    infix_eqeq = HOL.eq
     subset = fsubset_eq
     is_empty = is_empty
   types
@@ -131,16 +130,16 @@ why3_vc subset_trans
 why3_vc subset_remove by (auto simp add: fremove_def)
 
 why3_vc subset_eq
-  using assms ext_eq_def fcard_seteq by fastforce
+  using assms fcard_seteq by fastforce
 
 why3_vc subset_spec by auto
 
 why3_vc infix_eqeq_spec
-  by (metis ext_eq_def fsubset_antisym subset_spec)
+  by (simp add: fset_eq_iff)
 
 why3_vc extensionality
   using assms
-  by (auto simp add: ext_eq_def)
+  by simp
 
 why3_vc cardinal1
 proof (cases s rule: fset_strong_cases)
@@ -188,8 +187,7 @@ why3_vc diff_spec by simp
 
 why3_vc choose_spec
   using assms
-  using Why3_Set.is_empty_def
-  by (metis (full_types) ex_fin_conv fchoose_def someI_ex)
+  by (auto simp add: fchoose_def is_empty_def intro: someI_ex)
 
 why3_vc is_empty_spec
   by (simp add: Why3_Set.is_empty_def)

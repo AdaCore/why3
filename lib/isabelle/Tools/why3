@@ -34,7 +34,7 @@ function make_theory()
   BNAME=`basename "$1"`
 
   if [ ! -e "$1.thy" ]; then
-    echo -e "theory $BNAME\nimports Why3\nbegin\n\nwhy3_open \"$BNAME.xml\"\n" > "$1.thy"
+    echo -e "theory $BNAME\nimports Why3.Why3\nbegin\n\nwhy3_open \"$BNAME.xml\"\n" > "$1.thy"
     sed \
       -e 's/<lemma name="\([^"]*\)"[^>]*>/why3_vc \1\n\n/g' \
       -e 's/<[^l][^>]*>//g' \
@@ -83,7 +83,11 @@ else
 fi
 
 if [ "$BATCH" = true ]; then
-  "$ISABELLE_TOOL" process "${SESSION_DIR[@]}" -l "$SESSION" -T "$NAME"
+  if [ "$ISABELLE_ADDRESS" ]; then
+    isabelle_client -t "$NAME"
+  else
+    "$ISABELLE_TOOL" process "${SESSION_DIR[@]}" -l "$SESSION" -T "$NAME"
+  fi
 elif [ "$INTERACTIVE" = true ]; then
   make_theory "$NAME"
   if [ -f "$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER" ]; then
