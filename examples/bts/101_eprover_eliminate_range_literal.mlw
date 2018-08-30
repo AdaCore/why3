@@ -1,0 +1,30 @@
+module A
+
+use int.Int
+use mach.int.Int63
+
+let test (x:int63) : int63
+  requires { x < 100 }
+= x+1
+
+end
+
+
+(*
+
+module A
+
+use import int.Int
+use import mach.int.Int63
+
+val add (x y:int63) : int63
+  requires { int63'minInt <= int63'int x + int63'int y <= int63'maxInt }
+  ensures { int63'int result = int63'int x + int63'int y }
+
+let test (x:int63) : int63
+  requires { int63'int x < 100 }
+= add x (1:int63)
+
+end
+
+*)
