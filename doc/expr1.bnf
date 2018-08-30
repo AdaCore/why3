@@ -3,12 +3,12 @@
     | real                    ; real constant
     | "true" | "false"        ; Boolean constant
     | "()"                    ; empty tuple
-    | qualid                  ; qualified identifier
-    | qualifier? "(" expr ")"        ; qualified expression
+    | qualid                  ; identifier in a scope
+    | qualifier? "(" expr ")"        ; expression in a scope
     | qualifier? "begin" expr "end"  ; \textit{idem}
     | tight-op expr           ; tight operator
-    | "{" expr-field+ "}"     ; record
-    | "{" expr "with" expr-field+ "}"
+    | "{" (lqualid "=" expr ";")+ "}"     ; record
+    | "{" expr "with" (lqualid "=" expr ";")+ "}"
                               ; record update
     | expr "." lqualid        ; record field access
     | expr "[" expr "]" "'"*  ; collection access
@@ -30,7 +30,5 @@
     | "ghost" expr            ; ghost expression
     | expr ("," expr)+        ; tuple
     | expr "<-" expr          ; assignment
-    | ...                     ; continued in Fig.~\ref{fig:bnf:expr2}
-  \
-  expr-field ::= lqualid "=" expr ";" ; field \texttt{=} value %
+    | ...                     ; continued in Fig.~\ref{fig:bnf:expr2} %
 \end{syntax}

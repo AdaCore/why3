@@ -8,5 +8,5 @@
        | "()"		     ; unit type
        | "(" type ("," type)+ ")" ; tuple type
        | "{" type "}"        ; snapshot type
-       | "(" type ")"
+       | qualifier? "(" type ")"  ; type in a scope %
 \end{syntax}

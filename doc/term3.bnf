@@ -1,40 +1,30 @@
 \begin{syntax}
-  term ::= ...                ; see Fig.~\ref{fig:bnf:term1} and \ref{fig:bnf:term2}
+  term ::= ...  ; see Fig.~\ref{fig:bnf:term1} and \ref{fig:bnf:term2}
     | "if" term "then" term "else" term     ; conditional
     | "match" term "with" term-case+ "end"  ; pattern matching
     | "let" pattern "=" term "in" term      ; let-binding
-    | "let" symbol param+ "=" term "in" term    ; mapping definition
-    | "fun" param+ "->" term               ; unnamed mapping
+    | "let" symbol param+ "=" term "in" term  ; mapping definition
+    | "fun" param+ "->" term                ; unnamed mapping
   \
   term-case ::= "|" pattern "->" term
   \
-  pattern ::= "_"           ; catch-all
-    | "()"                  ; empty tuple
-    | "(" pattern ")"       ; parentheses
+  pattern ::=
+      binder                            ; variable or `\texttt{\_}'
+    | "()"                              ; empty tuple
     | "{" (lqualid "=" pattern ";")+ "}"  ; record pattern
-    | bound-var             ; variable
-    | uqualid pattern*      ; constructor
-    | "ghost" pattern       ; ghost sub-pattern
-    | pattern "as" "ghost"? bound-var ; named sub-pattern
-    | pattern "," pattern   ; tuple pattern
-    | pattern "|" pattern   ; ``or'' pattern
+    | uqualid pattern*                  ; constructor
+    | "ghost" pattern                   ; ghost sub-pattern
+    | pattern "as" "ghost"? bound-var   ; named sub-pattern
+    | pattern "," pattern               ; tuple pattern
+    | pattern "|" pattern               ; ``or'' pattern
+    | qualifier? "(" pattern ")"        ; pattern in a scope
   \
-  symbol ::= lident-ext attribute*  ; user-defined symbol
+  symbol ::= lident-ext attribute*      ; user-defined symbol
   \
   param ::=
-      type-arg              ; unnamed typed
-    | param-name            ; (un)named untyped
-    | "(" "ghost"? type ")" ; unnamed typed
-    | "(" "ghost"? param-name ")" ; (un)named untyped
-    | "(" "ghost"? param-name+ ":" type ")" ; multi-variable typed
-  \
-  param-name ::= "_"        ; unnamed parameter
-    | bound-var             ; named parameter %
+      type-arg                          ; unnamed typed
+    | binder                            ; (un)named untyped
+    | "(" "ghost"? type ")"             ; unnamed typed
+    | "(" "ghost"? binder ")"           ; (un)named untyped
+    | "(" "ghost"? binder+ ":" type ")" ; multi-variable typed %
 \end{syntax}
-
-%    | lqualid               ; unnamed sort-typed
-%    | "'" lident            ; unnamed variable-typed
-%    | "(" type ("," type)+ ")" ; unnamed tuple-typed
-%    | "{" type "}"          ; unnamed snapshot-typed
-%    | "(" "ghost"? type ")" ; unnamed typed
-%    | "(" "ghost"? (bound-var | "_")+ (":" type)? ")" ; multi-variable param %

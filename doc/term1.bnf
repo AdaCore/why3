@@ -4,7 +4,7 @@
     | "true" | "false"        ; Boolean constant
     | "()"                    ; empty tuple
     | qualid                  ; qualified identifier
-    | qualifier? "(" term ")"        ; qualified term
+    | qualifier? "(" term ")"        ; term in a scope
     | qualifier? "begin" term "end"  ; \textit{idem}
     | tight-op term           ; tight operator
     | "{" term-field+ "}"     ; record

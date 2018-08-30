@@ -41,19 +41,19 @@ Real constants can be given in base 10 or 16.
 Notice that the exponent in hexadecimal real constants is written in base 10.
 
 %\subsection{Identifiers}
-Identifiers are composed of letters, digits, the underscore character,
-and the quotation mark. %, as shown in Figure~\ref{fig:bnf:ident}.
+Identifiers are composed of letters, digits, underscores,
+and primes. %, as shown in Figure~\ref{fig:bnf:ident}.
 The syntax distinguishes identifiers that start with a lowercase letter
 or an underscore (\nonterm{lident}{}\spacefalse), identifiers that
 start with an uppercase letter (\nonterm{uident}{}\spacefalse),
-and identifiers that start with a quotation mark
+and identifiers that start with a prime
 (\nonterm{qident}{}\spacefalse, used exclusively for type variables):
 %\begin{figure}[ht]
 \begin{center}\input{./generated/ident_bnf.tex}\end{center}
 %\caption{Syntax for identifiers.}
 %\label{fig:bnf:ident}
 %\end{figure}
-Identifiers that contain a quotation mark followed by a letter,
+Identifiers that contain a prime followed by a letter,
 such as \texttt{int32'max}, are reserved for symbols
 introduced by \why and cannot be used for user-defined symbols.
 
@@ -62,17 +62,26 @@ In order to refer to symbols introduced in different namespaces
 in front of an identifier (e.g.~\texttt{Map.S.get}).
 This allows us to use the symbol \texttt{get}
 from the scope \texttt{Map.S} without importing
-it in the current scope:
+it in the current namespace:
 %\begin{figure}[ht]
 \begin{center}\input{./generated/qualid_bnf.tex}\end{center}
 %\caption{Syntax for qualified identifiers.}
 %\label{fig:bnf:qualid}
 %\end{figure}
+All parenthesised expressions in \whyml (types,
+patterns, logical terms, program expressions)
+admit a qualifier before the opening parenthesis,
+e.g.~\texttt{Map.S.(get m i)}. This imports
+the indicated scope into the current namespace during
+the parsing of the expression under the qualifier.
+For the sake of convenience, the parentheses can be omitted
+when the expression itself is enclosed in parentheses,
+square brackets or curly braces.
 
 %\subsection{Operators}
 Prefix and infix operators are built from characters organized in four
 precedence groups (\textsl{op-char-1} to \textsl{op-char-4}), with
-optional quotation marks at the end:
+optional primes at the end:
 %as shown in Figure~\ref{fig:bnf:operator}.
 %\begin{figure}[ht]
 \begin{center}\input{./generated/operator_bnf.tex}\end{center}
@@ -147,6 +156,18 @@ as long as it is not modified by the function.
 \section{Logical expressions: terms and formulas}
 \label{sec:terms}
 
+\begin{figure}[p!]
+\begin{center}\input{./generated/term1_bnf.tex}\end{center}
+\caption{\whyml terms (part I).}
+\label{fig:bnf:term1}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/term2_bnf.tex}\end{center}
+\caption{\whyml terms (part II).}
+\label{fig:bnf:term2}
+\end{figure}
+
 A significant part of a typical \whyml source file is occupied
 by non-executable logical content intended for specification
 and proof: function contracts, assertions, definitions of
@@ -161,12 +182,6 @@ connectives and quantifiers) and the terms of type \texttt{bool}
 syntactical level, and \why will perform the necessary conversions
 behind the scenes.
 
-\begin{figure}[p!]
-\begin{center}\input{./generated/term1_bnf.tex}\end{center}
-\caption{\whyml terms (part I).}
-\label{fig:bnf:term1}
-\end{figure}
-
 The syntax of \whyml terms is given in
 Figures~\ref{fig:bnf:term1}-\ref{fig:bnf:term3}.
 The constructions are listed in the order of
@@ -178,7 +193,7 @@ record field \texttt{p.x}, whereas \texttt{!p.x}
 denotes the field \texttt{x} of a record stored
 in the reference \texttt{p}.
 
-An operator inside parentheses can act as an identifier
+An operator in parentheses acts as an identifier
 referring to that operator, for example, in a definition.
 To distinguish between prefix and infix operators, an
 underscore symbol is appended at the end: for example,
@@ -194,7 +209,7 @@ arrays, sequences, etc. Bracket operators do not have
 any predefined meaning and may be used to denote access
 and update operations for various user-defined collection types.
 We can introduce multiple bracket operations in the same scope
-by disambiguating them with quotation marks after the closing
+by disambiguating them with primes after the closing
 bracket: for example, \texttt{a[i]} may denote array access
 and \texttt{s[i]'} sequence access.
 Notice that the in-place update operator \texttt{a[i] <- v}
@@ -208,10 +223,10 @@ operator \texttt{a[i <- v]} instead.
 
 \whyml supports ``associated'' names for operators, obtained
 by adding a suffix after the parenthesised operator name.
-For example, an axiom that represents the specification of an
-infix \texttt{(+)} operator may be called \texttt{(+)'spec}
+For example, an axiom that represents the specification of the
+infix operator \texttt{(+)} may be called \texttt{(+)'spec}
 or \texttt{(+)\_spec}. As with normal identifiers, names
-with a letter after a quotation mark, such as \texttt{(+)'spec},
+with a letter after a prime, such as \texttt{(+)'spec},
 can only be introduced by \why, and not by the user in a \whyml
 source.
 
@@ -229,17 +244,13 @@ can be chained. For example, the term \texttt{0 <= i < j < length a}
 is parsed as the conjunction of three inequalities \texttt{0 <= i},
 \texttt{i < j}, and \texttt{j < length a}.
 
-Just as with normal identifiers,
-we can put a qualifier prefix in front of a parenthesised operator,
-e.g.~\texttt{Map.S.([]) m i}, or in front of a parenthesised term,
-e.g.~\texttt{Map.S.(m[i])}, though parentheses can be omitted
-if the term is a record or a record update.
-
-\begin{figure}[ht]
-\begin{center}\input{./generated/term2_bnf.tex}\end{center}
-\caption{\whyml terms (part II).}
-\label{fig:bnf:term2}
-\end{figure}
+As with normal identifiers,
+we can put a qualifier over a parenthesised operator,
+e.g.~\texttt{Map.S.([]) m i}. Also, as noted above,
+a qualifier can be put over a parenthesised term,
+%e.g.~\texttt{Map.S.(m[i])},
+and the parentheses
+can be omitted if the term is a record or a record update.
 
 The propositional connectives in \whyml formulas are listed in
 Figure~\ref{fig:bnf:term2}. The non-standard connectives ---
@@ -250,7 +261,7 @@ transformations of \why and provide integrated proofs for
 \whyml assertions, postconditions, lemmas, etc.
 The semantics of these connectives
 follows the rules below:
-\begin{itemize}
+\begin{itemize}\setlength{\itemsep}{0ex}
 \item A proof task for \texttt{A \&\& B} is split into
 separate tasks for \texttt{A} and \texttt{A -> B}.
 If \texttt{A \&\& B} occurs as a premise, it behaves
@@ -327,6 +338,12 @@ To reduce ambiguity, \whyml forbids to place
 a non-parenthesised implication at the right-hand side
 of an equivalence: \texttt{A <-> B -> C} is rejected.
 
+\begin{figure}[ht]
+\begin{center}\input{./generated/term3_bnf.tex}\end{center}
+\caption{\whyml terms (part III).}
+\label{fig:bnf:term3}
+\end{figure}
+
 In Figure~\ref{fig:bnf:term3}, we find the more advanced
 term constructions: conditionals, let-bindings, pattern
 matching, and local function definitions,
@@ -336,15 +353,9 @@ defined in this way are called \emph{mappings};
 they are first-class values of ``arrow'' type
 \texttt{$\tau_1$ -> $\tau_2$}.
 
-\begin{figure}[ht]
-\begin{center}\input{./generated/term3_bnf.tex}\end{center}
-\caption{\whyml terms (part III).}
-\label{fig:bnf:term3}
-\end{figure}
-
 The patterns are similar to those of OCaml, though the \texttt{when}
-clauses and numerical constants are not supported. Unlike OCaml,
-\texttt{as} has a higher precedence than the comma: in the pattern
+clauses and numerical constants are not supported. Unlike in OCaml,
+\texttt{as} binds stronger than the comma: in the pattern
 \texttt{($p_1$,$p_2$ as x)}, variable \texttt{x} is bound to
 the value matched by pattern $p_2$. Also notice the closing
 \texttt{end} after the \texttt{match-with} term.
@@ -358,39 +369,34 @@ In program expressions, non-exhaustive pattern matching
 is accepted and a proof obligation is generated to show
 that the values not covered cannot occur in execution.
 
-The syntax of parameters (non-terminal
-\nonterm{param}{} in Figure~\ref{fig:bnf:term3})
-in user-defined symbols---%
+The syntax of parameters %(non-terminal
+%\nonterm{param}{} in Figure~\ref{fig:bnf:term3})
+in user-defined operations---%
 first-class mappings,
 top-level logical functions and predicates,
-or executable program functions---%
+and program functions---%
 is rather flexible in \whyml.
 Like in OCaml, the user can specify the name of a parameter
 without its type and let the type be inferred from the
 definition. Unlike in OCaml, the user can also specify
 the type of the parameter without giving its name.
-This is used when the symbol declaration does not
-contain the actual definition or specification of
+This is convenient when the symbol declaration does not
+provide the actual definition or specification of
 the symbol, and thus only the type signature is of
 relevance.
 For example, one can declare an abstract binary function
-simply by writing
-\texttt{function mem int int : int}.
-
-
+that adds an element to a set simply by writing
+\texttt{function add 'a (set 'a) : set 'a}.
+A standalone non-qualified lowercase identifier without
+attributes is treated as a type name when the definition
+is not provided, and as a parameter name otherwise.
 
 Ghost patterns, ghost variables after \texttt{as},
-and ghost binders in function definitions are only used
+and ghost parameters in function definitions are only used
 in program code, and not allowed in logical terms.
 
 \section{Program expressions}
 \label{sec:exprs}
-
-\begin{figure}[ht]
-\begin{center}\input{./generated/expr1_bnf.tex}\end{center}
-\caption{\whyml program expressions (part I).}
-\label{fig:bnf:expr1}
-\end{figure}
 
 The syntax of program expressions is given in
 Figures~\ref{fig:bnf:expr1}-\ref{fig:bnf:expr2}.
@@ -401,28 +407,34 @@ from group~1 can be chained. Notice that binary operators \texttt{\&\&}
 and \texttt{||} denote here the usual lazy conjunction and disjunction,
 respectively.
 
-Two new operators make appearance in Figure~\ref{fig:bnf:expr1}.
-One is \texttt{ghost} that marks the subordinate expression as
-ghost code added for verification purposes. Ghost code will be
-removed from the final code intended for execution, and therefore
-cannot influence the computation of the program results nor the
+\begin{figure}[ht]
+\begin{center}\input{./generated/expr1_bnf.tex}\end{center}
+\caption{\whyml program expressions (part I).}
+\label{fig:bnf:expr1}
+\end{figure}
+
+%Two new operators make appearance in Figure~\ref{fig:bnf:expr1}.
+Keyword \texttt{ghost} marks the expression as
+ghost code added for verification purposes. Ghost code is
+removed from the final code intended for execution, and thus
+cannot affect the computation of the program results nor the
 content of the observable memory.
 
-The other new operation is assignment which can be used to update
-in place a mutable field of a record or an element of a collection.
-The first form can be executed simultaneously
-on a tuple of values: \texttt{x.f, y.g <- a, b}. The second
+Assignment updates in place
+a mutable record field or an element of a collection.
+The former can be done simultaneously
+on a tuple of values: \texttt{x.f, y.g <- a, b}. The latter
 form, \texttt{a[i] <- v}, amounts to a call of the ternary
 bracket operator \texttt{([]<-)} and cannot be used in a
 multiple assignment.
 
+\newpage
 \begin{figure}[ht]
 \begin{center}\input{./generated/expr2_bnf.tex}\end{center}
 \caption{\whyml program expressions (part II).}
 \label{fig:bnf:expr2}
 \end{figure}
 
-\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
