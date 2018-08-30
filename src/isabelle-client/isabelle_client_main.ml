@@ -67,7 +67,7 @@ let decode_yxml s =
   let buf = Buffer.create 1024 in
   List.iter
     (function [s] -> Buffer.add_string buf s | _ -> ())
-    (List.map (String.split_on_char '\006') (String.split_on_char '\005' s));
+    (List.map (Strings.split '\006') (Strings.split '\005' s));
   Buffer.contents buf
 
 let parse_answer s =
@@ -112,7 +112,7 @@ let prefix_of_kind kind = match kind with
 let print_message (kind, msg) =
   let prfx = prefix_of_kind kind in
   List.iter (fun s -> Format.printf "%s%s\n" prfx s)
-    (String.split_on_char '\n' (decode_yxml msg))
+    (Strings.split '\n' (decode_yxml msg))
 
 let current_task = ref (None : (Unix.file_descr * string) option)
 
@@ -187,7 +187,7 @@ let is_consolidated nodes =
       (Json_base.get_field r "status") "consolidated")) nodes
 
 let base_name s =
-  let xs = String.split_on_char '/' s in
+  let xs = Strings.split '/' s in
   List.nth xs (List.length xs - 1)
 
 let use_theory sock session_id thy =
