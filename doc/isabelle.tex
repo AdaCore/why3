@@ -44,7 +44,34 @@ proof is completed, the user must send back the edited proof to
 \texttt{why3 ide} by closing the opened buffer, typically by hitting
 \texttt{Ctrl-w}.
 
-\subsection{Realizations}
+\subsection{Using Isabelle 2018 server}
+
+Starting from Isabelle version 2018, Why3 is able to exploit the
+server features of Isabelle to speed up the processing of proofs in
+batch mode, e.g. when replaying them from within Why3 IDE. Currently,
+when replaying proofs using the \verb|isabelle why3| tool, an Isabelle
+process including a rather heavyweight Java/Scala and PolyML runtime
+environment has to be started, and a suitable heap image has to be
+loaded for each proof obligation, which can take several seconds. To
+avoid this overhead, an Isabelle server and a suitable session can be
+started once, and then \verb|isabelle why3| can just connect to it and
+request the server to process theories. In order to allow a tool such
+as Why3 IDE to use the Isabelle server, it has to be started via the
+wrapper tool \verb|isabelle use_server|. For example, to process the proofs
+in examples/logic/genealogy using Why3 IDE and the Isabelle server, do
+the following:
+\begin{enumerate}
+\item Start an Isabelle server using
+\begin{verbatim}
+   isabelle server &
+\end{verbatim}
+\item Start Why3 IDE using
+\begin{verbatim}
+   isabelle use_server why3 ide genealogy
+\end{verbatim}
+\end{enumerate}
+
+ \subsection{Realizations}
 
 Realizations must be designed in some \texttt{.thy} as follows.
 The realization file corresponding to some \why file \texttt{f.why}
