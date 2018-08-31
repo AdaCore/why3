@@ -22,7 +22,7 @@ struct
 
   type t = X.t Vector.t
 
-  let create (us: unit) : t =
+  let create (_: unit) : t =
     Vector.create ?capacity:(Some 0) ~dummy:X.dummy
 
   let is_empty (h: t) : bool = Vector.is_empty h

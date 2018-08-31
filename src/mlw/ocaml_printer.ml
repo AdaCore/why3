@@ -76,8 +76,8 @@ module Print = struct
      aprinter: type variables
      tprinter: toplevel definitions *)
   let iprinter, aprinter, tprinter =
-    let isanitize = sanitizer char_to_alpha char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+    let isanitize = sanitizer char_to_alnumus char_to_alnumus in
+    let lsanitize = sanitizer char_to_lalnumus char_to_alnumus in
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
