@@ -385,11 +385,11 @@ Here are a few more semantic changes
 
   To obtain the effect of the former semantics of the \verb|any| construct, one should use instead a local \verb|val| function. In other words, if one was using the following structure in Why3 0.xx:
   \begin{lstlisting}
-    any (x:t) ensures { P(x) }
+    any t ensures { P }
   \end{lstlisting}
   then in 1.00 it should be written as
   \begin{lstlisting}
-    val x:t ensures { P(result) } in x
+    val x:t ensures { P } in x
   \end{lstlisting}
 
 
