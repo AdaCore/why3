@@ -137,6 +137,7 @@ let convert_notification_constructor n =
   | Next_Unproven_Node_Id (_, _) -> String "Next_Unproven_Node_Id"
   | Initialized _                -> String "Initialized"
   | Saved                        -> String "Saved"
+  | Saving_needed _              -> String "Saving_needed"
   | Message _                    -> String "Message"
   | Dead _                       -> String "Dead"
   | Task _                       -> String "Task"
@@ -169,6 +170,7 @@ let convert_request_constructor (r: ide_request) =
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
   | Unfocus_req               -> String "Unfocus_req"
   | Save_req                  -> String "Save_req"
+  | Check_need_saving_req     -> String "Check_need_saving_req"
   | Reload_req                -> String "Reload_req"
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
@@ -220,7 +222,8 @@ let print_request_to_json (r: ide_request): Json_base.json =
            "node_ID2", Int to_id]
   | Get_first_unproven_node id ->
       convert_record ["ide_request", cc r;
-           "node_ID", Int id]
+                      "node_ID", Int id]
+  | Check_need_saving_req
   | Unfocus_req
   | Save_req
   | Reload_req
@@ -384,9 +387,12 @@ let print_notification_to_json (n: notification): json =
            "infos", convert_infos infos]
   | Saved ->
       convert_record ["notification", cc n]
+  | Saving_needed b ->
+     convert_record ["notification", cc n;
+                     "need_saving", Bool b]
   | Message m ->
       convert_record ["notification", cc n;
-           "message", convert_message m]
+                      "message", convert_message m]
   | Dead s ->
       convert_record ["notification", cc n;
            "message", String s]

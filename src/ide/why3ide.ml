@@ -102,16 +102,9 @@ module Protocol_why3ide = struct
 
 end
 
-(* True when session differs from the saved session *)
-let session_needs_saving = ref false
-
 let get_notified = Protocol_why3ide.get_notified
 
-let send_request r =
-  (* If request changes the session then session needs saving *)
-  if modify_session r then
-    session_needs_saving := true;
-  Protocol_why3ide.send_request r
+let send_request r = Protocol_why3ide.send_request r
 
 (****************************************)
 (* server instance on the GTK scheduler *)
@@ -329,7 +322,10 @@ let files_need_saving () =
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
 let exit_function_safe () =
-  if not !session_needs_saving && not (files_need_saving ()) then
+  send_request Check_need_saving_req
+
+let exit_function_handler b =
+  if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
@@ -2412,11 +2408,11 @@ let treat_notification n =
      complete_context_menu ();
      Opt.iter select_iter goals_model#get_iter_first
   | Saved                         ->
-      session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
+  | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc)        ->
      if is_selected_alone id then

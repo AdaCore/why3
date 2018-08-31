@@ -559,6 +559,8 @@ let interpNotif (n: notification) =
       TaskList.remove_node (string_of_int nid)
   | Saved ->
       PE.error_print_msg "Saved"
+  | Saving_needed _b ->
+      PE.error_print_msg "Saving_needed"
   | Message m ->
     begin
       match m with

@@ -489,7 +489,7 @@ let get_modified_node n =
   | Remove nid -> Some nid
   | Next_Unproven_Node_Id (_, nid) -> Some nid
   | Initialized _ -> None
-  | Saved -> None
+  | Saved | Saving_needed _ -> None
   | Message _ -> None
   | Dead _ -> None
   | Task (nid, _, _) -> Some nid
@@ -927,22 +927,24 @@ end
 
   (* -------------------- *)
 
+  (* True when session differs from the saved session *)
+  let session_needs_saving = ref false
+
   (* Add a file into the session when (Add_file_req f) is sent *)
   (* Note that f is the path from execution directory to the file and fn is the
      path from the session directory to the file. *)
   let add_file_to_session cont f =
     let fn = Sysutil.relativize_filename
       (get_dir cont.controller_session) f in
-    let fn_exists =
-      try Some (get_file cont.controller_session fn)
-      with | Not_found -> None
-    in
-    match fn_exists with
-    | None ->
-        if (Sys.file_exists f) then
-          begin
-            match add_file cont f with
-            | [] ->
+    try
+      let (_ : file) = get_file cont.controller_session fn in
+      P.notify (Message (Information ("File already in session: " ^ fn)))
+    with Not_found ->
+         if (Sys.file_exists f) then
+           begin
+             match add_file cont f with
+             | [] ->
+             session_needs_saving := true;
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
                read_and_send (file_name file);
@@ -957,7 +959,6 @@ end
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
-    | Some _ -> P.notify (Message (Information ("File already in session: " ^ fn)))
 
 
   (* ------------ init server ------------ *)
@@ -1302,7 +1303,8 @@ end
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
-     | Save_req | Reload_req | Get_file_contents _ | Save_file_req _
+     | Save_req | Check_need_saving_req | Reload_req
+     | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
      | Get_first_unproven_node ni ->
@@ -1321,6 +1323,108 @@ end
 
   (* ----------------- treat_request -------------------- *)
 
+  let treat_request d r =
+    match r with
+    | Get_global_infos ->
+       Debug.dprintf debug "sending initialization infos@.";
+       P.notify (Initialized d.global_infos)
+    | Save_req                     ->
+       save_session ();
+       session_needs_saving := false
+    | Reload_req                   ->
+       reload_session ();
+       session_needs_saving := true
+    | Get_first_unproven_node ni   ->
+       notify_first_unproven_node d ni
+    | Remove_subtree nid           ->
+       remove_node nid;
+       session_needs_saving := true
+    | Copy_paste (from_id, to_id) ->
+       let from_any = any_from_node_ID from_id in
+       let to_any = any_from_node_ID to_id in
+       begin
+         try
+           C.copy_paste
+             ~notification:(notify_change_proved d.cont)
+             ~callback_pa:(callback_update_tree_proof d.cont)
+             ~callback_tr:(callback_update_tree_transform)
+             d.cont from_any to_any;
+           session_needs_saving := true
+         with C.BadCopyPaste ->
+           P.notify (Message (Error "invalid copy"))
+       end
+    | Get_file_contents f          ->
+       read_and_send f
+    | Save_file_req (name, text)   ->
+       save_file name text
+    | Check_need_saving_req ->
+       P.notify (Saving_needed !session_needs_saving)
+    | Get_task(nid,b,loc)          ->
+       send_task nid b loc
+    | Interrupt_req                ->
+       C.interrupt ()
+    | Command_req (nid, cmd)       ->
+       let snid = try Some(any_from_node_ID nid) with Not_found -> None in
+       begin
+         match interp commands_table d.cont snid cmd with
+         | Transform (s, _t, args) ->
+            apply_transform nid s args;
+            session_needs_saving := true
+         | Query s                 ->
+            P.notify (Message (Query_Info (nid, s)))
+         | Prove (p, limit)        ->
+            schedule_proof_attempt nid p limit;
+            session_needs_saving := true
+        | Strategies st           ->
+            run_strategy_on_task nid st;
+            session_needs_saving := true
+        | Edit p                  ->
+           schedule_edition nid p;
+           session_needs_saving := true
+        | Bisect                  ->
+           schedule_bisection nid;
+           session_needs_saving := true
+        | Replay valid_only       ->
+           replay ~valid_only snid;
+           session_needs_saving := true
+        | Clean                   ->
+           clean snid;
+           session_needs_saving := true
+        | Mark_Obsolete           ->
+           mark_obsolete snid;
+           session_needs_saving := true
+        | Focus_req ->
+           let d = get_server_data () in
+           let s = d.cont.controller_session in
+           let any = any_from_node_ID nid in
+           let focus_on =
+             match any with
+             | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+             | _ -> any
+           in
+           focused_node := Focus_on [focus_on];
+           reset_and_send_the_whole_tree ()
+        | Server_utils.Unfocus_req -> unfocus ()
+        | Help_message s          -> P.notify (Message (Information s))
+        | QError s                -> P.notify (Message (Query_Error (nid, s)))
+        | Other (s, _args)        ->
+           P.notify (Message (Information ("Unknown command: "^s)))
+      end
+    | Add_file_req f ->
+      add_file_to_session d.cont f
+    | Set_config_param(s,i)   ->
+       begin
+         match s with
+         | "max_tasks" -> Controller_itp.set_session_max_tasks i
+         | "timelimit" -> Server_utils.set_session_timelimit i
+         | "memlimit" -> Server_utils.set_session_memlimit i
+         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
+       end
+    | Set_prover_policy(p,u)   ->
+       let c = d.cont in
+       Controller_itp.set_session_prover_upgrade_policy c p u
+    | Unfocus_req             -> unfocus ()
+    | Exit_req                -> exit 0
 
   let treat_request r =
     let d = get_server_data () in
@@ -1340,105 +1444,21 @@ end
              Itp_communication.print_request r) r)))
       end
     else
-    try (
-      match r with
-      | Get_global_infos ->
-         let d= get_server_data () in
-         Debug.dprintf debug "sending initialization infos@.";
-         P.notify (Initialized d.global_infos)
-    | Save_req                     -> save_session ()
-    | Reload_req                   -> reload_session ()
-    | Get_first_unproven_node ni   ->
-      notify_first_unproven_node d ni
-    | Remove_subtree nid           -> remove_node nid
-    | Copy_paste (from_id, to_id)    ->
-        let from_any = any_from_node_ID from_id in
-        let to_any = any_from_node_ID to_id in
-        begin
-          try
-            C.copy_paste
-              ~notification:(notify_change_proved d.cont)
-              ~callback_pa:(callback_update_tree_proof d.cont)
-              ~callback_tr:(callback_update_tree_transform)
-              d.cont from_any to_any
-          with C.BadCopyPaste ->
-               P.notify (Message (Error "invalid copy"))
-        end
-    | Get_file_contents f          ->
-        read_and_send f
-    | Save_file_req (name, text)   ->
-        save_file name text;
-    | Get_task(nid,b,loc)          -> send_task nid b loc
-    | Interrupt_req                -> C.interrupt ()
-    | Command_req (nid, cmd)       ->
-      begin
-        let snid = try Some(any_from_node_ID nid) with Not_found -> None in
-        match interp commands_table d.cont snid cmd with
-        | Transform (s, _t, args) -> apply_transform nid s args
-        | Query s                 -> P.notify (Message (Query_Info (nid, s)))
-        | Prove (p, limit)        ->
-            schedule_proof_attempt nid p limit
-        | Strategies st           ->
-            run_strategy_on_task nid st
-        | Edit p                  -> schedule_edition nid p
-        | Bisect                  -> schedule_bisection nid
-        | Replay valid_only       -> replay ~valid_only snid
-        | Clean                   -> clean snid
-        | Mark_Obsolete           -> mark_obsolete snid
-        | Focus_req ->
-            let d = get_server_data () in
-            let s = d.cont.controller_session in
-            let any = any_from_node_ID nid in
-            let focus_on =
-              match any with
-              | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-              | _ -> any
-            in
-            focused_node := Focus_on [focus_on];
-            reset_and_send_the_whole_tree ()
-        | Server_utils.Unfocus_req -> unfocus ()
-        | Help_message s          -> P.notify (Message (Information s))
-        | QError s                -> P.notify (Message (Query_Error (nid, s)))
-        | Other (s, _args)        ->
-            P.notify (Message (Information ("Unknown command: "^s)))
-      end
-    | Add_file_req f ->
-      add_file_to_session d.cont f;
-(*      let f = Sysutil.relativize_filename
-          (Session_itp.get_dir d.cont.controller_session) f in
-         read_and_send f *)
-      ()
-(*
-    | Open_session_req file_or_dir_name ->
-        let b = init_cont file_or_dir_name in
-        if b then
-          reload_session ()
-        else
-          () (* Eventually print debug here *)
-*)
-    | Set_config_param(s,i)   ->
-       begin
-         match s with
-         | "max_tasks" -> Controller_itp.set_session_max_tasks i
-         | "timelimit" -> Server_utils.set_session_timelimit i
-         | "memlimit" -> Server_utils.set_session_memlimit i
-         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
-       end
-    | Set_prover_policy(p,u)   ->
-       let c = d.cont in
-       Controller_itp.set_session_prover_upgrade_policy c p u
-    | Unfocus_req             -> unfocus ()
-    | Exit_req                -> exit 0
-     )
-    with
-    | C.TransAlreadyExists (name,args) ->
-        P.notify (Message (Error
-          (Pp.sprintf "Transformation %s with arg [%s] already exists" name args)))
-    | e when not (Debug.test_flag Debug.stack_trace)->
-      P.notify (Message (Error (Pp.string_of
-          (fun fmt (r,e) -> Format.fprintf fmt
-             "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
-             print_request r Exn_printer.exn_printer e ) (r, e))))
+      try treat_request d r
+      with
+      | C.TransAlreadyExists (name,args) ->
+         P.notify
+           (Message
+              (Error
+                 (Pp.sprintf "Transformation %s with arg [%s] already exists"
+                             name args)))
+      | e when not (Debug.test_flag Debug.stack_trace)->
+         P.notify
+           (Message
+              (Error
+                 (Pp.sprintf
+                    "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
+                    print_request r Exn_printer.exn_printer e)))
 
   let treat_requests () : bool =
     List.iter treat_request (P.get_requests ());

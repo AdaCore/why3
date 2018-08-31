@@ -99,8 +99,10 @@ type notification =
      next unproven node from this node *)
   | Initialized  of global_information
   (** initial global data *)
+  | Saving_needed of bool
+  (** the session needs saving when argument is true *)
   | Saved
-  (** the session was saved on disk *)
+  (** the session was just saved on disk *)
   | Message      of message_notification
   (** an informative message, can be an error message *)
   | Dead         of string
@@ -136,12 +138,10 @@ type ide_request =
   | Unfocus_req
   | Save_req
   | Reload_req
+  | Check_need_saving_req
   | Exit_req
   | Interrupt_req
   | Get_global_infos
-
-(* Return true if the request modify the session *)
-val modify_session: ide_request -> bool
 
 
 val print_request: Format.formatter -> ide_request -> unit

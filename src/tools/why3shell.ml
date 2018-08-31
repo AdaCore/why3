@@ -250,6 +250,8 @@ let treat_notification fmt n =
     fprintf fmt "Initialized@."
   | Saved                         -> (* TODO *)
     fprintf fmt "got a Saved notification not yet supported@."
+  | Saving_needed _b                -> (* TODO *)
+    fprintf fmt "got a Saving_needed notification not yet supported@."
   | Message (msg)                 -> treat_message_notification fmt msg
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
