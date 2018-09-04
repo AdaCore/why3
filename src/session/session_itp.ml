@@ -930,7 +930,7 @@ let load_result r =
        match status with
        | "valid" -> Call_provers.Valid
        | "invalid" -> Call_provers.Invalid
-       | "unknown" -> Call_provers.Unknown ("", None)
+       | "unknown" -> Call_provers.Unknown ""
        | "timeout" -> Call_provers.Timeout
        | "outofmemory" -> Call_provers.OutOfMemory
        | "failure" -> Call_provers.Failure ""

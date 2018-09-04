@@ -51,7 +51,7 @@ let convert_prover_answer (pa: prover_answer) =
   | Timeout           -> "Timeout",""
   | OutOfMemory       -> "OutOfMemory",""
   | StepLimitExceeded -> "StepLimitExceeded",""
-  | Unknown(s,_)      -> "Unknown",s
+  | Unknown s         -> "Unknown",s
   | Failure s         -> "Failure",s
   | HighFailure       -> "HighFailure",""
 
@@ -533,7 +533,7 @@ let parse_prover_answer a d =
   | "Timeout"           -> Timeout
   | "OutOfMemory"       -> OutOfMemory
   | "StepLimitExceeded" -> StepLimitExceeded
-  | "Unknown"           -> Unknown (d,None)
+  | "Unknown"           -> Unknown d
   | "Failure"           -> Failure d
   | "HighFailure"       -> HighFailure
   | _                   -> HighFailure

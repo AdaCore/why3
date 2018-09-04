@@ -164,7 +164,7 @@ the proof containing this prover are selected";
    Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
    " filter the invalid goals";
    "--filter-unknown",
-   Arg.String (fun s -> opt_status := Call_provers.Unknown (s, None)::!opt_status),
+   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
    " filter when the prover reports it can't determine if the task is valid";
    "--filter-failure",
    Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),

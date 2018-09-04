@@ -15,13 +15,6 @@ open Model_parser
 
 (** {2 data types for prover answers} *)
 
-(** The reason why unknown was reported *)
-type reason_unknown =
-  | Resourceout
-  (** Out of resources  *)
-  | Other
-  (** Other reason *)
-
 type prover_answer =
   | Valid
       (** The task is valid according to the prover *)
@@ -33,7 +26,7 @@ type prover_answer =
       (** the task runs out of memory *)
   | StepLimitExceeded
       (** the task required more steps than the limit provided *)
-  | Unknown of (string * reason_unknown option)
+  | Unknown of string
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)

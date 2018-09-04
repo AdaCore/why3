@@ -19,10 +19,6 @@ let debug = Debug.register_info_flag "call_prover"
 let debug_attrs = Debug.register_info_flag "print_attrs"
   ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
 
-type reason_unknown =
-  | Resourceout
-  | Other
-
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
@@ -30,7 +26,7 @@ type prover_answer =
   | Timeout
   | OutOfMemory
   | StepLimitExceeded
-  | Unknown of (string * reason_unknown option)
+  | Unknown of string
   | Failure of string
   | HighFailure
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
@@ -127,6 +123,7 @@ let rec grep_steps out = function
         Some(int_of_string v)
       with _ -> grep_steps out l end
 
+(*
 let grep_reason_unknown out =
   try
     (* TODO: this is SMTLIB specific, should be done in drivers instead *)
@@ -137,6 +134,7 @@ let grep_reason_unknown out =
     | _ -> Other
   with Not_found ->
     Other
+ *)
 
 type prover_result_parser = {
   prp_regexps     : (string * prover_answer) list;
@@ -146,20 +144,13 @@ type prover_result_parser = {
   prp_model_parser : Model_parser.model_parser;
 }
 
-let print_unknown_reason fmt = function
-  | Some Resourceout -> fprintf fmt "resource limit reached"
-  | Some Other -> fprintf fmt "other"
-  | None -> fprintf fmt "none"
-
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown ("", r) -> fprintf fmt "Unknown (%a)" print_unknown_reason r
-  | Failure "" -> fprintf fmt "Failure"
-  | Unknown (s, r) -> fprintf fmt "Unknown %a(%s)" print_unknown_reason r s
+  | Unknown s -> fprintf fmt "Unknown (%s)" s
   | Failure s -> fprintf fmt "Failure (%s)" s
   | HighFailure -> fprintf fmt "HighFailure"
 
@@ -192,7 +183,7 @@ let rec grep out l = match l with
         ignore (Str.search_forward re out 0);
         match pa with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
-        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
+        | Unknown s -> Unknown (Str.replace_matched s out)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false
       with Not_found -> grep out l end
@@ -233,11 +224,20 @@ let debug_print_model ~print_attrs model =
   let model_str = Model_parser.model_to_string ~print_attrs model in
   Debug.dprintf debug "Call_provers: %s@." model_str
 
+type answer_or_model = Answer of prover_answer | Model of string
+
 let analyse_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
   let result_list = Str.full_split re out in
+  let result_list =
+    List.map
+      (function
+        | Str.Delim r -> Answer (grep r list_re)
+        | Str.Text t -> Model t)
+      result_list
+  in
 (*  Format.eprintf "[incremental model parsing] results list is @[[%a]@]@."
                  (Pp.print_list Pp.semi print_delim) result_list;
 *)
@@ -248,9 +248,25 @@ let analyse_result res_parser printer_mapping out =
           (HighFailure, saved_model)
         else
           (Opt.get saved_res, saved_model)
-    | Str.Delim res :: Str.Text model :: tl ->
-        (* Parse the text of the result *)
-        let res = grep res list_re in
+    | Answer res1 :: (Answer res2 :: tl as tl1) ->
+       Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
+          print_prover_answer res1 print_prover_answer res2;
+       begin
+         match res1,res2 with
+         | Unknown _, Unknown "resourceout" ->
+            analyse saved_model saved_res (Answer StepLimitExceeded :: tl)
+         | Unknown _, Unknown "timeout" ->
+            analyse saved_model saved_res (Answer Timeout :: tl)
+         | Unknown "", Unknown _ ->
+            analyse saved_model saved_res tl1
+         | Unknown s1, Unknown "" ->
+            analyse saved_model saved_res (Answer (Unknown s1) :: tl)
+         | Unknown s1, Unknown s2 ->
+            analyse saved_model saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
+         | _,_ ->
+            analyse saved_model saved_res tl1
+       end
+    | Answer res :: Model model :: tl ->
         if res = Valid then
           (Valid, None)
         else
@@ -260,13 +276,12 @@ let analyse_result res_parser printer_mapping out =
           debug_print_model ~print_attrs:false m;
           let m = if is_model_empty m then saved_model else (Some m) in
           analyse m (Some res) tl
-    | Str.Delim res :: tl ->
-        let res = grep res list_re in
+    | Answer res :: tl ->
         if res = Valid then
           (Valid, None)
         else
           analyse saved_model (Some res) tl
-    | Str.Text _fail :: tl -> analyse saved_model saved_res tl
+    | Model _fail :: tl -> analyse saved_model saved_res tl
   in
 
   analyse None None result_list
@@ -288,17 +303,10 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
       (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
       t, None *)
   in
-  let model = match model with | Some s -> s | None -> default_model in
+  let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
-  (* add info for unknown if possible. FIXME: this is too SMTLIB specific *)
-  let ans = match ans with
-    | Unknown (s, _) ->
-       let reason_unknown = grep_reason_unknown out in
-       Unknown (s, Some reason_unknown)
-    | _ -> ans
-  in
   (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
   let tlimit = float limit.limit_time in
   let ans, time =
@@ -488,7 +496,7 @@ let query_result_buffer id =
   with Not_found -> NoUpdates
 
 let editor_result ret = {
-  pr_answer = Unknown ("", None);
+  pr_answer = Unknown "not yet edited";
   pr_status = ret;
   pr_output = "";
   pr_time   = 0.0;
