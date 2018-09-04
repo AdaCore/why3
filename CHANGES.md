@@ -3,6 +3,7 @@
 Provers
   * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
   * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
+  * support for Coq 8.8.1 (released Jun 29, 2018)
   * support for CVC4 1.6 (released Jun 25, 2018)
   * support for Isabelle 2018 (released Aug 2018)
   * dropped support for Isabelle 2016 (2017 still supported) :x:
