@@ -2,8 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../tree_of_list.mlw" proved="true">
 <theory name="TreeOfList" proved="true">
@@ -25,7 +24,7 @@
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="36"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.6" expl="postcondition" proved="true">
   <transf name="destruct_alg_subst" proved="true" arg1="l&#39;1">
@@ -40,7 +39,7 @@
  </transf>
  </goal>
  <goal name="VC tree_of_list" expl="VC for tree_of_list" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="145"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
  <proof prover="4"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
