@@ -7,6 +7,7 @@ Provers
   * support for CVC4 1.6 (released Jun 25, 2018)
   * support for Isabelle 2018 (released Aug 2018)
   * dropped support for Isabelle 2016 (2017 still supported) :x:
+  * dropped support for Alt-Ergo versions < 2.0.0 :x:
 
 Version 1.0.0, June 25, 2018
 ----------------------------
