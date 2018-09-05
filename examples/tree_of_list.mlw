@@ -26,7 +26,7 @@ module TreeOfList
     variant  { n }
     ensures  { let t, l' = result in
                inorder t ++ l' = l && size t = n &&
-               (n> 0 -> let h = height t in power 2 (h-1) <= n < power 2 h) }
+               (n > 0 -> let h = height t in power 2 (h-1) <= n < power 2 h) }
   =
     if n = 0 then
       Empty, l
