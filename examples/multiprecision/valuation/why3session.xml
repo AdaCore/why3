@@ -21,10 +21,10 @@
   <transf name="introduce_premises" proved="true" >
    <goal name="VC valuation.2.0" expl="variant decrease" proved="true">
    <transf name="split_vc" proved="true" >
-    <goal name="VC valuation.2.0.0" expl="VC for valuation" proved="true">
+    <goal name="VC valuation.2.0.0" expl="variant decrease" proved="true">
     <proof prover="4"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="VC valuation.2.0.1" expl="VC for valuation" proved="true">
+    <goal name="VC valuation.2.0.1" expl="variant decrease" proved="true">
     <proof prover="1"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
@@ -43,7 +43,7 @@
   <goal name="VC valuation.6" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC valuation.6.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="2.24"/></proof>
+   <proof prover="0"><result status="valid" time="1.78"/></proof>
    </goal>
    <goal name="VC valuation.6.1" expl="postcondition" proved="true">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
@@ -56,10 +56,10 @@
  <goal name="valuation_mul" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="valuation_mul.0" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="valuation_mul.1" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="valuation_mul.2" proved="true">
   <proof prover="5"><result status="valid" time="0.00" steps="15"/></proof>
@@ -91,10 +91,10 @@
   </goal>
   <goal name="VC valuation_times_pow.2" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC valuation_times_pow.2.0" expl="VC for valuation_times_pow" proved="true">
+   <goal name="VC valuation_times_pow.2.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="VC valuation_times_pow.2.1" expl="VC for valuation_times_pow" proved="true">
+   <goal name="VC valuation_times_pow.2.1" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.13" steps="47"/></proof>
    </goal>
    <goal name="VC valuation_times_pow.2.2" expl="VC for valuation_times_pow" proved="true">
@@ -108,7 +108,7 @@
  </transf>
  </goal>
  <goal name="valuation_split" proved="true">
- <proof prover="5"><result status="valid" time="0.48" steps="164"/></proof>
+ <proof prover="5"><result status="valid" time="0.48" steps="126"/></proof>
  </goal>
  <goal name="VC valuation_lower_bound" expl="VC for valuation_lower_bound" proved="true">
  <transf name="split_vc" proved="true" >
@@ -119,7 +119,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC valuation_lower_bound.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
   <goal name="VC valuation_lower_bound.3" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.06" steps="43"/></proof>
@@ -162,14 +162,14 @@
   </goal>
   <goal name="VC valuation_monotonous.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC valuation_monotonous.6.0" expl="VC for valuation_monotonous" proved="true">
+   <goal name="VC valuation_monotonous.6.0" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
    <goal name="VC valuation_monotonous.6.1" expl="VC for valuation_monotonous" proved="true">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC valuation_monotonous.6.2" expl="VC for valuation_monotonous" proved="true">
-   <proof prover="5"><result status="valid" time="0.12" steps="110"/></proof>
+   <proof prover="5"><result status="valid" time="0.12" steps="111"/></proof>
    </goal>
    <goal name="VC valuation_monotonous.6.3" expl="VC for valuation_monotonous" proved="true">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -182,10 +182,10 @@
  </transf>
  </goal>
  <goal name="valuation_nondiv" proved="true">
- <proof prover="5"><result status="valid" time="0.13" steps="98"/></proof>
+ <proof prover="5"><result status="valid" time="0.13" steps="102"/></proof>
  </goal>
  <goal name="valuation_zero_prod" proved="true">
- <proof prover="5"><result status="valid" time="0.29" steps="84"/></proof>
+ <proof prover="5"><result status="valid" time="0.29" steps="85"/></proof>
  </goal>
  <goal name="VC valuation_times_nondiv" expl="VC for valuation_times_nondiv" proved="true">
  <transf name="split_vc" proved="true" >
@@ -209,10 +209,10 @@
   </goal>
   <goal name="VC valuation_times_nondiv.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC valuation_times_nondiv.6.0" expl="VC for valuation_times_nondiv" proved="true">
+   <goal name="VC valuation_times_nondiv.6.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
    </goal>
-   <goal name="VC valuation_times_nondiv.6.1" expl="VC for valuation_times_nondiv" proved="true">
+   <goal name="VC valuation_times_nondiv.6.1" expl="assertion" proved="true">
    <transf name="apply" proved="true" arg1="valuation_mul">
     <goal name="VC valuation_times_nondiv.6.1.0" proved="true">
     <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -221,14 +221,14 @@
     <proof prover="4"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="VC valuation_times_nondiv.6.1.2" proved="true">
-    <proof prover="5"><result status="valid" time="0.02" steps="35"/></proof>
+    <proof prover="5"><result status="valid" time="0.02" steps="28"/></proof>
     </goal>
    </transf>
    </goal>
-   <goal name="VC valuation_times_nondiv.6.2" expl="VC for valuation_times_nondiv" proved="true">
+   <goal name="VC valuation_times_nondiv.6.2" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC valuation_times_nondiv.6.3" expl="VC for valuation_times_nondiv" proved="true">
+   <goal name="VC valuation_times_nondiv.6.3" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
@@ -328,7 +328,7 @@
  </transf>
  </goal>
  <goal name="valuation_mod" proved="true">
- <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="21"/></proof>
  </goal>
  <goal name="valuation_decomp" proved="true">
  <transf name="split_vc" proved="true" >
