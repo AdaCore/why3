@@ -30,7 +30,7 @@ module TreeOfArray
     else
       let mid = lo + div (hi - lo) 2 in
       let left = tree_of_array_aux a lo mid in
-      let right = tree_of_array_aux a (mid + 1) hi in
+      let right = tree_of_array_aux a (mid+1) hi in
       Node left a[mid] right
 
   let tree_of_array (a: array 'a) : tree 'a
