@@ -98,6 +98,7 @@ void add_to_poll_list(int sock, short events) {
   }
   poll_list[poll_num].fd = sock;
   poll_list[poll_num].events = events;
+  poll_list[poll_num].revents = 0;
   poll_num++;
 }
 
@@ -110,19 +111,24 @@ struct pollfd* poll_list_lookup(int fd) {
   return NULL;
 }
 
+void poll_list_clean() {
+  int i = 0;
+  while (i < poll_num) {
+    if (poll_list[i].fd == -1) {
+      poll_list[i] = poll_list[poll_num - 1];
+      --poll_num;
+    } else ++i;
+  }
+}
+
 void poll_list_remove(int fd) {
-  int i;
-  assert (poll_num > 0);
-  for (i = 0; i < poll_num; i++) {
+  for (int i = 0; i < poll_num; ++i) {
     if (poll_list[i].fd == fd) {
+      poll_list[i].fd = -1;
+      poll_list[i].revents = 0;
       break;
     }
   }
-  if (i == poll_num) {
-    return;
-  }
-  poll_list[i] = poll_list[poll_num - 1];
-  poll_num--;
 }
 
 int open_temp_file(char* dir, char** outfile) {
@@ -597,6 +603,7 @@ int main(int argc, char **argv) {
   server_init_listening(socketname, parallel);
   while (1) {
     schedule_new_jobs();
+    poll_list_clean();
     while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
       continue;
     if (res == -1) {
@@ -621,9 +628,7 @@ int main(int argc, char **argv) {
       if (cur->fd == server_sock) {
         assert (cur->revents == POLLIN);
         server_accept_client();
-        //we should stop looking at other sockets now, because we have altered
-        //the poll list
-        break;
+        continue;
       }
 
       // a client
@@ -632,8 +637,7 @@ int main(int argc, char **argv) {
         continue;
       if (cur->revents & POLLERR) {
         close_client(client);
-      }
-      if (cur->revents & POLLOUT) {
+      } else if (cur->revents & POLLOUT) {
         write_to_client(client, cur);
       } else if (cur->revents & POLLIN) {
         read_on_client(client);
