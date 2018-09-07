@@ -35,7 +35,7 @@ tests: extract check-gmp
 	./build/minitests
 
 bench-tests: extract
-	gcc -O2 -Wall -g -std=c11 tests.c $(CFILES) -Ibench-include -Irandom -fomit-frame-pointer -fno-tree-vectorize -lgmp -o build/bench-tests
+	gcc -O2 -Wall -Wno-unused-function -g -std=c11 tests.c $(CFILES) -Ibench-include -Irandom -fomit-frame-pointer -fno-tree-vectorize -lgmp -o build/bench-tests
 
 
 build/why3%bench: extract check-gmp

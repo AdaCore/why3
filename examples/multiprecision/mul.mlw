@@ -312,10 +312,10 @@ module Mul
     done;
     !c
 
-  (** `wmpn_mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  (** `wmpn_mul_basecase r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
-  let wmpn_mul (r x y:t) (sx sy:int32) : unit
+  let wmpn_mul_basecase (r x y:t) (sx sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }
     requires { valid y sy }

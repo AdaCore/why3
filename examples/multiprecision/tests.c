@@ -72,7 +72,7 @@ int main () {
   /* Re-interpret reps argument as a size argument.  */
 
   init_genrand64((unsigned long long)time(NULL));
-  max_n = 200;
+  max_n = 1000;
   max_add = 50;
   max_mul = 20;
   max_toom = 95;
@@ -215,8 +215,9 @@ int main () {
 
   for (bn = 35; bn <= max_toom; bn += 2)
     {
-      mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
-      an = (bn * 3) / 2;
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = bn * 6;
       init_valid (ap, bp, an, bn);
 #ifdef BENCH
       elapsed = 0;
@@ -230,7 +231,7 @@ int main () {
             mpn_mul (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            toom32_mul (rp, ap, bp, ws, an, bn);
+            wmpn_mul (rp, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
@@ -257,6 +258,7 @@ int main () {
           abort();
         }
 #endif
+      //free(ws);
     }
 #ifdef COMPARE
   printf ("toom ok\n");

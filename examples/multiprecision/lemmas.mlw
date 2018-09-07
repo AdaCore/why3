@@ -55,11 +55,20 @@ module Lemmas
     requires { 0 < c }
     ensures { c * a < c * b }
   = ()
+
   let lemma prod_compat_r (a b c:int)
     requires { 0 <= a <= b }
     requires { 0 <= c }
     ensures { c * a <= c * b }
   = ()
+
+  let lemma prod_compat_strict_lr (a b c d:int)
+    requires { 0 <= a < b }
+    requires { 0 <= c < d }
+    ensures  { a * c < b * d }
+  = () (* assert { a * c < a * d = d * a < d * b = b * d } *)
+
+  meta remove_prop axiom prod_compat_strict_lr
 
   (** {3 Integer value of a natural number} *)
 
@@ -203,5 +212,15 @@ module Lemmas
                             * value_sub (pelts x) (x.offset + n) (x.offset + m) }
 
   = value_sub_concat (pelts x) x.offset (x.offset + p2i n) (x.offset + p2i m)
+
+
+  let lemma value_sub_eq (x1 x2: map int limb) (n1 n2 m1 m2: int)
+    requires { x1 = x2 }
+    requires { n1 = n2 }
+    requires { m1 = m2 }
+    ensures  { value_sub x1 n1 m1 = value_sub x2 n2 m2 }
+  = ()
+
+  meta remove_prop axiom value_sub_eq
 
 end
