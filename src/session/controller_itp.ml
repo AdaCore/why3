@@ -921,7 +921,7 @@ let find_prover notification c goal_id pr =
       (* does a proof using new_pr already exists ? *)
       if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
       then (* yes, then we remove the attempt *)
-        `Keep (* `Remove *) (* we keep it for now, because it prevents replay to terminate properly *)
+        `Remove
       else
         begin
           (* we modify the prover in-place *)
@@ -1012,8 +1012,10 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
 
   let craft_report s id pr limits pa =
     match s with
-    | UpgradeProver _ | Removed _ -> found_upgraded_prover := true
-    (* this is certainly wrong: after removed, there will be no more 'Done' notification, so counter should be decreased *)
+    | UpgradeProver _ -> found_upgraded_prover := true
+    | Removed _ ->
+       found_upgraded_prover := true;
+       decr count
     | Scheduled | Running -> ()
     | Undone | Interrupted ->
        decr count;
