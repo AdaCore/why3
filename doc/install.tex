@@ -169,10 +169,14 @@ with the GUI, and replay the proofs, a popup window will show up for asking you 
 between three options:
 \begin{itemize}
 \item Keep the former proof attempts as they are, with the old prover version. They will not be replayed.
-\item Upgrade the former proof attempts to an installed prover (typically a
-  upgraded version). The corresponding proof attempts will become
-  attached to this new prover, and marked as obsolete,
-  to make their replay mandatory. Note that you need to invoke again the replay command to replay those proof attempts.
+\item Remove the former proof attempts.
+\item Upgrade the former proof attempts to an installed prover
+  (typically an upgraded version). The corresponding proof attempts
+  will become attached to this new prover, and marked as obsolete, to
+  make their replay mandatory. If a proof attempt with this installed prover
+  is already present the old proof attempt is just removed. Note that you
+  need to invoke again the replay command to replay those proof
+  attempts.
 \item Copy the former proofs to an installed prover. This is a
   combination of the actions above: each proof attempt is duplicated,
   one with the former prover version, and one for the new
