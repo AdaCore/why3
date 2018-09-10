@@ -268,7 +268,10 @@ module Args : sig
     (string -> unit) -> string ->
     config * config * Env.env
 
-  val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+  val exit_with_usage :
+    ?exit_code : int ->
+    ?extra_help : (Format.formatter -> unit -> unit) ->
+    (string * Arg.spec * string) list -> string -> 'a
 
 end
 

@@ -914,9 +914,10 @@ module Args = struct
     let lp = List.rev_append !opt_loadpath (loadpath main) in
     config, base_config, Env.create_env lp
 
-  let exit_with_usage options usage =
-    Arg.usage (align_options options) usage;
-    exit 1
+  let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =
+    let options = align_options options in
+    Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
+    exit exit_code
 end
 
 

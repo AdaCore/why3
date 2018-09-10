@@ -71,6 +71,22 @@ let available_commands () =
   List.rev commands
 
 let command sscmd =
+  let sscmd,args =
+    let cur = !Arg.current in
+    if sscmd = "help" then begin
+      if cur + 1 >= Array.length Sys.argv then begin
+        let extra_help fmt () = extra_help fmt (available_commands ()) in
+        Args.exit_with_usage ~exit_code:0 ~extra_help option_list usage_msg
+      end;
+      let sscmd = Sys.argv.(cur + 1) in
+      sscmd, ["--help"]
+    end else begin
+      let args = ref [] in
+      for i = 1 to Array.length Sys.argv - 1 do
+        if i <> cur then args := Sys.argv.(i) :: !args;
+      done;
+      sscmd, List.rev !args
+    end in
   let cmd =
     let scmd = "why3" ^ sscmd in
     let cmd = Filename.concat command_path scmd in
@@ -86,12 +102,8 @@ let command sscmd =
           exit 1 in
       Filename.concat command_path scmd
     end in
-  let args = ref [] in
-  for i = 1 to Array.length Sys.argv - 1 do
-    if i <> !Arg.current then args := Sys.argv.(i) :: !args;
-  done;
   let scmd = "why3 " ^ sscmd in
-  Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
+  Unix.execv cmd (Array.of_list (scmd :: args))
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
