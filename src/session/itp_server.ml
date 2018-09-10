@@ -1022,6 +1022,8 @@ end
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
+  exception Return
+
   (* Callback of a proof_attempt *)
   let callback_update_tree_proof cont panid pa_status =
     let ses = cont.controller_session in
@@ -1033,7 +1035,6 @@ end
         let parent = node_ID_from_pn parent_id in
         new_node ~parent (APa panid)
     in
-    let exception Return in
     try
       begin match pa_status with
             | UpgradeProver _ ->
