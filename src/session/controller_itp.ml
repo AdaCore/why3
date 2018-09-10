@@ -917,6 +917,7 @@ let find_prover notification c goal_id pr =
    match Whyconf.get_prover_upgrade_policy c.controller_config pr with
    | exception Not_found -> `Keep
    | Whyconf.CPU_keep -> `Keep
+   | Whyconf.CPU_remove -> `Remove
    | Whyconf.CPU_upgrade new_pr ->
       (* does a proof using new_pr already exists ? *)
       if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
@@ -928,23 +929,17 @@ let find_prover notification c goal_id pr =
           Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
           `Found new_pr
         end
-   | Whyconf.CPU_remove -> `Remove
-   | Whyconf.CPU_duplicate _ (* _new_pr *) ->
-      assert false (* TODO *)
-(*
-      (* does a proof using new_p already exists ? *)
-      if Hprover.mem (goal_external_proofs parid) new_pr
+   | Whyconf.CPU_duplicate new_pr ->
+      (* does a proof using new_pr already exists ? *)
+      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
       then (* yes, then we do nothing *)
-        None
+        `Keep
       else
         begin
-          (* we duplicate the proof_attempt *)
-          let new_a = copy_external_proof
-                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
-          in
-          Some new_pr
+          (* we duplicate the proof attempt *)
+          `Found new_pr
         end
-*)
+
 
 let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
