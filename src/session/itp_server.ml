@@ -1033,17 +1033,24 @@ end
         let parent = node_ID_from_pn parent_id in
         new_node ~parent (APa panid)
     in
-    begin match pa_status with
-          | UpgradeProver _ ->
-             let n = get_node_name (APa panid) in
-             P.notify (Node_change (node_id, Name_change n))
-          | _ -> ()
-    end;
-    let pa = get_proof_attempt_node ses panid in
-    let new_status =
-      Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)
-    in
-    P.notify (Node_change (node_id, new_status))
+    let exception Return in
+    try
+      begin match pa_status with
+            | UpgradeProver _ ->
+               let n = get_node_name (APa panid) in
+               P.notify (Node_change (node_id, Name_change n))
+            | Removed _ -> P.notify (Remove node_id); raise Return
+            | Uninstalled _ -> ()
+            | Undone | Scheduled | Running
+            | Interrupted | Detached | Done _
+            | InternalFailure _ -> ()
+      end;
+      let pa = get_proof_attempt_node ses panid in
+      let new_status =
+        Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)
+      in
+      P.notify (Node_change (node_id, new_status))
+    with Return -> ()
 
   let notify_change_proved c x =
     try
