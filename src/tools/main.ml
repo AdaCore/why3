@@ -65,7 +65,6 @@ let available_commands () =
     if Str.string_match re v 0 then
       let w = Str.matched_group 1 v in
       match acc with
-      | _ when w = "contraption" -> acc
       | (h,_)::_ when h = w -> acc
       | _ -> (w, v) :: acc
     else acc) [] commands in
@@ -75,7 +74,7 @@ let command sscmd =
   let cmd =
     let scmd = "why3" ^ sscmd in
     let cmd = Filename.concat command_path scmd in
-    if cmd <> "" && cmd <> "contraption" && Sys.file_exists cmd
+    if cmd <> "" && Sys.file_exists cmd
     then cmd
     else begin
       let commands = available_commands () in
