@@ -1005,7 +1005,8 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
   let report = ref [] in
   let found_upgraded_prover = ref false in
 
-  let craft_report s id pr limits pa =
+  let craft_report s id limits pa =
+    let pr = pa.Session_itp.prover in
     match s with
     | UpgradeProver _ -> found_upgraded_prover := true
     | Removed _ ->
@@ -1017,9 +1018,11 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
        report := (id, pr, limits, Replay_interrupted ) :: !report
     | Done new_r ->
        decr count;
-        (match pa.Session_itp.proof_state with
-        | None -> (report := (id, pr, limits, No_former_result new_r) :: !report)
-        | Some old_r -> report := (id, pr, limits, Result (new_r, old_r)) :: !report)
+       begin
+         match pa.Session_itp.proof_state with
+         | None -> (report := (id, pr, limits, No_former_result new_r) :: !report)
+         | Some old_r -> report := (id, pr, limits, Result (new_r, old_r)) :: !report
+       end
     | InternalFailure e ->
        decr count;
        report := (id, pr, limits, CallFailed (e)) :: !report
@@ -1073,7 +1076,7 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
         in
         replay_proof_attempt c pr limit parid id
                              ~callback:(fun id s ->
-                                        craft_report s parid pr limit pa;
+                                        craft_report s parid limit pa;
                                         callback id s;
                                         if !count = 0 then
                                           final_callback !found_upgraded_prover !report)
