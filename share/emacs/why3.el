@@ -50,10 +50,6 @@
     (modify-syntax-entry ?\( "()1n" st)
     (modify-syntax-entry ?\) ")(4n" st)
     (modify-syntax-entry ?* ". 23" st)
-    ; attributes
-    (modify-syntax-entry ?[ "(]1b" st)
-    (modify-syntax-entry ?@ ". 2b" st)
-    (modify-syntax-entry ?] "> b" st)
     st)
   "Syntax table for why3-mode")
 
@@ -144,6 +140,14 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
+(defconst why3--syntax-propertize
+  (syntax-propertize-rules
+    ; attributes: [@foo]
+    ("\\(\\[\\)@[^]]*\\(]\\)" (1 "!]") (2 "!["))
+    ; star: (*)
+    ("\\((\\)\\*\\()\\)" (1 "()") (2 ")("))
+  ))
+
 ;; setting the mode
 (defun why3-mode ()
   "Major mode for editing Why3 programs.
@@ -161,6 +165,7 @@
   ; OCaml style comments for comment-region, comment-dwim, etc.
   (set (make-local-variable 'comment-start) "(*")
   (set (make-local-variable 'comment-end)   "*)")
+  (setq-local syntax-propertize-function why3--syntax-propertize)
   ; menu
   ; providing the mode
   (setq major-mode 'why3-mode)
