@@ -4,11 +4,11 @@
 <why3session shape_version="4">
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lemmas.mlw">
-<theory name="Lemmas">
+<file name="../lemmas.mlw" proved="true">
+<theory name="Lemmas" proved="true">
  <goal name="VC map_eq_shift" expl="VC for map_eq_shift" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC map_eq_shift.0" expl="postcondition" proved="true">
@@ -57,7 +57,7 @@
  <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="10"/></proof>
  </goal>
  <goal name="VC prod_compat_strict_lr" expl="VC for prod_compat_strict_lr" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="VC value_sub" expl="VC for value_sub" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -219,7 +219,7 @@
   <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="VC value_sub_lower_bound.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
@@ -268,7 +268,8 @@
  <goal name="VC value_concat" expl="VC for value_concat" proved="true">
  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="26"/></proof>
  </goal>
- <goal name="VC value_sub_eq" expl="VC for value_sub_eq">
+ <goal name="VC value_sub_eq" expl="VC for value_sub_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
 </file>
