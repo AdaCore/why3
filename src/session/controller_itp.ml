@@ -921,7 +921,7 @@ let find_prover notification c goal_id pr =
       (* does a proof using new_pr already exists ? *)
       if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
       then (* yes, then we remove the attempt *)
-        `Remove
+        `Keep (* `Remove *) (* we keep it for now, because it prevents replay to terminate properly *)
       else
         begin
           (* we modify the prover in-place *)
@@ -952,8 +952,9 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
   match find_prover notification c parid pr with
   | `Keep -> callback id (Uninstalled pr)
   | `Remove ->
-      remove_proof_attempt c.controller_session parid pr;
-      callback id (Removed pr)
+     (* it is necessary to call the callback before effectively removing the node, otherwise, a bad id will be used in the callback *)
+      callback id (Removed pr);
+      remove_proof_attempt c.controller_session parid pr
   | `Found pr' ->
      try
        if pr' <> pr then callback id (UpgradeProver pr');
@@ -1012,6 +1013,7 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
   let craft_report s id pr limits pa =
     match s with
     | UpgradeProver _ | Removed _ -> found_upgraded_prover := true
+    (* this is certainly wrong: after removed, there will be no more 'Done' notification, so counter should be decreased *)
     | Scheduled | Running -> ()
     | Undone | Interrupted ->
        decr count;
