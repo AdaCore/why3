@@ -229,17 +229,19 @@ module Print = struct
         List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
-  let rec print_pat info fmt = function
+  let rec print_pat ?(paren=false) info fmt = function
     | Pwild ->
         fprintf fmt "_"
     | Pvar {vs_name=id} ->
         (print_lident info) fmt id
     | Pas (p, {vs_name=id}) ->
-        fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
+        fprintf fmt (protect_on paren "%a as %a") (print_pat info) p
+          (print_lident info) id
     | Por (p1, p2) ->
-        fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
+        fprintf fmt (protect_on paren "%a | %a") (print_pat info) p1
+          (print_pat info) p2
     | Ptuple pl ->
-        fprintf fmt "(%a)" (print_list comma (print_pat info)) pl
+        fprintf fmt "(%a)" (print_list comma (print_pat ~paren:true info)) pl
     | Papp (ls, pl) ->
         match query_syntax info.info_syn ls.ls_name, pl with
         | Some s, _ ->
@@ -248,9 +250,10 @@ module Print = struct
             let pjl = let rs = restore_rs ls in get_record info rs in
             match pjl with
             | []  -> print_papp info ls fmt pl
-            | pjl -> fprintf fmt "@[<hov 2>{ %a }@]"
-                (print_list2 semi equal (print_rs info) (print_pat info))
-                (pjl, pl)
+            | pjl ->
+                fprintf fmt (protect_on paren "@[<hov 2>{ %a }@]")
+                  (print_list2 semi equal (print_rs info)
+                  (print_pat ~paren: true info)) (pjl, pl)
 
   and print_papp info ls fmt = function
     | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
