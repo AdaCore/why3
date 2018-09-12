@@ -4,6 +4,7 @@
 <why3session shape_version="4">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="16" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../../../stdlib/pigeon.mlw">
 <theory name="Pigeonhole" proved="true">
@@ -63,13 +64,38 @@
 <theory name="ListAndSet">
  <goal name="corner">
  </goal>
- <goal name="pigeon_0">
+ <goal name="pigeon_0" proved="true">
+ <transf name="unfold" proved="true" arg1="pigeon_set">
+  <goal name="pigeon_0.0" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="pigeon_0.0.0" proved="true">
+   <transf name="destruct_alg" proved="true" arg1="l">
+    <goal name="pigeon_0.0.0.0" proved="true">
+    <proof prover="2"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="pigeon_0.0.0.1" proved="true">
+    <transf name="assert" proved="true" arg1="(mem x1 empty)">
+     <goal name="pigeon_0.0.0.1.0" proved="true">
+     <proof prover="2"><result status="valid" time="0.05"/></proof>
+     </goal>
+     <goal name="pigeon_0.0.0.1.1" proved="true">
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="pigeon_1">
  </goal>
- <goal name="pigeon_2">
+ <goal name="pigeon_2" proved="true">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="pigeonhole">
+ <goal name="pigeonhole" proved="true">
+ <proof prover="0"><result status="valid" time="0.17"/></proof>
  </goal>
 </theory>
 </file>
