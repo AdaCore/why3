@@ -23,7 +23,7 @@ module Compare
    let i = ref sz in
    try
      while Int32.(>=) !i (Int32.of_int 1) do
-       variant { p2i !i }
+       variant { !i }
        invariant { 0 <= !i <= sz }
        invariant { forall j. !i <= j < sz ->
                    (pelts x)[x.offset+j] = (pelts y)[y.offset+j] }

@@ -122,6 +122,12 @@ let mk_env env kn tuc =
   let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
   mk_env th_int th_wf kn tuc
 
+let int_of_range env ty =
+  let td = Mts.find ty env.ts_ranges in
+  match td.Theory.td_node with
+  | Theory.Meta (_, [_; Theory.MAls s]) -> s
+  | _ -> assert false
+
 (* explanation attributes *)
 
 let expl_pre       = Ident.create_attribute "expl:precondition"
@@ -256,9 +262,18 @@ let decrease_alg env loc old_t t =
   t_case old_t (List.map add_cs csl)
 
 let decrease_def env loc old_t t =
-  if ty_equal (t_type old_t) ty_int && ty_equal (t_type t) ty_int
-  then t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
-             (ps_app env.ps_int_lt [t; old_t])
+  let ty = t_type t in
+  if ty_equal (t_type old_t) ty then
+    match ty.ty_node with
+    | Tyapp (ts,_) when ts_equal ts ts_int ->
+      t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
+            (ps_app env.ps_int_lt [t; old_t])
+    | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
+      let ls = int_of_range env ts in
+      let proj t = fs_app ls [t] ty_int in
+      ps_app env.ps_int_lt [proj t; proj old_t]
+    | _ ->
+      decrease_alg env loc old_t t
   else decrease_alg env loc old_t t
 
 let decrease env loc attrs expl olds news =
@@ -840,10 +855,7 @@ let rec k_expr env lps e res xmap =
           | Tyapp (s,_) when ts_equal s ts_int ->
               fun v -> t_var v.pv_vs
           | Tyapp (s,_) ->
-              let td = Mts.find s env.ts_ranges in
-              let s = match td.Theory.td_node with
-                | Theory.Meta (_, [_; Theory.MAls s]) -> s
-                | _ -> assert false (* never *) in
+              let s = int_of_range env s in
               fun v -> fs_app s [t_var v.pv_vs] ty_int
           | Tyvar _ -> assert false (* never *) in
         let a = int_of_pv a and i = t_var vi.pv_vs in

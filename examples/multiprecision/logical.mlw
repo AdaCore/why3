@@ -137,7 +137,7 @@ module Logical
     let l, retval = lsld_ext !low cnt in
     high := l;
     while (Int32.(>) !i zero) do
-      variant { p2i !i }
+      variant { !i }
       invariant { 0 <= !i < sz }
       invariant { radix * value_sub (pelts r) (r.offset + 1 + !i) (r.offset + sz)
                   + (power radix (sz - !i)) * retval + !high
@@ -359,7 +359,7 @@ module Logical
     high := l;
     let ghost c = power 2 (l2i cnt) in
     while (Int32.(>) !i 0) do
-      variant   { p2i !i }
+      variant   { !i }
       invariant { 0 <= !i < sz }
       invariant { radix * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
                     + (power radix (sz - !i)) * retval + !high
