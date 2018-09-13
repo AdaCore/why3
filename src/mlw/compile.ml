@@ -407,19 +407,22 @@ module Translate = struct
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
         ML.e_assign al (ML.I e.e_ity) mask eff attrs
-    | Ematch (e1, [], xl) when Mxs.is_empty xl ->
-        expr info svar e1.e_mask e1
     | Ematch (e1, bl, xl) when e_ghost e1 ->
         assert (Mxs.is_empty xl); (* Expr ensures this for the time being *)
         (* if [e1] is ghost but the entire [match-with] expression isn't,
            it must be the case the first non-absurd branch is irrefutable *)
         (match bl with (* FIXME: skip absurd branches *)
          | [] -> assert false | (_, e) :: _ -> expr info svar e.e_mask e)
+    | Ematch (e1, [], xl) when Mxs.is_empty xl ->
+        expr info svar e1.e_mask e1
     | Ematch (e1, bl, xl) ->
-        let e1 = expr info svar e1.e_mask e1 in
-        let bl = List.map (ebranch info svar mask) bl in
+        let e1, bl = match bl with
+          | [] -> expr info svar mask e1, []
+          | bl -> let bl = List.map (ebranch info svar mask) bl in
+              expr info svar e1.e_mask e1, bl in
         let mk_xl (xs, (pvl, e)) = let pvl = pv_list_of_mask pvl xs.xs_mask in
-          (xs, pvl, expr info svar mask e) in
+          if e.e_effect.eff_ghost then (xs, pvl, ML.e_unit)
+          else (xs, pvl, expr info svar mask e) in
         let xl = List.map mk_xl (Mxs.bindings xl) in
         ML.e_match e1 bl xl (ML.I e.e_ity) mask eff attrs
     | Eraise (xs, ex) -> let ex = match expr info svar xs.xs_mask ex with
