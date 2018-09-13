@@ -88,6 +88,9 @@ val unit_name : string
 val limit_line : limit_mode option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
+val limit_region : Gnat_loc.region option
+(* set if option --limit-region was given; we only prove VCs in the region *)
+
 val limit_subp : Ident.label option
 (* set if option --limit-subp was given; we only prove VCs from that subprogram
    *)

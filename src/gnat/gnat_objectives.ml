@@ -123,7 +123,7 @@ let add_to_objective ~toplevel ex go =
   (* add a goal to an objective.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
    * top-level, that is obtained by transformation. *)
-   let filter =
+   let filter_line =
       match Gnat_config.limit_line with
       | Some (Gnat_config.Limit_Line l) ->
          Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
@@ -132,7 +132,13 @@ let add_to_objective ~toplevel ex go =
          && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc ex))
       | None -> true
    in
-   if filter then begin
+   let filter_region =
+      match Gnat_config.limit_region with
+      | Some r ->
+         Gnat_loc.in_region r (Gnat_expl.get_loc ex)
+      | None -> true
+   in
+   if filter_line && filter_region then begin
       incr total_nb_goals;
       GoalMap.add goalmap go ex;
       let obj = find ex in
