@@ -70,7 +70,6 @@ type global =
   | ExitCodeValid of int
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
-  | ExitCodeOutOfMemory of int
   | ExitCodeStepLimitExceeded of int
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string

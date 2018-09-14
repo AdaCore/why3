@@ -589,12 +589,8 @@ let get_obs (pa_st: pa_status) = match pa_st with
 let get_proof_attempt (pa_st: pa_status) = match pa_st with
 | pa, _, _ -> pa
 
-let get_limit (pa_st: pa_status) = match pa_st with
-| _, _, l -> l
-
 let get_node_obs id = get_obs (get_node_id_pa id)
 let get_node_proof_attempt id = get_proof_attempt (get_node_id_pa id)
-let get_node_limit id = get_limit (get_node_id_pa id)
 
 let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
 
@@ -645,9 +641,9 @@ let notebook = GPack.notebook ~packing:vpan222#add ()
 (********************************)
 (* Task view (part of notebook) *)
 (********************************)
-let task_page,scrolled_task_view =
+let scrolled_task_view =
   let label = GMisc.label ~text:"Task" () in
-  0, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_task_view =
@@ -767,15 +763,15 @@ let error_page,error_view =
   0, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
-let log_page,log_view =
+let log_view =
   let label = GMisc.label ~text:"Log" () in
-  1, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 (* tab 3: edited proof *)
-let edited_page,edited_tab =
+let edited_tab =
   let label = GMisc.label ~text:"Edited proof" () in
-  2, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_edited_view =
@@ -791,9 +787,9 @@ let edited_view =
     ()
 
 (* tab 4: prover output *)
-let output_page,output_tab =
+let output_tab =
   let label = GMisc.label ~text:"Prover output" () in
-  3, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_output_view =
@@ -1011,22 +1007,6 @@ let reload_unsafe () =
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
-(* Same as reload_safe but propose to save edited sources before reload *)
-let reload_safe () =
-  if files_need_saving () then
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving source files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
-    in
-    match answer with
-    | 1 -> save_and_reload ()
-    | 2 -> reload_unsafe ()
-    | _ -> ()
-  else
-    reload_unsafe ()
-
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -1106,7 +1086,7 @@ let color_line ~color loc =
 
   let f, l, _, _ = Loc.get loc in
   try
-    let (_, v, _, _) = get_source_view_table f in
+    let v = get_source_view f in
     let color = convert_color color in
     color_line ~color v l
   with
@@ -1132,10 +1112,7 @@ let color_loc ?(ce=false) ~color loc =
 
   let f, l, b, e = Loc.get loc in
   try
-    let v = if ce then counterexample_view else
-      let (_, v, _, _) = get_source_view_table f in
-      v
-    in
+    let v = if ce then counterexample_view else get_source_view f in
     let color = convert_color color in
     color_loc ~color v l b e
   with
@@ -1550,35 +1527,6 @@ let treat_message_notification msg = match msg with
   | Error s                      ->
      print_message ~kind:1 ~notif_kind:"General request failure" "%s" s
 
-
-(***********************)
-(* First Unproven goal *)
-(***********************)
-
-let is_goal node =
-  get_node_type node = NGoal
-
-let proved node =
-  get_node_proved node
-
-let children node =
-  let iter = (get_node_row node)#iter in
-  let n = goals_model#iter_n_children (Some iter) in
-  let acc = ref [] in
-  for i = 0 to (n-1) do
-    let new_iter = goals_model#iter_children ?nth:(Some i) (Some iter) in
-    let child_node = get_node_id new_iter in
-    if (get_node_type child_node != NProofAttempt) then
-      acc := child_node :: !acc
-  done;
-  !acc
-
-let get_parent node =
-  let iter = (get_node_row node)#iter in
-  let parent_iter = goals_model#iter_parent iter in
-  match parent_iter with
-  | None -> None
-  | Some parent -> Some (get_node_id parent)
 
 let is_selected_alone id =
   match get_selected_row_references () with

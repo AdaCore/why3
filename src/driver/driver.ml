@@ -101,7 +101,6 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
-    | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
     | ExitCodeStepLimitExceeded s ->
       add_to_list exitcodes (s, StepLimitExceeded)
     | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
