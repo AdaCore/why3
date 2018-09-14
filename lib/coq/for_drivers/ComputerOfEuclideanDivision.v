@@ -64,7 +64,6 @@ Lemma cmod_cases : forall (n:Z) (d:Z), ((0%Z <= n)%Z -> ((0%Z < d)%Z ->
   (-d)%Z))%Z))))).
   intros n d.
   unfold int.EuclideanDivision.mod1.
-  SearchAbout Z.rem Z.quot.
   assert (Z.rem n d = n - (d * (Z.quot n d)))%Z.
   assert (H:= Z.quot_rem' n d).
   omega.
