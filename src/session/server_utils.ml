@@ -497,7 +497,7 @@ let split_list l node =
   split_list l []
 
 let get_first_unproven_goal_around
-    ~proved ~children ~get_parent ~is_goal ~is_pa node =
+    ~always_send ~proved ~children ~get_parent ~is_goal ~is_pa node =
   let rec look_around node =
     match get_parent node with
     | None -> unproven_goals_below_node ~proved ~children ~is_goal [] node
@@ -517,7 +517,7 @@ let get_first_unproven_goal_around
   | [] ->
     begin
       match before_node with
-      | [] -> None
+      | [] -> if always_send then Some node else None
       | hd :: _tl -> Some hd
     end
   | hd :: _tl  -> Some hd

@@ -72,7 +72,7 @@ rule token = parse
   | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
   | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
+      { FLOAT_VALUE (Model_parser.interp_float ~interp:false b eb sb) }
 
   | num as integer
       { INT_STR (integer) }

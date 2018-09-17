@@ -40,6 +40,7 @@ let is_builtin_prover =
     Sstr.mem s builtin_provers_set)
 
 let opt_timeout : int option ref = ref None
+let opt_memlimit : int option ref = ref None
 let opt_ce_timeout : int option ref = ref None
 let opt_warn_timeout : int ref = ref 1
 let opt_steps : int option ref = ref None
@@ -117,6 +118,9 @@ let set_prover s =
 let set_timeout t =
    opt_timeout := Some t
 
+let set_memlimit t =
+   opt_memlimit := Some t
+
 let set_ce_timeout t =
    opt_ce_timeout := Some t
 
@@ -183,9 +187,11 @@ let options = Arg.align [
    "--version", Arg.Unit print_version_info,
           " Print version information and exit";
    "-t", Arg.Int set_timeout,
-          " Set the timeout in seconds (default is 1 second)";
+          " Set the timeout in seconds";
    "--timeout", Arg.Int set_timeout,
-          " Set the timeout in seconds (default is 1 second)";
+          " Set the timeout in seconds";
+   "--memlimit", Arg.Int set_memlimit,
+          " Set the memory limit in megabytes";
    "--ce-timeout", Arg.Int set_ce_timeout,
           " Set the timeout for counter examples in seconds";
    "--warn-timeout", Arg.Int set_warn_timeout,
@@ -631,10 +637,15 @@ let steps ~prover =
   | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
   | _, Some c -> Steps_conversion.convert ~prover c
 
+let limit_mem () =
+  match manual_prover, !opt_memlimit with
+  | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_mem
+  | _, Some m -> m
+
 let back_convert_steps = Steps_conversion.back_convert
 
 let limit ~prover ~warning =
-  { Call_provers.empty_limit with
+  { Call_provers.limit_mem = limit_mem ();
     Call_provers.limit_time = limit_time ~prover ~warning;
     limit_steps = steps ~prover}
 

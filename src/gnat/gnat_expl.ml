@@ -45,6 +45,7 @@ type reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
+   | VC_Unreachable_Branch
    | VC_Dead_Code
 
 let is_warning_reason r =
@@ -93,6 +94,7 @@ let is_warning_reason r =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
+   | VC_Unreachable_Branch
    | VC_Dead_Code
      -> true
 
@@ -170,6 +172,7 @@ let reason_from_string s =
    (* VC_Warning_Kind - warnings *)
    | "VC_INCONSISTENT_PRE"          -> VC_Inconsistent_Pre
    | "VC_INCONSISTENT_POST"         -> VC_Inconsistent_Post
+   | "VC_UNREACHABLE_BRANCH"        -> VC_Unreachable_Branch
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
        let s = Format.sprintf "unknown VC reason: %s@." s in
@@ -222,6 +225,7 @@ let reason_to_ada reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "VC_INCONSISTENT_PRE"
    | VC_Inconsistent_Post         -> "VC_INCONSISTENT_POST"
+   | VC_Unreachable_Branch        -> "VC_UNREACHABLE_BRANCH"
    | VC_Dead_Code                 -> "VC_DEAD_CODE"
 
 let reason_to_string reason =
@@ -269,6 +273,7 @@ let reason_to_string reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "inconsistent_pre"
    | VC_Inconsistent_Post         -> "inconsistent_post"
+   | VC_Unreachable_Branch        -> "unreachable_branch"
    | VC_Dead_Code                 -> "dead_code"
 
 type gp_label =

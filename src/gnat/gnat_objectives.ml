@@ -644,193 +644,194 @@ let matches_subp_filter s subp =
 
 module Save_VCs = struct
 
-   exception Found of Whyconf.prover *  Call_provers.prover_result
+  exception Found of Whyconf.prover *  Call_provers.prover_result
 
-   let find_successful_proof s goal =
+  let find_successful_proof s goal =
   (* given a goal, find a successful proof attempt for exactly this goal (not
      counting transformations *)
-  try
-    Whyconf.Hprover.iter (fun prover paid ->
-      let pa = Session_itp.get_proof_attempt_node s paid in
-      match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
-      | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
-          raise (Found (prover, pr))
-      | _ -> ()) (Session_itp.get_proof_attempt_ids s goal);
-    raise Exit
-  with Found (prover, pr) -> prover, pr
+    try
+      Whyconf.Hprover.iter (fun prover paid ->
+          let pa = Session_itp.get_proof_attempt_node s paid in
+          match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
+          | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
+            raise (Found (prover, pr))
+          | _ -> ()) (Session_itp.get_proof_attempt_ids s goal);
+      raise Exit
+    with Found (prover, pr) -> prover, pr
 
-
-let add_to_prover_stat pr stat =
+  let add_to_prover_stat pr stat =
   (* add the result of the prover run to the statistics record for some prover
-     *)
-  stat.Gnat_report.count <- stat.Gnat_report.count + 1;
-  if pr.Call_provers.pr_time > stat.Gnat_report.max_time then
-    stat.Gnat_report.max_time <- pr.Call_provers.pr_time;
-  if pr.Call_provers.pr_steps > stat.Gnat_report.max_steps then
-    stat.Gnat_report.max_steps <- pr.Call_provers.pr_steps
+  *)
+    stat.Gnat_report.count <- stat.Gnat_report.count + 1;
+    if pr.Call_provers.pr_time > stat.Gnat_report.max_time then
+      stat.Gnat_report.max_time <- pr.Call_provers.pr_time;
+    if pr.Call_provers.pr_steps > stat.Gnat_report.max_steps then
+      stat.Gnat_report.max_steps <- pr.Call_provers.pr_steps
 
-(* TODO put this in Controller_itp *)
-let is_valid (c: Controller_itp.controller) goal =
-  Session_itp.pn_proved c.Controller_itp.controller_session goal
+  (* TODO put this in Controller_itp *)
+  let is_valid (c: Controller_itp.controller) goal =
+    Session_itp.pn_proved c.Controller_itp.controller_session goal
 
-let add_to_stat prover pr stat =
-  (* add the result pr of the prover run of "prover" to the statistics table *)
-  if Whyconf.Hprover.mem stat prover then
-    add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
-  else
-    Whyconf.Hprover.add stat prover
-      { Gnat_report.count = 1;
-        max_time = pr.Call_provers.pr_time;
-        max_steps = pr.Call_provers.pr_steps }
+  let add_to_stat prover pr stat =
+    (* add the result pr of the prover run of "prover" to the statistics table *)
+    if Whyconf.Hprover.mem stat prover then
+      add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
+    else
+      Whyconf.Hprover.add stat prover
+        { Gnat_report.count = 1;
+          max_time = pr.Call_provers.pr_time;
+          max_steps = pr.Call_provers.pr_steps }
 
-
-   let rec extract_stat_goal (c: Controller_itp.controller) stat goal =
-     (* Not obsolete and valid *)
-     assert (is_valid c goal);
-     let ses = c.Controller_itp.controller_session in
-     try
-       let prover, pr =
-         find_successful_proof c.Controller_itp.controller_session goal in
-       add_to_stat prover pr stat
-     with Exit ->
-       try
-         List.iter (fun tnid ->
-           if Session_itp.tn_proved c.Controller_itp.controller_session tnid then
-             List.iter (extract_stat_goal c stat)
-               (Session_itp.get_sub_tasks ses tnid);
+  let rec extract_stat_goal (c: Controller_itp.controller) stat goal =
+    (* Not obsolete and valid *)
+    assert (is_valid c goal);
+    let ses = c.Controller_itp.controller_session in
+    try
+      let prover, pr =
+        find_successful_proof c.Controller_itp.controller_session goal in
+      add_to_stat prover pr stat
+    with Exit ->
+    try
+      List.iter
+        (fun tnid ->
+          if Session_itp.tn_proved c.Controller_itp.controller_session tnid then
+            List.iter (extract_stat_goal c stat)
+              (Session_itp.get_sub_tasks ses tnid);
 
           (* need to exit here so once we found a transformation that proves
            * the goal, don't try further *)
-           raise Exit) (Session_itp.get_transformations ses goal);
-       with Exit -> ()
+          raise Exit)
+        (Session_itp.get_transformations ses goal);
+    with Exit -> ()
 
-   let extract_stats c (obj : objective) =
-     let stats = Whyconf.Hprover.create 5 in
-     let obj_rec = Gnat_expl.HCheck.find explmap obj in
-     GoalSet.iter (extract_stat_goal c stats) obj_rec.toplevel;
-     stats
+  let extract_stats c (obj : objective) =
+    let stats = Whyconf.Hprover.create 5 in
+    let obj_rec = Gnat_expl.HCheck.find explmap obj in
+    GoalSet.iter (extract_stat_goal c stats) obj_rec.toplevel;
+    stats
 
-   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
+  let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
-   module GM = GoalMap
+  module GM = GoalMap
 
-   let goal_map : string GM.t = GM.create 17
+  let goal_map : string GM.t = GM.create 17
 
-   let find check =
-      try Gnat_expl.HCheck.find count_map check
-      with Not_found ->
-         let r = ref 0 in
-         Gnat_expl.HCheck.add count_map check r;
-         r
+  let find check =
+    try Gnat_expl.HCheck.find count_map check
+    with Not_found ->
+      let r = ref 0 in
+      Gnat_expl.HCheck.add count_map check r;
+      r
 
-   let vc_file goal =
-      GM.find goal_map goal
+  let vc_file goal =
+    GM.find goal_map goal
 
-   let with_fmt_channel filename f =
-      let cout = open_out filename in
-      let fmt  = Format.formatter_of_out_channel cout in
-      f fmt;
-      close_out cout
+  let with_fmt_channel filename f =
+    let cout = open_out filename in
+    let fmt  = Format.formatter_of_out_channel cout in
+    f fmt;
+    close_out cout
 
-   let vc_name check (dr: Driver.driver) =
-      let r = find check in
-      incr r;
-      let n = !r in
-      let count_str = if n = 1 then "" else string_of_int n in
-      let ext = Driver.get_extension dr in
-      Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
+  let vc_name check (dr: Driver.driver) =
+    let r = find check in
+    incr r;
+    let n = !r in
+    let count_str = if n = 1 then "" else string_of_int n in
+    let ext = Driver.get_extension dr in
+    Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
-   let save_vc c goal (prover: Whyconf.prover) =
-      let check = get_objective goal in
-      let driver =
-        snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
-      (* Reusing a filename to get several prover files with the same name is
-         unsafe.
-      *)
-      let vc_fn = Sysutil.uniquify (vc_name check driver) in
-      GM.add goal_map goal vc_fn;
-      Sysutil.write_file vc_fn "";
-      vc_fn
+  let save_vc c goal (prover: Whyconf.prover) =
+    let check = get_objective goal in
+    let driver =
+      snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
+    (* Reusing a filename to get several prover files with the same name is
+       unsafe.
+    *)
+    let vc_fn = Sysutil.uniquify (vc_name check driver) in
+    GM.add goal_map goal vc_fn;
+    Sysutil.write_file vc_fn "";
+    vc_fn
 
-   let compute_trace s =
-     let rec compute_trace acc f =
-       let acc = Term.t_fold compute_trace acc f in
-       match Gnat_expl.extract_sloc f.Term.t_attrs with
-       (* it should be enough to look at the "sloc"s here, and not take into
-          account the explanations. *)
-       | Some loc -> Gnat_loc.S.add loc acc
-       | _ -> acc
-     in
-     fun goal ->
-       let task = Session_itp.get_task s goal in
-       let f = Task.task_goal_fmla task in
-       compute_trace Gnat_loc.S.empty f
+  let compute_trace s =
+    let rec compute_trace acc f =
+      let acc = Term.t_fold compute_trace acc f in
+      match Gnat_expl.extract_sloc f.Term.t_attrs with
+      (* it should be enough to look at the "sloc"s here, and not take into
+         account the explanations. *)
+      | Some loc -> Gnat_loc.S.add loc acc
+      | _ -> acc
+    in
+    fun goal ->
+      let task = Session_itp.get_task s goal in
+      let f = Task.task_goal_fmla task in
+      compute_trace Gnat_loc.S.empty f
 
-   let save_trace s goal =
-      let check = get_objective goal in
-      let trace_fn = Pp.sprintf "%a.trace" Gnat_expl.to_filename check in
-      let trace = compute_trace s goal in
-      (* Do not generate an empty file if there is no location at all.
-         Do not generate a file with a single location for the goal, as this
-         is not useful. *)
-      if Gnat_loc.S.cardinal trace > 1 then begin
-        with_fmt_channel trace_fn (fun fmt ->
-           Gnat_loc.S.iter (fun l ->
+  let save_trace s goal =
+    let check = get_objective goal in
+    let trace_fn = Pp.sprintf "%a.trace" Gnat_expl.to_filename check in
+    let trace = compute_trace s goal in
+    (* Do not generate an empty file if there is no location at all.
+       Do not generate a file with a single location for the goal, as this
+       is not useful. *)
+    if Gnat_loc.S.cardinal trace > 1 then begin
+      with_fmt_channel trace_fn
+        (fun fmt ->
+          Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
-             (Gnat_loc.orig_loc l)) trace);
-        (trace_fn, trace)
-      end
-      else ("", Gnat_loc.S.empty)
+                (Gnat_loc.orig_loc l)) trace);
+      (trace_fn, trace)
+    end
+    else ("", Gnat_loc.S.empty)
 
-   (* Group of functions to build a json object for a session tree.
-      More precisely a session forest, because we start with a list of
-      goals for a given check. See gnat_report.mli for the JSON
-      structure that we use here. *)
-   let rec check_to_json session obj =
-     let obj_rec = Gnat_expl.HCheck.find explmap obj in
-     let l = ref [] in
-     GoalSet.iter (fun x -> l := goal_to_json session x :: !l) obj_rec.toplevel;
-     Json_base.List !l
-   and goal_to_json session g =
-     let s = Mstr.empty in
-     Json_base.Record
-       (Mstr.add "proof_attempts" (proof_attempts_to_json session g)
-          (Mstr.add "transformations" (transformations_to_json session g) s))
-   and proof_attempts_to_json session g =
-     let s = Mstr.empty in
-     let r = Whyconf.Hprover.fold
-         (fun prover paid acc ->
+  (* Group of functions to build a json object for a session tree.
+     More precisely a session forest, because we start with a list of
+     goals for a given check. See gnat_report.mli for the JSON
+     structure that we use here. *)
+  let rec check_to_json session obj =
+    let obj_rec = Gnat_expl.HCheck.find explmap obj in
+    let l = ref [] in
+    GoalSet.iter (fun x -> l := goal_to_json session x :: !l) obj_rec.toplevel;
+    Json_base.List !l
+  and goal_to_json session g =
+    let s = Mstr.empty in
+    Json_base.Record
+      (Mstr.add "proof_attempts" (proof_attempts_to_json session g)
+         (Mstr.add "transformations" (transformations_to_json session g) s))
+  and proof_attempts_to_json session g =
+    let s = Mstr.empty in
+    let r = Whyconf.Hprover.fold
+        (fun prover paid acc ->
            let pa = Session_itp.get_proof_attempt_node session paid in
            let pr_name = prover.Whyconf.prover_name in
            match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
            | false, Some pr ->
-               Mstr.add pr_name (proof_result_to_json pr) acc
+             Mstr.add pr_name (proof_result_to_json pr) acc
            | _, _ -> acc)
-         (Session_itp.get_proof_attempt_ids session g) s in
-     Json_base.Record r
+        (Session_itp.get_proof_attempt_ids session g) s in
+    Json_base.Record r
 
-   and proof_result_to_json r =
-     let answer =
-       Pp.sprintf "%a"
-         Call_provers.print_prover_answer r.Call_provers.pr_answer in
-     let s = Mstr.empty in
-     let r =
-       Mstr.add "time" (Json_base.Float r.Call_provers.pr_time)
-         (Mstr.add "steps" (Json_base.Int r.Call_provers.pr_steps)
-            (Mstr.add "result" (Json_base.String answer) s)) in
-     Json_base.Record r
-   and transformations_to_json session g =
-     let map =
-       List.fold_left (fun acc tfid ->
-           let tf_name = Session_itp.get_transf_name session tfid in
-           Mstr.add tf_name (transformation_to_json session tfid) acc)
-         Mstr.empty
-         (Session_itp.get_transformations session g)
-     in
-     Json_base.Record map
-   and transformation_to_json session tf =
-     let transf_goals = Session_itp.get_sub_tasks session tf in
-     Json_base.List (List.map (goal_to_json session) transf_goals)
+  and proof_result_to_json r =
+    let answer =
+      Pp.sprintf "%a"
+        Call_provers.print_prover_answer r.Call_provers.pr_answer in
+    let s = Mstr.empty in
+    let r =
+      Mstr.add "time" (Json_base.Float r.Call_provers.pr_time)
+        (Mstr.add "steps" (Json_base.Int r.Call_provers.pr_steps)
+           (Mstr.add "result" (Json_base.String answer) s)) in
+    Json_base.Record r
+  and transformations_to_json session g =
+    let map =
+      List.fold_left (fun acc tfid ->
+          let tf_name = Session_itp.get_transf_name session tfid in
+          Mstr.add tf_name (transformation_to_json session tfid) acc)
+        Mstr.empty
+        (Session_itp.get_transformations session g)
+    in
+    Json_base.Record map
+  and transformation_to_json session tf =
+    let transf_goals = Session_itp.get_sub_tasks session tf in
+    Json_base.List (List.map (goal_to_json session) transf_goals)
 
 end
 
