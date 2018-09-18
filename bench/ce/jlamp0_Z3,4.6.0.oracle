@@ -6,22 +6,55 @@ a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 Line 8:
 b, [[@introduced], [@model_trace:b]] = {"type" : "Integer" ,
 "val" : "3" }
-Line 10:
+Line 11:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
 Line 12:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
 
+bench/ce/jlamp0.mlw M VC p1: Timeout
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "7" }
+Line 8:
+b, [[@introduced], [@model_trace:b]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 10:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "9" }
+Line 11:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "10" }
+Line 13:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "9" }
+
+bench/ce/jlamp0.mlw M VC p1: Timeout
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 8:
+b, [[@introduced], [@model_trace:b]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 10:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "5" }
+Line 11:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "5" }
+
 bench/ce/jlamp0.mlw M VC p2: Timeout
 Counter-example model:File jlamp0.mlw:
 Line 6:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "0" }
-Line 21:
+Line 20:
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "1" }
-Line 23:
+Line 22:
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "1" }
 
@@ -31,66 +64,20 @@ Counter-example model:File jlamp0.mlw:
 Line 6:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "0" }
-Line 21:
+Line 20:
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "1" }
-Line 22:
+Line 21:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "2" }
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "4" }
-Line 26:
+Line 25:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "5" }
-Line 27:
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "4" }
-
-bench/ce/jlamp0.mlw M VC p2: Timeout
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "0" }
-Line 21:
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "1" }
-Line 22:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "3" }
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "10" }
-Line 23:
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "12" }
 Line 26:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "13" }
-Line 27:
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "12" }
-
-bench/ce/jlamp0.mlw M VC p2: Timeout
-Counter-example model:File jlamp0.mlw:
-Line 6:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "0" }
-Line 21:
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "1" }
-Line 22:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "9" }
-c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
-"val" : "2" }
-Line 24:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "11" }
-Line 26:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "11" }
-Line 27:
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "4" }
 
@@ -100,12 +87,58 @@ Line 6:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 20:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "3" }
-Line 21:
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
 "val" : "1" }
+Line 21:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "3" }
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "10" }
 Line 22:
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "12" }
+Line 25:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "13" }
+Line 26:
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "12" }
+
+bench/ce/jlamp0.mlw M VC p2: Timeout
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 20:
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "9" }
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "2" }
+Line 23:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "11" }
+Line 25:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "11" }
+Line 26:
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "4" }
+
+bench/ce/jlamp0.mlw M VC p2: Timeout
+Counter-example model:File jlamp0.mlw:
+Line 6:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 19:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "3" }
+Line 20:
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "1" }
+Line 21:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
 c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
