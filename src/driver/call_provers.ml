@@ -513,6 +513,13 @@ let query_call = function
       if pid = 0 then NoUpdates else
       ProverFinished (editor_result ret)
 
+let interrupt_call = function
+  | ServerCall id ->
+      Prove_client.send_interrupt ~id
+
+  | EditorCall pid ->
+      (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
+
 let rec wait_on_call = function
   | ServerCall id as pc ->
       begin match query_result_buffer id with
@@ -551,5 +558,3 @@ let call_editor ~command fin =
   let pid = Unix.create_process exec argarray fd_in Unix.stdout Unix.stderr in
   if use_stdin then Unix.close fd_in;
   EditorCall pid
-
-let interrupt_call id = Prove_client.send_interrupt ~id
