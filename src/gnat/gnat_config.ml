@@ -77,6 +77,12 @@ let debug_no_auto_model =
 
 let () = Debug.set_flag debug_no_auto_model
 
+(* Set the vc_sp (fast_wp) everywhere.
+TODO we may want to do something more clever in the future. *)
+let debug_sp = Debug.register_flag "vc_sp"
+  ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
+let () = Debug.set_flag debug_sp
+
 let set_why3_conf s =
   if s != "" then
     opt_why3_conf_file := Some s
