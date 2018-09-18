@@ -84,6 +84,6 @@ module Combined
     assert {
       Abs.abs (1.0 -. (t'real x) *. (t'real x) *. 0.5 -. cos (t'real x)) <=. 0x1p-24
     };
-    sub (1.0:t) (mul (mul x x) (0.5:t))
+    safe_sub (1.0:t) (safe_mul (safe_mul x x) (0.5:t))
 
 end

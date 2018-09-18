@@ -60,7 +60,7 @@ module GenericFloat
 
   (** {3 Constructors and Constants} *)
 
-  constant zeroF     : t   (** +0.0 *)
+  val constant zeroF     : t   (** +0.0 *)
   (* exp_bias = 2^(sb - 1) - 1 *)
   (* max_finite_exp = 2^sb - 2 - exp_bias = exp_bias *)
   (* max_significand = (2^eb + 2^eb - 1) * 2^(1-eb) *)
@@ -70,25 +70,25 @@ module GenericFloat
 
   (** {3 Operators} *)
 
-  function add mode t t : t
-  function sub mode t t : t
-  function mul mode t t : t
-  function div mode t t : t
+  val function add mode t t : t
+  val function sub mode t t : t
+  val function mul mode t t : t
+  val function div mode t t : t
     (** The four basic operations, rounded in the given mode *)
 
-  function abs         t   : t   (** Absolute value *)
-  function neg         t   : t   (** Opposite *)
-  function fma  mode t t t : t   (** Fused multiply-add: x * y + z *)
-  function sqrt mode   t   : t   (** Square root *)
+  val function abs         t   : t   (** Absolute value *)
+  val function neg         t   : t   (** Opposite *)
+  val function fma  mode t t t : t   (** Fused multiply-add: x * y + z *)
+  val function sqrt mode   t   : t   (** Square root *)
 
-  function (.-_) (x:t)   : t = neg x
-  function (.+)  (x y:t) : t = add RNE x y
-  function (.-)  (x y:t) : t = sub RNE x y
-  function (.*)  (x y:t) : t = mul RNE x y
-  function (./)  (x y:t) : t = div RNE x y
+  let function (.-_) (x:t)   : t = neg x
+  let function (.+)  (x y:t) : t = add RNE x y
+  let function (.-)  (x y:t) : t = sub RNE x y
+  let function (.*)  (x y:t) : t = mul RNE x y
+  let function (./)  (x y:t) : t = div RNE x y
     (** Notations for operations in the default mode RNE *)
 
-  function roundToIntegral mode t : t
+  val function roundToIntegral mode t : t
     (** Rounding to an integer *)
 
   function min       t t : t
@@ -100,22 +100,26 @@ module GenericFloat
 
      2) if either argument is NaN then the other argument is returned
 
+     Due to the unclear status of min and max in IEEE norm, we
+     intentionally not provide these function as "val"s to be used in
+     programs
+
    *)
 
   (** {3 Comparisons} *)
 
-  predicate le t t
-  predicate lt t t
-  predicate ge (x:t) (y:t) = le y x
-  predicate gt (x:t) (y:t) = lt y x
-  predicate eq t t
+  val predicate le t t
+  val predicate lt t t
+  let predicate ge (x:t) (y:t) = le y x
+  let predicate gt (x:t) (y:t) = lt y x
+  val predicate eq t t
   (** equality on floats, different from = since not (eq NaN NaN) *)
 
-  predicate (.<=) (x:t) (y:t) = le x y
-  predicate (.<)  (x:t) (y:t) = lt x y
-  predicate (.>=) (x:t) (y:t) = ge x y
-  predicate (.>)  (x:t) (y:t) = gt x y
-  predicate (.=)  (x:t) (y:t) = eq x y
+  let predicate (.<=) (x:t) (y:t) = le x y
+  let predicate (.<)  (x:t) (y:t) = lt x y
+  let predicate (.>=) (x:t) (y:t) = ge x y
+  let predicate (.>)  (x:t) (y:t) = gt x y
+  let predicate (.=)  (x:t) (y:t) = eq x y
   (** Notations *)
 
 
@@ -798,15 +802,15 @@ module Float_BV_Converter
   (* with unsigned int as bitvector *)
   type t                        (* float *)
 
-  function of_ubv8  mode BV8.t  : t
-  function of_ubv16 mode BV16.t : t
-  function of_ubv32 mode BV32.t : t
-  function of_ubv64 mode BV64.t : t
+  val function of_ubv8  mode BV8.t  : t
+  val function of_ubv16 mode BV16.t : t
+  val function of_ubv32 mode BV32.t : t
+  val function of_ubv64 mode BV64.t : t
 
-  function to_ubv8  mode t : BV8.t
-  function to_ubv16 mode t : BV16.t
-  function to_ubv32 mode t : BV32.t
-  function to_ubv64 mode t : BV64.t
+  val function to_ubv8  mode t : BV8.t
+  val function to_ubv16 mode t : BV16.t
+  val function to_ubv32 mode t : BV32.t
+  val function to_ubv64 mode t : BV64.t
 
   use real.RealInfix
   use real.FromInt as FromInt
