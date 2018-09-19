@@ -279,16 +279,14 @@ let decrease_def env loc old_t t =
 let decrease env loc attrs expl olds news =
   if olds = [] && news = [] then t_true else
   let rec decr olds news = match olds, news with
-    | (old_t, Some old_r)::olds, (t, Some r)::news
-      when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
+    | (old_t, Some old_r)::olds, (t, Some r)::news when ls_equal old_r r ->
+        if t_equal old_t t then decr olds news else
         let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
-        t_or_simp dt (t_and_simp (t_equ_simp old_t t) (decr olds news))
-    | (old_t, None)::olds, (t, None)::news
-      when oty_equal old_t.t_ty t.t_ty ->
-        if t_equal old_t t then decr olds news
-        else
-          let dt = decrease_def env loc old_t t in
-          t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
+    | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
+        if t_equal old_t t then decr olds news else
+        let dt = decrease_def env loc old_t t in
+        t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::_, (t, None)::_ ->
         decrease_def env loc old_t t
     | _::_, [] -> t_true
