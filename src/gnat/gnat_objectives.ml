@@ -684,11 +684,11 @@ module Save_VCs = struct
       add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
     else
       Whyconf.Hprover.add stat prover
-        { Gnat_report.count = 1;
-          max_time = pr.Call_provers.pr_time;
-          max_steps = pr.Call_provers.pr_steps }
+        Gnat_report.{ count = 1;
+                      max_time = pr.Call_provers.pr_time;
+                      max_steps = pr.Call_provers.pr_steps }
 
-  let rec extract_stat_goal (c: Controller_itp.controller) stat goal =
+  let rec extract_stat_goal c stat stat_transforms goal =
     (* Not obsolete and valid *)
     assert (is_valid c goal);
     let ses = c.Controller_itp.controller_session in
@@ -701,8 +701,12 @@ module Save_VCs = struct
       List.iter
         (fun tnid ->
           if Session_itp.tn_proved c.Controller_itp.controller_session tnid then
-            List.iter (extract_stat_goal c stat)
-              (Session_itp.get_sub_tasks ses tnid);
+            let subtasks = Session_itp.get_sub_tasks ses tnid in
+            (* The transformation proved the goal *)
+            if subtasks = [] then
+              stat_transforms := !stat_transforms + 1
+            else
+              List.iter (extract_stat_goal c stat stat_transforms) subtasks;
 
           (* need to exit here so once we found a transformation that proves
            * the goal, don't try further *)
@@ -711,10 +715,14 @@ module Save_VCs = struct
     with Exit -> ()
 
   let extract_stats c (obj : objective) =
+    (* Hold the stats for provers *)
     let stats = Whyconf.Hprover.create 5 in
+    (* Hold the number of goals proved by a transformation. No timings
+       information available. *)
+    let stat_transforms = ref 0 in
     let obj_rec = Gnat_expl.HCheck.find explmap obj in
-    GoalSet.iter (extract_stat_goal c stats) obj_rec.toplevel;
-    stats
+    GoalSet.iter (extract_stat_goal c stats stat_transforms) obj_rec.toplevel;
+    (stats, !stat_transforms)
 
   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 

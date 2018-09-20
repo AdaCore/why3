@@ -167,7 +167,8 @@ val matches_subp_filter : Session_itp.session -> subp -> bool
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
-   val extract_stats : Controller_itp.controller -> objective -> Gnat_report.stats
+   val extract_stats :
+     Controller_itp.controller -> objective -> Gnat_report.stats * int
 
    val save_trace : Session_itp.session -> goal_id -> (string * Gnat_loc.S.t)
    (* compute the trace from the goal and save it to a file; return the trace

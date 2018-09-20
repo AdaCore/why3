@@ -169,8 +169,9 @@ let filter_model m trace =
 let report_messages c obj =
   let s = c.Controller_itp.controller_session in
   let result =
-    if C.session_proved_status c obj  then
-      Gnat_report.Proved (C.Save_VCs.extract_stats c obj)
+    if C.session_proved_status c obj then
+      let (stats, stat_tr) = C.Save_VCs.extract_stats c obj in
+      Gnat_report.Proved (stats, stat_tr)
     else
       let unproved_pa = C.session_find_unproved_pa c obj in
       let unproved_goal =
