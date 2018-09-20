@@ -35,6 +35,10 @@ let intros f =
     | Tquant (Tforall, fq) ->
         let vsl, _, fs = t_open_quant fq in
         intros_aux lp (lv @ vsl) fs
+    | Tlet (t, tb) ->
+        let vs, t2 = t_open_bound tb in
+        let f = t_equ (t_var vs) t in
+        intros_aux (f :: lp) ([vs] @ lv) t2
     | _ -> (lp, lv, f) in
   intros_aux [] [] f
 
