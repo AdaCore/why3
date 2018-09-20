@@ -301,12 +301,14 @@ let editor_merge me1 me2 =
 let shortcut_merge s1 s2 =
   Mstr.merge merge_opt_keep_first s1 s2
 
-let find_driver_file fn =
+let find_driver_file ~conf_file fn =
   (* Here we search for the driver file. The argument [fn] is the driver path
      as returned by the Why3 API. It simply returns the path as is in the
      configuration file. We first check if the path as is points to a file.
      Then we try to find the file relative to the why3.conf file. If that also
-     fails, we look into the SPARK drivers dir *)
+     fails, we look into the SPARK drivers dir.
+     If everything fails, we return an error message stating that we cannot find
+     the driver: it also returns the configuration file [conf_file] used. *)
   try
     if Sys.file_exists fn then fn
     else match !opt_why3_conf_file with
@@ -322,8 +324,9 @@ let find_driver_file fn =
       if Sys.file_exists full_path then full_path
       else
         Gnat_util.abort_with_message ~internal:false
-          (Format.sprintf "Could not find driver file %s" fn)
-
+          (Format.sprintf "Could not find driver file %s referenced from %s. \
+                           If this is a user-generated file, consider removing \
+                           it. If not, please report." fn conf_file)
 
 let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
@@ -380,8 +383,11 @@ let compute_base_provers config str_list =
 (* we slightly change the config so that drivers files are referenced
    with the right prefix. *)
 let get_gnatprove_config config =
+  let conf_file = Whyconf.get_conf_file config in
   let transform_driver (base_prover: Whyconf.config_prover) =
-    {base_prover with Whyconf.driver = find_driver_file base_prover.Whyconf.driver} in
+    {base_prover with Whyconf.driver =
+       find_driver_file ~conf_file base_prover.Whyconf.driver}
+  in
   Whyconf.set_provers config
     (Whyconf.Mprover.map transform_driver (Whyconf.get_provers config))
 
