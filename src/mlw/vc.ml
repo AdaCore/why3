@@ -1490,15 +1490,19 @@ let mk_vc_decl kn id f =
     Eval_match.eval_match kn f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
+let add_vc_decl kn id f vcl =
+  if can_simp f then vcl else mk_vc_decl kn id f :: vcl
+
 let vc env kn tuc d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn tuc in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
-      [mk_vc_decl kn s.rs_name f]
+      add_vc_decl kn s.rs_name f []
   | PDlet (LDrec rdl) ->
       let env = mk_env env kn tuc in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
-      List.map2 (fun rd f -> mk_vc_decl kn rd.rec_sym.rs_name f) rdl fl
+      let add rd f vcl = add_vc_decl kn rd.rec_sym.rs_name f vcl in
+      List.fold_right2 add rdl fl []
   | PDtype tdl ->
       let add_witness d vcl =
         let add_fd (mv,ldl) fd e =
@@ -1516,14 +1520,14 @@ let vc env kn tuc d = match d.pd_node with
         let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
         let f = vc_fun (mk_env env kn tuc)
           (Debug.test_noflag debug_sp) c.c_cty e in
-        mk_vc_decl kn d.itd_its.its_ts.ts_name f :: vcl in
+        add_vc_decl kn d.itd_its.its_ts.ts_name f vcl in
       let add_invariant d vcl =
         let vs_of_rs fd = (fd_of_rs fd).pv_vs in
         let vl = List.map vs_of_rs d.itd_fields in
         let expl f = vc_expl None Sattr.empty expl_type_inv f in
         let f = t_and_asym_l (List.map expl d.itd_invariant) in
         let f = t_exists_close_simp vl [] f in
-        mk_vc_decl kn d.itd_its.its_ts.ts_name f :: vcl in
+        add_vc_decl kn d.itd_its.its_ts.ts_name f vcl in
       let add_itd d vcl =
         if d.itd_witness <> [] then add_witness d vcl else
         if d.itd_invariant <> [] then add_invariant d vcl else
