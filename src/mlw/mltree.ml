@@ -299,6 +299,12 @@ let mk_its_defn its_name its_args its_private its_def =
 let e_unit =
   mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
 
+let e_const c =
+  mk_expr (Econst c)
+
+let e_var pv =
+  mk_expr (Evar pv)
+
 let var_defn pv e =
   Lvar (pv, e)
 

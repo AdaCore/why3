@@ -256,11 +256,13 @@ module Translate = struct
       when isconstructor info rs && mask = MaskGhost ->
         ML.e_unit
     | Econst c -> Debug.dprintf debug_compile "compiling constant@.";
+        assert (mask = MaskVisible);
         let c = match c with Number.ConstInt c -> c | _ -> assert false in
-        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) mask eff attrs
+        ML.e_const c (ML.I e.e_ity) mask eff attrs
     | Evar pv ->
         Debug.dprintf debug_compile "compiling variable %a@." print_pv pv;
-        ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) mask eff attrs
+        assert (mask = MaskVisible);
+        ML.e_var pv (ML.I e.e_ity) mask eff attrs
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
         expr info svar mask e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
