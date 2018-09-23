@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="2" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
@@ -595,7 +595,7 @@
   </goal>
   <goal name="VC count.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.64"/></proof>
+  <proof prover="2"><result status="valid" time="0.46"/></proof>
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   <proof prover="5"><result status="valid" time="0.12"/></proof>
   <proof prover="6"><result status="valid" time="0.05" steps="86"/></proof>
@@ -642,7 +642,7 @@
  <proof prover="6"><result status="valid" time="0.23" steps="450"/></proof>
  </goal>
  <goal name="numof_ytpmE" proved="true">
- <proof prover="0"><result status="valid" time="1.20"/></proof>
+ <proof prover="0"><result status="valid" time="0.94"/></proof>
  <proof prover="4"><result status="valid" time="1.22"/></proof>
  </goal>
  <goal name="VC separation" expl="VC for separation" proved="true">
@@ -677,13 +677,13 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="VC triangleInequalityInt.0.0" expl="VC for triangleInequalityInt" proved="true">
    <proof prover="0"><result status="valid" time="0.07"/></proof>
-   <proof prover="2"><result status="valid" time="0.22"/></proof>
+   <proof prover="2"><result status="valid" time="0.09"/></proof>
    <proof prover="4"><result status="valid" time="0.09"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
    <proof prover="6"><result status="valid" time="0.03" steps="79"/></proof>
    </goal>
    <goal name="VC triangleInequalityInt.0.1" expl="VC for triangleInequalityInt" proved="true">
-   <proof prover="0" timelimit="10"><result status="valid" time="5.77"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="4.92"/></proof>
    </goal>
   </transf>
   </goal>
@@ -751,7 +751,7 @@
   <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC count_or.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="4"><result status="valid" time="0.10"/></proof>
   <proof prover="6"><result status="valid" time="0.03" steps="90"/></proof>
   </goal>

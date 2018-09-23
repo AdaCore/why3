@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -96,7 +96,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC isqrt16.27" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.32"/></proof>
+  <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC isqrt16.28" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
@@ -226,7 +226,7 @@
   <proof prover="3"><result status="valid" time="0.49"/></proof>
   </goal>
   <goal name="VC isqrt32.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.52"/></proof>
+  <proof prover="3"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="VC isqrt32.24" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
@@ -380,13 +380,13 @@
   <proof prover="3"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="VC isqrt64.22" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.54"/></proof>
+  <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.06"/></proof>
   </goal>
   <goal name="VC isqrt64.23" expl="loop invariant preservation" proved="true">
   <proof prover="3" timelimit="60"><result status="valid" time="1.70"/></proof>
   </goal>
   <goal name="VC isqrt64.24" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.50"/></proof>
+  <proof prover="3"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="VC isqrt64.25" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -422,7 +422,7 @@
   <proof prover="3" timelimit="5"><result status="valid" time="1.00"/></proof>
   </goal>
   <goal name="VC isqrt64.31" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.45"/></proof>
+  <proof prover="3"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="VC isqrt64.32" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.37"/></proof>
@@ -587,7 +587,7 @@
                              <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.80" steps="571"/></proof>
                              </goal>
                              <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" proved="true">
-                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.26"/></proof>
+                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.84"/></proof>
                              </goal>
                             </transf>
                             </goal>
@@ -611,7 +611,7 @@
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.1" proved="true">
-                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.60"/></proof>
+                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.87"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -650,7 +650,7 @@
                               </transf>
                               </goal>
                               <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.1" proved="true">
-                              <proof prover="3" timelimit="5"><result status="valid" time="2.35"/></proof>
+                              <proof prover="3" timelimit="5"><result status="valid" time="1.86"/></proof>
                               </goal>
                              </transf>
                              </goal>
@@ -674,12 +674,12 @@
                         </transf>
                         </goal>
                         <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.1" proved="true">
-                        <proof prover="3" timelimit="5"><result status="valid" time="1.49"/></proof>
+                        <proof prover="3" timelimit="5"><result status="valid" time="1.21"/></proof>
                         </goal>
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.1" proved="true">
-                       <proof prover="3" timelimit="5"><result status="valid" time="2.26"/></proof>
+                       <proof prover="3" timelimit="5"><result status="valid" time="1.87"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -743,7 +743,7 @@
   </transf>
   </goal>
   <goal name="VC isqrt64.41" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.37"/></proof>
+  <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="VC isqrt64.42" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.00"/></proof>

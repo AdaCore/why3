@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -19,7 +19,7 @@
  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="NumOfDummy.VC numof_eq" expl="VC for numof_eq" proved="true">
- <proof prover="2"><result status="valid" time="4.15"/></proof>
+ <proof prover="2"><result status="valid" time="3.49"/></proof>
  </goal>
  <goal name="NumOfDummy.VC dummy_const" expl="VC for dummy_const" proved="true">
  <proof prover="6"><result status="valid" time="0.22" steps="356"/></proof>
@@ -574,7 +574,7 @@
   </goal>
   <goal name="VC remove.25" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
-  <proof prover="3"><result status="valid" time="0.25"/></proof>
+  <proof prover="3"><result status="valid" time="0.46"/></proof>
   </goal>
  </transf>
  </goal>

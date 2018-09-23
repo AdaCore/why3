@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -34,7 +34,7 @@
  <goal name="VC triplet" expl="VC for triplet">
  <transf name="split_goal_right" >
   <goal name="VC triplet.0" expl="assertion" proved="true">
-  <proof prover="4"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4"><result status="valid" time="5.00"/></proof>
   <proof prover="6"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="VC triplet.1" expl="assertion" proved="true">
@@ -55,7 +55,7 @@
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="1.27"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="valid" time="3.46"/></proof>
+  <proof prover="6"><result status="valid" time="2.82"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC triplet.4" expl="assertion" proved="true">
@@ -76,7 +76,7 @@
   <proof prover="10"><result status="valid" time="0.08" steps="184"/></proof>
   </goal>
   <goal name="VC triplet.7" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="4.82"/></proof>
+  <proof prover="6"><result status="valid" time="3.82"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
   <proof prover="8"><result status="timeout" time="5.00"/></proof>
   <proof prover="9"><result status="timeout" time="5.00"/></proof>

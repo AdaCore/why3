@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -582,7 +582,7 @@
    <proof prover="3" memlimit="1000"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="VC add_expr.4.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.39"/></proof>
+   <proof prover="3"><result status="valid" time="0.25"/></proof>
    </goal>
   </transf>
   </goal>
@@ -643,7 +643,7 @@
     <goal name="VC add_expr.17.0.0" expl="postcondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="VC add_expr.17.0.0.0" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.54"/></proof>
+     <proof prover="3"><result status="valid" time="0.38"/></proof>
      </goal>
      <goal name="VC add_expr.17.0.0.1" expl="postcondition" proved="true">
      <proof prover="3"><result status="valid" time="0.25"/></proof>
@@ -664,7 +664,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="66"/></proof>
   </goal>
   <goal name="VC add_expr.21" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.34" steps="268"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="268"/></proof>
   </goal>
   <goal name="VC add_expr.22" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -948,7 +948,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC check_combination.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.67"/></proof>
+  <proof prover="3"><result status="valid" time="1.18"/></proof>
   </goal>
   <goal name="VC check_combination.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -1484,7 +1484,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="76"/></proof>
   </goal>
   <goal name="VC linear_decision.78" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.38"/></proof>
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="VC linear_decision.79" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="76"/></proof>
@@ -1610,7 +1610,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC simp.13" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.31"/></proof>
+  <proof prover="2"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC simp.14" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -1678,10 +1678,10 @@
  </transf>
  </goal>
  <goal name="VC simp_eq" expl="VC for simp_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.49"/></proof>
+ <proof prover="2"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="VC simp_ctx" expl="VC for simp_ctx" proved="true">
- <proof prover="4"><result status="valid" time="0.28" steps="978"/></proof>
+ <proof prover="4"><result status="valid" time="0.15" steps="978"/></proof>
  </goal>
  <goal name="VC decision" expl="VC for decision" proved="true">
  <transf name="split_vc" proved="true" >
@@ -3074,7 +3074,7 @@
  </transf>
  </goal>
  <goal name="VC m_expr" expl="VC for m_expr" proved="true">
- <proof prover="4"><result status="valid" time="0.30" steps="1270"/></proof>
+ <proof prover="4"><result status="valid" time="0.16" steps="1270"/></proof>
  </goal>
  <goal name="VC m_eq" expl="VC for m_eq" proved="true">
  <proof prover="0"><result status="valid" time="0.30"/></proof>
@@ -3498,7 +3498,7 @@
   <proof prover="4"><result status="valid" time="0.15" steps="265"/></proof>
   </goal>
   <goal name="VC prop_ctx.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.33" steps="570"/></proof>
+  <proof prover="4"><result status="valid" time="0.33" steps="738"/></proof>
   </goal>
   <goal name="VC prop_ctx.12" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.14" steps="173"/></proof>
@@ -3510,19 +3510,19 @@
   <proof prover="4"><result status="valid" time="0.18" steps="267"/></proof>
   </goal>
   <goal name="VC prop_ctx.15" expl="postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.72" steps="3006"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="1.31" steps="2919"/></proof>
   </goal>
   <goal name="VC prop_ctx.16" expl="postcondition" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.11" steps="173"/></proof>
   </goal>
   <goal name="VC prop_ctx.17" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="397"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="397"/></proof>
   </goal>
   <goal name="VC prop_ctx.18" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="267"/></proof>
   </goal>
   <goal name="VC prop_ctx.19" expl="postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.68" steps="2905"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="1.32" steps="2919"/></proof>
   </goal>
   <goal name="VC prop_ctx.20" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.15" steps="263"/></proof>
@@ -3583,7 +3583,7 @@
   <proof prover="2"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC prop_ctx.37" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.92" steps="606"/></proof>
+  <proof prover="4"><result status="valid" time="0.69" steps="606"/></proof>
   </goal>
   <goal name="VC prop_ctx.38" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.21"/></proof>
@@ -3712,7 +3712,7 @@
     <goal name="VC prop_ctx.75.3.0" expl="VC for prop_ctx" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="VC prop_ctx.75.3.0.0" expl="VC for prop_ctx" proved="true">
-     <proof prover="0" timelimit="15" memlimit="2000"><result status="valid" time="1.36"/></proof>
+     <proof prover="0" timelimit="15" memlimit="2000"><result status="valid" time="0.85"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3903,7 +3903,7 @@
   <proof prover="4"><result status="valid" time="0.10" steps="39"/></proof>
   </goal>
   <goal name="VC prop_ctx.135" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.62" steps="189"/></proof>
+  <proof prover="4"><result status="valid" time="0.43" steps="189"/></proof>
   </goal>
   <goal name="VC prop_ctx.136" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>

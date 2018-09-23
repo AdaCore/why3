@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -94,7 +94,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="VC phase1_frame2.6" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="5.04"/></proof>
+  <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="4.32"/></proof>
   <proof prover="3" timelimit="30" memlimit="4000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -337,7 +337,7 @@
   </goal>
   <goal name="VC downsweep.15" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.10"/></proof>
-  <proof prover="5" memlimit="1000"><result status="valid" time="0.32" steps="203"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.18" steps="203"/></proof>
   </goal>
   <goal name="VC downsweep.16" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09"/></proof>
@@ -636,7 +636,7 @@
   <proof prover="1" timelimit="30"><result status="valid" time="0.06"/></proof>
   <proof prover="3" timelimit="30"><result status="valid" time="0.33"/></proof>
   <proof prover="5" timelimit="30" memlimit="1000"><result status="valid" time="0.04" steps="172"/></proof>
-  <proof prover="7" timelimit="30"><result status="valid" time="5.34"/></proof>
+  <proof prover="7" timelimit="30"><result status="valid" time="4.65"/></proof>
   </goal>
   <goal name="VC test_harness.19" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
