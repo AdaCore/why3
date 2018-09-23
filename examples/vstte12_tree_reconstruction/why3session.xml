@@ -9,10 +9,6 @@
 <prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_tree_reconstruction.mlw" proved="true">
 <theory name="Tree" proved="true">
- <goal name="VC depths" expl="VC for depths" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_head.0" proved="true">
@@ -206,9 +202,6 @@
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC map_leaf" expl="VC for map_leaf" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="map_leaf_depths" proved="true">
  <transf name="induction_ty_lex" proved="true" >

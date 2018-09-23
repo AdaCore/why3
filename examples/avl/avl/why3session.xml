@@ -4,38 +4,12 @@
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../avl.mlw" proved="true">
-<theory name="SelectionTypes" proved="true">
- <goal name="VC option_to_seq" expl="VC for option_to_seq" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC rebuild" expl="VC for rebuild" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
- </goal>
- <goal name="VC left_extend" expl="VC for left_extend" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
- </goal>
- <goal name="VC right_extend" expl="VC for right_extend" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
-</theory>
 <theory name="AVL" proved="true">
  <goal name="M.M.assoc" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="M.M.neutral" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
- </goal>
- <goal name="VC balancing" expl="VC for balancing" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
- </goal>
- <goal name="VC node_model" expl="VC for node_model" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- </goal>
- <goal name="VC seq_model" expl="VC for seq_model" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- </goal>
- <goal name="VC real_height" expl="VC for real_height" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="VC real_height_nonnegative" expl="VC for real_height_nonnegative" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="56"/></proof>
@@ -225,9 +199,6 @@
  </goal>
  <goal name="VC concat" expl="VC for concat" proved="true">
  <proof prover="1"><result status="valid" time="0.24" steps="765"/></proof>
- </goal>
- <goal name="VC default_split" expl="VC for default_split" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC insert" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >

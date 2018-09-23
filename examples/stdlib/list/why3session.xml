@@ -14,9 +14,6 @@
  </goal>
 </theory>
 <theory name="Length" proved="true">
- <goal name="VC length" expl="VC for length" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="Length_nonnegative" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="Length_nonnegative.0" proved="true">
@@ -36,17 +33,6 @@
  </transf>
  </goal>
 </theory>
-<theory name="Quant" proved="true">
- <goal name="VC for_all" expl="VC for for_all" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC for_some" expl="VC for for_some" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC mem" expl="VC for mem" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
-</theory>
 <theory name="Elements" proved="true">
  <goal name="elements_mem" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -54,11 +40,6 @@
   <proof prover="7"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
  </transf>
- </goal>
-</theory>
-<theory name="Nth" proved="true">
- <goal name="VC nth" expl="VC for nth" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="NthLength" proved="true">
@@ -84,14 +65,6 @@
  </transf>
  </goal>
 </theory>
-<theory name="HdTl" proved="true">
- <goal name="VC hd" expl="VC for hd" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC tl" expl="VC for tl" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
-</theory>
 <theory name="NthHdTl" proved="true">
  <goal name="Nth_tl" proved="true">
  <proof prover="7"><result status="valid" time="0.00" steps="21"/></proof>
@@ -101,9 +74,6 @@
  </goal>
 </theory>
 <theory name="Append" proved="true">
- <goal name="VC infix ++" expl="VC for infix ++" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="Append_assoc" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="Append_assoc.0" proved="true">
@@ -171,9 +141,6 @@
  </goal>
 </theory>
 <theory name="Reverse" proved="true">
- <goal name="VC reverse" expl="VC for reverse" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="reverse_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="reverse_append.0" proved="true">
@@ -214,9 +181,6 @@
  </goal>
 </theory>
 <theory name="RevAppend" proved="true">
- <goal name="VC rev_append" expl="VC for rev_append" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="rev_append_append_l" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="rev_append_append_l.0" proved="true">
@@ -240,11 +204,6 @@
  </goal>
  <goal name="rev_append_append_r" proved="true">
  <proof prover="7"><result status="valid" time="0.01" steps="40"/></proof>
- </goal>
-</theory>
-<theory name="Combine" proved="true">
- <goal name="VC combine" expl="VC for combine" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="Sorted" proved="true">
@@ -535,16 +494,6 @@
   </transf>
   </goal>
  </transf>
- </goal>
-</theory>
-<theory name="Prefix" proved="true">
- <goal name="VC prefix" expl="VC for prefix" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
-</theory>
-<theory name="Sum" proved="true">
- <goal name="VC sum" expl="VC for sum" proved="true">
- <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="FoldLeft" proved="true">

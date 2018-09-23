@@ -7,9 +7,6 @@
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../priority_queue.mlw" proved="true">
 <theory name="PQueue" proved="true">
- <goal name="VC balancing" expl="VC for balancing" proved="true">
- <proof prover="4"><result status="valid" time="0.00" steps="3"/></proof>
- </goal>
  <goal name="M.VC assoc_m" expl="VC for assoc_m" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC assoc_m.0" expl="assertion" proved="true">
@@ -93,9 +90,6 @@
   <proof prover="4"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="D.VC measure" expl="VC for measure" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC monoid_sum_is_min" expl="VC for monoid_sum_is_min" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -364,9 +358,6 @@
  <goal name="Sel.M.agg_cat" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
- <goal name="Sel.D.VC measure" expl="VC for measure" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
- </goal>
  <goal name="Sel.VC balancing" expl="VC for balancing" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
@@ -375,9 +366,6 @@
  </goal>
  <goal name="Sel.VC selected_part" expl="VC for selected_part" proved="true">
  <proof prover="4"><result status="valid" time="0.04" steps="257"/></proof>
- </goal>
- <goal name="VC to_bag" expl="VC for to_bag" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="VC to_bag_mem" expl="VC for to_bag_mem" proved="true">
  <transf name="split_goal_right" proved="true" >

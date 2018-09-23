@@ -8,13 +8,6 @@
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../lineardecision.mlw" proved="true">
 <theory name="LinearEquationsCoeffs" proved="true">
- <goal name="VC czero" expl="VC for czero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC cone" expl="VC for cone" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
  <goal name="neg_mul" proved="true">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
@@ -24,18 +17,6 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC expr_bound" expl="VC for expr_bound" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC valid_eq" expl="VC for valid_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC eq_bound" expl="VC for eq_bound" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC valid_ctx" expl="VC for valid_ctx" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC ctx_bound" expl="VC for ctx_bound" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC expr_bound_w" expl="VC for expr_bound_w" proved="true">
@@ -1587,12 +1568,6 @@
  <goal name="VC valid_expr&#39;" expl="VC for valid_expr&#39;" proved="true">
  <proof prover="2"><result status="valid" time="0.17"/></proof>
  </goal>
- <goal name="VC valid_eq&#39;" expl="VC for valid_eq&#39;" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC valid_ctx&#39;" expl="VC for valid_ctx&#39;" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC simp" expl="VC for simp" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC simp.0" expl="postcondition" proved="true">
@@ -1735,12 +1710,6 @@
  </goal>
 </theory>
 <theory name="RationalCoeffs" proved="true">
- <goal name="VC rzero" expl="VC for rzero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC rone" expl="VC for rone" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC prod_compat_eq" expl="VC for prod_compat_eq" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -2107,12 +2076,6 @@
  <goal name="C.sub_def" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="C.VC czero" expl="VC for czero" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="C.VC cone" expl="VC for cone" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="C.zero_def" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -2147,15 +2110,6 @@
  </goal>
 </theory>
 <theory name="LinearDecisionInt" proved="true">
- <goal name="VC izero" expl="VC for izero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC ione" expl="VC for ione" proved="true">
- <proof prover="2"><result status="valid" time="0.00"/></proof>
- </goal>
- <goal name="VC ieq" expl="VC for ieq" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC iadd" expl="VC for iadd" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2227,12 +2181,6 @@
  </goal>
  <goal name="C.sub_def" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="C.VC czero" expl="VC for czero" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="C.VC cone" expl="VC for cone" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="C.zero_def" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -2326,12 +2274,6 @@
  </goal>
 </theory>
 <theory name="MP64Coeffs" proved="true">
- <goal name="VC mzero" expl="VC for mzero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC mone" expl="VC for mone" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="qinterp_def" proved="true">
  <transf name="compute_in_goal" proved="true" >
  </transf>
@@ -2969,12 +2911,6 @@
  <goal name="C.sub_def" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="C.VC czero" expl="VC for czero" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="C.VC cone" expl="VC for cone" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="C.zero_def" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2998,12 +2934,6 @@
  </goal>
 </theory>
 <theory name="LinearDecisionIntMP" proved="true">
- <goal name="VC mpzero" expl="VC for mpzero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC mpone" expl="VC for mpone" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC mpadd" expl="VC for mpadd" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -3078,12 +3008,6 @@
  </goal>
  <goal name="C.sub_def" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="C.VC czero" expl="VC for czero" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="C.VC cone" expl="VC for cone" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="C.zero_def" proved="true">
  <transf name="compute_in_goal" proved="true" >
@@ -3205,14 +3129,6 @@
   <goal name="VC expr_bound&#39;.5" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="200"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="VC eq_bound&#39;" expl="VC for eq_bound&#39;" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC ctx_bound&#39;" expl="VC for ctx_bound&#39;" proved="true">
- <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
  <goal name="VC expr_bound_w&#39;" expl="VC for expr_bound_w&#39;" proved="true">

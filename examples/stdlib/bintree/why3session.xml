@@ -17,10 +17,6 @@
  </goal>
 </theory>
 <theory name="Size" proved="true">
- <goal name="VC size" expl="VC for size" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
  <goal name="size_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="size_nonneg.0" proved="true">
@@ -46,27 +42,11 @@
  </goal>
 </theory>
 <theory name="Height" proved="true">
- <goal name="VC height" expl="VC for height" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
  <goal name="height_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="height_nonneg.0" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Inorder" proved="true">
- <goal name="VC inorder" expl="VC for inorder" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
-</theory>
-<theory name="Preorder" proved="true">
- <goal name="VC preorder" expl="VC for preorder" proved="true">
- <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>
@@ -76,32 +56,6 @@
   <goal name="inorder_length.0" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Zipper" proved="true">
- <goal name="VC zip" expl="VC for zip" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC start" expl="VC for start" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC up" expl="VC for up" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC top" expl="VC for top" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC down_left" expl="VC for down_left" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
- <goal name="VC down_right" expl="VC for down_right" proved="true">
- <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>

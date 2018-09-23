@@ -9,18 +9,6 @@
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2017_tree_buffer.mlw" proved="true">
 <theory name="Spec" proved="true">
- <goal name="VC take" expl="VC for take" proved="true">
- <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC empty" expl="VC for empty" proved="true">
- <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC add" expl="VC for add" proved="true">
- <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC get" expl="VC for get" proved="true">
- <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="VC take_lemma" expl="VC for take_lemma" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC take_lemma.0" expl="variant decrease" proved="true">
@@ -108,9 +96,6 @@
 <theory name="RealTime" proved="true">
  <goal name="VC rt" expl="VC for rt" proved="true">
  <proof prover="5"><result status="valid" time="0.00" steps="6"/></proof>
- </goal>
- <goal name="VC de_allocate" expl="VC for de_allocate" proved="true">
- <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC process_queue" expl="VC for process_queue" proved="true">
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>

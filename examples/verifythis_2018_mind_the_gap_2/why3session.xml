@@ -6,9 +6,6 @@
 <prover id="2" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2018_mind_the_gap_2.mlw" proved="true">
 <theory name="GapBuffer" proved="true">
- <goal name="VC dummy_char" expl="VC for dummy_char" proved="true">
- <proof prover="2"><result status="valid" time="0.00"/></proof>
- </goal>
  <goal name="VC buffer" expl="VC for buffer" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -61,9 +58,6 @@
   <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC k" expl="VC for k" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC grow" expl="VC for grow" proved="true">
  <transf name="split_vc" proved="true" >

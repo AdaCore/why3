@@ -8,17 +8,11 @@
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../ropes.mlw" proved="true">
 <theory name="String" proved="true">
- <goal name="VC empty" expl="VC for empty" proved="true">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- </goal>
  <goal name="app_assoc" proved="true">
  <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="Rope" proved="true">
- <goal name="VC length" expl="VC for length" proved="true">
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- </goal>
  <goal name="rope_length_is_string_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="rope_length_is_string_length.0" proved="true">
@@ -46,9 +40,6 @@
  </goal>
 </theory>
 <theory name="Balance" proved="true">
- <goal name="VC max" expl="VC for max" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
  <proof prover="5"><result status="valid" time="0.09"/></proof>
  </goal>
