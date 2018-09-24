@@ -18,6 +18,7 @@
 set -e
 eval `opam config env`
 
+export OCAMLRUNPARAM=o=20,O=200
 ./configure --enable-local
 make
 
