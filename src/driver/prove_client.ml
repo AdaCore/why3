@@ -165,6 +165,14 @@ let send_request ~id ~timelimit ~memlimit ~use_stdin ~cmd =
   let s = Buffer.contents send_buf in
   send_request_string s
 
+let send_interrupt ~id =
+  if not (is_connected ()) then connect_internal ();
+  Buffer.clear send_buf;
+  Buffer.add_string send_buf "interrupt;";
+  Buffer.add_string send_buf (string_of_int id);
+  let s = Buffer.contents send_buf in
+  send_request_string s
+
 let rec read_lines blocking =
   let s = read_from_client blocking in
   (* TODO: should we detect and handle EOF here? *)

@@ -59,6 +59,7 @@ rule token = parse
   | "true" { TRUE }
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
+  | "lambda" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
   | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }

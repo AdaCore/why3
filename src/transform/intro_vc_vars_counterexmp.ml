@@ -85,6 +85,14 @@ module Hprid = Exthtbl.Make (struct
   let hash p = Exthtbl.hash p
 end)
 
+let same_line_loc loc1 loc2 =
+  match loc1, loc2 with
+  | Some loc1, Some loc2 ->
+      let (f1, l1, _, _) = Loc.get loc1 in
+      let (f2, l2, _, _) = Loc.get loc2 in
+      f1 = f2 && l1 = l2
+  | _ -> false
+
 (*  Used to generate duplicate vc_constant and axioms for counterex generation.
     This function is always called when the term is in negative position or
     under a positive term that is not introducible. This means it never change the
@@ -107,7 +115,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
     if info.vc_inside then begin
       match info.vc_loc with
       | None -> []
-      | Some loc ->
+      | Some loc when not (same_line_loc info.vc_loc ls.id_loc) ->
           (* variable inside the term T that triggers VC. If the variable
              should be in counterexample, introduce new constant in location
              loc with all attributes necessary for collecting it for
@@ -131,15 +139,16 @@ let rec do_intro info vc_loc vc_map vc_var t =
                  because those integrates a unique hash that would make
                  identical preid different lsymbol *)
               if (Hprid.mem vc_map id_new) then
-              []
-            else
-              begin
-                Hprid.add vc_map id_new true;
-                intro_const_equal_to_term
-                  ~term:t ~id_new:id_new ~axiom_name
-              end
+                []
+              else
+                begin
+                  Hprid.add vc_map id_new true;
+                  intro_const_equal_to_term
+                    ~term:t ~id_new:id_new ~axiom_name
+                end
           | exception Not_found -> []
           end
+      | _ -> []
     end
     else [] in
   match t.t_node with

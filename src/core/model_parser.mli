@@ -24,7 +24,7 @@ type float_type =
   | Float_value of string * string * string
   | Float_hexa of string * float
 
-val interp_float: string -> string -> string -> float_type
+val interp_float: ?interp:bool -> string -> string -> string -> float_type
 
 type model_value =
  | Integer of string
