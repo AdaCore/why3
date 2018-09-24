@@ -83,6 +83,9 @@ let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
 let () = Debug.set_flag debug_sp
 
+(* Disable warnings for unused variables *)
+let () = Debug.set_flag Dterm.debug_ignore_unused_var
+
 let set_why3_conf s =
   if s != "" then
     opt_why3_conf_file := Some s
