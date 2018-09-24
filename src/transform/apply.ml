@@ -296,7 +296,7 @@ let rewrite_list opt rev with_terms hl h1 =
     (* Used to find the equality we are rewriting on *)
     (* TODO here should fold with a boolean stating if we found equality yet to
        not go through all possible hypotheses *)
-    fold_decl (fun d (acclp,accterm) ->
+    fold_decl (fun d ((acclp,accterm) as acc) ->
       match d.d_node with
       | Dprop (Paxiom, pr, t) when Ident.id_equal pr.pr_name h.pr_name ->
           let lp, lv, f = intros t in
@@ -311,10 +311,10 @@ let rewrite_list opt rev with_terms hl h1 =
           let new_lp, new_term =
             if opt
             then try replace_subst lp lv t1 t2 with_terms accterm
-                 with Arg_trans _ -> (acclp, accterm)
+                 with Arg_trans _ -> acc
             else replace_subst lp lv t1 t2 with_terms accterm in
        new_lp@acclp, new_term
-      | _ -> (acclp, accterm)) (lp, term) in
+      | _ -> acc) (lp, term) in
   let do_all = List.fold_left (fun acc h -> Trans.bind acc (do_h h)) found_term hl in
   (* Pass the premises as new goals. Replace the former toberewritten
      hypothesis to the new rewritten one *)
