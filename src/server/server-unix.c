@@ -27,7 +27,6 @@
 #include <poll.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/wait.h>
@@ -41,6 +40,7 @@
 #include "writebuf.h"
 #include "options.h"
 #include "logging.h"
+#include "proc.h"
 
 #define READ_ONCE 1024
 
@@ -53,13 +53,6 @@ typedef struct {
 
 int server_sock = -1;
 
-typedef struct {
-  pid_t id;
-  int client_fd;
-  char* task_id;
-  char* outfile;
-} t_proc, *pproc;
-
 // the poll list is the list of file descriptors for which we monitor certain
 // events.
 struct pollfd* poll_list;
@@ -67,7 +60,6 @@ int poll_num = 0;
 int poll_len = 0;
 
 // global pointers are initialized with NULL by C semantics
-plist processes;
 plist clients;
 char *current_dir;
 
@@ -275,7 +267,7 @@ void server_init_listening(char* socketname, int parallel) {
   free(socketname_copy1);
   free(socketname_copy2);
   add_to_poll_list(server_sock, POLLIN);
-  processes = init_list(parallel);
+  init_process_list();
   setup_child_pipe();
 }
 
@@ -427,12 +419,6 @@ void send_msg_to_client(pclient client,
    queue_write(client, msgbuf);
 }
 
-void free_process(pproc proc) {
-   free(proc->outfile);
-   free(proc->task_id);
-   free(proc);
-}
-
 void handle_child_events() {
   pproc child;
   pclient client;
@@ -461,7 +447,7 @@ void handle_child_events() {
     }
     child = (pproc) list_lookup(processes, pid);
     list_remove(processes, pid);
-    client = (pclient) list_lookup(clients, child->client_fd);
+    client = (pclient) list_lookup(clients, child->client_key);
     if (client != NULL) {
       send_msg_to_client(client,
                          child->task_id,
@@ -500,7 +486,7 @@ void run_request (prequest r) {
 
   proc = (pproc) malloc(sizeof(t_proc));
   proc->task_id = r->id;
-  proc->client_fd = r->key;
+  proc->client_key = r->key;
   proc->id = id;
   proc->outfile = outfile;
   list_append(processes, id, (void*) proc);
@@ -538,8 +524,7 @@ void handle_msg(pclient client, int key) {
       case REQ_INTERRUPT:
         // removes all occurrences of r->id from the queue
         remove_from_queue(r->id);
-        // kill all processes whose id is r->id;
-        // TODO kill_processes(processes, r->id);
+        kill_processes(r->id);
         free_request(r);
         break;
       }

@@ -353,7 +353,9 @@ let () =
 
   let model_any : any Hint.t = Hint.create 17
 
-  let any_from_node_ID (nid:node_ID) : any = Hint.find model_any nid
+  let any_from_node_ID (nid:node_ID) : any option =
+    try Some (Hint.find model_any nid) with
+    | Not_found -> None
 
   let pan_to_node_ID  : node_ID Hpan.t = Hpan.create 17
   let pn_to_node_ID   : node_ID Hpn.t = Hpn.create 17
@@ -519,7 +521,7 @@ module P = struct
   (* true if nid is below f_node or does not exists (in which case the
      notification is a remove). false if not below.  *)
   let is_below s nid f_nodes =
-    let any = try Some (any_from_node_ID nid) with _ -> None in
+    let any = any_from_node_ID nid in
     match any with
     | None -> true
     | Some any ->
@@ -852,6 +854,10 @@ end
   let send_task nid show_full_context loc =
     let d = get_server_data () in
     let any = any_from_node_ID nid in
+    match any with
+    | None ->
+      P.notify (Message (Error "Please select a node id"))
+    | Some any ->
     if Session_itp.is_detached d.cont.controller_session any then
       match any with
       | APn _id ->
@@ -1079,28 +1085,37 @@ end
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
-    let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id prover
-                ~limit ~callback ~notification:(notify_change_proved d.cont))
-      unproven_goals
+    let any = any_from_node_ID nid in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"))
+    | Some any ->
+        let unproven_goals = unproven_goals_below_id d.cont any in
+        List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id
+            prover ~limit ~callback ~notification:(notify_change_proved d.cont))
+          unproven_goals
 
   let schedule_edition (nid: node_ID) (prover: Whyconf.prover) =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
-    try
-      let id =
-        match any_from_node_ID nid with
-        | APn id -> id
-        | APa panid -> get_proof_attempt_parent d.cont.controller_session panid
-        | _ -> raise Not_found
-      in
-      C.schedule_edition d.cont id prover
-                           ~callback ~notification:(notify_change_proved d.cont)
-    with Not_found ->
-      P.notify
-        (Message
-           (Error
-              "for edition you must select a proof attempt node"))
+    let any = any_from_node_ID nid in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"));
+    | Some any ->
+        try
+          let id =
+            match any with
+            | APn id -> id
+            | APa panid ->
+                get_proof_attempt_parent d.cont.controller_session panid
+            | _ -> raise Not_found
+          in
+          C.schedule_edition d.cont id prover
+            ~callback ~notification:(notify_change_proved d.cont)
+        with Not_found ->
+          P.notify
+            (Message
+               (Error
+                  "for edition you must select a proof attempt node"))
 
   (* ----------------- Schedule transformation -------------------- *)
 
@@ -1152,7 +1167,10 @@ end
         List.iter (fun id -> apply_transform (APn id) t args) child_ids
     in
     let nid = any_from_node_ID node_id in
-    apply_transform nid t args
+    match nid with
+    | None -> P.notify (Message (Error "Please select a node id"));
+    | Some nid ->
+        apply_transform nid t args
 
   let removed x =
     let nid = node_ID_from_any x in
@@ -1165,7 +1183,7 @@ end
     try
       let id =
         match any_from_node_ID nid with
-        | APa panid -> panid
+        | Some (APa panid) -> panid
         | _ -> raise Not_found
       in
       let callback_pa = callback_update_tree_proof d.cont in
@@ -1187,7 +1205,11 @@ end
 
   let run_strategy_on_task nid s =
     let d = get_server_data () in
-    let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
+    let any = any_from_node_ID nid in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"));
+    | Some any ->
+    let unproven_goals = unproven_goals_below_id d.cont any in
     try
       let (n,_,_,st) = Hstr.find d.cont.controller_strategies s in
       Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
@@ -1214,13 +1236,16 @@ end
 
   let remove_node nid =
     let d = get_server_data () in
-    let n = any_from_node_ID nid in
+    let any = any_from_node_ID nid in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"))
+    | Some any ->
     begin
       try
         remove_subtree
           ~notification:(notify_change_proved d.cont)
           ~removed
-          d.cont n
+          d.cont any
       with RemoveError -> (* TODO send an error instead of information *)
         P.notify (Message (Information "Cannot remove attached proof nodes or theories, and proof_attempt that did not yet return"))
     end
@@ -1293,8 +1318,12 @@ end
   let notify_first_unproven_node d ni =
     let s = d.cont.controller_session in
     let any = any_from_node_ID ni in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"))
+    | Some any ->
       let unproven_any =
         get_first_unproven_goal_around
+          ~always_send:false
           ~proved:(Session_itp.any_proved s)
           ~children:(get_undetached_children_no_pa s)
           ~get_parent:(get_any_parent s)
@@ -1351,15 +1380,21 @@ end
        let from_any = any_from_node_ID from_id in
        let to_any = any_from_node_ID to_id in
        begin
-         try
-           C.copy_paste
-             ~notification:(notify_change_proved d.cont)
-             ~callback_pa:(callback_update_tree_proof d.cont)
-             ~callback_tr:(callback_update_tree_transform)
-             d.cont from_any to_any;
-           session_needs_saving := true
-         with C.BadCopyPaste ->
-           P.notify (Message (Error "invalid copy"))
+        match from_any, to_any with
+        | None, _ | _, None ->
+          P.notify (Message (Error "Please select a node id"));
+        | Some from_any, Some to_any ->
+          begin
+            try
+              C.copy_paste
+                ~notification:(notify_change_proved d.cont)
+                ~callback_pa:(callback_update_tree_proof d.cont)
+                ~callback_tr:(callback_update_tree_transform)
+                d.cont from_any to_any;
+              session_needs_saving := true
+            with C.BadCopyPaste ->
+              P.notify (Message (Error "invalid copy"))
+          end
        end
     | Get_file_contents f          ->
        read_and_send f
@@ -1372,7 +1407,7 @@ end
     | Interrupt_req                ->
        C.interrupt ()
     | Command_req (nid, cmd)       ->
-       let snid = try Some(any_from_node_ID nid) with Not_found -> None in
+       let snid = any_from_node_ID nid in
        begin
          match interp commands_table d.cont snid cmd with
          | Transform (s, _t, args) ->
@@ -1402,16 +1437,20 @@ end
            mark_obsolete snid;
            session_needs_saving := true
         | Focus_req ->
-           let d = get_server_data () in
-           let s = d.cont.controller_session in
-           let any = any_from_node_ID nid in
-           let focus_on =
-             match any with
-             | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-             | _ -> any
-           in
-           focused_node := Focus_on [focus_on];
-           reset_and_send_the_whole_tree ()
+            let d = get_server_data () in
+            let s = d.cont.controller_session in
+            let any = any_from_node_ID nid in
+            begin match any with
+            | None -> P.notify (Message (Error "Please select a node id"))
+            | Some any ->
+              let focus_on =
+                match any with
+                | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+                | _ -> any
+              in
+              focused_node := Focus_on [focus_on];
+              reset_and_send_the_whole_tree ()
+            end
         | Server_utils.Unfocus_req -> unfocus ()
         | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))

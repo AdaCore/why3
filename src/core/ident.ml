@@ -368,7 +368,8 @@ let append_to_model_element_name ~attrs ~to_append =
     let splitted = Strings.bounded_split '@' attr_str 2 in
     match splitted with
     | [before; after] -> before ^ to_append ^ "@" ^ after
-    | _ -> attr_str^to_append in
+    | _ -> attr_str^to_append
+  in
   transform_model_trace_attr attrs trans
 
 let append_to_model_trace_attr ~attrs ~to_append =
