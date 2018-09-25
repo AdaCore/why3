@@ -4,6 +4,7 @@ dir=`dirname $0`
 
 updateoracle=false
 files=""
+success=true
 
 while test $# != 0; do
 case "$1" in
@@ -44,6 +45,7 @@ run () {
             echo "FAILED!"
             echo "diff is the following:"
             diff "$f.oracle" "$f.out"
+            success=false
         fi
     fi
 }
@@ -57,3 +59,8 @@ for file in $files; do
     run CVC4,1.5 $filedir/$filebase
     run Z3,4.6.0 $filedir/$filebase
 done
+if $success; then
+    exit 0
+else
+    exit 1
+fi
