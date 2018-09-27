@@ -163,72 +163,44 @@ let print_ls fmt ls =
 let print_pr fmt pr =
   Ident.print_decoded fmt (id_unique pprinter pr.pr_name)
 
-let print_library_path fmt lp =
+let print_qualified decode fmt id =
+(* if Debug.test_noflag debug_print_qualifs then raise Not_found; *)
+  let dot fmt () =
+    pp_print_char fmt '.'; pp_print_cut fmt () in
   let str fmt s =
     if String.contains s ' ' || String.contains s '.' then begin
       pp_print_char fmt '"'; pp_print_string fmt s; pp_print_char fmt '"'
-    end else pp_print_string fmt s in
-  let dot fmt () =
-    pp_print_char fmt '.'; pp_print_cut fmt () in
-  if lp <> [] then begin
-    print_list dot str fmt lp; dot fmt ()
-  end
-
-let print_qualified_name fmt qn =
-  let dot fmt () =
-    pp_print_char fmt '.'; pp_print_cut fmt () in
-  if qn <> [] then begin
-    dot fmt (); print_list dot pp_print_string fmt qn
-  end
-
-let print_decoded_name fmt qn =
-  match List.rev qn with
-  | sn::qn ->
-      print_qualified_name fmt (List.rev qn);
-      pp_print_char fmt '.'; pp_print_cut fmt ();
-      Ident.print_decoded fmt sn
-  | [] -> ()
+    end else pp_print_string fmt s;
+    dot fmt () in
+  let lp, tn, qn = Theory.restore_path id (* raises Not_found *) in
+  let qn = match lp with
+    | "why3"::_ -> if qn = [] then [tn] (* theory *) else qn
+    | _ -> print_list Pp.nothing str fmt lp; tn::qn in
+  if decode then match List.rev qn with
+    | [sn] ->
+        Ident.print_decoded fmt sn
+    | sn::qn ->
+        print_list dot pp_print_string fmt (List.rev qn); dot fmt ();
+        Ident.print_decoded fmt sn
+    | [] -> ()
+  else
+    print_list dot pp_print_string fmt qn
 
 let print_th_qualified fmt th =
-(*   if Debug.test_flag debug_print_qualifs then begin *)
-    try
-      let lp,tn,_ = Theory.restore_path th.th_name in
-      fprintf fmt "%a%s" print_library_path lp tn
-    with Not_found -> print_th fmt th
-(*   end else print_th fmt th *)
+  try print_qualified false fmt th.th_name with Not_found -> print_th fmt th
 
 let print_ts_qualified fmt ts =
   if ts_equal ts ts_func then pp_print_string fmt "(->)" else
-(*   if Debug.test_flag debug_print_qualifs then begin *)
-    try
-      let lp,tn,qn = Theory.restore_path ts.ts_name in
-      fprintf fmt "%a%s%a" print_library_path lp tn print_qualified_name qn
-    with Not_found -> print_ts fmt ts
-(*   end else print_ts fmt ts *)
+  try print_qualified false fmt ts.ts_name with Not_found -> print_ts fmt ts
 
 let print_cs_qualified fmt ls =
-(*   if Debug.test_flag debug_print_qualifs then begin *)
-    try
-      let lp,tn,qn = Theory.restore_path ls.ls_name in
-      fprintf fmt "%a%s%a" print_library_path lp tn print_qualified_name qn
-    with Not_found -> print_cs fmt ls
-(*   end else print_cs fmt ls *)
+  try print_qualified false fmt ls.ls_name with Not_found -> print_cs fmt ls
 
 let print_ls_qualified fmt ls =
-(*   if Debug.test_flag debug_print_qualifs then begin *)
-    try
-      let lp,tn,qn = Theory.restore_path ls.ls_name in
-      fprintf fmt "%a%s%a" print_library_path lp tn print_decoded_name qn
-    with Not_found -> print_ls fmt ls
-(*   end else print_ls fmt ls *)
+  try print_qualified true fmt ls.ls_name with Not_found -> print_ls fmt ls
 
 let print_pr_qualified fmt pr =
-(*   if Debug.test_flag debug_print_qualifs then begin *)
-    try
-      let lp,tn,qn = Theory.restore_path pr.pr_name in
-      fprintf fmt "%a%s%a" print_library_path lp tn print_decoded_name qn
-    with Not_found -> print_pr fmt pr
-(*   end else print_pr fmt pr *)
+  try print_qualified true fmt pr.pr_name with Not_found -> print_pr fmt pr
 
 (** Types *)
 
