@@ -48,6 +48,13 @@ module type Printer = sig
     val print_ty : formatter -> ty -> unit            (* type *)
     val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
 
+    val print_ts_qualified : formatter -> tysymbol -> unit
+    val print_ls_qualified : formatter -> lsymbol -> unit
+    val print_cs_qualified : formatter -> lsymbol -> unit
+    val print_pr_qualified : formatter -> prsymbol -> unit
+    val print_th_qualified : formatter -> theory -> unit
+    val print_ty_qualified : formatter -> ty -> unit
+
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
     val print_pat : formatter -> pattern -> unit      (* pattern *)

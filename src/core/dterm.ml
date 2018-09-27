@@ -124,16 +124,17 @@ let rec print_dty ht pri fmt = function
       Format.fprintf fmt "(%a)"
         (Pp.print_list Pp.comma (print_dty ht 0)) dl
   | Dapp (ts,[]) ->
-      Pretty.print_ts fmt ts
+      Pretty.print_ts_qualified fmt ts
   | Dapp (ts,dl) ->
       Format.fprintf fmt (protect_on (pri > 1) "%a@ %a")
-        Pretty.print_ts ts (Pp.print_list Pp.space (print_dty ht 2)) dl
+        Pretty.print_ts_qualified ts
+        (Pp.print_list Pp.space (print_dty ht 2)) dl
   | Duty ({ty_node = Tyapp (ts,(_::_))} as ty)
     when (pri > 1 && not (is_ts_tuple ts))
       || (pri = 1 && ts_equal ts Ty.ts_func) ->
-      Format.fprintf fmt "(%a)" Pretty.print_ty ty
+      Format.fprintf fmt "(%a)" Pretty.print_ty_qualified ty
   | Duty ty ->
-      Pretty.print_ty fmt ty
+      Pretty.print_ty_qualified fmt ty
 
 let print_dty = let ht = Hint.create 3 in fun fmt dty ->
   print_dty ht 0 fmt dty

@@ -263,7 +263,7 @@ let rec print_dity pur pri fmt = function
   | Durg (Dapp (s,tl,rl),{reg_name = id}) ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a@ @@%s")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl (Ident.id_unique rprinter id)
   | Dvar {contents = Dreg _} | Durg _ -> assert false
   | Dapp (s,[t1;t2],[]) when its_equal s its_func ->
@@ -273,16 +273,16 @@ let rec print_dity pur pri fmt = function
       Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity pur 0)) tl
   | Dapp (s,tl,_) when pur ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
   | Dapp (s,tl,rl) when not s.its_mutable ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl
   | Dapp (s,tl,rl) ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "{%a}%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl
 
 let print_dity fmt d = print_dity false 0 fmt d
