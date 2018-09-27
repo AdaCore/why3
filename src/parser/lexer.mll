@@ -43,6 +43,7 @@
         "match", MATCH;
         "meta", META;
         "not", NOT;
+        "partial", PARTIAL;
         "predicate", PREDICATE;
         "range", RANGE;
         "scope", SCOPE;

@@ -76,6 +76,7 @@ type dspec_final = {
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
+  ds_partial : bool;
   ds_checkrw : bool;
 }
 

@@ -120,6 +120,7 @@ let d2 : Ptree.decl =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body: expr = mk_expr Etrue in
@@ -150,6 +151,7 @@ let d3 : Ptree.decl =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body: expr = mk_evar id_b in
@@ -184,6 +186,7 @@ let d1 : Ptree.decl =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body: expr = mk_expr (Ecast (mk_econst "42", PTtyapp (Qident a, []))) in

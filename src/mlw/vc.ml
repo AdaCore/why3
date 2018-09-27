@@ -538,7 +538,7 @@ let rec k_expr env lps e res xmap =
            Kseq (k_expr env lps e v xmap, 0, k v) in
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
-    if eff.eff_oneway && not env.divergent then begin
+    if diverges eff.eff_oneway && not env.divergent then begin
       if Debug.test_noflag debug_ignore_diverges then
       Warning.emit ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \

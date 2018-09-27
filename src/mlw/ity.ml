@@ -868,16 +868,30 @@ exception IllegalAssign of region * region * region
 exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
+type termination_status =
+  | Ghostifiable
+  | Partial
+  | Diverges
+
+let ghostifiable status = (status = Ghostifiable)
+let partial status = (status = Partial)
+let diverges status = (status = Diverges)
+
+let termination_union t1 t2 = match (t1, t2) with
+  | Ghostifiable, Ghostifiable -> Ghostifiable
+  | _, Diverges | Diverges, _ -> Diverges
+  | _ -> Partial
+
 type effect = {
-  eff_reads  : Spv.t;         (* known variables *)
-  eff_writes : Spv.t Mreg.t;  (* writes to fields *)
-  eff_taints : Sreg.t;        (* ghost code writes *)
-  eff_covers : Sreg.t;        (* surviving writes *)
-  eff_resets : Sreg.t;        (* locked by covers *)
-  eff_raises : Sxs.t;         (* raised exceptions *)
-  eff_spoils : Stv.t;         (* immutable tyvars *)
-  eff_oneway : bool;          (* non-termination *)
-  eff_ghost  : bool;          (* ghost status *)
+  eff_reads  : Spv.t;               (* known variables *)
+  eff_writes : Spv.t Mreg.t;        (* writes to fields *)
+  eff_taints : Sreg.t;              (* ghost code writes *)
+  eff_covers : Sreg.t;              (* surviving writes *)
+  eff_resets : Sreg.t;              (* locked by covers *)
+  eff_raises : Sxs.t;               (* raised exceptions *)
+  eff_spoils : Stv.t;               (* immutable tyvars *)
+  eff_oneway : termination_status;  (* non-termination *)
+  eff_ghost  : bool;                (* ghost status *)
 }
 
 let eff_empty = {
@@ -888,7 +902,7 @@ let eff_empty = {
   eff_resets = Sreg.empty;
   eff_raises = Sxs.empty;
   eff_spoils = Stv.empty;
-  eff_oneway = false;
+  eff_oneway = Ghostifiable;
   eff_ghost  = false;
 }
 
@@ -906,7 +920,7 @@ let eff_equal e1 e2 =
 let eff_pure e =
   Mreg.is_empty e.eff_writes &&
   Sxs.is_empty e.eff_raises &&
-  not e.eff_oneway
+  ghostifiable e.eff_oneway
 
 let check_writes {eff_writes = wrt} pvs =
   if not (Mreg.is_empty wrt) then Spv.iter (fun v ->
@@ -940,12 +954,12 @@ let reset_taints e =
 
 let eff_ghostify gh e =
   if not gh || e.eff_ghost then e else
-  if e.eff_oneway then raise GhostDivergence else
+  if (not (ghostifiable e.eff_oneway)) then raise GhostDivergence else
   reset_taints { e with eff_ghost = true }
 
 let eff_ghostify_weak gh e =
   if not gh || e.eff_ghost then e else
-  if e.eff_oneway || not (Sxs.is_empty e.eff_raises) then e else
+  if not (ghostifiable e.eff_oneway && Sxs.is_empty e.eff_raises) then e else
   if not (Sreg.equal e.eff_taints (visible_writes e)) then e else
   (* it is not enough to catch BadGhostWrite from eff_ghostify below,
      because e may not have in eff_reads the needed visible variables
@@ -953,9 +967,14 @@ let eff_ghostify_weak gh e =
      Therefore, we check that all visible writes are already taints. *)
   eff_ghostify gh e
 
-let eff_diverge e = if e.eff_oneway then e else
+let eff_partial e =
+  if diverges e.eff_oneway || partial e.eff_oneway then e
+  else if e.eff_ghost then raise GhostDivergence else
+  { e with eff_oneway = Partial }
+
+let eff_diverge e = if diverges e.eff_oneway then e else
   if e.eff_ghost then raise GhostDivergence else
-  { e with eff_oneway = true }
+  { e with eff_oneway = Diverges }
 
 let eff_read_pre rd e =
   if Spv.subset rd e.eff_reads then e else
@@ -1077,7 +1096,7 @@ let eff_assign asl =
     eff_resets = resets;
     eff_raises = Sxs.empty;
     eff_spoils = Stv.empty;
-    eff_oneway = false;
+    eff_oneway = Ghostifiable;
     eff_ghost  = ghost } in
   (* verify that we can rebuild every value *)
   check_writes effect reads;
@@ -1120,7 +1139,7 @@ let eff_union e1 e2 = {
   eff_resets = Sreg.union e1.eff_resets e2.eff_resets;
   eff_raises = Sxs.union e1.eff_raises e2.eff_raises;
   eff_spoils = Stv.union e1.eff_spoils e2.eff_spoils;
-  eff_oneway = e1.eff_oneway || e2.eff_oneway;
+  eff_oneway = termination_union e1.eff_oneway e2.eff_oneway;
   eff_ghost  = e1.eff_ghost && e2.eff_ghost }
 
 let eff_union e1 e2 =
@@ -1481,8 +1500,10 @@ let cty_exec ({cty_effect = eff} as c) =
      in the resulting pvsymbol. Thus, we have to forbid all effects,
      including allocation. TODO/FIXME: we should probably forbid
      the rest of the signature to contain regions at all. *)
-  if eff.eff_oneway then Loc.errorm
+  if (diverges eff.eff_oneway) then Loc.errorm
     "This function may not terminate, it cannot be used as pure";
+  if (partial eff.eff_oneway) then Loc.errorm
+    "This function may fail, it cannot be used as pure";
   if not (eff_pure eff && Sreg.is_empty eff.eff_resets) then Loc.errorm
     "This function has side effects, it cannot be used as pure";
   if not (Mreg.is_empty c.cty_freeze.isb_reg) then Loc.errorm
@@ -1679,7 +1700,7 @@ let print_spec args pre post xpost oldies eff fmt ity =
   fprintf fmt "@[<hov 4>@[%a@]%a@]"
     (Pp.print_list_pre Pp.space print_pvty) args
     (Pp.print_option print_result) ity;
-  if eff.eff_oneway then pp_print_string fmt " diverges";
+  if diverges eff.eff_oneway then pp_print_string fmt " diverges";
   let reads = List.fold_right Spv.remove args eff.eff_reads in
   if not (Spv.is_empty reads) then fprintf fmt "@\nreads  { @[%a@] }"
     (Pp.print_list Pp.comma print_pv) (Spv.elements reads);

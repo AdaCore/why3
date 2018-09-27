@@ -79,6 +79,7 @@
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
 
   let spec_union s1 s2 = {
@@ -91,6 +92,7 @@
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
+    sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
   let break_id    = "'Break"
@@ -105,6 +107,24 @@
     match pat.pat_desc with
     | Pwild -> sp
     | _ -> { sp with sp_post = List.map apply sp.sp_post }
+
+  let apply_partial part sp =
+    if part
+    then { sp with sp_partial = true }
+    else sp
+
+  let apply_partial_ed e =
+    match e with
+    | Efun (bl, op, m, s, ex) ->
+       Efun (bl, op, m, apply_partial true s, ex)
+    | Eany (pl, rsk, op, m, s) ->
+       Eany (pl, rsk, op, m, apply_partial true s)
+    | _ -> assert false
+
+  let apply_partial_e part e =
+    if part
+    then { e with expr_desc = apply_partial_ed e.expr_desc }
+    else e                      
 
   let we_attr = Ident.create_attribute "expl:witness existence"
 
@@ -177,7 +197,7 @@
 
 %token ABSTRACT ABSURD ALIAS ANY ASSERT ASSUME AT BEGIN BREAK CHECK
 %token CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
-%token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
+%token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD PARTIAL
 %token PRIVATE PURE RAISE RAISES READS REC REQUIRES
 %token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES
 
@@ -727,8 +747,10 @@ numeral:
 (* Program declarations *)
 
 prog_decl:
-| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) { Dlet (add_model_trace_attr $4, $2, $3, $5) }
-| LET ghost kind attrs(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
+| VAL ghost kind partial attrs(lident_rich) mk_expr(val_defn)
+    { Dlet (add_model_trace_attr $5, $2, $3, apply_partial_e $4 $6) }
+| LET ghost kind partial attrs(lident_rich) mk_expr(fun_defn)
+    { Dlet ($5, $2, $3, apply_partial_e $4 $6) }
 | LET ghost kind attrs(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
 | LET REC with_list1(rec_defn)                        { Drec $3 }
 | EXCEPTION attrs(uident_nq)        { Dexn ($2, PTtuple [], Ity.MaskVisible) }
@@ -745,15 +767,20 @@ kind:
 | PREDICATE     { Expr.RKpred }
 | LEMMA         { Expr.RKlemma }
 
+%inline partial:
+| (* epsilon *) { false }
+| PARTIAL       { true }
+
 (* Function definitions *)
 
 rec_defn:
-| ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
-    { let pat, ty, mask = $5 in
-      let spec = apply_return pat (spec_union $6 $8) in
-      let id = mk_id return_id $startpos($7) $endpos($7) in
-      let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
-      $3, $1, $2, $4, ty, mask, spec, e }
+| ghost kind partial attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
+    { let pat, ty, mask = $6 in
+      let spec = apply_return pat (spec_union $7 $9) in
+      let spec = apply_partial $3 spec in
+      let id = mk_id return_id $startpos($8) $endpos($8) in
+      let e = { $10 with expr_desc = Eoptexn (id, mask, $10) } in
+      $4, $1, $2, $5, ty, mask, spec, e }
 
 fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
@@ -880,10 +907,10 @@ single_expr_:
       unfold false $6 pat }
 | LET ghost kind attrs(lident_op_nq) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
-| LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
-    { Elet ($4, $2, $3, $5, $7) }
-| LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
-    { Elet ($4, $2, $3, $5, $7) }
+| LET ghost kind partial attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
+    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
+| LET ghost kind partial attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
+    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
@@ -900,13 +927,13 @@ single_expr_:
         "this expression should not raise exceptions";
       if spec.sp_alias <> [] then Loc.errorm ~loc
         "this expression cannot have alias restrictions";
-      if spec.sp_diverge then Loc.errorm ~loc
+      if spec.sp_diverge || spec.sp_partial then Loc.errorm ~loc
         "this expression must terminate";
       let pre = pre_of_any loc ty spec.sp_post in
       let spec = { spec with sp_pre = spec.sp_pre @ pre } in
       Eany ([], Expr.RKnone, Some ty, mask, spec) }
-| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
-    { Elet ($4, $2, $3, $5, $7) }
+| VAL ghost kind partial attrs(lident_rich) mk_expr(val_defn) IN seq_expr
+    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
 | MATCH seq_expr WITH ext_match_cases END
     { let bl, xl = $4 in Ematch ($2, bl, xl) }
 | EXCEPTION attrs(uident) IN seq_expr

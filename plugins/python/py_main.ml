@@ -79,6 +79,7 @@ let empty_spec = {
   sp_variant = [];
   sp_checkrw = false;
   sp_diverge = false;
+  sp_partial = false;
 }
 
 type env = {

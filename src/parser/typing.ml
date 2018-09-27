@@ -645,7 +645,8 @@ let dspec muc sp lvm xsm old ity = {
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
   ds_checkrw = sp.sp_checkrw;
-  ds_diverge = sp.sp_diverge; }
+  ds_diverge = sp.sp_diverge;
+  ds_partial = sp.sp_partial; }
 
 let dspec_no_variant muc sp = match sp.sp_variant with
   | ({term_loc = loc},_)::_ ->

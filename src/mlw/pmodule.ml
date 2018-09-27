@@ -730,7 +730,8 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let eff = eff_reset (eff_write reads writes) resets in
   let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
-  let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
+  let eff = if partial cty.cty_effect.eff_oneway then eff_partial eff else eff in
+  let eff = if diverges cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
 

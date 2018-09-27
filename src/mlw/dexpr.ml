@@ -384,6 +384,7 @@ type dspec_final = {
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
+  ds_partial : bool;
   ds_checkrw : bool;
 }
 
@@ -892,6 +893,7 @@ let effect_of_dspec dsp =
         Loc.errorm ?loc:t.t_loc "mutable expression expected" in
   let wl, eff = List.fold_left add_write ([], eff_read pvs) dsp.ds_writes in
   let eff = Mxs.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
+  let eff = if dsp.ds_partial then eff_partial eff else eff in
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
 
@@ -924,8 +926,10 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
     print_xs (Sxs.choose (Sxs.diff ueff.eff_raises eeff.eff_raises));
-  if check_ue && ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc
-      "this@ expression@ does@ not@ diverge";
+  if check_ue && (diverges ueff.eff_oneway) && not (diverges eeff.eff_oneway)
+  then Loc.errorm ?loc "this@ expression@ does@ not@ diverge";
+  if check_ue && (partial ueff.eff_oneway) && (ghostifiable eeff.eff_oneway)
+  then Loc.errorm ?loc "this@ expression's@ termination@ is@ not@ partial";
   (* check that every computed effect is listed *)
   if check_rw && bad_read eeff ueff then Loc.errorm ?loc
     "this@ expression@ depends@ on@ variable@ %a,@ \
