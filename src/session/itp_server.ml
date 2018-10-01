@@ -595,10 +595,10 @@ end
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
-  let reload_files cont ~use_shapes =
+  let reload_files cont ~shape_version =
     capture_parse_or_type_errors
       (fun c ->
-        try let (_,_) = reload_files ~use_shapes c in [] with
+        try let (_,_) = reload_files ~shape_version c in [] with
         | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
@@ -971,7 +971,7 @@ end
 
   let init_server ?(send_source=true) config env f =
     Debug.dprintf debug "loading session %s@." f;
-    let ses,use_shapes = Session_itp.load_session f in
+    let ses,shape_version = Session_itp.load_session f in
     Debug.dprintf debug "creating controller@.";
     let c = create_controller config env ses in
     let shortcuts =
@@ -1011,7 +1011,7 @@ end
                      };
     Debug.dprintf debug "reloading source files@.";
     let d = get_server_data () in
-    let x = reload_files d.cont ~use_shapes in
+    let x = reload_files d.cont ~shape_version in
     reset_and_send_the_whole_tree ();
     (* After initial sending, we don't check anymore that there is a need to
            focus on a specific node. *)
@@ -1273,7 +1273,9 @@ end
     let _old_focus = !focused_node in
     unfocus ();
     clear_tables ();
-    let l = reload_files d.cont ~use_shapes:true in
+    let l = reload_files d.cont
+                         ~shape_version:(Some Termcode.current_shape_version)
+    in
     reset_and_send_the_whole_tree ();
     match l with
     | [] ->

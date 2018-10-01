@@ -223,18 +223,18 @@ let print_session fmt c =
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let reload_files (c : controller) ~use_shapes =
+let reload_files (c : controller) ~shape_version =
   let old_ses = c.controller_session in
   c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
   Whyconf.Hprover.reset c.controller_provers;
   load_drivers c;
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
-  merge_files ~use_shapes c.controller_env c.controller_session old_ses
+  merge_files ~shape_version c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list
 
-let reload_files (c: controller) ~use_shapes =
-  let errors, b1, b2 = reload_files c ~use_shapes in
+let reload_files (c: controller) ~shape_version =
+  let errors, b1, b2 = reload_files c ~shape_version in
   match errors with
   | [] -> b1, b2
   | _ -> raise (Errors_list errors)

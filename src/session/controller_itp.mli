@@ -110,8 +110,17 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : controller -> use_shapes:bool -> bool * bool
-(** reload the files of the given session:
+val reload_files : controller -> shape_version:int option -> bool * bool
+(** [reload_files] returns a pair [(o,d)]: [o] true means there are
+    obsolete goals, [d] means there are missed objects (goals,
+    transformations, theories or files) that are now detached in the
+    session returned.
+
+  If parsing or typing errors occurs, a list of errors is raised
+  inside exception Errors_list.
+
+  The detailed process of reloading the files of the given session is
+  as follows.
 
   - each file is parsed again and theories/goals extracted from it. If
     some syntax error or parsing error occurs, then the corresponding
@@ -155,13 +164,7 @@ val reload_files : controller -> use_shapes:bool -> bool * bool
       it, neither to its subgoals.
 
 
-  [reload_files] It returns a pair (o, d): o true means there are
-    obsolete goals, d means there are missed objects (goals, transformations,
-    theories or files) that are now detached in the session returned.
-   If parsing or typing errors occurs, a list of errors is raised inside
-   exception Errors_list.
-
-*)
+ *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
