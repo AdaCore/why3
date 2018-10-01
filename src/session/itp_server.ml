@@ -1197,6 +1197,11 @@ end
         (Message
            (Information
               "for bisection please select some proof attempt"))
+       | C.CannotRunBisectionOn _ ->
+          P.notify
+            (Message
+               (Error
+                  "for bisection please select a successful proof attempt"))
 
 
   (* ----------------- run strategy -------------------- *)

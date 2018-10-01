@@ -1151,11 +1151,14 @@ let create_rem_list =
   Buffer.contents b
 
 
+exception CannotRunBisectionOn of proofAttemptID
+
+
 let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_id =
   let ses = c.controller_session in
   let pa = get_proof_attempt_node ses pa_id in
   if not (proof_is_complete pa) then
-    invalid_arg "bisect: proof attempt should be valid";
+    raise (CannotRunBisectionOn pa_id); (* proof attempt should be valid *)
   let goal_id = pa.parent in
   let prover = pa.prover in
   let limit = { pa.limit with
@@ -1221,12 +1224,12 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
      *)
     let rem = create_rem_list rem in
     let callback st =
-      callback_tr "remove" [rem] st;
       begin match st with
       | TSscheduled ->
          Debug.dprintf
            debug
-           "[Bisect] transformation 'remove' scheduled@."
+           "[Bisect] transformation 'remove' scheduled@.";
+         callback_tr "remove" [rem] st;
       | TSfailed(_,exn) ->
          (* may happen if removing a type or a lsymbol that is used
 later on. We do has if proof fails. *)
@@ -1244,6 +1247,7 @@ later on. We do has if proof fails. *)
          Debug.dprintf
            debug
            "[Bisect] transformation 'remove' succeeds@.";
+         callback_tr "remove" [rem] st;
          match get_sub_tasks ses trid with
          | [pn] ->
             let limit = { limit with Call_provers.limit_time = !timelimit; } in

@@ -343,6 +343,7 @@ val replay:
 
  *)
 
+exception CannotRunBisectionOn of proofAttemptID
 
 val bisect_proof_attempt:
   callback_tr:(string -> string list -> transformation_status -> unit) ->
@@ -350,5 +351,23 @@ val bisect_proof_attempt:
   notification:notifier ->
   removed:notifier ->
   controller -> proofAttemptID -> unit
+  (** [bisect_proof_attempt ~callback_tr ~callback_pa ~notification
+                            ~removed cont id] runs a bisection process
+      based on the proof attempt [id] of the session managed by [cont].
 
+      The proof attempt [id] must be a successful one, otherwise,
+      exception [CannotRunBisectionOn id] is raised.
+
+      Bisection tries to remove from the context the largest number of
+      definitions and axioms, using the `remove` transformation (bound
+      to [Cut.remove_list]). It proceeeds by dichotomy of the
+      context. Note that there is no garantee that the removed data at
+      the end is globally maximal. During that process, [callback_tr]
+      is called each time the `remove` transformation is added to the session,
+      [callback_pa] is called each time the prover is called on a
+      reduced task, [notification] is called when a proof node is
+      created or modified, and [removed] is called when a node is
+      removed.
+
+   *)
 end
