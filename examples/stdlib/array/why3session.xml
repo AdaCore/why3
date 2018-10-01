@@ -110,7 +110,12 @@
    <proof prover="3"><result status="valid" time="0.85" steps="815"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.4" expl="assertion" proved="true">
-   <proof prover="6"><result status="valid" time="0.92"/></proof>
+   <transf name="remove" proved="true" arg1="real,tuple0,unit,map,zero,one,( * ),sum,get,set,([&lt;-]),([&lt;-]&#39;),make,inversions_for,inversions,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,numof_def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_some,numof_change_equiv,sum_def,sum_left,sum_ext,sum_le,sum_zero,sum_nonneg,sum_decomp,shift_left,exchange_set,array&#39;invariant,([&lt;-])_spec,make_spec">
+    <goal name="VC exchange_inversion.2.4.0" expl="assertion" proved="true">
+    <proof prover="3"><result status="valid" time="0.02" steps="115"/></proof>
+    <proof prover="6" timelimit="1"><result status="valid" time="0.01"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="VC exchange_inversion.2.5" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
