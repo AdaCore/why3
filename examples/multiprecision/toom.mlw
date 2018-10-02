@@ -62,9 +62,9 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   raises   { StackOverflow -> true }
   variant { k + k }
 =
-  let s = Int32.(/) sx 2 in (* TODO sx >> 1 *)
-  let n = Int32.(-) sx s in
-  let t = Int32.(-) sy n in
+  let s = sx / 2 in (* TODO sx >> 1 *)
+  let n = sx - s in
+  let t = sy - n in
   assert { 0 < s };
   assert { n-1 <= s <= n };
   assert { 0 < t <= s };
@@ -82,11 +82,11 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   assert { value x sx = a0 + m * a1 };
   assert { value y sy = b0 + m * b1 };
   let r' = decr_split r 0 in
-  let ro = C.incr_split r (Int32.(+) sx sy) in
+  let ro = C.incr_split r (sx + sy) in
   let scratch' = decr_split scratch 0 in
   assert { min r = offset r /\ max r = offset r + sx + sy };
-  let s_out = C.incr_split scratch (Int32.(+) n n) in
-  let vinf = C.incr_split r (Int32.(+) n n) in
+  let s_out = C.incr_split scratch (n + n) in
+  let vinf = C.incr_split r (n + n) in
   label ASM1 in
   let xsm1 = r in
   let ysm1 = C.incr_split r n in
@@ -96,10 +96,10 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
         ensures { min scratch = old min scratch }
         ensures { max scratch = old max scratch }
         ensures { plength scratch = old plength scratch }
-    if (Int32.(=) s n)
+    if (s = n)
     then
       if begin ensures { result <->  value x0 n < value x1 n }
-           Int32.(<) (wmpn_cmp x0 x1 n) 0
+           (wmpn_cmp x0 x1 n) < 0
          end
       then begin
         let ghost b = wmpn_sub_n xsm1 x1 x0 n in
@@ -109,8 +109,8 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
            no_borrow_ptr x0 x1 xsm1 (p2i n) (p2i n) b
     else
       (* n-s=1*)
-      if (Limb.(=) (get_ofs x0 s) 0) &&
-         (Int32.(<) (wmpn_cmp x0 x1 s) 0)
+      if ((get_ofs x0 s) = 0) &&
+         ((wmpn_cmp x0 x1 s) < 0)
       then begin
         assert { value x0 s < value x1 s };
         value_tail x0 s;
@@ -140,10 +140,10 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
         ensures { min scratch = old min scratch }
         ensures { max scratch = old max scratch }
         ensures { plength scratch = old plength scratch }
-    if (Int32.(=) t n)
+    if (t = n)
     then
       if begin ensures { result <-> value y0 n < value y1 n }
-           Int32.(<) (wmpn_cmp y0 y1 n) 0
+           (wmpn_cmp y0 y1 n) < 0
          end
       then begin
         let ghost b = wmpn_sub_n ysm1 y1 y0 n in
@@ -154,8 +154,8 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
         no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i n) b;
     else
       let y0t = C.incr y0 t in
-      let c0 = (Int32.(=) (wmpn_zero_p y0t (Int32.(-) n t)) 1) in
-      let c1 = (Int32.(<) (wmpn_cmp y0 y1 t) 0) in
+      let c0 = ((wmpn_zero_p y0t (n - t)) = 1) in
+      let c1 = ((wmpn_cmp y0 y1 t) < 0) in
       if c0 && c1
       then begin
         assert { value y0 t < value y1 t };
@@ -168,7 +168,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
         label Zero in
         let ghost ysm1z = { ysm1 } in
         let ysm1t = C.incr ysm1 t in
-        wmpn_zero ysm1t (Int32.(-) n t);
+        wmpn_zero ysm1t (n - t);
         value_sub_frame_shift (pelts ysm1) (pelts ysm1z)
                               (offset ysm1) (offset ysm1z) (p2i t);
         assert { value ysm1 t = value ysm1 t at Zero };
@@ -230,14 +230,14 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
       assert { forall p: ptr limb, n1 n2. 0 <= n1 <= n2 -> valid p n2 -> valid p n1 } in
     valid_monotonous s n;
     valid_monotonous t n;
-    (if Int32.(>) s t
+    (if s > t
      then wmpn_toom22_mul_rec vinf x1 y1 s_out s t (k-1)
      else wmpn_toom22_mul_n_rec vinf x1 y1 s_out s (k-1));
     wmpn_toom22_mul_n_rec v0 x0 y0 s_out n (k-1);
   end;
   label Adds in
-  value_concat v0 n (Int32.(+) n n);
-  value_concat vinf n (Int32.(+) s t);
+  value_concat v0 n (n + n);
+  value_concat vinf n (s + t);
   let v0n = incr_split v0 n in
   let vinfn = incr_split vinf n in
   let ghost lv0 = value v0 (int32'int n) in
@@ -249,14 +249,14 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   let cy = ref (wmpn_add_in_place vinf v0n n n) in (*TODO wmpn_add_n_in_place*)
   assert { value vinf n = lvinf + hv0 - m * !cy };
   let c = wmpn_add_n v0n vinf v0 n in
-  let cy2 = Limb.(+) c !cy in
+  let cy2 = c + !cy in
   assert { value v0n n = lvinf + hv0 + lv0 - m * cy2
            by value v0n n = lv0 + value vinf n - m * c
                           = lvinf + hv0 + lv0 - m * !cy - m * c
                           = lvinf + hv0 + lv0 - m * cy2 };
   label Add3 in
-  let c' = wmpn_add_in_place vinf vinfn n (Int32.(-) (Int32.(+) s t) n) in
-  cy := Limb.(+) !cy c';
+  let c' = wmpn_add_in_place vinf vinfn n ((s+t) - n) in
+  cy := !cy + c';
   assert { value vinf n = hvinf + lvinf + hv0 - m * !cy
            by m * (!cy at Add3) + m * c' = m * !cy
            so value vinf n = value vinf n at Add3 + hvinf - m * c'
@@ -272,7 +272,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   value_sub_frame (pelts v0n) (pelts vinfj) (offset vinf) (offset vinf + p2i n);
   assert { value_sub (pelts v0n) (offset v0n + n) (offset v0n + n + n)
            = value vinfj n };
-  value_concat v0n n (Int32.(+) n n);
+  value_concat v0n n (n + n);
   assert { value v0n (n+n) = a1 * b1 + a0 * b0 + hv0 + m * lvinf
              - m * cy2 - m * m * !cy
            by value v0n (n+n)
@@ -306,7 +306,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
       assert { value v0n (n+n)
                = value v0n (n+n) at AddSub + value scratch (n+n)
                  - power radix (n+n) * c'' };
-      cy := Limb.(+) !cy c'';
+      cy := !cy + c'';
       assert { value v0n (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
                  + hv0 + m * lvinf - m * cy2 - m * m * !cy
                by - m * m * c'' - m * m * !cy at AddSub = - m * m * !cy
@@ -322,7 +322,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
       assert { value v0n (n+n)
                = value v0n (n+n) at AddSub - value scratch (n+n)
                  + power radix (n+n) * b };
-      cy := Limb.sub_mod !cy b;
+      cy := sub_mod !cy b;
       assert { !cy <= 2 /\ !cy = !cy at AddSub - b
                \/ !cy = radix - 1 /\ !cy at AddSub = 0 /\ b = 1
                by [@case_split]
@@ -366,7 +366,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   join r v0n;
   value_sub_frame (pelts r) (pelts rj) (offset r) (offset r + p2i n);
   assert { value r n = value rj n = lv0 };
-  value_concat r n (Int32.( *) 3 n);
+  value_concat r n (3 * n);
   value_sub_frame (pelts r) (pelts v0nj) (offset r + p2i n)
                                          (offset r + 3 * p2i n);
   assert { value r (3*n) = value r n + m * value (v0n at Join) (n+n)
@@ -381,8 +381,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
   assert { value r (3*n) = value r (3*n) at JoinH };
   value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + p2i n);
   assert { value r n = value r n at JoinH };
-  value_concat r (3*n)
-               (Int32.(+) (Int32.( *) 3 n) (Int32.(-) (Int32.(+) s t) n));
+  value_concat r (3*n) ((3 * n) + ((s + t) - n));
   assert { forall i. offset r + 3 * n <= i < offset r + 3 * n + s + t - n ->
            min vinfnj <= i < max vinfnj
            by max vinfnj >= offset r + sx + sy
@@ -621,7 +620,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
               = m * m * m * m' - m * m * m
            so m * m * cy2 < m * m * m)) };
   end;
-  value_concat r (Int32.(+) n n) (Int32.(+) sx sy);
+  value_concat r (n + n) (sx + sy);
   assert { value_sub (pelts r) (offset r + n + n) (offset r + sx + sy)
            = value vinf0 (s+t) };
   assert { value r (sx + sy) = value r (n+n) + m * m * value vinf0 (s+t) };
@@ -634,8 +633,8 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
               so (m * m) * (value vinf0 (s+t) + cy2) < (m * m) * (m * m') };
   let ghost ri = { r } in
   label IncrM in
-  wmpn_incr vinf0 cy2 (Int32.(+) s t);
-  value_concat r (Int32.(+) n n) (Int32.(+) sx sy);
+  wmpn_incr vinf0 cy2 (s + t);
+  value_concat r (n + n) (sx + sy);
   assert { value_sub (pelts r) (offset r + n + n) (offset r + sx + sy)
            = value vinf0 (s+t) };
   assert { value r (sx + sy) = value r (n+n) + m * m * value vinf0 (s+t) };
@@ -660,10 +659,10 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
                        = value x sx * value y sy - m * m * m * !cy
            \/ value r (sx + sy) = value x sx * value y sy + m * m * m };
   let rh = { r } in
-  let vinfn = C.incr r (Int32.( *) 3 n) in
+  let vinfn = C.incr r (3 * n) in
   label IncrH in
   assert { valid vinfn (s+t-n) };
-  value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
+  value_concat r (3 * n) (sx + sy);
   assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
            = value vinfn (s+t-n)
            by pelts r = pelts vinfn
@@ -675,7 +674,7 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
            by power radix (3*n) = power radix (n+n+n)
               = power radix (n+n) * power radix n
               = power radix n * power radix n * power radix n };
-  if ([@likely] Limb.(<=) !cy 3)
+  if ([@likely] !cy <= 3)
   then begin
     assert { value r (sx+sy) = value x sx * value y sy
                                - power radix (3*n) * !cy
@@ -693,8 +692,8 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
                 >= power radix (3*n) * (value vinfn (s+t-n) + !cy)
                 so power radix (3*n) * (value vinfn (s+t-n) + !cy)
                    < power radix (3*n) * m'};
-    wmpn_incr vinfn !cy (Int32.(-) (Int32.(+) s t) n);
-    value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
+    wmpn_incr vinfn !cy ((s + t) - n);
+    value_concat r (3 * n) (sx + sy);
     assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
              = value vinfn (s+t-n)
              by pelts r = pelts vinfn
@@ -735,8 +734,8 @@ let rec wmpn_toom22_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) :
              so value r (3*n) < power radix (3*n)
              so power radix (3*n) * value vinfn (s+t-n) > 0
              so value vinfn (s+t-n) > 0 };
-    wmpn_decr_1 vinfn (Int32.(-) (Int32.(+) s t) n);
-    value_concat r (Int32.( *) 3 n) (Int32.(+) sx sy);
+    wmpn_decr_1 vinfn ((s + t) - n);
+    value_concat r (3 * n) (sx + sy);
     assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
              = value vinfn (s+t-n)
              by pelts r = pelts vinfn
@@ -802,10 +801,10 @@ with wmpn_toom22_mul_rec (r x y scratch: ptr limb) (sx sy: int32) (ghost k: int)
   raises   { StackOverflow -> true }
   variant  { k + k + 1 }
 =
-  if Int32.(<=) sy toom22_threshold
+  if sy <= toom22_threshold
   then wmpn_mul_basecase r x y sx sy
   else
-    if Int32.(<) (Int32.( *) 4 sx) (Int32.( *) 5 sy) (* ? *)
+    if (4 * sx < 5 * sy) (* ? *)
     then wmpn_toom22_mul r x y scratch sx sy k
     else wmpn_toom32_mul r x y scratch sx sy k
 
@@ -832,7 +831,7 @@ with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) :
   raises   { StackOverflow -> true }
   variant  { k + k + 1 }
 =
-  if Int32.(<=) sz toom22_threshold
+  if sz <= toom22_threshold
   then wmpn_mul_basecase r x y sz sz
   else wmpn_toom22_mul r x y scratch sz sz k
 
@@ -862,8 +861,8 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   variant { k + k }
 =
   let n = 1 + (if 2 * sx >= 3 * sy
-               then Int32.(/) (sx - 1) 3
-               else Int32.(/) (sy - 1) 2) in
+               then (sx - 1) / 3
+               else (sy - 1) / 2) in
   let s = sx - 2 * n in
   let t = sy - n in
   assert { 0 < s <= n };
@@ -886,9 +885,9 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   assert { value y sy = b0 + m * b1 };
   assert { value x sx = a0 + m * a1 + m * m * a2 };
   let rol = decr_split r 0 in
-  let ror = incr_split r (Int32.(+) sx sy) in
+  let ror = incr_split r (sx + sy) in
   let sol = decr_split scratch 0 in
-  let sor = incr_split scratch (Int32.(+) (Int32.(+) n n) 1) in
+  let sor = incr_split scratch ((n + n) + 1) in
   (* xp1 | yp1 | xm1 | ym1 *)
   let xp1 = r in                  (* x(1) = a0 + a1 + a2  *)
   let yp1 = incr_split r n in     (* y(1) = b0 + b1       *)
@@ -909,8 +908,8 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     begin
       let cmp = wmpn_cmp xp1 x1 n in
       if (*begin ensures { result <-> a0 + a2 < a1 }*)
-           Limb.(=) !xp1_hi 0
-           && (Int32.(<) cmp 0)
+           !xp1_hi = 0
+           && (cmp < 0)
          (*end*)
       then begin
         assert { value xp1 n < value x1 n };
@@ -945,11 +944,11 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         ensures { (!vm1_neg = (!vm1_neg at B1) /\ value ym1 n = b0 - b1)
                   \/ (!vm1_neg = not (!vm1_neg at B1) /\ value ym1 n = b1 - b0) }
         ensures { 0 <= !yp1_hi <= 1 }
-    if (Int32.(=) t n)
+    if (t = n)
     then begin
       yp1_hi := wmpn_add_n yp1 y0 y1 n;
       let cmp = wmpn_cmp y0 y1 n in
-      if (Int32.(<) cmp 0)
+      if (cmp < 0)
       then begin
         let ghost b = wmpn_sub_n ym1 y1 y0 n in
         assert { b = 0 };
@@ -962,9 +961,9 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     else begin
       yp1_hi := wmpn_add yp1 y0 y1 n t;
       let y0t = C.incr y0 t in
-      let c0 = Int32.(=) (wmpn_zero_p y0t (Int32.(-) n t)) 1 in
+      let c0 = ((wmpn_zero_p y0t (n - t)) = 1) in
       let cmp = wmpn_cmp y0 y1 t in
-      let c1 = Int32.(<) cmp 0 in
+      let c1 = (cmp < 0) in
       if c0 && c1
       then begin
         value_concat y0 t n;
@@ -975,7 +974,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         let ghost ym1z = { ym1 } in
         let ym1t = C.incr ym1 t in
         label Zero in
-        wmpn_zero ym1t (Int32.(-) n t);
+        wmpn_zero ym1t (n - t);
         assert { forall i. 0 <= i < t ->
                  (pelts ym1)[offset ym1 + i] = (pelts ym1z)[offset ym1z + i]
                  by offset ym1 + i < offset ym1t
@@ -1020,7 +1019,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                     = (a0 + a1 + a2) * (value yp1 n) }
           ensures { 0 <= !cy <= 3 }
           (* actually 2, but this is enough to prove there is no overflow *)
-    if (Limb.(=) !xp1_hi 1)
+    if (!xp1_hi = 1)
     then begin
       let sa = { scratch } in
       let sn = C.incr scratch n in
@@ -1053,7 +1052,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                   = (a0 + a1 + a2) * value yp1 n };
       cy := c end
     else begin
-      if (Limb.(=) !xp1_hi 2)
+      if (!xp1_hi = 2)
       then begin
       let sa = { scratch } in
       let sn = C.incr scratch n in
@@ -1097,7 +1096,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     end;
     begin ensures { value scratch (n + n) + power radix (n + n) * !cy
                     = (a0 + a1 + a2) * (b0 + b1) }
-    if not (Limb.(=) !yp1_hi 0)
+    if not (!yp1_hi = 0)
     then begin
       let sa = { scratch } in
       let sn = C.incr scratch n in
@@ -1158,7 +1157,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         ensures { max r = old max r }
         ensures { plength r = old plength r }
         ensures { 0 <= !hi <= 1 }
-  if (not (Limb.(=) !hi 0))
+  if (not (!hi = 0))
   then begin
     assert { !hi = 1 };
     value_concat vm1 n (2*n);
@@ -1317,7 +1316,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     end
     end;
     label Shift in
-    let s = Int32.(+) (Int32.( *) 2 n) 1 in
+    let s = (2 * n) + 1 in
     let ghost low = wmpn_rshift_in_place scratch s 1 in
     assert { low = 0 /\ value scratch s = vx0 + vx2
              by (low + radix * value scratch s)
@@ -1333,7 +1332,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   assert { vy = (vx0 + vx2) * m + vx0 + vx2 - (vx0 - vx1 + vx2 - vx3) };
   join xm1 ym1;
   (* (    r    |    xm1  ) *)
-  let ghost ss = Int32.(+) (Int32.( *) 2 n) 1 in
+  let ghost ss = (2 * n) + 1 in
   assert { value scratch ss = vx0 + vx2 };
   let vy0 = scratch in
   let ghost l02 = value scratch (int32'int n) in
@@ -1366,7 +1365,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   assert { value vy2 (n+1) + (c + t02) < (power radix n) * 5
            by c + t02 <= power radix n
            so value vy2 (n+1) + (c+t02) <= (power radix n) * 5 };
-  wmpn_incr vy2 (Limb.(+) c t02) (n+1);
+  wmpn_incr vy2 (c + t02) (n+1);
   assert { value vy2 (n+1) < (power radix n) * 5 };
   value_sub_frame (pelts vy0) (pelts os) (offset scratch) (offset scratch + int32'int n);
   assert { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
@@ -1396,11 +1395,11 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     assert { value scratch n = value scratch n at Vm1 + value vm1 n - m * c1 };
     let c2 = wmpn_add_in_place vy1 vm1n n n in
     assert { value vy1 n = value vy1 n at Vm1 + value vm1n n - m * c2};
-    hi := Limb.(+) !hi c2;
+    hi := !hi + c2;
     let c3 = wmpn_add_1_in_place vy1 c1 n in
     assert { value vy1 n
              = value vy1 n at Vm1 + value vm1n n + c1 - m * (c2 + c3) };
-    hi := Limb.(+) !hi c3;
+    hi := !hi + c3;
     wmpn_incr vy2 !hi (n+1);
     assert { value vy2 (n+1) = value ovy2 (n+1) + c2 + c3 + !hi at Vm1 };
     assert { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
@@ -1424,11 +1423,11 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     assert { value scratch n = value scratch n at Vm1 - value vm1 n + m * b1 };
     let b2 = wmpn_sub_in_place vy1 vm1n n n in
     assert { value vy1 n = value vy1 n at Vm1 - value vm1n n + m * b2 };
-    hi := Limb.(+) !hi b2;
+    hi := !hi + b2;
     let b3 = wmpn_sub_1_in_place vy1 b1 n in
     assert { value vy1 n
              = value vy1 n at Vm1 - value vm1n n - b1 + m * (b2 + b3) };
-    hi := Limb.(+) !hi b3;
+    hi := !hi + b3;
     assert { value vy0 n + m * value vy1 n + m * m * (value vy2 (n+1) - !hi)
              = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
                - (vx0 - vx1 + vx2 - vx3)
@@ -1475,7 +1474,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     ensures { value r3n (s+t) = vx3 }
     ensures { min r3n = old min r3n /\ max r3n = old max r3n }
     ensures { plength r3n = old plength r3n }
-    if (Int32.(>) s t)
+    if (s > t)
     then wmpn_mul r3n x2 y1 s t (k-1)
     else wmpn_mul r3n y1 x2 t s (k-1)
   end;
@@ -1492,7 +1491,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   value_sub_frame (pelts r1n) (pelts or) (offset r1n) (offset r1n + int32'int n);
   let ghost lvx0 = value r (int32'int n) in
   let ghost hvx0 = value r1n (int32'int n) in
-  value_concat or n (Int32.(+) n n);
+  value_concat or n (n + n);
   assert { vx0 = lvx0 + m * hvx0 };
   let ghost or3n = { r3n } in
   let r4n = incr_split r3n n in
@@ -1503,7 +1502,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                   (offset r4n + int32'int s + int32'int t - int32'int n);
   let ghost lvx3 = value r3n (int32'int n) in
   let ghost hvx3 = value r4n (int32'int s + int32'int t- int32'int n) in
-  value_concat or3n n (Int32.(+) s t);
+  value_concat or3n n (s + t);
   assert { vx3 = lvx3 + m * hvx3 };
   let ghost vvy0 = value vy0 (int32'int n) in
   let ghost vvy1 = value vy1 (int32'int n) in
@@ -1522,18 +1521,18 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
            by 0 <= value vy2 n
            so value vy2 n + (power radix n) * ly2 = value vy2 (n+1)
            so (power radix n) * ly2 <= value vy2 (n+1) < (power radix n) * 6 };
-  let h = ref (Limb.to_int64 (Limb.(+) ly2 bo1)) in
+  let h = ref (Limb.to_int64 (ly2 + bo1)) in
   label R2 in
   let bo2 = wmpn_sub_in_place r2n r n n in
   let bo2' = wmpn_sub_1_in_place r2n !bo n in
-  bo := Limb.(+) bo2 bo2';
+  bo := bo2 + bo2';
   assert { value r2n n - m * !bo = vvy1 - lvx0 - (!bo at R2) };
   assert { value r1n n + m * value r2n n - m * m * !bo
            = hvx0 - lvx3 + m * (vvy1 - lvx0) };
   label R3 in
   let bo3 = wmpn_sub_n r3n vy2 r1n n in
   let bo3' = wmpn_sub_1_in_place r3n !bo n in
-  bo := Limb.(+) bo3 bo3';
+  bo := bo3 + bo3';
   assert { value r3n n - m * !bo = value vy2 n - value r1n n - (!bo at R3) };
   assert { value r1n n + m * value r2n n + m * m * value r3n n - m * m *m * !bo
            = hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * value vy2 n
@@ -1544,7 +1543,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
   let ghost or2n = { r2n } in
   let ghost or3n = { r3n } in
   join r2n r3n;
-  value_concat r2n n (Int32.(+) n n);
+  value_concat r2n n (n + n);
   join r1n r2n;
   value_sub_frame (pelts r1n) (pelts or1n)
                   (offset r1n) (offset r1n + int32'int n);
@@ -1552,10 +1551,10 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                   (offset r1n + int32'int n) (offset r1n + 2 * int32'int n);
   value_sub_frame (pelts r1n) (pelts or3n)
                   (offset r1n + 2 * int32'int n) (offset r1n + 3 * int32'int n);
-  value_concat r1n n (Int32.( *) 3 n);
+  value_concat r1n n (3 * n);
   value_sub_concat (pelts r1n) (offset r1n + int32'int n)
-                   (offset r1n + int32'int (Int32.( *) 2 n))
-                   (offset r1n + int32'int (Int32.( *) 3 n));
+                   (offset r1n + int32'int (2 * n))
+                   (offset r1n + int32'int (3 * n));
   assert { value r1n (3*n)
            = value r1n n + m * value r2n n + m * m * value r3n n at Join3
            by offset r2n at Join3 = offset r1n + n
@@ -1590,7 +1589,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                 + m * m * m * ly2 + m * m * m * bo1
            so m * m * value vy2 n + m * m * m * ly2 = m * m * vvy2 };
   label Addy0 in
-  let c = wmpn_add_in_place r1n scratch (Int32.( *) 3 n) n in
+  let c = wmpn_add_in_place r1n scratch (3 * n) n in
   h := Int64.(+) !h (Limb.to_int64 c);
   assert { power radix (3*n) = m * m * m };
   assert { value r1n (3*n) + m * m * m * !h
@@ -1621,24 +1620,24 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
            by m * m = power radix (2*n) };
   assert { value r (4*n) + m * m * m * m * !h
            = vx0 + m * vy - m * lvx3 - m * m * vx0 + m * m * m * lvx3 };
-  let rs = Int32.(-) (Int32.(+) s t) n in
+  let rs = s + t - n in
   begin ensures { value r (4*n) + m * m * m * m * value r4n rs
                   = (value x sx) * (value y sy) }
-  if [@ex:likely] (Int32.(>) (Int32.(+) s t) n)
+  if [@ex:likely] (s + t > n)
   then begin
-    let r2n = incr r (Int32.( *) 2 n) in
+    let r2n = incr r (2 * n) in
     label Sub2 in
-    value_concat r (Int32.( *) 2 n) (Int32.( *) 4 n);
+    value_concat r (2 * n) (4 * n);
     assert { value r (4*n) = value r (2*n) + m*m * value r2n (2*n)
              by m * m = power radix (2*n)
              so value_sub (pelts r) (offset r + 2*n) (offset r + 4*n)
                 = value r2n (2*n) };
     assert { value r4n rs = hvx3 };
     let ghost or = { r } in
-    let b = wmpn_sub_in_place r2n r4n (Int32.( *) 2 n) rs in
+    let b = wmpn_sub_in_place r2n r4n (2 * n) rs in
     value_sub_frame (pelts r) (pelts or) (offset r) (offset r + 2 * int32'int n);
     assert { value r (2*n) = value or (2*n) };
-    value_concat r (Int32.( *) 2 n) (Int32.( *) 4 n);
+    value_concat r (2 * n) (4 * n);
     assert { value r (4*n) = value r (2*n) + m*m * value r2n (2*n)
              by m * m = power radix (2*n)
              so pelts r2n = pelts r
@@ -1784,25 +1783,25 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
     else begin
       (* this would be faster with salloc *)
       (*let ghost k = 64 in*) (* is always enough *)
-      let scratch = salloc (UInt32.of_int32 (Int32.(+) (Int32.( *) 5 sy) 128)) in
+      let scratch = salloc (UInt32.of_int32 ((5 * sy) + 128)) in
       (* c_assert (is_not_null scratch); *)
       let rol = decr_split r 0 in
-      let ror = incr_split r (Int32.(+) sx sy) in
-      if (Int32.(>=) (Int32.( *) 2 sx) (Int32.( *) 5 sy))
+      let ror = incr_split r (sx + sy) in
+      if ((2 * sx) >= (5 * sy))
       then begin
         let un = ref sx in
-        let su = Int32.(/) (Int32.( *) 3 sy) 2 in
+        let su = (3 * sy) / 2 in
         assert { 0 < su };
-        let ghost sr = Int32.(+) su sy in
-        let ws = salloc (UInt32.of_int32 (Int32.( *) 4 sy)) in
+        let ghost sr = su + sy in
+        let ws = salloc (UInt32.of_int32 (4 * sy)) in
         (* c_assert (is_not_null ws); *)
         wmpn_toom32_mul r x y scratch su sy k;
-        un := Int32.(-) !un su;
+        un := !un - su;
         let up = ref (C.incr x su) in
         let rp = ref (C.incr r su) in
         let ghost ou = ref su in
         let ghost or = ref sr in
-        while (Int32.(>=) !un (Int32.( *) 2 sy)) do (* 5/2?*)
+        while (!un >= (2 * sy)) do (* 5/2?*)
           invariant { min_int32 <= 2 * !un <= max_int32 }
           invariant { !ou + !un = sx }
           invariant { !or = !ou + sy }
@@ -1828,10 +1827,10 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
           let cy = wmpn_add_in_place rr ws sy sy in
           let rpn = C.incr rr sy in
           wmpn_incr rpn cy su;
-          un := Int32.(-) !un su;
+          un := !un - su;
           up.contents <- C.incr !up su;
-          ou := Int32.(+) !ou su;
-          or := Int32.(+) !or su;
+          ou := !ou + su;
+          or := !or + su;
           rp.contents <- C.incr !rp su;*)
           label StartLoop in
           let ghost o_r = { r } in
@@ -1862,12 +1861,12 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
           assert { value ws sr
                    = value ws (sy + su)
                    = value ws sy + power radix sy * value wsy su };
-          value_concat r !ou (Int32.(+) !ou sr);
+          value_concat r !ou (!ou + sr);
           assert { value r (!or + su) = value r (!ou + sr)
                    = value r !ou + power radix !ou * value !rp sr };
           value_concat !rp sy sr;
           assert { value !rp sr = value !rp sy + power radix sy * value rpn su };
-          value_concat x !ou (Int32.(+) !ou su);
+          value_concat x !ou (!ou + su);
           assert { value x (!ou + su)
                    = value x !ou + power radix !ou * value !up su };
           assert { value r (!ou + sr) + (power radix !or) * cy
@@ -1930,10 +1929,10 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                      + power radix !or * value rpn su at Incr
                      + power radix !or * cy
                    = value r (!ou + sr) at Incr + power radix !or * cy };
-          un := Int32.(-) !un su;
+          un := !un - su;
           up.contents <- C.incr !up su;
-          ou := Int32.(+) !ou su;
-          or := Int32.(+) !or su;
+          ou := !ou + su;
+          or := !or + su;
           rp.contents <- C.incr !rp su;
         done;
  (*       wmpn_copyi ws !rp sy;*)
@@ -1950,9 +1949,9 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
           ensures { min scratch = old min scratch
                     /\ max scratch = old max scratch
                     /\ plength scratch = old plength scratch }
-          if Int32.(<=) sy !un
+          if sy <= !un
           then begin
-            if (Int32.(<) (Int32.( *) 4 !un) (Int32.( *) 5 sy))
+            if ((4 * !un) < (5 * sy))
             then wmpn_toom22_mul ws !up y scratch !un sy k
             else wmpn_toom32_mul ws !up y scratch !un sy k
           end
@@ -1980,12 +1979,12 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         value_concat ws sy sr;
         assert { value ws sr
                  = value ws sy + power radix sy * value wsy !un };
-        value_concat r !ou (Int32.(+) !ou sr);
+        value_concat r !ou (!ou + sr);
         assert { value r (!or + !un) = value r (!ou + sr)
                  = value r !ou + power radix !ou * value !rp sr };
         value_concat !rp sy sr;
         assert { value !rp sr = value !rp sy + power radix sy * value rpn !un };
-        value_concat x !ou (Int32.(+) !ou !un);
+        value_concat x !ou (!ou + !un);
         assert { value x (!ou + !un)
                  = value x !ou + power radix !ou * value !up !un };
         assert { value r (!ou + sr) + (power radix !or) * cy
@@ -2053,7 +2052,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         sfree ws;
       end
       else begin
-        if (Int32.(<) (Int32.( *) 4 sx) (Int32.( *) 5 sy))
+        if ((4 * sx) < (5 * sy))
         then wmpn_toom22_mul r x y scratch sx sy k
         else wmpn_toom32_mul r x y scratch sx sy k
       end;
@@ -2072,9 +2071,9 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
                 = value r (sx + sy) at JoinR }
     end
         (* sy <= !un <= 2.5 * sy *)
-       (* if Int32.(<=) sy !un
+       (* if sy <= !un
         then begin
-           if (Int32.(<) (Int32.(*) 4 !un) (Int32.(*) 5 sy))
+           if ((4 * !un) < (5 * sy))
            then wmpn_toom22_mul ws !up y scratch !un sy k
            else wmpn_toom32_mul ws !up y scratch !un sy k
         end
@@ -2086,7 +2085,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
         sfree ws;
       end
       else begin
-        if (Int32.(<) (Int32.(*) 4 sx) (Int32.(*) 5 sy))
+        if ((4 * sx) < (5 * sy))
         then wmpn_toom22_mul r x y scratch sx sy k
         else wmpn_toom32_mul r x y scratch sx sy k
       end;
