@@ -1465,7 +1465,12 @@ let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
      print_message ~kind:1 ~notif_kind:"Proof_error" "%s" s
-  | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
+  | Transf_error (true, _id, tr_name, _arg, _loc, msg, _doc) ->
+      (* When the error reported by the transformation is fatal, we notify the
+         user with a popup. *)
+      let msg = Format.sprintf "Please report:\nTransformation %s failed: \n%s\n" tr_name msg in
+      GToolbox.message_box ~title:"Why3 fatal error" msg
+  | Transf_error (false, _id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
         print_message ~kind:1 ~notif_kind:"Transformation Error"
                       "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc

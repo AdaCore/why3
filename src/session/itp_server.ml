@@ -1138,8 +1138,15 @@ end
       with | _ -> "" in
       let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
       let tr_applied = tr ^ " " ^ (List.fold_left (fun x acc -> x ^ " " ^ acc) "" args) in
-      P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
-    | _ -> ()
+      P.notify (Message (Transf_error (false, node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
+    | TSscheduled -> ()
+    | TSfatal (id, e) ->
+      let doc = try
+        Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
+      with | _ -> "" in
+      let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
+      let tr_applied = tr ^ " " ^ (List.fold_left (fun x acc -> x ^ " " ^ acc) "" args) in
+      P.notify (Message (Transf_error (true, node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
 
   let apply_transform node_id t args =
     let d = get_server_data () in

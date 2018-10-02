@@ -12,6 +12,8 @@
 open Format
 open Wstdlib
 open Session_itp
+open Generic_arg_trans_utils
+open Args_wrapper
 
 let debug_sched = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
@@ -53,20 +55,24 @@ let print_status fmt st =
 
 type transformation_status =
   | TSscheduled | TSdone of transID | TSfailed of (proofNodeID * exn)
+  | TSfatal of (proofNodeID * exn)
 
 let print_trans_status fmt st =
   match st with
   | TSscheduled -> fprintf fmt "TScheduled"
   | TSdone _tid -> fprintf fmt "TSdone" (* TODO print tid *)
   | TSfailed _e -> fprintf fmt "TSfailed"
+  | TSfatal _e -> fprintf fmt "TSfatal"
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
+                     | STSfatal of string * proofNodeID * exn
 
 let print_strategy_status fmt st =
   match st with
   | STSgoto(id,n) ->
       fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
   | STShalt -> fprintf fmt "halt"
+  | STSfatal _ -> fprintf fmt "fatal"
 
 
 type controller =
@@ -716,7 +722,7 @@ let schedule_transformation c id name args ~callback ~notification =
     begin match s with
           | TSdone tid -> update_trans_node notification c.controller_session tid
           | TSscheduled
-          | TSfailed _ -> ()
+          | TSfailed _ | TSfatal _  -> ()
     end;
     callback s
   in
@@ -733,10 +739,18 @@ let schedule_transformation c id name args ~callback ~notification =
       | NoProgress ->
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, NoProgress))
+      | (Arg_trans _ | Arg_trans_decl _
+        | Arg_trans_term _ | Arg_trans_term2 _
+        | Arg_trans_pattern _ | Arg_trans_type _ | Arg_bad_hypothesis _
+        | Cannot_infer_type _ | Unnecessary_terms _ | Parse_error _
+        | Arg_expected _ | Arg_theory_not_found _ | Arg_expected_none _
+        | Arg_qid_not_found _ | Arg_pr_not_found _ | Arg_error _
+        | Arg_parse_type_error _ | Unnecessary_arguments _) as e ->
+          callback (TSfailed (id, e))
       | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
-        callback (TSfailed (id, e))
+        callback (TSfatal (id, e))
     end;
     false
   in
@@ -782,6 +796,8 @@ let run_strategy_on_goal
          let callback ntr =
            callback_tr trname [] ntr;
            match ntr with
+           | TSfatal (id, e) ->
+               callback (STSfatal (trname, id, e))
            | TSfailed _e -> (* transformation failed *)
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
@@ -1184,6 +1200,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
           begin match st with
           | TSscheduled -> ()
           | TSfailed _ -> assert false
+          | TSfatal _ -> assert false
           | TSdone trid ->
              match get_sub_tasks ses trid with
              | [pn] ->
@@ -1230,6 +1247,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
            debug
            "[Bisect] transformation 'remove' scheduled@.";
          callback_tr "remove" [rem] st;
+      | TSfatal (_, exn)
       | TSfailed(_,exn) ->
          (* may happen if removing a type or a lsymbol that is used
 later on. We do has if proof fails. *)
