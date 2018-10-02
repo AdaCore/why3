@@ -392,9 +392,13 @@ module Print = struct
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
   let sanitizer s = Strings.lowercase (sanitizer s)
-  let printer = create_ident_printer c_keywords ~sanitizer
+  let local_printer = create_ident_printer c_keywords ~sanitizer
+  let global_printer = create_ident_printer c_keywords ~sanitizer
 
-  let print_ident fmt id = fprintf fmt "%s" (id_unique printer id)
+  let print_local_ident fmt id = fprintf fmt "%s" (id_unique local_printer id)
+  let print_global_ident fmt id = fprintf fmt "%s" (id_unique global_printer id)
+
+  let clear_local_printer () = Ident.forget_all local_printer
 
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -418,7 +422,7 @@ module Print = struct
         (print_ty ~paren:true) ty (print_expr ~paren:false) expr
     | Tstruct (s,_) -> fprintf fmt "struct %s" s
     | Tunion _ -> raise (Unprinted "unions")
-    | Tnamed id -> print_ident fmt id
+    | Tnamed id -> print_global_ident fmt id
     | Tnosyntax -> raise (Unprinted "type without syntax")
 
   and print_unop fmt = function
@@ -468,7 +472,7 @@ module Print = struct
     | Ecall (e,l) -> fprintf fmt (protect_on paren "%a(%a)")
       (print_expr ~paren:true) e (print_list comma (print_expr ~paren:false)) l
     | Econst c -> print_const fmt c
-    | Evar id -> print_ident fmt id
+    | Evar id -> print_local_ident fmt id
     | Elikely e -> fprintf fmt (protect_on paren "__builtin_expect(%a,1)")
                            (print_expr ~paren:true) e
     | Eunlikely e -> fprintf fmt (protect_on paren "__builtin_expect(%a,0)")
@@ -493,8 +497,9 @@ module Print = struct
     then fprintf fmt "%s " (String.make stars '*')
     else ());
     match ie with
-    | id, Enothing -> print_ident fmt id
-    | id,e -> fprintf fmt "%a = %a" print_ident id (print_expr ~paren:false) e
+    | id, Enothing -> print_local_ident fmt id
+    | id,e -> fprintf fmt "%a = %a"
+                print_local_ident id (print_expr ~paren:false) e
 
   let rec print_stmt ~braces fmt = function
     | Snop -> Debug.dprintf debug_c_extraction "snop"; ()
@@ -529,10 +534,10 @@ module Print = struct
       | Dfun (id,(rt,args),body) ->
          let s = sprintf "%a %a(@[%a@])@ @[<hov>{@;<1 2>@[<hov>%a@]@\n}@\n@]"
                    (print_ty ~paren:false) rt
-                   print_ident id
+                   print_global_ident id
                    (print_list comma
 		      (print_pair_delim nothing space nothing
-			 (print_ty ~paren:false) print_ident))
+			 (print_ty ~paren:false) print_local_ident))
 	           args
                    print_body body in
          (* print into string first to print nothing in case of exception *)
@@ -540,10 +545,10 @@ module Print = struct
       | Dproto (id, (rt, args)) ->
          let s = sprintf "%a %a(@[%a@]);@;"
                    (print_ty ~paren:false) rt
-                   print_ident id
+                   print_global_ident id
                    (print_list comma
                       (print_pair_delim nothing space nothing
-		         (print_ty ~paren:false) print_ident))
+		         (print_ty ~paren:false) print_local_ident))
 	           args in
          fprintf fmt "%s" s
       | Ddecl (ty, lie) ->
@@ -569,7 +574,7 @@ module Print = struct
          fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
       | Dtypedef (ty,id) ->
          let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
-	           (print_ty ~paren:false) ty print_ident id in
+	           (print_ty ~paren:false) ty print_global_ident id in
          fprintf fmt "%s" s
     with Unprinted s ->
       Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
@@ -583,10 +588,14 @@ module Print = struct
         (print_stmt ~braces:true)
         fmt (def,s)
 
+  let print_global_def fmt def =
+    clear_local_printer ();
+    print_def fmt def
+
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
     newline fmt ();
-    fprintf fmt "@[<v>%a@]@." (print_list newline print_def) ast
+    fprintf fmt "@[<v>%a@]@." (print_list newline print_global_def) ast
 
 end
 
@@ -1145,7 +1154,7 @@ let header_gen = name_gen ".h"
 
 let print_header_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:true in
-  List.iter (Format.fprintf fmt "%a@." Print.print_def) cds
+  List.iter (Format.fprintf fmt "%a@." Print.print_global_def) cds
 
 let print_header_decl =
   let memo = Hashtbl.create 16 in
@@ -1166,7 +1175,7 @@ let print_prelude args ?old ?fname ~flat deps fmt pm =
   ignore pm;
   ignore args;
   let add_include id =
-    Format.fprintf fmt "%a@." Print.print_def C.(Dinclude (id,Proj)) in
+    Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in
   List.iter
     (fun m ->
       let id = m.Pmodule.mod_theory.Theory.th_name in
@@ -1176,7 +1185,7 @@ let print_prelude args ?old ?fname ~flat deps fmt pm =
 let print_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:false in
   let print_def d =
-    Format.fprintf fmt "%a@." Print.print_def d in
+    Format.fprintf fmt "%a@." Print.print_global_def d in
   List.iter print_def cds
 
 let print_decl =
