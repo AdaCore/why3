@@ -5,6 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_combinators.mlw" proved="true">
 <theory name="Combinators" proved="true">
  <goal name="VC eq" expl="VC for eq" proved="true">
@@ -87,70 +88,60 @@
  <goal name="VC value_in_context" expl="VC for value_in_context" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC value_in_context.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC value_in_context.1" expl="precondition" proved="true">
-  <transf name="destruct_alg_subst" proved="true" arg1="(subst c t)">
+  <transf name="destruct_alg_subst" proved="true" arg1="(subst x1 t)">
    <goal name="VC value_in_context.1.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC value_in_context.1.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC value_in_context.1.2" expl="precondition" proved="true">
-   <transf name="destruct_alg_subst" proved="true" arg1="x3">
+   <transf name="destruct_alg_subst" proved="true" arg1="x2">
     <goal name="VC value_in_context.1.2.0" expl="precondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC value_in_context.1.2.1" expl="precondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC value_in_context.1.2.2" expl="precondition" proved="true">
-    <transf name="destruct_alg_subst" proved="true" arg1="x4">
-     <goal name="VC value_in_context.1.2.2.0" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.04"/></proof>
-     </goal>
-     <goal name="VC value_in_context.1.2.2.1" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
-     </goal>
-     <goal name="VC value_in_context.1.2.2.2" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
-     </goal>
-    </transf>
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC value_in_context.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC value_in_context.3" expl="precondition" proved="true">
-  <transf name="destruct_alg_subst" proved="true" arg1="(subst c t)">
+  <transf name="destruct_alg_subst" proved="true" arg1="(subst x t)">
    <goal name="VC value_in_context.3.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC value_in_context.3.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC value_in_context.3.2" expl="precondition" proved="true">
    <transf name="destruct_alg_subst" proved="true" arg1="x3">
     <goal name="VC value_in_context.3.2.0" expl="precondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.04"/></proof>
+    <proof prover="3"><result status="valid" time="0.03"/></proof>
     </goal>
     <goal name="VC value_in_context.3.2.1" expl="precondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.04"/></proof>
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC value_in_context.3.2.2" expl="precondition" proved="true">
     <transf name="destruct_alg_subst" proved="true" arg1="x4">
      <goal name="VC value_in_context.3.2.2.0" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     <proof prover="3"><result status="valid" time="0.03"/></proof>
      </goal>
      <goal name="VC value_in_context.3.2.2.1" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.01"/></proof>
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC value_in_context.3.2.2.2" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
     </transf>
     </goal>

@@ -278,11 +278,6 @@ let () = Trans.register_transform
            (Trans.decl eliminate_exists None)
            ~desc:"Replace axioms of the form 'exists x. P' by 'constant x axiom P'."
 
-let simplify_intros =
-  Trans.compose Simplify_formula.simplify_trivial_wp_quantification
-                introduce_premises
-
-(*
 let subst_filter ls =
   Sattr.mem intro_attr ls.ls_name.id_attrs &&
   not (Ident.has_a_model_attr ls.ls_name)
@@ -290,7 +285,6 @@ let subst_filter ls =
 let simplify_intros =
   Trans.compose introduce_premises
                 (Subst.subst_filtered subst_filter)
-*)
 
 let split_vc =
   Trans.compose_l
@@ -301,5 +295,4 @@ let () = Trans.register_transform_l
            "split_vc" split_vc
            ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ \
               on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ \
-              by@ simplify_trivial_quantifications@ followed@ by@ \
-              introduce_premises)."
+              by@ introduce_premises@ followed@ by@ subst_all)."

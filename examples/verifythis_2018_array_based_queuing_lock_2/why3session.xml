@@ -4,8 +4,10 @@
 <why3session shape_version="5">
 <prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2018_array_based_queuing_lock_2.mlw" proved="true">
 <theory name="ABQL" proved="true">
  <goal name="VC tick" expl="VC for tick" proved="true">
@@ -73,10 +75,10 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC consecutive_last_push.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="75"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="76"/></proof>
   </goal>
   <goal name="VC consecutive_last_push.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.23" steps="163"/></proof>
+  <proof prover="4"><result status="valid" time="0.23" steps="162"/></proof>
   </goal>
   <goal name="VC consecutive_last_push.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.47"/></proof>
@@ -92,7 +94,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC consecutive_implies_sorted.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="75"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="76"/></proof>
   </goal>
   <goal name="VC consecutive_implies_sorted.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="51"/></proof>
@@ -143,7 +145,7 @@
  <goal name="VC main" expl="VC for main" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC main.0" expl="array creation size" proved="true">
-  <proof prover="3"><result status="valid" time="0.20"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.1" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.18"/></proof>
@@ -152,13 +154,13 @@
   <proof prover="3"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="VC main.3" expl="array creation size" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.4" expl="array creation size" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.5" expl="array creation size" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC main.6" expl="safety" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
@@ -249,76 +251,76 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.28" expl="safety" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.08" steps="116"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="116"/></proof>
   </goal>
   <goal name="VC main.29" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.30" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.32" steps="346"/></proof>
   </goal>
   <goal name="VC main.31" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="52"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
   <goal name="VC main.32" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.29" steps="970"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.33" steps="970"/></proof>
   </goal>
   <goal name="VC main.33" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="84"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="84"/></proof>
   </goal>
   <goal name="VC main.34" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.13" steps="57"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="57"/></proof>
   </goal>
   <goal name="VC main.35" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="78"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.35.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.10" steps="78"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.36" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.23" steps="323"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="323"/></proof>
   </goal>
   <goal name="VC main.37" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC main.37.0" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="41"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="41"/></proof>
    </goal>
    <goal name="VC main.37.1" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.27" steps="719"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.33" steps="719"/></proof>
    </goal>
    <goal name="VC main.37.2" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.12" steps="188"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.07" steps="188"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.38" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="5"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC main.39" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.39.0" expl="VC for main" proved="true">
+   <proof prover="5"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="VC main.39.1" expl="VC for main" proved="true">
+   <proof prover="5"><result status="valid" time="0.53"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.40" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="VC main.41" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="138"/></proof>
   </goal>
   <goal name="VC main.42" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC main.42.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="45"/></proof>
-   </goal>
-   <goal name="VC main.42.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="45"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4"><result status="valid" time="0.03" steps="48"/></proof>
   </goal>
   <goal name="VC main.43" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC main.44" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.44.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="45"/></proof>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC main.45" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -327,7 +329,24 @@
   <proof prover="4"><result status="valid" time="0.13" steps="33"/></proof>
   </goal>
   <goal name="VC main.47" expl="liveness" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <transf name="revert" proved="true" arg1="H41">
+   <goal name="VC main.47.0" expl="liveness" proved="true">
+   <transf name="split_goal_full" proved="true" >
+    <goal name="VC main.47.0.0" expl="liveness" proved="true">
+    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="48"/></proof>
+    </goal>
+    <goal name="VC main.47.0.1" expl="liveness" proved="true">
+    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="VC main.47.0.2" expl="liveness" proved="true">
+    <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="144"/></proof>
+    </goal>
+    <goal name="VC main.47.0.3" expl="liveness" proved="true">
+    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="109"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.48" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -424,7 +443,7 @@
    <proof prover="4"><result status="valid" time="0.03" steps="112"/></proof>
    </goal>
    <goal name="VC main.56.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.08" steps="109"/></proof>
+   <proof prover="4"><result status="valid" time="0.08" steps="123"/></proof>
    </goal>
    <goal name="VC main.56.2" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.04" steps="47"/></proof>
@@ -436,7 +455,7 @@
    <proof prover="4"><result status="valid" time="0.10" steps="195"/></proof>
    </goal>
    <goal name="VC main.56.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.01" steps="203"/></proof>
+   <proof prover="4"><result status="valid" time="0.11" steps="203"/></proof>
    </goal>
   </transf>
   </goal>
@@ -605,39 +624,28 @@
   <proof prover="4"><result status="valid" time="0.18" steps="242"/></proof>
   </goal>
   <goal name="VC main.68" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.68.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.90" steps="361"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.87" steps="361"/></proof>
   </goal>
   <goal name="VC main.69" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(th=th1)">
-   <goal name="VC main.69.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="63"/></proof>
-   </goal>
-   <goal name="VC main.69.1" expl="false case (loop invariant preservation)" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.55" steps="818"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.88" steps="1114"/></proof>
   </goal>
   <goal name="VC main.70" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.70.0" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.64" steps="292"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.70.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.73" steps="292"/></proof>
    </goal>
-   <goal name="VC main.70.1" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.06" steps="1287"/></proof>
+   <goal name="VC main.70.1" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="1.41" steps="1467"/></proof>
    </goal>
-   <goal name="VC main.70.2" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.02" steps="1349"/></proof>
+   <goal name="VC main.70.2" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="1.15" steps="1384"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.71" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="th=th1">
    <goal name="VC main.71.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="4"><result status="valid" time="0.06" steps="143"/></proof>
+   <proof prover="4"><result status="valid" time="0.08" steps="143"/></proof>
    </goal>
    <goal name="VC main.71.1" expl="false case (loop invariant preservation)" proved="true">
    <transf name="replace" proved="true" arg1="memo[th]" arg2="memo1[th]">
@@ -645,23 +653,35 @@
     <proof prover="3"><result status="valid" time="0.08"/></proof>
     </goal>
     <goal name="VC main.71.1.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.03" steps="49"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="49"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.72" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.67"/></proof>
+  <proof prover="0" timelimit="10" memlimit="1000"><result status="valid" time="1.63"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.72.0" expl="VC for main" proved="true">
+   <proof prover="5"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC main.72.1" expl="VC for main" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC main.72.1.0" expl="VC for main" proved="true">
+    <proof prover="2" timelimit="30" memlimit="4000"><result status="valid" time="11.81" steps="3770"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.73" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="45"/></proof>
   </goal>
   <goal name="VC main.74" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="53"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="53"/></proof>
   </goal>
   <goal name="VC main.75" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.48" steps="567"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="1.45" steps="567"/></proof>
   </goal>
   <goal name="VC main.76" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="65"/></proof>
@@ -671,58 +691,45 @@
    <goal name="VC main.77.0" expl="loop invariant preservation" proved="true">
    <transf name="assert" proved="true" arg1="(elts waiting_list &lt;&gt; Nil)">
     <goal name="VC main.77.0.0" proved="true">
-    <proof prover="4"><result status="valid" time="0.06" steps="70"/></proof>
+    <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="70"/></proof>
     </goal>
     <goal name="VC main.77.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="56"/></proof>
+    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="56"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.78" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC main.78.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_all_full" proved="true" >
-    <goal name="VC main.78.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.08" steps="49"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="VC main.78.1" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
-   </goal>
-   <goal name="VC main.78.2" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC main.78.3" expl="loop invariant preservation" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.78.0" expl="VC for main" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC main.78.4" expl="loop invariant preservation" proved="true">
-   <transf name="split_all_full" proved="true" >
-    <goal name="VC main.78.4.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="121"/></proof>
-    </goal>
-   </transf>
+   <goal name="VC main.78.1" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.05" steps="296"/></proof>
    </goal>
-   <goal name="VC main.78.5" expl="loop invariant preservation" proved="true">
-   <transf name="split_all_full" proved="true" >
-    <goal name="VC main.78.5.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.05" steps="47"/></proof>
-    </goal>
-   </transf>
+   <goal name="VC main.78.2" expl="VC for main" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC main.78.6" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.06" steps="193"/></proof>
+   <goal name="VC main.78.3" expl="VC for main" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC main.78.4" expl="VC for main" proved="true">
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC main.78.5" expl="VC for main" proved="true">
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC main.78.6" expl="VC for main" proved="true">
+   <proof prover="4"><result status="valid" time="0.08" steps="205"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.79" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.23"/></proof>
-  <proof prover="4"><result status="valid" time="0.19" steps="217"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="217"/></proof>
   </goal>
   <goal name="VC main.80" expl="liveness" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="52"/></proof>
   </goal>
   <goal name="VC main.81" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -764,226 +771,266 @@
   <goal name="VC main.89" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.89.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.48" steps="1095"/></proof>
+   <proof prover="4"><result status="valid" time="0.48" steps="1058"/></proof>
    </goal>
    <goal name="VC main.89.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.10" steps="41"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="39"/></proof>
    </goal>
    <goal name="VC main.89.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="1.64" steps="834"/></proof>
+   <proof prover="4"><result status="valid" time="1.63" steps="801"/></proof>
    </goal>
    <goal name="VC main.89.3" expl="assertion" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.07" steps="163"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.07" steps="152"/></proof>
    </goal>
    <goal name="VC main.89.4" expl="assertion" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="44"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC main.89.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="65"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="63"/></proof>
    </goal>
    <goal name="VC main.89.6" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC main.89.7" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="112"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="107"/></proof>
    </goal>
    <goal name="VC main.89.8" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="44"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.90" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.90.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="44"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
    </goal>
    <goal name="VC main.90.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="44"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="42"/></proof>
    </goal>
    <goal name="VC main.90.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="50"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="48"/></proof>
    </goal>
    <goal name="VC main.90.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="44"/></proof>
    </goal>
    <goal name="VC main.90.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.11" steps="95"/></proof>
+   <proof prover="4"><result status="valid" time="0.11" steps="89"/></proof>
    </goal>
    <goal name="VC main.90.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="125"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="118"/></proof>
    </goal>
    <goal name="VC main.90.6" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.13" steps="136"/></proof>
+   <proof prover="4"><result status="valid" time="0.13" steps="129"/></proof>
    </goal>
    <goal name="VC main.90.7" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="54"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="52"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.91" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.91.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.39" steps="288"/></proof>
+   <proof prover="4"><result status="valid" time="0.39" steps="278"/></proof>
    </goal>
    <goal name="VC main.91.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="43"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="41"/></proof>
    </goal>
    <goal name="VC main.91.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="2.55" steps="1555"/></proof>
+   <proof prover="4"><result status="valid" time="2.55" steps="1512"/></proof>
    </goal>
    <goal name="VC main.91.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.60" steps="630"/></proof>
+   <proof prover="4"><result status="valid" time="0.60" steps="632"/></proof>
    </goal>
    <goal name="VC main.91.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="48"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
    </goal>
    <goal name="VC main.91.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.16" steps="318"/></proof>
+   <proof prover="4"><result status="valid" time="0.16" steps="305"/></proof>
    </goal>
    <goal name="VC main.91.6" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.72" steps="1159"/></proof>
+   <proof prover="4"><result status="valid" time="0.72" steps="1120"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.92" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.92.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.23" steps="442"/></proof>
+   <proof prover="4"><result status="valid" time="0.23" steps="422"/></proof>
    </goal>
    <goal name="VC main.92.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.09" steps="239"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="223"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.93" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.93.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.16" steps="346"/></proof>
+   <proof prover="4"><result status="valid" time="0.16" steps="338"/></proof>
    </goal>
    <goal name="VC main.93.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="44"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
    </goal>
    <goal name="VC main.93.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.98" steps="1497"/></proof>
+   <proof prover="4"><result status="valid" time="0.98" steps="1473"/></proof>
    </goal>
    <goal name="VC main.93.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="231"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="219"/></proof>
    </goal>
    <goal name="VC main.93.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.19" steps="206"/></proof>
+   <proof prover="4"><result status="valid" time="0.19" steps="199"/></proof>
    </goal>
    <goal name="VC main.93.5" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="53"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="51"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.94" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.94.0" expl="assertion" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="3.20" steps="3773"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="3.20" steps="3733"/></proof>
    </goal>
    <goal name="VC main.94.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="44"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
    </goal>
    <goal name="VC main.94.2" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="3.34" steps="1129"/></proof>
+   <proof prover="4"><result status="valid" time="2.64" steps="1095"/></proof>
    </goal>
    <goal name="VC main.94.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="53"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="51"/></proof>
    </goal>
    <goal name="VC main.94.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.11" steps="176"/></proof>
+   <proof prover="4"><result status="valid" time="0.11" steps="166"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.95" expl="safety" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.22" steps="293"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.22" steps="284"/></proof>
   </goal>
   <goal name="VC main.96" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.97" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.63" steps="636"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.63" steps="607"/></proof>
   </goal>
   <goal name="VC main.98" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.34" steps="569"/></proof>
+  <proof prover="4"><result status="valid" time="0.34" steps="545"/></proof>
   </goal>
   <goal name="VC main.99" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="110"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="102"/></proof>
   </goal>
   <goal name="VC main.100" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.101" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="56"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="54"/></proof>
   </goal>
   <goal name="VC main.102" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="113"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.102.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.06" steps="107"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.103" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.56" steps="746"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.39" steps="689"/></proof>
   </goal>
   <goal name="VC main.104" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.12" steps="242"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.104.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="52"/></proof>
+   </goal>
+   <goal name="VC main.104.1" expl="VC for main" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="282"/></proof>
+   </goal>
+   <goal name="VC main.104.2" expl="VC for main" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.09" steps="287"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.105" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="3.74" steps="1713"/></proof>
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  <proof prover="3"><result status="valid" time="3.78"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="3.60" steps="1676"/></proof>
   </goal>
   <goal name="VC main.106" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.41" steps="598"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.36" steps="562"/></proof>
   </goal>
   <goal name="VC main.107" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.26" steps="341"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="326"/></proof>
   </goal>
   <goal name="VC main.108" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.58" steps="865"/></proof>
+  <proof prover="4"><result status="valid" time="0.60" steps="898"/></proof>
   </goal>
   <goal name="VC main.109" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.109.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="59"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="57"/></proof>
    </goal>
    <goal name="VC main.109.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.96" steps="557"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.96" steps="542"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.110" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.93" steps="507"/></proof>
+  <proof prover="2"><result status="valid" time="0.71" steps="1165"/></proof>
   </goal>
   <goal name="VC main.111" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.111.0" expl="loop invariant preservation" proved="true">
+   <transf name="assert" proved="true" arg1="(elts waiting_list &lt;&gt; Nil)">
+    <goal name="VC main.111.0.0" proved="true">
+    <proof prover="4"><result status="valid" time="0.06" steps="183"/></proof>
+    </goal>
+    <goal name="VC main.111.0.1" expl="loop invariant preservation" proved="true">
+    <proof prover="4" memlimit="2000"><result status="valid" time="1.76" steps="879"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.112" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.112.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="47"/></proof>
+   <proof prover="5"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="VC main.112.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="1.74" steps="1031"/></proof>
+   <proof prover="2"><result status="valid" time="0.83" steps="1250"/></proof>
    </goal>
    <goal name="VC main.112.2" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="3.86" steps="1078"/></proof>
+   <proof prover="2"><result status="valid" time="0.72" steps="1279"/></proof>
    </goal>
    <goal name="VC main.112.3" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="2.57" steps="1392"/></proof>
+   <proof prover="2"><result status="valid" time="0.73" steps="1231"/></proof>
    </goal>
    <goal name="VC main.112.4" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="47"/></proof>
+   <proof prover="5"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="VC main.112.5" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="47"/></proof>
+   <proof prover="5"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="VC main.112.6" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.07" steps="47"/></proof>
+   <proof prover="5"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.113" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="183"/></proof>
   </goal>
   <goal name="VC main.114" expl="liveness" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="48"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.114.0" expl="liveness" proved="true">
+   <proof prover="4"><result status="valid" time="0.05" steps="46"/></proof>
+   </goal>
+   <goal name="VC main.114.1" expl="liveness" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC main.114.2" expl="liveness" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC main.114.3" expl="liveness" proved="true">
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.115" expl="safety" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="44"/></proof>
@@ -1017,172 +1064,66 @@
   <proof prover="4"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
   <goal name="VC main.124" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.124.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="40"/></proof>
-   </goal>
-   <goal name="VC main.124.1" expl="VC for main" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="190"/></proof>
-   </goal>
-   <goal name="VC main.124.2" expl="VC for main" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.09" steps="199"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.14" steps="170"/></proof>
   </goal>
   <goal name="VC main.125" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.09"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="123"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.126" expl="loop invariant preservation" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.16" steps="358"/></proof>
   </goal>
   <goal name="VC main.127" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="31"/></proof>
   </goal>
   <goal name="VC main.128" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.128.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="31"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="VC main.129" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.129.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.03" steps="43"/></proof>
+   </goal>
+   <goal name="VC main.129.1" expl="loop invariant preservation" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="43"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC main.129" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  </goal>
   <goal name="VC main.130" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="43"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="43"/></proof>
   </goal>
   <goal name="VC main.131" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.132" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.132.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="33"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="33"/></proof>
    </goal>
    <goal name="VC main.132.1" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="48"/></proof>
    </goal>
    <goal name="VC main.132.2" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="44"/></proof>
    </goal>
    <goal name="VC main.132.3" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="43"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="43"/></proof>
    </goal>
    <goal name="VC main.132.4" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="67"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="67"/></proof>
    </goal>
    <goal name="VC main.132.5" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.06" steps="32"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.11" steps="32"/></proof>
    </goal>
    <goal name="VC main.132.6" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.08" steps="100"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="100"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.133" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="31"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.134" expl="liveness" proved="true">
-  <transf name="revert" proved="true" arg1="H41">
-   <goal name="VC main.134.0" expl="liveness" proved="true">
-   <transf name="split_goal_full" proved="true" >
-    <goal name="VC main.134.0.0" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.1" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.01"/></proof>
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="VC main.134.0.2" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.3" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.4" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="VC main.134.0.5" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="VC main.134.0.6" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="VC main.134.0.7" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
-    </goal>
-    <goal name="VC main.134.0.8" expl="liveness" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="53"/></proof>
-    </goal>
-    <goal name="VC main.134.0.9" expl="liveness" proved="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    </goal>
-    <goal name="VC main.134.0.10" expl="liveness" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="216"/></proof>
-    </goal>
-    <goal name="VC main.134.0.11" expl="liveness" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="210"/></proof>
-    </goal>
-    <goal name="VC main.134.0.12" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
-    </goal>
-    <goal name="VC main.134.0.13" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.14" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.05"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.15" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.06"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.16" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.06"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.17" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.03"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.18" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.19" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.06"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.20" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.21" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.02"/></proof>
-    <proof prover="3"><result status="valid" time="0.02"/></proof>
-    </goal>
-    <goal name="VC main.134.0.22" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="VC main.134.0.23" expl="liveness" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.135" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1206,31 +1147,52 @@
   <proof prover="4"><result status="valid" time="0.08" steps="84"/></proof>
   </goal>
   <goal name="VC main.142" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="57"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="57"/></proof>
   </goal>
   <goal name="VC main.143" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="78"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.143.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="78"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.144" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.88" steps="2527"/></proof>
+  <transf name="case" proved="true" arg1="(th=th1)">
+   <goal name="VC main.144.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="54"/></proof>
+   </goal>
+   <goal name="VC main.144.1" expl="false case (loop invariant preservation)" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.55" steps="1579"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.145" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.14" steps="299"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.145.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.02" steps="41"/></proof>
+   </goal>
+   <goal name="VC main.145.1" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.80" steps="2178"/></proof>
+   </goal>
+   <goal name="VC main.145.2" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.26" steps="782"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.146" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.38" steps="875"/></proof>
+  <proof prover="5"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC main.147" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.79" steps="1953"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="1.88" steps="1953"/></proof>
   </goal>
   <goal name="VC main.148" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="32"/></proof>
   </goal>
   <goal name="VC main.149" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="138"/></proof>
   </goal>
   <goal name="VC main.150" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="48"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="48"/></proof>
   </goal>
   <goal name="VC main.151" expl="loop invariant preservation" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="45"/></proof>
@@ -1264,21 +1226,22 @@
   </transf>
   </goal>
   <goal name="VC main.154" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
   <goal name="VC main.155" expl="liveness" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC main.155.0" expl="liveness" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="41"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="41"/></proof>
    </goal>
    <goal name="VC main.155.1" expl="liveness" proved="true">
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC main.155.2" expl="liveness" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.12" steps="140"/></proof>
    </goal>
    <goal name="VC main.155.3" expl="liveness" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="37"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1304,90 +1267,87 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.163" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.12" steps="57"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.13" steps="57"/></proof>
   </goal>
   <goal name="VC main.164" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC main.164.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.10" steps="78"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="78"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.165" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.87" steps="2364"/></proof>
+  <proof prover="0"><result status="valid" time="1.50"/></proof>
   </goal>
   <goal name="VC main.166" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC main.166.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="41"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.166.0" expl="VC for main" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="41"/></proof>
    </goal>
-   <goal name="VC main.166.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.57" steps="1701"/></proof>
+   <goal name="VC main.166.1" expl="VC for main" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.57" steps="1348"/></proof>
    </goal>
-   <goal name="VC main.166.2" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.08" steps="324"/></proof>
+   <goal name="VC main.166.2" expl="VC for main" proved="true">
+   <proof prover="4"><result status="valid" time="0.14" steps="349"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.167" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.26" steps="602"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.21" steps="602"/></proof>
   </goal>
   <goal name="VC main.168" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.35"/></proof>
+  <proof prover="0"><result status="valid" time="1.64"/></proof>
   <proof prover="3"><result status="valid" time="0.93"/></proof>
   </goal>
   <goal name="VC main.169" expl="loop invariant preservation" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="VC main.170" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="138"/></proof>
-  </goal>
-  <goal name="VC main.171" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC main.171.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="45"/></proof>
-   </goal>
-   <goal name="VC main.171.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="45"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.170.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="152"/></proof>
    </goal>
   </transf>
   </goal>
+  <goal name="VC main.171" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
   <goal name="VC main.172" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="45"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="45"/></proof>
   </goal>
   <goal name="VC main.173" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC main.174" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.174.0" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.174.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="35"/></proof>
    </goal>
-   <goal name="VC main.174.1" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.05" steps="50"/></proof>
-   </goal>
-   <goal name="VC main.174.2" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC main.174.3" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC main.174.4" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
-   </goal>
-   <goal name="VC main.174.5" expl="VC for main" proved="true">
+   <goal name="VC main.174.1" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="VC main.174.6" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.08" steps="112"/></proof>
+   <goal name="VC main.174.2" expl="loop invariant preservation" proved="true">
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC main.174.3" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="45"/></proof>
+   </goal>
+   <goal name="VC main.174.4" expl="loop invariant preservation" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="67"/></proof>
+   </goal>
+   <goal name="VC main.174.5" expl="loop invariant preservation" proved="true">
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.06" steps="34"/></proof>
+   </goal>
+   <goal name="VC main.174.6" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.08" steps="98"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.175" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.10" steps="33"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="33"/></proof>
   </goal>
   <goal name="VC main.176" expl="liveness" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.14" steps="175"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.177" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -1409,103 +1369,112 @@
   </transf>
   </goal>
   <goal name="VC main.180" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.181" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.182" expl="safety" proved="true">
-  <proof prover="4"><result status="valid" time="0.18" steps="408"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.20" steps="408"/></proof>
   </goal>
   <goal name="VC main.183" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="VC main.184" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.69" steps="887"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.185" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="173"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="173"/></proof>
   </goal>
   <goal name="VC main.186" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.87" steps="2224"/></proof>
+  <proof prover="4"><result status="valid" time="2.12" steps="2224"/></proof>
   </goal>
   <goal name="VC main.187" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.28" steps="929"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.29" steps="929"/></proof>
   </goal>
   <goal name="VC main.188" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="63"/></proof>
   </goal>
   <goal name="VC main.189" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.189.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="104"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4"><result status="valid" time="0.06" steps="94"/></proof>
   </goal>
   <goal name="VC main.190" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.21" steps="3515"/></proof>
+  <proof prover="4"><result status="valid" time="1.36" steps="3515"/></proof>
   </goal>
   <goal name="VC main.191" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.191.0" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="47"/></proof>
-   </goal>
-   <goal name="VC main.191.1" expl="VC for main" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.76" steps="2007"/></proof>
-   </goal>
-   <goal name="VC main.191.2" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.46" steps="1504"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.28" steps="676"/></proof>
   </goal>
   <goal name="VC main.192" expl="loop invariant preservation" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.19" steps="339"/></proof>
   </goal>
   <goal name="VC main.193" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC main.194" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="VC main.195" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.07" steps="172"/></proof>
+  <proof prover="4"><result status="valid" time="0.15" steps="172"/></proof>
   </goal>
   <goal name="VC main.196" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="54"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.196.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="51"/></proof>
+   </goal>
+   <goal name="VC main.196.1" expl="VC for main" proved="true">
+   <proof prover="4"><result status="valid" time="0.02" steps="51"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.197" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.198" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC main.198.0" expl="VC for main" proved="true">
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="51"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.199" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.199.0" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.199.0" expl="loop invariant preservation" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="VC main.199.0.0" expl="loop invariant preservation" proved="true">
+    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.08" steps="39"/></proof>
+    </goal>
+   </transf>
    </goal>
-   <goal name="VC main.199.1" expl="VC for main" proved="true">
+   <goal name="VC main.199.1" expl="loop invariant preservation" proved="true">
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC main.199.2" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC main.199.2" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <goal name="VC main.199.3" expl="loop invariant preservation" proved="true">
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC main.199.3" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <goal name="VC main.199.4" expl="loop invariant preservation" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="VC main.199.4.0" expl="loop invariant preservation" proved="true">
+    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="91"/></proof>
+    </goal>
+   </transf>
    </goal>
-   <goal name="VC main.199.4" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <goal name="VC main.199.5" expl="loop invariant preservation" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="VC main.199.5.0" expl="loop invariant preservation" proved="true">
+    <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.05" steps="38"/></proof>
+    </goal>
+   </transf>
    </goal>
-   <goal name="VC main.199.5" expl="VC for main" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC main.199.6" expl="VC for main" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="122"/></proof>
+   <goal name="VC main.199.6" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.06" steps="122"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.200" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.05" steps="37"/></proof>
+  <proof prover="4"><result status="valid" time="0.12" steps="37"/></proof>
   </goal>
   <goal name="VC main.201" expl="liveness" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1542,7 +1511,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.210" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.211" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -1661,25 +1630,21 @@
   <proof prover="4" memlimit="2000"><result status="valid" time="0.14" steps="48"/></proof>
   </goal>
   <goal name="VC main.221" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.221.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.24" steps="321"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4"><result status="valid" time="2.61" steps="691"/></proof>
   </goal>
   <goal name="VC main.222" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.50"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="2.66" steps="1419"/></proof>
   </goal>
   <goal name="VC main.223" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC main.223.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.66" steps="700"/></proof>
+   <proof prover="4"><result status="valid" time="1.81" steps="700"/></proof>
    </goal>
    <goal name="VC main.223.1" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.13" steps="1125"/></proof>
+   <proof prover="4"><result status="valid" time="1.10" steps="1125"/></proof>
    </goal>
    <goal name="VC main.223.2" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="6.47" steps="1077"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="2.14" steps="1073"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1691,73 +1656,62 @@
    <goal name="VC main.224.1" expl="false case (loop invariant preservation)" proved="true">
    <transf name="replace" proved="true" arg1="memo[th]" arg2="memo1[th]">
     <goal name="VC main.224.1.0" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="3"><result status="valid" time="0.07"/></proof>
+    <proof prover="3"><result status="valid" time="0.05"/></proof>
     </goal>
     <goal name="VC main.224.1.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.03" steps="52"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="52"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.225" expl="loop invariant preservation" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.16" steps="283"/></proof>
+  <proof prover="0"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC main.226" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.11" steps="48"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
   <goal name="VC main.227" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.15" steps="231"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="231"/></proof>
   </goal>
   <goal name="VC main.228" expl="loop invariant preservation" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.228.0" expl="VC for main" proved="true">
-   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.03" steps="63"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC main.228.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="63"/></proof>
    </goal>
-   <goal name="VC main.228.1" expl="VC for main" proved="true">
-   <proof prover="4"><result status="valid" time="0.02" steps="63"/></proof>
+   <goal name="VC main.228.1" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.04" steps="63"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC main.229" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="63"/></proof>
   </goal>
   <goal name="VC main.230" expl="loop invariant preservation" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC main.230.0" expl="loop invariant preservation" proved="true">
-   <transf name="assert" proved="true" arg1="(elts waiting_list &lt;&gt; Nil)">
-    <goal name="VC main.230.0.0" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.27" steps="452"/></proof>
-    </goal>
-    <goal name="VC main.230.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="64"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC main.231" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC main.231.0" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="49"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="49"/></proof>
    </goal>
    <goal name="VC main.231.1" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.04" steps="83"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="83"/></proof>
    </goal>
    <goal name="VC main.231.2" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="83"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="83"/></proof>
    </goal>
    <goal name="VC main.231.3" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="83"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="83"/></proof>
    </goal>
    <goal name="VC main.231.4" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.10" steps="67"/></proof>
+   <proof prover="4" memlimit="2000"><result status="valid" time="0.03" steps="67"/></proof>
    </goal>
    <goal name="VC main.231.5" expl="loop invariant preservation" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.11" steps="50"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="50"/></proof>
    </goal>
    <goal name="VC main.231.6" expl="loop invariant preservation" proved="true">
-   <proof prover="4"><result status="valid" time="0.10" steps="68"/></proof>
+   <proof prover="4"><result status="valid" time="0.07" steps="68"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1765,20 +1719,7 @@
   <proof prover="4" memlimit="2000"><result status="valid" time="0.13" steps="49"/></proof>
   </goal>
   <goal name="VC main.233" expl="liveness" proved="true">
-  <transf name="split_all_full" proved="true" >
-   <goal name="VC main.233.0" expl="liveness" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.24" steps="182"/></proof>
-   </goal>
-   <goal name="VC main.233.1" expl="liveness" proved="true">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="VC main.233.2" expl="liveness" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.12" steps="51"/></proof>
-   </goal>
-   <goal name="VC main.233.3" expl="liveness" proved="true">
-   <proof prover="4" memlimit="2000"><result status="valid" time="0.02" steps="52"/></proof>
-   </goal>
-  </transf>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.66" steps="465"/></proof>
   </goal>
  </transf>
  </goal>
