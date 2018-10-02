@@ -391,12 +391,10 @@ module Print = struct
   and print_let_def ?(functor_arg=false) info fmt = function
     | Lvar (pv, {e_node = Eany ty}) when functor_arg ->
         fprintf fmt "@[<hov 2>val %a : %a@]"
-          (print_lident info) (pv_name pv)
-          (print_ty info) ty;
+          (print_lident info) (pv_name pv) (print_ty info) ty;
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
-          (print_lident info) (pv_name pv)
-          (print_expr info) e;
+          (print_lident info) (pv_name pv) (print_expr info) e
     | Lsym (rs, res, args, ef) ->
         fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
           (print_lident info) rs.rs_name
@@ -513,11 +511,12 @@ module Print = struct
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
     | Efor (pv1, pv2, dir, pv3, e) ->
-        if is_mapped_to_int info pv1.pv_ity then
+        if is_mapped_to_int info pv1.pv_ity then begin
           fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
             print_for_direction dir (print_lident info) (pv_name pv3)
-            (print_expr info) e
+            (print_expr info) e;
+          forget_pv pv1 end
         else
           let for_id  = id_register (id_fresh "for_loop_to") in
           let cmp, op = match dir with
