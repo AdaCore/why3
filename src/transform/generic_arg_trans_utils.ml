@@ -155,11 +155,6 @@ let sort =
   Trans.bind get_local sort
 
 
-(* Add an attribute to a goal (useful to add an expl for example) *)
-let add_goal_attr_trans attr =
-  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_attr_add attr g)])
-
-
 (****************************)
 (* Substitution of terms    *)
 (****************************)
@@ -183,3 +178,13 @@ let replace_tdecl (subst: term_subst) (td: tdecl) =
   | Decl d ->
       create_decl (replace_decl subst d)
   | _ -> td
+
+
+(************************)
+(* Explanation handling *)
+(************************)
+
+let create_goal ~expl pr t =
+  let expl = Ident.create_attribute ("expl:" ^ expl) in
+  let t = Term.t_attr_add expl t in
+  create_prop_decl Pgoal pr t
