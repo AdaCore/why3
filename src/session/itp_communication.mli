@@ -40,8 +40,8 @@ type global_information =
 
 type message_notification =
   | Proof_error           of node_ID * string
-  | Transf_error          of node_ID * string * string * Loc.position * string * string
-  (** Transf_error (nid, trans_with_arg, arg_opt, loc, error_msg, doc_of_transf *)
+  | Transf_error          of bool * node_ID * string * string * Loc.position * string * string
+  (** Transf_error (is_fatal, nid, trans_with_arg, arg_opt, loc, error_msg, doc_of_transf *)
   | Strat_error           of node_ID * string
   | Replay_Info           of string
   | Query_Info            of node_ID * string

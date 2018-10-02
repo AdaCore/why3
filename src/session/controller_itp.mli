@@ -34,10 +34,17 @@ type transformation_status =
     TSscheduled
   | TSdone of transID
   | TSfailed of (proofNodeID * exn)
+  (* We distinguish normal usage exception of transformation from fatal
+     exception like assertion failure that should not be raised *)
+  | TSfatal of (proofNodeID * exn)
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
+                     (* When a transformation fatally returns, we have to
+                        fatally fail the strategy
+                        [transformation_name, pid, exn] *)
+                     | STSfatal of string * proofNodeID * exn
 
 val print_strategy_status : Format.formatter -> strategy_status -> unit
 

@@ -567,7 +567,7 @@ let interpNotif (n: notification) =
       | Proof_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Proof error on selected node: \"%s\"" s)
-      | Transf_error (_ids, _tr, _args, _loc, s, _d) ->
+      | Transf_error (_b, _ids, _tr, _args, _loc, s, _d) ->
         PE.error_print_msg
           (Format.asprintf "Transformation error on selected node: \"%s\"" s)
       | Strat_error (_nid, s) ->

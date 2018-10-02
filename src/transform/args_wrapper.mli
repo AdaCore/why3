@@ -26,6 +26,8 @@ exception Arg_expected_none of string
 exception Arg_pr_not_found of Decl.prsymbol
 exception Arg_qid_not_found of Ptree.qualid
 exception Arg_error of string
+exception Arg_parse_type_error of Loc.position * string * exn
+exception Unnecessary_arguments of string list
 
 
 val build_naming_tables : Task.task -> Trans.naming_table
@@ -97,9 +99,6 @@ type (_, _) trans_typ =
   (** transformation with an optional boolean argument. The first
       string is the keyword for that optional argument, its presence
       meaning "true" *)
-
-exception Arg_parse_type_error of Loc.position * string * exn
-exception Unnecessary_arguments of string list
 
 (** {2 parsing and typing of arguments}
 

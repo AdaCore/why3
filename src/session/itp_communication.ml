@@ -36,7 +36,7 @@ type global_information =
 
 type message_notification =
   | Proof_error           of node_ID * string
-  | Transf_error          of node_ID * string * string * Loc.position * string * string
+  | Transf_error          of bool * node_ID * string * string * Loc.position * string * string
   (* Transf_error (nid, trans_with_arg, arg_opt, loc, error_msg, doc_of_trans *)
   | Strat_error           of node_ID * string
   | Replay_Info           of string
@@ -155,7 +155,8 @@ let print_request fmt r =
 let print_msg fmt m =
   match m with
   | Proof_error (_ids, s)                        -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, _tr, _args, _loc, s, _d) -> fprintf fmt "transf error %s" s
+  | Transf_error (b, _ids, _tr, _args, _loc, s, _d) ->
+      fprintf fmt "transf error (is fatal = %b) %s" b s
   | Strat_error (_ids, s)                        -> fprintf fmt "start error %s" s
   | Replay_Info s                                -> fprintf fmt "replay info %s" s
   | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
