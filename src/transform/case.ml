@@ -19,6 +19,20 @@ open Generic_arg_trans_utils
 (** This file contains transformation with arguments that acts directly on a
     logic connector for intro (case, or_intro, intros, exists) *)
 
+(** Explanations *)
+
+(* Explanation for [left]/[right] *)
+let left_case_expl = "left case"
+let right_case_expl = "right case"
+
+(* Explanation for [case] *)
+let true_case_expl = "true case"
+let false_case_expl = "false case"
+
+(* Add an explanation attribute to a goal *)
+let create_goal_trans ~expl =
+  Trans.goal (fun pr g -> [create_goal ~expl pr g])
+
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t name =
@@ -29,13 +43,11 @@ let case t name =
   in
   let h = Decl.create_prsymbol (gen_ident name) in
   let hnot = Decl.create_prsymbol (gen_ident name) in
-  let attr_true = create_attribute "expl:true case" in
-  let attr_false = create_attribute "expl:false case" in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
-  let left_trans = Trans.compose (add_goal_attr_trans attr_true)
+  let left_trans = Trans.compose (create_goal_trans ~expl:true_case_expl)
       (Trans.add_decls [t_decl]) in
-  let right_trans = Trans.compose (add_goal_attr_trans attr_false)
+  let right_trans = Trans.compose (create_goal_trans ~expl:false_case_expl)
       (Trans.add_decls [t_not_decl]) in
   Trans.par [left_trans; right_trans]
 
@@ -47,9 +59,9 @@ let or_intro (left: bool) : Task.task Trans.trans =
         match t.t_node with
         | Tbinop (Tor, t1, t2) ->
           if left then
-            [create_prop_decl Pgoal pr t1]
+            [create_goal ~expl:left_case_expl pr t1]
           else
-            [create_prop_decl Pgoal pr t2]
+            [create_goal ~expl:right_case_expl pr t2]
         | _ -> [d]
       end
     | _ -> [d]) None
@@ -58,7 +70,7 @@ let exists_aux g x =
   let t = subst_exist g x in
   let pr_goal = create_prsymbol (gen_ident "G") in
   let new_goal = Decl.create_prop_decl Decl.Pgoal pr_goal t in
-      [new_goal]
+  [new_goal]
 
 (* From task [delta |- exists x. G] and term t, build
    the task  [delta |- G[x -> t]].

@@ -93,7 +93,7 @@ let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : T
                      | [] ->
                         let d = create_prop_decl Pgoal pr (subst_in_term sigma t) in
                         let td = Theory.create_decl d in
-Task.add_tdecl tuc td
+                        Task.add_tdecl tuc td
                      | _ -> raise (Arg_trans "apply_subst failed")
                end
             | Dprop(_k,pr,_t) when Spr.mem pr prs ->

@@ -17,6 +17,11 @@ open Generic_arg_trans_utils
 (** This file contains transformations with arguments that eliminates logic
     connectors (instantiate, destruct, destruct_alg). *)
 
+(** Explanation *)
+
+(* Explanation for destruct premises *)
+let destruct_expl = "destruct premise"
+
 let is_lsymbol t =
   match t.t_node with
   | Tapp (_, []) -> true
@@ -192,11 +197,11 @@ let destruct pr : Task.task Trans.tlist =
       (* Destruct case for an implication. The first goal should be new_decl,
          the second one is unchanged. *)
       | first_task :: second_task :: [] ->
-        let new_goal =
-          create_prop_decl Pgoal (create_prsymbol (gen_ident "G")) new_decl in
-        let first_goal = Task.add_decl first_task new_goal in
-        let second_goal = Task.add_tdecl second_task goal in
-        first_goal :: second_goal :: []
+          let pr = create_prsymbol (gen_ident "G") in
+          let new_goal = create_goal ~expl:destruct_expl pr new_decl in
+          let first_goal = Task.add_decl first_task new_goal in
+          let second_goal = Task.add_tdecl second_task goal in
+          first_goal :: second_goal :: []
       | _ -> assert false)
 
 (* from task [delta, name:forall x.A |- G,
