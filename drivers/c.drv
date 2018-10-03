@@ -27,17 +27,17 @@ module mach.int.Int32
 
   syntax type int32  "int32_t"
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val (-_)    "-(%1)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (-_)    "-%1"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 end
 
 module mach.int.UInt32Gen
@@ -54,16 +54,16 @@ module mach.int.UInt32
   syntax converter of_int "%1U"
 
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 
 end
 
@@ -185,16 +185,16 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 
   syntax converter of_int "%1U"
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 
   syntax val add_with_carry "add32_with_carry"
   syntax val sub_with_borrow "sub32_with_borrow"
@@ -202,17 +202,17 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
   syntax val add3 "add32_3"
   syntax val lsld "lsld32"
 
-  syntax val add_mod "(%1) + (%2)"
-  syntax val sub_mod "(%1) - (%2)"
-  syntax val mul_mod "(%1) * (%2)"
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
 
   syntax val div2by1
          "(uint32_t)((((uint64_t)%1) | (((uint64_t)%2) << 32))/(uint64_t)(%3))"
 
-  syntax val lsl "(%1) << (%2)"
-  syntax val lsr "(%1) >> (%2)"
+  syntax val lsl "%1 << %2"
+  syntax val lsr "%1 >> %2"
 
-  syntax val is_msb_set "(%1) & 0x80000000U"
+  syntax val is_msb_set "%1 & 0x80000000U"
 
   syntax val count_leading_zeros "__builtin_clz(%1)"
 
@@ -227,17 +227,17 @@ module mach.int.Int64
 
   syntax type int64  "int64_t"
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val (-_)    "-(%1)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (-_)    "-%1"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 end
 
 module mach.int.UInt64Gen
@@ -253,17 +253,17 @@ module mach.int.UInt64
 
   syntax converter of_int "%1ULL"
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val (-_)    "-(%1)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (-_)    "-%1"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 
 end
 
@@ -508,16 +508,16 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 "
   syntax converter of_int "%1ULL"
 
-  syntax val (+)     "(%1) + (%2)"
-  syntax val (-)     "(%1) - (%2)"
-  syntax val ( * )   "(%1) * (%2)"
-  syntax val (/)     "(%1) / (%2)"
-  syntax val (%)     "(%1) % (%2)"
-  syntax val (=)     "(%1) == (%2)"
-  syntax val (<=)    "(%1) <= (%2)"
-  syntax val (<)     "(%1) < (%2)"
-  syntax val (>=)    "(%1) >= (%2)"
-  syntax val (>)     "(%1) > (%2)"
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val ( * )   "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val (=)     "%1 == %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
 
   syntax val add_with_carry "add64_with_carry"
   syntax val add_double "add64_double"
@@ -532,14 +532,14 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val add3 "add64_3"
   syntax val lsld "lsld64"
 
-  syntax val add_mod "(%1) + (%2)"
-  syntax val sub_mod "(%1) - (%2)"
-  syntax val mul_mod "(%1) * (%2)"
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
 
-  syntax val lsl "(%1) << (%2)"
-  syntax val lsr "(%1) >> (%2)"
+  syntax val lsl "%1 << %2"
+  syntax val lsr "%1 >> %2"
 
-  syntax val is_msb_set "(%1) & 0x8000000000000000ULL"
+  syntax val is_msb_set "%1 & 0x8000000000000000ULL"
 
   syntax val count_leading_zeros "__builtin_clzll(%1)"
 
@@ -570,16 +570,16 @@ module mach.c.C
   syntax val is_not_null "(%1) != NULL"
   syntax val null "NULL"
 
-  syntax val incr "%1+(%2)"
+  syntax val incr "%1 + %2"
 
-  syntax val get "*(%1)"
-  syntax val get_ofs "*(%1+(%2))"
+  syntax val get "*%1"
+  syntax val get_ofs "%1[%2]"
 
-  syntax val set "*(%1) = %2"
-  syntax val set_ofs "*(%1+(%2)) = %3"
+  syntax val set "*%1 = %2"
+  syntax val set_ofs "%1[%2] = %3"
 
-  syntax val incr_split "%1+(%2)"
-  syntax val decr_split "%1-(%2)"
+  syntax val incr_split "%1 + %2"
+  syntax val decr_split "%1 - %2"
   syntax val join "IGNORE2"
   syntax val join_r "IGNORE2"
 
