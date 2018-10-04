@@ -537,16 +537,9 @@ let create_let_decl ld =
         List.fold_right add_rd rdl ([],[],[])
     | LDsym (s,c) ->
         add_rs Mrs.empty s c ([],[],[]) in
-  let fail_trusted_rec ls =
-    Loc.error ?loc:ls.ls_name.id_loc (Decl.NoTerminationProof ls) in
-  let is_trusted_rec = match ld with
-    | LDrec ({rec_sym = {rs_logic = RLls ls; rs_cty = c}; rec_varl = []}::_)
-      when total c.cty_effect.eff_oneway -> abst = [] || fail_trusted_rec ls
-    | _ -> false in
   let defn = if defn = [] then [] else
     let dl = List.map (fun (s,vl,t) -> make_ls_defn s vl t) defn in
-    try [create_logic_decl dl] with Decl.NoTerminationProof ls ->
-    if is_trusted_rec then fail_trusted_rec ls;
+    try [create_logic_decl dl] with Decl.NoTerminationProof _ ->
     let abst = List.map (fun (s,_) -> create_param_decl s) dl in
     let mk_ax ({ls_name = id} as s, vl, t) =
       let nm = id.id_string ^ "_def" in

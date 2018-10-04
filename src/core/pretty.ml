@@ -807,6 +807,6 @@ let () = Exn_printer.register
       fprintf fmt "Ident %a is already declared, with a different declaration"
         Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
-      fprintf fmt "Cannot prove the termination of %a" print_ls ls
+      fprintf fmt "Cannot prove termination for %a" print_ls ls
   | _ -> raise exn
   end
