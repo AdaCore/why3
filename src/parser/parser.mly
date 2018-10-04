@@ -108,23 +108,28 @@
     | Pwild -> sp
     | _ -> { sp with sp_post = List.map apply sp.sp_post }
 
-  let apply_partial part sp =
-    if part
-    then { sp with sp_partial = true }
-    else sp
+  type partial =
+    | Regular
+    | Partial
+    | Ghost
 
-  let apply_partial_ed e =
-    match e with
-    | Efun (bl, op, m, s, ex) ->
-       Efun (bl, op, m, apply_partial true s, ex)
-    | Eany (pl, rsk, op, m, s) ->
-       Eany (pl, rsk, op, m, apply_partial true s)
-    | _ -> assert false
+  let ghost part = (part = Ghost)
 
-  let apply_partial_e part e =
-    if part
-    then { e with expr_desc = apply_partial_ed e.expr_desc }
-    else e                      
+  let apply_partial_sp part sp =
+    if part <> Partial then sp else
+    { sp with sp_partial = true }
+
+  let apply_partial part e =
+    if part <> Partial then e else
+    let ed = match e.expr_desc with
+      | Efun (_::_ as bl, op, m, s, ex) ->
+          Efun (bl, op, m, apply_partial_sp part s, ex)
+      | Eany (_::_ as pl, rsk, op, m, s) ->
+          Eany (pl, rsk, op, m, apply_partial_sp part s)
+      | _ ->
+          Loc.errorm ~loc:e.expr_loc
+            "this expression cannot be declared partial" in
+    { e with expr_desc = ed }
 
   let we_attr = Ident.create_attribute "expl:witness existence"
 
@@ -747,18 +752,26 @@ numeral:
 (* Program declarations *)
 
 prog_decl:
-| VAL ghost kind partial attrs(lident_rich) mk_expr(val_defn)
-    { Dlet (add_model_trace_attr $5, $2, $3, apply_partial_e $4 $6) }
-| LET ghost kind partial attrs(lident_rich) mk_expr(fun_defn)
-    { Dlet ($5, $2, $3, apply_partial_e $4 $6) }
-| LET ghost kind attrs(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
-| LET REC with_list1(rec_defn)                        { Drec $3 }
-| EXCEPTION attrs(uident_nq)        { Dexn ($2, PTtuple [], Ity.MaskVisible) }
-| EXCEPTION attrs(uident_nq) return { Dexn ($2, fst $3, snd $3) }
+| VAL ghost kind attrs(lident_rich) mk_expr(val_defn)
+    { Dlet (add_model_trace_attr $4, ghost $2, $3, apply_partial $2 $5) }
+| LET ghost kind attrs(lident_rich) mk_expr(fun_defn)
+    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+| LET ghost kind attrs(lident_rich) const_defn
+    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+| LET REC with_list1(rec_defn)
+    { Drec $3 }
+| EXCEPTION attrs(uident_nq)
+    { Dexn ($2, PTtuple [], Ity.MaskVisible) }
+| EXCEPTION attrs(uident_nq) return
+    { Dexn ($2, fst $3, snd $3) }
 
 ghost:
-| (* epsilon *) { false }
-| GHOST         { true }
+| (* epsilon *) { Regular }
+| PARTIAL       { Partial }
+| GHOST         { Ghost }
+| GHOST PARTIAL
+| PARTIAL GHOST { Loc.errorm ~loc:(floc $startpos $endpos)
+                    "Ghost functions cannot be partial" }
 
 kind:
 | (* epsilon *) { Expr.RKnone }
@@ -767,20 +780,15 @@ kind:
 | PREDICATE     { Expr.RKpred }
 | LEMMA         { Expr.RKlemma }
 
-%inline partial:
-| (* epsilon *) { false }
-| PARTIAL       { true }
-
 (* Function definitions *)
 
 rec_defn:
-| ghost kind partial attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
-    { let pat, ty, mask = $6 in
-      let spec = apply_return pat (spec_union $7 $9) in
-      let spec = apply_partial $3 spec in
-      let id = mk_id return_id $startpos($8) $endpos($8) in
-      let e = { $10 with expr_desc = Eoptexn (id, mask, $10) } in
-      $4, $1, $2, $5, ty, mask, spec, e }
+| ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
+    { let pat, ty, mask = $5 in
+      let spec = apply_return pat (spec_union $6 $8) in
+      let id = mk_id return_id $startpos($7) $endpos($7) in
+      let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
+      $3, ghost $1, $2, $4, ty, mask, apply_partial_sp $1 spec, e }
 
 fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
@@ -893,7 +901,7 @@ single_expr_:
         | Pas (p,v,g) -> Pas (push p, v, g)
         | Por (p,q) -> Por (push p, q)
         | _ -> Pghost pat) in
-      let pat = if $2 then push $4 else $4 in
+      let pat = if ghost $2 then push $4 else $4 in
       let rec unfold gh d p = match p.pat_desc with
         | Pparen p | Pscope (_,p) -> unfold gh d p
         | Pghost p -> unfold true d p
@@ -904,13 +912,13 @@ single_expr_:
         | _ when $3 = Expr.RKnone -> Ematch (d, [pat, $8], [])
         | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
             "illegal kind qualifier" in
-      unfold false $6 pat }
+      unfold false (apply_partial $2 $6) pat }
 | LET ghost kind attrs(lident_op_nq) EQUAL seq_expr IN seq_expr
-    { Elet ($4, $2, $3, $6, $8) }
-| LET ghost kind partial attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
-    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
-| LET ghost kind partial attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
-    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
+    { Elet ($4, ghost $2, $3, apply_partial $2 $6, $8) }
+| LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
+    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+| LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
+    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
@@ -932,8 +940,8 @@ single_expr_:
       let pre = pre_of_any loc ty spec.sp_post in
       let spec = { spec with sp_pre = spec.sp_pre @ pre } in
       Eany ([], Expr.RKnone, Some ty, mask, spec) }
-| VAL ghost kind partial attrs(lident_rich) mk_expr(val_defn) IN seq_expr
-    { Elet ($5, $2, $3, apply_partial_e $4 $6, $8) }
+| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
+    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | MATCH seq_expr WITH ext_match_cases END
     { let bl, xl = $4 in Ematch ($2, bl, xl) }
 | EXCEPTION attrs(uident) IN seq_expr
@@ -1206,7 +1214,7 @@ pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | GHOST mk_pat(pat_uni_)                { Pghost $2 }
-| mk_pat(pat_uni_) AS ghost attrs(lident_nq)
+| mk_pat(pat_uni_) AS boption(GHOST) attrs(lident_nq)
                                         { Pas ($1,add_model_trace_attr $4,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
@@ -1238,7 +1246,7 @@ let_pat_conj_:
 let_pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(let_pat_uni_) AS ghost attrs(lident_nq)
+| mk_pat(let_pat_uni_) AS boption(GHOST) attrs(lident_nq)
                                         { Pas ($1,add_model_trace_attr $4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
 

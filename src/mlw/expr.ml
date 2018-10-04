@@ -1176,13 +1176,13 @@ let print_rs fmt s =
 
 let print_rs_head fmt s = fprintf fmt "%s%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
+  (if partial s.rs_cty.cty_effect.eff_oneway then "partial " else "")
   (match s.rs_logic with
     | RLnone -> ""
     | RLpv _ -> "function "
     | RLls {ls_value = None} -> "predicate "
     | RLls _ -> "function "
     | RLlemma -> "lemma ")
-  (if partial s.rs_cty.cty_effect.eff_oneway then "partial " else "")
   print_rs s print_id_attrs (id_of_rs s)
 
 let print_invariant fmt fl =

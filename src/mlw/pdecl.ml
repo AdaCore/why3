@@ -541,8 +541,7 @@ let create_let_decl ld =
     Loc.error ?loc:ls.ls_name.id_loc (Decl.NoTerminationProof ls) in
   let is_trusted_rec = match ld with
     | LDrec ({rec_sym = {rs_logic = RLls ls; rs_cty = c}; rec_varl = []}::_)
-         when ghostifiable c.cty_effect.eff_oneway ->
-       abst = [] || fail_trusted_rec ls
+      when total c.cty_effect.eff_oneway -> abst = [] || fail_trusted_rec ls
     | _ -> false in
   let defn = if defn = [] then [] else
     let dl = List.map (fun (s,vl,t) -> make_ls_defn s vl t) defn in

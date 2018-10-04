@@ -926,10 +926,10 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
     print_xs (Sxs.choose (Sxs.diff ueff.eff_raises eeff.eff_raises));
-  if check_ue && (diverges ueff.eff_oneway) && not (diverges eeff.eff_oneway)
-  then Loc.errorm ?loc "this@ expression@ does@ not@ diverge";
-  if check_ue && (partial ueff.eff_oneway) && (ghostifiable eeff.eff_oneway)
-  then Loc.errorm ?loc "this@ expression's@ termination@ is@ not@ partial";
+  if check_ue && diverges ueff.eff_oneway && not (diverges eeff.eff_oneway)
+    then Loc.errorm ?loc "this@ expression@ does@ not@ diverge";
+  if check_ue && partial ueff.eff_oneway && total eeff.eff_oneway
+    then Loc.errorm ?loc "this@ expression@ does@ not@ diverge@ or@ fail";
   (* check that every computed effect is listed *)
   if check_rw && bad_read eeff ueff then Loc.errorm ?loc
     "this@ expression@ depends@ on@ variable@ %a,@ \

@@ -1057,7 +1057,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       end;
       begin
         match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
-        | _, Ghostifiable | Diverges, _ | Partial, Partial -> ()
+        | _, Total | Diverges, _ | Partial, Partial -> ()
         | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
       end;
       cl.rs_table <- Mrs.add rs rs' cl.rs_table;
@@ -1246,5 +1246,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | CloneDivergence (iv, il) -> Format.fprintf fmt
       "Cannot instantiate symbol %a with symbol %a \
        that has worse termination status"
-      print_id iv print_id il 
+      print_id iv print_id il
   | _ -> raise e)

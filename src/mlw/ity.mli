@@ -339,25 +339,26 @@ exception IllegalAssign of region * region * region
 exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
-type termination_status =
-  | Ghostifiable
+(* termination status *)
+type oneway =
+  | Total
   | Partial
   | Diverges
 
-val ghostifiable : termination_status -> bool
-val partial : termination_status -> bool
-val diverges : termination_status -> bool
+val total : oneway -> bool
+val partial : oneway -> bool
+val diverges : oneway -> bool
 
 type effect = private {
-  eff_reads  : Spv.t;               (* known variables *)
-  eff_writes : Spv.t Mreg.t;        (* writes to fields *)
-  eff_taints : Sreg.t;              (* ghost code writes *)
-  eff_covers : Sreg.t;              (* surviving writes *)
-  eff_resets : Sreg.t;              (* locked by covers *)
-  eff_raises : Sxs.t;               (* raised exceptions *)
-  eff_spoils : Stv.t;               (* immutable tyvars *)
-  eff_oneway : termination_status;  (* non-termination *)
-  eff_ghost  : bool;                (* ghost status *)
+  eff_reads  : Spv.t;         (* known variables *)
+  eff_writes : Spv.t Mreg.t;  (* writes to fields *)
+  eff_taints : Sreg.t;        (* ghost code writes *)
+  eff_covers : Sreg.t;        (* surviving writes *)
+  eff_resets : Sreg.t;        (* locked by covers *)
+  eff_raises : Sxs.t;         (* raised exceptions *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
+  eff_oneway : oneway;        (* non-termination *)
+  eff_ghost  : bool;          (* ghost status *)
 }
 
 val eff_empty : effect
