@@ -91,9 +91,9 @@ let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : T
             | Dprop(Pgoal,pr,t) ->
                begin match postponed with
                      | [] ->
-                        let d = create_prop_decl Pgoal pr (subst_in_term sigma t) in
-                        let td = Theory.create_decl d in
-                        Task.add_tdecl tuc td
+                        let t = subst_in_term sigma t in
+                        let d = create_prop_decl Pgoal pr t in
+                        Task.add_decl tuc d
                      | _ -> raise (Arg_trans "apply_subst failed")
                end
             | Dprop(_k,pr,_t) when Spr.mem pr prs ->
@@ -125,19 +125,36 @@ let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : T
                match ld' with
                | [] -> aux rem tuc postponed
                | _ ->
-                  let d = Theory.create_decl (create_logic_decl ld') in
-                  begin
-                    match Task.add_tdecl tuc d with
-                    | tuc ->
-                        aux (List.rev_append postponed rem) tuc []
-                    | exception _ ->
-                                aux rem tuc (d::postponed)
+                  begin match create_logic_decl ld' with
+                    | d ->
+                        let td = Theory.create_decl d in
+                        begin
+                          match Task.add_tdecl tuc td with
+                          | tuc ->
+                              aux (List.rev_append postponed rem) tuc []
+                          | exception _ ->
+                              aux rem tuc (td::postponed)
+                        end
+                    | exception (NoTerminationProof _) ->
+                        let tuc = List.fold_left (fun tuc (ls,_) ->
+                          let d = create_param_decl ls in
+                          Task.add_decl tuc d) tuc ld' in
+                        let tuc, pp = List.fold_left (fun (tuc,pp) (ls,ld) ->
+                          let nm = ls.ls_name.Ident.id_string ^ "'def" in
+                          let pr = create_prsymbol (Ident.id_fresh nm) in
+                          let f = ls_defn_axiom ld in
+                          let d = create_prop_decl Paxiom pr f in
+                          let td = Theory.create_decl d in
+                          try Task.add_tdecl tuc td, pp
+                          with _ -> tuc, td::pp) (tuc, []) ld' in
+                        aux (List.rev_append postponed rem) tuc pp
                   end
              end
           | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
              let ind_list =
                List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
-                         let idl = List.map (fun (pr, t) -> (pr, subst_in_term sigma t)) idl in
+                         let idl = List.map (fun (pr, t) ->
+                            (pr, subst_in_term sigma t)) idl in
                          (ls, idl)) ind_list
              in
              let d = create_ind_decl is ind_list in
