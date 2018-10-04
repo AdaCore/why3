@@ -117,6 +117,7 @@ let d1 : decl =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body = mk_eapp mul_int [mk_evar id_x; mk_econst "7"] in
@@ -163,6 +164,7 @@ let d2 =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body =
@@ -221,6 +223,7 @@ let d3 =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body =

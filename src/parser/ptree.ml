@@ -111,6 +111,7 @@ type spec = {
   sp_variant : variant;
   sp_checkrw : bool;
   sp_diverge : bool;
+  sp_partial : bool;
 }
 
 type expr = {

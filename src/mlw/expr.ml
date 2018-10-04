@@ -74,8 +74,10 @@ let rs_kind s = match s.rs_logic with
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
 
 let check_effects ?loc c =
-  if c.cty_effect.eff_oneway then Loc.errorm ?loc
+  if diverges c.cty_effect.eff_oneway then Loc.errorm ?loc
     "This function may not terminate, it cannot be used as pure";
+  if partial c.cty_effect.eff_oneway then Loc.errorm ?loc
+    "This function may fail, it cannot be used as pure";
   if not (cty_pure c) then Loc.errorm ?loc
     "This function has side effects, it cannot be used as pure"
 
@@ -451,7 +453,7 @@ let localize_reset_stale v r el =
 
 (* localize a divergence *)
 let localize_divergence el =
-  let diverges eff = eff.eff_oneway in
+  let diverges eff = diverges eff.eff_oneway in
   List.iter (fun e -> if diverges e.e_effect then
     let loc = e_locate_effect diverges e in
     Loc.error ?loc GhostDivergence) el;
@@ -1149,7 +1151,7 @@ let ls_decr_of_rec_defn = function
   | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}} } -> Some ls
   | _ -> None
 
-(* pretty-pringting *)
+(* pretty-printing *)
 
 open Format
 open Pretty
@@ -1172,8 +1174,9 @@ let forget_let_defn = function
 let print_rs fmt s =
   Ident.print_decoded fmt (id_unique sprinter (id_of_rs s))
 
-let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
+let print_rs_head fmt s = fprintf fmt "%s%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
+  (if partial s.rs_cty.cty_effect.eff_oneway then "partial " else "")
   (match s.rs_logic with
     | RLnone -> ""
     | RLpv _ -> "function "

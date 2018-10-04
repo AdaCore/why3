@@ -451,6 +451,8 @@ let empty_clones m = {
   xs_table = Mxs.empty;
 }
 
+exception CloneDivergence of ident * ident
+
 (* populate the clone structure *)
 
 let rec sm_trans_ty tym tsm ty = match ty.ty_node with
@@ -730,7 +732,8 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let eff = eff_reset (eff_write reads writes) resets in
   let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
-  let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
+  let eff = if partial cty.cty_effect.eff_oneway then eff_partial eff else eff in
+  let eff = if diverges cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
 
@@ -1052,6 +1055,11 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
       | _ -> raise (BadInstance rs.rs_name)
       end;
+      begin
+        match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
+        | _, Total | Diverges, _ | Partial, Partial -> ()
+        | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
+      end;
       cl.rs_table <- Mrs.add rs rs' cl.rs_table;
       let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
@@ -1228,9 +1236,15 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
+let print_id fmt id = Ident.print_decoded fmt id.id_string
+
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+  | CloneDivergence (iv, il) -> Format.fprintf fmt
+      "Cannot instantiate symbol %a with symbol %a \
+       that has worse termination status"
+      print_id iv print_id il
   | _ -> raise e)

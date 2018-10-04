@@ -38,7 +38,7 @@
     sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
     sp_reads   = [];    sp_writes  = [];  sp_alias  = [];
     sp_variant = [];
-    sp_checkrw = false; sp_diverge = false;
+    sp_checkrw = false; sp_diverge = false; sp_partial = false;
   }
 
   let spec_union s1 s2 = {
@@ -51,6 +51,7 @@
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
+    sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
 %}
