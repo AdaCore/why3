@@ -1,5 +1,26 @@
 :x: marks a potential source of incompatibility
 
+Version 1.1.0, ...
+------------------
+
+Core
+  * variants can now be inferred on some lemma functions
+  * coercions are now supported for `if` and `match` branches
+
+Language
+  * program functions can now be marked `partial` to prevent them from
+    being used in ghost context; the annotation does not have to be
+    explicitly put on their callers
+  * `use` now accepts several module names separated by commas
+  * symbolic operators can be used in identifiers like `(+)_ident` or
+    `([])'ident`
+
+Standard library
+  * floating-point functions from `ieee_float` can now be used in programs
+
+Transformations
+  * `split_vc` behaves slightly differently :x:
+
 Provers
   * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
   * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
@@ -51,6 +72,7 @@ Language
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
   * added a minimal memory model for the C language in `mach.c`
+  * new modules `witness.Witness` and `witness.Nat`
 
 Extraction
   * improved extraction to OCaml
