@@ -34,7 +34,10 @@ run () {
     $dir/../bin/why3prove.opt --debug print_attrs -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
-        sed 's/ ([0-9]\+\.[0-9]\+s)//' > "$f.out"
+        sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
+        # This ad hoc sed removes diff between Timeout and Unknown (unknown)
+        # when running from platform with different speed.
+        sed -r 's/(Timeout|Unknown \(unknown\))/Timeout or Unknown/' > "$f.out"
     if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
         echo "ok"
     else
