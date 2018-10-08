@@ -696,9 +696,9 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Eassign l ->
      List.iter
-       (fun (pvs, rs, v) ->
+       (fun (pvs, rs, e) ->
          let fld = fd_of_rs rs in
-         let value = get v info in
+         let value = interp_expr info e in
          match get pvs info with
          | Vconstr(c, args) ->
             let rec aux cargs args =

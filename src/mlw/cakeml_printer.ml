@@ -268,10 +268,10 @@ module Print = struct
           (print_expr info) e (print_list_next newline (print_branch info)) bl
           (print_list_next newline (print_xbranch true info)) xl
     | Eassign al ->
-        let assign fmt (rho, rs, pv) =
+        let assign fmt (rho, rs, e) =
           fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
             (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
-            (print_lident info) (pv_name pv) in
+            (print_expr info) e in
         begin match al with
           | [] -> assert false | [a] -> assign fmt a
           | al -> fprintf fmt "@[(%a)]" (print_list semi assign) al end

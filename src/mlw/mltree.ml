@@ -54,7 +54,7 @@ and expr_node =
   | Efun    of var list * expr
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
-  | Eassign of (pvsymbol * rsymbol * pvsymbol) list
+  | Eassign of (pvsymbol * rsymbol * expr) list
   | Ematch  of expr * reg_branch list * exn_branch list
   | Eblock  of expr list
   | Ewhile  of expr * expr

@@ -1028,7 +1028,7 @@ module MLToC = struct
        d@defs, C.(Sseq(Sseq(s,assigns), Sblock b))
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
-    | Eassign ([pv, ({rs_field = Some _} as rs), v]) ->
+    | Eassign ([pv, ({rs_field = Some _} as rs), e2]) ->
        let t =
          match query_syntax info.syntax rs.rs_name with
          | Some s ->
@@ -1047,7 +1047,8 @@ module MLToC = struct
 	    in
             C.Esyntax(s,ty_of_ty info rty, rtyargs, params)
          | None -> raise (Unsupported ("assign not in driver")) in
-       [], C.(Sexpr(Ebinop(Bassign, t, C.Evar v.pv_vs.vs_name)))
+       let v = expr info env e2 in
+       [], C.(Sexpr(Ebinop(Bassign, t, simplify_expr v)))
     | Eassign _ -> raise (Unsupported "assign")
     | Ehole | Eany _ -> assert false
     | Eexn (_,_,e) -> expr info env e
