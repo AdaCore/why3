@@ -644,40 +644,29 @@ let print_goal fmt d =
    | _ -> assert false
 *)
 
-let local_decls task symbmap =
-  let rec skip t = function
-    | { td_node = Use th } :: rest
-      when id_equal t.th_name th.th_name -> rest
-    | _ :: rest -> skip t rest
-    | [] -> []
-  in
-  let rec filter ((acc1,acc2) as acc) = function
-    | { td_node = Decl d } :: rest ->
-        let id = Sid.choose d.d_news in
-        (try filter acc (skip (Mid.find id symbmap) rest)
-         with Not_found ->
-              filter (acc1,d::acc2) rest)
-    | _ :: rest -> filter acc rest
-    | [] -> match acc1,acc2 with
-            | [], g::r -> List.rev r, [g]
-            | _ -> assert false
-  in
-  filter ([],[]) (task_tdecls task)
-
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
-  let (ld1,ld2) = local_decls task ut in
+  let ld = Task.local_decls task ut in
   let rec aux fmt l =
     match l with
       | [] -> ()
+      | [_] -> ()
       | d :: r ->
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
+  let rec last fmt l =
+    match l with
+      | [] -> ()
+      | [d] ->
+         fprintf fmt "@[%a@]@\n@\n" print_decl d
+      | _ :: r ->
+         last fmt r
+  in
   fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld1;
+  fprintf fmt "@[<v 0>%a@]" aux ld;
   fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld2
+  fprintf fmt "@[<v 0>%a@]" last ld
 
 let sprinter = sprinter
 let aprinter = aprinter
