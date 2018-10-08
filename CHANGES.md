@@ -6,6 +6,14 @@ Version 1.1.0, ...
 Core
   * variants can now be inferred on some lemma functions
   * coercions are now supported for `if` and `match` branches
+  * `interrupt` command should now properly interrupt running provers.
+  * clearer typing error messages thanks to printing qualified names
+  * fixed handling of prover upgrades, resurected the policy
+    "duplicate" and added a policy "remove"
+
+API
+  * added `Call_provers.interrupt_call` to interrupt a running prover
+    [contribution Pierre-Yves Strub <pierre-yves@strub.nu>]
 
 Language
   * program functions can now be marked `partial` to prevent them from
@@ -14,9 +22,11 @@ Language
   * `use` now accepts several module names separated by commas
   * symbolic operators can be used in identifiers like `(+)_ident` or
     `([])'ident`
+  * range types have now a default ordering to be used in `variant` clause
 
 Standard library
-  * floating-point functions from `ieee_float` can now be used in programs
+  * library `Ieee_float`: floating-point operations can now be used in
+    programs
 
 Transformations
   * `split_vc` behaves slightly differently :x:
@@ -27,6 +37,7 @@ Provers
   * support for Coq 8.8.1 (released Jun 29, 2018)
   * support for CVC4 1.6 (released Jun 25, 2018)
   * support for Isabelle 2018 (released Aug 2018)
+    [Contribution Stefan Berghofer <stefan.berghofer@secunet.com>]
   * dropped support for Isabelle 2016 (2017 still supported) :x:
   * dropped support for Alt-Ergo versions < 2.0.0 :x:
 
