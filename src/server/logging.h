@@ -14,9 +14,7 @@
 
 void init_logging();
 
-void log_msg(char* s);
-void log_msg_len(char* s, int len);
+void log_msg(char* s, ...) __attribute__ ((format (printf, 1, 2)));
 void logging_shutdown(char* s);
 
 #endif
-

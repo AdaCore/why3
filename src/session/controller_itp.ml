@@ -505,7 +505,10 @@ let timeout_handler () =
 
 let interrupt () =
   (* Interrupt provers *)
-  Hashtbl.iter (fun _k e -> e.tp_callback Interrupted)
+  Hashtbl.iter
+    (fun call e ->
+     Call_provers.interrupt_call call;
+     e.tp_callback Interrupted)
     prover_tasks_in_progress;
   Hashtbl.clear prover_tasks_in_progress;
   (* Do not interrupt editors

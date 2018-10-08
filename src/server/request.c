@@ -64,8 +64,7 @@ prequest parse_request(char* str_req, int len, int key) {
   char* tmp;
   bool runstdin = false;
 
-  log_msg("received query");
-  log_msg_len(str_req, len);
+  log_msg("received query %.*s",len,str_req);
 
   semic = count_semicolons(str_req, len);
   if (semic == 0) {

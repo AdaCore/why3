@@ -177,7 +177,8 @@ val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates
     from the server related to a given prover call. *)
 
+val interrupt_call : prover_call -> unit
+(** non-blocking function that asks for prover interruption *)
+
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)
-
-val interrupt_call : int -> unit
