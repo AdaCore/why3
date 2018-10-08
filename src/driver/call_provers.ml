@@ -516,7 +516,6 @@ let query_call = function
 let interrupt_call = function
   | ServerCall id ->
       Prove_client.send_interrupt ~id
-
   | EditorCall pid ->
       (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
 

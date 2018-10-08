@@ -402,7 +402,7 @@ void run_request (prequest r) {
                      NULL,
                      &si,
                      &pi)) {
-       log_msg(cmd);
+       log_msg("%s",cmd);
        CloseHandle(outfilehandle);
        CloseHandle(ghJob);
        send_msg_to_client(client,

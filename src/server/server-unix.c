@@ -523,6 +523,7 @@ void handle_msg(pclient client, int key) {
         break;
       case REQ_INTERRUPT:
         // removes all occurrences of r->id from the queue
+        log_msg("Why3 server: removing id '%s' from queue",r->id);
         remove_from_queue(r->id);
         kill_processes(r->id);
         free_request(r);
