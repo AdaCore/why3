@@ -174,6 +174,11 @@
   let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error"
     | _ -> raise exn)
+
+  let core_ident_error  = format_of_string
+    "Symbol %s cannot be user-defined. User-defined symbol cannot use ' \
+      before a letter. You can only use ' followed by _ or a number."
+
 %}
 
 (* Tokens *)
@@ -1301,7 +1306,7 @@ uident:
 uident_nq:
 | UIDENT          { mk_id $1 $startpos $endpos }
 | CORE_UIDENT     { let loc = floc $startpos($1) $endpos($1) in
-                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
+                    Loc.errorm ~loc core_ident_error $1 }
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
@@ -1312,7 +1317,7 @@ lident_nq:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
 | CORE_LIDENT     { let loc = floc $startpos($1) $endpos($1) in
-                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
+                    Loc.errorm ~loc core_ident_error $1 }
 
 lident_keyword:
 | RANGE           { "range" }
