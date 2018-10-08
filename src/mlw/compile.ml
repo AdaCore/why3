@@ -620,8 +620,7 @@ module Transform = struct
 
   let rec can_inline ({e_effect = eff1} as e1) ({e_effect = eff2} as e2) =
     match e2.e_node with
-    | Evar _ | Eapp _ | Eassign _ | Econst _ -> true
-    | Eblock el -> List.for_all (fun e -> can_inline e1 e) el
+    | Evar _ | Econst _ | Eapp _ | Eassign [_] -> true
     | Elet (Lvar (_, {e_effect = eff1'}), e2') ->
        no_reads_writes_conflict eff1.eff_reads eff1'.eff_writes
        && can_inline e1 e2'
