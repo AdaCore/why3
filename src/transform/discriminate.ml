@@ -211,26 +211,16 @@ let map metas_rewrite_pr env d =
       in
       let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
       ts_of_ls env ls (List.rev_append defns axioms),[]
-  | Dlogic _ -> Printer.unsupportedDecl d
+    | Dlogic _ -> Printer.unsupportedDecl d
       "Recursively-defined symbols are not supported, run eliminate_recursion"
-  | Dind _ -> Printer.unsupportedDecl d
+    | Dind _ -> Printer.unsupportedDecl d
       "Inductive predicates are not supported, run eliminate_inductive"
-  | Dprop (k,pr,f) ->
+    | Dprop (k,pr,f) ->
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
       let conv_f tvar (task,metas) =
-        (* Format.eprintf "f0: %a@. env: %a@." Pretty.print_fmla *)
-        (*   (t_ty_subst tvar Mvs.empty f) *)
-        (*   print_env env; *)
         let f = t_ty_subst tvar Mvs.empty f in
         let f = t_app_map (find_logic env) f in
-        (* Format.eprintf "f: %a@. env: %a@." Pretty.print_fmla f *)
-        (*   print_env menv; *)
-        (* Format.eprintf "undef ls: %a, ts: %a@." *)
-        (*   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) *)
-        (*   menv.undef_lsymbol *)
-        (*   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) *)
-        (*   menv.undef_tsymbol; *)
         if substs_len = 1 then
           create_prop_decl k pr f :: task, metas
         else
