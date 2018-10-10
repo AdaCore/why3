@@ -228,17 +228,6 @@ let sp_let v t sp rd =
   if Spv.mem v rd then sp_and (t_equ (t_var v.pv_vs) t) sp else
   t_let_close_simp v.pv_vs t sp
 
-(* affected program variables *)
-
-let ity_affected wr ity =
-  Util.any ity_rch_fold (Mreg.contains wr) ity
-
-let pv_affected wr v = ity_affected wr v.pv_ity
-
-let pvs_affected wr pvs =
-  if Mreg.is_empty wr then Spv.empty
-  else Spv.filter (pv_affected wr) pvs
-
 (* variant decrease preconditions *)
 
 let decrease_alg env loc old_t t =

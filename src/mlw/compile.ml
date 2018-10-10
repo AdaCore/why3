@@ -610,10 +610,11 @@ module Transform = struct
   open Mltree
 
   let no_reads_writes_conflict spv spv_mreg =
-    let is_not_write {pv_ity = ity} = match ity.ity_node with
-      | Ityreg rho -> not (Mreg.mem rho spv_mreg)
-      | _ -> true in
-    Spv.for_all is_not_write spv
+    (* let is_not_write {pv_ity = ity} = match ity.ity_node with
+     *   | Ityreg rho -> not (Mreg.mem rho spv_mreg)
+     *   | _ -> true in
+     * Spv.for_all is_not_write spv *)
+    Spv.is_empty (pvs_affected spv_mreg spv)
 
   let mk_list_eb ebl f =
     let mk_acc e (e_acc, s_acc) =

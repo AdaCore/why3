@@ -1231,6 +1231,17 @@ let eff_escape eff ity =
     Spv.fold add_fd fs esc in
   Mreg.fold add_write eff.eff_writes esc
 
+(* affected program variables by some writes effect *)
+
+let ity_affected wr ity =
+  Util.any ity_rch_fold (Mreg.contains wr) ity
+
+let pv_affected wr v = ity_affected wr v.pv_ity
+
+let pvs_affected wr pvs =
+  if Mreg.is_empty wr then Spv.empty
+  else Spv.filter (pv_affected wr) pvs
+
 (** specification *)
 
 type pre = term   (* precondition: pre_fmla *)
