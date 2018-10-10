@@ -1,3 +1,4 @@
+Weakest Precondition
 bench/ce/if_decision_branch.mlw Other VC f: Valid
 bench/ce/if_decision_branch.mlw Other VC f: Timeout or Unknown
 Counter-example model:File if_decision_branch.mlw:
@@ -14,4 +15,14 @@ Line 26:
 TEMP_NAME, [[@introduced], [@model],
 [@model_trace:TEMP_NAME]] = {"type" : "Boolean" ,
 "val" : true }
+
+Strongest Postcondition
+bench/ce/if_decision_branch.mlw Other VC f: Valid
+bench/ce/if_decision_branch.mlw Other VC f: Timeout or Unknown
+Counter-example model:File if_decision_branch.mlw:
+Line 18:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+"val" : "5" }
+Line 19:
+the check fails with all inputs
 
