@@ -21,6 +21,10 @@ open Trans
 open Driver_ast
 open Call_provers
 
+let driver_debug =
+  Debug.register_flag "interm_task"
+    ~desc:"Print intermediate task generated during processing of a driver"
+
 (** drivers *)
 
 type driver = {
@@ -324,11 +328,21 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
     | task -> update task
 
+(* Apply driver's transformations to the task *)
 let prepare_task drv task =
-  let lookup_transform t = lookup_transform t drv.drv_env in
+  let lookup_transform t = lookup_transform t drv.drv_env, t in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task tr = Trans.apply tr task in
+  let apply task (tr,name) =
+    let task = Trans.apply tr task in
+    Debug.dprintf driver_debug "Task after transformation: %s\n%a@."
+      name Pretty.print_task task;
+    task
+  in
+  Debug.dprintf driver_debug "Task before driver's transformation\n%a@."
+    Pretty.print_task task;
   let task = update_task drv task in
+  Debug.dprintf driver_debug "Task after update\n%a@."
+    Pretty.print_task task;
   List.fold_left apply task transl
 
 let print_task_prepared ?old drv fmt task =
