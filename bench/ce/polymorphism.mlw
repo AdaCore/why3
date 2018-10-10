@@ -1,0 +1,17 @@
+
+
+module Test
+
+  type mono = B int
+  
+  goal gm: forall x: mono. x = B 0
+
+  type mono2 = C int bool
+  
+  goal gm2: forall x. x = C 0 false
+
+  type poly 'a = A 'a
+  
+  goal g: forall x: poly int. x = A 0 
+
+end
