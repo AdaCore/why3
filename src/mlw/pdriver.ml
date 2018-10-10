@@ -220,7 +220,8 @@ let load_driver env file extra_files =
   List.iter (fun f ->
     let fe = load_file f in
     List.iter add_theory fe.fe_th_rules;
-    List.iter add_module fe.fe_mo_rules)
+    List.iter add_module fe.fe_mo_rules;
+    List.iter add_global fe.fe_global)
     extra_files;
   {
     drv_env         = env;
