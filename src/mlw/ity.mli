@@ -399,6 +399,18 @@ val mask_adjust : effect -> ity -> mask -> mask
 
 val eff_escape : effect -> ity -> Sity.t
 
+val ity_affected : 'a Mreg.t -> ity -> bool
+(** [ity_affected wr ity] returns [true] if the regions of [ity] are contained
+    in the effect described by [wr]. *)
+
+val pv_affected  : 'a Mreg.t -> pvsymbol -> bool
+(** [pv_affected wr pv] returns [true] if the regions of [pv] are contained in
+    the effect described by [wr]. *)
+
+val pvs_affected : 'a Mreg.t -> Spv.t -> Spv.t
+(** [pvs_affected wr pvs] returns the set of pvsymbols from [pvs] whose regions
+    are contained in the effect described by [wr]. *)
+
 (** {2 Computation types (higher-order types with effects)} *)
 
 type pre = term   (** precondition: pre_fmla *)
