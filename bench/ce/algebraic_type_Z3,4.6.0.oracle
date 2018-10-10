@@ -5,3 +5,21 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
 "val" : {"apply" : "Integer" , "list" : [{"type" : "Integer" ,
 "val" : "0" }] } }
 
+bench/ce/algebraic_type.mlw M g2: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 10:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "B" , "list" : [{"type" : "Integer" ,
+"val" : "0" }] } }
+
+bench/ce/algebraic_type.mlw M g4: Unknown (sat)
+bench/ce/algebraic_type.mlw M g5: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 16:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "Au" , "list" : [{"type" : "Integer" , "val" : "1" },
+{"type" : "Integer" ,
+"val" : "0" }] } }
+
+bench/ce/algebraic_type.mlw M g1: Timeout or Unknown
+bench/ce/algebraic_type.mlw M g7: Timeout or Unknown
