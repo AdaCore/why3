@@ -21,10 +21,11 @@ module mach.int.Unsigned
 end
 
 module mach.int.Int32
-  syntax val of_int "%1"
 
   syntax type int32  "int32_t"
+  syntax literal int32 "0x%8x"
 
+  syntax val of_int "(int32_t)%1"
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (-_)    "-%1"
@@ -49,7 +50,8 @@ end
 
 module mach.int.UInt32
 
-  syntax converter of_int "%1U"
+  syntax literal uint32 "0x%8xU"
+  (* syntax converter of_int "%1U" *)
 
 
   syntax val (+)     "%1 + %2"
@@ -181,7 +183,8 @@ struct __lsld32_result
 struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 "
 
-  syntax converter of_int "%1U"
+  syntax literal uint32 "0x%8xU"
+  (* syntax converter of_int "%1U" *)
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -220,10 +223,10 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 end
 
 module mach.int.Int64
-  syntax val of_int "%1"
-
   syntax type int64  "int64_t"
+  syntax literal int64 "0x%16xLL"
 
+  syntax val of_int "(int64_t)%1"
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (-_)    "-%1"
@@ -248,7 +251,8 @@ end
 
 module mach.int.UInt64
 
-  syntax converter of_int "%1ULL"
+  syntax literal uint64 "0x%16xULL"
+  (* syntax converter of_int "%1ULL" *)
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -503,7 +507,8 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   return result;
 }
 "
-  syntax converter of_int "%1ULL"
+  syntax literal "0x%16xULL"
+  (* syntax converter of_int "%1ULL" *)
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
