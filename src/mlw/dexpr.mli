@@ -191,7 +191,7 @@ val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
 (** Final stage *)
 
-val expr : ?keep_loc:bool -> dexpr -> expr
+val expr : ?keep_loc:bool -> ?lghost:bool -> dexpr -> expr
 
 val let_defn : ?keep_loc:bool -> dlet_defn -> let_defn
 val rec_defn : ?keep_loc:bool -> drec_defn -> let_defn

@@ -1602,9 +1602,9 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
       "Lemma-functions must have parameters"
   | RKlocal, _ -> invalid_arg "Dexpr.let_defn"
 
-let expr ?(keep_loc=true) de =
+let expr ?(keep_loc=true) ?(lghost=false) de =
   let uloc = if keep_loc then None else Some None in
-  expr uloc env_empty de
+  expr uloc {env_empty with lgh = lghost} de
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundLabel s ->
