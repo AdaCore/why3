@@ -14,6 +14,12 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
 "val" : "0" }] } }
 
 bench/ce/algebraic_type.mlw M g4: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 12:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "A" ,
+"list" : [] } }
+
 bench/ce/algebraic_type.mlw M g5: Timeout or Unknown
 Counter-example model:File algebraic_type.mlw:
 Line 16:
@@ -23,7 +29,21 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
 "val" : "1" }] } }
 
 bench/ce/algebraic_type.mlw M g1: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 25:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "-1" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
 bench/ce/algebraic_type.mlw M g7: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 27:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "0" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
 Strongest Postcondition
 bench/ce/algebraic_type.mlw M G: Timeout or Unknown
 Counter-example model:File algebraic_type.mlw:
@@ -40,6 +60,12 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
 "val" : "0" }] } }
 
 bench/ce/algebraic_type.mlw M g4: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 12:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "A" ,
+"list" : [] } }
+
 bench/ce/algebraic_type.mlw M g5: Timeout or Unknown
 Counter-example model:File algebraic_type.mlw:
 Line 16:
@@ -49,4 +75,18 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
 "val" : "1" }] } }
 
 bench/ce/algebraic_type.mlw M g1: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 25:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "-1" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
 bench/ce/algebraic_type.mlw M g7: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 27:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "0" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
