@@ -1106,9 +1106,13 @@ let add_types muc tdl =
                 | Qdot _ -> raise Not_found
               with Not_found -> Loc.errorm ~loc:(qloc q)
                 "Unknown field %a" print_qualid q in
+              let nm = v.pv_vs.vs_name.id_string in
               let dity = dity_of_ity v.pv_ity in
               let de = dexpr muc denv_empty e in
               let de = Dexpr.dexpr ?loc:de.de_loc (DEcast (de, dity)) in
+              let ld = id_fresh nm, true, RKnone, de in
+              let dv = Dexpr.dexpr ?loc:de.de_loc (DEvar (nm, ([],dity))) in
+              let de = Dexpr.dexpr ?loc:de.de_loc (DElet (ld, dv)) in
               Mpv.add v (expr ~keep_loc:true de) m in
             let wit = List.fold_left add_w Mpv.empty d.td_wit in
             let wit = if d.td_wit = [] then [] else
