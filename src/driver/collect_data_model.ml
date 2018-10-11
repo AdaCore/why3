@@ -202,11 +202,11 @@ let remove_end_num s =
     | _ -> s
   end
 
+(* Used to handle case of badly formed table *)
+exception Incorrect_table
+
 (* Add the variables that can be deduced from ITE to the table of variables *)
 let add_vars_to_table (table: correspondence_table) key value : correspondence_table =
-
-  (* Used to handle case of badly formed table *)
-  let exception Incorrect_table in
 
   let rec add_vars_to_table ~type_value (table: correspondence_table) value =
 
