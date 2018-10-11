@@ -59,6 +59,26 @@ bads () {
     done
 }
 
+warns () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    rm -f bench_errors
+    for f in $1/*.[wm][hl][yw] ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>bench_errors; then
+            echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+        if ! test -s bench_errors; then
+            echo "SHOULD HAVE A WARNING !"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+	echo "ok"
+    done
+}
+
 drivers () {
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
@@ -250,8 +270,10 @@ echo ""
 echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
+goods bench/programs/warn-typing --parse-only
 bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
+warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
 echo ""
 
