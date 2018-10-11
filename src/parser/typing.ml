@@ -1109,7 +1109,7 @@ let add_types muc tdl =
               let dity = dity_of_ity v.pv_ity in
               let de = dexpr muc denv_empty e in
               let de = Dexpr.dexpr ?loc:de.de_loc (DEcast (de, dity)) in
-              Mpv.add v (expr ~keep_loc:true ~lghost:true de) m in
+              Mpv.add v (expr ~keep_loc:true ~ughost:true de) m in
             let wit = List.fold_left add_w Mpv.empty d.td_wit in
             let wit = if d.td_wit = [] then [] else
               List.map (fun (_,v) -> try Mpv.find v wit with
