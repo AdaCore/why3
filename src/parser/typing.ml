@@ -30,6 +30,9 @@ let debug_parse_only = Debug.register_flag "parse_only"
 let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
 
+let debug_useless_at = Debug.register_flag "ignore_useless_at"
+  ~desc:"Remove@ warning@ for@ useless@ at/old."
+
 (** symbol lookup *)
 
 let rec qloc = function
@@ -365,8 +368,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       (* check if the label has actually been defined *)
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
-      if not (Hstr.find at_uses l) then Loc.errorm ~loc
-        "this `at'/`old' operator is never used";
+      if not (Hstr.find at_uses l) && Debug.test_noflag debug_useless_at then
+        Warning.emit ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
