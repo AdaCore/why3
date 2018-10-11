@@ -188,21 +188,6 @@ let rec grep out l = match l with
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
-(*
-let rec grep out l = match l with
-  | [] ->
-      HighFailure
-  | (re,pa) :: l ->
-      begin try
-        ignore (Str.search_forward re out 0);
-        match pa with
-        | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
-        | Unknown (s, ru) -> Unknown ((Str.replace_matched s out), ru)
-        | Failure s -> Failure (Str.replace_matched s out)
-        | HighFailure -> assert false
-      with Not_found -> grep out l end
-*)
-
 (* Create a regexp matching the same as the union of all regexp of the list. *)
 let craft_efficient_re l =
   let s = Format.asprintf "%a"
@@ -214,12 +199,6 @@ let craft_efficient_re l =
   in
   Str.regexp s
 
-(*
-let print_delim fmt d =
-  match d with
-  | Str.Delim s -> Format.fprintf fmt "Delim %s" s
-  | Str.Text s -> Format.fprintf fmt "Text %s" s
- *)
 let debug_print_model ~print_attrs model =
   let model_str = Model_parser.model_to_string ~print_attrs model in
   Debug.dprintf debug "Call_provers: %s@." model_str
@@ -238,9 +217,6 @@ let analyse_result res_parser printer_mapping out =
         | Str.Text t -> Model t)
       result_list
   in
-(*  Format.eprintf "[incremental model parsing] results list is @[[%a]@]@."
-                 (Pp.print_list Pp.semi print_delim) result_list;
-*)
   let rec analyse saved_model saved_res l =
     match l with
     | [] ->

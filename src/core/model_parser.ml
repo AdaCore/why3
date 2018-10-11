@@ -100,6 +100,7 @@ type model_value =
  | Boolean of bool
  | Array of model_array
  | Record of model_record
+ | Proj of model_proj
  | Bitvector of string
  | Apply of string * model_value list
  | Unparsed of string
@@ -111,7 +112,10 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
+
 and model_record = (field_name * model_value) list
+and model_proj = (proj_name * model_value)
+and proj_name = string
 and field_name = string
 
 let array_create_constant ~value =
@@ -209,6 +213,8 @@ let rec convert_model_value value : Json_base.json =
       Json_base.Record m
   | Record r ->
       convert_record r
+  | Proj p ->
+      convert_proj p
 
 and convert_array a =
   let m_others =
@@ -229,6 +235,13 @@ and convert_record r =
   let m_field = Mstr.add "Field" fields Mstr.empty in
   let m = Mstr.add "val" (Json_base.Record m_field) m in
   Json_base.Record m
+
+and convert_proj p =
+  let proj_name, value = p in
+  let m = Mstr.add "type" (Json_base.String "Proj") Mstr.empty in
+  let m = Mstr.add "proj_name" (Json_base.String proj_name) m in
+  let m = Mstr.add "value" (convert_model_value value) m in
+  Json_base.Proj m
 
 and convert_fields fields =
   Json_base.List
@@ -277,6 +290,11 @@ and print_record_human fmt r =
     (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
     (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
 
+and print_proj_human fmt p =
+  let s, v = p in
+  fprintf fmt "%s %a"
+    s print_model_value_human v
+
 and print_model_value_human fmt (v: model_value) =
   match v with
   | Integer s -> fprintf fmt "%s" s
@@ -288,6 +306,7 @@ and print_model_value_human fmt (v: model_value) =
     fprintf fmt "(%s %a)" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
+  | Proj p -> print_proj_human fmt p
   | Bitvector s -> fprintf fmt "%s" s
   | Unparsed s -> fprintf fmt "%s" s
 
@@ -437,16 +456,15 @@ let print_model
     ~print_model_value
     fmt
     model =
-  (* Simple and easy way to print file sorted alphabetically
-   FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
-   *)
-  let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e) l
+  StringMap.iter (fun k e ->
+      print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e)
+    model.model_files
 
 let print_model_human
     ?(me_name_trans = why_name_trans)
     fmt
-    model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+    model =
+  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
 let print_model ?(me_name_trans = why_name_trans)
     ~print_attrs
@@ -671,7 +689,6 @@ let print_model_json
     fmt
     model_files_bindings
 
-
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
     ?(vc_line_trans = (fun i -> string_of_int i))
@@ -696,20 +713,66 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
+let recover_name term_map raw_name =
+  let t = Mstr.find raw_name term_map in
+  construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
+
+let rec replace_projection (const_function: string -> string) model_value =
+  match model_value with
+  | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
+    | Unparsed _ -> model_value
+  | Array a ->
+      Array (replace_projection_array const_function a)
+  | Record r ->
+      let r =
+        List.map (fun (field_name, value) ->
+          let field_name = try const_function field_name with
+            Not_found -> field_name
+          in
+          (field_name, replace_projection const_function value)
+          )
+          r
+      in
+      Record r
+  | Proj p ->
+      let proj_name, value = p in
+      let proj_name =
+        try const_function proj_name
+        with Not_found -> proj_name
+      in
+      Proj (proj_name, replace_projection const_function value)
+  | Apply (s, l) ->
+      let s = try const_function s
+        with Not_found -> s
+      in
+      Apply (s, (List.map (fun v -> replace_projection const_function v) l))
+
+and replace_projection_array const_function a =
+  let {arr_others = others; arr_indices = arr_index_list} = a in
+  let others = replace_projection const_function others in
+  let arr_index_list =
+    List.map
+      (fun ind ->
+         let {arr_index_key = key; arr_index_value = value} = ind in
+         let value = replace_projection const_function value in
+         {arr_index_key = key; arr_index_value = value}
+      )
+      arr_index_list
+  in
+  {arr_others = others; arr_indices = arr_index_list}
+
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
+    let raw_element_value = replace_projection (fun x -> (recover_name term_map x).men_name) raw_element.me_value in
     try
       (
        let t = Mstr.find raw_element_name term_map in
-       let real_model_trace =
-         construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
-       in
        let model_element = {
-	 me_name = real_model_trace;
-	 me_value = raw_element.me_value;
-	 me_location = t.t_loc;
-	 me_term = Some t;
+         me_name = construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs;
+         me_value = raw_element_value;
+         me_location = t.t_loc;
+         me_term = Some t;
        } in
        add_to_model model model_element
       )

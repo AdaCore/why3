@@ -56,6 +56,7 @@ val convert_record : (string * 'a) list -> 'a Wstdlib.Mstr.t
    function to print it *)
 type json =
   | Record of json Wstdlib.Mstr.t
+  | Proj of json Wstdlib.Mstr.t
   | List of json list
   | String of string
   | Int of int
