@@ -10,9 +10,8 @@ module ref.Ref
   syntax type ref "%1"
   syntax val ref "%1"
   syntax val (!_) "%1"
-  syntax converter (!_) "%1"
   syntax val (:=) "%1 = %2"
-  syntax converter contents "%1"
+  syntax val contents "%1"
 end
 
 module mach.int.Unsigned
@@ -23,7 +22,6 @@ end
 
 module mach.int.Int32
   syntax val of_int "%1"
-  syntax converter of_int "%1"
 
   syntax type int32  "int32_t"
 
@@ -44,8 +42,8 @@ module mach.int.UInt32Gen
 
   syntax type uint32 "uint32_t"
 
-  syntax converter max_uint32 "0xffffffff"
-  syntax converter length "32"
+  syntax val max_uint32 "0xffffffff"
+  syntax val length "32"
 
 end
 
@@ -223,7 +221,6 @@ end
 
 module mach.int.Int64
   syntax val of_int "%1"
-  syntax converter of_int "%1"
 
   syntax type int64  "int64_t"
 
@@ -244,8 +241,8 @@ module mach.int.UInt64Gen
 
   syntax type uint64 "uint64_t"
 
-  syntax converter max_uint64 "0xffffffffffffffff"
-  syntax converter length "64"
+  syntax val max_uint64 "0xffffffffffffffff"
+  syntax val length "64"
 
 end
 

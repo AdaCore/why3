@@ -386,10 +386,12 @@ module Int63
     lemma to_int_in_bounds,
     lemma extensionality
 
-  let constant zero = of_int 0
-  let constant one = of_int 1
-  let constant max_int = of_int max_int63
-  let constant min_int = of_int min_int63
+  let constant zero = (0:int63)
+  let constant one = (1:int63)
+  val constant max_int:int63
+     ensures { int63'int result = max_int63)
+  val constant min_int:int63
+     ensures { int63'int result = min_int63
 
 (*  use bv.BV63 as BV63
 
@@ -409,11 +411,11 @@ module Refint63
   let incr (r: ref int63) : unit
     requires { [@expl:integer overflow] to_int !r < max_int63 }
     ensures  { to_int !r = to_int (old !r) + 1 }
-  = r := !r + of_int 1
+  = r := !r + (1:int63)
   let decr (r: ref int63) : unit
     requires { [@expl:integer overflow] min_int63 < to_int !r }
     ensures  { to_int !r = to_int (old !r) - 1 }
-  = r := !r - of_int 1
+  = r := !r - (1:int63)
 
   let (+=) (r: ref int63) (v: int63) : unit
     requires { [@expl:integer overflow] in_bounds (to_int !r + to_int v) }
