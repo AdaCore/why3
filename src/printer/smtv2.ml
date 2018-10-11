@@ -135,6 +135,9 @@ type info = {
   info_version : version;
   meta_model_projection : Sls.t;
   mutable list_records : ((string * string) list) Mstr.t;
+  (* For algebraic type counterexamples: constructors with no arguments can be
+     misunderstood for variables *)
+  mutable noarg_constructors: string list;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
@@ -568,13 +571,17 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
                                 vc_term_loc = vc_loc;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
-                                Printer.list_records = info.list_records}
+                                Printer.list_records = info.list_records;
+                                noarg_constructors = info.noarg_constructors}
   | Plemma -> assert false
 
 let print_constructor_decl info fmt (ls,args) =
   let field_names =
     (match args with
-    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
+        let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
+        info.noarg_constructors <- cons_name :: info.noarg_constructors;
+        []
     | _ ->
         fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
         let field_names, _ =
@@ -698,6 +705,7 @@ let print_task version args ?old:_ fmt task =
     info_version = version;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
     list_records = Mstr.empty;
+    noarg_constructors = [];
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;

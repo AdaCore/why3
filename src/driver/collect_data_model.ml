@@ -451,7 +451,8 @@ let convert_to_model_element name (t: term) =
   let value = convert_to_model_value t in
   Model_parser.create_model_element ~name ~value ()
 
-let default_apply_to_record (list_records: (string list) Mstr.t) (t: term) =
+let default_apply_to_record (list_records: (string list) Mstr.t)
+    (noarg_constructors: string list) (t: term) =
 
   let rec array_apply_to_record (a: array) =
     match a with
@@ -468,6 +469,10 @@ let default_apply_to_record (list_records: (string list) Mstr.t) (t: term) =
   and apply_to_record (v: term) =
     match v with
     | Sval _ -> v
+    (* Variable with no arguments can actually be constructors. We check this
+       here and if it is the case we change the variable into a value. *)
+    | Variable s when List.mem s noarg_constructors ->
+        Apply (s, [])
     | Cvc4_Variable _ | Function_Local_Variable _ | Variable _ -> v
     | Array a ->
         Array (array_apply_to_record a)
@@ -499,16 +504,16 @@ let apply_to_records_ref = ref None
 let register_apply_to_records f =
   apply_to_records_ref := Some f
 
-let apply_to_record list_records t =
+let apply_to_record list_records noarg_constructors t =
   match !apply_to_records_ref with
-  | None -> default_apply_to_record list_records t
-  | Some f -> f list_records t
+  | None -> default_apply_to_record list_records noarg_constructors t
+  | Some f -> f list_records noarg_constructors t
 
-let definition_apply_to_record list_records d =
+let definition_apply_to_record list_records noarg_constructors d =
     match d with
     | Function (lt, t) ->
-        Function (lt, apply_to_record list_records t)
-    | Term t -> Term (apply_to_record list_records t)
+        Function (lt, apply_to_record list_records noarg_constructors t)
+    | Term t -> Term (apply_to_record list_records noarg_constructors  t)
     | Noelement -> Noelement
 
 let rec convert_to_tree_def (d: definition) : tree_definition =
@@ -581,7 +586,7 @@ and convert_tarray_to_array a =
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
 let create_list (projections_list: Sstr.t) (list_records: ((string * string) list) Mstr.t)
-    (table: definition Mstr.t) =
+    (noarg_constructors: string list) (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
@@ -590,10 +595,13 @@ let create_list (projections_list: Sstr.t) (list_records: ((string * string) lis
       Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) list_records Mstr.empty
   in
 
-  (* Convert Apply that were actually recorded as record to Record. *)
+  (* Convert Apply that were actually recorded as record to Record. Also replace
+     Variable that are originally unary constructor  *)
   let table =
     Mstr.fold (fun key value acc ->
-      let value = definition_apply_to_record list_records value in
+      let value =
+        definition_apply_to_record list_records noarg_constructors value
+      in
       Mstr.add key value acc) table Mstr.empty
   in
 

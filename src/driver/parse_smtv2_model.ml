@@ -57,16 +57,17 @@ let do_parsing model =
        l;
      Wstdlib.Mstr.empty
 
-let do_parsing list_proj list_records model =
+let do_parsing list_proj list_records noarg_constructors model =
   let m = do_parsing model in
-  Collect_data_model.create_list list_proj list_records m
+  Collect_data_model.create_list list_proj list_records noarg_constructors m
 
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)
 (* For Alt-ergo the output is not the same and we
    match on "I don't know". But we also need to begin
    parsing on a fresh new line ".*" ensures it *)
-let parse : raw_model_parser = fun list_proj list_records input ->
+let parse : raw_model_parser =
+  fun list_proj list_records noarg_constructors input ->
   try
 (*    let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
     ignore (Str.search_forward r input 0);
@@ -74,7 +75,7 @@ let parse : raw_model_parser = fun list_proj list_records input ->
     let nr = Str.regexp "^)+" in
     let res = Str.search_backward nr input (String.length input) in
     let model_string = String.sub input 0 (res + String.length (Str.matched_string input)) in
-    do_parsing list_proj list_records model_string
+    do_parsing list_proj list_records noarg_constructors model_string
   with
   | Not_found -> []
 

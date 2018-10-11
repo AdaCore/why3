@@ -404,7 +404,7 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Sstr.t -> ((string * string) list) Mstr.t ->
+  Sstr.t -> ((string * string) list) Mstr.t -> string list ->
     string -> model_element list
 
 (*
@@ -884,7 +884,8 @@ let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
     let list_records = printer_mapping.list_records in
-    let raw_model = raw_mp list_proj list_records input in
+    let noarg_cons = printer_mapping.noarg_constructors in
+    let raw_model = raw_mp list_proj list_records noarg_cons input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -903,4 +904,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ -> [])
+  (fun _ _ _ _ -> [])

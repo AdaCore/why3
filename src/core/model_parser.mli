@@ -333,11 +333,16 @@ type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
   Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
-    string -> model_element list
-(** Parses the input string into model elements. It contains the list of
-    projections and a map associating the name of printed projections to the
-    fields (couple of printed field and model_trace name) that are collected in
-    the task.
+    string list -> string -> model_element list
+(** Parses the input string into model elements.
+    [raw_model_parser: proj->record_map->noarg_cons->s->mel]
+    [proj]: is the list of projections
+    [record_map]: is a map associating the name of printed projections to the
+      fields (couple of printed field and model_trace name).
+    [noarg_cons]: List of constructors with no arguments (collected to avoid
+      confusion between variable and constructors)
+    [s]: model
+    [mel]: collected model
  *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
