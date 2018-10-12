@@ -910,7 +910,8 @@ module Pairing(Old: S)(New: S) = struct
              let oldi = Hashtbl.find old_checksums c in
              let oldg = table.table_old.(oldi) in
              Hashtbl.remove old_checksums c;
-             result.(new_goal_index newg) <- (newg, Some (oldg, false))
+             let obs = Old.shape oldg <> New.shape newg in
+             result.(new_goal_index newg) <- (newg, Some (oldg, obs))
         with Not_found ->
           acc := mk_node table (New newi) :: !acc
       done;
