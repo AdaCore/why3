@@ -21,7 +21,7 @@
    <transf name="subst" proved="true" arg1="a">
     <goal name="VC fetch_and_add.0.0.0" expl="assertion" proved="true">
     <transf name="apply" proved="true" arg1="Div_mod">
-     <goal name="VC fetch_and_add.0.0.0.0" proved="true">
+     <goal name="VC fetch_and_add.0.0.0.0" expl="apply premises" proved="true">
      <proof prover="3"><result status="valid" time="0.02"/></proof>
      </goal>
     </transf>
@@ -228,16 +228,16 @@
   </goal>
   <goal name="VC main.25" expl="liveness" proved="true">
   <transf name="right" proved="true" >
-   <goal name="VC main.25.0" expl="VC for main" proved="true">
+   <goal name="VC main.25.0" expl="right case" proved="true">
    <transf name="split_vc" proved="true" >
-    <goal name="VC main.25.0.0" expl="VC for main" proved="true">
+    <goal name="VC main.25.0.0" expl="right case" proved="true">
     <transf name="exists" proved="true" arg1="0">
      <goal name="VC main.25.0.0.0" proved="true">
      <proof prover="4"><result status="valid" time="0.01" steps="27"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="VC main.25.0.1" expl="VC for main" proved="true">
+    <goal name="VC main.25.0.1" expl="right case" proved="true">
     <proof prover="3"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
@@ -468,10 +468,10 @@
    <transf name="rewrite" proved="true" arg1="H">
     <goal name="VC main.57.1.0" expl="assertion" proved="true">
     <transf name="apply" proved="true" arg1="consecutive_last_push">
-     <goal name="VC main.57.1.0.0" proved="true">
+     <goal name="VC main.57.1.0.0" expl="apply premises" proved="true">
      <proof prover="3"><result status="valid" time="0.03"/></proof>
      </goal>
-     <goal name="VC main.57.1.0.1" proved="true">
+     <goal name="VC main.57.1.0.1" expl="apply premises" proved="true">
      <proof prover="3"><result status="valid" time="0.01"/></proof>
      </goal>
     </transf>
@@ -587,7 +587,7 @@
      </goal>
      <goal name="VC main.63.1.0.3" expl="VC for main" proved="true">
      <transf name="assert" proved="true" arg1="( x1 &lt;&gt; th )">
-      <goal name="VC main.63.1.0.3.0" proved="true">
+      <goal name="VC main.63.1.0.3.0" expl="asserted formula" proved="true">
       <proof prover="3"><result status="valid" time="0.08"/></proof>
       </goal>
       <goal name="VC main.63.1.0.3.1" expl="VC for main" proved="true">
@@ -595,7 +595,7 @@
        <goal name="VC main.63.1.0.3.1.0" expl="VC for main" proved="true">
        <proof prover="3"><result status="valid" time="0.06"/></proof>
        </goal>
-       <goal name="VC main.63.1.0.3.1.1" proved="true">
+       <goal name="VC main.63.1.0.3.1.1" expl="equality hypothesis" proved="true">
        <proof prover="4"><result status="valid" time="0.05" steps="68"/></proof>
        </goal>
       </transf>
@@ -604,7 +604,7 @@
      </goal>
     </transf>
     </goal>
-    <goal name="VC main.63.1.1" proved="true">
+    <goal name="VC main.63.1.1" expl="equality hypothesis" proved="true">
     <proof prover="4"><result status="valid" time="0.04" steps="49"/></proof>
     </goal>
    </transf>
@@ -652,7 +652,7 @@
     <goal name="VC main.71.1.0" expl="false case (loop invariant preservation)" proved="true">
     <proof prover="3"><result status="valid" time="0.08"/></proof>
     </goal>
-    <goal name="VC main.71.1.1" proved="true">
+    <goal name="VC main.71.1.1" expl="equality hypothesis" proved="true">
     <proof prover="4"><result status="valid" time="0.04" steps="49"/></proof>
     </goal>
    </transf>
@@ -690,7 +690,7 @@
   <transf name="split_vc" proved="true" >
    <goal name="VC main.77.0" expl="loop invariant preservation" proved="true">
    <transf name="assert" proved="true" arg1="(elts waiting_list &lt;&gt; Nil)">
-    <goal name="VC main.77.0.0" proved="true">
+    <goal name="VC main.77.0.0" expl="asserted formula" proved="true">
     <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="70"/></proof>
     </goal>
     <goal name="VC main.77.0.1" expl="loop invariant preservation" proved="true">
@@ -978,7 +978,7 @@
   <transf name="split_vc" proved="true" >
    <goal name="VC main.111.0" expl="loop invariant preservation" proved="true">
    <transf name="assert" proved="true" arg1="(elts waiting_list &lt;&gt; Nil)">
-    <goal name="VC main.111.0.0" proved="true">
+    <goal name="VC main.111.0.0" expl="asserted formula" proved="true">
     <proof prover="4"><result status="valid" time="0.06" steps="183"/></proof>
     </goal>
     <goal name="VC main.111.0.1" expl="loop invariant preservation" proved="true">
@@ -1357,13 +1357,13 @@
   </goal>
   <goal name="VC main.179" expl="assertion" proved="true">
   <transf name="apply" proved="true" arg1="H22">
-   <goal name="VC main.179.0" proved="true">
+   <goal name="VC main.179.0" expl="apply premises" proved="true">
    <proof prover="4" memlimit="2000"><result status="valid" time="0.15" steps="327"/></proof>
    </goal>
-   <goal name="VC main.179.1" proved="true">
+   <goal name="VC main.179.1" expl="apply premises" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC main.179.2" proved="true">
+   <goal name="VC main.179.2" expl="apply premises" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
@@ -1592,7 +1592,7 @@
      </goal>
      <goal name="VC main.216.1.0.3" expl="VC for main" proved="true">
      <transf name="assert" proved="true" arg1="( x1 &lt;&gt; th )">
-      <goal name="VC main.216.1.0.3.0" proved="true">
+      <goal name="VC main.216.1.0.3.0" expl="asserted formula" proved="true">
       <proof prover="3"><result status="valid" time="0.09"/></proof>
       <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="70"/></proof>
       </goal>
@@ -1601,7 +1601,7 @@
        <goal name="VC main.216.1.0.3.1.0" expl="VC for main" proved="true">
        <proof prover="3"><result status="valid" time="0.05"/></proof>
        </goal>
-       <goal name="VC main.216.1.0.3.1.1" proved="true">
+       <goal name="VC main.216.1.0.3.1.1" expl="equality hypothesis" proved="true">
        <proof prover="4" memlimit="2000"><result status="valid" time="0.04" steps="64"/></proof>
        </goal>
       </transf>
@@ -1610,7 +1610,7 @@
      </goal>
     </transf>
     </goal>
-    <goal name="VC main.216.1.1" proved="true">
+    <goal name="VC main.216.1.1" expl="equality hypothesis" proved="true">
     <proof prover="4" memlimit="2000"><result status="valid" time="0.05" steps="52"/></proof>
     </goal>
    </transf>
@@ -1658,7 +1658,7 @@
     <goal name="VC main.224.1.0" expl="false case (loop invariant preservation)" proved="true">
     <proof prover="3"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="VC main.224.1.1" proved="true">
+    <goal name="VC main.224.1.1" expl="equality hypothesis" proved="true">
     <proof prover="4"><result status="valid" time="0.04" steps="52"/></proof>
     </goal>
    </transf>

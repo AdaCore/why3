@@ -82,7 +82,7 @@
   </goal>
   <goal name="VC equality.6" expl="precondition" proved="true">
   <transf name="assert" proved="true" arg1="((k-1)*lambda &gt;= 0)">
-   <goal name="VC equality.6.0" proved="true">
+   <goal name="VC equality.6.0" expl="asserted formula" proved="true">
    <proof prover="7"><result status="valid" time="2.45"/></proof>
    </goal>
    <goal name="VC equality.6.1" expl="precondition" proved="true">
@@ -139,7 +139,7 @@
    </goal>
    <goal name="VC equality.20.2" expl="postcondition" proved="true">
    <transf name="assert" proved="true" arg1="((k-1) * lambda &gt;= 0)">
-    <goal name="VC equality.20.2.0" proved="true">
+    <goal name="VC equality.20.2.0" expl="asserted formula" proved="true">
     <proof prover="7"><result status="valid" time="4.35"/></proof>
     </goal>
     <goal name="VC equality.20.2.1" expl="postcondition" proved="true">
@@ -214,7 +214,7 @@
      </goal>
     </transf>
     </goal>
-    <goal name="VC tortoise_and_hare.10.0.1" proved="true">
+    <goal name="VC tortoise_and_hare.10.0.1" expl="equality hypothesis" proved="true">
     <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
@@ -247,31 +247,31 @@
   </goal>
   <goal name="VC tortoise_and_hare.19" expl="loop invariant preservation" proved="true">
   <transf name="assert" proved="true" arg1="(lam1 = 0)">
-   <goal name="VC tortoise_and_hare.19.0" proved="true">
+   <goal name="VC tortoise_and_hare.19.0" expl="asserted formula" proved="true">
    <proof prover="6"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC tortoise_and_hare.19.1" expl="loop invariant preservation" proved="true">
    <transf name="assert" proved="true" arg1="(x (n + i1) = x n)">
-    <goal name="VC tortoise_and_hare.19.1.0" proved="true">
+    <goal name="VC tortoise_and_hare.19.1.0" expl="asserted formula" proved="true">
     <proof prover="6"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC tortoise_and_hare.19.1.1" expl="loop invariant preservation" proved="true">
     <transf name="instantiate" proved="true" arg1="H24" arg2="(n+i1),n">
      <goal name="VC tortoise_and_hare.19.1.1.0" expl="loop invariant preservation" proved="true">
      <transf name="assert" proved="true" arg1="(exists k. k &gt;= 1 /\ i1 = k * lambda)">
-      <goal name="VC tortoise_and_hare.19.1.1.0.0" proved="true">
+      <goal name="VC tortoise_and_hare.19.1.1.0.0" expl="asserted formula" proved="true">
       <proof prover="6"><result status="valid" time="0.03"/></proof>
       </goal>
       <goal name="VC tortoise_and_hare.19.1.1.0.1" expl="loop invariant preservation" proved="true">
       <transf name="destruct" proved="true" arg1="h">
        <goal name="VC tortoise_and_hare.19.1.1.0.1.0" expl="loop invariant preservation" proved="true">
        <transf name="assert" proved="true" arg1="((k-1) * lambda &gt;= 0)">
-        <goal name="VC tortoise_and_hare.19.1.1.0.1.0.0" proved="true">
+        <goal name="VC tortoise_and_hare.19.1.1.0.1.0.0" expl="asserted formula" proved="true">
         <proof prover="7"><result status="valid" time="9.59"/></proof>
         </goal>
         <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1" expl="loop invariant preservation" proved="true">
         <transf name="assert" proved="true" arg1="(i1 &gt;= lambda)">
-         <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.0" proved="true">
+         <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.0" expl="asserted formula" proved="true">
          <proof prover="6"><result status="valid" time="0.04"/></proof>
          </goal>
          <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1" expl="loop invariant preservation" proved="true">
@@ -281,12 +281,12 @@
           </goal>
           <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1" expl="false case (loop invariant preservation)" proved="true">
           <transf name="assert" proved="true" arg1="(x (n + lambda) &lt;&gt; x n)">
-           <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0" proved="true">
+           <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0" expl="asserted formula" proved="true">
            <transf name="assert" proved="true" arg1="(lambda &lt; i1)">
-            <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0.0" proved="true">
+            <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0.0" expl="asserted formula" proved="true">
             <proof prover="2"><result status="valid" time="0.80" steps="276"/></proof>
             </goal>
-            <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0.1" proved="true">
+            <goal name="VC tortoise_and_hare.19.1.1.0.1.0.1.1.1.0.1" expl="asserted formula" proved="true">
             <proof prover="5"><result status="valid" time="0.03"/></proof>
             </goal>
            </transf>
@@ -316,7 +316,7 @@
   <transf name="case" proved="true" arg1="(i = mu+1)">
    <goal name="VC tortoise_and_hare.20.0" expl="true case (loop variant decrease)" proved="true">
    <transf name="assert" proved="true" arg1="(x mu = x (mu + n))">
-    <goal name="VC tortoise_and_hare.20.0.0" proved="true">
+    <goal name="VC tortoise_and_hare.20.0.0" expl="asserted formula" proved="true">
     <proof prover="6"><result status="valid" time="0.05"/></proof>
     </goal>
     <goal name="VC tortoise_and_hare.20.0.1" expl="true case (loop variant decrease)" proved="true">
@@ -334,7 +334,7 @@
    <goal name="VC tortoise_and_hare.21.0" expl="loop invariant preservation" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
    </goal>
-   <goal name="VC tortoise_and_hare.21.1" proved="true">
+   <goal name="VC tortoise_and_hare.21.1" expl="equality hypothesis" proved="true">
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
@@ -366,30 +366,30 @@
   <transf name="case" proved="true" arg1="(lam = 0)">
    <goal name="VC tortoise_and_hare.26.0" expl="true case (assertion)" proved="true">
    <transf name="assert" proved="true" arg1="(lambda &gt;= mu)">
-    <goal name="VC tortoise_and_hare.26.0.0" proved="true">
+    <goal name="VC tortoise_and_hare.26.0.0" expl="asserted formula" proved="true">
     <transf name="case" proved="true" arg1="(lambda &lt; mu)">
-     <goal name="VC tortoise_and_hare.26.0.0.0" expl="true case" proved="true">
+     <goal name="VC tortoise_and_hare.26.0.0.0" expl="true case (asserted formula)" proved="true">
      <transf name="assert" proved="true" arg1="(x (n + lambda) &lt;&gt; x n)">
-      <goal name="VC tortoise_and_hare.26.0.0.0.0" proved="true">
+      <goal name="VC tortoise_and_hare.26.0.0.0.0" expl="asserted formula" proved="true">
       <proof prover="5"><result status="valid" time="0.03"/></proof>
       </goal>
-      <goal name="VC tortoise_and_hare.26.0.0.0.1" expl="true case" proved="true">
+      <goal name="VC tortoise_and_hare.26.0.0.0.1" expl="true case (asserted formula)" proved="true">
       <transf name="assert" proved="true" arg1="(x (n + lambda) = x n)">
-       <goal name="VC tortoise_and_hare.26.0.0.0.1.0" proved="true">
+       <goal name="VC tortoise_and_hare.26.0.0.0.1.0" expl="asserted formula" proved="true">
        <transf name="instantiate" proved="true" arg1="H18" arg2="(n+lambda),n">
-        <goal name="VC tortoise_and_hare.26.0.0.0.1.0.0" proved="true">
+        <goal name="VC tortoise_and_hare.26.0.0.0.1.0.0" expl="asserted formula" proved="true">
         <proof prover="6"><result status="valid" time="0.05"/></proof>
         </goal>
        </transf>
        </goal>
-       <goal name="VC tortoise_and_hare.26.0.0.0.1.1" expl="true case" proved="true">
+       <goal name="VC tortoise_and_hare.26.0.0.0.1.1" expl="true case (asserted formula)" proved="true">
        <proof prover="6"><result status="valid" time="0.03"/></proof>
        </goal>
       </transf>
       </goal>
      </transf>
      </goal>
-     <goal name="VC tortoise_and_hare.26.0.0.1" expl="false case" proved="true">
+     <goal name="VC tortoise_and_hare.26.0.0.1" expl="false case (asserted formula)" proved="true">
      <proof prover="6"><result status="valid" time="0.02"/></proof>
      </goal>
     </transf>
@@ -398,7 +398,7 @@
     <transf name="destruct" proved="true" arg1="H10">
      <goal name="VC tortoise_and_hare.26.0.1.0" expl="true case (assertion)" proved="true">
      <transf name="assert" proved="true" arg1="(n = lambda \/ n = 2*lambda)">
-      <goal name="VC tortoise_and_hare.26.0.1.0.0" proved="true">
+      <goal name="VC tortoise_and_hare.26.0.1.0.0" expl="asserted formula" proved="true">
       <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
       </goal>
       <goal name="VC tortoise_and_hare.26.0.1.0.1" expl="true case (assertion)" proved="true">
