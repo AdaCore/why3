@@ -279,20 +279,20 @@ let print_float_human fmt f =
   | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
-  fprintf fmt "(";
+  fprintf fmt "@[(";
   List.iter (fun e ->
-    fprintf fmt "%s => %a," e.arr_index_key print_model_value_human e.arr_index_value)
+    fprintf fmt "@[%s =>@ %a,@]" e.arr_index_key print_model_value_human e.arr_index_value)
     arr.arr_indices;
-  fprintf fmt "others => %a)" print_model_value_human arr.arr_others
+  fprintf fmt "@[others =>@ %a@])@]" print_model_value_human arr.arr_others
 
 and print_record_human fmt r =
-  fprintf fmt "%a"
+  fprintf fmt "@[%a@]"
     (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
-    (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
+    (fun fmt (f, v) -> fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
 
 and print_proj_human fmt p =
   let s, v = p in
-  fprintf fmt "%s %a"
+  fprintf fmt "@[{%s =>@ %a}@]"
     s print_model_value_human v
 
 and print_model_value_human fmt (v: model_value) =
@@ -302,8 +302,10 @@ and print_model_value_human fmt (v: model_value) =
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
+  | Apply (s, []) ->
+      fprintf fmt "%s" s
   | Apply (s, lt) ->
-    fprintf fmt "(%s %a)" s (Pp.print_list Pp.space print_model_value_human) lt
+    fprintf fmt "@[(%s@ %a)@]" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
