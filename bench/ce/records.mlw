@@ -34,6 +34,13 @@ module M
   =
     x := { !x with f = 6 };
     !x
+    
+  let record_match_eval_test44 (x : ref r) : r
+    ensures { result.g }
+  = [@vc:sp]
+    x := { !x with f = 6 };
+    assert { !x.f = 12};
+    !x
 
   val re : ref r
 
@@ -78,4 +85,18 @@ module Mutable
     x.f <- 6;
     x
 
+  let record_old_test1 (x : r) : unit
+    ensures { old x.f = x.f}
+  =
+    x.f <- 6
+
+  let record_at_test2 (x : r) : unit
+  =
+    label L in
+    x.f <- 6;
+    label M in
+    x.f <- 12;
+    assert { x at L = x at M} 
+
 end
+

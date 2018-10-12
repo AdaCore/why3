@@ -1,0 +1,57 @@
+module Ref
+
+  type ref = { mutable contents [@model_trace:] : int }
+
+  function (!) (x: ref) : int = x.contents
+
+  let ref (v: int) ensures { result = { contents = v } } = { contents = v }
+
+  let (!) (r:ref) ensures { result = !r } = r.contents
+
+  let (:=) (r:ref) (v:int) ensures { !r = v } = r.contents <- v
+
+end
+
+module M
+  use list.List
+  use int.Int
+  use Ref
+
+  let test_post (x: int) (y: ref): unit
+    ensures { old !y >= x }
+      =
+      y := x - 1 + !y
+
+  let test_post2 (x: int) (y: ref): unit
+    requires { x > 42 }
+    ensures { old !y > !y + x }
+      =
+      y := x - 1 + !y
+
+
+  (**********************************************************
+   ** Getting counterexamples for terms of primitive types **
+   **********************************************************)
+  val y :ref
+
+  let incr (x23: ref): unit
+  ensures { !x23 = old !x23 + 2 + !y }
+  =
+  (*#"random_path.random" 62 27 32#*)
+  y := !y + 1;
+  x23 := !x23 + 1;
+  x23 := !x23 + 1
+
+  let test_loop (x: ref): unit
+  ensures { !x < old !x }
+  =
+  label L in
+  incr x;
+  label M in
+  while !x > 0 do
+  invariant { !x > !x at L + !x at M }
+  variant { !x }
+    x := !x - 1
+  done
+
+end
