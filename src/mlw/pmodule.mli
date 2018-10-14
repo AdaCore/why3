@@ -48,6 +48,8 @@ type overload =
 
 val overload_of_rs : rsymbol -> overload
 
+val ref_attr : Ident.attribute
+
 exception IncompatibleNotation of string
 
 (** {2 Module} *)
@@ -138,6 +140,14 @@ val bool_module : pmodule
 val unit_module : pmodule
 val highord_module : pmodule
 val tuple_module : int -> pmodule
+val ref_module : pmodule
+
+val its_ref     : itysymbol
+val ts_ref      : tysymbol
+val rs_ref_cons : rsymbol
+val rs_ref_proj : rsymbol
+val ls_ref_cons : lsymbol
+val ls_ref_proj : lsymbol
 
 (** {2 WhyML language} *)
 

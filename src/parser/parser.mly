@@ -166,6 +166,18 @@
     let p = mk_t (Tquant (Dterm.DTexists, bl, [], join ql)) in
     [mk_t (Tattr (ATstr we_attr, p))]
 
+  let set_ref id =
+    List.iter (function
+      | ATstr a when Ident.attr_equal a Pmodule.ref_attr ->
+          Loc.errorm ~loc:id.id_loc "this variable is already a reference"
+      | _ -> ()) id.id_ats;
+    { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
+
+  let set_ref_opt loc r = function
+    | id when not r -> id
+    | Some id -> Some (set_ref id)
+    | None -> Loc.errorm ~loc "anonymous parameters cannot be references"
+
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -208,13 +220,13 @@
 %token ABSTRACT ABSURD ALIAS ANY ASSERT ASSUME AT BEGIN BREAK CHECK
 %token CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD PARTIAL
-%token PRIVATE PURE RAISE RAISES READS REC REQUIRES
+%token PRIVATE PURE RAISE RAISES READS REF REC REQUIRES
 %token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES
 
 (* symbols *)
 
 %token AND ARROW
-%token BAR
+%token AMP BAR
 %token COLON COMMA
 %token DOT DOTDOT EQUAL LT GT LTGT MINUS
 %token LEFTPAR LEFTSQ
@@ -493,10 +505,12 @@ ind_case:
 
 ty:
 | ty_arg          { $1 }
+| REF ty_arg+     { PTref $2 }
 | lqualid ty_arg+ { PTtyapp ($1, $2) }
 | ty ARROW ty     { PTarrow ($1, $3) }
 
 ty_arg:
+| REF                               { PTref [] }
 | lqualid                           { PTtyapp ($1, []) }
 | quote_lident                      { PTtyvar $1 }
 | uqualid DOT ty_block              { PTscope ($1, $3) }
@@ -524,7 +538,7 @@ params:  param*  { List.concat $1 }
 binders: binder+ { List.concat $1 }
 
 param:
-| anon_binder
+| special_binder
     { error_param (floc $startpos $endpos) }
 | lident_nq attr+
     { error_param (floc $startpos $endpos) }
@@ -533,18 +547,20 @@ param:
 | LEFTPAR GHOST ty RIGHTPAR
     { [floc $startpos $endpos, None, true, $3] }
 | LEFTPAR binder_vars_rest RIGHTPAR
-    { match $2 with [l,_] -> error_param l
+    { match snd $2 with [l,_] -> error_param l
       | _ -> error_loc (floc $startpos($3) $endpos($3)) }
 | LEFTPAR GHOST binder_vars_rest RIGHTPAR
-    { match $3 with [l,_] -> error_param l
+    { match snd $3 with [l,_] -> error_param l
       | _ -> error_loc (floc $startpos($4) $endpos($4)) }
 | LEFTPAR binder_vars cast RIGHTPAR
-    { List.map (fun (l,i) -> l, i, false, $3) $2 }
+    { let r = fst $2 in let ty = if r then PTref [$3] else $3 in
+      List.map (fun (l,i) -> l, set_ref_opt l r i, false, ty) (snd $2) }
 | LEFTPAR GHOST binder_vars cast RIGHTPAR
-    { List.map (fun (l,i) -> l, i, true, $4) $3 }
+    { let r = fst $3 in let ty = if r then PTref [$4] else $4 in
+      List.map (fun (l,i) -> l, set_ref_opt l r i, true, ty) (snd $3) }
 
 binder:
-| anon_binder
+| special_binder
     { let l,i = $1 in [l, i, false, None] }
 | lident_nq attr+
     { [floc $startpos $endpos, Some (add_attr $1 $2), false, None] }
@@ -552,39 +568,49 @@ binder:
     { match $1 with
       | PTtyapp (Qident id, [])
       | PTparen (PTtyapp (Qident id, [])) ->
-          [floc $startpos $endpos, Some id, false, None]
-      | _ -> [floc $startpos $endpos, None, false, Some $1] }
+              [floc $startpos $endpos, Some id, false, None]
+      | PTparen (PTref [PTtyapp (Qident id, [])]) ->
+              let id = set_ref id in
+              [floc $startpos $endpos, Some id, false, None]
+      | _ ->  [floc $startpos $endpos, None,    false, Some $1] }
 | LEFTPAR GHOST ty RIGHTPAR
     { match $3 with
       | PTtyapp (Qident id, []) ->
-             [floc $startpos $endpos, Some id, true, None]
-      | _ -> [floc $startpos $endpos, None, true, Some $3] }
+              [floc $startpos $endpos, Some id, true,  None]
+      | PTref [PTtyapp (Qident id, [])] ->
+              let id = set_ref id in
+              [floc $startpos $endpos, Some id, true,  None]
+      | _ ->  [floc $startpos $endpos, None,    true,  Some $3] }
 | LEFTPAR binder_vars_rest RIGHTPAR
-    { match $2 with [l,i] -> [l, i, false, None]
+    { match snd $2 with [l,i] -> [l, set_ref_opt l (fst $2) i, false, None]
       | _ -> error_loc (floc $startpos($3) $endpos($3)) }
 | LEFTPAR GHOST binder_vars_rest RIGHTPAR
-    { match $3 with [l,i] -> [l, i, true, None]
+    { match snd $3 with [l,i] -> [l, set_ref_opt l (fst $3) i, true, None]
       | _ -> error_loc (floc $startpos($4) $endpos($4)) }
 | LEFTPAR binder_vars cast RIGHTPAR
-    { List.map (fun (l,i) -> l, i, false, Some $3) $2 }
+    { let r = fst $2 in let ty = if r then PTref [$3] else $3 in
+      List.map (fun (l,i) -> l, set_ref_opt l r i, false, Some ty) (snd $2) }
 | LEFTPAR GHOST binder_vars cast RIGHTPAR
-    { List.map (fun (l,i) -> l, i, true, Some $4) $3 }
+    { let r = fst $3 in let ty = if r then PTref [$4] else $4 in
+      List.map (fun (l,i) -> l, set_ref_opt l r i, true, Some ty) (snd $3) }
 
 binder_vars:
-| binder_vars_head  { List.rev $1 }
+| binder_vars_head  { fst $1, match snd $1 with
+                        | [] -> Loc.error ~loc:(floc $startpos $endpos) Error
+                        | bl -> List.rev bl }
 | binder_vars_rest  { $1 }
 
 binder_vars_rest:
 | binder_vars_head attr+ binder_var*
-    { List.rev_append (match $1 with
+    { let l2 = floc $startpos($2) $endpos($2) in
+      fst $1, List.rev_append (match snd $1 with
         | (l, Some id) :: bl ->
-            let l2 = floc $startpos($2) $endpos($2) in
             (Loc.join l l2, Some (add_attr id $2)) :: bl
-        | _ -> assert false) $3 }
-| binder_vars_head anon_binder binder_var*
-    { List.rev_append $1 ($2 :: $3) }
-| anon_binder binder_var*
-    { $1 :: $2 }
+        | _ -> Loc.error ~loc:l2 Error) $3 }
+| binder_vars_head special_binder binder_var*
+    { fst $1, List.rev_append (snd $1) ($2 :: $3) }
+| special_binder binder_var*
+    { false, $1 :: $2 }
 
 binder_vars_head:
 | ty {
@@ -593,15 +619,18 @@ binder_vars_head:
       | PTtyapp (Qident id, []) -> of_id id :: acc
       | _ -> Loc.error ~loc:(floc $startpos $endpos) Error in
     match $1 with
-      | PTtyapp (Qident id, l) -> List.fold_left push [of_id id] l
+      | PTtyapp (Qident id, l) ->
+                  false, List.fold_left push [of_id id] l
+      | PTref l -> true, List.fold_left push [] l
       | _ -> Loc.error ~loc:(floc $startpos $endpos) Error }
 
 binder_var:
 | attrs(lident_nq)  { floc $startpos $endpos, Some $1 }
-| anon_binder       { $1 }
+| special_binder       { $1 }
 
-anon_binder:
-| UNDERSCORE        { floc $startpos $endpos, None }
+special_binder:
+| UNDERSCORE            { floc $startpos $endpos, None }
+| AMP attrs(lident_nq)  { floc $startpos $endpos, Some (set_ref $2) }
 
 (* Logical terms *)
 
@@ -924,6 +953,10 @@ single_expr_:
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+| LET ghost REF attrs(lident_nq) EQUAL seq_expr IN seq_expr
+    { let rf = mk_expr Eref $startpos($3) $endpos($3) in
+      let ee = { $6 with expr_desc = Eapply (rf, $6) } in
+      Elet (set_ref $4, ghost $2, Expr.RKnone, apply_partial $2 ee, $8) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
@@ -1024,6 +1057,7 @@ expr_dot: e = mk_expr(expr_dot_) { e }
 expr_arg_:
 | qualid                    { Eident $1 }
 | numeral                   { Econst $1 }
+| REF                       { Eref }
 | TRUE                      { Etrue }
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
@@ -1225,6 +1259,8 @@ pat_uni_:
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
+| AMP attrs(lident_nq)                  { Pvar (add_model_trace_attr
+                                                            (set_ref $2)) }
 | attrs(lident_nq)                      { Pvar (add_model_trace_attr $1) }
 | uqualid                               { Papp ($1,[]) }
 | uqualid DOT mk_pat(pat_block_)        { Pscope ($1,$3) }
@@ -1327,6 +1363,8 @@ sident:
 | lident          { $1 }
 | uident          { $1 }
 | STRING          { mk_id $1 $startpos $endpos }
+| REF             { mk_id "ref" $startpos $endpos }
+(* TODO: we can add other keywords and save on quotes *)
 
 quote_lident:
 | QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
@@ -1427,13 +1465,17 @@ semicolon_list1(X):
 
 located(X): X { $1, $startpos, $endpos }
 
-
 (* Parsing of a list of qualified identifiers for the ITP *)
+
+qualid_extended:
+| qualid { $1 }
+| REF    { Qident (mk_id "ref" $startpos $endpos) }
+
 qualid_eof:
-| qualid EOF { $1 }
+| qualid_extended EOF { $1 }
 
 qualid_comma_list_eof:
-| comma_list1(qualid) EOF { $1 }
+| comma_list1(qualid_extended) EOF { $1 }
 
 ident_comma_list_eof:
 | comma_list1(ident) EOF { $1 }

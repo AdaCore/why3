@@ -31,6 +31,7 @@ type pty =
   | PTtyvar of ident
   | PTtyapp of qualid * pty list
   | PTtuple of pty list
+  | PTref   of pty list
   | PTarrow of pty * pty
   | PTscope of qualid * pty
   | PTparen of pty
@@ -120,6 +121,7 @@ type expr = {
 }
 
 and expr_desc =
+  | Eref
   | Etrue
   | Efalse
   | Econst of Number.constant

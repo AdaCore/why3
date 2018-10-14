@@ -507,7 +507,8 @@ let built_in_modules =
     ] ;
     ["ref"],"Ref",
     [], (* ? *)
-    ["ref", exec_ref_make ;
+    ["mk ref", exec_ref_make ;
+     "contents", exec_ref_get ;
      Ident.op_prefix "!", exec_ref_get;
      Ident.op_infix ":=", exec_ref_set;
     ] ;

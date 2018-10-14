@@ -85,6 +85,7 @@
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
+        "ref", REF;
         "requires", REQUIRES;
         "return", RETURN;
         "returns", RETURNS;
@@ -222,6 +223,8 @@ rule token = parse
       { DOT }
   | ".."
       { DOTDOT }
+  | "&"
+      { AMP }
   | "|"
       { BAR }
   | "<"

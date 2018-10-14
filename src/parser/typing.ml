@@ -118,6 +118,8 @@ let rec ty_of_pty ns = function
   | PTtuple tyl ->
       let s = its_tuple (List.length tyl) in
       ty_app s.its_ts (List.map (ty_of_pty ns) tyl)
+  | PTref tyl ->
+      ty_app ts_ref (List.map (ty_of_pty ns) tyl)
   | PTarrow (ty1, ty2) ->
       ty_func (ty_of_pty ns ty1) (ty_of_pty ns ty2)
   | PTscope (q, ty) ->
@@ -438,6 +440,8 @@ let rec ity_of_pty muc = function
       Loc.try3 ~loc:(qloc q) ity_app s tyl []
   | PTtuple tyl ->
       ity_tuple (List.map (ity_of_pty muc) tyl)
+  | PTref tyl ->
+      ity_app its_ref (List.map (ity_of_pty muc) tyl) []
   | PTarrow (ty1, ty2) ->
       ity_func (ity_of_pty muc ty1) (ity_of_pty muc ty2)
   | PTpure ty ->
@@ -809,6 +813,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let dty = if Mts.is_empty muc.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
+  | Ptree.Eref ->
+      DEsym (RS rs_ref_cons)
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in
@@ -1153,6 +1159,7 @@ let add_types muc tdl =
                 find_itysymbol muc q in
           Loc.try3 ~loc:(qloc q) ity_app s (List.map (down muc) tyl) []
       | PTtuple tyl -> ity_tuple (List.map (down muc) tyl)
+      | PTref tyl -> ity_app its_ref (List.map (down muc) tyl) []
       | PTarrow (ty1,ty2) -> ity_func (down muc ty1) (down muc ty2)
       | PTpure ty -> ity_purify (down muc ty)
       | PTscope (q,ty) ->

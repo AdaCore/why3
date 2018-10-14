@@ -766,6 +766,8 @@ module MLToC = struct
       let n = Number.compute_int_constant ic in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
+    | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref_cons ->
+       expr info env e
     | Eapp (rs, el) ->
        Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
        if is_rs_tuple rs && env.computes_return_value

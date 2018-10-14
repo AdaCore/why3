@@ -71,6 +71,12 @@ let same_overload r1 r2 =
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
   | _ -> false (* two NoOver's are not the same *)
 
+let ref_attr = Ident.create_attribute "mlw:reference_var"
+
+let has_ref s =
+  let has v = Sattr.mem ref_attr v.pv_vs.vs_name.id_attrs in
+  List.exists has s.rs_cty.cty_args
+
 exception IncompatibleNotation of string
 
 let merge_ps chk x vo vn =
@@ -87,12 +93,14 @@ let merge_ps chk x vo vn =
     (* but we can merge two compatible symbols *)
     | RS r1, RS r2 ->
         if rs_equal r1 r2 then vo else
+        if has_ref r1 || has_ref r2 then vn else
         if not (same_overload r1 r2) then vn else
         if ity_equal (fsty r1) (fsty r2) then vn else
         OO (Srs.add r2 (Srs.singleton r1))
     (* or add a compatible symbol to notation *)
     | OO s1, RS r2 ->
         if Srs.mem r2 s1 then vo else
+        if has_ref r2 then vn else
         let r1 = Srs.choose s1 in
         if not (same_overload r1 r2) then vn else
         let ty = fsty r2 in
@@ -398,6 +406,26 @@ let unit_module =
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
   close_module (List.fold_left add uc (create_type_decl [td]))
 
+let itd_ref =
+  let tv = create_tvsymbol (id_fresh "a") in
+  let attrs = Sattr.singleton (create_attribute "model_trace:") in
+  let pj = create_pvsymbol (id_fresh ~attrs "contents") (ity_var tv) in
+  create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
+                                            [tv] [true, pj] [] []
+
+let its_ref = itd_ref.itd_its
+let rs_ref_cons = List.hd itd_ref.itd_constructors
+let rs_ref_proj = List.hd itd_ref.itd_fields
+
+let ts_ref = its_ref.its_ts
+let ls_ref_cons = ls_of_rs rs_ref_cons
+let ls_ref_proj = ls_of_rs rs_ref_proj
+
+let ref_module =
+  let add uc d = add_pdecl_raw ~warn:false uc d in
+  let uc = empty_module dummy_env (id_fresh "Ref") ["why3";"Ref"] in
+  close_module (List.fold_left add uc (create_type_decl [itd_ref]))
+
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export m builtin_module in
@@ -408,6 +436,8 @@ let create_module env ?(path=[]) n =
 let add_use uc d = Sid.fold (fun id uc ->
   if id_equal id ts_func.ts_name then
     use_export uc highord_module
+  else if id_equal id ts_ref.ts_name then
+    use_export uc ref_module
   else match is_ts_tuple_id id with
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
@@ -1187,6 +1217,7 @@ end)
 let mlw_language_builtin =
   let builtin s =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
+    if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
     if s = highord_theory.th_name.id_string then highord_module else
     if s = bool_theory.th_name.id_string then bool_module else
