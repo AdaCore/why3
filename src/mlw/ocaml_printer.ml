@@ -27,7 +27,6 @@ open Printer
 
 type info = {
   info_syn          : syntax_map;
-  info_convert      : syntax_map;
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;
@@ -278,9 +277,8 @@ module Print = struct
 
   let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
     (* here [rs] refers to a [val] declaration *)
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn     rs.rs_name with
-    | None, None (* when info.info_flat *) ->
+    match query_syntax info.info_syn     rs.rs_name with
+    | None (* when info.info_flat *) ->
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
@@ -332,19 +330,16 @@ module Print = struct
             List.exists (rs_equal rs) its.itd_constructors in
           List.exists is_constructor its
       | _ -> false in
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _, [{e_node = Econst _}] ->
-        syntax_arguments s print_constant fmt pvl
-    | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
+    match query_syntax info.info_syn rs.rs_name, pvl with
+    | Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
-    | _, None, [t] when is_rs_tuple rs ->
+    | None, [t] when is_rs_tuple rs ->
         fprintf fmt "@[%a@]" (print_expr info) t
-    | _, None, tl when is_rs_tuple rs ->
+    | None, tl when is_rs_tuple rs ->
         fprintf fmt "@[(%a)@]" (print_list comma (print_expr info)) tl
-    | _, None, [t1] when isfield ->
+    | None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
-    | _, None, tl when isconstructor () ->
+    | None, tl when isconstructor () ->
         let pjl = get_record info rs in
         begin match pjl, tl with
           | [], [] ->
@@ -359,9 +354,9 @@ module Print = struct
               fprintf fmt "@[<hov 2>{ %a }@]"
                 (print_list2 semi equal (print_rs info)
                    (print_expr ~paren:true info)) (pjl, tl) end
-    | _, None, [] ->
+    | None, [] ->
         (print_lident info) fmt rs.rs_name
-    | _, _, tl ->
+    | _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]"
           (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
@@ -456,12 +451,8 @@ module Print = struct
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
-        begin match query_syntax info.info_convert rs.rs_name, pvl with
-          | Some s, [{e_node = Econst _}] ->
-              syntax_arguments s print_constant fmt pvl
-          | _ ->
-              fprintf fmt (protect_on paren "%a")
-                (print_apply info rs) pvl end
+       fprintf fmt (protect_on paren "%a")
+               (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
@@ -679,7 +670,6 @@ let print_decl =
     ignore (old);
     let info = {
       info_syn          = pargs.Pdriver.syntax;
-      info_convert      = pargs.Pdriver.converter;
       info_literal      = pargs.Pdriver.literal;
       info_current_th   = th;
       info_current_mo   = Some m;

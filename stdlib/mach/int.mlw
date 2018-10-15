@@ -584,6 +584,9 @@ module UInt64GMP
     lemma to_int_in_bounds,
     lemma extensionality
 
+  val constant uint64_max:uint64
+     ensures { uint64'int result = uint64'maxInt }
+
   val lsld (x cnt:uint64) : (uint64,uint64)
     requires { 0 < to_int cnt < 64 }
     returns { (r,d) -> to_int r + (max_uint64+1) * to_int d =

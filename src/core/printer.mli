@@ -65,7 +65,6 @@ val print_interface : interface Pp.pp
 
 val meta_syntax_type : meta
 val meta_syntax_logic : meta
-val meta_syntax_converter : meta
 val meta_syntax_literal : meta
 val meta_remove_prop : meta
 val meta_remove_logic : meta
@@ -74,7 +73,6 @@ val meta_realized_theory : meta
 
 val syntax_type : tysymbol -> string -> bool -> tdecl
 val syntax_logic : lsymbol -> string -> bool -> tdecl
-val syntax_converter : lsymbol -> string -> bool -> tdecl
 val syntax_literal : tysymbol -> string -> bool -> tdecl
 val remove_prop : prsymbol -> tdecl
 
@@ -83,19 +81,15 @@ val check_syntax_logic: lsymbol -> string -> unit
 
 type syntax_map = (string*int) Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
-type converter_map = (string*int) Mls.t
 
 val get_syntax_map : task -> syntax_map
 val add_syntax_map : tdecl -> syntax_map -> syntax_map
 (* interprets a declaration as a syntax rule, if any *)
 
-val get_converter_map : task -> converter_map
-
 val get_rliteral_map : task -> syntax_map
 val add_rliteral_map : tdecl -> syntax_map -> syntax_map
 
 val query_syntax : syntax_map -> ident -> string option
-val query_converter : converter_map -> lsymbol -> string option
 
 val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
@@ -118,8 +112,6 @@ val syntax_float_literal :
 (** {2 pretty-printing transformations (useful for caching)} *)
 
 val on_syntax_map : (syntax_map -> 'a Trans.trans) -> 'a Trans.trans
-
-val on_converter_map : (converter_map -> 'a Trans.trans) -> 'a Trans.trans
 
 val sprint_tdecl :
   ('a -> Format.formatter -> Theory.tdecl -> 'a * string list) ->

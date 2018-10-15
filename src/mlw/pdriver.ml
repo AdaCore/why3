@@ -27,7 +27,6 @@ type driver = {
   drv_thinterface : Printer.interface_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
-  drv_converter   : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
 }
 
@@ -38,7 +37,6 @@ type printer_args = {
   thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
-  converter   : Printer.syntax_map;
   literal     : Printer.syntax_map;
 }
 
@@ -89,7 +87,6 @@ let load_driver env file extra_files =
   let thprelude = ref Mid.empty in
   let thinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
-  let converter_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
   let qualid    = ref [] in
 
@@ -110,8 +107,6 @@ let load_driver env file extra_files =
     if ls.ls_value <> None then raise (PSymExpected ls) else ls in
   let add_syntax id s b =
     syntax_map := Mid.add id (s,if b then 1 else 0) !syntax_map in
-  let add_converter id s b =
-    converter_map := Mid.add id (s,if b then 1 else 0) !converter_map in
   let add_literal id s b =
     literal_map := Mid.add id (s,if b then 1 else 0) !literal_map in
   let add_local th = function
@@ -130,8 +125,6 @@ let load_driver env file extra_files =
         let ps = find_ps th q in
         Printer.check_syntax_logic ps s;
         add_syntax ps.ls_name s b
-    | Rconverter _ ->
-        Loc.errorm "Syntax converter cannot be used in pure theories"
     | Rliteral (q,s,b) ->
         let ts = find_ts th q in
         add_literal ts.ts_name s b
@@ -194,9 +187,6 @@ let load_driver env file extra_files =
     | MRval (q,s) ->
         let id = find_val m q in
         add_syntax id s false
-    | MRtheory (Rconverter (q,s,b)) ->
-        let id = find_val m q in
-        add_converter id s b
     | MRtheory trule ->
         add_local m.mod_theory (loc,trule)
   in
@@ -231,7 +221,6 @@ let load_driver env file extra_files =
     drv_thinterface = Mid.map List.rev !thinterface;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
-    drv_converter   = !converter_map;
     drv_literal     = !literal_map;
   }
 
@@ -287,7 +276,6 @@ let lookup_printer drv =
       thinterface = drv.drv_thinterface;
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
-      converter   = drv.drv_converter;
       literal     = drv.drv_literal;
     }
   in

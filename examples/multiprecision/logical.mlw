@@ -259,7 +259,7 @@ module Logical
     ensures { result + radix * value r sz
               = value x sz * (power 2 (Limb.length - cnt)) }
   =
-    let tnc = (Limb.of_int Limb.length) - cnt in
+    let tnc = (64:uint64) - cnt in
     let msb = sz - 1 in
     let xp = ref (C.incr x 0) in
     let rp = ref (C.incr r 0) in
@@ -436,7 +436,7 @@ module Logical
     ensures  { result + radix * value x sz
                = value (old x) sz * (power 2 (Limb.length - cnt)) }
   =
-    let tnc = (Limb.of_int Limb.length) - cnt in
+    let tnc = (64:uint64) - cnt in
     let msb = sz - 1 in
     let xp = ref (C.incr x 0) in
     let ghost ox = { x } in

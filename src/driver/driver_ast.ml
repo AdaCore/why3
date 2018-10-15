@@ -31,7 +31,6 @@ type th_rule =
   | Rsyntaxts  of qualid * string * bool
   | Rsyntaxfs  of qualid * string * bool
   | Rsyntaxps  of qualid * string * bool
-  | Rconverter of qualid * string * bool
   | Rliteral   of qualid * string * bool
   | Rremovepr  of qualid
   | Rremoveall

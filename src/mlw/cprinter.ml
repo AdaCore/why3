@@ -383,7 +383,6 @@ type info = Pdriver.printer_args = private {
   thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
-  converter   : Printer.syntax_map;
   literal     : Printer.syntax_map; (*TODO handle literals*)
 }
 
@@ -797,11 +796,8 @@ module MLToC = struct
 	 end
        else
 	 let e' =
-           match
-             (query_syntax info.syntax rs.rs_name,
-              query_syntax info.converter rs.rs_name) with
-           | _, Some s
-             | Some s, _ ->
+           match query_syntax info.syntax rs.rs_name with
+           | Some s ->
               begin
                 try
                   let _ =
@@ -823,8 +819,7 @@ module MLToC = struct
 		    | Tyapp (_,args) ->
                        Array.of_list (List.map (ty_of_ty info) args)
 		  in
-		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
-                            Mid.mem rs.rs_name info.converter)
+		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params, false)
                 with Not_found ->
 		  let args =
                     List.filter
@@ -884,6 +879,7 @@ module MLToC = struct
 	    Debug.dprintf debug_c_extraction "propagate constant %s for var %s@."
 			  (BigInt.to_string n) (pv_name pv).id_string;
             C.propagate_in_block (pv_name pv) ce (expr info env e)
+(*
           | Eapp (rs,_) when Mid.mem rs.rs_name info.converter ->
             begin match expr info {env with computes_return_value = false} le
               with
@@ -891,6 +887,7 @@ module MLToC = struct
               C.propagate_in_block (pv_name pv) se (expr info env e)
             | _ -> assert false
             end
+ *)
           | _->
             let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
             match expr info {env with computes_return_value = false} le with
@@ -1045,9 +1042,8 @@ module MLToC = struct
     | Eabsurd -> assert false
     | Eassign ([pv, ({rs_field = Some _} as rs), v]) ->
        let t =
-         match (query_syntax info.syntax rs.rs_name,
-                      query_syntax info.converter rs.rs_name) with
-         | _, Some s | Some s, _ ->
+         match query_syntax info.syntax rs.rs_name with
+         | Some s ->
             let _ =
               try
                 Str.search_forward
@@ -1061,9 +1057,8 @@ module MLToC = struct
 	      | Tyapp (_,args) ->
                  Array.of_list (List.map (ty_of_ty info) args)
 	    in
-            C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
-                      Mid.mem rs.rs_name info.converter)
-         | None, None -> raise (Unsupported ("assign not in driver")) in
+            C.Esyntax(s,ty_of_ty info rty, rtyargs, params, false)
+         | None -> raise (Unsupported ("assign not in driver")) in
        [], C.(Sexpr(Ebinop(Bassign, t, C.Evar v.pv_vs.vs_name)))
     | Eassign _ -> raise (Unsupported "assign")
     | Ehole | Eany _ -> assert false

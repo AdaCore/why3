@@ -172,10 +172,6 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
       in
       Mid.iter it th.th_local;
       th_uc
-    | Rconverter (q,s,b) ->
-        let cs = syntax_converter (find_ls th q) s b in
-        add_meta th cs meta;
-        th_uc
     | Rliteral (q,s,b) ->
         let cs = syntax_literal (find_ts th q) s b in
         add_meta th cs meta;
