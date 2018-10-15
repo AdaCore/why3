@@ -969,8 +969,8 @@ single_expr_:
             let e = { e with expr_desc = Ewhile (e1, inv, var, cont e2) } in
             let id = { id with id_str = id.id_str ^ break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
-        | Efor (id, ef, dir, et, inv, e1) ->
-            let e = { e with expr_desc = Efor (id,ef,dir,et,inv,cont e1) } in
+        | Efor (i, ef, dir, et, inv, e1) ->
+            let e = { e with expr_desc = Efor (i,ef,dir,et,inv,cont e1) } in
             let id = { id with id_str = id.id_str ^ break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
@@ -981,7 +981,7 @@ single_expr_:
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* loop_body DONE
+| FOR lident_nq EQUAL seq_expr for_dir seq_expr DO invariant* loop_body DONE
     { let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
@@ -1100,7 +1100,7 @@ assertion_kind:
 | ASSUME  { Expr.Assume }
 | CHECK   { Expr.Check }
 
-for_direction:
+for_dir:
 | TO      { Expr.To }
 | DOWNTO  { Expr.DownTo }
 
