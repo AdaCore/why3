@@ -318,8 +318,8 @@ and refine_function ~enc (table: correspondence_table) (term: tterm) =
           if Hstr.mem enc v then
             term
           else
+            let () = Hstr.add enc v () in
             let table = refine_variable_value ~enc table v tree in
-            Hstr.add enc v ();
             let tree = Mstr.find v table in
             TCvc4_Variable (Tree tree)
         )
