@@ -23,9 +23,8 @@ end
 module mach.int.Int32
 
   syntax type int32  "int32_t"
-  syntax literal int32 "0x%8x"
+  syntax literal int32 "%d"
 
-  syntax val of_int "(int32_t)(%1)"
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (-_)    "-%1"
@@ -221,9 +220,8 @@ end
 
 module mach.int.Int64
   syntax type int64  "int64_t"
-  syntax literal int64 "0x%16xLL"
+  syntax literal int64 "%dLL"
 
-  syntax val of_int "(int64_t)(%1)"
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
   syntax val (-_)    "-%1"
