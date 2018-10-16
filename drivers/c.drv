@@ -10,9 +10,8 @@ module ref.Ref
   syntax type ref "%1"
   syntax val ref "%1"
   syntax val (!_) "%1"
-  syntax converter (!_) "%1"
   syntax val (:=) "%1 = %2"
-  syntax converter contents "%1"
+  syntax val contents "%1"
 end
 
 module mach.int.Unsigned
@@ -22,10 +21,9 @@ module mach.int.Unsigned
 end
 
 module mach.int.Int32
-  syntax val of_int "%1"
-  syntax converter of_int "%1"
 
   syntax type int32  "int32_t"
+  syntax literal int32 "%d"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -44,15 +42,14 @@ module mach.int.UInt32Gen
 
   syntax type uint32 "uint32_t"
 
-  syntax converter max_uint32 "0xffffffff"
-  syntax converter length "32"
+  syntax val max_uint32 "0xffffffff"
+  syntax val length "32"
 
 end
 
 module mach.int.UInt32
 
-  syntax converter of_int "%1U"
-
+  syntax literal uint32 "0x%8xU"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -183,7 +180,7 @@ struct __lsld32_result
 struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 "
 
-  syntax converter of_int "%1U"
+  syntax literal uint32 "0x%8xU"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -222,10 +219,8 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 end
 
 module mach.int.Int64
-  syntax val of_int "%1"
-  syntax converter of_int "%1"
-
   syntax type int64  "int64_t"
+  syntax literal int64 "%dLL"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -244,14 +239,14 @@ module mach.int.UInt64Gen
 
   syntax type uint64 "uint64_t"
 
-  syntax converter max_uint64 "0xffffffffffffffff"
-  syntax converter length "64"
+  syntax val max_uint64 "0xffffffffffffffff"
+  syntax val length "64"
 
 end
 
 module mach.int.UInt64
 
-  syntax converter of_int "%1ULL"
+  syntax literal uint64 "0x%16xULL"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -506,7 +501,9 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   return result;
 }
 "
-  syntax converter of_int "%1ULL"
+  syntax literal uint64 "0x%16xULL"
+
+  syntax val uint64_max "0xffffffffffffffffULL"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"

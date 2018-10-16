@@ -126,7 +126,6 @@ type version = V20 | V26
 
 type info = {
   info_syn        : syntax_map;
-  info_converters : converter_map;
   info_rliteral   : syntax_map;
   mutable info_model : S.t;
   mutable info_in_goal : bool;
@@ -249,18 +248,7 @@ let rec print_term info fmt t =
       end
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
-    (* let's check if a converter applies *)
-    begin try
-      match tl with
-      | [ { t_node = Tconst _} ] ->
-        begin match query_converter info.info_converters ls with
-        | None -> raise Exit
-        | Some s -> syntax_arguments s (print_term info) fmt tl
-        end
-      | _ -> raise Exit
-    with Exit ->
-    (* non converter applies, then ... *)
-    match query_syntax info.info_syn ls.ls_name with
+    begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
@@ -287,7 +275,8 @@ in
 	    fprintf fmt "@[(%a@ %a)@]"
 	      (print_ident info) ls.ls_name
               (print_list space (print_term info)) tl
-        end end
+                end
+    end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
@@ -700,7 +689,6 @@ let print_task version args ?old:_ fmt task =
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
-    info_converters = Printer.get_converter_map task;
     info_rliteral = Printer.get_rliteral_map task;
     info_model = S.empty;
     info_in_goal = false;

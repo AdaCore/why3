@@ -145,18 +145,15 @@ module Print = struct
             List.exists (rs_equal rs) its.itd_constructors in
           List.exists is_constructor its
       | _ -> false in
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _, [{e_node = Econst _}] ->
-        syntax_arguments s print_constant fmt pvl
-    | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
+    match query_syntax info.info_syn rs.rs_name, pvl with
+    | Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
-    | _, None, tl when is_rs_tuple rs ->
+    | None, tl when is_rs_tuple rs ->
         fprintf fmt "@[(%a)@]"
           (print_list comma (print_expr info)) tl
-    | _, None, [t1] when isfield ->
+    | None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
-    | _, None, tl when isconstructor () -> let pjl = get_record info rs in
+    | None, tl when isconstructor () -> let pjl = get_record info rs in
         begin match pjl, tl with
           | [], [] ->
               (print_uident info) fmt rs.rs_name
@@ -171,9 +168,9 @@ module Print = struct
               fprintf fmt "@[<hov 2>{ @[%a@] }@]"
                 (print_list2 semi equal (print_rs info) (print_expr info))
                 (pjl, tl) end
-    | _, None, [] ->
+    | None, [] ->
         (print_lident info) fmt rs.rs_name
-    | _, _, tl ->
+    | _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]" (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
 
@@ -252,12 +249,8 @@ module Print = struct
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
-        begin match query_syntax info.info_convert rs.rs_name, pvl with
-          | Some s, [{e_node = Econst _}] ->
-              syntax_arguments s print_constant fmt pvl
-          | _ ->
-              fprintf fmt (protect_on paren "%a")
-                (print_apply info rs) pvl end
+       fprintf fmt (protect_on paren "%a")
+               (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2

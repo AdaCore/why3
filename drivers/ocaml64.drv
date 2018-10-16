@@ -206,7 +206,6 @@ module mach.int.Int63
   syntax type     int63     "int"
 
   syntax literal   int63    "%1"
-  syntax converter of_int   "%1"
 
   syntax val of_int "Z.to_int %1"
   syntax val to_int "Z.of_int %1"
@@ -310,8 +309,6 @@ module mach.onetime.OneTime
   syntax val  ge     "%1 >= %2"
   syntax val  eq     "%1 = %2"
   syntax val  ne     "%1 <> %2"
-
-  syntax converter to_peano "%1"
 
   syntax val transfer "%1"
   syntax val neg      "-%1"

@@ -275,8 +275,8 @@ module N
     ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
               (pelts r)[j] = old (pelts r)[j] }
   =
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
+    let zero = (0:int32) in
+    let one = (1:int32) in
     let i = ref zero in
     let xp = ref (C.incr x zero) in
     let rp = ref (C.incr r zero) in
@@ -309,7 +309,7 @@ module N
   =
    let i = ref sz in
    try
-     while Int32.(>=) !i (Int32.of_int 1) do
+     while Int32.(>=) !i (1:int32) do
        variant { p2i !i }
        invariant { 0 <= !i <= sz }
        invariant { forall j. !i <= j < sz ->
@@ -322,7 +322,7 @@ module N
        value_sub_frame_shift (pelts x) (pelts y) (p2i !i+x.offset)
                              (p2i !i+y.offset) ((p2i sz) - (p2i !i));
        let ghost k = p2i !i in
-       i := Int32.(-) !i (Int32.of_int 1);
+       i := Int32.(-) !i (1:int32);
 
        assert { 0 <= !i < sz };
        let lx = get_ofs x !i in
@@ -348,7 +348,7 @@ module N
                       >= power radix (k-1)
                       > ((value y (k-1)) - (value x (k-1)))
                        };
-             raise Return32 (Int32.of_int 1)
+             raise Return32 (1:int32)
             end
             else begin
              assert { ly > lx };
@@ -362,13 +362,13 @@ module N
                       >= power radix (k-1)
                       > ((value x (k-1)) - (value y (k-1)))
                      };
-            raise Return32 (Int32.(-_) (Int32.of_int 1))
+            raise Return32 (Int32.(-_) (1:int32))
             end
          end
        else ()
      done;
      value_sub_frame_shift (pelts x) (pelts y) x.offset y.offset (p2i sz);
-     Int32.of_int 0
+     (0:int32)
    with Return32 r -> r
    end
 
@@ -379,15 +379,15 @@ module N
      ensures { Int32.to_int result = 1 <-> value x sz = 0 }
    =
      let i = ref sz in
-     let uzero = Limb.of_int 0 in
+     let uzero = (0:uint64) in
      let lx = ref uzero in
      try
-       while Int32.(>=) !i (Int32.of_int 1) do
+       while Int32.(>=) !i (1:int32) do
          variant { p2i !i }
          invariant { 0 <= !i <= sz }
          invariant { value_sub (pelts x) (x.offset + !i) (x.offset + sz)=0 }
          let ghost k = p2i !i in
-         i := Int32.(-) !i (Int32.of_int 1);
+         i := Int32.(-) !i (1:int32);
          assert { 0 <= !i < sz };
          lx := get_ofs x !i;
          if not (Limb.(=) !lx uzero)
@@ -395,13 +395,13 @@ module N
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
            value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
-           raise Return32 (Int32.of_int 0);
+           raise Return32 (0:int32);
          end
          else begin
            assert { 1+2=3 };
          end
        done;
-       Int32.of_int 1
+       (1:int32)
      with Return32 r -> r
      end
 
@@ -412,8 +412,8 @@ module N
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
   =
-    let i = ref (Int32.of_int 0) in
-    let lzero = Limb.of_int 0 in
+    let i = ref (0:int32) in
+    let lzero = (0:uint64) in
     while Int32.(<) !i sz do
       invariant { 0 <= !i <= sz }
       variant { sz - !i }
@@ -422,7 +422,7 @@ module N
                 -> (pelts r)[j] = old (pelts r)[j] }
       set_ofs r !i lzero;
       value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done
 
   (** {3 Addition} *)
@@ -442,10 +442,10 @@ module N
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let c = ref y in
     let lx = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz && (not (Limb.(=) !c limb_zero)) do
       invariant { 0 <= !i <= sz }
       invariant { !i > 0 -> 0 <= !c <= 1 }
@@ -478,7 +478,7 @@ module N
                                + (power radix k) * !lx
              = value x k + y + (power radix k) * !lx
              = value x !i + y*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     if Int32.(=) !i sz then !c
     else begin
@@ -495,7 +495,7 @@ module N
       assert { value r !i + (power radix !i) * !c =
                   value x !i + y };
       let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
       value_sub_tail (pelts r) r.offset (r.offset + k);
       value_sub_tail (pelts x) x.offset (x.offset + k);
     done;
@@ -517,11 +517,11 @@ module N
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
     =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
@@ -564,7 +564,7 @@ module N
               = value x !i
                  + (value y k + (power radix k) * !ly)
               = value x !i + value y !i*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     !c
 
@@ -583,11 +583,11 @@ module N
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
  =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sy do
       variant { sy - !i }
       invariant { 0 <= !i <= sy }
@@ -629,7 +629,7 @@ module N
               = value x !i
                  + (value y k + (power radix k) * !ly)
               = value x !i + value y !i*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     try
     begin while Int32.(<) !i sx do
@@ -640,7 +640,7 @@ module N
       invariant { 0 <= !c <= 1 }
       invariant { forall j. (j < offset r \/ offset r + sx <= j)
                 -> (pelts r)[j] = old (pelts r)[j] }
-      (if (Limb.(=) !c (Limb.of_int 0)) then raise Break);
+      (if (Limb.(=) !c ((0:uint64))) then raise Break);
       label StartLoop2 in
       lx := get_ofs x !i;
       let res, carry = add_with_carry !lx limb_zero !c in
@@ -667,7 +667,7 @@ module N
                  + (power radix k) * !lx
               = value x !i
                  + value y sy*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     assert { !i = sx }
     end
@@ -699,7 +699,7 @@ module N
                so value r k
                   = value r k + power radix k * !c
                   = value x k + value y sy*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     !c
 
@@ -715,11 +715,11 @@ module N
     writes   { x.data.elts }
   =
     let ghost ox = { x } in
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sy do
       variant   { sy - !i }
       invariant { 0 <= !i <= sy }
@@ -770,7 +770,7 @@ module N
               = value ox !i
                  + (value y k + (power radix k) * !ly)
               = value ox !i + value y !i*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     try
     while Int32.(<) !i sx do
@@ -817,7 +817,7 @@ module N
                  + (power radix k) * !lx
               = value ox !i
                  + value y sy*) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     assert { !i = sx };
     !c
@@ -975,10 +975,10 @@ module N
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let b = ref y in
     let lx = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz && (not (Limb.(=) !b limb_zero)) do
       invariant { 0 <= !i <= sz }
       invariant { !i > 0 -> 0 <= !b <= 1 }
@@ -1012,7 +1012,7 @@ module N
              = value x k - y + power radix k * !lx
              = value x !i - y*)
       };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     if Int32.(=) !i sz then !b
     else begin
@@ -1029,7 +1029,7 @@ module N
       assert { value r !i - power radix !i * !b
                    = value x !i - y };
       let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
       value_sub_tail (pelts r) r.offset (r.offset + k);
       value_sub_tail (pelts x) x.offset (x.offset + k);
     done;
@@ -1050,11 +1050,11 @@ module N
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
@@ -1098,7 +1098,7 @@ module N
                  - (value y k + power radix k * !ly)
                = value x !i - value y !i*)
         };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
       done;
       !b
 
@@ -1117,12 +1117,12 @@ module N
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    let one = Int32.of_int 1 in
+    let i = ref (0:int32) in
+    let one = (1:int32) in
     while Int32.(<) !i sy do
       variant { sy - !i }
       invariant { 0 <= !i <= sy }
@@ -1174,7 +1174,7 @@ module N
       invariant { forall j. (j < offset r \/ offset r + sx <= j)
                 -> (pelts r)[j] = old (pelts r)[j] }
       invariant { 0 <= !b <= 1 }
-      (if (Limb.(=) !b (Limb.of_int 0)) then raise Break);
+      (if (Limb.(=) !b ((0:uint64))) then raise Break);
       label StartLoop2 in
       lx := get_ofs x !i;
       let res, borrow = sub_with_borrow !lx limb_zero !b in
@@ -1233,7 +1233,7 @@ module N
                   = value r k + power radix k * !b
                   = value x k - value y sy*)
              };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     !b
 
@@ -1249,12 +1249,12 @@ module N
               (pelts x)[j] = (pelts (old x))[j] }
   =
     let ghost ox = { x } in
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    let one = Int32.of_int 1 in
+    let i = ref (0:int32) in
+    let one = (1:int32) in
     while Int32.(<) !i sy do
       variant { sy - !i }
       invariant { 0 <= !i <= sy }
@@ -1506,10 +1506,10 @@ module N
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
@@ -1567,7 +1567,7 @@ module N
                = (value x k + (power radix k) * !lx) * y
                = value x !i * y *)
                };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     !c
 
@@ -1585,11 +1585,11 @@ module N
     ensures { forall j. (j < r.offset \/ r.offset + sz <= j) ->
               (pelts r)[j] = (pelts (old r))[j] }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let lr = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
@@ -1690,7 +1690,7 @@ module N
                      + (power radix k) * (!lr)
                      ) *)
                     };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done;
     !c
 
@@ -1709,11 +1709,11 @@ module N
               -> (pelts r)[j] = old (pelts r)[j] }
   =
     zero r sz;
-    let limb_zero = Limb.of_int 0 in
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 0)) in
+    let limb_zero = (0:uint64) in
+    let one = (1:int32) in
+    let rp = ref (C.incr r (0:int32)) in
     let ly = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       invariant { 0 <= !i <= sz }
       invariant { value r (!i + sz) = value x sz * value y !i }
@@ -1782,13 +1782,13 @@ module N
               = value (old r) (sz + sz)
                 + value x sz * value y sz }
   =
-    let limb_zero = Limb.of_int 0 in
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 0)) in
+    let limb_zero = (0:uint64) in
+    let one = (1:int32) in
+    let rp = ref (C.incr r (0:int32)) in
     let ly = ref limb_zero in
     let lr = ref limb_zero in
     let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       invariant { 0 <= !i <= sz }
       invariant { value r (!i + sz)
@@ -1982,9 +1982,9 @@ module N
     assert { value r (sx + 1) = value x sx * value y 1
              by value y 1 = !ly
              so value r sx + power radix sx * c = value x sx * value y 1 };
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 1)) in
-    let i = ref (Int32.of_int 1) in
+    let one = (1:int32) in
+    let rp = ref (C.incr r (1:int32)) in
+    let i = ref (1:int32) in
     while Int32.(<) !i sy do
       invariant { 1 <= !i <= sy }
       invariant { value r (!i + sx) = value x sx * value y !i }
@@ -2107,7 +2107,7 @@ module N
     returns { (r,_d) -> l2i r <= radix - (power 2 cnt) }
     returns { (_r,d) -> l2i d < power 2 cnt }
   =
-    let uzero = Limb.of_int 0 in
+    let uzero = (0:uint64) in
     if (Limb.(=) cnt uzero) then (x, uzero)
     else
     begin
@@ -2196,9 +2196,9 @@ module N
     ensures { value r sz + (power radix sz) * result =
               value x sz * (power 2 (cnt)) }
   =
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
+    let limb_zero = (0:uint64) in
+    let zero = (0:int32) in
+    let one = (1:int32) in
     let msb = Int32.(-) sz one in
     let xp = ref (C.incr x msb) in
     let rp = ref (C.incr r msb) in
@@ -2335,9 +2335,9 @@ module N
     ensures { result + radix * value r sz
               = value x sz * (power 2 (Limb.length - cnt)) }
   =
-    let tnc = Limb.(-) (Limb.of_int Limb.length) cnt in
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
+    let tnc = Limb.(-) (64:uint64) cnt in
+    let zero = (0:int32) in
+    let one = (1:int32) in
     let msb = Int32.(-) sz one in
     let xp = ref (C.incr x zero) in
     let rp = ref (C.incr r zero) in
@@ -2489,8 +2489,8 @@ module N
     requires { d >= div radix 2 }
     ensures { reciprocal result d }
   =
-    let v = div2by1 (Limb.of_int max_uint64)
-                    (Limb.(-) (Limb.of_int max_uint64) d)
+    let v = div2by1 uint64_max
+                    (Limb.(-) uint64_max d)
                     d in
     fact_div (radix * radix - 1) (l2i d) (- radix);
     assert { v = (div (radix*radix - 1) (d)) - radix
@@ -2519,7 +2519,7 @@ module N
     returns { q, r -> l2i q * d + l2i r = ul + radix * uh }
     returns { _q, r -> 0 <= l2i r < d }
   =
-    let one = Limb.of_int 1 in
+    let one = (1:uint64) in
     let ghost k = radix * radix - (radix + l2i v) * l2i d in
     let ghost u = l2i ul + radix * l2i uh in
     assert { 1 <= k <= d };
@@ -2769,9 +2769,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
               = value q sz * y + result }
     ensures { result < y }
   =
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
+    let limb_zero = (0:uint64) in
+    let zero = (0:int32) in
+    let one = (1:int32) in
     let msb = Int32.(-) sz one in
     let lx = ref limb_zero in
     let i = ref msb in
@@ -3028,8 +3028,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
   =
     let ghost d = l2i dl + radix * l2i dh in
     let ghost u = l2i ul + radix * (l2i um + radix * l2i uh) in
-    let zero = Limb.of_int 0 in
-    let one = Limb.of_int 1 in
+    let zero = (0:uint64) in
+    let one = (1:uint64) in
     let q1 = ref zero in
     let r0 = ref zero in
     let r1 = ref zero in
@@ -3545,7 +3545,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { reciprocal_3by2 result dh dl }
   =
     let ghost d = l2i dl + radix * l2i dh in
-    let one = Limb.of_int 1 in
+    let one = (1:uint64) in
     let v = ref (invert_limb dh) in
     assert { radix * radix - dh
              <= (radix + !v) * dh
@@ -3666,7 +3666,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     returns { (r,d) -> x - y - z = l2i r - radix * l2i d
                      /\ 0 <= d <= 2 }
   =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let u1, b1 = sub_with_borrow x y limb_zero in
     let u2, b2 = sub_with_borrow u1 z limb_zero in
     (u2, (Limb.(+) b1 b2))
@@ -3685,11 +3685,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
 =
-    let limb_zero = Limb.of_int 0 in
+    let limb_zero = (0:uint64) in
     let lx = ref limb_zero in
     let lr = ref limb_zero in
     let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
+    let i = ref (0:int32) in
     while Int32.(<) !i sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
@@ -3741,7 +3741,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       assert { rh = radix - 2 -> borrow <= 1
                by rl <= 1 };
       b := Limb.(+) rh borrow;
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
       assert { value r !i - (power radix !i) * !b
                  = value (old r) !i
                    - value x !i * y
@@ -3812,11 +3812,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value x sy < value y sy }
     ensures { 0 <= result <= 1 }
   =
-    let one = Int32.of_int 1 in
-    let two = Int32.of_int 2 in
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let uone = Limb.of_int 1 in
+    let one = (1:int32) in
+    let two = (2:int32) in
+    let limb_zero = (0:uint64) in
+    let zero = (0:int32) in
+    let uone = (1:uint64) in
     let xp = ref (C.incr x (Int32.(-) sx two)) in
     let qp = ref (C.incr q (Int32.(-) sx sy)) in
     let dh = C.get_ofs y (Int32.(-) sy one) in
@@ -4064,7 +4064,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let nx0 = C.get_ofs !xp one in
       if [@ex:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
       then begin
-        ql := Limb.of_int Limb.max_uint64;
+        ql := Limb.uint64_max;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
         value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
         let ghost vlx = value xd (p2i sy - 1) in
@@ -5923,11 +5923,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value x 2 < value y 2 }
     ensures { 0 <= result <= 1 }
   =
-    let one = Int32.of_int 1 in
-    let zero = Int32.of_int 0 in
-    let two = Int32.of_int 2 in
-    let uzero = Limb.of_int 0 in
-    let uone = Limb.of_int 1 in
+    let one = (1:int32) in
+    let zero = (0:int32) in
+    let two = (2:int32) in
+    let uzero = (0:uint64) in
+    let uone = (1:uint64) in
     let xp = ref (C.incr x (Int32.(-) sx two)) in
     let dh = C.get_ofs y one in
     let dl = C.get y in
@@ -6168,10 +6168,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value r sy < value y sy }
   =
     label Start in
-    let one = Int32.of_int 1 in
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let two = Int32.of_int 2 in
+    let one = (1:int32) in
+    let limb_zero = (0:uint64) in
+    let zero = (0:int32) in
+    let two = (2:int32) in
     value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
     value_sub_lower_bound (pelts y) y.offset (y.offset + p2i sy - 1);
     assert { value y sy >= power radix (sy - 1) };
@@ -6849,7 +6849,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value r sy < value y sy }
     diverges
   =
-    let uone = UInt32.of_int 1 in
+    let uone = (1:UInt32.uint32) in
     let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) uone) in
     c_assert (is_not_null nx);
     let ny = malloc (UInt32.of_int32 sy) in

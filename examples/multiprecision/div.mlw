@@ -47,8 +47,8 @@ module Div
     requires { d >= div radix 2 }
     ensures { reciprocal result d }
   =
-    let v = div2by1 (Limb.of_int max_uint64)
-                    ((Limb.of_int max_uint64) - d)
+    let v = div2by1 Limb.uint64_max
+                    (Limb.uint64_max - d)
                     d in
     fact_div (radix * radix - 1) (l2i d) (- radix);
     assert { v = (div (radix*radix - 1) (d)) - radix
@@ -1559,7 +1559,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       let nx0 = C.get_ofs !xp 1 in
       if [@ex:unlikely] (!x1 = dh && nx0 = dl)
       then begin
-        ql := Limb.of_int Limb.max_uint64;
+        ql := Limb.uint64_max;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
         value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
         let ghost vlx = value xd (p2i sy - 1) in
