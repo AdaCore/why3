@@ -138,8 +138,7 @@ module matrix.Matrix
 end
 
 module mach.int.Int31
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -157,8 +156,7 @@ module mach.int.Int31
   syntax val      (>)       "(>)"
 end
 module mach.int.Int63
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val      of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -234,4 +232,3 @@ module mach.matrix.Matrix63
   syntax val make          "Array.make_matrix"
   syntax val copy          "(Array.map Array.copy)"
 end
-
