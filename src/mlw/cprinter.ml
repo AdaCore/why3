@@ -799,11 +799,9 @@ module MLToC = struct
 	 let e' =
            match
              (query_syntax info.syntax rs.rs_name,
-              query_syntax info.converter rs.rs_name,
-              if rs_equal rs Pmodule.rs_ref_cons then Some "%1" else None) with
-           | _, _, Some s
-           | _, Some s, _
-           | Some s, _, _ ->
+              query_syntax info.converter rs.rs_name) with
+           | _, Some s
+             | Some s, _ ->
               begin
                 try
                   let _ =

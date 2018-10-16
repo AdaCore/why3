@@ -51,6 +51,7 @@ end
 module ref.Ref
   syntax type     ref      "%1 ref"
   syntax function contents "!%1"
+  syntax val      ref      "ref %1"
   syntax val      (!_)     "!%1"
   syntax val      (:=)     "%1 := %2"
 end

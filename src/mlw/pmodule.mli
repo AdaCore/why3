@@ -144,6 +144,7 @@ val ref_module : pmodule
 
 val its_ref     : itysymbol
 val ts_ref      : tysymbol
+val rs_ref      : rsymbol
 val rs_ref_cons : rsymbol
 val rs_ref_proj : rsymbol
 val ls_ref_cons : lsymbol

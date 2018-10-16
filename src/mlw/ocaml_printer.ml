@@ -344,8 +344,6 @@ module Print = struct
         fprintf fmt "@[(%a)@]" (print_list comma (print_expr info)) tl
     | _, None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
-    | _, None, [t1] when rs_equal rs rs_ref_cons ->
-        fprintf fmt "@[<hov 2>ref %a@]" (print_expr ~paren:true info) t1
     | _, None, tl when isconstructor () ->
         let pjl = get_record info rs in
         begin match pjl, tl with

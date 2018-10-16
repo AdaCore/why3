@@ -421,10 +421,17 @@ let ts_ref = its_ref.its_ts
 let ls_ref_cons = ls_of_rs rs_ref_cons
 let ls_ref_proj = ls_of_rs rs_ref_proj
 
+let rs_ref_ld, rs_ref =
+  let cty = rs_ref_cons.rs_cty in
+  let ityl = List.map (fun v -> v.pv_ity) cty.cty_args in
+  let_sym (id_fresh "ref") (c_app rs_ref_cons [] ityl cty.cty_result)
+
 let ref_module =
   let add uc d = add_pdecl_raw ~warn:false uc d in
   let uc = empty_module dummy_env (id_fresh "Ref") ["why3";"Ref"] in
-  close_module (List.fold_left add uc (create_type_decl [itd_ref]))
+  let uc = List.fold_left add uc (create_type_decl [itd_ref]) in
+  let uc = use_export uc builtin_module (* needed for "=" *) in
+  close_module (add uc (create_let_decl rs_ref_ld))
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in

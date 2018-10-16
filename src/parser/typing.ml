@@ -814,7 +814,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
   | Ptree.Eref ->
-      DEsym (RS rs_ref_cons)
+      DEsym (RS rs_ref)
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in
