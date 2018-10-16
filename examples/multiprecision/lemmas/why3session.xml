@@ -48,13 +48,13 @@
  </transf>
  </goal>
  <goal name="limb_max_bound" proved="true">
- <proof prover="5"><result status="valid" time="0.02" steps="5"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
  <goal name="VC prod_compat_strict_r" expl="VC for prod_compat_strict_r" proved="true">
  <proof prover="1"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="VC prod_compat_r" expl="VC for prod_compat_r" proved="true">
- <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="10"/></proof>
+ <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="11"/></proof>
  </goal>
  <goal name="VC prod_compat_strict_lr" expl="VC for prod_compat_strict_lr" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -62,43 +62,43 @@
  <goal name="VC value_sub" expl="VC for value_sub" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_frame" expl="VC for value_sub_frame" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_frame.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_frame.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="23"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
   <goal name="VC value_sub_frame.2" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.07" steps="34"/></proof>
+  <proof prover="5"><result status="valid" time="0.07" steps="46"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_frame_shift" expl="VC for value_sub_frame_shift" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_frame_shift.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_frame_shift.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_frame_shift.2" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="VC value_sub_frame_shift.3" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC value_sub_frame_shift.4" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC value_sub_frame_shift.4.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC value_sub_frame_shift.4.0.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.17"/></proof>
+    <proof prover="0"><result status="valid" time="0.04"/></proof>
     <proof prover="3"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
@@ -106,36 +106,36 @@
   </transf>
   </goal>
   <goal name="VC value_sub_frame_shift.5" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_frame_shift.6" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_tail" expl="VC for value_sub_tail" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_tail.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_tail.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_tail.2" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.07" steps="34"/></proof>
+  <proof prover="5"><result status="valid" time="0.07" steps="39"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_concat" expl="VC for value_sub_concat" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_concat.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC value_sub_concat.1" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="VC value_sub_concat.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="VC value_sub_concat.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.12"/></proof>
@@ -145,32 +145,32 @@
  <goal name="VC value_sub_head" expl="VC for value_sub_head" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_head.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="VC value_sub_head.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.06" steps="24"/></proof>
+  <proof prover="5"><result status="valid" time="0.06" steps="29"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_update" expl="VC for value_sub_update" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_update.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="VC value_sub_update.1" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="13"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="14"/></proof>
   </goal>
   <goal name="VC value_sub_update.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
-  </goal>
-  <goal name="VC value_sub_update.3" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
+  <goal name="VC value_sub_update.3" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
   <goal name="VC value_sub_update.4" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20" memlimit="2000"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="5" timelimit="20" memlimit="2000"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="VC value_sub_update.5" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20" memlimit="2000"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="5" timelimit="20" memlimit="2000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="VC value_sub_update.6" expl="postcondition" proved="true">
   <proof prover="1" memlimit="2000"><result status="valid" time="0.06"/></proof>
@@ -180,10 +180,10 @@
  <goal name="VC value_zero" expl="VC for value_zero" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_zero.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="9"/></proof>
   </goal>
   <goal name="VC value_zero.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="26"/></proof>
   </goal>
   <goal name="VC value_zero.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -193,30 +193,30 @@
  <goal name="VC value_sub_update_no_change" expl="VC for value_sub_update_no_change" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_update_no_change.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="31"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
   <goal name="VC value_sub_update_no_change.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_shift_no_change" expl="VC for value_sub_shift_no_change" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_shift_no_change.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="21"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="VC value_sub_shift_no_change.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_lower_bound" expl="VC for value_sub_lower_bound" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_lower_bound.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="VC value_sub_lower_bound.1" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_lower_bound.2" expl="postcondition" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.06"/></proof>
@@ -226,36 +226,36 @@
  <goal name="VC value_sub_upper_bound" expl="VC for value_sub_upper_bound" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_upper_bound.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="8"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
   <goal name="VC value_sub_upper_bound.1" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC value_sub_upper_bound.2" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="10"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="11"/></proof>
   </goal>
   <goal name="VC value_sub_upper_bound.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
   <goal name="VC value_sub_upper_bound.4" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.08" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.08" steps="34"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_lower_bound_tight" expl="VC for value_sub_lower_bound_tight" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_lower_bound_tight.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="13"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="14"/></proof>
   </goal>
   <goal name="VC value_sub_lower_bound_tight.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC value_sub_upper_bound_tight" expl="VC for value_sub_upper_bound_tight" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC value_sub_upper_bound_tight.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
   <goal name="VC value_sub_upper_bound_tight.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -263,10 +263,10 @@
  </transf>
  </goal>
  <goal name="VC value_tail" expl="VC for value_tail" proved="true">
- <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="9"/></proof>
+ <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
  <goal name="VC value_concat" expl="VC for value_concat" proved="true">
- <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="26"/></proof>
+ <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="27"/></proof>
  </goal>
  <goal name="VC value_sub_eq" expl="VC for value_sub_eq" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
