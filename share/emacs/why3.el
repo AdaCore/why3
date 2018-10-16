@@ -25,7 +25,7 @@
 (defconst why3-font-lock-keywords-1
   (list
    `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "pure" "returns" "raises" "reads" "writes" "alias" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "partial" "raise" "return" "break" "continue" "try" "with" "theory" "uses" "module" "converter" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "partial" "raise" "return" "break" "continue" "try" "with" "theory" "uses" "module" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 
