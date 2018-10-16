@@ -1,7 +1,7 @@
 :x: marks a potential source of incompatibility
 
-Version 1.1.0, ...
-------------------
+Version 1.1.0, October 17, 2018
+-------------------------------
 
 Core
   * variants can now be inferred on some lemma functions
@@ -13,7 +13,7 @@ Core
 
 API
   * added `Call_provers.interrupt_call` to interrupt a running prover
-    [contribution Pierre-Yves Strub <pierre-yves@strub.nu>]
+    (contribution by Pierre-Yves Strub)
 
 Language
   * program functions can now be marked `partial` to prevent them from
@@ -35,10 +35,11 @@ Provers
   * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
   * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
   * support for Coq 8.8.1 (released Jun 29, 2018)
+  * support for Coq 8.8.2 (released Sep 26, 2018)
   * support for CVC4 1.6 (released Jun 25, 2018)
   * support for Z3 4.7.1 (released May 23, 2018)
   * support for Isabelle 2018 (released Aug 2018)
-    [Contribution Stefan Berghofer <stefan.berghofer@secunet.com>]
+    (contribution by Stefan Berghofer)
   * dropped support for Isabelle 2016 (2017 still supported) :x:
   * dropped support for Alt-Ergo versions < 2.0.0 :x:
 
