@@ -6,7 +6,10 @@ theory bv.BV_Gen
 end
 
 theory bv.BV64
-  (* syntax converter of_int "((_ int2bv 64) %1)" *)
+  (* mapping of_int to int2bv is disabled because it breaks proofs
+     in examples/queens_bv, examples/bitwalker *)
+
+  (* syntax function of_int "((_ int2bv 64) %1)" *)
   syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
@@ -14,7 +17,7 @@ theory bv.BV64
 end
 
 theory bv.BV32
-  (* syntax converter of_int "((_ int2bv 32) %1)" *)
+  (* syntax function of_int "((_ int2bv 32) %1)" *)
   syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
@@ -22,7 +25,7 @@ theory bv.BV32
 end
 
 theory bv.BV16
-  (* syntax converter of_int "((_ int2bv 16) %1)" *)
+  (* syntax function of_int "((_ int2bv 16) %1)" *)
   syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
@@ -30,7 +33,7 @@ theory bv.BV16
 end
 
 theory bv.BV8
-  (* syntax converter of_int "((_ int2bv 8) %1)" *)
+  (* syntax function of_int "((_ int2bv 8) %1)" *)
   syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth

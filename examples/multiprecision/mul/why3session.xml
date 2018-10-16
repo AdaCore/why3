@@ -6,16 +6,17 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mul.mlw" proved="true">
 <theory name="Mul" proved="true">
  <goal name="VC wmpn_mul_1" expl="VC for wmpn_mul_1" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC wmpn_mul_1.0" expl="loop invariant init" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="VC wmpn_mul_1.1" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="70"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="75"/></proof>
   </goal>
   <goal name="VC wmpn_mul_1.2" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -23,7 +24,7 @@
   <goal name="VC wmpn_mul_1.3" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_1.3.0" expl="VC for wmpn_mul_1" proved="true">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="18"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="19"/></proof>
    </goal>
    <goal name="VC wmpn_mul_1.3.1" expl="VC for wmpn_mul_1" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -31,7 +32,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul_1.4" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="43"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_mul_1.4.0" expl="VC for wmpn_mul_1" proved="true">
    <proof prover="2"><result status="valid" time="0.06"/></proof>
@@ -114,7 +115,7 @@
      </goal>
      <goal name="VC wmpn_mul_1.14.0.0.1" proved="true">
      <proof prover="2"><result status="valid" time="0.35"/></proof>
-     <proof prover="3"><result status="valid" time="0.29"/></proof>
+     <proof prover="3"><result status="valid" time="0.16"/></proof>
      </goal>
      <goal name="VC wmpn_mul_1.14.0.0.2" proved="true">
      <proof prover="2"><result status="valid" time="0.26"/></proof>
@@ -144,7 +145,7 @@
   <proof prover="2"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_mul_1.20" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC wmpn_mul_1.21" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -157,7 +158,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_1.1" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="69"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="74"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_1.2" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -189,7 +190,7 @@
   <goal name="VC wmpn_addmul_1.6" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_addmul_1.6.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="43"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="44"/></proof>
    </goal>
   </transf>
   </goal>
@@ -233,7 +234,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_1.13" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="2.55"/></proof>
+  <proof prover="0"><result status="valid" time="2.17"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_1.14" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -257,10 +258,10 @@
     <goal name="VC wmpn_addmul_1.14.5.0" expl="VC for wmpn_addmul_1" proved="true">
     <transf name="apply" proved="true" arg1="prod_compat_r">
      <goal name="VC wmpn_addmul_1.14.5.0.0" expl="apply premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.03"/></proof>
+     <proof prover="2"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC wmpn_addmul_1.14.5.0.1" expl="apply premises" proved="true">
-     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     <proof prover="2"><result status="valid" time="0.03"/></proof>
      </goal>
     </transf>
     </goal>
@@ -296,7 +297,7 @@
     <goal name="VC wmpn_addmul_1.20.0.0" expl="assertion" proved="true">
     <transf name="reflection_f" proved="true" arg1="mp_decision">
      <goal name="VC wmpn_addmul_1.20.0.0.0" expl="assertion" proved="true">
-     <proof prover="0"><result status="valid" time="0.38"/></proof>
+     <proof prover="0"><result status="valid" time="0.24"/></proof>
      </goal>
      <goal name="VC wmpn_addmul_1.20.0.0.1" proved="true">
      <proof prover="3"><result status="valid" time="0.27"/></proof>
@@ -329,7 +330,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_1.27" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_1.28" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -339,10 +340,10 @@
  <goal name="VC wmpn_mul_n" expl="VC for wmpn_mul_n" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC wmpn_mul_n.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.09" steps="27"/></proof>
+  <proof prover="5"><result status="valid" time="0.09" steps="28"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.1" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.2" expl="loop invariant init" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -355,10 +356,10 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul_n.3" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="95"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="99"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.4" expl="loop invariant init" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="27"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.5" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -402,7 +403,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.12" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="73"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="74"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.13" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -410,7 +411,7 @@
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC wmpn_mul_n.13.1" expl="VC for wmpn_mul_n" proved="true">
-   <proof prover="5"><result status="valid" time="0.06" steps="42"/></proof>
+   <proof prover="5"><result status="valid" time="0.06" steps="43"/></proof>
    </goal>
   </transf>
   </goal>
@@ -424,7 +425,7 @@
     <goal name="VC wmpn_mul_n.15.0.0" expl="precondition" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC wmpn_mul_n.15.0.0.0" expl="precondition" proved="true">
-     <proof prover="5" timelimit="20" memlimit="3000"><result status="valid" time="0.04" steps="86"/></proof>
+     <proof prover="5" timelimit="20" memlimit="3000"><result status="valid" time="0.04" steps="87"/></proof>
      </goal>
     </transf>
     </goal>
@@ -433,7 +434,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul_n.16" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.12" steps="54"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.12" steps="55"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.17" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="4.35"/></proof>
@@ -442,13 +443,13 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.19" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="56"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="57"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.20" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="72"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.21" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="107"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="108"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.22" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.12"/></proof>
@@ -473,7 +474,7 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.28" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.10" steps="77"/></proof>
+  <proof prover="5"><result status="valid" time="0.10" steps="78"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.29" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -489,22 +490,22 @@
   <goal name="VC wmpn_mul_n.30" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_n.30.0" expl="assertion" proved="true">
-   <proof prover="0" timelimit="10"><result status="valid" time="0.86"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="0.50"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_mul_n.31" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="80"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="81"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.32" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_n.32.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.09" steps="81"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.09" steps="82"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_mul_n.33" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="82"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.14" steps="83"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.34" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -582,7 +583,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.46" expl="postcondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="38"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
   <goal name="VC wmpn_mul_n.47" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -592,7 +593,7 @@
  <goal name="VC wmpn_addmul_n" expl="VC for wmpn_addmul_n" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC wmpn_addmul_n.0" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.12" steps="27"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.1" expl="loop invariant init" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -614,7 +615,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.2" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="98"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="102"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.3" expl="loop invariant init" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -623,7 +624,7 @@
     <goal name="VC wmpn_addmul_n.3.0.0" expl="loop invariant init" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="VC wmpn_addmul_n.3.0.0.0" expl="loop invariant init" proved="true">
-     <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="22"/></proof>
+     <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="23"/></proof>
      </goal>
     </transf>
     </goal>
@@ -641,28 +642,28 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.7" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="22"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="23"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.8" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.05" steps="8"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.05" steps="9"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.9" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.10" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.11" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="2.74"/></proof>
+  <proof prover="0"><result status="valid" time="2.35"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="52"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="53"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.13" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="37"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="38"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.14" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="82"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.15" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -685,13 +686,13 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.16" expl="assertion" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="49"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.02" steps="50"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.17" expl="assertion" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.18" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="66"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.05" steps="67"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.19" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -705,10 +706,10 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.20" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="52"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="53"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.21" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.08" steps="55"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.08" steps="56"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.22" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -717,7 +718,7 @@
     <goal name="VC wmpn_addmul_n.22.0.0" expl="precondition" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC wmpn_addmul_n.22.0.0.0" expl="precondition" proved="true">
-     <proof prover="5"><result status="valid" time="0.04" steps="56"/></proof>
+     <proof prover="5"><result status="valid" time="0.04" steps="57"/></proof>
      </goal>
     </transf>
     </goal>
@@ -726,7 +727,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.23" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="72"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.24" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.44"/></proof>
@@ -738,22 +739,22 @@
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.27" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.05" steps="74"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.05" steps="75"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.28" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="75"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.06" steps="76"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.29" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="4.78"/></proof>
+  <proof prover="0"><result status="valid" time="3.80"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.30" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.32" steps="114"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.32" steps="115"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.31" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.32" expl="precondition" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.32" steps="79"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.32" steps="80"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.33" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -767,7 +768,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.34" expl="assertion" proved="true">
-  <proof prover="5" timelimit="20"><result status="valid" time="0.47" steps="81"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="0.29" steps="82"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.35" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -865,7 +866,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_addmul_n.48" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="33"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
  </transf>
  </goal>
@@ -874,7 +875,7 @@
   <goal name="VC wmpn_mul_basecase.0" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_basecase.0.0" expl="VC for wmpn_mul_basecase" proved="true">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="12"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.04" steps="13"/></proof>
    </goal>
    <goal name="VC wmpn_mul_basecase.0.1" expl="VC for wmpn_mul_basecase" proved="true">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -882,22 +883,22 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul_basecase.1" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.2" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="30"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.3" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.4" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="18"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.5" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="36"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.6" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="26"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.7" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -905,29 +906,29 @@
    <proof prover="0"><result status="valid" time="0.69"/></proof>
    </goal>
    <goal name="VC wmpn_mul_basecase.7.1" expl="VC for wmpn_mul_basecase" proved="true">
-   <proof prover="0"><result status="valid" time="0.27"/></proof>
+   <proof prover="0"><result status="valid" time="0.41"/></proof>
    </goal>
    <goal name="VC wmpn_mul_basecase.7.2" expl="VC for wmpn_mul_basecase" proved="true">
-   <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="72"/></proof>
+   <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="73"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_mul_basecase.8" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="46"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.9" expl="loop invariant init" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="35"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.10" expl="loop invariant init" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="37"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="38"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.11" expl="loop invariant init" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.09" steps="38"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.09" steps="39"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.12" expl="loop invariant init" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_basecase.12.0" expl="loop invariant init" proved="true">
-   <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="38"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="39"/></proof>
    </goal>
   </transf>
   </goal>
@@ -938,10 +939,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.15" expl="loop invariant init" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="38"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.03" steps="39"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.16" expl="loop invariant init" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="83"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.06" steps="84"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.17" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
@@ -950,27 +951,27 @@
   <proof prover="0"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.19" expl="assertion" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="88"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.03" steps="89"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.20" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="70"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="71"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.21" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="53"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="54"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.22" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="106"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="107"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.23" expl="assertion" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="65"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="66"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.24" expl="assertion" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.54" steps="135"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.54" steps="136"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.25" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_mul_basecase.25.0" expl="precondition" proved="true">
-   <proof prover="5" memlimit="2000"><result status="valid" time="0.13" steps="66"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="0.13" steps="67"/></proof>
    </goal>
   </transf>
   </goal>
@@ -997,16 +998,16 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.31" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="84"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.14" steps="85"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.32" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.22" steps="85"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.22" steps="86"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.33" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.34" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.38" steps="87"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.38" steps="88"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.35" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -1020,10 +1021,10 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul_basecase.36" expl="assertion" proved="true">
-  <proof prover="5" timelimit="10" memlimit="2000"><result status="valid" time="4.57" steps="132"/></proof>
+  <proof prover="5" timelimit="10" memlimit="2000"><result status="valid" time="3.64" steps="133"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.37" expl="assertion" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="3.79" steps="90"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="2.51" steps="91"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.38" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -1040,16 +1041,16 @@
         <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0" expl="assertion" proved="true">
         <transf name="apply" proved="true" arg1="HR">
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.2" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.4" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1064,7 +1065,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.9" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1076,22 +1077,22 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.12" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.24"/></proof>
+         <proof prover="3"><result status="valid" time="0.18"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.13" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.14" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.04"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.15" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.04"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.16" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.04"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.17" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.18" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1106,10 +1107,10 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.22" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.18"/></proof>
+         <proof prover="3"><result status="valid" time="0.19"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.23" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.24" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1157,7 +1158,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.39" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.40" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1181,7 +1182,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.47" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.48" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1199,10 +1200,10 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.53" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.20"/></proof>
+         <proof prover="3"><result status="valid" time="0.19"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.54" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.55" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1223,7 +1224,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.61" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="2"><result status="valid" time="0.23"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.62" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1250,37 +1251,37 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.70" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.71" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.72" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="2"><result status="valid" time="0.17"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.73" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.74" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.26"/></proof>
+         <proof prover="3"><result status="valid" time="0.19"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.75" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.76" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.77" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.78" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.79" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.80" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.03"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.81" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1289,7 +1290,7 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.83" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.04"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.84" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1307,10 +1308,10 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.89" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.90" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="2"><result status="valid" time="0.23"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.91" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1328,13 +1329,13 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.96" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.97" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.98" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.99" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1352,10 +1353,10 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.104" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.01"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.105" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="2"><result status="valid" time="0.22"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.106" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1364,25 +1365,28 @@
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.108" expl="apply premises" proved="true">
-         <proof prover="2"><result status="valid" time="0.22"/></proof>
+         <proof prover="3"><result status="valid" time="0.01"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.109" expl="apply premises" proved="true">
-         <proof prover="2"><result status="valid" time="0.23"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.110" expl="apply premises" proved="true">
-         <proof prover="2"><result status="valid" time="0.17"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.111" expl="apply premises" proved="true">
-         <proof prover="2"><result status="valid" time="0.23"/></proof>
+         <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.112" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.02"/></proof>
+         <proof prover="3"><result status="valid" time="0.03"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.113" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
          </goal>
          <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.114" expl="apply premises" proved="true">
          <proof prover="3"><result status="valid" time="0.02"/></proof>
+         </goal>
+         <goal name="VC wmpn_mul_basecase.38.0.0.0.0.0.0.115" expl="apply premises" proved="true">
+         <proof prover="4"><result status="valid" time="0.16"/></proof>
          </goal>
         </transf>
         </goal>
@@ -1435,7 +1439,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.50" expl="postcondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="49"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.04" steps="50"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.51" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
