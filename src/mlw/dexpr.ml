@@ -1487,8 +1487,10 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
 and var_defn uloc env (id,gh,kind,de) =
   let e = match kind with
     | RKlemma -> Loc.errorm ?loc:id.pre_loc
-        "Lemma-functions must have parameters"
-    | RKfunc | RKpred | RKlocal | RKnone ->
+        "lemma-functions must have parameters"
+    | RKlocal -> Loc.errorm ?loc:id.pre_loc
+        "illegal kind qualifier"
+    | RKfunc | RKpred | RKnone ->
         let e = expr uloc {env with ugh = gh} de in
         e_ghostify env.cgh e in
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
@@ -1578,10 +1580,11 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
         "Function %s returns unexpected ghost results" nm;
       fst (let_sym id ~ghost ~kind c)
   | (RKfunc | RKpred), ([], _) ->
-      (* FIXME: let ghost constant c = <effectful> *)
       let e = expr uloc {env_empty with ugh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
+      if not e.e_ity.ity_pure then Loc.errorm ?loc
+        "This value is mutable, it cannot be used as pure";
       let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
       (* the rsymbol will carry a single postcondition "the result
          is equal to the logical constant". Any user-written spec
