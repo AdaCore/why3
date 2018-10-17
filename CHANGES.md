@@ -8,7 +8,7 @@ Core
   * coercions are now supported for `if` and `match` branches
   * `interrupt` command should now properly interrupt running provers.
   * clearer typing error messages thanks to printing qualified names
-  * fixed handling of prover upgrades, resurected the policy
+  * fixed handling of prover upgrades, resurrected the policy
     "duplicate" and added a policy "remove"
 
 API
@@ -25,7 +25,7 @@ Language
   * range types have now a default ordering to be used in `variant` clause
 
 Standard library
-  * library `Ieee_float`: floating-point operations can now be used in
+  * library `ieee_float`: floating-point operations can now be used in
     programs
 
 Transformations
