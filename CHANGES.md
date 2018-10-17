@@ -1,19 +1,19 @@
 :x: marks a potential source of incompatibility
 
-Version 1.1.0, ...
-------------------
+Version 1.1.0, October 17, 2018
+-------------------------------
 
 Core
   * variants can now be inferred on some lemma functions
   * coercions are now supported for `if` and `match` branches
   * `interrupt` command should now properly interrupt running provers.
   * clearer typing error messages thanks to printing qualified names
-  * fixed handling of prover upgrades, resurected the policy
+  * fixed handling of prover upgrades, resurrected the policy
     "duplicate" and added a policy "remove"
 
 API
   * added `Call_provers.interrupt_call` to interrupt a running prover
-    [contribution Pierre-Yves Strub <pierre-yves@strub.nu>]
+    (contribution by Pierre-Yves Strub)
 
 Language
   * program functions can now be marked `partial` to prevent them from
@@ -25,7 +25,7 @@ Language
   * range types have now a default ordering to be used in `variant` clause
 
 Standard library
-  * library `Ieee_float`: floating-point operations can now be used in
+  * library `ieee_float`: floating-point operations can now be used in
     programs
 
 Transformations
@@ -35,10 +35,11 @@ Provers
   * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
   * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
   * support for Coq 8.8.1 (released Jun 29, 2018)
+  * support for Coq 8.8.2 (released Sep 26, 2018)
   * support for CVC4 1.6 (released Jun 25, 2018)
   * support for Z3 4.7.1 (released May 23, 2018)
   * support for Isabelle 2018 (released Aug 2018)
-    [Contribution Stefan Berghofer <stefan.berghofer@secunet.com>]
+    (contribution by Stefan Berghofer)
   * dropped support for Isabelle 2016 (2017 still supported) :x:
   * dropped support for Alt-Ergo versions < 2.0.0 :x:
 
