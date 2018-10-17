@@ -1507,6 +1507,15 @@ let add_vc_decl kn id f vcl =
   if can_simp f then vcl else mk_vc_decl kn id f :: vcl
 
 let vc env kn tuc d = match d.pd_node with
+  | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
+      []
+  | PDlet (LDvar (v, e)) ->
+      let env = mk_env env kn tuc in
+      let c, e = match e.e_node with
+        | Eexec ({c_node = Cfun e} as c, _) -> c, e
+        | _ -> c_fun [] [] [] Mxs.empty Mpv.empty e, e in
+      let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
+      add_vc_decl kn v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn tuc in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
