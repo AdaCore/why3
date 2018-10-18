@@ -248,6 +248,7 @@ val prepare_edition :
     session directory, and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
+exception GoalNodeDetached of proofNodeID
 
 val schedule_transformation :
   controller ->

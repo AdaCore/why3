@@ -1154,12 +1154,15 @@ end
     let rec apply_transform nid t args =
       match nid with
       | APn id ->
-        if Session_itp.check_if_already_exists d.cont.controller_session id t args then
-          P.notify (Message (Information "Transformation already applied"))
+        if Session_itp.is_detached d.cont.controller_session nid then
+          P.notify (Message (Information "Transformation cannot apply on detached node"))
         else
-          let callback = callback_update_tree_transform t args in
-          C.schedule_transformation d.cont id t args ~callback
-            ~notification:(notify_change_proved d.cont)
+          if Session_itp.check_if_already_exists d.cont.controller_session id t args then
+            P.notify (Message (Information "Transformation already applied"))
+          else
+            let callback = callback_update_tree_transform t args in
+            C.schedule_transformation d.cont id t args ~callback
+              ~notification:(notify_change_proved d.cont)
       | APa panid ->
         let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
         apply_transform (APn parent_id) t args
@@ -1513,6 +1516,11 @@ end
               (Error
                  (Pp.sprintf "Transformation %s with arg [%s] already exists"
                              name args)))
+      | C.GoalNodeDetached _id ->
+        P.notify
+           (Message
+              (Information
+                 ("Transformation cannot apply on detached node")))
       | e when not (Debug.test_flag Debug.stack_trace)->
          P.notify
            (Message
