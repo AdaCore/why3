@@ -793,8 +793,8 @@ let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
       e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         i' (clone_invl cl ism invl) (clone_expr cl ism e)
-  | Eraise (xs, e) ->
-      e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+  | Eraise (xs, e1) ->
+      e_raise (sm_find_xs sm xs) (clone_expr cl sm e1) (clone_ity cl e.e_ity)
   | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->
       let xs' = create_xsymbol (id_clone id) ~mask (clone_ity cl ity) in
       e_exn xs' (clone_expr cl (sm_save_xs sm xs xs') e)
