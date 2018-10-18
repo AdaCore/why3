@@ -717,6 +717,7 @@ let schedule_edition c id pr ~callback ~notification =
   run_timeout_handler ()
 
 exception TransAlreadyExists of string * string
+exception GoalNodeDetached of proofNodeID
 
 (*** { 2 transformations} *)
 
@@ -757,6 +758,8 @@ let schedule_transformation c id name args ~callback ~notification =
     end;
     false
   in
+  if Session_itp.is_detached c.controller_session (APn id) then
+    raise (GoalNodeDetached id);
   if Session_itp.check_if_already_exists c.controller_session id name args then
     raise (TransAlreadyExists (name, List.fold_left (fun acc s -> s ^ " " ^ acc) "" args));
   S.idle ~prio:0 apply_trans;
