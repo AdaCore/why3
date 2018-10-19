@@ -443,7 +443,7 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
-    | Eany _ -> assert false
+    | Eany _ -> () (* FIXME *)
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
