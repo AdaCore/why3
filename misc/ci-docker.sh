@@ -6,6 +6,10 @@ if test -z "$DEBIAN_VERSION"; then
     DEBIAN_VERSION="stable"
 fi
 
+if test -z "$COMPILER"; then
+    COMPILER="system"
+fi
+
 autoconf && (automake --add-missing 2> /dev/null || true)
 IMAGE=bench-image-$COMPILER-$DEBIAN_VERSION
 
