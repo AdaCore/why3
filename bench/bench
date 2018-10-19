@@ -98,6 +98,7 @@ drivers () {
 }
 
 valid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
@@ -113,6 +114,7 @@ valid_goals () {
 }
 
 invalid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
     for f in $1/*.mlw; do

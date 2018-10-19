@@ -9,9 +9,14 @@ stages:
   script:
     - misc/ci-docker.sh misc/ci-local.sh
 
-build:
+build-system:
   variables:
     COMPILER: system
+  <<: *build_definition
+
+build-4.02.3:
+  variables:
+    COMPILER: 4.02.3
   <<: *build_definition
 
 build-4.03.0:
@@ -39,21 +44,24 @@ build-4.07.0:
     COMPILER: 4.07.0
   <<: *build_definition
 
-bench:
+.bench_template1: &bench_definition_always
   stage: test
-  variables:
-    COMPILER: 4.04.0
-    OPAM_PACKAGES: alt-ergo.2.0.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh bench ide
 
-.bench_template: &bench_definition
-  stage: test
-  script:
-    - misc/ci-docker.sh misc/ci-local.sh bench ide
+.bench_template2: &bench_definition
+  <<: *bench_definition_always
   only:
     - tags
     - schedules
+
+bench-system:
+  <<: *bench_definition_always
+
+bench-4.02.3:
+  variables:
+    COMPILER: 4.02.3
+  <<: *bench_definition
 
 bench-4.03.0:
   variables:
@@ -78,12 +86,12 @@ bench-4.06.1:
 bench-4.07.0:
   variables:
     COMPILER: 4.07.0
-  <<: *bench_definition
+  <<: *bench_definition_always
 
-full:
+full-4.07.0:
   stage: test
   variables:
-    COMPILER: 4.04.0
+    COMPILER: 4.07.0
     DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
     OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx alt-ergo.2.0.0
   script:
@@ -92,7 +100,7 @@ full:
 nightly-bench:
   stage: nightly
   variables:
-    COMPILER: 4.04.0
+    COMPILER: 4.05.0
     DEBIAN_PACKAGES: cvc3 spass
     OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.1 coq-flocq.2.6.1
   script:
@@ -101,7 +109,7 @@ nightly-bench:
 ce-bench:
   stage: nightly
   variables:
-    COMPILER: 4.04.0
+    COMPILER: 4.05.0
     DEBIAN_PACKAGES: cvc3 spass
     OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.1 coq-flocq.2.6.1
   script:
