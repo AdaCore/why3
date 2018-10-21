@@ -597,7 +597,7 @@ binder:
 
 binder_vars:
 | binder_vars_head  { fst $1, match snd $1 with
-                        | [] -> Loc.error ~loc:(floc $startpos $endpos) Error
+                        | [] -> Loc.error ~loc:(floc $endpos $endpos) Error
                         | bl -> List.rev bl }
 | binder_vars_rest  { $1 }
 
@@ -615,15 +615,16 @@ binder_vars_rest:
 
 binder_vars_head:
 | ty {
+    let of_id id = id.id_loc, binder_of_id id in
     let push acc = function
-      | PTtyapp (Qident id, []) -> (id.id_loc, binder_of_id id) :: acc
-      | _ -> Loc.error ~loc:(floc $startpos $endpos) Error in
+      | PTtyapp (Qident id, []) -> of_id id :: acc
+      | _ -> Loc.error ~loc:(floc $endpos $endpos) Error in
     match $1 with
       | PTtyapp (Qident {id_str = "ref"}, l) ->
           true, List.fold_left push [] l
       | PTtyapp (Qident id, l) ->
-          false, List.fold_left push [id.id_loc, binder_of_id id] l
-      | _ -> Loc.error ~loc:(floc $startpos $endpos) Error }
+          false, List.fold_left push [of_id id] l
+      | _ -> Loc.error ~loc:(floc $endpos $endpos) Error }
 
 binder_var:
 | attrs(lident_nq)      { floc $startpos $endpos, Some $1 }
@@ -720,6 +721,7 @@ term_dot: mk_term(term_dot_) { $1 }
 
 term_arg_:
 | qualid                    { Tident $1 }
+| AMP qualid                { Tasref $2 }
 | numeral                   { Tconst $1 }
 | TRUE                      { Ttrue }
 | FALSE                     { Tfalse }
@@ -881,7 +883,11 @@ assign_expr:
 | expr LARROW expr
     { let loc = floc $startpos $endpos in
       let rec down ll rl = match ll, rl with
-        | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl -> (e1,q,e2) :: down ll rl
+        | ({expr_desc = Eident q} as e1)::ll, e2::rl ->
+            let e1 = {e1 with expr_desc = Easref q} in
+            (e1, None, e2) :: down ll rl
+        | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl ->
+            (e1, Some q, e2) :: down ll rl
         | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_ ->
             begin match Ident.sn_decode id.id_str with
               | Ident.SNget _ -> Loc.errorm ~loc
@@ -1078,6 +1084,7 @@ expr_dot: e = mk_expr(expr_dot_) { e }
 
 expr_arg_:
 | qualid                    { Eident $1 }
+| AMP qualid                { Easref $2 }
 | numeral                   { Econst $1 }
 | TRUE                      { Etrue }
 | FALSE                     { Efalse }

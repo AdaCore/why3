@@ -220,6 +220,20 @@ let mk_closure crcmap loc ls =
   let vl = Lists.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
+(* handle auto-dereference in logical terms *)
+
+let vs_dref vs = Sattr.mem Pmodule.ref_attr vs.vs_name.id_attrs
+
+let undereference dt =
+  let to_deref = function
+    | DTvar _ -> true (* needed for DEpure *)
+    | DTgvar vs -> vs_dref vs
+    | _ -> false in
+  match dt.dt_node with
+  | DTapp (ls, [dt])
+    when ls_equal ls ls_ref_proj && to_deref dt.dt_node -> dt
+  | _ -> Loc.errorm ?loc:dt.dt_loc "not a reference variable"
+
 (* track the use of labels *)
 let at_uses = Hstr.create 5
 
@@ -242,7 +256,12 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
               Hstr.replace at_uses l true
         | None -> ()
         end;
-        func_app (DTgvar v.pv_vs) el
+        if vs_dref v.pv_vs then
+          let loc = qloc q and ls = Pmodule.ls_ref_proj in
+          let e = Dterm.dterm crcmap ~loc (DTgvar v.pv_vs) in
+          apply_ls loc ls [] ls.ls_args ((loc, e)::el)
+        else
+          func_app (DTgvar v.pv_vs) el
     | None ->
         let ls = find_lsymbol_ns ns q in
         apply_ls (qloc q) ls [] ls.ls_args el
@@ -377,6 +396,10 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tscope (q, e1) ->
       let ns = import_namespace ns (string_list_of_qualid q) in
       DTattr (dterm ns km crcmap gvars at denv e1, Sattr.empty)
+  | Ptree.Tasref q ->
+      let e1 = { term_desc = Tident q; term_loc = loc } in
+      let d1 = dterm ns km crcmap gvars at denv e1 in
+      DTattr (undereference d1, Sattr.empty)
   | Ptree.Tattr (ATpos uloc, e1) ->
       DTuloc (dterm ns km crcmap gvars at denv e1, uloc)
   | Ptree.Tattr (ATstr attr, e1) ->
@@ -386,7 +409,6 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tcast (e1, pty) ->
       let d1 = dterm ns km crcmap gvars at denv e1 in
       DTcast (d1, dty_of_pty ns pty))
-
 
 let no_gvars at q = match at with
   | Some _ -> Loc.errorm ~loc:(qloc q)
@@ -409,7 +431,6 @@ open Dexpr
 let ty_of_pty tuc = ty_of_pty (get_namespace tuc)
 
 let get_namespace muc = List.hd muc.Pmodule.muc_import
-
 
 let dterm muc =
   let uc = muc.muc_theory in
@@ -677,8 +698,9 @@ let dbinder muc (_,id,gh,opt) =
 let is_reusable de = match de.de_node with
   | DEvar _ | DEsym _ -> true | _ -> false
 
-let mk_var n de =
-  Dexpr.dexpr ?loc:de.de_loc (DEvar (n, de.de_dvty))
+let mk_var n { de_dvty = (argl, _ as dvty); de_loc = loc } =
+  let dref = List.map Util.ffalse argl, false in
+  Dexpr.dexpr ?loc (DEvar (n, dvty, dref))
 
 let mk_let ~loc n de node =
   let de1 = Dexpr.dexpr ~loc node in
@@ -692,6 +714,10 @@ let update_any kind e = match e.expr_desc with
 let local_kind = function
   | RKfunc | RKpred -> RKlocal
   | k -> k
+
+let undereference ({de_loc = loc} as de) =
+  try Dexpr.undereference de with Not_found ->
+    Loc.errorm ?loc "not a reference variable"
 
 let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   let expr_app loc e el =
@@ -721,6 +747,10 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
       DEattr (eff_dterm muc denv e1, Sattr.empty)
+  | Ptree.Tasref q ->
+      let e1 = { term_desc = Tident q; term_loc = loc } in
+      let d1 = eff_dterm muc denv e1 in
+      DEattr (undereference d1, Sattr.empty)
   | Ptree.Tattr (ATpos uloc, e1) ->
       DEuloc (eff_dterm muc denv e1, uloc)
   | Ptree.Tattr (ATstr attr, e1) ->
@@ -924,7 +954,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEfor (id, efrom, dir, eto, inv, dexpr muc denv e1)
   | Ptree.Eassign asl ->
       let mk_assign (e1,q,e2) =
-        dexpr muc denv e1, find_record_field muc q, dexpr muc denv e2 in
+        let f = match q with
+          | Some q -> find_record_field muc q
+          | None -> rs_ref_proj in
+        dexpr muc denv e1, f, dexpr muc denv e2 in
       DEassign (List.map mk_assign asl)
   | Ptree.Eraise (q, e1) ->
       let xs = find_dxsymbol q in
@@ -966,6 +999,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
       DEattr (dexpr muc denv e1, Sattr.empty)
+  | Ptree.Easref q ->
+      let e1 = { expr_desc = Eident q; expr_loc = loc } in
+      let d1 = dexpr muc denv e1 in
+      DEattr (undereference d1, Sattr.empty)
   | Ptree.Eattr (ATpos uloc, e1) ->
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Eattr (ATstr attr, e1) ->

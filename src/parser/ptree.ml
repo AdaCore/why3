@@ -74,6 +74,7 @@ and term_desc =
   | Tfalse
   | Tconst of Number.constant
   | Tident of qualid
+  | Tasref of qualid
   | Tidapp of qualid * term list
   | Tapply of term * term
   | Tinfix of term * ident * term
@@ -127,6 +128,7 @@ and expr_desc =
   | Econst of Number.constant
   (* lambda-calculus *)
   | Eident of qualid
+  | Easref of qualid
   | Eidapp of qualid * expr list
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
@@ -138,7 +140,7 @@ and expr_desc =
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
-  | Eassign of (expr * qualid * expr) list
+  | Eassign of (expr * qualid option * expr) list
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
