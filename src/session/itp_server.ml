@@ -279,8 +279,8 @@ module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
-let debug_attrs = Debug.register_info_flag "print_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
 (****************)
 (* Command list *)

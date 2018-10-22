@@ -16,8 +16,8 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
-let debug_attrs = Debug.register_info_flag "print_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions."
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =

@@ -33,7 +33,7 @@ run () {
     f="$2_$1"
     printf "WP  $2 ($1)... "
     echo "Weakest Precondition" > "$f.out"
-    $dir/../bin/why3prove.opt --debug print_attrs -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
+    $dir/../bin/why3prove.opt --debug print_model_attrs -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
@@ -42,7 +42,7 @@ run () {
         sed -r 's/(Timeout|Unknown \(unknown\))/Timeout or Unknown/' >> "$f.out"
     printf "SP  $2 ($1)... "
     echo "Strongest Postcondition" >> "$f.out"
-    $dir/../bin/why3prove.opt --debug print_attrs --debug vc_sp -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
+    $dir/../bin/why3prove.opt --debug print_model_attrs --debug vc_sp -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
