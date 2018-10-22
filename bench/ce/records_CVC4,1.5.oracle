@@ -62,19 +62,33 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
-bench/ce/records.mlw M VC test_record_match_eval_test5: Timeout or Unknown
+bench/ce/records.mlw M VC record_match_eval_test44: Timeout or Unknown
 Counter-example model:File records.mlw:
 Line 38:
-re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
-Line 40:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 41:
+Line 42:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+
+bench/ce/records.mlw M VC record_match_eval_test44: Valid
+bench/ce/records.mlw M VC test_record_match_eval_test5: Timeout or Unknown
+Counter-example model:File records.mlw:
+Line 45:
+re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 47:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 48:
 re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
@@ -84,7 +98,7 @@ x, [[@introduced],
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 43:
+Line 50:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
@@ -92,13 +106,13 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 57:
+Line 64:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : true } }] } }
-Line 58:
+Line 65:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
@@ -108,13 +122,13 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Valid
 bench/ce/records.mlw Mutable VC record_match_eval_test2: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 65:
+Line 72:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 66:
+Line 73:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
@@ -123,19 +137,19 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 
 bench/ce/records.mlw Mutable VC record_match_eval_test3: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 70:
+Line 77:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 71:
+Line 78:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 73:
+Line 80:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
@@ -144,19 +158,19 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 
 bench/ce/records.mlw Mutable VC record_match_eval_test4: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 75:
+Line 82:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 76:
+Line 83:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 78:
+Line 85:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
@@ -217,19 +231,33 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
-bench/ce/records.mlw M VC test_record_match_eval_test5: Timeout or Unknown
+bench/ce/records.mlw M VC record_match_eval_test44: Timeout or Unknown
 Counter-example model:File records.mlw:
 Line 38:
-re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
-Line 40:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 41:
+Line 42:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+
+bench/ce/records.mlw M VC record_match_eval_test44: Valid
+bench/ce/records.mlw M VC test_record_match_eval_test5: Timeout or Unknown
+Counter-example model:File records.mlw:
+Line 45:
+re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 47:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 48:
 re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
@@ -242,13 +270,13 @@ x, [[@introduced],
 
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 57:
+Line 64:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : true } }] } }
-Line 58:
+Line 65:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
@@ -258,13 +286,13 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Valid
 bench/ce/records.mlw Mutable VC record_match_eval_test2: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 65:
+Line 72:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 66:
+Line 73:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
@@ -273,13 +301,13 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 
 bench/ce/records.mlw Mutable VC record_match_eval_test3: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 70:
+Line 77:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 71:
+Line 78:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
@@ -288,13 +316,13 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 
 bench/ce/records.mlw Mutable VC record_match_eval_test4: Timeout or Unknown
 Counter-example model:File records.mlw:
-Line 75:
+Line 82:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 76:
+Line 83:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
