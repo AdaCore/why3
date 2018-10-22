@@ -447,9 +447,14 @@ and convert_z3_array (t: term) : array =
 and convert_record l =
   List.map (fun (f, v) -> f, convert_to_model_value v) l
 
-let convert_to_model_element name (t: term) =
+let convert_to_model_element ~set_str name (t: term) =
   let value = convert_to_model_value t in
-  Model_parser.create_model_element ~name ~value ()
+  let attrs =
+    match Mstr.find name set_str with
+    | exception Not_found -> Ident.Sattr.empty
+    | attrs -> attrs
+  in
+  Model_parser.create_model_element ~name ~value ~attrs ()
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
@@ -586,7 +591,7 @@ and convert_tarray_to_array a =
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
 let create_list (projections_list: Sstr.t) (list_records: ((string * string) list) Mstr.t)
-    (noarg_constructors: string list) (table: definition Mstr.t) =
+    (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t) (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
@@ -657,7 +662,7 @@ let create_list (projections_list: Sstr.t) (list_records: ((string * string) lis
   (* Then converts all variables to raw_model_element *)
   Mstr.fold
     (fun key value list_acc ->
-      try (convert_to_model_element key value :: list_acc)
+      try (convert_to_model_element ~set_str key value :: list_acc)
       with Not_value when not (Debug.test_flag Debug.stack_trace) -> list_acc
       | e -> raise e)
     table

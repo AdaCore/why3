@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
+open Ident
 open Term
 
 (* Information about the term that triggers VC.  *)
@@ -42,3 +44,6 @@ val model_trace_for_postcondition:
 val check_enter_vc_term: Term.term -> bool -> vc_term_info -> unit
 
 val check_exit_vc_term: Term.term -> bool -> vc_term_info -> unit
+
+val update_info_labels: string -> Sattr.t Mstr.t -> Term.term ->
+  Term.lsymbol -> Sattr.t Mstr.t

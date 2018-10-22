@@ -114,6 +114,7 @@ type model_element = {
 val create_model_element :
   name      : string ->
   value     : model_value ->
+  attrs     : Ident.Sattr.t ->
   ?location : Loc.position ->
   ?term     : Term.term ->
   unit ->
@@ -333,7 +334,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
   Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
-    string list -> string -> model_element list
+    string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
 (** Parses the input string into model elements.
     [raw_model_parser: proj->record_map->noarg_cons->s->mel]
     [proj]: is the list of projections

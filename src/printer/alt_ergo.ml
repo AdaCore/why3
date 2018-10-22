@@ -422,7 +422,8 @@ let print_prop_decl vc_loc args info fmt k pr f =
 				queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 list_records = Mstr.empty;
-                                noarg_constructors = []};
+                                noarg_constructors = [];
+                                set_str = Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false

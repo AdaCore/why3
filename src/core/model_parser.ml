@@ -346,7 +346,7 @@ let split_model_trace_name mt_name =
   | first::second::_ -> (first, second)
   | [] -> ("", "")
 
-let create_model_element ~name ~value ?location ?term () =
+let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
     | "result" -> Result
@@ -355,7 +355,7 @@ let create_model_element ~name ~value ?location ?term () =
   let me_name = {
     men_name = name;
     men_kind = me_kind;
-    men_attrs = match term with | None -> Sattr.empty | Some t -> t.t_attrs;
+    men_attrs = match term with | None -> attrs | Some t -> Sattr.union t.t_attrs attrs;
   } in
   {
     me_name = me_name;
@@ -407,19 +407,43 @@ type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
   Sstr.t -> ((string * string) list) Mstr.t -> string list ->
-    string -> model_element list
+    Ident.Sattr.t Mstr.t -> string -> model_element list
 
 (*
 ***************************************************************
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element ~print_attrs print_model_value me_name_trans fmt m_element =
+
+(* Adapt name of the model to potential labels applying to it: *)
+let apply_location_label ~at_loc ~attrs me_name =
+  let sats =
+    Sattr.filter (fun x -> Strings.has_prefix "at" x.attr_string) attrs
+  in
+  let _labels_added, me_name =
+    Sattr.fold (fun attr_at (labels_added, me_name) ->
+      match Strings.split ':' attr_at.attr_string with
+      | "at" :: label :: "loc" :: loc_file :: loc_line :: [] ->
+          let loc_line = int_of_string loc_line in
+          if at_loc = (Filename.basename loc_file, loc_line) &&
+             not (Sstr.mem label labels_added)
+          then
+            (Sstr.add label labels_added, me_name ^ " at " ^ label)
+          else
+            (labels_added, me_name)
+      | _ -> (labels_added, me_name))
+      sats (Sstr.empty, me_name)
+  in
+  me_name
+
+let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
     let me_name = me_name_trans m_element.me_name in
+    let attrs = m_element.me_name.men_attrs in
+    let me_name = apply_location_label ~at_loc ~attrs me_name in
     if print_attrs then
       fprintf fmt  "%s, [%a] = %a"
         me_name
@@ -431,10 +455,16 @@ let print_model_element ~print_attrs print_model_value me_name_trans fmt m_eleme
         me_name
         print_model_value m_element.me_value
 
-let print_model_elements ~print_attrs ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element ~print_attrs print_model_value me_name_trans) fmt m_elements
+let print_model_elements ~at_loc ~print_attrs ?(sep = "\n")
+    print_model_value me_name_trans fmt m_elements
+  =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep)
+    (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans)
+    fmt m_elements
 
-let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename model_file =
+let print_model_file ~print_attrs ~print_model_value fmt
+    me_name_trans filename model_file
+  =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -442,7 +472,7 @@ let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename 
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements ~print_attrs print_model_value me_name_trans fmt m_elements)
+      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -549,6 +579,7 @@ let add_offset off (loc, a) =
   (Loc.user_position f (l + off) fc lc, a)
 
 let interleave_line
+    ~filename
     ~print_attrs
     start_comment
     end_comment
@@ -566,7 +597,7 @@ let interleave_line
       asprintf "%s%s%a%s"
         (get_padding line)
         start_comment
-        (print_model_elements ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
+        (print_model_elements ~at_loc:(filename,line_number) ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
         end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
@@ -598,8 +629,9 @@ let interleave_with_source
        the file because they contain extra ".." which cannot be reliably removed
        (because of potential symbolic link). So, we use the basename.
     *)
+    let rel_filename = Filename.basename rel_filename in
     let model_files =
-      StringMap.filter (fun k _ -> Filename.basename k = Filename.basename rel_filename)
+      StringMap.filter (fun k _ -> Filename.basename k = rel_filename)
         model.model_files
     in
     let model_file = snd (StringMap.choose model_files) in
@@ -609,7 +641,7 @@ let interleave_with_source
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
-        (interleave_line ~print_attrs
+        (interleave_line ~filename:rel_filename ~print_attrs
            start_comment end_comment me_name_trans model_file)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file)
@@ -766,12 +798,17 @@ and replace_projection_array const_function a =
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
-    let raw_element_value = replace_projection (fun x -> (recover_name term_map x).men_name) raw_element.me_value in
+    let raw_element_value =
+      replace_projection
+        (fun x -> (recover_name term_map x).men_name)
+        raw_element.me_value
+    in
     try
       (
        let t = Mstr.find raw_element_name term_map in
+       let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
        let model_element = {
-         me_name = construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs;
+         me_name = construct_name (get_model_trace_string ~attrs:t.t_attrs) attrs;
          me_value = raw_element_value;
          me_location = t.t_loc;
          me_term = Some t;
@@ -887,7 +924,8 @@ let make_mp_from_raw (raw_mp:raw_model_parser) =
     let list_proj = printer_mapping.list_projections in
     let list_records = printer_mapping.list_records in
     let noarg_cons = printer_mapping.noarg_constructors in
-    let raw_model = raw_mp list_proj list_records noarg_cons input in
+    let set_str = printer_mapping.set_str in
+    let raw_model = raw_mp list_proj list_records noarg_cons set_str input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -906,4 +944,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ _ -> [])
+  (fun _ _ _ _ _ -> [])
