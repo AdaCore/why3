@@ -412,7 +412,10 @@ module Print = struct
 
   let clear_local_printer () = Ident.forget_all local_printer
 
-  let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+  let protect_on ?(boxed=false) x s =
+    if x then "@[<1>(" ^^ s ^^ ")@]"
+    else if not boxed then "@[" ^^ s ^^ "@]"
+    else s
 
   let extract_stars ty =
     let rec aux acc = function
