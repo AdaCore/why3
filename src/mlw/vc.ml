@@ -767,8 +767,8 @@ let rec k_expr env lps e res xmap =
         let branch (pp,e) = pp.pp_pat, k_expr env lps e res xmap in
         let bl = List.map branch bl in
         let kk v =
-          if s then try
-            if true || ity_fragile e.e_ity then raise Exit;
+          if s then (* try
+            if ity_fragile e.e_ity then raise Exit;
             let add_br (p,k) (bl,tl,fl) =
               let t, f, k = term_of_kode res k in
               let tl = t_close_branch p t :: tl in
@@ -778,7 +778,8 @@ let rec k_expr env lps e res xmap =
             let tv = t_var v.pv_vs in
             let t = t_case tv tl and f = sp_case tv fl in
             Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f))
-          with Exit -> Ktag (SP, Kcase (v, bl))
+          with Exit -> *)
+            Ktag (SP, Kcase (v, bl))
           else Kcase (v, bl) in
         let k = match bl with
           | [] ->
