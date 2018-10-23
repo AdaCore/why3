@@ -183,6 +183,10 @@
     (* TODO: recognize and fail on core idents *)
     Some id
 
+  let lq_as_ref = function
+    | Qident {id_str = "ref"} -> true
+    | _ -> raise Error
+
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -453,18 +457,30 @@ abstract:
 | ABSTRACT          { Abstract }
 
 type_field:
-| attrs(lident_nq) cast
-  { { f_ident = $1; f_mutable = false; f_ghost = false;
-      f_pty = $2; f_loc = floc $startpos $endpos } }
-| field_modifiers attrs(lident_nq) cast
-  { { f_ident = $2; f_mutable = fst $1; f_ghost = snd $1;
-      f_pty = $3; f_loc = floc $startpos $endpos } }
+| field_modifiers ref_amp_id cast
+  { let mut, ghs = $1 and rff, id = $2 in
+    let ty = if rff then PTref [$3] else $3 in
+    { f_ident = id; f_mutable = mut; f_ghost = ghs;
+      f_pty = ty; f_loc = floc $startpos $endpos } }
 
-field_modifiers:
+%inline field_modifiers:
+| (* epsilon *) { false, false }
 | MUTABLE       { true,  false }
 | GHOST         { false, true  }
 | GHOST MUTABLE { true,  true  }
 | MUTABLE GHOST { true,  true  }
+
+(* we have to use lqualid instead of REF after field_modifiers
+   to avoid a conflict with ty. However, if the given lqualid
+   is not REF, then we want to fail as soon as possible: either
+   at AMP, if it occurs after the lqualid, or else at COLON. *)
+ref_amp_id:
+| lq_as_ref AMP attrs(lident_nq)  { $1, set_ref (set_ref $3) }
+| lqualid attrs(lident_nq)        { lq_as_ref $1, set_ref $2 }
+| AMP attrs(lident_nq)            { false, set_ref $2 }
+| attrs(lident_nq)                { false, $1 }
+
+lq_as_ref:  lqualid               { lq_as_ref $1 }
 
 type_case:
 | attrs(uident_nq) params { floc $startpos $endpos, $1, $2 }
@@ -597,7 +613,7 @@ binder:
 
 binder_vars:
 | binder_vars_head  { fst $1, match snd $1 with
-                        | [] -> Loc.error ~loc:(floc $endpos $endpos) Error
+                        | [] -> raise Error
                         | bl -> List.rev bl }
 | binder_vars_rest  { $1 }
 
@@ -607,7 +623,7 @@ binder_vars_rest:
       fst $1, List.rev_append (match snd $1 with
         | (l, Some id) :: bl ->
             (Loc.join l l2, Some (add_attr id $2)) :: bl
-        | _ -> Loc.error ~loc:l2 Error) $3 }
+        | _ -> error_loc l2) $3 }
 | binder_vars_head special_binder binder_var*
     { fst $1, List.rev_append (snd $1) ($2 :: $3) }
 | special_binder binder_var*
@@ -618,13 +634,13 @@ binder_vars_head:
     let of_id id = id.id_loc, binder_of_id id in
     let push acc = function
       | PTtyapp (Qident id, []) -> of_id id :: acc
-      | _ -> Loc.error ~loc:(floc $endpos $endpos) Error in
+      | _ -> raise Error in
     match $1 with
       | PTtyapp (Qident {id_str = "ref"}, l) ->
           true, List.fold_left push [] l
       | PTtyapp (Qident id, l) ->
           false, List.fold_left push [of_id id] l
-      | _ -> Loc.error ~loc:(floc $endpos $endpos) Error }
+      | _ -> raise Error }
 
 binder_var:
 | attrs(lident_nq)      { floc $startpos $endpos, Some $1 }

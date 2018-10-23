@@ -559,7 +559,8 @@ let bl_type bl = List.map (fun (_,_,t) -> t) bl
 let pv_dref pv = attr_dref pv.pv_vs.vs_name.id_attrs
 
 let id_nref {pre_loc = loc; pre_attrs = attrs} =
-  if attr_dref attrs then Loc.errorm ?loc "illegal reference marker";
+  if attr_dref attrs then Loc.errorm ?loc
+    "reference markers are only admitted over program variables";
   false
 
 let id_dref id dity =
