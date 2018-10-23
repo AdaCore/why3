@@ -68,10 +68,13 @@ theory list.Combine
   syntax function combine "List.combine %1 %2"
 end
 
-module ref.Ref
+module Ref
   syntax type     ref      "%1 ref"
   syntax function contents "!%1"
   syntax val      ref      "ref %1"
+end
+
+module ref.Ref
   syntax val      (!_)     "!%1"
   syntax val      (:=)     "%1 := %2"
 end

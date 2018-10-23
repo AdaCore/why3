@@ -13,15 +13,11 @@
 
 module Ref
 
-  type ref 'a = { mutable contents [@model_trace:] : 'a }
+  use export why3.Ref.Ref
 
-  function (!) (x: ref 'a) : 'a = x.contents
+  let function (!) (r: ref 'a) = r.contents
 
-  let ref (v: 'a) ensures { result = { contents = v } } = { contents = v }
-
-  let (!) (r:ref 'a) ensures { result = !r } = r.contents
-
-  let (:=) (r:ref 'a) (v:'a) ensures { !r = v } = r.contents <- v
+  let (:=) (ref r:'a) (v:'a) ensures { r = v } = r <- v
 
 end
 
@@ -34,11 +30,11 @@ module Refint
   use int.Int
   use export Ref
 
-  let incr (r: ref int) ensures { !r = old !r + 1 } = r := !r + 1
-  let decr (r: ref int) ensures { !r = old !r - 1 } = r := !r - 1
+  let incr (ref r: int) ensures { r = old r + 1 } = r <- r + 1
+  let decr (ref r: int) ensures { r = old r - 1 } = r <- r - 1
 
-  let (+=)   (r: ref int) (v: int) ensures { !r = old !r + v } = r := !r + v
-  let (-=)   (r: ref int) (v: int) ensures { !r = old !r - v } = r := !r - v
-  let ( *= ) (r: ref int) (v: int) ensures { !r = old !r * v } = r := !r * v
+  let (+=)   (ref r: int) (v: int) ensures { r = old r + v } = r <- r + v
+  let (-=)   (ref r: int) (v: int) ensures { r = old r - v } = r <- r - v
+  let ( *= ) (ref r: int) (v: int) ensures { r = old r * v } = r <- r * v
 
 end

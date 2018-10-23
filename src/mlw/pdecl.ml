@@ -527,8 +527,6 @@ let create_let_decl ld =
     | LDvar ({pv_vs = {vs_name = {id_loc = loc}}},e) ->
         if not (ity_closed e.e_ity) then
           Loc.errorm ?loc "Top-level variables must have monomorphic type";
-        if match e.e_node with Eexec _ -> false | _ -> true then
-          Loc.errorm ?loc "Top-level computations must carry a specification";
         [], [], []
     | LDrec rdl ->
         let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in

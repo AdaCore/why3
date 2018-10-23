@@ -686,7 +686,8 @@ and exec_call env rs args ity_result =
       let env = add_local_funs locals env in
       begin
         match d.c_node with
-        | Capp _ -> assert false (* TODO ? *)
+        | Capp (rs',pvl) ->
+          exec_call env rs' (pvl @ args) ity_result
         | Cpur _ -> assert false (* TODO ? *)
         | Cany -> raise CannotCompute
         | Cfun body ->

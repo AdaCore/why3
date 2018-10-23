@@ -69,6 +69,17 @@ end
 
 (* WhyML *)
 
+module Ref
+  syntax type     ref      "%1 ref"
+  syntax function contents "!%1"
+  syntax val      ref      "ref %1"
+end
+
+module ref.Ref
+  syntax val      (!_)     "!%1"
+  syntax val      (:=)     "%1 := %2"
+end
+
 module stack.Stack
   syntax type      t        "(%1 Stack.t)"
   syntax val       create   "Stack.create"
