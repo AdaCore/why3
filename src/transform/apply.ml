@@ -84,9 +84,9 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
                         ^ " terms in with are useless"))
   | _ when diff > 0 ->
       Debug.dprintf debug_matching "Not enough withed terms@.";
-      raise (Arg_trans (trans_name ^ ": there are " ^
+      raise (Arg_trans_missing (trans_name ^ ": there are " ^
                         string_of_int diff
-                        ^ " terms missing"))
+                        ^ " terms missing:", slv))
   | _ (* when diff = 0 *) ->
       let new_subst_ty, new_subst =
         try first_order_matching slv lv withed_terms with

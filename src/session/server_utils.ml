@@ -151,8 +151,11 @@ let print_id s tables =
   let d = (* Not_found should not happend *)
     Ident.Mid.find (symbol_name table_id) km
   in
-  let pr = tables.Trans.printer in
-  let apr = tables.Trans.aprinter in
+  (* We use snapshots of printers to avoid registering new value insides it only
+     to print info messages to the user.
+  *)
+  let pr = Ident.duplicate_ident_printer tables.Trans.printer in
+  let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   let module P = (val Pretty.create pr apr pr pr false) in
   (* Different constructs are printed differently *)
   match d.Decl.d_node, table_id with
@@ -217,11 +220,15 @@ let search ~search_both s tables =
          (List.length ids)
          (Pp.print_list Pp.space (fun fmt id -> Pp.string fmt id.Ident.id_string))
          ids
-    else let l = Decl.Sdecl.elements l in
-         let pr = tables.Trans.printer in
-         let apr = tables.Trans.aprinter in
-         let module P = (val Pretty.create pr apr pr pr false) in
-         Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
+    else
+      let l = Decl.Sdecl.elements l in
+      (* We use snapshots of printers to avoid registering new value insides it
+         only to print info messages to the user.
+      *)
+      let pr = Ident.duplicate_ident_printer tables.Trans.printer in
+      let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
+      let module P = (val Pretty.create pr apr pr pr false) in
+      Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
 
 let print_id _cont task args =
   match args with

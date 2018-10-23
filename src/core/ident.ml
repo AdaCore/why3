@@ -254,6 +254,12 @@ let create_ident_printer ?(sanitizer = same) sl =
     sanitizer = sanitizer;
     blacklist = sl }
 
+let duplicate_ident_printer id_printer =
+  {id_printer with
+   indices = Hstr.copy id_printer.indices;
+   values  = Hid.copy id_printer.values;
+  }
+
 let known_id printer id =
   try
     (let _ = Hid.find printer.values id in true)

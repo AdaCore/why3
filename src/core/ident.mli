@@ -115,6 +115,13 @@ val create_ident_printer :
   ?sanitizer : (string -> string) -> string list -> ident_printer
 (** start a new printer with a sanitizing function and a blacklist *)
 
+val duplicate_ident_printer: ident_printer -> ident_printer
+(** This is used to avoid editing the current (mutable) printer when raising
+    exception or printing information messages for the user.
+    This should be avoided for any other usage including display of the whole
+    task.
+*)
+
 val id_unique :
   ident_printer -> ?sanitizer : (string -> string) -> ident -> string
 (** use ident_printer to generate a unique name for ident
