@@ -5,14 +5,15 @@ prelude "#include <stdint.h>"
 prelude "#include <stdio.h>"
 prelude "#include <assert.h>"
 
-module ref.Ref
-
+module Ref
   syntax type ref "%1"
   syntax val ref "%1"
+  syntax val contents "%1"
+end
+
+module ref.Ref
   syntax val (!_) "%1"
-  syntax converter (!_) "%1"
   syntax val (:=) "%1 = %2"
-  syntax converter contents "%1"
 end
 
 module mach.int.Unsigned

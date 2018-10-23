@@ -391,7 +391,7 @@ let exec_print _ args =
 
 let built_in_modules =
   [
-    ["bool"],"Bool", [],
+    ["why3"; "Bool"],"Bool", [],
     [ "True", eval_true ;
       "False", eval_false ;
     ] ;
@@ -505,16 +505,16 @@ let built_in_modules =
      "set", exec_matrix_set ;
      "copy", exec_matrix_copy ;
     ] ;
-    ["ref"],"Ref",
-    [], (* ? *)
+    ["why3"; "Ref"],"Ref", [],
     ["ref", exec_ref_make ;
      "mk ref", exec_ref_make ;
      "contents", exec_ref_get ;
-     Ident.op_prefix "!", exec_ref_get;
+    ] ;
+    ["ref"],"Ref", [],
+    [Ident.op_prefix "!", exec_ref_get;
      Ident.op_infix ":=", exec_ref_set;
     ] ;
-    ["debug"],"Debug",
-    [],
+    ["debug"],"Debug", [],
     ["print", exec_print ] ;
   ]
 
