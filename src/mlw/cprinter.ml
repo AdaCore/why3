@@ -538,20 +538,22 @@ module Print = struct
       (print_stmt ~braces:false) s1
       (print_stmt ~braces:false) s2
     | Sif(c,t,e) when is_nop e ->
-       fprintf fmt "if(%a)@\n%a" print_expr_no_paren c
-         (print_stmt ~braces:true) (Sblock([],t))
-    | Sif (c,t,e) -> fprintf fmt "if(%a)@\n%a@\nelse@\n%a"
-      print_expr_no_paren c
-      (print_stmt ~braces:true) (Sblock([],t))
-      (print_stmt ~braces:true) (Sblock([],e))
-    | Swhile (e,b) -> fprintf fmt "while (%a)@;<1 2>%a"
-      print_expr_no_paren e (print_stmt ~braces:true) (Sblock([],b))
+       fprintf fmt "@[<hov>if (%a) {@\n  @[<hov>%a@]@\n}@]"
+         print_expr_no_paren c (print_stmt ~braces:false) t
+    | Sif(c,t,e) ->
+       fprintf fmt
+         "@[<hov>if (%a) {@\n  @[<hov>%a @]@\n} else {@\n  @[<hov>%a@]@\n}@]"
+         print_expr_no_paren c
+         (print_stmt ~braces:false) t
+         (print_stmt ~braces:false) e
+    | Swhile (e,b) -> fprintf fmt "@[<hov>while (%a) {@\n  @[<hov>%a@]@\n}@]"
+      print_expr_no_paren e (print_stmt ~braces:false) b
     | Sfor (einit, etest, eincr, s) ->
-       fprintf fmt "for (%a; %a; %a)@;<1 2>%a"
+       fprintf fmt "@[<hov>for (%a; %a; %a) {@\n  @[<hov>%a@]@\n}@]"
          print_expr_no_paren einit
          print_expr_no_paren etest
          print_expr_no_paren eincr
-         (print_stmt ~braces:true) (Sblock([],s))
+         (print_stmt ~braces:false) s
     | Sbreak -> fprintf fmt "break;"
     | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" print_expr_no_paren e
