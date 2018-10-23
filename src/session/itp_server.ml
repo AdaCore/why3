@@ -78,132 +78,109 @@ let unproven_goals_below_id cont id =
 
 let p s id =
   let _,tables = Session_itp.get_task_name_table s id in
-  let pr = tables.Trans.printer in
-  let apr = tables.Trans.aprinter in
+  (* We use snapshots of printers to avoid registering new values inside it
+     only for exception messages.
+  *)
+  let pr = Ident.duplicate_ident_printer tables.Trans.printer in
+  let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (Pretty.create pr apr pr pr false)
 
-let print_term s id fmt t =
-  let module P = (val (p s id)) in P.print_term fmt t
-
-let print_type s id fmt t =
-  let module P = (val (p s id)) in P.print_ty fmt t
-
-let print_opt_type s id fmt t =
+let print_opt_type ~print_type fmt t =
   match t with
   | None -> Format.fprintf fmt "bool"
-  | Some t -> print_type s id fmt t
-
-let print_ts s id fmt t =
-  let module P = (val (p s id)) in P.print_ts fmt t
-
-let print_ls s id fmt t =
-  let module P = (val (p s id)) in P.print_ls fmt t
-
-let print_tv s id fmt t =
-  let module P = (val (p s id)) in P.print_tv fmt t
-
-let print_vsty s id fmt t =
-  let module P = (val (p s id)) in P.print_vsty fmt t
-
-let print_pr s id fmt t =
-  let module P = (val (p s id)) in P.print_pr fmt t
-
-let print_pat s id fmt t =
-  let module P = (val (p s id)) in P.print_pat fmt t
-
-let print_tdecl s id fmt t =
-  let module P = (val (p s id)) in P.print_tdecl fmt t
+  | Some t -> print_type fmt t
 
 (* Exception reporting *)
 
 (* TODO remove references to id.id_string in this function *)
 let bypass_pretty s id =
+  let module P = (val (p s id)) in
   begin fun fmt exn -> match exn with
   | Ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
-        (print_type s id) t1 (print_type s id) t2
+        P.print_ty t1 P.print_ty t2
   | Ty.BadTypeArity ({Ty.ts_args = []} as ts, _) ->
-      fprintf fmt "Type symbol %a expects no arguments" (print_ts s id) ts
+      fprintf fmt "Type symbol %a expects no arguments" P.print_ts ts
   | Ty.BadTypeArity (ts, app_arg) ->
       let i = List.length ts.Ty.ts_args in
       fprintf fmt "Type symbol %a expects %i argument%s but is applied to %i"
-        (print_ts s id) ts i (if i = 1 then "" else "s") app_arg
+        P.print_ts ts i (if i = 1 then "" else "s") app_arg
   | Ty.DuplicateTypeVar tv ->
-      fprintf fmt "Type variable %a is used twice" (print_tv s id) tv
+      fprintf fmt "Type variable %a is used twice" P.print_tv tv
   | Ty.UnboundTypeVar tv ->
-      fprintf fmt "Unbound type variable: %a" (print_tv s id) tv
+      fprintf fmt "Unbound type variable: %a" P.print_tv tv
   | Ty.UnexpectedProp ->
       fprintf fmt "Unexpected propositional type"
   | Term.BadArity ({Term.ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
-        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
+        (if ls.Term.ls_value = None then "Predicate" else "Function") P.print_ls ls
   | Term.BadArity (ls, app_arg) ->
       let i = List.length ls.Term.ls_args in
       fprintf fmt "%s %a expects %i argument%s but is applied to %i"
         (if ls.Term.ls_value = None then "Predicate" else "Function")
-        (print_ls s id) ls i (if i = 1 then "" else "s") app_arg
+        P.print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
       fprintf fmt "Empty match expression"
   | Term.DuplicateVar vs ->
-      fprintf fmt "Variable %a is used twice" (print_vsty s id) vs
+      fprintf fmt "Variable %a is used twice" P.print_vsty vs
   | Term.UncoveredVar vs ->
-      fprintf fmt "Variable %a uncovered in \"or\"-pattern" (print_vsty s id) vs
+      fprintf fmt "Variable %a uncovered in \"or\"-pattern" P.print_vsty vs
   | Term.FunctionSymbolExpected ls ->
-      fprintf fmt "Not a function symbol: %a" (print_ls s id) ls
+      fprintf fmt "Not a function symbol: %a" P.print_ls ls
   | Term.PredicateSymbolExpected ls ->
-      fprintf fmt "Not a predicate symbol: %a" (print_ls s id) ls
+      fprintf fmt "Not a predicate symbol: %a" P.print_ls ls
   | Term.ConstructorExpected ls ->
       fprintf fmt "%s %a is not a constructor"
-        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
+        (if ls.Term.ls_value = None then "Predicate" else "Function") P.print_ls ls
   | Term.TermExpected t ->
-      fprintf fmt "Not a term: %a" (print_term s id) t
+      fprintf fmt "Not a term: %a" P.print_term t
   | Term.FmlaExpected t ->
-      fprintf fmt "Not a formula: %a" (print_term s id) t
+      fprintf fmt "Not a formula: %a" P.print_term t
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
-        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
-        (print_type s id) ty
+        (if ls.Term.ls_value = None then "Predicate" else "Function") P.print_ls ls
+        P.print_ty ty
   | Pattern.NonExhaustive pl ->
       fprintf fmt "Pattern not covered by a match:@\n  @[%a@]"
-        (print_pat s id) (List.hd pl)
+        P.print_pat (List.hd pl)
   | Decl.BadConstructor ls ->
-      fprintf fmt "Bad constructor: %a" (print_ls s id) ls
+      fprintf fmt "Bad constructor: %a" P.print_ls ls
   | Decl.BadRecordField ls ->
-      fprintf fmt "Not a record field: %a" (print_ls s id) ls
+      fprintf fmt "Not a record field: %a" P.print_ls ls
   | Decl.RecordFieldMissing ls ->
-      fprintf fmt "Field %a is missing" (print_ls s id) ls
+      fprintf fmt "Field %a is missing" P.print_ls ls
   | Decl.DuplicateRecordField ls ->
-      fprintf fmt "Field %a is used twice in the same constructor" (print_ls s id) ls
+      fprintf fmt "Field %a is used twice in the same constructor" P.print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
         "Type symbol %a is a type alias and cannot be declared as algebraic"
-        (print_ts s id) ts
+        P.print_ts ts
   | Decl.NonFoundedTypeDecl ts ->
-      fprintf fmt "Cannot construct a value of type %a" (print_ts s id) ts
+      fprintf fmt "Cannot construct a value of type %a" P.print_ts ts
   | Decl.NonPositiveTypeDecl (_ts, ls, ty) ->
       fprintf fmt "Constructor %a \
           contains a non strictly positive occurrence of type %a"
-        (print_ls s id) ls (print_type s id) ty
+        P.print_ls ls P.print_ty ty
   | Decl.InvalidIndDecl (_ls, pr) ->
       fprintf fmt "Ill-formed inductive clause %a"
-        (print_pr s id) pr
+        P.print_pr pr
   | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
       fprintf fmt "Inductive clause %a contains \
           a non strictly positive occurrence of symbol %a"
-        (print_pr s id) pr (print_ls s id) ls1
+        P.print_pr pr P.print_ls ls1
   | Decl.BadLogicDecl (ls1,ls2) ->
       fprintf fmt "Ill-formed definition: symbols %a and %a are different"
-        (print_ls s id) ls1 (print_ls s id) ls2
+        P.print_ls ls1 P.print_ls ls2
   | Decl.UnboundVar vs ->
-      fprintf fmt "Unbound variable:\n%a" (print_vsty s id) vs
+      fprintf fmt "Unbound variable:\n%a" P.print_vsty vs
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %s is defined twice" id.Ident.id_string
   | Decl.EmptyDecl ->
       fprintf fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
-      fprintf fmt "Algebraic type %a has no constructors" (print_ts s id) ts
+      fprintf fmt "Algebraic type %a has no constructors" P.print_ts ts
   | Decl.EmptyIndDecl ls ->
-      fprintf fmt "Inductive predicate %a has no constructors" (print_ls s id) ls
+      fprintf fmt "Inductive predicate %a has no constructors" P.print_ls ls
   | Decl.KnownIdent id ->
       fprintf fmt "Ident %s is already declared" id.Ident.id_string
   | Decl.UnknownIdent id ->
@@ -212,11 +189,12 @@ let bypass_pretty s id =
       fprintf fmt "Ident %s is already declared, with a different declaration"
         id.Ident.id_string
   | Decl.NoTerminationProof ls ->
-      fprintf fmt "Cannot prove the termination of %a" (print_ls s id) ls
+      fprintf fmt "Cannot prove the termination of %a" P.print_ls ls
   | _ -> Format.fprintf fmt "Uncaught: %a" Exn_printer.exn_printer exn
   end
 
 let get_exception_message ses id e =
+  let module P = (val (p ses id)) in
   match e with
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
@@ -224,23 +202,27 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
-        (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
+        (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") P.print_tdecl) ld,
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t) ->
       Pp.sprintf "Error in transformation %s during with term:\n %a : %a " s
-        (print_term ses id) t (print_opt_type ses id) t.Term.t_ty,
+        P.print_term t (print_opt_type ~print_type:P.print_ty) t.Term.t_ty,
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term2 (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
-        (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
-        (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
+        P.print_term t1 (print_opt_type ~print_type:P.print_ty) t1.Term.t_ty
+        P.print_term t2 (print_opt_type ~print_type:P.print_ty) t2.Term.t_ty,
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_pattern (s, pa1, pa2) ->
       Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
-        s (print_pat ses id) pa1 (print_pat ses id) pa2, Loc.dummy_position, ""
+        s P.print_pat pa1 P.print_pat pa2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
       Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
-        s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
+        s P.print_ty ty1 P.print_ty ty2, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
+      Pp.sprintf "Error in transformation function: %s %a\n" s
+        (Pp.print_list Pp.space P.print_vs) (Term.Svs.elements svs),
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Cannot_infer_type s ->
@@ -248,7 +230,7 @@ let get_exception_message ses id e =
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_pr_not_found pr ->
-      Pp.sprintf "Property not found: %a" (print_pr ses id) pr, Loc.dummy_position, ""
+      Pp.sprintf "Property not found: %a" P.print_pr pr, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
       Pp.sprintf "Transformation raised a general error: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_theory_not_found s ->
@@ -261,7 +243,7 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Unnecessary_terms l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline
-           (fun fmt s -> Format.fprintf fmt "%a" (print_term ses id) s)) l, Loc.dummy_position, ""
+           (fun fmt s -> Format.fprintf fmt "%a" P.print_term s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
