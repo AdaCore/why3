@@ -166,10 +166,13 @@
     let p = mk_t (Tquant (Dterm.DTexists, bl, [], join ql)) in
     [mk_t (Tattr (ATstr we_attr, p))]
 
+  let double_ref {id_loc = loc} =
+    Loc.errorm ~loc "this variable is already a reference"
+
   let set_ref id =
     List.iter (function
       | ATstr a when Ident.attr_equal a Pmodule.ref_attr ->
-          Loc.errorm ~loc:id.id_loc "this variable is already a reference"
+          double_ref id
       | _ -> ()) id.id_ats;
     { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
 
@@ -184,7 +187,7 @@
     Some id
 
   let lq_as_ref = function
-    | Qident {id_str = "ref"} -> true
+    | Qident {id_str = "ref"} -> ()
     | _ -> raise Error
 
   let error_param loc =
@@ -475,12 +478,13 @@ type_field:
    is not REF, then we want to fail as soon as possible: either
    at AMP, if it occurs after the lqualid, or else at COLON. *)
 ref_amp_id:
-| lq_as_ref AMP attrs(lident_nq)  { $1, set_ref (set_ref $3) }
-| lqualid attrs(lident_nq)        { lq_as_ref $1, set_ref $2 }
+| lq_as_ref AMP attrs(lident_nq)  { true,  double_ref $3 }
+| lq_as_ref_id attr*              { true,  add_attr $1 $2 }
 | AMP attrs(lident_nq)            { false, set_ref $2 }
 | attrs(lident_nq)                { false, $1 }
 
-lq_as_ref:  lqualid               { lq_as_ref $1 }
+lq_as_ref:    lqualid             { lq_as_ref $1 }
+lq_as_ref_id: lqualid lident_nq   { lq_as_ref $1; set_ref $2 }
 
 type_case:
 | attrs(uident_nq) params { floc $startpos $endpos, $1, $2 }
@@ -553,6 +557,8 @@ cast:
    names, whose type must be inferred. *)
 
 params:  param*  { List.concat $1 }
+
+params1: param+  { List.concat $1 }
 
 binders: binder+ { List.concat $1 }
 
@@ -649,10 +655,6 @@ binder_var:
 special_binder:
 | UNDERSCORE            { floc $startpos $endpos, None }
 | AMP attrs(lident_nq)  { floc $startpos $endpos, Some (set_ref $2) }
-
-ref_binder:
-|     attrs(lident_nq)  { add_model_trace_attr (set_ref $1) }
-| AMP attrs(lident_nq)  { add_model_trace_attr (set_ref (set_ref $2)) }
 
 (* Logical terms *)
 
@@ -809,15 +811,17 @@ numeral:
 (* Program declarations *)
 
 prog_decl:
-| VAL ghost kind attrs(lident_rich) mk_expr(val_defn)
-    { Dlet (add_model_trace_attr $4, ghost $2, $3, apply_partial $2 $5) }
-| VAL ghost REF ref_binder mk_expr(val_const_defn)
+| VAL ghost kind attrs(lident_rich) mk_expr(fun_decl)
+    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+| VAL ghost kind sym_binder mk_expr(const_decl)
+    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+| VAL ghost REF ref_binder mk_expr(const_decl)
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
       Dlet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee) }
 | LET ghost kind attrs(lident_rich) mk_expr(fun_defn)
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
-| LET ghost kind attrs(lident_rich) const_defn
+| LET ghost kind sym_binder const_defn
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
 | LET ghost REF ref_binder const_defn
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
@@ -863,12 +867,12 @@ fun_defn:
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
       Efun (List.map add_model_attrs $1, ty, mask, spec, e) }
 
-val_defn:
-| params return_opt spec
+fun_decl:
+| params1 return_opt spec
     { let pat, ty, mask = $2 in
       Eany ($1, Expr.RKnone, ty, mask, apply_return pat $3) }
 
-val_const_defn:
+const_decl:
 | return_opt spec
     { let pat, ty, mask = $1 in
       Eany ([], Expr.RKnone, ty, mask, apply_return pat $2) }
@@ -981,14 +985,14 @@ single_expr_:
         | Pghost p -> unfold true d p
         | Pcast (p,ty) -> unfold gh (cast d ty) p
         | Ptuple [] -> unfold gh (cast d (PTtuple [])) (re_pat p Pwild)
-        | Pvar id -> Elet (add_model_trace_attr id, gh, $3, d, $8)
+        | Pvar id -> Elet (id, gh, $3, d, $8)
         | Pwild -> Elet (id_anonymous p.pat_loc, gh, $3, d, $8)
         | _ when $3 = Expr.RKnone -> Ematch (d, [pat, $8], [])
         | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
             "illegal kind qualifier" in
       unfold false (apply_partial $2 $6) pat }
-| LET ghost kind attrs(lident_op_nq) EQUAL seq_expr IN seq_expr
-    { Elet ($4, ghost $2, $3, apply_partial $2 $6, $8) }
+| LET ghost kind attrs(lident_op_nq) const_defn IN seq_expr
+    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
@@ -1018,9 +1022,11 @@ single_expr_:
       let pre = pre_of_any loc ty spec.sp_post in
       let spec = { spec with sp_pre = spec.sp_pre @ pre } in
       Eany ([], Expr.RKnone, Some ty, mask, spec) }
-| VAL ghost kind attrs(lident_rich) mk_expr(val_defn) IN seq_expr
+| VAL ghost kind attrs(lident_rich) mk_expr(fun_decl) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
-| VAL ghost REF ref_binder mk_expr(val_const_defn) IN seq_expr
+| VAL ghost kind sym_binder mk_expr(const_decl) IN seq_expr
+    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+| VAL ghost REF ref_binder mk_expr(const_decl) IN seq_expr
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
       Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
@@ -1058,11 +1064,12 @@ single_expr_:
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* loop_body DONE
-    { let id_b = mk_id break_id $startpos($7) $endpos($7) in
+| FOR attrs(lident_nq) EQUAL seq_expr
+               for_direction seq_expr DO invariant* loop_body DONE
+    { let id = add_model_trace_attr $2 in
+      let id_b = mk_id break_id $startpos($7) $endpos($7) in
       let id_c = mk_id continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
-      let id = add_model_trace_attr $2 in
       let e = mk_expr (Efor (id, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | ABSURD
@@ -1297,15 +1304,13 @@ pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | GHOST mk_pat(pat_uni_)                { Pghost $2 }
-| mk_pat(pat_uni_) AS boption(GHOST) attrs(lident_nq)
-                                        { Pas ($1,add_model_trace_attr $4,$3) }
+| mk_pat(pat_uni_) AS boption(GHOST) var_binder
+                                        { Pas ($1,$4,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
-| AMP attrs(lident_nq)                  { Pvar (add_model_trace_attr
-                                                            (set_ref $2)) }
-| attrs(lident_nq)                      { Pvar (add_model_trace_attr $1) }
+| var_binder                            { Pvar $1 }
 | uqualid                               { Papp ($1,[]) }
 | uqualid DOT mk_pat(pat_block_)        { Pscope ($1,$3) }
 | pat_block_                            { $1 }
@@ -1331,9 +1336,23 @@ let_pat_conj_:
 let_pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(let_pat_uni_) AS boption(GHOST) attrs(lident_nq)
-                                        { Pas ($1,add_model_trace_attr $4,$3) }
+| mk_pat(let_pat_uni_) AS boption(GHOST) var_binder
+                                        { Pas ($1,$4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
+
+(* One-variable binders *)
+
+sym_binder: (* let and val without parameters *)
+|     attrs(lident_rich)  { add_model_trace_attr $1 }
+| AMP attrs(lident_nq)    { add_model_trace_attr (set_ref $2) }
+
+var_binder: (* pattern variables *)
+|     attrs(lident_nq)    { add_model_trace_attr $1 }
+| AMP attrs(lident_nq)    { add_model_trace_attr (set_ref $2) }
+
+ref_binder: (* let ref and val ref *)
+|     attrs(lident_nq)    { add_model_trace_attr (set_ref $1) }
+| AMP attrs(lident_nq)    { add_model_trace_attr (double_ref $2) }
 
 (* Qualified idents *)
 
