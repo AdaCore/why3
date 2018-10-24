@@ -230,8 +230,10 @@ let mk_closure crcmap loc ls =
 
 let vs_dref vs = Sattr.mem Pmodule.ref_attr vs.vs_name.id_attrs
 
-let to_deref = function
-  | DTvar _ -> true (* needed for DEpure *)
+let rec to_deref = function
+  | DTattr ({dt_node = DTvar _}, attrs)
+    when Sattr.mem Pmodule.ref_attr attrs -> true (* needed for DEpure *)
+  | DTattr (dt,_) | DTuloc (dt,_) | DTcast (dt,_) -> to_deref dt.dt_node
   | DTgvar vs -> vs_dref vs
   | _ -> false
 
