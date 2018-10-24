@@ -13,6 +13,16 @@ open Wstdlib
 
 type variable = string
 
+(* Simple counterexample that already represent a complete value *)
+type simple_value =
+  | Integer of string
+  | Decimal of (string * string)
+  | Fraction of (string * string)
+  | Float of Model_parser.float_type
+  | Other of string
+  | Bitvector of string
+  | Boolean of bool
+
 type array =
   (* Array_var is used by let-bindings only *)
   | Array_var of variable
@@ -20,41 +30,27 @@ type array =
   | Store of array * term * term
 
 and term =
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of Model_parser.float_type
+  | Sval of simple_value
   | Apply of (string * term list)
-  | Other of string
   | Array of array
-  | Bitvector of string
-  | Boolean of bool
   | Cvc4_Variable of variable
   | Function_Local_Variable of variable
   | Variable of variable
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
+  (* TODO remove tree *)
+  | Trees of (string * term) list
 
 type definition =
   | Function of (variable * string option) list * term
   | Term of term (* corresponding value of a term *)
   | Noelement
 
-(* Type returned by parsing of model.
-   An hashtable that makes a correspondence between names (string) and
-   associated definition (complex stuff) *)
-(* The boolean is true when the term has no external variable *)
-type correspondence_table = (bool * definition) Mstr.t
-
 val add_element: (string * definition) option ->
-  correspondence_table -> bool -> correspondence_table
-
+  definition Mstr.t -> definition Mstr.t
 
 val make_local: (variable * string option) list -> term -> term
-
-val print_term: Format.formatter -> term -> unit
-val print_def: Format.formatter -> definition -> unit
 
 (* Used for let bindings of z3 *)
 val substitute: (string * term) list -> term -> term

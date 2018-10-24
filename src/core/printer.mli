@@ -37,6 +37,13 @@ type printer_mapping = {
   list_projections: Sstr.t;
   (* List of projections as printed in the model *)
   list_records: ((string * string) list) Mstr.t;
+  (* List of constructors with no arguments that can be confused for variables
+     during parsing. *)
+  noarg_constructors: string list;
+  (* List of attributes corresponding to a printed constants (that was on the
+     immediate term, not inside the ident) *)
+  set_str: Sattr.t Mstr.t
+
 }
 
 type printer_args = {

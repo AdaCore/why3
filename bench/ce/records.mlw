@@ -35,6 +35,13 @@ module M
     x := { !x with f = 6 };
     !x
 
+  let record_match_eval_test44 (x : ref r) : r
+    ensures { result.g }
+  = [@vc:sp]
+    x := { !x with f = 6 };
+    assert { !x.f = 12};
+    !x
+
   val re : ref r
 
   let test_record_match_eval_test5 (x : ref r) : r

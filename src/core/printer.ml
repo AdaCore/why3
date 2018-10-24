@@ -36,6 +36,8 @@ type printer_mapping = {
   queried_terms : Term.term Mstr.t;
   list_projections: Sstr.t;
   list_records: ((string * string) list) Mstr.t;
+  noarg_constructors: string list;
+  set_str: Sattr.t Mstr.t
 }
 
 type printer_args = {
@@ -61,6 +63,8 @@ let get_default_printer_mapping = {
   queried_terms = Mstr.empty;
   list_projections = Sstr.empty;
   list_records = Mstr.empty;
+  noarg_constructors = [];
+  set_str = Mstr.empty
 }
 
 let register_printer ~desc s p =

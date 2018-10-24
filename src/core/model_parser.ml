@@ -100,6 +100,7 @@ type model_value =
  | Boolean of bool
  | Array of model_array
  | Record of model_record
+ | Proj of model_proj
  | Bitvector of string
  | Apply of string * model_value list
  | Unparsed of string
@@ -111,7 +112,10 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
+
 and model_record = (field_name * model_value) list
+and model_proj = (proj_name * model_value)
+and proj_name = string
 and field_name = string
 
 let array_create_constant ~value =
@@ -209,6 +213,8 @@ let rec convert_model_value value : Json_base.json =
       Json_base.Record m
   | Record r ->
       convert_record r
+  | Proj p ->
+      convert_proj p
 
 and convert_array a =
   let m_others =
@@ -229,6 +235,13 @@ and convert_record r =
   let m_field = Mstr.add "Field" fields Mstr.empty in
   let m = Mstr.add "val" (Json_base.Record m_field) m in
   Json_base.Record m
+
+and convert_proj p =
+  let proj_name, value = p in
+  let m = Mstr.add "type" (Json_base.String "Proj") Mstr.empty in
+  let m = Mstr.add "proj_name" (Json_base.String proj_name) m in
+  let m = Mstr.add "value" (convert_model_value value) m in
+  Json_base.Proj m
 
 and convert_fields fields =
   Json_base.List
@@ -266,16 +279,21 @@ let print_float_human fmt f =
   | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
-  fprintf fmt "(";
+  fprintf fmt "@[(";
   List.iter (fun e ->
-    fprintf fmt "%s => %a," e.arr_index_key print_model_value_human e.arr_index_value)
+    fprintf fmt "@[%s =>@ %a,@]" e.arr_index_key print_model_value_human e.arr_index_value)
     arr.arr_indices;
-  fprintf fmt "others => %a)" print_model_value_human arr.arr_others
+  fprintf fmt "@[others =>@ %a@])@]" print_model_value_human arr.arr_others
 
 and print_record_human fmt r =
-  fprintf fmt "%a"
+  fprintf fmt "@[%a@]"
     (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
-    (fun fmt (f, v) -> fprintf fmt "%s = %a" f print_model_value_human v)) r
+    (fun fmt (f, v) -> fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
+
+and print_proj_human fmt p =
+  let s, v = p in
+  fprintf fmt "@[{%s =>@ %a}@]"
+    s print_model_value_human v
 
 and print_model_value_human fmt (v: model_value) =
   match v with
@@ -284,10 +302,13 @@ and print_model_value_human fmt (v: model_value) =
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b"  b
+  | Apply (s, []) ->
+      fprintf fmt "%s" s
   | Apply (s, lt) ->
-    fprintf fmt "(%s %a)" s (Pp.print_list Pp.space print_model_value_human) lt
+    fprintf fmt "@[(%s@ %a)@]" s (Pp.print_list Pp.space print_model_value_human) lt
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
+  | Proj p -> print_proj_human fmt p
   | Bitvector s -> fprintf fmt "%s" s
   | Unparsed s -> fprintf fmt "%s" s
 
@@ -325,7 +346,7 @@ let split_model_trace_name mt_name =
   | first::second::_ -> (first, second)
   | [] -> ("", "")
 
-let create_model_element ~name ~value ?location ?term () =
+let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
     | "result" -> Result
@@ -334,7 +355,7 @@ let create_model_element ~name ~value ?location ?term () =
   let me_name = {
     men_name = name;
     men_kind = me_kind;
-    men_attrs = match term with | None -> Sattr.empty | Some t -> t.t_attrs;
+    men_attrs = match term with | None -> attrs | Some t -> Sattr.union t.t_attrs attrs;
   } in
   {
     me_name = me_name;
@@ -385,20 +406,44 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Sstr.t -> ((string * string) list) Mstr.t ->
-    string -> model_element list
+  Sstr.t -> ((string * string) list) Mstr.t -> string list ->
+    Ident.Sattr.t Mstr.t -> string -> model_element list
 
 (*
 ***************************************************************
 **  Quering the model
 ***************************************************************
 *)
-let print_model_element ~print_attrs print_model_value me_name_trans fmt m_element =
+
+(* Adapt name of the model to potential labels applying to it: *)
+let apply_location_label ~at_loc ~attrs me_name =
+  let sats =
+    Sattr.filter (fun x -> Strings.has_prefix "at" x.attr_string) attrs
+  in
+  let _labels_added, me_name =
+    Sattr.fold (fun attr_at (labels_added, me_name) ->
+      match Strings.split ':' attr_at.attr_string with
+      | "at" :: label :: "loc" :: loc_file :: loc_line :: [] ->
+          let loc_line = int_of_string loc_line in
+          if at_loc = (Filename.basename loc_file, loc_line) &&
+             not (Sstr.mem label labels_added)
+          then
+            (Sstr.add label labels_added, me_name ^ " at " ^ label)
+          else
+            (labels_added, me_name)
+      | _ -> (labels_added, me_name))
+      sats (Sstr.empty, me_name)
+  in
+  me_name
+
+let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
     let me_name = me_name_trans m_element.me_name in
+    let attrs = m_element.me_name.men_attrs in
+    let me_name = apply_location_label ~at_loc ~attrs me_name in
     if print_attrs then
       fprintf fmt  "%s, [%a] = %a"
         me_name
@@ -410,10 +455,16 @@ let print_model_element ~print_attrs print_model_value me_name_trans fmt m_eleme
         me_name
         print_model_value m_element.me_value
 
-let print_model_elements ~print_attrs ?(sep = "\n") print_model_value me_name_trans fmt m_elements =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element ~print_attrs print_model_value me_name_trans) fmt m_elements
+let print_model_elements ~at_loc ~print_attrs ?(sep = "\n")
+    print_model_value me_name_trans fmt m_elements
+  =
+  Pp.print_list (fun fmt () -> Pp.string fmt sep)
+    (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans)
+    fmt m_elements
 
-let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename model_file =
+let print_model_file ~print_attrs ~print_model_value fmt
+    me_name_trans filename model_file
+  =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
@@ -421,7 +472,7 @@ let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename 
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements ~print_attrs print_model_value me_name_trans fmt m_elements)
+      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements)
     model_file;
   fprintf fmt "@\n"
 
@@ -437,16 +488,15 @@ let print_model
     ~print_model_value
     fmt
     model =
-  (* Simple and easy way to print file sorted alphabetically
-   FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
-   *)
-  let l = StringMap.bindings model.model_files in
-  List.iter (fun (k, e) -> print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e) l
+  StringMap.iter (fun k e ->
+      print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e)
+    model.model_files
 
 let print_model_human
     ?(me_name_trans = why_name_trans)
     fmt
-    model = print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+    model =
+  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
 let print_model ?(me_name_trans = why_name_trans)
     ~print_attrs
@@ -529,6 +579,7 @@ let add_offset off (loc, a) =
   (Loc.user_position f (l + off) fc lc, a)
 
 let interleave_line
+    ~filename
     ~print_attrs
     start_comment
     end_comment
@@ -546,7 +597,7 @@ let interleave_line
       asprintf "%s%s%a%s"
         (get_padding line)
         start_comment
-        (print_model_elements ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
+        (print_model_elements ~at_loc:(filename,line_number) ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
         end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
@@ -578,8 +629,9 @@ let interleave_with_source
        the file because they contain extra ".." which cannot be reliably removed
        (because of potential symbolic link). So, we use the basename.
     *)
+    let rel_filename = Filename.basename rel_filename in
     let model_files =
-      StringMap.filter (fun k _ -> Filename.basename k = Filename.basename rel_filename)
+      StringMap.filter (fun k _ -> Filename.basename k = rel_filename)
         model.model_files
     in
     let model_file = snd (StringMap.choose model_files) in
@@ -589,7 +641,7 @@ let interleave_with_source
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
-        (interleave_line ~print_attrs
+        (interleave_line ~filename:rel_filename ~print_attrs
            start_comment end_comment me_name_trans model_file)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file)
@@ -671,7 +723,6 @@ let print_model_json
     fmt
     model_files_bindings
 
-
 let model_to_string_json
     ?(me_name_trans = why_name_trans)
     ?(vc_line_trans = (fun i -> string_of_int i))
@@ -696,20 +747,71 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
+let recover_name term_map raw_name =
+  let t = Mstr.find raw_name term_map in
+  construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
+
+let rec replace_projection (const_function: string -> string) model_value =
+  match model_value with
+  | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
+    | Unparsed _ -> model_value
+  | Array a ->
+      Array (replace_projection_array const_function a)
+  | Record r ->
+      let r =
+        List.map (fun (field_name, value) ->
+          let field_name = try const_function field_name with
+            Not_found -> field_name
+          in
+          (field_name, replace_projection const_function value)
+          )
+          r
+      in
+      Record r
+  | Proj p ->
+      let proj_name, value = p in
+      let proj_name =
+        try const_function proj_name
+        with Not_found -> proj_name
+      in
+      Proj (proj_name, replace_projection const_function value)
+  | Apply (s, l) ->
+      let s = try const_function s
+        with Not_found -> s
+      in
+      Apply (s, (List.map (fun v -> replace_projection const_function v) l))
+
+and replace_projection_array const_function a =
+  let {arr_others = others; arr_indices = arr_index_list} = a in
+  let others = replace_projection const_function others in
+  let arr_index_list =
+    List.map
+      (fun ind ->
+         let {arr_index_key = key; arr_index_value = value} = ind in
+         let value = replace_projection const_function value in
+         {arr_index_key = key; arr_index_value = value}
+      )
+      arr_index_list
+  in
+  {arr_others = others; arr_indices = arr_index_list}
+
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
+    let raw_element_value =
+      replace_projection
+        (fun x -> (recover_name term_map x).men_name)
+        raw_element.me_value
+    in
     try
       (
        let t = Mstr.find raw_element_name term_map in
-       let real_model_trace =
-         construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
-       in
+       let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
        let model_element = {
-	 me_name = real_model_trace;
-	 me_value = raw_element.me_value;
-	 me_location = t.t_loc;
-	 me_term = Some t;
+         me_name = construct_name (get_model_trace_string ~attrs:t.t_attrs) attrs;
+         me_value = raw_element_value;
+         me_location = t.t_loc;
+         me_term = Some t;
        } in
        add_to_model model model_element
       )
@@ -821,7 +923,9 @@ let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
     let list_records = printer_mapping.list_records in
-    let raw_model = raw_mp list_proj list_records input in
+    let noarg_cons = printer_mapping.noarg_constructors in
+    let set_str = printer_mapping.set_str in
+    let raw_model = raw_mp list_proj list_records noarg_cons set_str input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -840,4 +944,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ -> [])
+  (fun _ _ _ _ _ -> [])

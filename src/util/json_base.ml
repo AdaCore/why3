@@ -62,6 +62,7 @@ let convert_record l =
 
 type json =
   | Record of json Mstr.t
+  | Proj of json Mstr.t
   | List of json list
   | String of string
   | Int of int
@@ -72,6 +73,7 @@ type json =
 let rec print_json fmt v =
   match v with
   | Record r -> map_bindings (fun x -> x) print_json fmt (Mstr.bindings r)
+  | Proj p -> map_bindings (fun x -> x) print_json fmt (Mstr.bindings p)
   | List l -> list print_json fmt l
   | String s -> string fmt s
   | Int i -> int fmt i

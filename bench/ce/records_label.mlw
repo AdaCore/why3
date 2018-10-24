@@ -1,0 +1,32 @@
+
+
+module Old
+
+  use int.Int
+
+  type r = {mutable f : int; mutable g : bool}
+
+  val y : r
+
+  let record_old_test1 (x : r) : unit
+    ensures { old (x.f + y.f) = x.f }
+  =
+    x.f <- 6
+    
+  let record_at_test2 (x : r) : unit
+  =
+    label L in
+    x.f <- 6;
+    label M in
+    x.f <- 12;
+    assert { x.f at L = ((x.f + x.f + 1) at M + x.f + y.f)}
+
+  let several_hats (x : r): unit
+  = 
+    label L in
+    label M in
+    x.f <- 6;
+    (* Here, the counterexample variable should mention both M and L *)
+    assert { x.f at L  = x.f at M + 1}
+
+end

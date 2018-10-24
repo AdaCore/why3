@@ -135,10 +135,14 @@ type info = {
   info_version : version;
   meta_model_projection : Sls.t;
   mutable list_records : ((string * string) list) Mstr.t;
+  (* For algebraic type counterexamples: constructors with no arguments can be
+     misunderstood for variables *)
+  mutable noarg_constructors: string list;
   info_cntexample_need_push : bool;
   info_cntexample: bool;
   info_incremental: bool;
   info_set_incremental: bool;
+  mutable info_labels: Sattr.t Mstr.t;
   mutable incr_list: (prsymbol * term) list;
 }
 
@@ -253,18 +257,23 @@ let rec print_term info fmt t =
         (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
-	    let vc_term_info = info.info_vc_term in
-	    if vc_term_info.vc_inside then begin
-	      match vc_term_info.vc_loc with
-	      | None -> ()
-	      | Some loc ->
+
+            let str_ls = sprintf "%a" (print_ident info) ls.ls_name in
+            let cur_var = info.info_labels in
+            let new_var = update_info_labels  str_ls cur_var t ls in
+            let () = info.info_labels <- new_var in
+            let vc_term_info = info.info_vc_term in
+            if vc_term_info.vc_inside then begin
+              match vc_term_info.vc_loc with
+              | None -> ()
+              | Some loc ->
                 let attrs = (* match vc_term_info.vc_func_name with
                   | None -> *)
                     ls.ls_name.id_attrs
                   (* | Some _ ->
                     model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
                    *)
-in
+                in
 		let _t_check_pos = t_attr_set ~loc attrs t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
@@ -322,7 +331,8 @@ and print_fmla info fmt f =
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) f fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
-          | [] -> print_ident info fmt ls.ls_name
+          | [] ->
+              print_ident info fmt ls.ls_name
           | _ -> fprintf fmt "(%a@ %a)"
               (print_ident info) ls.ls_name
               (print_list space (print_term info)) tl
@@ -568,13 +578,19 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
                                 vc_term_loc = vc_loc;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
-                                Printer.list_records = info.list_records}
+                                Printer.list_records = info.list_records;
+                                noarg_constructors = info.noarg_constructors;
+                                set_str = info.info_labels;
+                              }
   | Plemma -> assert false
 
 let print_constructor_decl info fmt (ls,args) =
   let field_names =
     (match args with
-    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name; []
+    | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name;
+        let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
+        info.noarg_constructors <- cons_name :: info.noarg_constructors;
+        []
     | _ ->
         fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
         let field_names, _ =
@@ -698,12 +714,14 @@ let print_task version args ?old:_ fmt task =
     info_version = version;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
     list_records = Mstr.empty;
+    noarg_constructors = [];
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;
     (* info_set_incremental add the incremental option to the header. It is not
        needed for some provers
     *)
+    info_labels = Mstr.empty;
     info_set_incremental = not need_push && incremental;
     incr_list = [];
     }

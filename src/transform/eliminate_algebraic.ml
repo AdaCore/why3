@@ -271,6 +271,13 @@ let meta_proj =
            given@ constructor@ at@ the@ specified@ position.@ \
            For@ internal@ use."
 
+(* Adding meta so that counterexamples consider this new projection as a
+   counterexample projection. This allow counterexamples to appear for
+   these values.
+*)
+let add_meta_cnt tsk ls =
+  add_meta tsk meta_projection [MAls ls]
+
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
   let pj_add (m,tsk) (cs,pl) =
@@ -294,6 +301,7 @@ let add_projections (state,task) _ts _ty csl =
       let ax = t_forall_close (List.rev vl) [] (t_equ hh t) in
       let mal = [MAls ls; MAls cs; MAint (!c - 1); MApr pr] in
       let tsk = add_prop_decl tsk Paxiom pr ax in
+      let tsk = add_meta_cnt tsk ls in
       let tsk = if state.keep_t then add_meta tsk meta_proj mal else tsk in
       ls::pjl, tsk
     in

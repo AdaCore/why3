@@ -203,6 +203,25 @@
     "Symbol %s cannot be user-defined. User-defined symbol cannot use ' \
       before a letter. You can only use ' followed by _ or a number."
 
+  let add_record_projections (d: Ptree.decl) =
+    let meta_id = {id_str = Theory.(meta_projection.meta_name);
+                   id_ats = [];
+                   id_loc = Loc.dummy_position}
+    in
+    match d with
+    | Dtype dl ->
+        List.iter (fun td ->
+          match td.td_def with
+          | TDrecord fl ->
+              List.iter (fun field ->
+                let m = Dmeta (meta_id, [Mfs (Qident field.f_ident)]) in
+                Typing.add_decl field.f_loc m
+                )
+                fl
+          | _ -> ()
+          )
+          dl
+    | _ -> ()
 %}
 
 (* Tokens *)
@@ -326,7 +345,9 @@ module_decl:
 | IMPORT uqualid
     { Typing.import_scope (floc $startpos $endpos) $2 }
 | d = pure_decl | d = prog_decl | d = meta_decl
-    { Typing.add_decl (floc $startpos $endpos) d }
+    { Typing.add_decl (floc $startpos $endpos) d;
+      add_record_projections d
+    }
 | use_clone { () }
 
 (* Use and clone *)

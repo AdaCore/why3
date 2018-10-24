@@ -9,9 +9,20 @@
 (*                                                                  *)
 (********************************************************************)
 
+
 open Wstdlib
 
 type variable = string
+
+(* Simple counterexample that already represent a complete value *)
+type simple_value =
+  | Integer of string
+  | Decimal of (string * string)
+  | Fraction of (string * string)
+  | Float of Model_parser.float_type
+  | Other of string
+  | Bitvector of string
+  | Boolean of bool
 
 type array =
   | Array_var of variable
@@ -19,87 +30,28 @@ type array =
   | Store of array * term * term
 
 and term =
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of Model_parser.float_type
+  | Sval of simple_value
   | Apply of (string * term list)
-  | Other of string
   | Array of array
-  | Bitvector of string
-  | Boolean of bool
   | Cvc4_Variable of variable
   | Function_Local_Variable of variable
   | Variable of variable
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
+  (* TODO remove tree *)
+  | Trees of (string * term) list
 
 type definition =
   | Function of (variable * string option) list * term
   | Term of term
   | Noelement
 
-(* Type returned by parsing of model.
-   An hashtable that makes a correspondence between names (string) and
-   associated definition (complex stuff) *)
-type correspondence_table = (bool * definition) Mstr.t
-
-let print_float fmt f =
-  match f with
-  | Model_parser.Plus_infinity -> Format.fprintf fmt "Plus_infinity"
-  | Model_parser.Minus_infinity -> Format.fprintf fmt "Minus_infinity"
-  | Model_parser.Plus_zero -> Format.fprintf fmt "Plus_zero"
-  | Model_parser.Minus_zero -> Format.fprintf fmt "Minus_zero"
-  | Model_parser.Not_a_number -> Format.fprintf fmt "NaN"
-  | Model_parser.Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
-  | Model_parser.Float_hexa(s,f) -> Format.fprintf fmt "%s (%g)" s f
-
-let rec print_array fmt a =
-  match a with
-  | Array_var v -> Format.fprintf fmt "ARRAY_VAR : %s" v
-  | Const t -> Format.fprintf fmt "CONST : %a" print_term t
-  | Store (a, t1, t2) ->
-      Format.fprintf fmt "STORE : %a %a %a"
-        print_array a print_term t1 print_term t2
-
-(* Printing function for terms *)
-and print_term fmt t =
-  match t with
-  | Integer s -> Format.fprintf fmt "Integer: %s" s
-  | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
-  | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
-  | Float f -> Format.fprintf fmt "Float: %a" print_float f
-  | Apply (s, lt) ->
-      Format.fprintf fmt "Apply: (%s, %a)" s
-        (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma print_term)
-        lt
-  | Other s -> Format.fprintf fmt "Other: %s" s
-  | Array a -> Format.fprintf fmt "Array: %a" print_array a
-  | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv
-  | Boolean _b -> Format.fprintf fmt "Boolean"
-  | Cvc4_Variable cvc -> Format.fprintf fmt "CVC4VAR: %s" cvc
-  | Function_Local_Variable v -> Format.fprintf fmt "LOCAL: %s" v
-  | Variable v -> Format.fprintf fmt "VAR: %s" v
-  | Ite _ -> Format.fprintf fmt "ITE"
-  | Record (n, l) ->
-      Format.fprintf fmt "record_type: %s; list_fields: %a" n
-        (Pp.print_list Pp.semi
-           (fun fmt (x, a) -> Format.fprintf fmt "(%s, %a)" x print_term a))
-        l
-  | To_array t -> Format.fprintf fmt "TO_array: %a@." print_term t
-
-let print_def fmt d =
-  match d with
-  | Function (_vars, t) -> Format.fprintf fmt "FUNCTION : %a" print_term t
-  | Term t -> Format.fprintf fmt "TERM : %a" print_term t
-  | Noelement -> Format.fprintf fmt "NOELEMENT"
-
-let add_element x (t: correspondence_table) b =
+let add_element x (t: definition Mstr.t) =
   match x with
   | None -> t
   | Some (key, value) ->
-      Mstr.add key (b, value) t
+      Mstr.add key value t
 
 exception Bad_local_variable
 
@@ -150,19 +102,17 @@ and make_local vars_lists t =
   | Apply (s, lt) ->
     let lt = List.map (make_local vars_lists) lt in
     Apply (s, lt)
-  | Integer _ | Decimal _ | Fraction _ | Float _ | Other _ -> t
-  | Bitvector _ -> t
+  | Sval v -> Sval v
   | Cvc4_Variable _ -> raise Bad_local_variable
-  | Boolean _ -> t
   | Function_Local_Variable _ -> raise Bad_local_variable
   | Record (n, l) -> Record (n, List.map (fun (f, x) -> f, make_local vars_lists x) l)
   | To_array t -> To_array (make_local vars_lists t)
+  (* TODO tree does not exist yet *)
+  | Trees t -> Trees t
 
 let rec subst var value t =
   match t with
-  | Integer _ | Decimal _ | Fraction _ | Float _
-    | Other _ | Bitvector _ | Boolean _ ->
-      t
+  | Sval v -> Sval v
   | Array a -> Array (subst_array var value a)
   | Cvc4_Variable _ -> raise Bad_local_variable
   | Function_Local_Variable _ -> t
@@ -178,7 +128,8 @@ let rec subst var value t =
  | To_array t -> To_array (subst var value t)
  | Apply (s, lt) ->
      Apply (s, List.map (subst var value) lt)
-
+ (* Tree does not exists yet *)
+ | Trees t -> Trees t
 
 and subst_array var value a =
   match a with

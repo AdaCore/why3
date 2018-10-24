@@ -1,0 +1,65 @@
+
+module Array
+
+
+  use int.Int
+  use map.Map
+
+  type array = private {
+    mutable ghost elts : int -> int;
+                length : int
+  } invariant { 0 <= length }
+
+  function ([]) (a: array) (i: int) : int = a.elts i
+
+  val ([]) (a: array) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { result = a[i] }
+
+  val ghost function ([<-]) (a: array) (i: int) (v: int): array
+    ensures { result.length = a.length }
+    ensures { result.elts = Map.set a.elts i v }
+
+  val ([]<-) (a: array) (i: int) (v: int) : unit writes {a}
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { a.elts = Map.set (old a).elts i v }
+    ensures  { a = (old a)[i <- v] }
+
+end
+
+module A
+
+  use int.Int
+  use Array
+
+  let f1 (a:array) : int
+  = a[0]
+
+  let f2 (a:array) : unit
+    requires { a.length >= 2 }
+    ensures { a[0] <> a[1] }
+  = a[0] <- 42
+
+end
+
+(*
+module B
+
+  use int.Int
+  use array.Array
+  clone array.Sorted with
+    type elt=int,
+    predicate le=(<=)
+
+
+  let f1 (a:array int) : unit
+    ensures { sorted a }
+  = ()
+
+
+  let f2 (a:array int) : array int
+    ensures { sorted result }
+  = a
+
+end
+*)

@@ -34,6 +34,7 @@ type model_value =
  | Boolean of bool
  | Array of model_array
  | Record of model_record
+ | Proj of model_proj
  | Bitvector of string
  | Apply of string * model_value list
  | Unparsed of string
@@ -45,6 +46,8 @@ and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
+and model_proj = (proj_name * model_value)
+and proj_name = string
 and model_record = (field_name * model_value) list
 and field_name = string
 
@@ -98,19 +101,20 @@ type model_element_name = {
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name     : model_element_name;
+  me_name       : model_element_name;
     (** Information about the name of the model element  *)
-  me_value    : model_value;
+  me_value      : model_value;
     (** Counter-example value for the element. *)
-  me_location : Loc.position option;
+  me_location   : Loc.position option;
     (** Source-code location of the element. *)
-  me_term     : Term.term option;
+  me_term       : Term.term option;
     (** Why term corresponding to the element.  *)
 }
 
 val create_model_element :
-  name     : string ->
-  value    : model_value ->
+  name      : string ->
+  value     : model_value ->
+  attrs     : Ident.Sattr.t ->
   ?location : Loc.position ->
   ?term     : Term.term ->
   unit ->
@@ -330,11 +334,16 @@ type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
   Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
-    string -> model_element list
-(** Parses the input string into model elements. It contains the list of
-    projections and a map associating the name of printed projections to the
-    fields (couple of printed field and model_trace name) that are collected in
-    the task.
+    string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
+(** Parses the input string into model elements.
+    [raw_model_parser: proj->record_map->noarg_cons->s->mel]
+    [proj]: is the list of projections
+    [record_map]: is a map associating the name of printed projections to the
+      fields (couple of printed field and model_trace name).
+    [noarg_cons]: List of constructors with no arguments (collected to avoid
+      confusion between variable and constructors)
+    [s]: model
+    [mel]: collected model
  *)
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit

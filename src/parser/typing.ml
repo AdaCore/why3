@@ -285,19 +285,25 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
   in
   let qualid_app q el = match gvars at q with
     | Some v ->
-        begin match at with
-        | Some l -> (* check for impact *)
-            let u = Opt.get (gvars None q) in
-            if not (pv_equal v u) then
-              Hstr.replace at_uses l true
-        | None -> ()
-        end;
+        let attrs = match at with
+          | Some l -> (* check for impact *)
+              let u = Opt.get (gvars None q) in
+              if pv_equal v u then Sattr.empty else begin
+                let attr = create_attribute ("at:" ^ l) in
+                Hstr.replace at_uses l true;
+                Sattr.singleton attr
+              end
+          | None -> Sattr.empty
+        in
+        let e = DTgvar v.pv_vs in
+        let e = if Sattr.is_empty attrs then e else
+          DTattr (Dterm.dterm crcmap ~loc e, attrs) in
         if vs_dref v.pv_vs then
+          let e = Dterm.dterm crcmap ~loc e in
           let loc = qloc q and ls = Pmodule.ls_ref_proj in
-          let e = Dterm.dterm crcmap ~loc (DTgvar v.pv_vs) in
           apply_ls loc ls [] ls.ls_args ((loc, e)::el)
         else
-          func_app (DTgvar v.pv_vs) el
+          func_app e el
     | None ->
         let ls = find_lsymbol_ns ns q in
         apply_ls (qloc q) ls [] ls.ls_args el

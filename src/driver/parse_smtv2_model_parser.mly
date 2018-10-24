@@ -10,9 +10,10 @@
 (********************************************************************)
 
 %{
+open Smt2_model_defs
 %}
 
-%start <Smt2_model_defs.correspondence_table> output
+%start <Smt2_model_defs.definition Wstdlib.Mstr.t> output
 %token <string> ATOM
 %token MODEL
 %token STORE
@@ -55,8 +56,8 @@ output:
 | LPAREN MODEL list_decls RPAREN { $3 }
 
 list_decls:
-| LPAREN decl RPAREN { Smt2_model_defs.add_element $2 Wstdlib.Mstr.empty false}
-| LPAREN decl RPAREN list_decls { Smt2_model_defs.add_element $2 $4 false }
+| LPAREN decl RPAREN { add_element $2 Wstdlib.Mstr.empty}
+| LPAREN decl RPAREN list_decls { add_element $2 $4 }
 | COMMENT list_decls  { $2 } (* Lines beginning with ';' are ignored *)
 
 (* Examples:
@@ -68,8 +69,8 @@ list_decls:
 decl:
 | DEFINE_FUN name LPAREN args_lists RPAREN
     ireturn_type smt_term
-    { let t = Smt2_model_defs.make_local $4 $7 in
-        Some ($2, (Smt2_model_defs.Function ($4, t))) }
+    { let t = make_local $4 $7 in
+        Some ($2, (Function ($4, t))) }
 | DECLARE_SORT isort_def { None }
 | DECLARE_DATATYPES idata_def { None }
 (* z3 declare function *)
@@ -77,32 +78,32 @@ decl:
 | FORALL LPAREN args_lists RPAREN smt_term { None } (* z3 cardinality *)
 
 smt_term:
-| name      { Smt2_model_defs.Variable $1  }
-| integer   { Smt2_model_defs.Integer $1   }
-| decimal   { Smt2_model_defs.Decimal $1   }
-| fraction  { Smt2_model_defs.Fraction $1  }
-| array     { Smt2_model_defs.Array $1     }
-| bitvector { Smt2_model_defs.Bitvector $1 }
-| boolean   { Smt2_model_defs.Boolean $1   }
+| name      { Variable $1         }
+| integer   { Sval (Integer $1)   }
+| decimal   { Sval (Decimal $1)   }
+| fraction  { Sval (Fraction $1)  }
+| array     { Array $1            }
+| bitvector { Sval (Bitvector $1) }
+| boolean   { Sval (Boolean $1)   }
 (* z3 sometimes answer with boolean expressions for some reason ? *)
-| boolean_expression { Smt2_model_defs.Other "" }
-| FLOAT_VALUE { Smt2_model_defs.Float $1 }
+| boolean_expression { Sval (Other "") }
+| FLOAT_VALUE { Sval (Float $1) }
 (* ite (= ?a ?b) ?c ?d *)
 | LPAREN ITE pair_equal smt_term smt_term RPAREN
     {  match $3 with
-    | None -> Smt2_model_defs.Other ""
-    | Some (t1, t2) -> Smt2_model_defs.Ite (t1, t2, $4, $5) }
+    | None -> Sval (Other "")
+    | Some (t1, t2) -> Ite (t1, t2, $4, $5) }
 (* No parsable value are applications. *)
 | application { $1 }
 
 (* Particular case for functions that are defined as an equality:
    define-fun f ((a int) (b int)) (= a b) *)
-| LPAREN EQUAL list_smt_term RPAREN { Smt2_model_defs.Other "" }
+| LPAREN EQUAL list_smt_term RPAREN { Sval (Other "") }
 | LPAREN LET LPAREN list_let RPAREN smt_term RPAREN
-    { Smt2_model_defs.substitute $4 $6 }
+    { substitute $4 $6 }
 (* z3 specific constructor *)
 | LPAREN UNDERSCORE AS_ARRAY name RPAREN
-    { Smt2_model_defs.To_array (Smt2_model_defs.Variable $4) }
+    { To_array (Variable $4) }
 
 
 (* value of let are not used *)
@@ -129,11 +130,11 @@ list_smt_term:
 | list_smt_term smt_term { $2 :: $1}
 
 application:
-| LPAREN name list_smt_term RPAREN { Smt2_model_defs.Apply($2, List.rev $3) }
-| LPAREN binop smt_term smt_term RPAREN { Smt2_model_defs.Apply($2, [$3;$4]) }
+| LPAREN name list_smt_term RPAREN { Apply ($2, List.rev $3) }
+| LPAREN binop smt_term smt_term RPAREN { Apply ($2, [$3;$4]) }
 (* This should not happen in relevant part of the model *)
 | LPAREN INT_TO_BV smt_term RPAREN {
-  Smt2_model_defs.Apply($2, [$3]) }
+  Apply ($2, [$3]) }
 
 
 binop:
@@ -145,20 +146,20 @@ array:
 | LPAREN
     LPAREN AS CONST ireturn_type
     RPAREN smt_term
-  RPAREN{ Smt2_model_defs.Const $7 }
+  RPAREN{ Const $7 }
 | LPAREN
     STORE array smt_term smt_term
-  RPAREN { Smt2_model_defs.Store ($3, $4, $5) }
+  RPAREN { Store ($3, $4, $5) }
 | LPAREN
     STORE name smt_term smt_term
-  RPAREN { Smt2_model_defs.Store (Smt2_model_defs.Array_var $3, $4, $5) }
+  RPAREN { Store (Array_var $3, $4, $5) }
 (* When array is of type int -> bool, Cvc4 returns something that looks like:
    (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
 | LPAREN
     ARRAY_LAMBDA
     LPAREN LAMBDA LPAREN args_lists RPAREN smt_term
   RPAREN RPAREN
-    { Smt2_model_defs.Const $8 }
+    { Const $8 }
 
 args_lists:
 | { [] }
