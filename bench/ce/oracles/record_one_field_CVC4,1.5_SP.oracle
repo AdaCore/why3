@@ -1,0 +1,148 @@
+Strongest Postcondition
+bench/ce/record_one_field.mlw Ref VC ref1: Valid
+bench/ce/record_one_field.mlw Ref VC ref11: Valid
+bench/ce/record_one_field.mlw Ref VC ref11: Valid
+bench/ce/record_one_field.mlw Ref VC prefix !: Valid
+bench/ce/record_one_field.mlw Ref VC infix :=: Valid
+bench/ce/record_one_field.mlw Ref VC infix :=: Valid
+bench/ce/record_one_field.mlw M VC test_post: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 24:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "1" }
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "0" } }
+Line 25:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "1" }
+y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "0" } }
+
+bench/ce/record_one_field.mlw M VC test_post2: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 29:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "43" }
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "42" } }
+Line 31:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "43" }
+y, [[@introduced],
+[@model_trace:y]] = {"proj_name" : "contents" , "type" : "Proj" ,
+"value" : {"type" : "Integer" , "val" : "42" } }
+y at 'Old, [[@introduced],
+[@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "42" } }
+
+bench/ce/record_one_field.mlw M VC incr: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 39:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+Line 41:
+x23, [[@introduced], [@model_trace:x23],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+Line 42:
+x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+x23 at 'Old, [[@introduced], [@at:'Old], [@model_trace:x23],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+
+bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 39:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+Line 49:
+x, [[@introduced], [@model_trace:x],
+[@at:'Old:loc:location],
+[@at:L:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+Line 56:
+x at L, [[@introduced], [@model_trace:x], [@at:L],
+[@at:L:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+x at M, [[@introduced], [@model_trace:x], [@at:M],
+[@at:M:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+x, [[@introduced],
+[@model_trace:x]] = {"proj_name" : "contents" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "2" } }
+
+bench/ce/record_one_field.mlw M VC test_loop: Valid
+bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 39:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "3" } }
+Line 49:
+x, [[@introduced], [@model_trace:x],
+[@at:'Old:loc:location],
+[@at:L:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "3" } }
+Line 56:
+x at L, [[@introduced], [@model_trace:x], [@at:L],
+[@at:L:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "3" } }
+x at M, [[@introduced], [@model_trace:x], [@at:M],
+[@at:M:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "3" } }
+x, [[@introduced],
+[@model_trace:x]] = {"proj_name" : "contents" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "3" } }
+
+bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File record_one_field.mlw:
+Line 39:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "-2" } }
+Line 49:
+x, [[@introduced], [@model_trace:x],
+[@at:'Old:loc:location],
+[@at:L:loc:location],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "-2" } }
+Line 50:
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "-2" } }
+x at 'Old, [[@introduced], [@model_trace:x], [@at:'Old],
+[@at:'Old:loc:location] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "-2" } }
+
